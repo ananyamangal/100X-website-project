@@ -22,7 +22,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const db = client.db();
     const result = await db.collection("products").findOneAndUpdate(
       { _id: new ObjectId(params.id) },
-      { $set: { ...productData, inStock: true, updatedAt: new Date().toISOString() } },
+      { $set: { ...productData, updatedAt: new Date().toISOString() } },
       { returnDocument: "after" }
     );
     if (!result.value) return NextResponse.json({ error: "Not found" }, { status: 404 });

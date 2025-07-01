@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
     const now = new Date().toISOString()
     const newProduct = {
       ...productData,
-      inStock: true,
       createdAt: now,
       updatedAt: now,
     }
