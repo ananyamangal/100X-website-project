@@ -556,7 +556,7 @@ function ProductForm({
     e.preventDefault()
     const productData = {
       ...formData,
-      inStock: !!formData.inStock,
+      inStock: true,
       features: formData.features.split("\n").filter((f) => f.trim()),
       specifications: formData.specifications.split("\n").filter((s) => s.trim()),
       applications: formData.applications.split("\n").filter((a) => a.trim()),
@@ -648,18 +648,6 @@ function ProductForm({
                 onChange={(e) => setFormData({ ...formData, reviewsCount: Number.parseInt(e.target.value) })}
                 required
               />
-            </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="inStock"
-                checked={formData.inStock}
-                onChange={(e) => setFormData({ ...formData, inStock: e.target.checked })}
-                className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-              />
-              <label htmlFor="inStock" className="text-sm font-medium text-gray-700">
-                In Stock
-              </label>
             </div>
           </div>
 
