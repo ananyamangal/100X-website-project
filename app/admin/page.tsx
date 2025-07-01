@@ -556,6 +556,7 @@ function ProductForm({
     e.preventDefault()
     const productData = {
       ...formData,
+      inStock: !!formData.inStock,
       features: formData.features.split("\n").filter((f) => f.trim()),
       specifications: formData.specifications.split("\n").filter((s) => s.trim()),
       applications: formData.applications.split("\n").filter((a) => a.trim()),
