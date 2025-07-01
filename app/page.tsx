@@ -355,86 +355,76 @@ Please follow up with detailed information.`
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products
-              .filter((product) => product.inStock)
-              .map((product, index) => (
-                <Card
-                  key={index}
-                  className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg"
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={product.imageUrl || "/placeholder.svg"}
-                      alt={product.name}
-                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute top-4 left-4">
-                      <Badge
-                        className={`${
-                          product.badge === "Best Seller"
-                            ? "bg-red-500 hover:bg-red-600"
-                            : product.badge === "Eco-Friendly"
-                              ? "bg-green-500 hover:bg-green-600"
-                              : product.badge === "New Launch"
-                                ? "bg-blue-500 hover:bg-blue-600"
-                                : "bg-orange-500 hover:bg-orange-600"
-                        }`}
-                      >
-                        {product.badge}
-                      </Badge>
+            {products.map((product, index) => (
+              <Card
+                key={index}
+                className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg"
+              >
+                <div className="relative overflow-hidden">
+                  <img
+                    src={product.imageUrl || "/placeholder.svg"}
+                    alt={product.name}
+                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <Badge
+                      className={`bg-green-500 hover:bg-green-600`}
+                    >
+                      In Stock
+                    </Badge>
+                  </div>
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
+                    <div className="flex items-center space-x-1">
+                      <Star className="text-yellow-400 fill-current" size={16} />
+                      <span className="text-sm font-semibold">{product.rating}</span>
+                      <span className="text-xs text-gray-600">({product.reviewsCount})</span>
                     </div>
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
-                      <div className="flex items-center space-x-1">
-                        <Star className="text-yellow-400 fill-current" size={16} />
-                        <span className="text-sm font-semibold">{product.rating}</span>
-                        <span className="text-xs text-gray-600">({product.reviewsCount})</span>
-                      </div>
+                  </div>
+                </div>
+
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-xl font-bold text-gray-800 group-hover:text-green-600 transition-colors">
+                      {product.name}
+                    </h3>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-green-600">{product.priceRange}</div>
                     </div>
                   </div>
 
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-xl font-bold text-gray-800 group-hover:text-green-600 transition-colors">
-                        {product.name}
-                      </h3>
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-green-600">{product.priceRange}</div>
+                  <p className="text-gray-600 mb-4 line-clamp-2">{product.detailedDescription}</p>
+
+                  <div className="space-y-2 mb-6">
+                    {product.features.slice(0, 3).map((feature, idx) => (
+                      <div key={idx} className="flex items-center text-sm text-gray-600">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-3"></div>
+                        {feature}
                       </div>
-                    </div>
+                    ))}
+                  </div>
 
-                    <p className="text-gray-600 mb-4 line-clamp-2">{product.detailedDescription}</p>
-
-                    <div className="space-y-2 mb-6">
-                      {product.features.slice(0, 3).map((feature, idx) => (
-                        <div key={idx} className="flex items-center text-sm text-gray-600">
-                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-3"></div>
-                          {feature}
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="flex gap-3">
-                      <Button
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                        onClick={() => {
-                          setSelectedProduct(product.id ?? null)
-                          setCurrentPage("product")
-                        }}
-                      >
-                        View Details
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent"
-                        onClick={() => handleBrochureDownload(product.name)}
-                      >
-                        <Download size={16} className="mr-2" />
-                        Brochure
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                  <div className="flex gap-3">
+                    <Button
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                      onClick={() => {
+                        setSelectedProduct(product.id ?? null)
+                        setCurrentPage("product")
+                      }}
+                    >
+                      View Details
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent"
+                      onClick={() => handleBrochureDownload(product.name)}
+                    >
+                      <Download size={16} className="mr-2" />
+                      Brochure
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </section>
@@ -1221,7 +1211,7 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
           <div>
             <h2 className="text-4xl font-bold text-gray-800 mb-6">Our Journey</h2>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-            100X Circle Pvt Ltd is India’s fast-growing OEM of advanced fogging machines, agri implements, and airport ground equipment. Located at Sector 7, IMT Manesar, Gurgaon, we proudly uphold the 'Make in India' mission by delivering CE-certified, ISO 9001-compliant, and W.H.O-compliant solutions for both public and private sectors. Our brand ‘100X’ stands for innovation, reliability, and scalable performance across segments
+            100X Circle Pvt Ltd is India's fast-growing OEM of advanced fogging machines, agri implements, and airport ground equipment. Located at Sector 7, IMT Manesar, Gurgaon, we proudly uphold the 'Make in India' mission by delivering CE-certified, ISO 9001-compliant, and W.H.O-compliant solutions for both public and private sectors. Our brand '100X' stands for innovation, reliability, and scalable performance across segments
             </p>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
               Our range includes:

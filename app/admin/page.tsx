@@ -135,8 +135,6 @@ export default function AdminDashboard() {
 
   const stats = {
     totalProducts: products.length,
-    inStockProducts: products.filter((p) => p.inStock).length,
-    outOfStockProducts: products.filter((p) => !p.inStock).length,
     averageRating: products.reduce((acc, p) => acc + p.rating, 0) / products.length || 0,
     totalReviews: products.reduce((acc, p) => acc + p.reviewsCount, 0),
   }
@@ -269,20 +267,6 @@ function DashboardTab({ stats, products }: { stats: any; products: Product[] }) 
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Package className="text-blue-600" size={24} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">In Stock</p>
-                <p className="text-3xl font-bold text-green-600">{stats.inStockProducts}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Package className="text-green-600" size={24} />
               </div>
             </div>
           </CardContent>
@@ -432,9 +416,7 @@ function ProductsTab({
                       >
                         {product.badge}
                       </Badge>
-                      <Badge variant={product.inStock ? "default" : "destructive"}>
-                        {product.inStock ? "In Stock" : "Out of Stock"}
-                      </Badge>
+                      <Badge className="bg-green-100 text-green-800">In Stock</Badge>
                     </div>
                     <p className="text-gray-600 mb-2">{product.shortDescription}</p>
                     <div className="flex items-center space-x-4 text-sm text-gray-500">
