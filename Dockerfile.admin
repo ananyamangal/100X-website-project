@@ -1,0 +1,21 @@
+# Separate Docker container for admin dashboard
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy admin-specific files only
+COPY app/admin ./app/admin
+COPY app/api/admin ./app/api/admin
+COPY components ./components
+COPY lib ./lib
+
+# Build admin dashboard
+RUN npm run build
+
+EXPOSE 3001
+
+CMD ["npm", "run", "start:admin"]

@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Main website
+  website:
+    build: 
+      context: .
+      dockerfile: Dockerfile.website
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+    networks:
+      - app-network
+
+  # Admin dashboard (separate container)
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - DATABASE_URL=${DATABASE_URL}
+    networks:
+      - admin-network
+    # Only accessible from specific IPs
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  app-network:
+    driver: bridge
+  admin-network:
+    driver: bridge
+    internal: true  # No external access

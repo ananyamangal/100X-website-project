@@ -1,0 +1,1505 @@
+"use client"
+
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import {
+  Menu,
+  X,
+  Phone,
+  Mail,
+  MapPin,
+  Download,
+  MessageCircle,
+  ArrowRight,
+  Star,
+  Users,
+  Award,
+  Shield,
+  ChevronRight,
+  Play,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Youtube,
+  Calendar,
+  User,
+  Search,
+  ChevronLeft,
+  CheckCircle,
+  Target,
+  Eye,
+  Heart,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+
+// Product interface to match backend
+interface Product {
+  _id?: string;
+  id?: string;
+  name: string;
+  imageUrl: string;
+  priceRange: string;
+  rating: number;
+  reviewsCount: number;
+  shortDescription: string;
+  detailedDescription: string;
+  features: string[];
+  specifications: string[];
+  applications: string[];
+  badge: string;
+  whatsappMessageText: string;
+  category: string;
+  inStock: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export default function HomePage() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [currentPage, setCurrentPage] = useState("home")
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null)
+  const [showBrochureForm, setShowBrochureForm] = useState(false)
+  const [brochureFormData, setBrochureFormData] = useState({ name: "", phone: "", productName: "" })
+  const [products, setProducts] = useState<Product[]>([])
+
+  const heroSlides = [
+    {
+      image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&h=600&fit=crop",
+      title: "Revolutionary Fogging Technology",
+      subtitle: "Advanced pest control solutions for modern agriculture",
+    },
+    {
+      image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1200&h=600&fit=crop",
+      title: "Precision Battery Sprayers",
+      subtitle: "Eco-friendly spraying with unmatched efficiency",
+    },
+    {
+      image: "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=1200&h=600&fit=crop",
+      title: "Heavy-Duty Power Tillers",
+      subtitle: "Built for the toughest farming conditions",
+    },
+    {
+      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&h=600&fit=crop",
+      title: "Complete Agricultural Solutions",
+      subtitle: "From seeding to harvesting - we've got you covered",
+    },
+  ]
+
+  // Fetch products from API
+  useEffect(() => {
+    fetch("/api/admin/products")
+      .then(res => res.json())
+      .then(data => {
+        console.log("API data:", data); // Debug log
+        setProducts(
+          Array.isArray(data)
+            ? data.map((p: any) => ({
+                ...p,
+                id: p._id,
+                image: p.imageUrl,
+                price: p.priceRange,
+                reviews: p.reviewsCount,
+                description: p.shortDescription,
+                whatsappText: p.whatsappMessageText,
+              }))
+            : []
+        )
+      })
+  }, [])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
+    }, 4000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const blogPosts = [
+    {
+      id: 1,
+      title: "Top 10 Agricultural Equipment Maintenance Tips for 2024",
+      excerpt:
+        "Learn essential maintenance practices to extend the life of your farming equipment and maximize productivity.",
+      image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=250&fit=crop",
+      date: "2024-01-15",
+      author: "Dr. Rajesh Kumar",
+      category: "Maintenance",
+      readTime: "5 min read",
+    },
+    {
+      id: 2,
+      title: "Battery vs Fuel-Powered Sprayers: Which is Right for Your Farm?",
+      excerpt:
+        "Compare the pros and cons of battery and fuel-powered sprayers to make the best choice for your agricultural needs.",
+      image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=250&fit=crop",
+      date: "2024-01-10",
+      author: "Priya Sharma",
+      category: "Equipment Guide",
+      readTime: "7 min read",
+    },
+    {
+      id: 3,
+      title: "Precision Agriculture: How Modern Equipment is Changing Farming",
+      excerpt:
+        "Discover how precision agriculture technology is revolutionizing farming practices and increasing crop yields.",
+      image: "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=400&h=250&fit=crop",
+      date: "2024-01-05",
+      author: "Amit Singh",
+      category: "Technology",
+      readTime: "6 min read",
+    },
+    {
+      id: 4,
+      title: "Seasonal Equipment Checklist: Preparing for Monsoon Season",
+      excerpt:
+        "Essential equipment preparation tips to ensure your machinery is ready for the challenging monsoon season.",
+      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=250&fit=crop",
+      date: "2024-01-01",
+      author: "Suresh Patel",
+      category: "Seasonal Tips",
+      readTime: "4 min read",
+    },
+  ]
+
+  const stats = [
+    { number: "10,000+", label: "Happy Farmers", icon: Users },
+    { number: "50+", label: "Products", icon: Award },
+    { number: "15+", label: "States Covered", icon: MapPin },
+    { number: "24/7", label: "Support", icon: Shield },
+  ]
+
+  const whatsappNumber = "91XXXXXXXXXX"
+  const businessEmail = "info@100x.com"
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+    const name = formData.get("name")
+    const phone = formData.get("phone")
+    const email = formData.get("email")
+    const subject = formData.get("subject")
+    const message = formData.get("message")
+
+    const whatsappMessage = `New Contact Form Submission:
+Name: ${name}
+Phone: ${phone}
+Email: ${email}
+Subject: ${subject}
+Message: ${message}`
+
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`, "_blank")
+  }
+
+  const handleBrochureDownload = (productName: string) => {
+    setBrochureFormData({ ...brochureFormData, productName })
+    setShowBrochureForm(true)
+  }
+
+  const handleBrochureFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+    const name = formData.get("name") as string
+    const phone = formData.get("phone") as string
+
+    // Create dummy PDF download
+    const link = document.createElement("a")
+    link.href = "/placeholder.pdf" // This would be your actual PDF URL
+    link.download = `${brochureFormData.productName}-Brochure.pdf`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    // Send WhatsApp message
+    const whatsappMessage = `Brochure Downloaded:
+Product: ${brochureFormData.productName}
+Name: ${name}
+Phone: ${phone}
+Please follow up with detailed information.`
+
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`, "_blank")
+
+    setShowBrochureForm(false)
+    setBrochureFormData({ name: "", phone: "", productName: "" })
+    alert("Brochure download started! We'll contact you soon with more details.")
+  }
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case "blog":
+        return <BlogPage blogPosts={blogPosts} setCurrentPage={setCurrentPage} />
+      case "about":
+        return <AboutPage setCurrentPage={setCurrentPage} />
+      case "product":
+        return selectedProduct ? (
+          <ProductDetailPage
+            product={products.find((p) => p.id === selectedProduct)!}
+            setCurrentPage={setCurrentPage}
+            setSelectedProduct={setSelectedProduct}
+            onBrochureDownload={handleBrochureDownload}
+            whatsappNumber={whatsappNumber}
+          />
+        ) : (
+          renderHomePage()
+        )
+      default:
+        return renderHomePage()
+    }
+  }
+
+  const renderHomePage = () => (
+    <>
+      {/* Hero Section with Image Slider */}
+      <section id="home" className="pt-32 min-h-screen relative overflow-hidden flex items-center">
+        <div className="absolute inset-0">
+          <img
+            src={heroSlides[currentSlide].image || "/placeholder.svg"}
+            alt="Agricultural equipment"
+            className="w-full h-full object-cover transition-all duration-1000"
+          />
+          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-green-900/30 to-transparent"></div>
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 py-20">
+          <div className="max-w-4xl mx-auto text-center text-white">
+            <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
+              India's Leading Agricultural Equipment Manufacturer
+            </Badge>
+            <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
+              100X – <span className="text-green-400">Powering</span> the Fields
+            </h1>
+            <p className="text-xl md:text-2xl mb-12 text-gray-200 leading-relaxed max-w-3xl mx-auto">
+              {heroSlides[currentSlide].subtitle}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
+              <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-10 py-4">
+                <Link href="#products" className="flex items-center">
+                  Explore Products <ArrowRight className="ml-2" size={20} />
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-lg px-10 py-4 bg-transparent"
+                onClick={() =>
+                  window.open(
+                    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("I want to see a product demo")}`,
+                    "_blank",
+                  )
+                }
+              >
+                <Play className="mr-2" size={20} />
+                Watch Demo
+              </Button>
+            </div>
+
+            {/* Hero Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+              {stats.map((stat, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-green-400 mb-2">{stat.number}</div>
+                  <div className="text-sm md:text-base text-gray-300">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Slide Indicators */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
+          {heroSlides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`w-4 h-4 rounded-full transition-all ${
+                index === currentSlide ? "bg-green-400" : "bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Slide Navigation */}
+        <button
+          onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
+          className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
+        >
+          <ChevronLeft size={24} />
+        </button>
+        <button
+          onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
+          className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
+        >
+          <ChevronRight size={24} />
+        </button>
+      </section>
+
+      {/* Products Section */}
+      <section id="products" className="py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-20">
+            <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
+              Our Products
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Premium Agricultural Equipment</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Discover our comprehensive range of agricultural equipment designed to boost productivity and efficiency.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {products
+              .filter((product) => product.inStock)
+              .map((product, index) => (
+                <Card
+                  key={index}
+                  className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg"
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={product.imageUrl || "/placeholder.svg"}
+                      alt={product.name}
+                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <Badge
+                        className={`${
+                          product.badge === "Best Seller"
+                            ? "bg-red-500 hover:bg-red-600"
+                            : product.badge === "Eco-Friendly"
+                              ? "bg-green-500 hover:bg-green-600"
+                              : product.badge === "New Launch"
+                                ? "bg-blue-500 hover:bg-blue-600"
+                                : "bg-orange-500 hover:bg-orange-600"
+                        }`}
+                      >
+                        {product.badge}
+                      </Badge>
+                    </div>
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
+                      <div className="flex items-center space-x-1">
+                        <Star className="text-yellow-400 fill-current" size={16} />
+                        <span className="text-sm font-semibold">{product.rating}</span>
+                        <span className="text-xs text-gray-600">({product.reviewsCount})</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-xl font-bold text-gray-800 group-hover:text-green-600 transition-colors">
+                        {product.name}
+                      </h3>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-green-600">{product.priceRange}</div>
+                      </div>
+                    </div>
+
+                    <p className="text-gray-600 mb-4 line-clamp-2">{product.detailedDescription}</p>
+
+                    <div className="space-y-2 mb-6">
+                      {product.features.slice(0, 3).map((feature, idx) => (
+                        <div key={idx} className="flex items-center text-sm text-gray-600">
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-3"></div>
+                          {feature}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Button
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                        onClick={() => {
+                          setSelectedProduct(product.id ?? null)
+                          setCurrentPage("product")
+                        }}
+                      >
+                        View Details
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent"
+                        onClick={() => handleBrochureDownload(product.name)}
+                      >
+                        <Download size={16} className="mr-2" />
+                        Brochure
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Blog Preview Section */}
+      <section className="py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-20">
+            <Badge className="mb-6 bg-purple-100 text-purple-800 hover:bg-purple-200 text-lg px-6 py-2">
+              Latest Blog Posts
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Agricultural Insights & Tips</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Stay updated with the latest farming techniques, equipment guides, and industry insights
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {blogPosts.slice(0, 3).map((post) => (
+              <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300">
+                <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <Badge variant="secondary">{post.category}</Badge>
+                    <span className="text-sm text-gray-500">{post.readTime}</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{post.title}</h3>
+                  <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <User size={16} className="text-gray-400" />
+                      <span className="text-sm text-gray-600">{post.author}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Calendar size={16} className="text-gray-400" />
+                      <span className="text-sm text-gray-600">{new Date(post.date).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-purple-600 text-purple-600 hover:bg-purple-50 bg-transparent"
+              onClick={() => setCurrentPage("blog")}
+            >
+              View All Blog Posts <ArrowRight className="ml-2" size={20} />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Form Section */}
+      <section id="contact" className="py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-20">
+            <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
+              Get In Touch
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Contact Us</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Ready to transform your farming operations? Get in touch with our experts today!
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-8">Contact Information</h3>
+              <div className="space-y-6">
+                <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <Phone className="text-green-600" size={24} />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-800">Phone</div>
+                    <div className="text-gray-600">+91 9891258221</div>
+                    <div className="text-sm text-gray-500">Mon-Sat: 9:00 AM - 6:00 PM</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <Mail className="text-green-600" size={24} />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-800">Business Email</div>
+                    <div className="text-gray-600">{businessEmail}</div>
+                    <div className="text-sm text-gray-500">Professional webmail included</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <MapPin className="text-green-600" size={24} />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-800">Address</div>
+                    <div className="text-gray-600">123 Agricultural Hub, Industrial Area</div>
+                    <div className="text-sm text-gray-500">Your City - 123456</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Google Maps Integration */}
+              <div className="mt-8">
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">Find Us on Map</h4>
+                <div className="bg-gray-200 rounded-xl h-64 flex items-center justify-center">
+                  <div className="text-center text-gray-600">
+                    <MapPin size={48} className="mx-auto mb-4 text-green-600" />
+                    <p className="font-semibold">Google Maps Integration</p>
+                    <p className="text-sm">Interactive map will be embedded here</p>
+                    <Button
+                      className="mt-4 bg-green-600 hover:bg-green-700"
+                      onClick={() =>
+                        window.open("https://maps.google.com/maps?q=123+Agricultural+Hub+Industrial+Area", "_blank")
+                      }
+                    >
+                      View on Google Maps
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Form */}
+            <Card className="border-0 shadow-xl">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Send us a Message</h3>
+                <form onSubmit={handleContactSubmit} className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input name="firstName" placeholder="First Name" required className="p-4" />
+                    <Input name="lastName" placeholder="Last Name" required className="p-4" />
+                  </div>
+                  <Input name="phone" type="tel" placeholder="Phone Number" required className="p-4" />
+                  <Input name="email" type="email" placeholder="Email Address" required className="p-4" />
+                  <select
+                    name="subject"
+                    className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select Product Interest</option>
+                    {products.map((product) => (
+                      <option key={product.id} value={product.name}>
+                        {product.name}
+                      </option>
+                    ))}
+                    <option value="general">General Inquiry</option>
+                    <option value="support">Technical Support</option>
+                    <option value="dealer">Dealer Partnership</option>
+                  </select>
+                  <Textarea name="message" placeholder="Your Message" rows={4} required className="p-4 resize-none" />
+                  <Button type="submit" size="lg" className="w-full bg-green-600 hover:bg-green-700">
+                    Send Message via WhatsApp <MessageCircle className="ml-2" size={20} />
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 bg-gradient-to-r from-green-600 to-green-700 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Boost Your Farm's Productivity?</h2>
+          <p className="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
+            Join thousands of successful farmers who have transformed their operations with 100X equipment.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              variant="secondary"
+              className="bg-white text-green-600 hover:bg-gray-100 text-lg px-8 py-4"
+              onClick={() =>
+                window.open(
+                  `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("I'm interested in 100X agricultural equipment. Please provide more information.")}`,
+                  "_blank",
+                )
+              }
+            >
+              <MessageCircle className="mr-2" size={20} />
+              Get Free Consultation
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-2 border-white text-white hover:bg-white hover:text-green-600 text-lg px-8 py-4 bg-transparent"
+              onClick={() => handleBrochureDownload("Complete Product Catalog")}
+            >
+              <Download className="mr-2" size={20} />
+              Download Catalog
+            </Button>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Brochure Form Modal */}
+      {showBrochureForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Download Brochure</h3>
+              <p className="text-gray-600 mb-6">Please provide your details to download the brochure for:</p>
+              <p className="font-semibold text-green-600 mb-6">{brochureFormData.productName}</p>
+              <form onSubmit={handleBrochureFormSubmit} className="space-y-4">
+                <Input name="name" placeholder="Your Full Name" required className="p-3" />
+                <Input name="phone" type="tel" placeholder="Phone Number" required className="p-3" />
+                <div className="flex gap-3">
+                  <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">
+                    <Download className="mr-2" size={16} />
+                    Download Now
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowBrochureForm(false)}
+                    className="bg-transparent"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Header */}
+      <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-lg z-50 border-b">
+        {/* Top Bar */}
+        <div className="bg-green-600 text-white py-2">
+          <div className="container mx-auto px-4 flex justify-between items-center text-sm">
+            <div className="flex items-center space-x-4">
+              <span className="flex items-center">
+                <Phone size={14} className="mr-1" /> +91 XXXXXXXXXX
+              </span>
+              <span className="flex items-center">
+                <Mail size={14} className="mr-1" /> {businessEmail}
+              </span>
+            </div>
+            <div className="hidden md:flex items-center space-x-4">
+              <span>Contact Us for bulk orders</span>
+            </div>
+          </div>
+        </div>
+
+        <nav className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <button onClick={() => setCurrentPage("home")} className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-xl">100X</span>
+              </div>
+              <div className="flex flex-col">
+                <h1 className="text-2xl font-bold text-gray-800">100X</h1>
+                <span className="text-sm text-green-600 font-medium">Powering the Fields</span>
+              </div>
+            </button>
+
+            {/* Desktop Menu */}
+            <div className="hidden lg:flex items-center space-x-8">
+              <button
+                onClick={() => setCurrentPage("home")}
+                className={`font-semibold transition-colors ${
+                  currentPage === "home" ? "text-green-600" : "text-gray-700 hover:text-green-600"
+                }`}
+              >
+                Home
+              </button>
+              <Link href="#products" className="text-gray-700 hover:text-green-600 transition-colors">
+                Products
+              </Link>
+              <button
+                onClick={() => setCurrentPage("about")}
+                className={`transition-colors ${
+                  currentPage === "about" ? "text-green-600 font-semibold" : "text-gray-700 hover:text-green-600"
+                }`}
+              >
+                About Us
+              </button>
+              <Link href="#contact" className="text-gray-700 hover:text-green-600 transition-colors">
+                Contact
+              </Link>
+              <button
+                onClick={() => setCurrentPage("blog")}
+                className={`transition-colors ${
+                  currentPage === "blog" ? "text-green-600 font-semibold" : "text-gray-700 hover:text-green-600"
+                }`}
+              >
+                Blog
+              </button>
+              <Button
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => handleBrochureDownload("Complete Product Catalog")}
+              >
+                <Download size={16} className="mr-2" />
+                Brochure
+              </Button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className="lg:hidden mt-4 pb-4 border-t">
+              <div className="flex flex-col space-y-4 pt-4">
+                <button
+                  onClick={() => {
+                    setCurrentPage("home")
+                    setIsMenuOpen(false)
+                  }}
+                  className="text-left text-green-600 font-semibold"
+                >
+                  Home
+                </button>
+                <Link href="#products" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+                  Products
+                </Link>
+                <button
+                  onClick={() => {
+                    setCurrentPage("about")
+                    setIsMenuOpen(false)
+                  }}
+                  className="text-left text-gray-700"
+                >
+                  About Us
+                </button>
+                <Link href="#contact" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+                  Contact
+                </Link>
+                <button
+                  onClick={() => {
+                    setCurrentPage("blog")
+                    setIsMenuOpen(false)
+                  }}
+                  className="text-left text-gray-700"
+                >
+                  Blog
+                </button>
+              </div>
+            </div>
+          )}
+        </nav>
+      </header>
+
+      {/* Main Content */}
+      <main>{renderPage()}</main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div>
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">100X</span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">100X</h3>
+                  <p className="text-green-400 text-sm">Powering the Fields</p>
+                </div>
+              </div>
+              <p className="text-gray-400 mb-6">
+                Leading manufacturer of premium agricultural equipment with professional web solutions including free
+                hosting, SSL, and business email.
+              </p>
+              {/* Social Media Links */}
+              <div className="flex space-x-4">
+                <a
+                  href="https://facebook.com/100x"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer"
+                >
+                  <Facebook size={20} />
+                </a>
+                <a
+                  href="https://twitter.com/100x"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-400 transition-colors cursor-pointer"
+                >
+                  <Twitter size={20} />
+                </a>
+                <a
+                  href="https://instagram.com/100x"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors cursor-pointer"
+                >
+                  <Instagram size={20} />
+                </a>
+                <a
+                  href="https://linkedin.com/company/100x"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors cursor-pointer"
+                >
+                  <Linkedin size={20} />
+                </a>
+                <a
+                  href="https://youtube.com/100x"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer"
+                >
+                  <Youtube size={20} />
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-6 text-lg">Products</h4>
+              <ul className="space-y-3 text-gray-400">
+                {products.slice(0, 5).map((product) => (
+                  <li key={product.id}>
+                    <button
+                      onClick={() => {
+                        setSelectedProduct(product.id ?? null)
+                        setCurrentPage("product")
+                      }}
+                      className="hover:text-green-400 transition-colors text-left"
+                    >
+                      {product.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-6 text-lg">Quick Links</h4>
+              <ul className="space-y-3 text-gray-400">
+                <li>
+                  <button onClick={() => setCurrentPage("home")} className="hover:text-green-400 transition-colors">
+                    Home
+                  </button>
+                </li>
+                <li>
+                  <Link href="#products" className="hover:text-green-400 transition-colors">
+                    Products
+                  </Link>
+                </li>
+                <li>
+                  <button onClick={() => setCurrentPage("about")} className="hover:text-green-400 transition-colors">
+                    About Us
+                  </button>
+                </li>
+                <li>
+                  <Link href="#contact" className="hover:text-green-400 transition-colors">
+                    Contact
+                  </Link>
+                </li>
+                <li>
+                  <button onClick={() => setCurrentPage("blog")} className="hover:text-green-400 transition-colors">
+                    Blog
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-6 text-lg">Contact Info</h4>
+              <div className="space-y-4 text-gray-400">
+                <p className="flex items-center">
+                  <Phone className="mr-3" size={16} /> +91 9891258221
+                </p>
+                <p className="flex items-center">
+                  <Mail className="mr-3" size={16} /> {businessEmail}
+                </p>
+                <p className="flex items-start">
+                  <MapPin className="mr-3 mt-1" size={16} /> 123 Agricultural Hub, Industrial Area, Your City - 123456
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-400 mb-4 md:mb-0">
+              &copy; 2024 100X Agricultural Equipment. All rights reserved. | SSL Secured | Mobile Responsive
+            </p>
+            <div className="flex space-x-6 text-gray-400 text-sm">
+              <a href="#" className="hover:text-green-400 transition-colors">
+                Privacy Policy
+              </a>
+              <a href="#" className="hover:text-green-400 transition-colors">
+                Terms of Service
+              </a>
+              <a href="#" className="hover:text-green-400 transition-colors">
+                FTP Access
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* WhatsApp Floating Button */}
+      <button
+        onClick={() =>
+          window.open(
+            `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi! I'm interested in 100X agricultural equipment. Can you help me?")}`,
+            "_blank",
+          )
+        }
+        className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 z-50 animate-pulse"
+        aria-label="Contact us on WhatsApp"
+      >
+        <MessageCircle size={28} />
+      </button>
+    </div>
+  )
+}
+
+// Product Detail Page Component
+function ProductDetailPage({
+  product,
+  setCurrentPage,
+  setSelectedProduct,
+  onBrochureDownload,
+  whatsappNumber,
+}: {
+  product: any
+  setCurrentPage: (page: string) => void
+  setSelectedProduct: (id: string | null) => void
+  onBrochureDownload: (productName: string) => void
+  whatsappNumber: string
+}) {
+  return (
+    <div className="pt-32 min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-12">
+        {/* Breadcrumb */}
+        <div className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
+          <button onClick={() => setCurrentPage("home")} className="hover:text-green-600">
+            Home
+          </button>
+          <ChevronRight size={16} />
+          <span>Products</span>
+          <ChevronRight size={16} />
+          <span className="text-green-600">{product.name}</span>
+        </div>
+
+        {/* Product Header */}
+        <div className="grid lg:grid-cols-2 gap-12 mb-16">
+          <div>
+            <img
+              src={product.imageUrl || "/placeholder.svg"}
+              alt={product.name}
+              className="w-full rounded-2xl shadow-2xl"
+            />
+          </div>
+          <div>
+            <Badge
+              className={`mb-4 ${
+                product.badge === "Best Seller"
+                  ? "bg-red-500 hover:bg-red-600"
+                  : product.badge === "Eco-Friendly"
+                    ? "bg-green-500 hover:bg-green-600"
+                    : product.badge === "New Launch"
+                      ? "bg-blue-500 hover:bg-blue-600"
+                      : "bg-orange-500 hover:bg-orange-600"
+              }`}
+            >
+              {product.badge}
+            </Badge>
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">{product.name}</h1>
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="flex items-center space-x-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`${i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                    size={20}
+                  />
+                ))}
+                <span className="ml-2 text-lg font-semibold">{product.rating}</span>
+                <span className="text-gray-600">({product.reviewsCount} reviews)</span>
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-green-600 mb-6">{product.priceRange}</div>
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">{product.detailedDescription}</p>
+
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <Button
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 flex-1"
+                onClick={() =>
+                  window.open(
+                    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`I'm interested in ${product.name}. Please share detailed pricing and availability.`)}`,
+                    "_blank",
+                  )
+                }
+              >
+                <MessageCircle className="mr-2" size={20} />
+                Get Quote on WhatsApp
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent"
+                onClick={() => onBrochureDownload(product.name)}
+              >
+                <Download className="mr-2" size={20} />
+                Download Brochure
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Product Details Tabs */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
+          <div className="grid md:grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">Key Features</h3>
+              <div className="space-y-4">
+                {product.features.map((feature: string, index: number) => (
+                  <div key={index} className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg">
+                    <CheckCircle className="text-green-600" size={20} />
+                    <span className="text-gray-700 font-medium">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">Technical Specifications</h3>
+              <div className="space-y-3">
+                {product.specifications.map((spec: string, index: number) => (
+                  <div key={index} className="flex justify-between items-center py-3 border-b border-gray-200">
+                    <span className="text-gray-600">{spec.split(":")[0]}:</span>
+                    <span className="font-semibold text-gray-800">{spec.split(":")[1]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Applications */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
+          <h3 className="text-2xl font-bold text-gray-800 mb-6">Applications</h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {product.applications.map((application: string, index: number) => (
+              <div key={index} className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-gray-700">{application}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Contact Section */}
+        <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 text-white text-center">
+          <h3 className="text-3xl font-bold mb-4">Ready to Purchase?</h3>
+          <p className="text-xl mb-8 opacity-90">
+            Get in touch with our experts for detailed pricing, customization options, and delivery information.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              variant="secondary"
+              className="bg-white text-green-600 hover:bg-gray-100"
+              onClick={() =>
+                window.open(
+                  `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`I want to purchase ${product.name}. Please provide detailed information about pricing, delivery, and payment options.`)}`,
+                  "_blank",
+                )
+              }
+            >
+              <MessageCircle className="mr-2" size={20} />
+              Contact Sales Team
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-2 border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
+              onClick={() => onBrochureDownload(product.name)}
+            >
+              <Download className="mr-2" size={20} />
+              Download Technical Specs
+            </Button>
+          </div>
+        </div>
+
+        {/* Back to Products */}
+        <div className="text-center mt-12">
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => {
+              setSelectedProduct(null)
+              setCurrentPage("home")
+            }}
+            className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent"
+          >
+            <ChevronLeft className="mr-2" size={20} />
+            Back to Products
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// About Page Component
+function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void }) {
+  const milestones = [
+    { year: "2015", title: "Company Founded", description: "Started with a vision to revolutionize agriculture" },
+    { year: "2017", title: "First 1000 Customers", description: "Reached our first major milestone" },
+    { year: "2019", title: "National Expansion", description: "Expanded operations across 10 states" },
+    { year: "2021", title: "Technology Innovation", description: "Launched precision agriculture solutions" },
+    { year: "2023", title: "10,000+ Farmers", description: "Serving over 10,000 satisfied farmers" },
+    {
+      year: "2024",
+      title: "Digital Transformation",
+      description: "Complete web solutions for agricultural businesses",
+    },
+  ]
+
+  const values = [
+    {
+      icon: Target,
+      title: "Mission",
+      description:
+        "To empower farmers with innovative, reliable, and affordable agricultural equipment that enhances productivity, reduces labor intensity, and contributes to sustainable farming practices.",
+    },
+    {
+      icon: Eye,
+      title: "Vision",
+      description:
+        "To be the leading provider of agricultural equipment solutions, driving the transformation of farming practices through technology, innovation, and unwavering commitment to farmer success.",
+    },
+    {
+      icon: Heart,
+      title: "Values",
+      description:
+        "Quality, integrity, innovation, and customer-centricity form the foundation of everything we do. We believe in building lasting relationships based on trust and mutual success.",
+    },
+  ]
+
+  const team = [
+    {
+      name: "Rajesh Kumar",
+      position: "Founder & CEO",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
+      description: "20+ years experience in agricultural engineering and business development.",
+    },
+    {
+      name: "Priya Sharma",
+      position: "Head of Engineering",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=300&h=300&fit=crop&crop=face",
+      description: "Expert in precision agriculture technology and product development.",
+    },
+    {
+      name: "Amit Singh",
+      position: "Operations Director",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face",
+      description: "Specialist in supply chain management and quality control.",
+    },
+  ]
+
+  return (
+    <div className="pt-32 min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-12">
+        {/* About Header */}
+        <div className="text-center mb-20">
+          <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">Our Story</Badge>
+          <h1 className="text-5xl font-bold text-gray-800 mb-6">About 100X Circle Pvt Ltd</h1>
+        
+        </div>
+
+        {/* Company Story */}
+        <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+          <div>
+            <h2 className="text-4xl font-bold text-gray-800 mb-6">Our Journey</h2>
+            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+            100X Circle Pvt Ltd is India’s fast-growing OEM of advanced fogging machines, agri implements, and airport ground equipment. Located at Sector 7, IMT Manesar, Gurgaon, we proudly uphold the 'Make in India' mission by delivering CE-certified, ISO 9001-compliant, and W.H.O-compliant solutions for both public and private sectors. Our brand ‘100X’ stands for innovation, reliability, and scalable performance across segments
+            </p>
+            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+              Our range includes:
+            </p>
+            <ul className="text-lg text-gray-600 mb-6 leading-relaxed">
+                            <li>Thermal Fogging Machines (Portable & Vehicle-Mounted)</li>
+                            <li>Bio-Foggers for sensitive applications</li>
+                            <li>Mini Fogging Machines for compact operations</li>
+                            <li>Complete Agricultural Machinery line</li>
+                            <li>Heavy-duty Airport Baggage Trolleys</li>
+                          </ul>
+               <br></br>         
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+            Tested in approved labs, our machines are available and listed on the Government e-Marketplace (GeM) and widely used by defense forces, municipal bodies, and agriculture departments. 100X Circle is UDYAM/MSME registered and offers authorized dealership support across India.
+
+            </p>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="text-center p-6 bg-green-50 rounded-xl">
+                <div className="text-3xl font-bold text-green-600 mb-2">2015</div>
+                <div className="text-gray-600">Founded</div>
+              </div>
+              <div className="text-center p-6 bg-green-50 rounded-xl">
+                <div className="text-3xl font-bold text-green-600 mb-2">10K+</div>
+                <div className="text-gray-600">Happy Farmers</div>
+              </div>
+            </div>
+          </div>
+          <div className="relative">
+            <img
+              src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&h=500&fit=crop"
+              alt="100X manufacturing facility"
+              className="w-full rounded-2xl shadow-2xl"
+            />
+            <div className="absolute -top-6 -left-6 w-24 h-24 bg-green-600 rounded-2xl flex items-center justify-center">
+              <Award className="text-white" size={32} />
+            </div>
+          </div>
+        </div>
+
+        {/* Mission, Vision, Values */}
+        <div className="mb-20">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Foundation</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              The principles that guide our work and define our commitment to agricultural excellence.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {values.map((value, index) => (
+              <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
+                <CardContent className="p-8">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <value.icon className="text-green-600" size={36} />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">{value.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{value.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className="mb-20">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Milestones</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Key achievements that mark our journey of growth and innovation in agricultural equipment manufacturing.
+            </p>
+          </div>
+          <div className="relative">
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-green-200"></div>
+            <div className="space-y-12">
+              {milestones.map((milestone, index) => (
+                <div key={index} className={`flex items-center ${index % 2 === 0 ? "flex-row" : "flex-row-reverse"}`}>
+                  <div className={`w-1/2 ${index % 2 === 0 ? "pr-8 text-right" : "pl-8 text-left"}`}>
+                    <Card className="hover:shadow-lg transition-all duration-300">
+                      <CardContent className="p-6">
+                        <div className="text-2xl font-bold text-green-600 mb-2">{milestone.year}</div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">{milestone.title}</h3>
+                        <p className="text-gray-600">{milestone.description}</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  <div className="relative z-10 w-6 h-6 bg-green-600 rounded-full border-4 border-white shadow-lg"></div>
+                  <div className="w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Team Section */}
+        <div className="mb-20">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Meet Our Team</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              The passionate professionals behind 100X's success, dedicated to serving farmers with excellence.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {team.map((member, index) => (
+              <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
+                <CardContent className="p-8">
+                  <img
+                    src={member.image || "/placeholder.svg"}
+                    alt={member.name}
+                    className="w-32 h-32 rounded-full mx-auto mb-6 object-cover"
+                  />
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">{member.name}</h3>
+                  <p className="text-green-600 font-semibold mb-4">{member.position}</p>
+                  <p className="text-gray-600">{member.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Manufacturing Excellence */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">Manufacturing Excellence</h2>
+              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+                Our state-of-the-art manufacturing facility combines traditional craftsmanship with modern technology to
+                produce agricultural equipment of the highest quality. Every product undergoes rigorous testing to
+                ensure durability and performance in real field conditions.
+              </p>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600 mb-1">ISO</div>
+                  <div className="text-sm text-gray-600">Certified</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600 mb-1">99.5%</div>
+                  <div className="text-sm text-gray-600">Quality Rate</div>
+                </div>
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600 mb-1">24/7</div>
+                  <div className="text-sm text-gray-600">Production</div>
+                </div>
+                <div className="text-center p-4 bg-orange-50 rounded-lg">
+                  <div className="text-2xl font-bold text-orange-600 mb-1">50+</div>
+                  <div className="text-sm text-gray-600">Products</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <img
+                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop"
+                alt="Manufacturing facility"
+                className="w-full rounded-xl shadow-lg"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Back to Home */}
+        <div className="text-center">
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => setCurrentPage("home")}
+            className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent"
+          >
+            <ChevronLeft className="mr-2" size={20} />
+            Back to Home
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Blog Page Component
+function BlogPage({
+  blogPosts,
+  setCurrentPage,
+}: {
+  blogPosts: any[]
+  setCurrentPage: (page: string) => void
+}) {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("All")
+
+  const categories = ["All", "Maintenance", "Equipment Guide", "Technology", "Seasonal Tips"]
+
+  const filteredPosts = blogPosts.filter((post) => {
+    const matchesSearch =
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory
+    return matchesSearch && matchesCategory
+  })
+
+  return (
+    <div className="pt-32 min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-12">
+        {/* Blog Header */}
+        <div className="text-center mb-16">
+          <Badge className="mb-4 bg-purple-100 text-purple-800 hover:bg-purple-200">Agricultural Blog</Badge>
+          <h1 className="text-5xl font-bold text-gray-800 mb-4">Latest Insights & Tips</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Stay updated with the latest farming techniques, equipment guides, and industry insights from our experts
+          </p>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="flex flex-col md:flex-row gap-4 mb-12">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Input
+              placeholder="Search blog posts..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 py-3"
+            />
+          </div>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          >
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Blog Posts Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {filteredPosts.map((post) => (
+            <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300">
+              <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <Badge variant="secondary">{post.category}</Badge>
+                  <span className="text-sm text-gray-500">{post.readTime}</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-3 hover:text-purple-600 transition-colors cursor-pointer">
+                  {post.title}
+                </h3>
+                <p className="text-gray-600 mb-4">{post.excerpt}</p>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <User size={16} className="text-gray-400" />
+                    <span className="text-sm text-gray-600">{post.author}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Calendar size={16} className="text-gray-400" />
+                    <span className="text-sm text-gray-600">
+                      {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""}
+                    </span>
+                  </div>
+                </div>
+                <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                  Read Full Article <ArrowRight className="ml-2" size={16} />
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Back to Home */}
+        <div className="text-center">
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => setCurrentPage("home")}
+            className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent"
+          >
+            <ChevronLeft className="mr-2" size={20} />
+            Back to Home
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
