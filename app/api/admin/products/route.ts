@@ -4,6 +4,7 @@ import { Product } from "@/lib/productModel"
 
 export async function GET(request: NextRequest) {
   try {
+    console.log("✅ MONGODB_URI in GET:", process.env.MONGODB_URI);
     const client = await clientPromise
     const db = client.db()
     const products = await db.collection("products").find({}).toArray()
