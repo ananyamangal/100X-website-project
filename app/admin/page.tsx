@@ -590,11 +590,18 @@ function ProductForm({
                 required
               >
                 <option value="">Select Category</option>
-                <option value="Spraying Equipment">Spraying Equipment</option>
-                <option value="Tillage Equipment">Tillage Equipment</option>
-                <option value="Seeding Equipment">Seeding Equipment</option>
-                <option value="Harvesting Equipment">Harvesting Equipment</option>
-                <option value="Other">Other</option>
+                <option value="Vehicle mountable Fogging Machines">Vehicle mountable Fogging Machines</option>
+                <option value="Cold Foggers">Cold Foggers </option>
+                <option value="Agriculture Sprayers">Agriculture Sprayers</option>
+                <option value="Power Weeders and  Tillers">Power Weeders and  Tillers</option>
+                <option value="Brush Cutter">Brush Cutter</option>
+                <option value="Lawn mower">Lawn mower</option>
+                <option value="Water pumps">Water pumps</option>
+                <option value="Chain Saw">Chain Saw</option>
+                <option value="Chaff Cutter">Chaff Cutter</option>
+                <option value="seeders">seeders</option>
+                <option value="Trolleys">Trolleys</option>
+               
               </select>
             </div>
           </div>

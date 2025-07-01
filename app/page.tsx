@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   Menu,
@@ -89,7 +87,7 @@ export default function HomePage() {
     {
       image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&h=600&fit=crop",
       title: "Complete Agricultural Solutions",
-      subtitle: "From seeding to harvesting - we've got you covered",
+      subtitle: "[YOUR NEW TEXT HERE]",
     },
   ]
 
@@ -170,16 +168,16 @@ export default function HomePage() {
   ]
 
   const stats = [
-    { number: "10,000+", label: "Happy Farmers", icon: Users },
+    { number: "10000+", label: "happy customers", icon: Users },
     { number: "50+", label: "Products", icon: Award },
-    { number: "15+", label: "States Covered", icon: MapPin },
+    { number: "28", label: "States", icon: MapPin },
     { number: "24/7", label: "Support", icon: Shield },
   ]
 
-  const whatsappNumber = "91XXXXXXXXXX"
-  const businessEmail = "info@100x.com"
+  const whatsappNumber = "919891258221"
+  const businessEmail = "100xcircle@gmail.com"
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
     const name = formData.get("name")
@@ -188,13 +186,14 @@ export default function HomePage() {
     const subject = formData.get("subject")
     const message = formData.get("message")
 
-    const whatsappMessage = `New Contact Form Submission:
-Name: ${name}
-Phone: ${phone}
-Email: ${email}
-Subject: ${subject}
-Message: ${message}`
+    // Send email
+    await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, email, subject, message, type: "contact" }),
+    })
 
+    const whatsappMessage = `New Contact Form Submission:\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nSubject: ${subject}\nMessage: ${message}`
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`, "_blank")
   }
 
@@ -203,11 +202,18 @@ Message: ${message}`
     setShowBrochureForm(true)
   }
 
-  const handleBrochureFormSubmit = (e: React.FormEvent) => {
+  const handleBrochureFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
     const name = formData.get("name") as string
     const phone = formData.get("phone") as string
+
+    // Send email
+    await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, productName: brochureFormData.productName, type: "brochure" }),
+    })
 
     // Create dummy PDF download
     const link = document.createElement("a")
@@ -218,12 +224,7 @@ Message: ${message}`
     document.body.removeChild(link)
 
     // Send WhatsApp message
-    const whatsappMessage = `Brochure Downloaded:
-Product: ${brochureFormData.productName}
-Name: ${name}
-Phone: ${phone}
-Please follow up with detailed information.`
-
+    const whatsappMessage = `Brochure Downloaded:\nProduct: ${brochureFormData.productName}\nName: ${name}\nPhone: ${phone}\nPlease follow up with detailed information.`
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`, "_blank")
 
     setShowBrochureForm(false)
@@ -271,10 +272,11 @@ Please follow up with detailed information.`
         <div className="relative z-10 container mx-auto px-4 py-20">
           <div className="max-w-4xl mx-auto text-center text-white">
             <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
-              India's Leading Agricultural Equipment Manufacturer
+            Certified Professional Products 
+
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-              100X – <span className="text-green-400">Powering</span> the Fields
+              100X – <span className="text-green-400">Built</span> with Technology
             </h1>
             <p className="text-xl md:text-2xl mb-12 text-gray-200 leading-relaxed max-w-3xl mx-auto">
               {heroSlides[currentSlide].subtitle}
@@ -291,7 +293,7 @@ Please follow up with detailed information.`
                 className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-lg px-10 py-4 bg-transparent"
                 onClick={() =>
                   window.open(
-                    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("I want to see a product demo")}`,
+                    "https://www.youtube.com/@100Xcircle",
                     "_blank",
                   )
                 }
@@ -348,9 +350,9 @@ Please follow up with detailed information.`
             <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
               Our Products
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Premium Agricultural Equipment</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Wide Range of Products</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover our comprehensive range of agricultural equipment designed to boost productivity and efficiency.
+              Discover our comprehensive range of prodcust designed to boost productivity and efficiency.
             </p>
           </div>
 
@@ -439,6 +441,22 @@ Please follow up with detailed information.`
         </div>
       </section>
 
+      {/* Reviews Carousel Section */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-6 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-lg px-6 py-2">
+              Customer Reviews
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">What Our Customers Say</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Hear from real customers about their experience with 100X Circle Pvt Ltd.
+            </p>
+          </div>
+          <ReviewsCarousel />
+        </div>
+      </section>
+
       {/* Blog Preview Section */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -514,7 +532,8 @@ Please follow up with detailed information.`
                   </div>
                   <div>
                     <div className="font-semibold text-gray-800">Phone</div>
-                    <div className="text-gray-600">+91 9891258221</div>
+                    <div className="text-gray-600">+91 7827229116</div>
+                    <div className="text-gray-600">+91 8178567520</div>
                     <div className="text-sm text-gray-500">Mon-Sat: 9:00 AM - 6:00 PM</div>
                   </div>
                 </div>
@@ -526,7 +545,7 @@ Please follow up with detailed information.`
                   <div>
                     <div className="font-semibold text-gray-800">Business Email</div>
                     <div className="text-gray-600">{businessEmail}</div>
-                    <div className="text-sm text-gray-500">Professional webmail included</div>
+                    
                   </div>
                 </div>
 
@@ -536,28 +555,20 @@ Please follow up with detailed information.`
                   </div>
                   <div>
                     <div className="font-semibold text-gray-800">Address</div>
-                    <div className="text-gray-600">123 Agricultural Hub, Industrial Area</div>
-                    <div className="text-sm text-gray-500">Your City - 123456</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Google Maps Integration */}
-              <div className="mt-8">
-                <h4 className="text-lg font-semibold text-gray-800 mb-4">Find Us on Map</h4>
-                <div className="bg-gray-200 rounded-xl h-64 flex items-center justify-center">
-                  <div className="text-center text-gray-600">
-                    <MapPin size={48} className="mx-auto mb-4 text-green-600" />
-                    <p className="font-semibold">Google Maps Integration</p>
-                    <p className="text-sm">Interactive map will be embedded here</p>
-                    <Button
-                      className="mt-4 bg-green-600 hover:bg-green-700"
-                      onClick={() =>
-                        window.open("https://maps.google.com/maps?q=123+Agricultural+Hub+Industrial+Area", "_blank")
-                      }
-                    >
-                      View on Google Maps
-                    </Button>
+                    <div className="text-gray-600">UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana</div>
+                    {/* Google Map Embed */}
+                    <div className="mt-4 rounded-xl overflow-hidden shadow-lg">
+                      <iframe
+                        src="https://www.google.com/maps?q=UG,398,Sector+7,Industrial+Model+Township,Gurugram,Haryana&output=embed"
+                        width="100%"
+                        height="300"
+                        style={{ border: 0 }}
+                        allowFullScreen={true}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="100X Location Map"
+                      ></iframe>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -604,9 +615,9 @@ Please follow up with detailed information.`
       <section className="py-24 bg-gradient-to-r from-green-600 to-green-700 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Boost Your Farm's Productivity?</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Boost Your Business?</h2>
           <p className="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
-            Join thousands of successful farmers who have transformed their operations with 100X equipment.
+            Join thousands of successful customers who have transformed their operations with 100X equipment.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
@@ -678,10 +689,10 @@ Please follow up with detailed information.`
           <div className="container mx-auto px-4 flex justify-between items-center text-sm">
             <div className="flex items-center space-x-4">
               <span className="flex items-center">
-                <Phone size={14} className="mr-1" /> +91 XXXXXXXXXX
+                <Phone size={14} className="mr-1" /> +91 7827229116
               </span>
               <span className="flex items-center">
-                <Mail size={14} className="mr-1" /> {businessEmail}
+                <Phone size={14} className="mr-1" /> +91 8178567520
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-4">
@@ -693,12 +704,9 @@ Please follow up with detailed information.`
         <nav className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <button onClick={() => setCurrentPage("home")} className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">100X</span>
-              </div>
+              <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
               <div className="flex flex-col">
-                <h1 className="text-2xl font-bold text-gray-800">100X</h1>
-                <span className="text-sm text-green-600 font-medium">Powering the Fields</span>
+                <span className="text-sm text-green-600 font-medium">Circle Pvt Ltd.</span>
               </div>
             </button>
 
@@ -723,9 +731,9 @@ Please follow up with detailed information.`
               >
                 About Us
               </button>
-              <Link href="#contact" className="text-gray-700 hover:text-green-600 transition-colors">
+              <a href="#contact" className="text-gray-700 hover:text-green-600 transition-colors">
                 Contact
-              </Link>
+              </a>
               <button
                 onClick={() => setCurrentPage("blog")}
                 className={`transition-colors ${
@@ -801,17 +809,14 @@ Please follow up with detailed information.`
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">100X</span>
-                </div>
+                <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
                 <div>
                   <h3 className="text-xl font-bold">100X</h3>
-                  <p className="text-green-400 text-sm">Powering the Fields</p>
+                  <p className="text-green-400 text-sm">Certified professional products</p>
                 </div>
               </div>
               <p className="text-gray-400 mb-6">
-                Leading manufacturer of premium agricultural equipment with professional web solutions including free
-                hosting, SSL, and business email.
+                Leading manufacturer of premium products across India.
               </p>
               {/* Social Media Links */}
               <div className="flex space-x-4">
@@ -912,13 +917,13 @@ Please follow up with detailed information.`
               <h4 className="font-semibold mb-6 text-lg">Contact Info</h4>
               <div className="space-y-4 text-gray-400">
                 <p className="flex items-center">
-                  <Phone className="mr-3" size={16} /> +91 9891258221
+                  <Phone className="mr-3" size={16} /> +91 7827229116
                 </p>
                 <p className="flex items-center">
-                  <Mail className="mr-3" size={16} /> {businessEmail}
+                  <Phone className="mr-3" size={16} /> +91 8178567520
                 </p>
                 <p className="flex items-start">
-                  <MapPin className="mr-3 mt-1" size={16} /> 123 Agricultural Hub, Industrial Area, Your City - 123456
+                  <MapPin className="mr-3 mt-1" size={16} /> UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana
                 </p>
               </div>
             </div>
@@ -926,7 +931,7 @@ Please follow up with detailed information.`
 
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 mb-4 md:mb-0">
-              &copy; 2024 100X Agricultural Equipment. All rights reserved. | SSL Secured | Mobile Responsive
+              &copy; 2025 100X Circle Pvt Ltd.
             </p>
             <div className="flex space-x-6 text-gray-400 text-sm">
               <a href="#" className="hover:text-green-400 transition-colors">
@@ -1211,7 +1216,7 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
       <div className="container mx-auto px-4 py-12">
         {/* About Header */}
         <div className="text-center mb-20">
-          <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">Our Story</Badge>
+          <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">About Us</Badge>
           <h1 className="text-5xl font-bold text-gray-800 mb-6">About 100X Circle Pvt Ltd</h1>
         
         </div>
@@ -1221,7 +1226,7 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
           <div>
             <h2 className="text-4xl font-bold text-gray-800 mb-6">Our Journey</h2>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-            100X Circle Pvt Ltd is India’s fast-growing OEM of advanced fogging machines, agri implements, and airport ground equipment. Located at Sector 7, IMT Manesar, Gurgaon, we proudly uphold the 'Make in India' mission by delivering CE-certified, ISO 9001-compliant, and W.H.O-compliant solutions for both public and private sectors. Our brand ‘100X’ stands for innovation, reliability, and scalable performance across segments
+            100X Circle Pvt Ltd is India's fast-growing OEM of advanced fogging machines, agri implements, and airport ground equipment. Located at Sector 7, IMT Manesar, Gurgaon, we proudly uphold the 'Make in India' mission by delivering CE-certified, ISO 9001-compliant, and W.H.O-compliant solutions for both public and private sectors. Our brand '100X' stands for innovation, reliability, and scalable performance across segments
             </p>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
               Our range includes:
@@ -1278,62 +1283,6 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
                   </div>
                   <h3 className="text-2xl font-bold text-gray-800 mb-4">{value.title}</h3>
                   <p className="text-gray-600 leading-relaxed">{value.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Timeline */}
-        <div className="mb-20">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Milestones</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Key achievements that mark our journey of growth and innovation in agricultural equipment manufacturing.
-            </p>
-          </div>
-          <div className="relative">
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-green-200"></div>
-            <div className="space-y-12">
-              {milestones.map((milestone, index) => (
-                <div key={index} className={`flex items-center ${index % 2 === 0 ? "flex-row" : "flex-row-reverse"}`}>
-                  <div className={`w-1/2 ${index % 2 === 0 ? "pr-8 text-right" : "pl-8 text-left"}`}>
-                    <Card className="hover:shadow-lg transition-all duration-300">
-                      <CardContent className="p-6">
-                        <div className="text-2xl font-bold text-green-600 mb-2">{milestone.year}</div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">{milestone.title}</h3>
-                        <p className="text-gray-600">{milestone.description}</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  <div className="relative z-10 w-6 h-6 bg-green-600 rounded-full border-4 border-white shadow-lg"></div>
-                  <div className="w-1/2"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Team Section */}
-        <div className="mb-20">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Meet Our Team</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The passionate professionals behind 100X's success, dedicated to serving farmers with excellence.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {team.map((member, index) => (
-              <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
-                <CardContent className="p-8">
-                  <img
-                    src={member.image || "/placeholder.svg"}
-                    alt={member.name}
-                    className="w-32 h-32 rounded-full mx-auto mb-6 object-cover"
-                  />
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">{member.name}</h3>
-                  <p className="text-green-600 font-semibold mb-4">{member.position}</p>
-                  <p className="text-gray-600">{member.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -1502,4 +1451,90 @@ function BlogPage({
       </div>
     </div>
   )
+}
+
+function ReviewsCarousel() {
+  const reviews = [
+    {
+      name: "Amit Verma",
+      title: "Business Owner, Punjab",
+      review:
+        "The team at 100X Circle Pvt Ltd. is extremely professional and responsive. Their support made the entire process seamless. Highly recommended!",
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    },
+    {
+      name: "Priya Sharma",
+      title: "Entrepreneur, Maharashtra",
+      review:
+        "Excellent service and a wide range of products. The company truly cares about customer satisfaction and goes the extra mile.",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    },
+    {
+      name: "Rakesh Singh",
+      title: "Retailer, Uttar Pradesh",
+      review:
+        "I was impressed by the professionalism and prompt delivery. 100X Circle Pvt Ltd. is my go-to for all business needs.",
+      avatar: "https://randomuser.me/api/portraits/men/65.jpg",
+    },
+    {
+      name: "Sunita Joshi",
+      title: "Distributor, Rajasthan",
+      review:
+        "Great experience working with 100X Circle Pvt Ltd. Their after-sales service is top-notch and the team is always ready to help.",
+      avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+    },
+  ];
+
+  // Determine how many reviews to show based on screen size
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  let reviewsPerPage = 3;
+  if (windowWidth < 768) reviewsPerPage = 1;
+  else if (windowWidth < 1024) reviewsPerPage = 2;
+
+  const [start, setStart] = useState(0);
+  const canGoBack = start > 0;
+  const canGoForward = start + reviewsPerPage < reviews.length;
+
+  const handlePrev = () => {
+    setStart((prev) => Math.max(prev - reviewsPerPage, 0));
+  };
+  const handleNext = () => {
+    setStart((prev) => Math.min(prev + reviewsPerPage, reviews.length - reviewsPerPage));
+  };
+
+  return (
+    <div className="relative max-w-5xl mx-auto">
+      <div className="flex items-center justify-center mb-6">
+        {canGoBack && (
+          <button onClick={handlePrev} className="p-2 rounded-full bg-gray-200 hover:bg-yellow-200 mr-4" aria-label="Previous reviews">
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
+          </button>
+        )}
+        <div className={`grid grid-cols-1 md:grid-cols-${reviewsPerPage} lg:grid-cols-${reviewsPerPage} gap-8 w-full`}>
+          {reviews.slice(start, start + reviewsPerPage).map((review, idx) => (
+            <Card key={start + idx} className="p-8 text-center shadow-xl border-0 flex flex-col items-center">
+              <img
+                src={review.avatar}
+                alt={review.name}
+                className="w-20 h-20 rounded-full mb-4 object-cover border-4 border-yellow-200"
+              />
+              <h3 className="text-xl font-bold text-gray-800 mb-1">{review.name}</h3>
+              <p className="text-sm text-gray-500 mb-4">{review.title}</p>
+              <p className="text-lg text-gray-700 italic mb-2">“{review.review}”</p>
+            </Card>
+          ))}
+        </div>
+        {canGoForward && (
+          <button onClick={handleNext} className="p-2 rounded-full bg-gray-200 hover:bg-yellow-200 ml-4" aria-label="Next reviews">
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }
