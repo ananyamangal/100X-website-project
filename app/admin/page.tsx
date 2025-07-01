@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Plus,
   Edit,
@@ -26,6 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import Cookies from 'js-cookie';
 
 interface Product {
   _id?: string;
@@ -49,7 +48,60 @@ interface Product {
   brochureUrl?: string;
 }
 
+function AdminAuthGate({ children }: { children: React.ReactNode }) {
+  const [isAuthed, setIsAuthed] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (Cookies.get('admin-token') === 'authenticated') {
+      setIsAuthed(true);
+    }
+    setLoading(false);
+  }, []);
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordInput === 'dtu@ananya') {
+      Cookies.set('admin-token', 'authenticated', { path: '/admin' });
+      setIsAuthed(true);
+    } else {
+      setError('Invalid password');
+    }
+  };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-gray-50">Loading...</div>;
+  }
+
+  if (!isAuthed) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <form onSubmit={handlePasswordSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-xs">
+          <h2 className="text-xl font-bold mb-4">Admin Login</h2>
+          <input
+            type="password"
+            placeholder="Enter admin password"
+            value={passwordInput}
+            onChange={e => setPasswordInput(e.target.value)}
+            className="w-full border px-3 py-2 rounded mb-4"
+            required
+          />
+          {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
+          <button type="submit" className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Login</button>
+        </form>
+      </div>
+    );
+  }
+  return <>{children}</>;
+}
+
 export default function AdminDashboard() {
+  return <AdminAuthGate><AdminDashboardContent /></AdminAuthGate>;
+}
+
+function AdminDashboardContent() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [products, setProducts] = useState<Product[]>([])
   const [isAddingProduct, setIsAddingProduct] = useState(false)
@@ -218,6 +270,17 @@ export default function AdminDashboard() {
                 <FileText className="mr-3" size={20} />
                 Content
               </button>
+              <button
+                onClick={() => setActiveTab("submissions")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "submissions"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <FileText className="mr-3" size={20} />
+                Submissions
+              </button>
             </nav>
           </div>
 
@@ -240,6 +303,7 @@ export default function AdminDashboard() {
             )}
             {activeTab === "analytics" && <AnalyticsTab products={products} />}
             {activeTab === "content" && <ContentTab />}
+            {activeTab === "submissions" && <SubmissionsTab />}
           </div>
         </div>
       </div>
@@ -963,4 +1027,60 @@ function ContentTab() {
       </Card>
     </div>
   )
+}
+
+function SubmissionsTab() {
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch("/api/submissions")
+      .then((res) => res.json())
+      .then((data) => {
+        setSubmissions(Array.isArray(data) ? data : []);
+        setLoading(false);
+      });
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">User Submissions</h2>
+        <p className="text-gray-600">All contact and brochure download submissions from users</p>
+      </div>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border rounded-lg">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 border-b">Date</th>
+                <th className="px-4 py-2 border-b">Name</th>
+                <th className="px-4 py-2 border-b">Phone</th>
+                <th className="px-4 py-2 border-b">Type</th>
+                <th className="px-4 py-2 border-b">Product</th>
+                <th className="px-4 py-2 border-b">Email</th>
+                <th className="px-4 py-2 border-b">Subject</th>
+                <th className="px-4 py-2 border-b">Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              {submissions.map((s) => (
+                <tr key={s._id ? String(s._id) : `${s.name || ''}-${s.phone || ''}-${s.createdAt || ''}`} className="border-b hover:bg-gray-50">
+                  <td className="px-4 py-2 text-xs text-gray-500">{s.createdAt ? new Date(s.createdAt).toLocaleString() : ''}</td>
+                  <td className="px-4 py-2">{s.name}</td>
+                  <td className="px-4 py-2">{s.phone}</td>
+                  <td className="px-4 py-2 capitalize">{s.type}</td>
+                  <td className="px-4 py-2">{s.productName || '-'}</td>
+                  <td className="px-4 py-2">{s.email || '-'}</td>
+                  <td className="px-4 py-2">{s.subject || '-'}</td>
+                  <td className="px-4 py-2 max-w-xs truncate" title={s.message}>{s.message || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 }

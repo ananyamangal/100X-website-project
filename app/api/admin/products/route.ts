@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
+import { Product } from "@/lib/productModel";
 
-// GET product by ID
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+// GET all products
+export async function GET(request: NextRequest) {
   try {
-    const { id } = params;
-
-    if (!ObjectId.isValid(id)) {
-      return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
-    }
-
     const client = await clientPromise;
     const db = client.db();
-    const product = await db.collection("products").findOne({ _id: new ObjectId(id) });
-
-    if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(product);
+    const products = await db.collection("products").find({}).toArray();
+    return NextResponse.json(products);
   } catch (error) {
-    console.error("❌ Error in GET /api/admin/products/[id]:", error);
-    return NextResponse.json({ error: "Failed to fetch product by ID" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
+  }
+}
+
+// POST create new product
+export async function POST(request: NextRequest) {
+  try {
+    const productData: Product = await request.json();
+    const now = new Date().toISOString();
+    const newProduct = { ...productData, createdAt: now, updatedAt: now };
+    const client = await clientPromise;
+    const db = client.db();
+    const result = await db.collection("products").insertOne(newProduct);
+    return NextResponse.json({ ...newProduct, _id: result.insertedId }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
   }
 }
 

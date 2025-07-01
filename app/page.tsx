@@ -186,6 +186,13 @@ export default function HomePage() {
     const subject = formData.get("subject")
     const message = formData.get("message")
 
+    // Save submission to backend
+    await fetch("/api/submissions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, email, subject, message, type: "contact" }),
+    })
+
     const whatsappMessage = `New Contact Form Submission:\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nSubject: ${subject}\nMessage: ${message}`
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`, "_blank")
   }
@@ -200,6 +207,13 @@ export default function HomePage() {
     const formData = new FormData(e.target as HTMLFormElement)
     const name = formData.get("name") as string
     const phone = formData.get("phone") as string
+
+    // Save submission to backend
+    await fetch("/api/submissions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, productName: brochureFormData.productName, type: "brochure" }),
+    })
 
     // Create dummy PDF download
     const link = document.createElement("a")
@@ -929,6 +943,7 @@ export default function HomePage() {
               <a href="#" className="hover:text-green-400 transition-colors">
                 FTP Access
               </a>
+              <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
             </div>
           </div>
         </div>

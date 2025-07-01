@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Lock, User, Shield } from "lucide-react"
 
 export default function AdminLogin() {
-  const [credentials, setCredentials] = useState({ username: "", password: "" })
+  const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
@@ -20,26 +20,14 @@ export default function AdminLogin() {
     setIsLoading(true)
     setError("")
 
-    // In production, this would call your authentication API
-    try {
-      const response = await fetch("/api/admin/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
-      })
-
-      if (response.ok) {
-        // Set secure HTTP-only cookie
-        document.cookie = "admin-token=authenticated; path=/admin; secure; samesite=strict"
-        router.push("/admin")
-      } else {
-        setError("Invalid credentials")
-      }
-    } catch (err) {
-      setError("Login failed. Please try again.")
-    } finally {
-      setIsLoading(false)
+    // Simple password check (no username)
+    if (password === "dtu@ananya") {
+      document.cookie = "admin-token=authenticated; path=/admin; secure; samesite=strict"
+      router.push("/admin")
+    } else {
+      setError("Invalid password")
     }
+    setIsLoading(false)
   }
 
   return (
@@ -56,23 +44,12 @@ export default function AdminLogin() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-4">
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <Input
-                  type="text"
-                  placeholder="Username"
-                  value={credentials.username}
-                  onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
-                  className="pl-10 py-3"
-                  required
-                />
-              </div>
-              <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <Input
                   type="password"
                   placeholder="Password"
-                  value={credentials.password}
-                  onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 py-3"
                   required
                 />
@@ -83,8 +60,12 @@ export default function AdminLogin() {
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>
             )}
 
-            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 py-3" disabled={isLoading}>
-              {isLoading ? "Signing In..." : "Sign In"}
+            <Button
+              type="submit"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3"
+              disabled={isLoading}
+            >
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
 

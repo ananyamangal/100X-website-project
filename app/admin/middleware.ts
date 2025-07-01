@@ -1,18 +1,18 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // In production, this should check for proper authentication
-  const isProduction = process.env.NODE_ENV === "production"
-  const isAuthenticated = request.cookies.get("admin-token")
+  const { pathname } = request.nextUrl;
+  const isLoginPage = pathname === '/admin/login';
+  const token = request.cookies.get('admin-token')?.value;
 
-  if (isProduction && !isAuthenticated) {
-    return NextResponse.redirect(new URL("/admin/login", request.url))
+  if (!isLoginPage && token !== 'authenticated') {
+    const loginUrl = new URL('/admin/login', request.url);
+    return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.next()
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: "/admin/:path*",
-}
+  matcher: '/admin/:path*',
+};
