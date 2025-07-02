@@ -67,6 +67,16 @@ export default function HomePage() {
   const [showBrochureForm, setShowBrochureForm] = useState(false)
   const [brochureFormData, setBrochureFormData] = useState({ name: "", phone: "", productName: "" })
   const [products, setProducts] = useState<Product[]>([])
+  const [phraseIndex, setPhraseIndex] = useState(0)
+
+  const changingPhrases = [
+    "100 X your Productivity",
+    "100 X your Performance",
+    "100 X your Growth",
+    "100 X your Harvest",
+    "100 X Coverage",
+    "100 X Results",
+  ]
 
   const heroSlides = [
     {
@@ -117,6 +127,13 @@ export default function HomePage() {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
     }, 4000)
+    return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPhraseIndex((prev) => (prev + 1) % changingPhrases.length)
+    }, 2000)
     return () => clearInterval(timer)
   }, [])
 
@@ -174,8 +191,8 @@ export default function HomePage() {
     { number: "24/7", label: "Support", icon: Shield },
   ]
 
-  const whatsappNumber = "919891258221"
   const businessEmail = "100xcircle@gmail.com"
+  const whatsappNumber = "917827229116"
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -194,7 +211,7 @@ export default function HomePage() {
     })
 
     const whatsappMessage = `New Contact Form Submission:\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nSubject: ${subject}\nMessage: ${message}`
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`, "_blank")
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`, "_blank")
   }
 
   const handleBrochureDownload = (productName: string) => {
@@ -225,7 +242,7 @@ export default function HomePage() {
 
     // Send WhatsApp message
     const whatsappMessage = `Brochure Downloaded:\nProduct: ${brochureFormData.productName}\nName: ${name}\nPhone: ${phone}\nPlease follow up with detailed information.`
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`, "_blank")
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`, "_blank")
 
     setShowBrochureForm(false)
     setBrochureFormData({ name: "", phone: "", productName: "" })
@@ -278,9 +295,9 @@ export default function HomePage() {
             <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
               100X – <span className="text-green-400">Built</span> with Technology
             </h1>
-            <p className="text-xl md:text-2xl mb-12 text-gray-200 leading-relaxed max-w-3xl mx-auto">
-              {heroSlides[currentSlide].subtitle}
-            </p>
+            <div className="text-2xl md:text-3xl font-bold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
+              {changingPhrases[phraseIndex]}
+            </div>
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
               <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-10 py-4">
                 <Link href="#products" className="flex items-center">
@@ -626,7 +643,7 @@ export default function HomePage() {
               className="bg-white text-green-600 hover:bg-gray-100 text-lg px-8 py-4"
               onClick={() =>
                 window.open(
-                  `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("I'm interested in 100X agricultural equipment. Please provide more information.")}`,
+                  `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`,
                   "_blank",
                 )
               }
@@ -953,7 +970,7 @@ export default function HomePage() {
       <button
         onClick={() =>
           window.open(
-            `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi! I'm interested in 100X agricultural equipment. Can you help me?")}`,
+            `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`,
             "_blank",
           )
         }
@@ -1040,7 +1057,7 @@ function ProductDetailPage({
                 className="bg-green-600 hover:bg-green-700 flex-1"
                 onClick={() =>
                   window.open(
-                    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`I'm interested in ${product.name}. Please share detailed pricing and availability.`)}`,
+                    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`,
                     "_blank",
                   )
                 }
@@ -1115,7 +1132,7 @@ function ProductDetailPage({
               className="bg-white text-green-600 hover:bg-gray-100"
               onClick={() =>
                 window.open(
-                  `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`I want to purchase ${product.name}. Please provide detailed information about pricing, delivery, and payment options.`)}`,
+                  `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`,
                   "_blank",
                 )
               }
@@ -1257,8 +1274,8 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
           </div>
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&h=500&fit=crop"
-              alt="100X manufacturing facility"
+              src="/new.png"
+              alt="About 100X Circle Pvt Ltd"
               className="w-full rounded-2xl shadow-2xl"
             />
             <div className="absolute -top-6 -left-6 w-24 h-24 bg-green-600 rounded-2xl flex items-center justify-center">
@@ -1321,7 +1338,7 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
             </div>
             <div>
               <img
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop"
+                src="/production.png"
                 alt="Manufacturing facility"
                 className="w-full rounded-xl shadow-lg"
               />
