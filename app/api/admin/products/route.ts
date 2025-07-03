@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
     const products = await db.collection("products").find({}).toArray();
     return NextResponse.json(products);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
+    console.error("❌ Error in GET /api/admin/products:", error);
+    return NextResponse.json({ error: "Failed to fetch products", details: String(error) }, { status: 500 });
   }
 }
 
@@ -25,7 +26,8 @@ export async function POST(request: NextRequest) {
     const result = await db.collection("products").insertOne(newProduct);
     return NextResponse.json({ ...newProduct, _id: result.insertedId }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
+    console.error("❌ Error in POST /api/admin/products:", error);
+    return NextResponse.json({ error: "Failed to create product", details: String(error) }, { status: 500 });
   }
 }
 

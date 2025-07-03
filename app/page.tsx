@@ -42,7 +42,7 @@ interface Product {
   _id?: string;
   id?: string;
   name: string;
-  imageUrl: string;
+  imageUrls: string[];
   priceRange: string;
   rating: number;
   reviewsCount: number;
@@ -57,6 +57,59 @@ interface Product {
   inStock: boolean;
   createdAt?: string;
   updatedAt?: string;
+}
+
+// Add this mapping at the top of the file, after imports
+const badgeLogoMap: Record<string, string> = {
+  'Korean Technology': '/logos clipart 2/Korean Technology.png',
+  'German Technology': '/logos clipart 2/german technology.png',
+  'Japnese Technology': '/logos clipart 2/Japnese technology.png',
+  'GeM': '/logos clipart 2/GeM logo.png',
+  'GeM logo': '/logos clipart 2/GeM logo.png',
+  'Heavy Duty': '/logos clipart 2/Heavy duty.png',
+  'Eco Friendly': '/logos clipart 2/Ecofreidly.png',
+  'Ecofreidly': '/logos clipart 2/Ecofreidly.png',
+  'BIS Approved': '/logos clipart 2/BIS approved.png',
+};
+
+function YoutubeShortsCarousel() {
+  const [shorts, setShorts] = useState<string[]>([]);
+  useEffect(() => {
+    fetch("/api/youtube-shorts")
+      .then((res) => res.json())
+      .then((data) => Array.isArray(data) ? setShorts(data) : setShorts([]));
+  }, []);
+  if (!shorts.length) return null;
+  return (
+    <section className="py-24 bg-gray-50">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <Badge className="mb-6 bg-red-100 text-red-800 hover:bg-red-200 text-lg px-6 py-2">
+            YouTube Shorts
+          </Badge>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Product Demo and Videos</h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Watch our latest product demos, tips, and more on YouTube Shorts!
+          </p>
+        </div>
+        <div className="flex gap-6 overflow-x-auto pb-4">
+          {shorts.map((id) => (
+            <div key={id} className="min-w-[320px] max-w-xs flex-shrink-0 rounded-xl overflow-hidden shadow-lg bg-black">
+              <iframe
+                width="320"
+                height="568"
+                src={`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&controls=0&loop=1&playlist=${id}`}
+                title="YouTube Short"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-[568px] border-0"
+              ></iframe>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default function HomePage() {
@@ -106,20 +159,17 @@ export default function HomePage() {
     fetch("/api/admin/products")
       .then(res => res.json())
       .then(data => {
-        console.log("API data:", data); // Debug log
-        setProducts(
-          Array.isArray(data)
-            ? data.map((p: any) => ({
-                ...p,
-                id: p._id,
-                image: p.imageUrl,
-                price: p.priceRange,
-                reviews: p.reviewsCount,
-                description: p.shortDescription,
-                whatsappText: p.whatsappMessageText,
-              }))
-            : []
-        )
+        const normalized = Array.isArray(data)
+          ? data.map((p: any) => ({
+              ...p,
+              imageUrls: Array.isArray(p.imageUrls)
+                ? p.imageUrls
+                : p.imageUrl
+                  ? [p.imageUrl]
+                  : [],
+            }))
+          : [];
+        setProducts(normalized);
       })
   }, [])
 
@@ -375,7 +425,6 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products
-              .filter((product) => product.inStock)
               .map((product, index) => (
                 <Card
                   key={index}
@@ -383,13 +432,13 @@ export default function HomePage() {
                 >
                   <div className="relative overflow-hidden">
                     <img
-                      src={product.imageUrl || "/placeholder.svg"}
+                      src={product.imageUrls[0] || "/placeholder.svg"}
                       alt={product.name}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute top-4 left-4">
                       <Badge
-                        className={`${
+                        className={`$${
                           product.badge === "Best Seller"
                             ? "bg-red-500 hover:bg-red-600"
                             : product.badge === "Eco-Friendly"
@@ -397,8 +446,11 @@ export default function HomePage() {
                               : product.badge === "New Launch"
                                 ? "bg-blue-500 hover:bg-blue-600"
                                 : "bg-orange-500 hover:bg-orange-600"
-                        }`}
+                        } flex items-center gap-2`}
                       >
+                        {badgeLogoMap[product.badge] && (
+                          <img src={badgeLogoMap[product.badge]} alt={product.badge + ' logo'} className="inline-block w-6 h-6 object-contain mr-1" />
+                        )}
                         {product.badge}
                       </Badge>
                     </div>
@@ -457,6 +509,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <YoutubeShortsCarousel />
 
       {/* Reviews Carousel Section */}
       <section className="py-24 bg-white">
@@ -535,7 +589,7 @@ export default function HomePage() {
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Contact Us</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Ready to transform your farming operations? Get in touch with our experts today!
+              Ready to transform your work? Get in touch with our experts today!
             </p>
           </div>
 
@@ -549,8 +603,8 @@ export default function HomePage() {
                   </div>
                   <div>
                     <div className="font-semibold text-gray-800">Phone</div>
-                    <div className="text-gray-600">+91 7827229116</div>
-                    <div className="text-gray-600">+91 8178567520</div>
+                    <div className="text-gray-600"><a href="tel:+917827229116" className="underline hover:text-green-600">+91 7827229116</a></div>
+                    <div className="text-gray-600"><a href="tel:+918178567520" className="underline hover:text-green-600">+91 8178567520</a></div>
                     <div className="text-sm text-gray-500">Mon-Sat: 9:00 AM - 6:00 PM</div>
                   </div>
                 </div>
@@ -561,8 +615,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <div className="font-semibold text-gray-800">Business Email</div>
-                    <div className="text-gray-600">{businessEmail}</div>
-                    
+                    <div className="text-gray-600"><a href="mailto:100xcircle@gmail.com" className="underline hover:text-green-600">100xcircle@gmail.com</a></div>
                   </div>
                 </div>
 
@@ -666,6 +719,15 @@ export default function HomePage() {
     </>
   )
 
+  // Helper to scroll to contact section
+  const scrollToContact = () => {
+    setCurrentPage("home");
+    setTimeout(() => {
+      const el = document.getElementById("contact");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Brochure Form Modal */}
@@ -706,10 +768,12 @@ export default function HomePage() {
           <div className="container mx-auto px-4 flex justify-between items-center text-sm">
             <div className="flex items-center space-x-4">
               <span className="flex items-center">
-                <Phone size={14} className="mr-1" /> +91 7827229116
+                <Phone size={14} className="mr-1" />
+                <a href="tel:+917827229116" className="underline hover:text-green-200">+91 7827229116</a>
               </span>
               <span className="flex items-center">
-                <Phone size={14} className="mr-1" /> +91 8178567520
+                <Phone size={14} className="mr-1" />
+                <a href="tel:+918178567520" className="underline hover:text-green-200">+91 8178567520</a>
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-4">
@@ -748,7 +812,14 @@ export default function HomePage() {
               >
                 About Us
               </button>
-              <a href="#contact" className="text-gray-700 hover:text-green-600 transition-colors">
+              <a
+                href="#contact"
+                className="text-gray-700 hover:text-green-600 transition-colors"
+                onClick={e => {
+                  e.preventDefault();
+                  scrollToContact();
+                }}
+              >
                 Contact
               </a>
               <button
@@ -799,7 +870,15 @@ export default function HomePage() {
                 >
                   About Us
                 </button>
-                <Link href="#contact" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+                <Link
+                  href="#contact"
+                  className="text-gray-700"
+                  onClick={e => {
+                    e.preventDefault();
+                    setIsMenuOpen(false);
+                    scrollToContact();
+                  }}
+                >
                   Contact
                 </Link>
                 <button
@@ -918,7 +997,14 @@ export default function HomePage() {
                   </button>
                 </li>
                 <li>
-                  <Link href="#contact" className="hover:text-green-400 transition-colors">
+                  <Link
+                    href="#contact"
+                    className="hover:text-green-400 transition-colors"
+                    onClick={e => {
+                      e.preventDefault();
+                      scrollToContact();
+                    }}
+                  >
                     Contact
                   </Link>
                 </li>
@@ -934,10 +1020,10 @@ export default function HomePage() {
               <h4 className="font-semibold mb-6 text-lg">Contact Info</h4>
               <div className="space-y-4 text-gray-400">
                 <p className="flex items-center">
-                  <Phone className="mr-3" size={16} /> +91 7827229116
+                  <Phone className="mr-3" size={16} /> <a href="tel:+917827229116" className="underline hover:text-green-400">+91 7827229116</a>
                 </p>
                 <p className="flex items-center">
-                  <Phone className="mr-3" size={16} /> +91 8178567520
+                  <Phone className="mr-3" size={16} /> <a href="tel:+918178567520" className="underline hover:text-green-400">+91 8178567520</a>
                 </p>
                 <p className="flex items-start">
                   <MapPin className="mr-3 mt-1" size={16} /> UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana
@@ -997,6 +1083,12 @@ function ProductDetailPage({
   onBrochureDownload: (productName: string) => void
   whatsappNumber: string
 }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const handleImageClick = (index: number) => {
+    setCurrentImageIndex(index);
+  };
+
   return (
     <div className="pt-32 min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-12">
@@ -1014,15 +1106,32 @@ function ProductDetailPage({
         {/* Product Header */}
         <div className="grid lg:grid-cols-2 gap-12 mb-16">
           <div>
-            <img
-              src={product.imageUrl || "/placeholder.svg"}
-              alt={product.name}
-              className="w-full rounded-2xl shadow-2xl"
-            />
+            <div className="relative">
+              <img
+                src={product.imageUrls[currentImageIndex] || "/placeholder.svg"}
+                alt={product.name}
+                className="w-full rounded-2xl shadow-2xl"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                {product.imageUrls.map((url: string, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => handleImageClick(index)}
+                    className="w-1/4 h-full bg-black/50 hover:bg-black"
+                  >
+                    <img
+                      src={url}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           <div>
             <Badge
-              className={`mb-4 ${
+              className={`$${
                 product.badge === "Best Seller"
                   ? "bg-red-500 hover:bg-red-600"
                   : product.badge === "Eco-Friendly"
@@ -1030,8 +1139,11 @@ function ProductDetailPage({
                     : product.badge === "New Launch"
                       ? "bg-blue-500 hover:bg-blue-600"
                       : "bg-orange-500 hover:bg-orange-600"
-              }`}
+              } flex items-center gap-2`}
             >
+              {badgeLogoMap[product.badge] && (
+                <img src={badgeLogoMap[product.badge]} alt={product.badge + ' logo'} className="inline-block w-6 h-6 object-contain mr-1" />
+              )}
               {product.badge}
             </Badge>
             <h1 className="text-4xl font-bold text-gray-800 mb-4">{product.name}</h1>
@@ -1179,7 +1291,7 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
     { year: "2017", title: "First 1000 Customers", description: "Reached our first major milestone" },
     { year: "2019", title: "National Expansion", description: "Expanded operations across 10 states" },
     { year: "2021", title: "Technology Innovation", description: "Launched precision agriculture solutions" },
-    { year: "2023", title: "10,000+ Farmers", description: "Serving over 10,000 satisfied farmers" },
+    { year: "2023", title: "10,000+ curstomers", description: "Serving over 10,000 satisfied curstomers" },
     {
       year: "2024",
       title: "Digital Transformation",
@@ -1192,7 +1304,7 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
       icon: Target,
       title: "Mission",
       description:
-        "To empower farmers with innovative, reliable, and affordable agricultural equipment that enhances productivity, reduces labor intensity, and contributes to sustainable farming practices.",
+        "To empower curstomers with innovative, reliable, and affordable agricultural equipment that enhances productivity, reduces labor intensity, and contributes to sustainable farming practices.",
     },
     {
       icon: Eye,
@@ -1268,7 +1380,7 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
               </div>
               <div className="text-center p-6 bg-green-50 rounded-xl">
                 <div className="text-3xl font-bold text-green-600 mb-2">10K+</div>
-                <div className="text-gray-600">Happy Farmers</div>
+                <div className="text-gray-600">Happy curstomers</div>
               </div>
             </div>
           </div>
@@ -1474,45 +1586,52 @@ function BlogPage({
 function ReviewsCarousel() {
   const reviews = [
     {
-      name: "Amit Verma",
-      title: "Business Owner, Punjab",
+      name: "Ramesh S.",
+      title: "EcoCare Pest Services, Bihar & Jharkhand",
       review:
-        "The team at 100X Circle Pvt Ltd. is extremely professional and responsive. Their support made the entire process seamless. Highly recommended!",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+        "We've been using 100X fogging machines for over a year now in our pest control business across Bihar and Jharkhand. The coverage and performance are excellent, especially in dense residential areas. Easy to operate, low maintenance, and highly effective in mosquito control. Definitely recommended for professional use.",
+      avatar: "/review-avatars/review1.jpg",
     },
     {
-      name: "Priya Sharma",
-      title: "Entrepreneur, Maharashtra",
+      name: "Dr. Meena Verma",
+      title: "Public Health Officer, UP",
       review:
-        "Excellent service and a wide range of products. The company truly cares about customer satisfaction and goes the extra mile.",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+        "100X's Double Barrel Fogging Machine was a game-changer during our dengue prevention drives. It covers large areas in less time, and the pulse jet technology really improves the fog output. Our teams found it reliable and easy to handle in both urban and rural campaigns.",
+      avatar: "/review-avatars/review3.jpg",
     },
     {
-      name: "Rakesh Singh",
-      title: "Retailer, Uttar Pradesh",
+      name: "Vijay Kumar",
+      title: "Farmer from Muzaffarpur, Bihar",
       review:
-        "I was impressed by the professionalism and prompt delivery. 100X Circle Pvt Ltd. is my go-to for all business needs.",
-      avatar: "https://randomuser.me/api/portraits/men/65.jpg",
+        "I bought the 100X power weeder last season for my vegetable farm. It's strong, fuel-efficient, and saved me a lot of labor. Even my son can handle it without much training. Great support from the company too!",
+      avatar: "/review-avatars/review5.jpg",
     },
     {
-      name: "Sunita Joshi",
-      title: "Distributor, Rajasthan",
+      name: "Ramdas Yadav",
+      title: "Agri Cooperative Leader, UP",
       review:
-        "Great experience working with 100X Circle Pvt Ltd. Their after-sales service is top-notch and the team is always ready to help.",
-      avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+        "Our cooperative purchased 2 tillers  from 100X for shared farming. These machines are robust and ideal for small and medium farms. We're happy with the results and cost savings. Many farmers in our group are planning to buy their own now.",
+      avatar: "/review-avatars/review2.jpg",
+    },
+    {
+      name: "Mahesh Patel",
+      title: "Gujarat",
+      review:
+        "I've used different machines from 100X – from hand carried foggers to vehicle mounted type foggers . All products are solid, well-engineered, and suited for Indian conditions. Their double barrel fogger especially stands out for its fog throw and area coverage.",
+      avatar: "/review-avatars/review4.jpg",
     },
   ];
 
-  // Determine how many reviews to show based on screen size
+  // Responsive reviews per page
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  let reviewsPerPage = 3;
-  if (windowWidth < 768) reviewsPerPage = 1;
-  else if (windowWidth < 1024) reviewsPerPage = 2;
+  let reviewsPerPage = 5;
+  if (windowWidth < 1280) reviewsPerPage = 4;
+  if (windowWidth < 900) reviewsPerPage = 2;
 
   const [start, setStart] = useState(0);
   const canGoBack = start > 0;
@@ -1526,24 +1645,24 @@ function ReviewsCarousel() {
   };
 
   return (
-    <div className="relative max-w-5xl mx-auto">
+    <div className="relative max-w-7xl mx-auto">
       <div className="flex items-center justify-center mb-6">
         {canGoBack && (
           <button onClick={handlePrev} className="p-2 rounded-full bg-gray-200 hover:bg-yellow-200 mr-4" aria-label="Previous reviews">
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
           </button>
         )}
-        <div className={`grid grid-cols-1 md:grid-cols-${reviewsPerPage} lg:grid-cols-${reviewsPerPage} gap-8 w-full`}>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-${reviewsPerPage} lg:grid-cols-${reviewsPerPage} gap-6 w-full`}>
           {reviews.slice(start, start + reviewsPerPage).map((review, idx) => (
-            <Card key={start + idx} className="p-8 text-center shadow-xl border-0 flex flex-col items-center">
+            <Card key={start + idx} className="p-6 text-center shadow-xl border-0 flex flex-col items-center min-h-[260px] max-w-[320px] mx-auto">
               <img
                 src={review.avatar}
                 alt={review.name}
-                className="w-20 h-20 rounded-full mb-4 object-cover border-4 border-yellow-200"
+                className="w-16 h-16 rounded-full mb-3 object-cover border-2 border-yellow-200"
               />
-              <h3 className="text-xl font-bold text-gray-800 mb-1">{review.name}</h3>
-              <p className="text-sm text-gray-500 mb-4">{review.title}</p>
-              <p className="text-lg text-gray-700 italic mb-2">“{review.review}”</p>
+              <h3 className="text-lg font-bold text-gray-800 mb-1 line-clamp-1">{review.name}</h3>
+              <p className="text-sm text-gray-500 mb-2 line-clamp-1">{review.title}</p>
+              <p className="text-base text-gray-700 italic line-clamp-6">"{review.review}"</p>
             </Card>
           ))}
         </div>

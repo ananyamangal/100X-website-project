@@ -30,7 +30,8 @@ interface Product {
   _id?: string;
   id?: string;
   name: string;
-  imageUrl: string;
+  imageUrl?: string;
+  imageUrls?: string[];
   priceRange: string;
   rating: number;
   reviewsCount: number;
@@ -121,7 +122,7 @@ function AdminDashboardContent() {
             ? data.map((p: any) => ({
                 ...p,
                 id: p._id,
-                image: p.imageUrl,
+                image: p.imageUrl || p.imageUrls?.[0] || '',
                 price: p.priceRange,
                 reviews: p.reviewsCount,
                 description: p.shortDescription,
@@ -144,7 +145,7 @@ function AdminDashboardContent() {
     setProducts([...products, {
       ...created,
       id: created._id,
-      image: created.imageUrl,
+      image: created.imageUrl || created.imageUrls?.[0] || '',
       price: created.priceRange,
       reviews: created.reviewsCount,
       description: created.shortDescription,
@@ -165,7 +166,7 @@ function AdminDashboardContent() {
     setProducts(products.map(p => p.id === updated._id ? {
       ...updated,
       id: updated._id,
-      image: updated.imageUrl,
+      image: updated.imageUrl || updated.imageUrls?.[0] || '',
       price: updated.priceRange,
       reviews: updated.reviewsCount,
       description: updated.shortDescription,
@@ -187,10 +188,8 @@ function AdminDashboardContent() {
 
   const stats = {
     totalProducts: products.length,
-    inStockProducts: products.filter((p) => p.inStock).length,
-    outOfStockProducts: products.filter((p) => !p.inStock).length,
-    averageRating: products.reduce((acc, p) => acc + p.rating, 0) / products.length || 0,
-    totalReviews: products.reduce((acc, p) => acc + p.reviewsCount, 0),
+    averageRating: products.length > 0 ? (products.reduce((acc, p) => acc + (Number(p.rating) || 0), 0) / products.length).toFixed(1) : '0.0',
+    totalReviews: products.reduce((acc, p) => acc + (Number(p.reviewsCount) || 0), 0).toString(),
   }
 
   return (
@@ -342,22 +341,8 @@ function DashboardTab({ stats, products }: { stats: any; products: Product[] }) 
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">In Stock</p>
-                <p className="text-3xl font-bold text-green-600">{stats.inStockProducts}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Package className="text-green-600" size={24} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
                 <p className="text-sm font-medium text-gray-600">Average Rating</p>
-                <p className="text-3xl font-bold text-yellow-600">{stats.averageRating.toFixed(1)}</p>
+                <p className="text-3xl font-bold text-yellow-600">{stats.averageRating}</p>
               </div>
               <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <Star className="text-yellow-600" size={24} />
@@ -388,10 +373,10 @@ function DashboardTab({ stats, products }: { stats: any; products: Product[] }) 
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recentProducts.map((product) => (
-              <div key={product.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+            {recentProducts.map((product, index) => (
+              <div key={product.id || product._id || index} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                 <img
-                  src={typeof product.imageUrl === 'string' ? product.imageUrl || '/placeholder.svg' : '/placeholder.svg'}
+                  src={typeof product.imageUrls?.[0] === 'string' ? product.imageUrls?.[0] || '/placeholder.svg' : '/placeholder.svg'}
                   alt={typeof product.name === 'string' ? product.name || 'Product Image' : 'Product Image'}
                   className="w-16 h-16 object-cover rounded-lg"
                 />
@@ -470,13 +455,13 @@ function ProductsTab({
 
       {/* Products List */}
       <div className="space-y-4">
-        {products.map((product) => (
-          <Card key={product.id} className="overflow-hidden">
+        {products.map((product, index) => (
+          <Card key={product.id || product._id || index} className="overflow-hidden">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4 flex-1">
                   <img
-                    src={typeof product.imageUrl === 'string' ? product.imageUrl || '/placeholder.svg' : '/placeholder.svg'}
+                    src={typeof product.imageUrls?.[0] === 'string' ? product.imageUrls?.[0] || '/placeholder.svg' : '/placeholder.svg'}
                     alt={typeof product.name === 'string' ? product.name || 'Product Image' : 'Product Image'}
                     className="w-20 h-20 object-cover rounded-lg"
                   />
@@ -495,9 +480,6 @@ function ProductsTab({
                         }`}
                       >
                         {product.badge}
-                      </Badge>
-                      <Badge variant={product.inStock ? "default" : "destructive"}>
-                        {product.inStock ? "In Stock" : "Out of Stock"}
                       </Badge>
                     </div>
                     <p className="text-gray-600 mb-2">{product.shortDescription}</p>
@@ -598,7 +580,7 @@ function ProductForm({
 }) {
   const [formData, setFormData] = useState({
     name: product?.name || "",
-    imageUrl: product?.imageUrl || "",
+    imageUrls: product?.imageUrls || [],
     priceRange: product?.priceRange || "",
     rating: product?.rating || 4.5,
     reviewsCount: product?.reviewsCount || 0,
@@ -607,10 +589,9 @@ function ProductForm({
     features: product?.features?.join("\n") || "",
     specifications: product?.specifications?.join("\n") || "",
     applications: product?.applications?.join("\n") || "",
-    badge: product?.badge || "New Launch",
+    badge: product?.badge || "",
     whatsappMessageText: product?.whatsappMessageText || "",
     category: product?.category || "",
-    inStock: product?.inStock ?? true,
     brochureUrl: product?.brochureUrl || "",
   })
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -620,7 +601,6 @@ function ProductForm({
     e.preventDefault()
     const productData = {
       ...formData,
-      inStock: true,
       features: formData.features.split("\n").filter((f) => f.trim()),
       specifications: formData.specifications.split("\n").filter((s) => s.trim()),
       applications: formData.applications.split("\n").filter((a) => a.trim()),
@@ -683,14 +663,22 @@ function ProductForm({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Badge</label>
               <select
-                value={formData.badge}
+                value={String(formData.badge ?? '')}
                 onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
+                <option value="">Select Badge</option>
+                <option value="Korean Technology">Korean Technology</option>
+                <option value="German Technology">German Technology</option>
+                <option value="Japnese Technology">Japnese Technology</option>
+                <option value="GeM">GeM</option>
+                <option value="Heavy Duty">Heavy Duty</option>
+                <option value="Eco Friendly">Eco Friendly</option>
+                <option value="Ecofreidly">Ecofreidly</option>
+                <option value="BIS Approved">BIS Approved</option>
                 <option value="Best Seller">Best Seller</option>
                 <option value="Eco-Friendly">Eco-Friendly</option>
                 <option value="New Launch">New Launch</option>
-                <option value="Heavy Duty">Heavy Duty</option>
                 <option value="Budget Friendly">Budget Friendly</option>
                 <option value="Precision Tech">Precision Tech</option>
               </select>
@@ -723,25 +711,58 @@ function ProductForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Product Images (max 5)</label>
             <input
               type="file"
               accept="image/*"
+              multiple
               onChange={async (e) => {
-                if (e.target.files && e.target.files[0]) {
+                if (e.target.files && e.target.files.length > 0) {
+                  let files = Array.from(e.target.files);
+                  // Prevent more than 5 images
+                  if ((formData.imageUrls?.length || 0) + files.length > 5) {
+                    files = files.slice(0, 5 - (formData.imageUrls?.length || 0));
+                  }
                   setUploadingImage(true);
                   const uploadForm = new FormData();
-                  uploadForm.append("file", e.target.files[0]);
-                  uploadForm.append("type", "image");
+                  files.forEach((file) => uploadForm.append("file", file));
+                  uploadForm.append("type", "images");
                   const res = await fetch("/api/upload", { method: "POST", body: uploadForm });
                   const data = await res.json();
-                  setFormData(prev => ({ ...prev, imageUrl: data.url }));
+                  setFormData(prev => ({
+                    ...prev,
+                    imageUrls: [...(prev.imageUrls || []), ...(data.urls || [])].slice(0, 5)
+                  }));
                   setUploadingImage(false);
                 }
               }}
+              disabled={(formData.imageUrls?.length || 0) >= 5}
             />
-            {uploadingImage && <span>Uploading image...</span>}
-            {formData.imageUrl && <img src={formData.imageUrl} alt="Product" className="w-32 h-32 object-cover mt-2" />}
+            {uploadingImage && <span>Uploading images...</span>}
+            {formData.imageUrls && formData.imageUrls.length > 0 && (
+              <div className="mt-2 flex gap-4 flex-wrap">
+                {formData.imageUrls.map((url, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={url}
+                      alt={`Product Image ${index + 1}`}
+                      className="w-32 h-32 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-80 hover:opacity-100 group-hover:opacity-100"
+                      onClick={() => setFormData(prev => ({
+                        ...prev,
+                        imageUrls: prev.imageUrls.filter((_, i) => i !== index)
+                      }))}
+                      aria-label="Remove image"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
@@ -929,7 +950,7 @@ function AnalyticsTab({ products }: { products: Product[] }) {
               .map((product) => (
                 <div key={product.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                   <img
-                    src={typeof product.imageUrl === 'string' ? product.imageUrl || '/placeholder.svg' : '/placeholder.svg'}
+                    src={typeof product.imageUrls?.[0] === 'string' ? product.imageUrls?.[0] || '/placeholder.svg' : '/placeholder.svg'}
                     alt={typeof product.name === 'string' ? product.name || 'Product Image' : 'Product Image'}
                     className="w-12 h-12 object-cover rounded-lg"
                   />
