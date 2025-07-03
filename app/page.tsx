@@ -1622,39 +1622,12 @@ function ReviewsCarousel() {
     },
   ];
 
-  // Responsive reviews per page
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  let reviewsPerPage = 5;
-  if (windowWidth < 1280) reviewsPerPage = 4;
-  if (windowWidth < 900) reviewsPerPage = 2;
-
-  const [start, setStart] = useState(0);
-  const canGoBack = start > 0;
-  const canGoForward = start + reviewsPerPage < reviews.length;
-
-  const handlePrev = () => {
-    setStart((prev) => Math.max(prev - reviewsPerPage, 0));
-  };
-  const handleNext = () => {
-    setStart((prev) => Math.min(prev + reviewsPerPage, reviews.length - reviewsPerPage));
-  };
-
   return (
     <div className="relative max-w-7xl mx-auto">
       <div className="flex items-center justify-center mb-6">
-        {canGoBack && (
-          <button onClick={handlePrev} className="p-2 rounded-full bg-gray-200 hover:bg-yellow-200 mr-4" aria-label="Previous reviews">
-            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
-          </button>
-        )}
-        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-${reviewsPerPage} lg:grid-cols-${reviewsPerPage} gap-6 w-full`}>
-          {reviews.slice(start, start + reviewsPerPage).map((review, idx) => (
-            <Card key={start + idx} className="p-6 text-center shadow-xl border-0 flex flex-col items-center min-h-[260px] max-w-[320px] mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 w-full overflow-x-auto">
+          {reviews.map((review, idx) => (
+            <Card key={idx} className="p-6 text-center shadow-xl border-0 flex flex-col items-center min-h-[260px] max-w-[320px] mx-auto">
               <img
                 src={review.avatar}
                 alt={review.name}
@@ -1666,11 +1639,6 @@ function ReviewsCarousel() {
             </Card>
           ))}
         </div>
-        {canGoForward && (
-          <button onClick={handleNext} className="p-2 rounded-full bg-gray-200 hover:bg-yellow-200 ml-4" aria-label="Next reviews">
-            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
-          </button>
-        )}
       </div>
     </div>
   );
