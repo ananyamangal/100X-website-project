@@ -823,14 +823,26 @@ function ProductForm({
                     files = files.slice(0, 5 - (formData.imageUrls?.length || 0));
                   }
                   setUploadingImage(true);
-                  const uploadForm = new FormData();
-                  files.forEach((file) => uploadForm.append("file", file));
-                  uploadForm.append("type", "images");
-                  const res = await fetch("/api/upload", { method: "POST", body: uploadForm });
-                  const data = await res.json();
+                  const urls: string[] = [];
+                  for (const file of files) {
+                    const formDataCloud = new FormData();
+                    formDataCloud.append("file", file);
+                    formDataCloud.append("upload_preset", "product_uploads");
+                    const res = await fetch(
+                      "https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload",
+                      {
+                        method: "POST",
+                        body: formDataCloud,
+                      }
+                    );
+                    const data = await res.json();
+                    if (data.secure_url) {
+                      urls.push(data.secure_url);
+                    }
+                  }
                   setFormData(prev => ({
                     ...prev,
-                    imageUrls: [...(prev.imageUrls || []), ...(data.urls || [])].slice(0, 5)
+                    imageUrls: [...(prev.imageUrls || []), ...urls].slice(0, 5)
                   }));
                   setUploadingImage(false);
                 }
@@ -872,12 +884,19 @@ function ProductForm({
               onChange={async (e) => {
                 if (e.target.files && e.target.files[0]) {
                   setUploadingBrochure(true);
-                  const uploadForm = new FormData();
-                  uploadForm.append("file", e.target.files[0]);
-                  uploadForm.append("type", "brochure");
-                  const res = await fetch("/api/upload", { method: "POST", body: uploadForm });
+                  const file = e.target.files[0];
+                  const formDataCloud = new FormData();
+                  formDataCloud.append("file", file);
+                  formDataCloud.append("upload_preset", "product_uploads");
+                  const res = await fetch(
+                    "https://api.cloudinary.com/v1_1/dhbvzugv6/raw/upload",
+                    {
+                      method: "POST",
+                      body: formDataCloud,
+                    }
+                  );
                   const data = await res.json();
-                  setFormData(prev => ({ ...prev, brochureUrl: data.url }));
+                  setFormData(prev => ({ ...prev, brochureUrl: data.secure_url }));
                   setUploadingBrochure(false);
                 }
               }}

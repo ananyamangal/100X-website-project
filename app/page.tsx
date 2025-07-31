@@ -75,6 +75,14 @@ const badgeLogoMap: Record<string, string> = {
 
 function YoutubeShortsCarousel() {
   const [shorts, setShorts] = useState<string[]>([]);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollBy = (offset: number) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
+
   useEffect(() => {
     fetch("/api/youtube-shorts")
       .then((res) => res.json())
@@ -82,7 +90,7 @@ function YoutubeShortsCarousel() {
   }, []);
   if (!shorts.length) return null;
   return (
-    <section className="py-24 bg-gray-50">
+    <section className="py-24 bg-gray-50 relative">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <Badge className="mb-6 bg-red-100 text-red-800 hover:bg-red-200 text-lg px-6 py-2">
@@ -93,20 +101,47 @@ function YoutubeShortsCarousel() {
             Watch our latest product demos, tips, and more on YouTube Shorts!
           </p>
         </div>
-        <div className="flex gap-6 overflow-x-auto pb-4">
-          {shorts.map((id) => (
-            <div key={id} className="min-w-[320px] max-w-xs flex-shrink-0 rounded-xl overflow-hidden shadow-lg bg-black">
-              <iframe
-                width="320"
-                height="568"
-                src={`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&controls=0&loop=1&playlist=${id}`}
-                title="YouTube Short"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-[568px] border-0"
-              ></iframe>
-            </div>
-          ))}
+        <div className="relative">
+          {/* Left Arrow */}
+          <button
+            type="button"
+            aria-label="Scroll left"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow p-2 rounded-full"
+            style={{ display: shorts.length > 1 ? 'block' : 'none' }}
+            onClick={() => scrollBy(-340)}
+          >
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          {/* Scrollable Shorts */}
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto pb-4 scroll-smooth"
+            style={{ scrollBehavior: 'smooth' }}
+          >
+            {shorts.map((id) => (
+              <div key={id} className="min-w-[320px] max-w-xs flex-shrink-0 rounded-xl overflow-hidden shadow-lg bg-black">
+                <iframe
+                  width="320"
+                  height="568"
+                  src={`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&controls=0&loop=1&playlist=${id}`}
+                  title="YouTube Short"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-[568px] border-0"
+                ></iframe>
+              </div>
+            ))}
+          </div>
+          {/* Right Arrow */}
+          <button
+            type="button"
+            aria-label="Scroll right"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow p-2 rounded-full"
+            style={{ display: shorts.length > 1 ? 'block' : 'none' }}
+            onClick={() => scrollBy(340)}
+          >
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
         </div>
       </div>
     </section>

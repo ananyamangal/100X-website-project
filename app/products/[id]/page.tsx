@@ -173,7 +173,13 @@ export default function ProductDetailPage() {
                 size="lg"
                 variant="outline"
                 className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent flex-1"
-                onClick={() => alert('Brochure download coming soon!')}
+                onClick={() => {
+                  if (product.brochureUrl) {
+                    window.open(product.brochureUrl, '_blank');
+                  } else {
+                    alert('Brochure download coming soon!');
+                  }
+                }}
               >
                 <Download className="mr-2" size={20} />
                 Download Brochure
