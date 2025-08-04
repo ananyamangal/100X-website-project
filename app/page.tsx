@@ -295,7 +295,7 @@ export default function HomePage() {
     { number: "500+", label: "products", icon: Package },
     { number: "50+", label: "distributors", icon: BarChart3 },
     { number: "10+", label: "Years Industry Experience", icon: Award },
-    { number: "99.8%", label: "On-Time Delivery Rate", icon: Shield },
+    
   ]
 
   const businessEmail = "100xcircle@gmail.com"
