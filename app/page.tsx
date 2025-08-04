@@ -30,6 +30,8 @@ import {
   Target,
   Eye,
   Heart,
+  Package,
+  BarChart3,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -171,22 +173,22 @@ export default function HomePage() {
   // Default hero slides (fallback)
   const defaultHeroSlides = [
     {
-      image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&h=600&fit=crop",
+      image: "/banner.jpeg",
       title: "Revolutionary Fogging Technology",
       subtitle: "Advanced pest control solutions for modern agriculture",
     },
     {
-      image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1200&h=600&fit=crop",
+      image: "/banner.jpeg",
       title: "Precision Battery Sprayers",
       subtitle: "Eco-friendly spraying with unmatched efficiency",
     },
     {
-      image: "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=1200&h=600&fit=crop",
+      image: "/banner.jpeg",
       title: "Heavy-Duty Power Tillers",
       subtitle: "Built for the toughest farming conditions",
     },
     {
-      image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&h=600&fit=crop",
+      image: "/banner.jpeg",
       title: "Complete Agricultural Solutions",
       subtitle: "[YOUR NEW TEXT HERE]",
     },
@@ -290,9 +292,10 @@ export default function HomePage() {
 
   const stats = [
     { number: "10000+", label: "happy customers", icon: Users },
-    { number: "50+", label: "Products", icon: Award },
-    { number: "28", label: "States", icon: MapPin },
-    { number: "24/7", label: "Support", icon: Shield },
+    { number: "500+", label: "products", icon: Package },
+    { number: "50+", label: "distributors", icon: BarChart3 },
+    { number: "10+", label: "Years Industry Experience", icon: Award },
+    { number: "99.8%", label: "On-Time Delivery Rate", icon: Shield },
   ]
 
   const businessEmail = "100xcircle@gmail.com"
@@ -382,7 +385,7 @@ export default function HomePage() {
       <section id="home" className="pt-32 min-h-screen relative overflow-hidden flex items-center">
         <div className="absolute inset-0">
           <img
-            src={heroSlides[currentSlide].image || "/placeholder.svg"}
+            src={heroSlides[currentSlide].image || "/banner.jpeg"}
             alt="Agricultural equipment"
             className="w-full h-full object-cover transition-all duration-1000"
           />
@@ -390,51 +393,69 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-green-900/30 to-transparent"></div>
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 py-20">
-          <div className="max-w-4xl mx-auto text-center text-white">
-            <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
-            Certified Professional Products 
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            {/* Text Content - Left Side */}
+            <div className="text-white text-center md:text-left">
+              <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
+                Certified Professional Products 
+              </Badge>
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+                100X – <span className="text-green-400">Built</span> with Technology
+              </h1>
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
+                {changingPhrases[phraseIndex]}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center md:justify-start mb-8">
+                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
+                  <Link href="#products" className="flex items-center">
+                    Explore Products <ArrowRight className="ml-2" size={20} />
+                  </Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-lg px-8 py-4 bg-transparent"
+                  onClick={() =>
+                    window.open(
+                      "https://www.youtube.com/@100Xcircle",
+                      "_blank",
+                    )
+                  }
+                >
+                  <Play className="mr-2" size={20} />
+                  Watch Demo
+                </Button>
+              </div>
 
-            </Badge>
-            <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-              100X – <span className="text-green-400">Built</span> with Technology
-            </h1>
-            <div className="text-2xl md:text-3xl font-bold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
-              {changingPhrases[phraseIndex]}
-            </div>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-              <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-10 py-4">
-                <Link href="#products" className="flex items-center">
-                  Explore Products <ArrowRight className="ml-2" size={20} />
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-lg px-10 py-4 bg-transparent"
-                onClick={() =>
-                  window.open(
-                    "https://www.youtube.com/@100Xcircle",
-                    "_blank",
-                  )
-                }
-              >
-                <Play className="mr-2" size={20} />
-                Watch Demo
-              </Button>
+              {/* Stats Section - Left Side Only */}
+              <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-md mx-auto md:mx-0">
+                {stats.map((stat, index) => (
+                  <div key={index} className="text-center md:text-left">
+                    <div className="text-3xl font-bold text-green-400 mb-2">{stat.number}</div>
+                    <div className="text-sm text-gray-300">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Hero Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            {/* Empty Right Side on Desktop */}
+            <div className="hidden md:block">
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Section - Mobile View */}
+        <div className="md:hidden mt-8">
+            <div className="grid grid-cols-2 gap-8 max-w-md mx-auto">
               {stats.map((stat, index) => (
                 <div key={index} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-green-400 mb-2">{stat.number}</div>
-                  <div className="text-sm md:text-base text-gray-300">{stat.label}</div>
+                  <div className="text-3xl font-bold text-green-400 mb-2">{stat.number}</div>
+                  <div className="text-sm text-gray-300">{stat.label}</div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
 
         {/* Slide Indicators */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
