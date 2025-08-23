@@ -5,8 +5,6 @@ import { ObjectId } from 'mongodb';
 interface Banner {
   _id?: string;
   image: string;
-  title: string;
-  subtitle: string;
   order: number;
   isActive: boolean;
   createdAt?: Date;
@@ -15,8 +13,6 @@ interface Banner {
 
 interface BannerInput {
   image: string;
-  title: string;
-  subtitle: string;
   order?: number;
   isActive?: boolean;
 }

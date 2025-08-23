@@ -54,7 +54,8 @@ interface Product {
   features: string[];
   specifications: string[];
   applications: string[];
-  badge: string;
+  badges: string[]; // Changed from badge: string to badges: string[]
+  youtubeLink?: string; // Added YouTube link field
   whatsappMessageText: string;
   category: string;
   inStock: boolean;
@@ -1153,22 +1154,27 @@ function ProductDetailPage({
             </div>
           </div>
           <div>
-            <Badge
-              className={`$${
-                product.badge === "Best Seller"
-                  ? "bg-red-500 hover:bg-red-600"
-                  : product.badge === "Eco-Friendly"
-                    ? "bg-green-500 hover:bg-green-600"
-                    : product.badge === "New Launch"
-                      ? "bg-blue-500 hover:bg-blue-600"
-                      : "bg-orange-500 hover:bg-orange-600"
-              } flex items-center gap-2`}
-            >
-              {badgeLogoMap[product.badge] && (
-                <img src={badgeLogoMap[product.badge]} alt={product.badge + ' logo'} className="inline-block w-6 h-6 object-contain mr-1" />
-              )}
-              {product.badge}
-            </Badge>
+            <div className="flex flex-wrap gap-3 mb-4">
+              {(product.badges || [product.badge]).map((badge, index) => (
+                <Badge
+                  key={index}
+                  className={`$${
+                    badge === "Best Seller"
+                      ? "bg-red-500 hover:bg-red-600"
+                      : badge === "Eco-Friendly"
+                        ? "bg-green-500 hover:bg-green-600"
+                        : badge === "New Launch"
+                          ? "bg-blue-500 hover:bg-blue-600"
+                          : "bg-orange-500 hover:bg-orange-600"
+                  } flex items-center gap-2`}
+                >
+                  {badgeLogoMap[badge] && (
+                    <img src={badgeLogoMap[badge]} alt={badge + ' logo'} className="inline-block w-6 h-6 object-contain mr-1" />
+                  )}
+                  {badge}
+                </Badge>
+              ))}
+            </div>
             <h1 className="text-4xl font-bold text-gray-800 mb-4">{product.name}</h1>
             <div className="flex items-center space-x-4 mb-6">
               <div className="flex items-center space-x-1">
@@ -1236,6 +1242,19 @@ function ProductDetailPage({
                     <span className="font-semibold text-gray-800">{spec.split(":")[1]}</span>
                   </div>
                 ))}
+                {product.youtubeLink && (
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                    <span className="text-gray-600">YouTube Demo:</span>
+                    <a 
+                      href={product.youtubeLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="font-semibold text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Watch Demo Video
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>

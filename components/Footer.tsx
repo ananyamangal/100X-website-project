@@ -61,7 +61,10 @@ export default function Footer() {
           </div>
         </div>
         <div className="text-center text-gray-500 text-sm border-t border-gray-800 pt-8">
-          &copy; {new Date().getFullYear()} 100X Circle Pvt Ltd. All rights reserved.
+          <div className="flex justify-center items-center space-x-4">
+            <span>&copy; {new Date().getFullYear()} 100X Circle Pvt Ltd. All rights reserved.</span>
+            <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
+          </div>
         </div>
       </div>
     </footer>

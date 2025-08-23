@@ -45,7 +45,8 @@ interface Product {
   features: string[];
   specifications: string[];
   applications: string[];
-  badge: string;
+  badges: string[]; // Changed from badge: string to badges: string[]
+  youtubeLink?: string; // Added YouTube link field
   whatsappMessageText: string;
   category: string;
   inStock: boolean;
@@ -58,8 +59,6 @@ interface Banner {
   _id?: string;
   id?: string;
   image: string;
-  title: string;
-  subtitle: string;
   order: number;
   isActive: boolean;
   createdAt?: string;
@@ -632,17 +631,27 @@ function DashboardTab({ stats, products }: { stats: any; products: Product[] }) 
                   <h3 className="font-semibold text-gray-900">{product.name}</h3>
                   <p className="text-sm text-gray-600">{product.priceRange}</p>
                 </div>
-                <Badge
-                  className={`${
-                    product.badge === "Best Seller"
-                      ? "bg-red-100 text-red-800"
-                      : product.badge === "Eco-Friendly"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-blue-100 text-blue-800"
-                  }`}
-                >
-                  {product.badge}
-                </Badge>
+                <div className="flex flex-wrap gap-1">
+                  {(product.badges || [product.badge]).slice(0, 2).map((badge, index) => (
+                    <Badge
+                      key={index}
+                      className={`${
+                        badge === "Best Seller"
+                          ? "bg-red-100 text-red-800"
+                          : badge === "Eco-Friendly"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {badge}
+                    </Badge>
+                  ))}
+                  {(product.badges || [product.badge]).length > 2 && (
+                    <Badge className="bg-gray-100 text-gray-600 text-xs">
+                      +{(product.badges || [product.badge]).length - 2}
+                    </Badge>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -722,19 +731,29 @@ function ProductsTab({
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
                       <h3 className="text-xl font-bold text-gray-900">{product.name}</h3>
-                      <Badge
-                        className={`${
-                          product.badge === "Best Seller"
-                            ? "bg-red-100 text-red-800"
-                            : product.badge === "Eco-Friendly"
-                              ? "bg-green-100 text-green-800"
-                              : product.badge === "New Launch"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-orange-100 text-orange-800"
-                        }`}
-                      >
-                        {product.badge}
-                      </Badge>
+                      <div className="flex flex-wrap gap-2">
+                        {(product.badges || [product.badge]).slice(0, 3).map((badge, index) => (
+                          <Badge
+                            key={index}
+                            className={`${
+                              badge === "Best Seller"
+                                ? "bg-red-100 text-red-800"
+                                : badge === "Eco-Friendly"
+                                  ? "bg-green-100 text-green-800"
+                                  : badge === "New Launch"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : "bg-orange-100 text-orange-800"
+                            }`}
+                          >
+                            {badge}
+                          </Badge>
+                        ))}
+                        {(product.badges || [product.badge]).length > 3 && (
+                          <Badge className="bg-gray-100 text-gray-600">
+                            +{(product.badges || [product.badge]).length - 3} more
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <p className="text-gray-600 mb-2">{product.shortDescription}</p>
                     <div className="flex items-center space-x-4 text-sm text-gray-500">
@@ -940,7 +959,8 @@ function ProductForm({
     features: product?.features?.join("\n") || "",
     specifications: product?.specifications?.join("\n") || "",
     applications: product?.applications?.join("\n") || "",
-    badge: product?.badge || "",
+    badges: product?.badges || [], // Changed from badge to badges array
+    youtubeLink: product?.youtubeLink || "", // Added YouTube link field
     whatsappMessageText: product?.whatsappMessageText || "",
     category: product?.category || "",
     brochureUrl: product?.brochureUrl || "",
@@ -955,6 +975,7 @@ function ProductForm({
       features: formData.features.split("\n").filter((f) => f.trim()),
       specifications: formData.specifications.split("\n").filter((s) => s.trim()),
       applications: formData.applications.split("\n").filter((a) => a.trim()),
+      badges: Array.isArray(formData.badges) ? formData.badges : [], // Ensure badges is always an array
       ...(product && { id: product.id, createdAt: product.createdAt }),
     }
     onSave(productData)
@@ -998,27 +1019,52 @@ function ProductForm({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Badge</label>
-              <select
-                value={String(formData.badge ?? '')}
-                onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="">Select Badge</option>
-                <option value="Korean Technology">Korean Technology</option>
-                <option value="German Technology">German Technology</option>
-                <option value="Japnese Technology">Japnese Technology</option>
-                <option value="GeM">GeM</option>
-                <option value="Heavy Duty">Heavy Duty</option>
-                <option value="Eco Friendly">Eco Friendly</option>
-                <option value="Ecofreidly">Ecofreidly</option>
-                <option value="BIS Approved">BIS Approved</option>
-                <option value="Best Seller">Best Seller</option>
-                <option value="Eco-Friendly">Eco-Friendly</option>
-                <option value="New Launch">New Launch</option>
-                <option value="Budget Friendly">Budget Friendly</option>
-                <option value="Precision Tech">Precision Tech</option>
-              </select>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Badges (Select multiple)</label>
+              <div className="space-y-2">
+                {[
+                  "Korean Technology",
+                  "German Technology", 
+                  "Japnese Technology",
+                  "GeM",
+                  "Heavy Duty",
+                  "Eco Friendly",
+                  "Ecofreidly",
+                  "BIS Approved",
+                  "Best Seller",
+                  "Eco-Friendly",
+                  "New Launch",
+                  "Budget Friendly",
+                  "Precision Tech"
+                ].map((badge) => (
+                  <label key={badge} className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.badges.includes(badge)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({ ...formData, badges: [...formData.badges, badge] });
+                        } else {
+                          setFormData({ ...formData, badges: formData.badges.filter(b => b !== badge) });
+                        }
+                      }}
+                      className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                    />
+                    <span className="text-sm text-gray-700">{badge}</span>
+                  </label>
+                ))}
+              </div>
+              {formData.badges.length > 0 && (
+                <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Selected Badges:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.badges.map((badge, index) => (
+                      <Badge key={index} className="bg-green-100 text-green-800">
+                        {badge}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -1194,6 +1240,17 @@ function ProductForm({
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">YouTube Link (Optional)</label>
+            <Input
+              value={formData.youtubeLink}
+              onChange={(e) => setFormData({ ...formData, youtubeLink: e.target.value })}
+              placeholder="https://www.youtube.com/watch?v=..."
+              type="url"
+            />
+            <p className="text-xs text-gray-500 mt-1">Enter the full YouTube URL for product demo or review videos</p>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp Message Text</label>
             <Input
               value={formData.whatsappMessageText}
@@ -1231,7 +1288,12 @@ function AnalyticsTab({ products }: { products: Product[] }) {
 
   const badgeStats = products.reduce(
     (acc, product) => {
-      acc[product.badge] = (acc[product.badge] || 0) + 1
+      const badges = product.badges || [product.badge];
+      badges.forEach(badge => {
+        if (badge) {
+          acc[badge] = (acc[badge] || 0) + 1;
+        }
+      });
       return acc
     },
     {} as Record<string, number>,
@@ -1604,15 +1666,14 @@ function BannersTab({
                     <div className="w-64 h-40 flex-shrink-0">
                       <img
                         src={banner.image}
-                        alt={banner.title}
+                        alt="Banner"
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex-1 p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">{banner.title}</h3>
-                          <p className="text-gray-600 mb-2">{banner.subtitle}</p>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">Banner Image</h3>
                           <div className="flex items-center space-x-4 text-sm text-gray-500">
                             <span>Order: {banner.order}</span>
                             <span>Status: {banner.isActive ? 'Active' : 'Inactive'}</span>
@@ -1678,8 +1739,6 @@ function BannerForm({
 }) {
   const [formData, setFormData] = useState({
     image: banner?.image || "",
-    title: banner?.title || "",
-    subtitle: banner?.subtitle || "",
     order: banner?.order || 1,
     isActive: banner?.isActive ?? true,
   })
@@ -1695,17 +1754,51 @@ function BannerForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
-              <Input
-                type="url"
-                value={formData.image}
-                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                placeholder="https://example.com/image.jpg"
+              <label className="block text-sm font-medium text-gray-700 mb-2">Banner Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const formDataCloud = new FormData();
+                    formDataCloud.append("file", file);
+                    formDataCloud.append("upload_preset", "product_uploads");
+                    
+                    try {
+                      const res = await fetch(
+                        "https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload",
+                        {
+                          method: "POST",
+                          body: formDataCloud,
+                        }
+                      );
+                      const data = await res.json();
+                      if (data.secure_url) {
+                        setFormData({ ...formData, image: data.secure_url });
+                      }
+                    } catch (error) {
+                      console.error('Error uploading image:', error);
+                      alert('Failed to upload image. Please try again.');
+                    }
+                  }
+                }}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">Upload a banner image from your computer</p>
+              {formData.image && (
+                <div className="mt-2">
+                  <img 
+                    src={formData.image} 
+                    alt="Banner preview" 
+                    className="w-full h-32 object-cover rounded-lg border"
+                  />
+                </div>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Order</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
               <Input
                 type="number"
                 value={formData.order}
@@ -1713,28 +1806,8 @@ function BannerForm({
                 min="1"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
             </div>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-            <Input
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Banner title"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Subtitle</label>
-            <Textarea
-              value={formData.subtitle}
-              onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-              placeholder="Banner subtitle"
-              rows={3}
-              required
-            />
           </div>
           
           <div className="flex items-center space-x-2">

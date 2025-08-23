@@ -31,32 +31,42 @@ export default function ProductCard({
   return (
     <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg">
       <div className="relative overflow-hidden">
-        <img
-          src={product.imageUrls?.[0] || '/placeholder.svg'}
-          alt={product.name}
-          className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-        />
-        <div className="absolute top-4 left-4">
-          <Badge
-            className={`$${
-              product.badge === 'Best Seller'
-                ? 'bg-red-500 hover:bg-red-600'
-                : product.badge === 'Eco-Friendly'
-                ? 'bg-green-500 hover:bg-green-600'
-                : product.badge === 'New Launch'
-                ? 'bg-blue-500 hover:bg-blue-600'
-                : 'bg-orange-500 hover:bg-orange-600'
-            } flex items-center gap-2`}
-          >
-            {badgeLogoMap[product.badge] && (
-              <img
-                src={badgeLogoMap[product.badge]}
-                alt={product.badge + ' logo'}
-                className="inline-block w-6 h-6 object-contain mr-1"
-              />
-            )}
-            {product.badge}
-          </Badge>
+        <div className="relative w-full aspect-square overflow-hidden">
+          <img
+            src={product.imageUrls?.[0] || '/placeholder.svg'}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+        </div>
+        <div className="absolute top-4 left-4 flex flex-wrap gap-1 max-w-[calc(100%-2rem)]">
+          {(product.badges || [product.badge]).slice(0, 3).map((badge, index) => (
+            <Badge
+              key={index}
+              className={`$${
+                badge === 'Best Seller'
+                  ? 'bg-red-500 hover:bg-red-600'
+                  : badge === 'Eco-Friendly'
+                  ? 'bg-green-500 hover:bg-green-600'
+                  : badge === 'New Launch'
+                  ? 'bg-blue-500 hover:bg-blue-600'
+                  : 'bg-orange-500 hover:bg-orange-600'
+              } flex items-center gap-1 px-2 py-1 text-xs whitespace-nowrap`}
+            >
+              {badgeLogoMap[badge] && (
+                <img
+                  src={badgeLogoMap[badge]}
+                  alt={badge + ' logo'}
+                  className="w-4 h-4 object-contain"
+                />
+              )}
+              <span className="truncate">{badge}</span>
+            </Badge>
+          ))}
+          {(product.badges || [product.badge]).length > 3 && (
+            <Badge className="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 text-xs">
+              +{(product.badges || [product.badge]).length - 3}
+            </Badge>
+          )}
         </div>
         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
           <div className="flex items-center space-x-1">

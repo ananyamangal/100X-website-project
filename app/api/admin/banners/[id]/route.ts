@@ -4,8 +4,6 @@ import { ObjectId } from 'mongodb';
 
 interface BannerUpdate {
   image?: string;
-  title?: string;
-  subtitle?: string;
   order?: number;
   isActive?: boolean;
 }
