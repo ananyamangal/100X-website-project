@@ -19,12 +19,16 @@ import {
   ChevronDown,
   ChevronUp,
   Image,
+  Check,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 import Cookies from 'js-cookie';
 
 interface Product {
@@ -126,6 +130,32 @@ function AdminDashboardContent() {
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [uploadingBrochure, setUploadingBrochure] = useState(false)
+  const [categories, setCategories] = useState<string[]>(() => {
+    // Try to load categories from localStorage, fallback to default categories
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('admin-categories')
+      if (saved) {
+        try {
+          return JSON.parse(saved)
+        } catch (e) {
+          console.error('Failed to parse saved categories:', e)
+        }
+      }
+    }
+    return [
+      "Vehicle mountable Fogging Machines",
+      "Cold Foggers",
+      "Agriculture Sprayers",
+      "Power Weeders and Tillers",
+      "Brush Cutter",
+      "Lawn mower",
+      "Water pumps",
+      "Chain Saw",
+      "Chaff Cutter",
+      "seeders",
+      "Trolleys"
+    ]
+  })
 
   // Fetch products from API
   useEffect(() => {
@@ -175,7 +205,9 @@ function AdminDashboardContent() {
       body: JSON.stringify(newProduct),
     })
     const created = await res.json()
-    setProducts([...products, {
+    
+    // Add the new product to state
+    const updatedProducts = [...products, {
       ...created,
       id: created._id,
       image: created.imageUrl || created.imageUrls?.[0] || '',
@@ -183,7 +215,25 @@ function AdminDashboardContent() {
       reviews: created.reviewsCount,
       description: created.shortDescription,
       whatsappText: created.whatsappMessageText,
-    }])
+    }]
+    setProducts(updatedProducts)
+    
+    // Check if the new product has a category that's not in our categories list
+    if (newProduct.category && !categories.includes(newProduct.category)) {
+      console.log('Adding new category:', newProduct.category);
+      const updatedCategories = [...categories, newProduct.category]
+      setCategories(updatedCategories)
+      
+      // Update localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
+        console.log('Updated localStorage with categories:', updatedCategories);
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new Event('categoriesUpdated'))
+        console.log('Dispatched categoriesUpdated event');
+      }
+    }
+    
     setIsAddingProduct(false)
   }
 
@@ -196,7 +246,12 @@ function AdminDashboardContent() {
       body: JSON.stringify(updatedProduct),
     })
     const updated = await res.json()
-    setProducts(products.map(p => p.id === updated._id ? {
+    
+    // Get the old product to check if category changed
+    const oldProduct = products.find(p => p.id === updatedProduct.id)
+    
+    // Update products state
+    const updatedProducts = products.map(p => p.id === updated._id ? {
       ...updated,
       id: updated._id,
       image: updated.imageUrl || updated.imageUrls?.[0] || '',
@@ -204,7 +259,25 @@ function AdminDashboardContent() {
       reviews: updated.reviewsCount,
       description: updated.shortDescription,
       whatsappText: updated.whatsappMessageText,
-    } : p))
+    } : p)
+    setProducts(updatedProducts)
+    
+    // Check if the updated product has a new category that's not in our categories list
+    if (updatedProduct.category && !categories.includes(updatedProduct.category)) {
+      const updatedCategories = [...categories, updatedProduct.category]
+      setCategories(updatedCategories)
+      
+      // Update localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new Event('categoriesUpdated'))
+      }
+    }
+    
+    // Clean up empty categories (this will handle the old category if it's no longer used)
+    cleanupEmptyCategories(updatedProducts)
+    
     setEditingProduct(null)
   }
 
@@ -215,7 +288,13 @@ function AdminDashboardContent() {
         method: "DELETE",
         credentials: "include",
       })
-      setProducts(products.filter(p => p.id !== productId))
+      
+      // Remove the product from state
+      const updatedProducts = products.filter(p => p.id !== productId)
+      setProducts(updatedProducts)
+      
+      // Clean up empty categories
+      cleanupEmptyCategories(updatedProducts)
     }
   }
 
@@ -259,6 +338,48 @@ function AdminDashboardContent() {
         credentials: "include",
       })
       setBanners(banners.filter(b => b.id !== bannerId))
+    }
+  }
+
+  // Utility function to clean up empty categories
+  const cleanupEmptyCategories = (currentProducts: Product[]) => {
+    const remainingCategories = new Set(currentProducts.map(p => p.category))
+    const categoriesToRemove = categories.filter(cat => !remainingCategories.has(cat))
+    
+    if (categoriesToRemove.length > 0) {
+      const updatedCategories = categories.filter(cat => remainingCategories.has(cat))
+      setCategories(updatedCategories)
+      
+      // Update localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new Event('categoriesUpdated'))
+      }
+      
+      // Show notification about removed categories
+      if (categoriesToRemove.length === 1) {
+        alert(`Category "${categoriesToRemove[0]}" has been removed as it no longer has any products.`)
+      } else {
+        alert(`Categories "${categoriesToRemove.join(', ')}" have been removed as they no longer have any products.`)
+      }
+      
+      return true // Categories were cleaned up
+    }
+    return false // No cleanup needed
+  }
+
+  // Add new category
+  const handleAddCategory = (newCategory: string) => {
+    if (!categories.includes(newCategory)) {
+      const updatedCategories = [...categories, newCategory]
+      setCategories(updatedCategories)
+      // Save to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new Event('categoriesUpdated'))
+      }
     }
   }
 
@@ -357,6 +478,17 @@ function AdminDashboardContent() {
                 Banners
               </button>
               <button
+                onClick={() => setActiveTab("categories")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "categories"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Package className="mr-3" size={20} />
+                Categories
+              </button>
+              <button
                 onClick={() => setActiveTab("submissions")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "submissions"
@@ -376,9 +508,11 @@ function AdminDashboardContent() {
             {activeTab === "products" && (
               <ProductsTab
                 products={products}
+                categories={categories}
                 onAddProduct={handleAddProduct}
                 onUpdateProduct={handleUpdateProduct}
                 onDeleteProduct={handleDeleteProduct}
+                onAddCategory={handleAddCategory}
                 isAddingProduct={isAddingProduct}
                 setIsAddingProduct={setIsAddingProduct}
                 editingProduct={editingProduct}
@@ -401,6 +535,21 @@ function AdminDashboardContent() {
               />
             )}
             {activeTab === "content" && <ContentTab />}
+            {activeTab === "categories" && (
+              <CategoriesTab
+                categories={categories}
+                onAddCategory={handleAddCategory}
+                onDeleteCategory={(categoryToDelete) => {
+                  const updatedCategories = categories.filter(cat => cat !== categoryToDelete)
+                  setCategories(updatedCategories)
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
+                    // Dispatch custom event to notify other components
+                    window.dispatchEvent(new Event('categoriesUpdated'))
+                  }
+                }}
+              />
+            )}
             {activeTab === "submissions" && <SubmissionsTab />}
           </div>
         </div>
@@ -506,9 +655,11 @@ function DashboardTab({ stats, products }: { stats: any; products: Product[] }) 
 // Products Tab Component
 function ProductsTab({
   products,
+  categories,
   onAddProduct,
   onUpdateProduct,
   onDeleteProduct,
+  onAddCategory,
   isAddingProduct,
   setIsAddingProduct,
   editingProduct,
@@ -517,9 +668,11 @@ function ProductsTab({
   setExpandedProduct,
 }: {
   products: Product[]
+  categories: string[]
   onAddProduct: (product: Omit<Product, "id" | "createdAt" | "updatedAt" | "_id">) => void
   onUpdateProduct: (product: Product) => void
   onDeleteProduct: (id: string) => void
+  onAddCategory: (category: string) => void
   isAddingProduct: boolean
   setIsAddingProduct: (value: boolean) => void
   editingProduct: Product | null
@@ -544,6 +697,8 @@ function ProductsTab({
       {(isAddingProduct || editingProduct) && (
         <ProductForm
           product={editingProduct}
+          categories={categories}
+          onAddCategory={onAddCategory}
           onSave={editingProduct ? onUpdateProduct : onAddProduct}
           onCancel={() => {
             setIsAddingProduct(false)
@@ -667,13 +822,110 @@ function ProductsTab({
   )
 }
 
+// Category Combobox Component
+function CategoryCombobox({
+  value,
+  onValueChange,
+  categories,
+  onAddCategory,
+}: {
+  value: string
+  onValueChange: (value: string) => void
+  categories: string[]
+  onAddCategory: (category: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [inputValue, setInputValue] = useState(value)
+
+  // Update input value when value prop changes
+  useEffect(() => {
+    setInputValue(value)
+  }, [value])
+
+  const handleSelect = (selectedValue: string) => {
+    if (selectedValue === "add-new") {
+      // Add new category
+      if (inputValue.trim()) {
+        onAddCategory(inputValue.trim())
+        onValueChange(inputValue.trim())
+      }
+    } else {
+      onValueChange(selectedValue)
+      setInputValue(selectedValue)
+    }
+    setOpen(false)
+  }
+
+  const handleInputChange = (newValue: string) => {
+    setInputValue(newValue)
+    onValueChange(newValue) // Update the form value as user types
+  }
+
+  const filteredCategories = categories.filter(category =>
+    category.toLowerCase().includes(inputValue.toLowerCase())
+  )
+
+  return (
+    <div className="relative">
+      <Input
+        value={inputValue}
+        onChange={(e) => handleInputChange(e.target.value)}
+        placeholder="Type or select category..."
+        className="w-full"
+        onFocus={() => setOpen(true)}
+        onBlur={() => {
+          // Delay closing to allow clicking on dropdown items
+          setTimeout(() => setOpen(false), 200)
+        }}
+      />
+      {open && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+          {inputValue.trim() && !categories.includes(inputValue.trim()) && (
+            <div
+              className="px-3 py-2 text-sm text-green-600 hover:bg-gray-100 cursor-pointer flex items-center"
+              onClick={() => handleSelect("add-new")}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Use "{inputValue.trim()}" as new category
+            </div>
+          )}
+          {filteredCategories.map((category) => (
+            <div
+              key={category}
+              className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer flex items-center"
+              onClick={() => handleSelect(category)}
+            >
+              <Check
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  value === category ? "opacity-100" : "opacity-0"
+                )}
+              />
+              {category}
+            </div>
+          ))}
+          {filteredCategories.length === 0 && !inputValue.trim() && (
+            <div className="px-3 py-2 text-sm text-gray-500">
+              No categories found
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Product Form Component
 function ProductForm({
   product,
+  categories,
+  onAddCategory,
   onSave,
   onCancel,
 }: {
   product?: Product | null
+  categories: string[]
+  onAddCategory: (category: string) => void
   onSave: (product: any) => void
   onCancel: () => void
 }) {
@@ -726,26 +978,12 @@ function ProductForm({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-              <select
+              <CategoryCombobox
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
-              >
-                <option value="">Select Category</option>
-                <option value="Vehicle mountable Fogging Machines">Vehicle mountable Fogging Machines</option>
-                <option value="Cold Foggers">Cold Foggers </option>
-                <option value="Agriculture Sprayers">Agriculture Sprayers</option>
-                <option value="Power Weeders and  Tillers">Power Weeders and  Tillers</option>
-                <option value="Brush Cutter">Brush Cutter</option>
-                <option value="Lawn mower">Lawn mower</option>
-                <option value="Water pumps">Water pumps</option>
-                <option value="Chain Saw">Chain Saw</option>
-                <option value="Chaff Cutter">Chaff Cutter</option>
-                <option value="seeders">seeders</option>
-                <option value="Trolleys">Trolleys</option>
-               
-              </select>
+                onValueChange={(value) => setFormData({ ...formData, category: value })}
+                categories={categories}
+                onAddCategory={onAddCategory}
+              />
             </div>
           </div>
 
@@ -1161,6 +1399,87 @@ function ContentTab() {
               <FileText className="mr-2" size={16} />
               Legal Pages
             </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+// Categories Tab Component
+function CategoriesTab({
+  categories,
+  onAddCategory,
+  onDeleteCategory,
+}: {
+  categories: string[]
+  onAddCategory: (category: string) => void
+  onDeleteCategory: (category: string) => void
+}) {
+  const [newCategory, setNewCategory] = useState("")
+
+  const handleAddCategory = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
+      onAddCategory(newCategory.trim())
+      setNewCategory("")
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Category Management</h2>
+        <p className="text-gray-600">Manage product categories for your catalog</p>
+      </div>
+
+      {/* Add New Category */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Add New Category</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleAddCategory} className="flex gap-4">
+            <Input
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="Enter new category name"
+              className="flex-1"
+            />
+            <Button type="submit" disabled={!newCategory.trim() || categories.includes(newCategory.trim())}>
+              <Plus className="mr-2" size={16} />
+              Add Category
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* Categories List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Existing Categories ({categories.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {categories.map((category, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium text-gray-900">{category}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onDeleteCategory(category)}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="mr-1" size={14} />
+                  Delete
+                </Button>
+              </div>
+            ))}
+            {categories.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                No categories found. Add your first category above.
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
