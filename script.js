@@ -183,7 +183,7 @@ function showLoading() {
 // Performance optimization - defer non-critical JavaScript
 window.addEventListener("load", () => {
   // Add any non-critical functionality here
-  console.log("100X Agricultural Equipment website loaded successfully!")
+  console.log("100X Equipment website loaded successfully!")
 })
 
 // Error handling for external resources

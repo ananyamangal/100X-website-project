@@ -400,7 +400,7 @@ function AdminDashboardContent() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-sm text-gray-500">Manage your agricultural equipment catalog</p>
+                <p className="text-sm text-gray-500">Manage your equipment catalog</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -694,7 +694,7 @@ function ProductsTab({
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Product Management</h2>
-          <p className="text-gray-600">Add, edit, and manage your agricultural equipment catalog</p>
+          <p className="text-gray-600">Add, edit, and manage your equipment catalog</p>
         </div>
         <Button onClick={() => setIsAddingProduct(true)} className="bg-green-600 hover:bg-green-700">
           <Plus className="mr-2" size={16} />

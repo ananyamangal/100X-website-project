@@ -409,9 +409,9 @@ p {
 
 .contact-form {
   background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
@@ -429,10 +429,10 @@ p {
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 12px;
+  padding: 16px;
   border: 2px solid #ddd;
-  border-radius: 5px;
-  font-size: 1rem;
+  border-radius: 8px;
+  font-size: 1.125rem;
   transition: border-color 0.3s ease;
 }
 

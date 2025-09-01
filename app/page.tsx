@@ -76,6 +76,7 @@ const badgeLogoMap: Record<string, string> = {
   'BIS Approved': '/logos clipart 2/BIS approved.png',
 };
 
+
 function YoutubeShortsCarousel() {
   const [shorts, setShorts] = useState<string[]>([]);
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -190,7 +191,7 @@ export default function HomePage() {
     },
     {
       image: "/banner.jpeg",
-      title: "Complete Agricultural Solutions",
+      title: "Complete Solutions",
       subtitle: "[YOUR NEW TEXT HERE]",
     },
   ]
@@ -237,6 +238,26 @@ export default function HomePage() {
     return () => clearInterval(timer)
   }, [])
 
+  // Handle hash-based navigation (e.g., /#about, /#contact)
+  useEffect(() => {
+    const handleHashNavigation = () => {
+      const hash = typeof window !== 'undefined' ? window.location.hash : ''
+      if (hash === '#about') {
+        setCurrentPage('about')
+      } else if (hash === '#contact') {
+        setCurrentPage('home')
+        setTimeout(() => {
+          const el = document.getElementById('contact')
+          if (el) el.scrollIntoView({ behavior: 'smooth' })
+        }, 100)
+      }
+    }
+
+    handleHashNavigation()
+    window.addEventListener('hashchange', handleHashNavigation)
+    return () => window.removeEventListener('hashchange', handleHashNavigation)
+  }, [])
+
   useEffect(() => {
     const timer = setInterval(() => {
       setPhraseIndex((prev) => (prev + 1) % changingPhrases.length)
@@ -247,7 +268,7 @@ export default function HomePage() {
   const blogPosts = [
     {
       id: 1,
-      title: "Top 10 Agricultural Equipment Maintenance Tips for 2024",
+      title: "Top 10 Equipment Maintenance Tips for 2024",
       excerpt:
         "Learn essential maintenance practices to extend the life of your farming equipment and maximize productivity.",
       image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=250&fit=crop",
@@ -559,9 +580,9 @@ export default function HomePage() {
             <Badge className="mb-6 bg-purple-100 text-purple-800 hover:bg-purple-200 text-lg px-6 py-2">
               Latest Blog Posts
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Agricultural Insights & Tips</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Industry Insights & Tips</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Stay updated with the latest farming techniques, equipment guides, and industry insights
+              Stay updated with the latest usage techniques, equipment guides, and industry insights
             </p>
           </div>
 
@@ -650,19 +671,6 @@ export default function HomePage() {
                   <div>
                     <div className="font-semibold text-gray-800">Address</div>
                     <div className="text-gray-600">UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana</div>
-                    {/* Google Map Embed */}
-                    <div className="mt-4 rounded-xl overflow-hidden shadow-lg">
-                      <iframe
-                        src="https://www.google.com/maps?q=UG,398,Sector+7,Industrial+Model+Township,Gurugram,Haryana&output=embed"
-                        width="100%"
-                        height="300"
-                        style={{ border: 0 }}
-                        allowFullScreen={true}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title="100X Location Map"
-                      ></iframe>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -670,18 +678,18 @@ export default function HomePage() {
 
             {/* Contact Form */}
             <Card className="border-0 shadow-xl">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">Send us a Message</h3>
-                <form onSubmit={handleContactSubmit} className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input name="firstName" placeholder="First Name" required className="p-4" />
-                    <Input name="lastName" placeholder="Last Name" required className="p-4" />
+              <CardContent className="p-10">
+                <h3 className="text-3xl font-bold text-gray-800 mb-8">Send us a Message</h3>
+                <form onSubmit={handleContactSubmit} className="space-y-7 text-lg">
+                  <div className="grid grid-cols-2 gap-5">
+                    <Input name="firstName" placeholder="First Name" required className="p-5 text-lg" />
+                    <Input name="lastName" placeholder="Last Name" required className="p-5 text-lg" />
                   </div>
-                  <Input name="phone" type="tel" placeholder="Phone Number" required className="p-4" />
-                  <Input name="email" type="email" placeholder="Email Address" required className="p-4" />
+                  <Input name="phone" type="tel" placeholder="Phone Number" required className="p-5 text-lg" />
+                  <Input name="email" type="email" placeholder="Email Address" required className="p-5 text-lg" />
                   <select
                     name="subject"
-                    className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full p-5 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   >
                     <option value="">Select Product Interest</option>
@@ -694,9 +702,9 @@ export default function HomePage() {
                     <option value="support">Technical Support</option>
                     <option value="dealer">Dealer Partnership</option>
                   </select>
-                  <Textarea name="message" placeholder="Your Message" rows={4} required className="p-4 resize-none" />
-                  <Button type="submit" size="lg" className="w-full bg-green-600 hover:bg-green-700">
-                    Send Message via WhatsApp <MessageCircle className="ml-2" size={20} />
+                  <Textarea name="message" placeholder="Your Message" rows={6} required className="p-5 text-lg resize-none" />
+                  <Button type="submit" size="lg" className="w-full bg-green-600 hover:bg-green-700 text-xl py-6">
+                    Send Message via WhatsApp <MessageCircle className="ml-2" size={22} />
                   </Button>
                 </form>
               </CardContent>
@@ -788,20 +796,20 @@ export default function HomePage() {
       {/* Header */}
       <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-lg z-50 border-b">
         {/* Top Bar */}
-        <div className="bg-green-600 text-white py-2">
-          <div className="container mx-auto px-4 flex justify-between items-center text-sm">
-            <div className="flex items-center space-x-4">
+        <div className="bg-green-600 text-white py-3">
+          <div className="container mx-auto px-4 flex justify-center items-center">
+            <div className="flex flex-wrap items-center gap-6 text-lg font-semibold justify-center">
               <span className="flex items-center">
-                <Phone size={14} className="mr-1" />
+                WhatsApp Us for queries
+              </span>
+              <span className="flex items-center">
+                <MessageCircle size={18} className="mr-2" />
                 <a href="tel:+917827229116" className="underline hover:text-green-200">+91 7827229116</a>
               </span>
               <span className="flex items-center">
-                <Phone size={14} className="mr-1" />
+                <MessageCircle size={18} className="mr-2" />
                 <a href="tel:+918178567520" className="underline hover:text-green-200">+91 8178567520</a>
               </span>
-            </div>
-            <div className="hidden md:flex items-center space-x-4">
-              <span>Contact Us for bulk orders</span>
             </div>
           </div>
         </div>
@@ -811,7 +819,7 @@ export default function HomePage() {
             <button onClick={() => setCurrentPage("home")} className="flex items-center space-x-3">
               <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
               <div className="flex flex-col">
-                <span className="text-sm text-green-600 font-medium">Circle Pvt Ltd.</span>
+                <span className="text-base md:text-lg text-black font-bold">Circle Pvt Ltd.</span>
               </div>
             </button>
 
@@ -1084,10 +1092,11 @@ export default function HomePage() {
             "_blank",
           )
         }
-        className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 z-50 animate-pulse"
+        className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white px-7 py-5 rounded-full shadow-2xl transition-all duration-500 hover:scale-110 z-50 animate-pulse flex items-center gap-3 text-lg md:text-xl"
         aria-label="Contact us on WhatsApp"
       >
-        <MessageCircle size={28} />
+        <MessageCircle size={30} />
+        <span className="font-semibold">WhatsApp Us</span>
       </button>
     </div>
   )
@@ -1155,7 +1164,7 @@ function ProductDetailPage({
           </div>
           <div>
             <div className="flex flex-wrap gap-3 mb-4">
-              {(product.badges || [product.badge]).map((badge, index) => (
+              {(product.badges || [product.badge]).map((badge: string, index: number) => (
                 <Badge
                   key={index}
                   className={`$${
@@ -1443,7 +1452,7 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Foundation</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The principles that guide our work and define our commitment to agricultural excellence.
+              The principles that guide our work and define our commitment to excellence.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -1468,7 +1477,7 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
               <h2 className="text-3xl font-bold text-gray-800 mb-6">Manufacturing Excellence</h2>
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">
                 Our state-of-the-art manufacturing facility combines traditional craftsmanship with modern technology to
-                produce agricultural equipment of the highest quality. Every product undergoes rigorous testing to
+                produce equipment of the highest quality. Every product undergoes rigorous testing to
                 ensure durability and performance in real field conditions.
               </p>
               <div className="grid grid-cols-2 gap-6">
@@ -1543,10 +1552,10 @@ function BlogPage({
       <div className="container mx-auto px-4 py-12">
         {/* Blog Header */}
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-purple-100 text-purple-800 hover:bg-purple-200">Agricultural Blog</Badge>
+          <Badge className="mb-4 bg-purple-100 text-purple-800 hover:bg-purple-200">Blog</Badge>
           <h1 className="text-5xl font-bold text-gray-800 mb-4">Latest Insights & Tips</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Stay updated with the latest farming techniques, equipment guides, and industry insights from our experts
+            Stay updated with the latest technology, equipment guides, and industry insights from our experts
           </p>
         </div>
 

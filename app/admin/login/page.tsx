@@ -38,7 +38,7 @@ export default function AdminLogin() {
             <Shield className="text-white" size={40} />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-800">Admin Access</CardTitle>
-          <p className="text-gray-600">100X Agricultural Equipment Dashboard</p>
+          <p className="text-gray-600">100X Dashboard</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">

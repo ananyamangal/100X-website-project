@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link'
+import { Menu, X, Download, MessageCircle } from 'lucide-react'
 import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 
@@ -24,6 +26,7 @@ export default function AllProductsPage() {
   const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [loading, setLoading] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   // For product details navigation, you may want to use a modal or router push
   const handleViewDetails = (product: any) => {
@@ -94,7 +97,95 @@ export default function AllProductsPage() {
     : products.filter(p => p.category === selectedCategory);
 
   return (
-    <div className="pt-32 min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
+      {/* Hide global Navbar from layout on this page */}
+      <style jsx global>{`
+        header.bg-white.shadow-sm.border-b { display: none !important; }
+      `}</style>
+
+      {/* Header (same as Home page) */}
+      <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-lg z-50 border-b">
+        {/* Top Bar */}
+        <div className="bg-green-600 text-white py-3">
+          <div className="container mx-auto px-4 flex justify-center items-center">
+            <div className="flex flex-wrap items-center gap-6 text-lg font-semibold justify-center">
+              <span className="flex items-center">WhatsApp Us for queries</span>
+              <span className="flex items-center">
+                <MessageCircle size={18} className="mr-2" />
+                <a href="tel:+917827229116" className="underline hover:text-green-200">+91 7827229116</a>
+              </span>
+              <span className="flex items-center">
+                <MessageCircle size={18} className="mr-2" />
+                <a href="tel:+918178567520" className="underline hover:text-green-200">+91 8178567520</a>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Navbar */}
+        <nav className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <Link href="/" className="flex items-center space-x-3">
+              <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
+              <div className="flex flex-col">
+                <span className="text-base md:text-lg text-black font-bold">Circle Pvt Ltd.</span>
+              </div>
+            </Link>
+
+            {/* Desktop Menu */}
+            <div className="hidden lg:flex items-center space-x-8">
+              <Link href="/" className="text-gray-700 hover:text-green-600 transition-colors">
+                Home
+              </Link>
+              <Link href="/products" className="text-green-600 font-semibold transition-colors">
+                Products
+              </Link>
+              <a href="/#about" className="text-gray-700 hover:text-green-600 transition-colors">
+                About Us
+              </a>
+              <Link href="/#contact" className="text-gray-700 hover:text-green-600 transition-colors">
+                Contact
+              </Link>
+              <Button className="bg-green-600 hover:bg-green-700">
+                <Download size={16} className="mr-2" />
+                Brochure
+              </Button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className="lg:hidden mt-4 pb-4 border-t">
+              <div className="flex flex-col space-y-4 pt-4">
+                <Link href="/" className="text-left text-green-600 font-semibold" onClick={() => setIsMenuOpen(false)}>
+                  Home
+                </Link>
+                <Link href="/products" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+                  Products
+                </Link>
+                <a href="/#about" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+                  About Us
+                </a>
+                <Link href="/#contact" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+                  Contact
+                </Link>
+                <Button className="bg-green-600 hover:bg-green-700" onClick={() => setIsMenuOpen(false)}>
+                  <Download size={16} className="mr-2" />
+                  Brochure
+                </Button>
+              </div>
+            </div>
+          )}
+        </nav>
+      </header>
+
+      {/* Spacer for fixed header */}
+      <div className="pt-32" />
       <div className="container mx-auto px-4 py-12">
         <div className="mb-10 text-center">
           <h1 className="text-5xl font-bold text-gray-800 mb-4">All Products</h1>
