@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,16 +28,46 @@ export default function ProductCard({
   onViewDetails: () => void;
   onBrochureDownload: () => void;
 }) {
+  // Normalize images for slideshow
+  const images: string[] =
+    (product.imageUrls && Array.isArray(product.imageUrls) && product.imageUrls.length > 0)
+      ? product.imageUrls
+      : product.imageUrl
+        ? [product.imageUrl]
+        : product.image
+          ? [product.image]
+          : ['/placeholder.svg'];
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!images || images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 5000); // slow slideshow
+    return () => clearInterval(interval);
+  }, [images]);
+
   return (
     <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg">
       <div className="relative overflow-hidden">
-        <div className="relative w-full aspect-square overflow-hidden">
+        <div className="relative w-full aspect-[4/3] overflow-hidden bg-white">
           <img
-            src={product.imageUrls?.[0] || '/placeholder.svg'}
+            src={images[currentImageIndex]}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-contain p-4 transition-all duration-700"
           />
         </div>
+        {images.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 bg-white/70 rounded-full px-2 py-1">
+            {images.slice(0, 5).map((_, idx) => (
+              <span
+                key={idx}
+                className={`w-2 h-2 rounded-full ${idx === (currentImageIndex % Math.min(images.length, 5)) ? 'bg-green-600' : 'bg-gray-300'}`}
+              />
+            ))}
+          </div>
+        )}
         <div className="absolute top-4 left-4 flex flex-wrap gap-1 max-w-[calc(100%-2rem)]">
           {(product.badges || [product.badge]).slice(0, 3).map((badge, index) => (
             <Badge

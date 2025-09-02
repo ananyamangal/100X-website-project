@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Download, MessageCircle, Star, CheckCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, MessageCircle, Star, CheckCircle, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 
 const badgeLogoMap: Record<string, string> = {
@@ -17,6 +17,88 @@ const badgeLogoMap: Record<string, string> = {
   'Ecofreidly': '/logos clipart 2/Ecofreidly.png',
   'BIS Approved': '/logos clipart 2/BIS approved.png',
 };
+
+function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  return (
+    <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-lg z-50 border-b">
+      <div className="bg-green-600 text-white py-3">
+        <div className="container mx-auto px-4 flex justify-center items-center">
+          <div className="flex flex-wrap items-center gap-6 text-lg font-semibold justify-center">
+            <span className="flex items-center">
+              WhatsApp Us for queries
+            </span>
+            <span className="flex items-center">
+              <MessageCircle size={18} className="mr-2" />
+              <a href="tel:+917827229116" className="underline hover:text-green-200">+91 7827229116</a>
+            </span>
+            <span className="flex items-center">
+              <MessageCircle size={18} className="mr-2" />
+              <a href="tel:+918178567520" className="underline hover:text-green-200">+91 8178567520</a>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <nav className="container mx-auto px-4 py-4">
+        <div className="flex justify-between items-center">
+          <Link href="/" className="flex items-center space-x-3">
+            <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
+            <div className="flex flex-col">
+              <span className="text-base md:text-lg text-black font-bold">Circle Pvt Ltd.</span>
+            </div>
+          </Link>
+
+          <div className="hidden lg:flex items-center space-x-8">
+            <Link href="/" className="font-semibold text-gray-700 hover:text-green-600 transition-colors">
+              Home
+            </Link>
+            <Link href="/products" className="text-gray-700 hover:text-green-600 transition-colors">
+              Products
+            </Link>
+            <Link href="/#contact" className="text-gray-700 hover:text-green-600 transition-colors">
+              Contact
+            </Link>
+            <Button
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => {
+                // Could link to a catalog or trigger a download; placeholder for now
+                window.open('/', '_self');
+              }}
+            >
+              <Download size={16} className="mr-2" />
+              Brochure
+            </Button>
+          </div>
+
+          <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {isMenuOpen && (
+          <div className="lg:hidden mt-4 pb-4 border-t">
+            <div className="flex flex-col space-y-4 pt-4">
+              <Link href="/" className="text-left text-green-600 font-semibold" onClick={() => setIsMenuOpen(false)}>
+                Home
+              </Link>
+              <Link href="/products" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+                Products
+              </Link>
+              <Link
+                href="/#contact"
+                className="text-gray-700"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
+        )}
+      </nav>
+    </header>
+  );
+}
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -71,6 +153,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="pt-32 min-h-screen bg-gray-50">
+      <Header />
       <div className="container mx-auto px-4 py-12">
         <div className="mb-8">
           <Link href="/products">
