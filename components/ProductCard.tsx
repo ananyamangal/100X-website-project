@@ -8,15 +8,15 @@ import Link from 'next/link';
 
 // Map badge to logo if needed (copy logic from homepage)
 const badgeLogoMap: Record<string, string> = {
-  'Korean Technology': '/logos clipart 2/Korean Technology.png',
-  'German Technology': '/logos clipart 2/german technology.png',
-  'Japnese Technology': '/logos clipart 2/Japnese technology.png',
-  'GeM': '/logos clipart 2/GeM logo.png',
-  'GeM logo': '/logos clipart 2/GeM logo.png',
-  'Heavy Duty': '/logos clipart 2/Heavy duty.png',
-  'Eco Friendly': '/logos clipart 2/Ecofreidly.png',
-  'Ecofreidly': '/logos clipart 2/Ecofreidly.png',
-  'BIS Approved': '/logos clipart 2/BIS approved.png',
+  'Korean Technology': '/Logos clipart 2/Korean Technology.png',
+  'German Technology': '/Logos clipart 2/german technology.png',
+  'Japnese Technology': '/Logos clipart 2/Japnese technology.png',
+  'GeM': '/Logos clipart 2/GeM logo.png',
+  'GeM logo': '/Logos clipart 2/GeM logo.png',
+  'Heavy Duty': '/Logos clipart 2/Heavy Duty.png',
+  'Eco Friendly': '/Logos clipart 2/Ecofreidly.png',
+  'Ecofreidly': '/Logos clipart 2/Ecofreidly.png',
+  'BIS Approved': '/Logos clipart 2/BIS approved.png',
 };
 
 export default function ProductCard({
@@ -108,9 +108,11 @@ export default function ProductCard({
       </div>
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-3">
-          <h3 className="text-xl font-bold text-gray-800 group-hover:text-green-600 transition-colors">
-            {product.name}
-          </h3>
+          <Link href={`/products/${product._id || product.id}`}>
+            <h3 className="text-xl font-bold text-gray-800 group-hover:text-green-600 transition-colors cursor-pointer hover:underline">
+              {product.name}
+            </h3>
+          </Link>
           <div className="text-right">
             <div className="text-lg font-bold text-green-600">{product.priceRange}</div>
           </div>

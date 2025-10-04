@@ -7,15 +7,15 @@ import { ChevronLeft, ChevronRight, Download, MessageCircle, Star, CheckCircle, 
 import Link from 'next/link';
 
 const badgeLogoMap: Record<string, string> = {
-  'Korean Technology': '/logos clipart 2/Korean Technology.png',
-  'German Technology': '/logos clipart 2/german technology.png',
-  'Japnese Technology': '/logos clipart 2/Japnese technology.png',
-  'GeM': '/logos clipart 2/GeM logo.png',
-  'GeM logo': '/logos clipart 2/GeM logo.png',
-  'Heavy Duty': '/logos clipart 2/Heavy duty.png',
-  'Eco Friendly': '/logos clipart 2/Ecofreidly.png',
-  'Ecofreidly': '/logos clipart 2/Ecofreidly.png',
-  'BIS Approved': '/logos clipart 2/BIS approved.png',
+  'Korean Technology': '/Logos clipart 2/Korean Technology.png',
+  'German Technology': '/Logos clipart 2/german technology.png',
+  'Japnese Technology': '/Logos clipart 2/Japnese technology.png',
+  'GeM': '/Logos clipart 2/GeM logo.png',
+  'GeM logo': '/Logos clipart 2/GeM logo.png',
+  'Heavy Duty': '/Logos clipart 2/Heavy Duty.png',
+  'Eco Friendly': '/Logos clipart 2/Ecofreidly.png',
+  'Ecofreidly': '/Logos clipart 2/Ecofreidly.png',
+  'BIS Approved': '/Logos clipart 2/BIS approved.png',
 };
 
 function Header() {
