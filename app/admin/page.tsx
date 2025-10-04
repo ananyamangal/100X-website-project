@@ -65,6 +65,21 @@ interface Banner {
   updatedAt?: string;
 }
 
+interface BlogPost {
+  _id?: string;
+  id?: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  image: string;
+  category: string;
+  author: string;
+  publishedAt: string;
+  isPublished: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 function AdminAuthGate({ children }: { children: React.ReactNode }) {
   const [isAuthed, setIsAuthed] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
@@ -122,10 +137,13 @@ function AdminDashboardContent() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [products, setProducts] = useState<Product[]>([])
   const [banners, setBanners] = useState<Banner[]>([])
+  const [blogs, setBlogs] = useState<BlogPost[]>([])
   const [isAddingProduct, setIsAddingProduct] = useState(false)
   const [isAddingBanner, setIsAddingBanner] = useState(false)
+  const [isAddingBlog, setIsAddingBlog] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
+  const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null)
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [uploadingBrochure, setUploadingBrochure] = useState(false)
@@ -193,6 +211,27 @@ function AdminDashboardContent() {
             : []
         )
       })
+  }, [])
+
+  // Fetch blogs from API
+  useEffect(() => {
+    fetch("/api/admin/blogs")
+      .then(res => res.json())
+      .then(data => {
+        console.log("Blog API data:", data);
+        setBlogs(
+          Array.isArray(data)
+            ? data.map((b: any) => ({
+                ...b,
+                id: b._id,
+              }))
+            : []
+        )
+      })
+      .catch(error => {
+        console.error("Error fetching blogs:", error);
+        setBlogs([]);
+      });
   }, [])
 
   // Add product
@@ -337,6 +376,49 @@ function AdminDashboardContent() {
         credentials: "include",
       })
       setBanners(banners.filter(b => b.id !== bannerId))
+    }
+  }
+
+  // Add blog
+  const handleAddBlog = async (newBlog: Omit<BlogPost, "id" | "createdAt" | "updatedAt" | "_id">) => {
+    const res = await fetch("/api/admin/blogs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(newBlog),
+    })
+    const created = await res.json()
+    setBlogs([...blogs, {
+      ...created,
+      id: created._id,
+    }])
+    setIsAddingBlog(false)
+  }
+
+  // Update blog
+  const handleUpdateBlog = async (updatedBlog: BlogPost) => {
+    const res = await fetch(`/api/admin/blogs/${updatedBlog.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(updatedBlog),
+    })
+    const updated = await res.json()
+    setBlogs(blogs.map(b => b.id === updated._id ? {
+      ...updated,
+      id: updated._id,
+    } : b))
+    setEditingBlog(null)
+  }
+
+  // Delete blog
+  const handleDeleteBlog = async (blogId: string) => {
+    if (confirm("Are you sure you want to delete this blog post?")) {
+      await fetch(`/api/admin/blogs/${blogId}`, {
+        method: "DELETE",
+        credentials: "include",
+      })
+      setBlogs(blogs.filter(b => b.id !== blogId))
     }
   }
 
@@ -488,6 +570,17 @@ function AdminDashboardContent() {
                 Categories
               </button>
               <button
+                onClick={() => setActiveTab("blogs")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "blogs"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <FileText className="mr-3" size={20} />
+                Blogs
+              </button>
+              <button
                 onClick={() => setActiveTab("submissions")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "submissions"
@@ -547,6 +640,18 @@ function AdminDashboardContent() {
                     window.dispatchEvent(new Event('categoriesUpdated'))
                   }
                 }}
+              />
+            )}
+            {activeTab === "blogs" && (
+              <BlogsTab
+                blogs={blogs}
+                onAddBlog={handleAddBlog}
+                onUpdateBlog={handleUpdateBlog}
+                onDeleteBlog={handleDeleteBlog}
+                isAddingBlog={isAddingBlog}
+                setIsAddingBlog={setIsAddingBlog}
+                editingBlog={editingBlog}
+                setEditingBlog={setEditingBlog}
               />
             )}
             {activeTab === "submissions" && <SubmissionsTab />}
@@ -1605,6 +1710,112 @@ function SubmissionsTab() {
   );
 }
 
+// Blogs Tab Component
+function BlogsTab({
+  blogs,
+  onAddBlog,
+  onUpdateBlog,
+  onDeleteBlog,
+  isAddingBlog,
+  setIsAddingBlog,
+  editingBlog,
+  setEditingBlog,
+}: {
+  blogs: BlogPost[]
+  onAddBlog: (blog: Omit<BlogPost, "id" | "createdAt" | "updatedAt" | "_id">) => void
+  onUpdateBlog: (blog: BlogPost) => void
+  onDeleteBlog: (id: string) => void
+  isAddingBlog: boolean
+  setIsAddingBlog: (value: boolean) => void
+  editingBlog: BlogPost | null
+  setEditingBlog: (blog: BlogPost | null) => void
+}) {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Blog Management</h2>
+          <p className="text-gray-600">Manage blog posts and articles</p>
+        </div>
+        <Button
+          onClick={() => setIsAddingBlog(true)}
+          className="bg-green-600 hover:bg-green-700"
+        >
+          <Plus className="mr-2" size={16} />
+          Add Blog Post
+        </Button>
+      </div>
+
+      {isAddingBlog && (
+        <BlogForm
+          blog={null}
+          onSave={onAddBlog}
+          onCancel={() => setIsAddingBlog(false)}
+        />
+      )}
+
+      <div className="grid gap-6">
+        {blogs
+          .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+          .map((blog) => (
+            <Card key={blog.id} className="overflow-hidden">
+              <CardContent className="p-0">
+                {editingBlog?.id === blog.id ? (
+                  <BlogForm
+                    blog={blog}
+                    onSave={onUpdateBlog}
+                    onCancel={() => setEditingBlog(null)}
+                  />
+                ) : (
+                  <div className="flex">
+                    <div className="w-64 h-40 flex-shrink-0">
+                      <img
+                        src={blog.image}
+                        alt="Blog"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 p-6">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-xl font-bold text-gray-900">{blog.title}</h3>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingBlog(blog)}
+                          >
+                            <Edit size={14} />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => onDeleteBlog(blog.id!)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-gray-600 mb-2 line-clamp-2">{blog.excerpt}</p>
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <span>Category: {blog.category}</span>
+                        <span>Author: {blog.author}</span>
+                        <span>Published: {new Date(blog.publishedAt).toLocaleDateString()}</span>
+                        <Badge variant={blog.isPublished ? "default" : "secondary"}>
+                          {blog.isPublished ? "Published" : "Draft"}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+      </div>
+    </div>
+  )
+}
+
 // Banners Tab Component
 function BannersTab({
   banners,
@@ -1724,6 +1935,208 @@ function BannersTab({
         </Card>
       )}
     </div>
+  )
+}
+
+// Blog Form Component
+function BlogForm({
+  blog,
+  onSave,
+  onCancel,
+}: {
+  blog?: BlogPost | null
+  onSave: (blog: any) => void
+  onCancel: () => void
+}) {
+  const [formData, setFormData] = useState({
+    title: blog?.title || "",
+    excerpt: blog?.excerpt || "",
+    content: blog?.content || "",
+    image: blog?.image || "",
+    category: blog?.category || "",
+    author: blog?.author || "",
+    isPublished: blog?.isPublished ?? true,
+  })
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState("")
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formData.title || !formData.content) {
+      setUploadError("Please fill in title and content")
+      return
+    }
+    onSave(formData)
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Blog Title</label>
+              <Input
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Enter blog title"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Author</label>
+              <Input
+                value={formData.author}
+                onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                placeholder="Enter author name"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Excerpt</label>
+            <Textarea
+              value={formData.excerpt}
+              onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+              placeholder="Brief description of the blog post"
+              rows={3}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+            <Textarea
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              placeholder="Write your blog content here..."
+              rows={10}
+              required
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <Input
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                placeholder="e.g., Maintenance, Equipment Guide, Technology"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Blog Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    setUploadError("");
+                    setIsUploading(true);
+                    
+                    // Create preview immediately
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                      setFormData({ ...formData, image: e.target?.result as string });
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    const formDataCloud = new FormData();
+                    formDataCloud.append("file", file);
+                    formDataCloud.append("upload_preset", "product_uploads");
+                    
+                    try {
+                      const res = await fetch(
+                        "https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload",
+                        {
+                          method: "POST",
+                          body: formDataCloud,
+                        }
+                      );
+                      
+                      if (!res.ok) {
+                        throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+                      }
+                      
+                      const data = await res.json();
+                      if (data.secure_url) {
+                        setFormData({ ...formData, image: data.secure_url });
+                        setUploadError("");
+                      } else {
+                        throw new Error("No secure URL returned from Cloudinary");
+                      }
+                    } catch (error) {
+                      console.error('Error uploading image:', error);
+                      setUploadError(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                    } finally {
+                      setIsUploading(false);
+                    }
+                  }
+                }}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+                disabled={isUploading}
+              />
+              <p className="text-xs text-gray-500 mt-1">Upload a blog image from your computer</p>
+              
+              {isUploading && (
+                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-600">Uploading image...</p>
+                </div>
+              )}
+              
+              {uploadError && (
+                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{uploadError}</p>
+                </div>
+              )}
+              
+              {formData.image && !uploadError && (
+                <div className="mt-2">
+                  <img 
+                    src={formData.image} 
+                    alt="Blog preview" 
+                    className="w-full h-32 object-cover rounded-lg border"
+                  />
+                  <p className="text-xs text-green-600 mt-1">✓ Image uploaded successfully</p>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="isPublished"
+              checked={formData.isPublished}
+              onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+              className="rounded border-gray-300"
+            />
+            <label htmlFor="isPublished" className="text-sm font-medium text-gray-700">
+              Published (visible on website)
+            </label>
+          </div>
+          
+          <div className="flex space-x-3">
+            <Button 
+              type="submit" 
+              className="bg-green-600 hover:bg-green-700"
+              disabled={isUploading || !formData.title || !formData.content}
+            >
+              <Save className="mr-2" size={16} />
+              {isUploading ? 'Uploading...' : (blog ? 'Update Blog' : 'Add Blog')}
+            </Button>
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isUploading}>
+              <X className="mr-2" size={16} />
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
 

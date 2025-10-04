@@ -70,8 +70,6 @@ const badgeLogoMap: Record<string, string> = {
   'Japnese Technology': '/Logos clipart 2/Japnese technology.png',
   'GeM': '/Logos clipart 2/GeM logo.png',
   'GeM logo': '/Logos clipart 2/GeM logo.png',
-  'Heavy Duty': '/Logos clipart 2/Heavy Duty.png',
-  'Heavy duty': '/Logos clipart 2/Heavy Duty.png', // Case variation
   'Eco Friendly': '/Logos clipart 2/Ecofreidly.png',
   'Ecofreidly': '/Logos clipart 2/Ecofreidly.png',
   'BIS Approved': '/Logos clipart 2/BIS approved.png',
@@ -158,10 +156,12 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentPage, setCurrentPage] = useState("home")
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null)
+  const [selectedBlog, setSelectedBlog] = useState<any | null>(null)
   const [showBrochureForm, setShowBrochureForm] = useState(false)
   const [brochureFormData, setBrochureFormData] = useState({ name: "", phone: "", productName: "" })
   const [products, setProducts] = useState<Product[]>([])
   const [banners, setBanners] = useState<any[]>([])
+  const [blogPosts, setBlogPosts] = useState<any[]>([])
   const [phraseIndex, setPhraseIndex] = useState(0)
 
   const changingPhrases = [
@@ -242,6 +242,25 @@ export default function HomePage() {
       });
   }, [])
 
+  // Fetch blogs from API
+  useEffect(() => {
+    fetch("/api/admin/blogs")
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log('Blogs fetched:', data);
+        setBlogPosts(Array.isArray(data) ? data : []);
+      })
+      .catch(error => {
+        console.error('Error fetching blogs:', error);
+        setBlogPosts([]);
+      });
+  }, [])
+
   useEffect(() => {
     if (heroSlides.length === 0) return;
     
@@ -278,7 +297,8 @@ export default function HomePage() {
     return () => clearInterval(timer)
   }, [])
 
-  const blogPosts = [
+  // Default blog posts (fallback)
+  const defaultBlogPosts = [
     {
       id: 1,
       title: "Top 10 Equipment Maintenance Tips for 2024",
@@ -324,6 +344,13 @@ export default function HomePage() {
       readTime: "4 min read",
     },
   ]
+
+  // Use blogs from API or fallback to default
+  const displayBlogPosts = blogPosts.length > 0 ? 
+    blogPosts
+      .filter(b => b.isPublished) // Only show published blogs
+      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    : defaultBlogPosts
 
   const stats = [
     { number: "10000+", label: "happy customers", icon: Users },
@@ -394,7 +421,19 @@ export default function HomePage() {
   const renderPage = () => {
     switch (currentPage) {
       case "blog":
-        return <BlogPage blogPosts={blogPosts} setCurrentPage={setCurrentPage} />
+        return selectedBlog ? (
+          <BlogArticlePage
+            blog={selectedBlog}
+            setCurrentPage={setCurrentPage}
+            setSelectedBlog={setSelectedBlog}
+          />
+        ) : (
+          <BlogPage 
+            blogPosts={displayBlogPosts} 
+            setCurrentPage={setCurrentPage}
+            setSelectedBlog={setSelectedBlog}
+          />
+        )
       case "about":
         return <AboutPage setCurrentPage={setCurrentPage} />
       case "product":
@@ -606,7 +645,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {blogPosts.slice(0, 3).map((post) => (
+            {displayBlogPosts.slice(0, 3).map((post) => (
               <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300">
                 <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
                 <CardContent className="p-6">
@@ -1550,9 +1589,11 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
 function BlogPage({
   blogPosts,
   setCurrentPage,
+  setSelectedBlog,
 }: {
   blogPosts: any[]
   setCurrentPage: (page: string) => void
+  setSelectedBlog: (blog: any) => void
 }) {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
@@ -1606,12 +1647,12 @@ function BlogPage({
         {/* Blog Posts Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {filteredPosts.map((post) => (
-            <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300">
+            <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer" onClick={() => setSelectedBlog(post)}>
               <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-3">
                   <Badge variant="secondary">{post.category}</Badge>
-                  <span className="text-sm text-gray-500">{post.readTime}</span>
+                  <span className="text-sm text-gray-500">{post.readTime || "5 min read"}</span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3 hover:text-purple-600 transition-colors cursor-pointer">
                   {post.title}
@@ -1625,7 +1666,7 @@ function BlogPage({
                   <div className="flex items-center space-x-2">
                     <Calendar size={16} className="text-gray-400" />
                     <span className="text-sm text-gray-600">
-                      {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""}
+                      {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : (post.date || "2024-01-01")}
                     </span>
                   </div>
                 </div>
@@ -1648,6 +1689,116 @@ function BlogPage({
             <ChevronLeft className="mr-2" size={20} />
             Back to Home
           </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Blog Article Page Component
+function BlogArticlePage({
+  blog,
+  setCurrentPage,
+  setSelectedBlog,
+}: {
+  blog: any
+  setCurrentPage: (page: string) => void
+  setSelectedBlog: (blog: any) => void
+}) {
+  return (
+    <div className="pt-32 min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-12">
+        {/* Breadcrumb */}
+        <div className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
+          <button onClick={() => setCurrentPage("home")} className="hover:text-green-600">
+            Home
+          </button>
+          <span>/</span>
+          <button onClick={() => setSelectedBlog(null)} className="hover:text-green-600">
+            Blog
+          </button>
+          <span>/</span>
+          <span className="text-gray-900">{blog.title}</span>
+        </div>
+
+        {/* Article Header */}
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            {/* Article Image */}
+            <div className="relative h-96">
+              <img
+                src={blog.image || "/placeholder.svg"}
+                alt={blog.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/20"></div>
+            </div>
+
+            {/* Article Content */}
+            <div className="p-8 md:p-12">
+              {/* Article Meta */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-4">
+                  <Badge variant="secondary" className="text-sm">
+                    {blog.category}
+                  </Badge>
+                  <div className="flex items-center space-x-2 text-gray-500">
+                    <User size={16} />
+                    <span className="text-sm">{blog.author}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-500">
+                    <Calendar size={16} />
+                    <span className="text-sm">
+                      {blog.publishedAt ? new Date(blog.publishedAt).toLocaleDateString() : (blog.date || "2024-01-01")}
+                    </span>
+                  </div>
+                </div>
+                <span className="text-sm text-gray-500">{blog.readTime || "5 min read"}</span>
+              </div>
+
+              {/* Article Title */}
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                {blog.title}
+              </h1>
+
+              {/* Article Excerpt */}
+              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                {blog.excerpt}
+              </p>
+
+              {/* Article Content */}
+              <div className="prose prose-lg max-w-none">
+                <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {blog.content}
+                </div>
+              </div>
+
+              {/* Article Footer */}
+              <div className="mt-12 pt-8 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 font-semibold text-lg">
+                        {blog.author?.charAt(0) || "A"}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">{blog.author}</p>
+                      <p className="text-sm text-gray-500">Article Author</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedBlog(null)}
+                    className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent"
+                  >
+                    <ChevronLeft className="mr-2" size={20} />
+                    Back to Blog
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
