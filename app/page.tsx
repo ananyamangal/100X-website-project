@@ -71,6 +71,7 @@ const badgeLogoMap: Record<string, string> = {
   'GeM': '/Logos clipart 2/GeM logo.png',
   'GeM logo': '/Logos clipart 2/GeM logo.png',
   'Heavy Duty': '/Logos clipart 2/Heavy Duty.png',
+  'Heavy duty': '/Logos clipart 2/Heavy Duty.png', // Case variation
   'Eco Friendly': '/Logos clipart 2/Ecofreidly.png',
   'Ecofreidly': '/Logos clipart 2/Ecofreidly.png',
   'BIS Approved': '/Logos clipart 2/BIS approved.png',
@@ -197,7 +198,11 @@ export default function HomePage() {
   ]
 
   // Use banners from API or fallback to default
-  const heroSlides = banners.length > 0 ? banners.filter(b => b.isActive).sort((a, b) => a.order - b.order) : defaultHeroSlides
+  const heroSlides = banners.length > 0 ? 
+    banners
+      .filter(b => b.isActive && b.image) // Only show active banners with images
+      .sort((a, b) => (a.order || 0) - (b.order || 0)) 
+    : defaultHeroSlides
 
   // Fetch products from API
   useEffect(() => {
@@ -221,8 +226,14 @@ export default function HomePage() {
   // Fetch banners from API
   useEffect(() => {
     fetch("/api/admin/banners")
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
+        console.log('Banners fetched:', data);
         setBanners(Array.isArray(data) ? data : []);
       })
       .catch(error => {
@@ -232,11 +243,13 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
+    if (heroSlides.length === 0) return;
+    
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
     }, 4000)
     return () => clearInterval(timer)
-  }, [])
+  }, [heroSlides.length])
 
   // Handle hash-based navigation (e.g., /#about, /#contact)
   useEffect(() => {
@@ -401,13 +414,19 @@ export default function HomePage() {
     }
   }
 
-  const renderHomePage = () => (
+  const renderHomePage = () => {
+    // Ensure we have valid slides and currentSlide is within bounds
+    const validSlides = heroSlides.length > 0 ? heroSlides : defaultHeroSlides;
+    const safeCurrentSlide = Math.max(0, Math.min(currentSlide, validSlides.length - 1));
+    const currentSlideData = validSlides[safeCurrentSlide] || defaultHeroSlides[0];
+
+    return (
     <>
       {/* Hero Section with Image Slider */}
       <section id="home" className="pt-32 min-h-screen relative overflow-hidden flex items-center">
         <div className="absolute inset-0">
           <img
-            src={heroSlides[currentSlide].image || "/banner.jpeg"}
+            src={currentSlideData?.image || "/banner.jpeg"}
             alt="Agricultural equipment"
             className="w-full h-full object-cover transition-all duration-1000"
           />
@@ -750,6 +769,7 @@ export default function HomePage() {
       </section>
     </>
   )
+  }
 
   // Helper to scroll to contact section
   const scrollToContact = () => {

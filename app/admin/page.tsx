@@ -1742,9 +1742,15 @@ function BannerForm({
     order: banner?.order || 1,
     isActive: banner?.isActive ?? true,
   })
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState("")
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!formData.image) {
+      setUploadError("Please upload a banner image")
+      return
+    }
     onSave(formData)
   }
 
@@ -1761,6 +1767,16 @@ function BannerForm({
                 onChange={async (e) => {
                   if (e.target.files && e.target.files[0]) {
                     const file = e.target.files[0];
+                    setUploadError("");
+                    setIsUploading(true);
+                    
+                    // Create preview immediately
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                      setFormData({ ...formData, image: e.target?.result as string });
+                    };
+                    reader.readAsDataURL(file);
+                    
                     const formDataCloud = new FormData();
                     formDataCloud.append("file", file);
                     formDataCloud.append("upload_preset", "product_uploads");
@@ -1773,27 +1789,53 @@ function BannerForm({
                           body: formDataCloud,
                         }
                       );
+                      
+                      if (!res.ok) {
+                        throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+                      }
+                      
                       const data = await res.json();
                       if (data.secure_url) {
                         setFormData({ ...formData, image: data.secure_url });
+                        setUploadError("");
+                      } else {
+                        throw new Error("No secure URL returned from Cloudinary");
                       }
                     } catch (error) {
                       console.error('Error uploading image:', error);
-                      alert('Failed to upload image. Please try again.');
+                      setUploadError(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                      // Keep the preview but show error
+                    } finally {
+                      setIsUploading(false);
                     }
                   }
                 }}
                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 required
+                disabled={isUploading}
               />
               <p className="text-xs text-gray-500 mt-1">Upload a banner image from your computer</p>
-              {formData.image && (
+              
+              {isUploading && (
+                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-600">Uploading image...</p>
+                </div>
+              )}
+              
+              {uploadError && (
+                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{uploadError}</p>
+                </div>
+              )}
+              
+              {formData.image && !uploadError && (
                 <div className="mt-2">
                   <img 
                     src={formData.image} 
                     alt="Banner preview" 
                     className="w-full h-32 object-cover rounded-lg border"
                   />
+                  <p className="text-xs text-green-600 mt-1">✓ Image uploaded successfully</p>
                 </div>
               )}
             </div>
@@ -1824,11 +1866,15 @@ function BannerForm({
           </div>
           
           <div className="flex space-x-3">
-            <Button type="submit" className="bg-green-600 hover:bg-green-700">
+            <Button 
+              type="submit" 
+              className="bg-green-600 hover:bg-green-700"
+              disabled={isUploading || !formData.image}
+            >
               <Save className="mr-2" size={16} />
-              {banner ? 'Update Banner' : 'Add Banner'}
+              {isUploading ? 'Uploading...' : (banner ? 'Update Banner' : 'Add Banner')}
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isUploading}>
               <X className="mr-2" size={16} />
               Cancel
             </Button>

@@ -14,6 +14,7 @@ const badgeLogoMap: Record<string, string> = {
   'GeM': '/Logos clipart 2/GeM logo.png',
   'GeM logo': '/Logos clipart 2/GeM logo.png',
   'Heavy Duty': '/Logos clipart 2/Heavy Duty.png',
+  'Heavy duty': '/Logos clipart 2/Heavy Duty.png', // Case variation
   'Eco Friendly': '/Logos clipart 2/Ecofreidly.png',
   'Ecofreidly': '/Logos clipart 2/Ecofreidly.png',
   'BIS Approved': '/Logos clipart 2/BIS approved.png',
