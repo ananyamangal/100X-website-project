@@ -462,83 +462,137 @@ export default function HomePage() {
     return (
     <>
       {/* Hero Section with Image Slider */}
-      <section id="home" className="pt-32 min-h-screen relative overflow-hidden flex items-center">
-        <div className="absolute inset-0">
-          <img
-            src={currentSlideData?.image || "/banner.jpeg"}
-            alt="Agricultural equipment"
-            className="w-full h-full object-cover transition-all duration-1000"
-          />
-          <div className="absolute inset-0 bg-black/50"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-green-900/30 to-transparent"></div>
-        </div>
-
-        <div className="relative z-10 container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            {/* Text Content - Left Side */}
-            <div className="text-white text-center md:text-left">
-              <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
-                Certified Professional Products 
-              </Badge>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
-                100X – <span className="text-green-400">Built</span> with Technology
-              </h1>
-              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
-                {changingPhrases[phraseIndex]}
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center md:justify-start mb-8">
-                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
-                  <Link href="#products" className="flex items-center">
-                    Explore Products <ArrowRight className="ml-2" size={20} />
-                  </Link>
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-lg px-8 py-4 bg-transparent"
-                  onClick={() =>
-                    window.open(
-                      "https://www.youtube.com/@100Xcircle",
-                      "_blank",
-                    )
-                  }
-                >
-                  <Play className="mr-2" size={20} />
-                  Watch Demo
-                </Button>
-              </div>
-
-              {/* Stats Section - Left Side Only */}
-              <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-md mx-auto md:mx-0">
-                {stats.map((stat, index) => (
-                  <div key={index} className="text-center md:text-left">
-                    <div className="text-3xl font-bold text-green-400 mb-2">{stat.number}</div>
-                    <div className="text-sm text-gray-300">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Empty Right Side on Desktop */}
-            <div className="hidden md:block">
-            </div>
+      <section id="home" className="pt-32 relative overflow-hidden">
+        {/* Banner Images - Desktop View */}
+        <div className="hidden md:block min-h-screen relative">
+          <div className="absolute inset-0">
+            <img
+              src={currentSlideData?.image || "/banner.jpeg"}
+              alt="Agricultural equipment"
+              className="w-full h-full object-cover transition-all duration-1000"
+            />
+            {/* Very subtle overlay for text readability while maintaining brightness */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-transparent"></div>
           </div>
-        </div>
 
-        {/* Stats Section - Mobile View */}
-        <div className="md:hidden mt-8">
-            <div className="grid grid-cols-2 gap-8 max-w-md mx-auto">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="text-3xl font-bold text-green-400 mb-2">{stat.number}</div>
-                  <div className="text-sm text-gray-300">{stat.label}</div>
+          <div className="relative z-10 container mx-auto px-4 flex items-center min-h-screen">
+            <div className="grid md:grid-cols-2 gap-8 items-center w-full">
+              {/* Text Content - Left Side */}
+              <div className="text-white text-center md:text-left">
+                <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
+                  Certified Professional Products 
+                </Badge>
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+                  100X – <span className="text-green-400">Built</span> with Technology
+                </h1>
+                <div className="text-xl md:text-2xl lg:text-3xl font-bold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
+                  {changingPhrases[phraseIndex]}
                 </div>
-              ))}
+                <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center md:justify-start mb-8">
+                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
+                    <Link href="#products" className="flex items-center">
+                      Explore Products <ArrowRight className="ml-2" size={20} />
+                    </Link>
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-lg px-8 py-4 bg-transparent"
+                    onClick={() =>
+                      window.open(
+                        "https://www.youtube.com/@100Xcircle",
+                        "_blank",
+                      )
+                    }
+                  >
+                    <Play className="mr-2" size={20} />
+                    Watch Demo
+                  </Button>
+                </div>
+
+                {/* Stats Section - Left Side Only */}
+                <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-md mx-auto md:mx-0">
+                  {stats.map((stat, index) => (
+                    <div key={index} className="text-center md:text-left">
+                      <div className="text-3xl font-bold text-green-400 mb-2">{stat.number}</div>
+                      <div className="text-sm text-gray-300">{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Empty Right Side on Desktop */}
+              <div className="hidden md:block">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile View - Banner First, Then Content */}
+        <div className="md:hidden">
+          {/* Banner Images - Mobile View */}
+          <div className="relative h-80">
+            <div className="absolute inset-0">
+              <img
+                src={currentSlideData?.image || "/banner.jpeg"}
+                alt="Agricultural equipment"
+                className="w-full h-full object-cover transition-all duration-1000"
+              />
+              {/* No overlay for mobile to maintain full brightness */}
             </div>
           </div>
 
-        {/* Slide Indicators */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
+          {/* Content Below Banner - Mobile View */}
+          <div className="bg-white py-12">
+            <div className="container mx-auto px-4">
+              <div className="text-center">
+                <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
+                  Certified Professional Products 
+                </Badge>
+                <h1 className="text-3xl font-bold text-gray-800 mb-6 leading-tight">
+                  100X – <span className="text-green-600">Built</span> with Technology
+                </h1>
+                <div className="text-xl font-bold text-green-600 mb-6 min-h-[2rem] transition-all duration-500">
+                  {changingPhrases[phraseIndex]}
+                </div>
+                <div className="flex flex-col gap-4 justify-center mb-8">
+                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
+                    <Link href="#products" className="flex items-center justify-center">
+                      Explore Products <ArrowRight className="ml-2" size={20} />
+                    </Link>
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-lg px-8 py-4 bg-transparent"
+                    onClick={() =>
+                      window.open(
+                        "https://www.youtube.com/@100Xcircle",
+                        "_blank",
+                      )
+                    }
+                  >
+                    <Play className="mr-2" size={20} />
+                    Watch Demo
+                  </Button>
+                </div>
+
+                {/* Stats Section - Mobile View */}
+                <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
+                  {stats.map((stat, index) => (
+                    <div key={index} className="text-center">
+                      <div className="text-3xl font-bold text-green-600 mb-2">{stat.number}</div>
+                      <div className="text-sm text-gray-600">{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Slide Indicators - Desktop */}
+        <div className="hidden md:block absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
           {heroSlides.map((_, index) => (
             <button
               key={index}
@@ -550,18 +604,45 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Slide Navigation */}
+        {/* Slide Indicators - Mobile */}
+        <div className="md:hidden absolute top-72 left-1/2 transform -translate-x-1/2 flex space-x-3">
+          {heroSlides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`w-3 h-3 rounded-full transition-all ${
+                index === currentSlide ? "bg-green-600" : "bg-white/70"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Slide Navigation - Desktop */}
         <button
           onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-          className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
+          className="hidden md:block absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
         >
           <ChevronLeft size={24} />
         </button>
         <button
           onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-          className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
+          className="hidden md:block absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
         >
           <ChevronRight size={24} />
+        </button>
+
+        {/* Slide Navigation - Mobile */}
+        <button
+          onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
+          className="md:hidden absolute left-4 top-40 transform -translate-y-1/2 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <button
+          onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
+          className="md:hidden absolute right-4 top-40 transform -translate-y-1/2 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all"
+        >
+          <ChevronRight size={20} />
         </button>
       </section>
 
