@@ -728,7 +728,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {displayBlogPosts.slice(0, 3).map((post) => (
               <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300">
-                <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
+                <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-3">
                     <Badge variant="secondary">{post.category}</Badge>
@@ -1729,7 +1729,7 @@ function BlogPage({
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {filteredPosts.map((post) => (
             <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer" onClick={() => setSelectedBlog(post)}>
-              <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
+              <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-3">
                   <Badge variant="secondary">{post.category}</Badge>
@@ -1805,14 +1805,14 @@ function BlogArticlePage({
         {/* Article Header */}
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            {/* Article Image */}
+            {/* Article Top Image */}
             <div className="relative h-96">
               <img
-                src={blog.image || "/placeholder.svg"}
+                src={blog.topImage || blog.image || "/placeholder.svg"}
                 alt={blog.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-black/20"></div>
+              <div className="absolute inset-0 bg-black/10"></div>
             </div>
 
             {/* Article Content */}
@@ -1853,6 +1853,24 @@ function BlogArticlePage({
                   {blog.content}
                 </div>
               </div>
+
+              {/* Inline Images */}
+              {blog.inlineImages && blog.inlineImages.length > 0 && (
+                <div className="mt-8 space-y-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Related Images</h3>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {blog.inlineImages.map((imageUrl: string, idx: number) => (
+                      <div key={idx} className="rounded-xl overflow-hidden shadow-lg">
+                        <img
+                          src={imageUrl}
+                          alt={`Blog image ${idx + 1}`}
+                          className="w-full h-auto object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Article Footer */}
               <div className="mt-12 pt-8 border-t border-gray-200">

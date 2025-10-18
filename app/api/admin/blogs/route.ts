@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clientPromise } from '@/lib/mongodb';
+import clientPromise from '@/lib/mongodb';
 import { BlogInput } from '@/lib/blogModel';
 
 // GET - Fetch all blog posts
@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
     // Set default values
     const newBlog = {
       ...blogData,
+      inlineImages: blogData.inlineImages || [], // Ensure inlineImages is an array
       publishedAt: new Date().toISOString(),
       createdAt: new Date(),
       updatedAt: new Date()

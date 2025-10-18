@@ -20,6 +20,7 @@ import {
   ChevronUp,
   Image,
   Check,
+  CheckCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -71,7 +72,8 @@ interface BlogPost {
   title: string;
   excerpt: string;
   content: string;
-  image: string;
+  topImage: string;
+  inlineImages: string[];
   category: string;
   author: string;
   publishedAt: string;
@@ -145,6 +147,7 @@ function AdminDashboardContent() {
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null)
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null)
+  const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [uploadingBrochure, setUploadingBrochure] = useState(false)
   const [categories, setCategories] = useState<string[]>(() => {
@@ -381,44 +384,83 @@ function AdminDashboardContent() {
 
   // Add blog
   const handleAddBlog = async (newBlog: Omit<BlogPost, "id" | "createdAt" | "updatedAt" | "_id">) => {
-    const res = await fetch("/api/admin/blogs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(newBlog),
-    })
-    const created = await res.json()
-    setBlogs([...blogs, {
-      ...created,
-      id: created._id,
-    }])
-    setIsAddingBlog(false)
+    try {
+      const res = await fetch("/api/admin/blogs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(newBlog),
+      })
+      if (res.ok) {
+        const created = await res.json()
+        setBlogs([...blogs, {
+          ...created,
+          id: created._id,
+        }])
+        setIsAddingBlog(false)
+        setNotification({type: 'success', message: 'Blog created successfully!'})
+        setTimeout(() => setNotification(null), 3000)
+      } else {
+        setNotification({type: 'error', message: 'Failed to create blog'})
+        setTimeout(() => setNotification(null), 3000)
+      }
+    } catch (error) {
+      console.error("Error adding blog:", error)
+      setNotification({type: 'error', message: 'Error creating blog'})
+      setTimeout(() => setNotification(null), 3000)
+    }
   }
 
   // Update blog
   const handleUpdateBlog = async (updatedBlog: BlogPost) => {
-    const res = await fetch(`/api/admin/blogs/${updatedBlog.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(updatedBlog),
-    })
-    const updated = await res.json()
-    setBlogs(blogs.map(b => b.id === updated._id ? {
-      ...updated,
-      id: updated._id,
-    } : b))
-    setEditingBlog(null)
+    try {
+      const res = await fetch(`/api/admin/blogs/${updatedBlog.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(updatedBlog),
+      })
+      if (res.ok) {
+        const updated = await res.json()
+        setBlogs(blogs.map(b => b.id === updated._id ? {
+          ...updated,
+          id: updated._id,
+        } : b))
+        setEditingBlog(null)
+        setNotification({type: 'success', message: 'Blog updated successfully!'})
+        setTimeout(() => setNotification(null), 3000)
+      } else {
+        setNotification({type: 'error', message: 'Failed to update blog'})
+        setTimeout(() => setNotification(null), 3000)
+      }
+    } catch (error) {
+      console.error("Error updating blog:", error)
+      setNotification({type: 'error', message: 'Error updating blog'})
+      setTimeout(() => setNotification(null), 3000)
+    }
   }
 
   // Delete blog
   const handleDeleteBlog = async (blogId: string) => {
     if (confirm("Are you sure you want to delete this blog post?")) {
-      await fetch(`/api/admin/blogs/${blogId}`, {
-        method: "DELETE",
-        credentials: "include",
-      })
-      setBlogs(blogs.filter(b => b.id !== blogId))
+      try {
+        const res = await fetch(`/api/admin/blogs/${blogId}`, {
+          method: "DELETE",
+          credentials: "include",
+        })
+        if (res.ok) {
+          setBlogs(blogs.filter(b => b.id !== blogId))
+          setNotification({type: 'success', message: 'Blog deleted successfully!'})
+          setTimeout(() => setNotification(null), 3000)
+        } else {
+          setNotification({type: 'error', message: 'Failed to delete blog'})
+          setTimeout(() => setNotification(null), 3000)
+        }
+      } catch (error) {
+        console.error("Error deleting blog:", error)
+        setNotification({type: 'error', message: 'Error deleting blog'})
+        setTimeout(() => setNotification(null), 3000)
+      }
     }
   }
 
@@ -472,6 +514,22 @@ function AdminDashboardContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg ${
+          notification.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+        } animate-slide-in`}>
+          <div className="flex items-center space-x-3">
+            {notification.type === 'success' ? (
+              <CheckCircle size={20} />
+            ) : (
+              <X size={20} />
+            )}
+            <span className="font-medium">{notification.message}</span>
+          </div>
+        </div>
+      )}
+      
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1770,7 +1828,7 @@ function BlogsTab({
                   <div className="flex">
                     <div className="w-64 h-40 flex-shrink-0">
                       <img
-                        src={blog.image}
+                        src={blog.topImage || blog.image || "/placeholder.svg"}
                         alt="Blog"
                         className="w-full h-full object-cover"
                       />
@@ -1801,6 +1859,9 @@ function BlogsTab({
                         <span>Category: {blog.category}</span>
                         <span>Author: {blog.author}</span>
                         <span>Published: {new Date(blog.publishedAt).toLocaleDateString()}</span>
+                        {blog.inlineImages && blog.inlineImages.length > 0 && (
+                          <span className="text-blue-600">📷 {blog.inlineImages.length} inline images</span>
+                        )}
                         <Badge variant={blog.isPublished ? "default" : "secondary"}>
                           {blog.isPublished ? "Published" : "Draft"}
                         </Badge>
@@ -1952,18 +2013,24 @@ function BlogForm({
     title: blog?.title || "",
     excerpt: blog?.excerpt || "",
     content: blog?.content || "",
-    image: blog?.image || "",
+    topImage: blog?.topImage || "",
+    inlineImages: blog?.inlineImages || [],
     category: blog?.category || "",
     author: blog?.author || "",
     isPublished: blog?.isPublished ?? true,
   })
-  const [isUploading, setIsUploading] = useState(false)
+  const [isUploadingTop, setIsUploadingTop] = useState(false)
+  const [isUploadingInline, setIsUploadingInline] = useState(false)
   const [uploadError, setUploadError] = useState("")
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.title || !formData.content) {
       setUploadError("Please fill in title and content")
+      return
+    }
+    if (!formData.topImage) {
+      setUploadError("Please upload a top image")
       return
     }
     onSave(formData)
@@ -2016,39 +2083,97 @@ function BlogForm({
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-              <Input
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                placeholder="e.g., Maintenance, Equipment Guide, Technology"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Blog Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={async (e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    const file = e.target.files[0];
-                    setUploadError("");
-                    setIsUploading(true);
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <Input
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              placeholder="e.g., Maintenance, Equipment Guide, Technology"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Top Image (Main Banner)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                if (e.target.files && e.target.files[0]) {
+                  const file = e.target.files[0];
+                  setUploadError("");
+                  setIsUploadingTop(true);
+                  
+                  const formDataCloud = new FormData();
+                  formDataCloud.append("file", file);
+                  formDataCloud.append("upload_preset", "product_uploads");
+                  
+                  try {
+                    const res = await fetch(
+                      "https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload",
+                      {
+                        method: "POST",
+                        body: formDataCloud,
+                      }
+                    );
                     
-                    // Create preview immediately
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                      setFormData({ ...formData, image: e.target?.result as string });
-                    };
-                    reader.readAsDataURL(file);
+                    if (!res.ok) {
+                      throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+                    }
                     
-                    const formDataCloud = new FormData();
-                    formDataCloud.append("file", file);
-                    formDataCloud.append("upload_preset", "product_uploads");
-                    
-                    try {
+                    const data = await res.json();
+                    if (data.secure_url) {
+                      setFormData({ ...formData, topImage: data.secure_url });
+                      setUploadError("");
+                    } else {
+                      throw new Error("No secure URL returned from Cloudinary");
+                    }
+                  } catch (error) {
+                    console.error('Error uploading image:', error);
+                    setUploadError(`Failed to upload top image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                  } finally {
+                    setIsUploadingTop(false);
+                  }
+                }
+              }}
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              required
+              disabled={isUploadingTop}
+            />
+            <p className="text-xs text-gray-500 mt-1">Upload the main banner image for the top of the blog post</p>
+            
+            {isUploadingTop && (
+              <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-600">Uploading top image...</p>
+              </div>
+            )}
+            
+            {formData.topImage && (
+              <div className="mt-2">
+                <img src={formData.topImage} alt="Top preview" className="w-32 h-32 object-cover rounded-lg" />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Inline Images (Optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={async (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  const files = Array.from(e.target.files);
+                  setUploadError("");
+                  setIsUploadingInline(true);
+                  
+                  try {
+                    const uploadedUrls: string[] = [];
+                    for (const file of files) {
+                      const formDataCloud = new FormData();
+                      formDataCloud.append("file", file);
+                      formDataCloud.append("upload_preset", "product_uploads");
+                      
                       const res = await fetch(
                         "https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload",
                         {
@@ -2063,49 +2188,57 @@ function BlogForm({
                       
                       const data = await res.json();
                       if (data.secure_url) {
-                        setFormData({ ...formData, image: data.secure_url });
-                        setUploadError("");
-                      } else {
-                        throw new Error("No secure URL returned from Cloudinary");
+                        uploadedUrls.push(data.secure_url);
                       }
-                    } catch (error) {
-                      console.error('Error uploading image:', error);
-                      setUploadError(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                    } finally {
-                      setIsUploading(false);
                     }
+                    
+                    setFormData({ ...formData, inlineImages: [...formData.inlineImages, ...uploadedUrls] });
+                    setUploadError("");
+                  } catch (error) {
+                    console.error('Error uploading images:', error);
+                    setUploadError(`Failed to upload inline images: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                  } finally {
+                    setIsUploadingInline(false);
                   }
-                }}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
-                disabled={isUploading}
-              />
-              <p className="text-xs text-gray-500 mt-1">Upload a blog image from your computer</p>
-              
-              {isUploading && (
-                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-600">Uploading image...</p>
-                </div>
-              )}
-              
-              {uploadError && (
-                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-600">{uploadError}</p>
-                </div>
-              )}
-              
-              {formData.image && !uploadError && (
-                <div className="mt-2">
-                  <img 
-                    src={formData.image} 
-                    alt="Blog preview" 
-                    className="w-full h-32 object-cover rounded-lg border"
-                  />
-                  <p className="text-xs text-green-600 mt-1">✓ Image uploaded successfully</p>
-                </div>
-              )}
-            </div>
+                }
+              }}
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              disabled={isUploadingInline}
+            />
+            <p className="text-xs text-gray-500 mt-1">Upload images to be displayed within the blog content (multiple images allowed)</p>
+            
+            {isUploadingInline && (
+              <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-600">Uploading inline images...</p>
+              </div>
+            )}
+            
+            {formData.inlineImages.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {formData.inlineImages.map((url, idx) => (
+                  <div key={idx} className="relative">
+                    <img src={url} alt={`Inline ${idx + 1}`} className="w-24 h-24 object-cover rounded-lg" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newImages = formData.inlineImages.filter((_, i) => i !== idx);
+                        setFormData({ ...formData, inlineImages: newImages });
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+
+          {uploadError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">{uploadError}</p>
+            </div>
+          )}
           
           <div className="flex items-center space-x-2">
             <input
@@ -2124,12 +2257,12 @@ function BlogForm({
             <Button 
               type="submit" 
               className="bg-green-600 hover:bg-green-700"
-              disabled={isUploading || !formData.title || !formData.content}
+              disabled={isUploadingTop || isUploadingInline || !formData.title || !formData.content || !formData.topImage}
             >
               <Save className="mr-2" size={16} />
-              {isUploading ? 'Uploading...' : (blog ? 'Update Blog' : 'Add Blog')}
+              {(isUploadingTop || isUploadingInline) ? 'Uploading...' : (blog ? 'Update Blog' : 'Add Blog')}
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel} disabled={isUploading}>
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isUploadingTop || isUploadingInline}>
               <X className="mr-2" size={16} />
               Cancel
             </Button>

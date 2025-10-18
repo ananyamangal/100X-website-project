@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clientPromise } from '@/lib/mongodb';
+import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
 interface BlogUpdate {
   title?: string;
   excerpt?: string;
   content?: string;
-  image?: string;
+  topImage?: string;
+  inlineImages?: string[];
   category?: string;
   author?: string;
   isPublished?: boolean;
