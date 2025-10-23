@@ -729,6 +729,8 @@ export default function HomePage() {
             {displayBlogPosts.slice(0, 3).map((post) => (
               <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300">
                 <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
+                
+                
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-3">
                     <Badge variant="secondary">{post.category}</Badge>
@@ -746,6 +748,15 @@ export default function HomePage() {
                       <span className="text-sm text-gray-600">{new Date(post.date).toLocaleDateString()}</span>
                     </div>
                   </div>
+                  <Button
+  className="w-full bg-purple-600 hover:bg-purple-700"
+  onClick={() => {
+    setSelectedBlog(post)
+    setCurrentPage("blog")
+  }}
+>
+  Read Full Article <ArrowRight className="ml-2" size={16} />
+</Button>
                 </CardContent>
               </Card>
             ))}
@@ -1751,9 +1762,16 @@ function BlogPage({
                     </span>
                   </div>
                 </div>
-                <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                  Read Full Article <ArrowRight className="ml-2" size={16} />
-                </Button>
+                <Button
+  className="w-full bg-purple-600 hover:bg-purple-700"
+  onClick={() => {
+    setSelectedBlog(post)
+    setCurrentPage("blog")
+  }}
+>
+  Read Full Article <ArrowRight className="ml-2" size={16} />
+</Button>
+
               </CardContent>
             </Card>
           ))}
