@@ -413,32 +413,47 @@ function AdminDashboardContent() {
 
   // Update blog
   const handleUpdateBlog = async (updatedBlog: BlogPost) => {
+    // 1️⃣ Ensure the blog has an ID
+    if (!updatedBlog.id) {
+      console.error("Blog ID is missing! Cannot update.");
+      setNotification({ type: 'error', message: 'Blog ID is missing' });
+      setTimeout(() => setNotification(null), 3000);
+      return;
+    }
+  
     try {
+      // 2️⃣ Call the API with the correct blog ID
       const res = await fetch(`/api/admin/blogs/${updatedBlog.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(updatedBlog),
-      })
+      });
+  
       if (res.ok) {
-        const updated = await res.json()
+        const updated = await res.json();
+  
+        // 3️⃣ Update blogs state with the new data
         setBlogs(blogs.map(b => b.id === updated._id ? {
           ...updated,
           id: updated._id,
-        } : b))
-        setEditingBlog(null)
-        setNotification({type: 'success', message: 'Blog updated successfully!'})
-        setTimeout(() => setNotification(null), 3000)
+        } : b));
+  
+        setEditingBlog(null);
+        setNotification({ type: 'success', message: 'Blog updated successfully!' });
+        setTimeout(() => setNotification(null), 3000);
       } else {
-        setNotification({type: 'error', message: 'Failed to update blog'})
-        setTimeout(() => setNotification(null), 3000)
+        const errData = await res.json();
+        console.error("Failed to update blog:", errData);
+        setNotification({ type: 'error', message: 'Failed to update blog' });
+        setTimeout(() => setNotification(null), 3000);
       }
     } catch (error) {
-      console.error("Error updating blog:", error)
-      setNotification({type: 'error', message: 'Error updating blog'})
-      setTimeout(() => setNotification(null), 3000)
+      console.error("Error updating blog:", error);
+      setNotification({ type: 'error', message: 'Error updating blog' });
+      setTimeout(() => setNotification(null), 3000);
     }
-  }
+  };
 
   // Delete blog
   const handleDeleteBlog = async (blogId: string) => {
@@ -1821,7 +1836,9 @@ function BlogsTab({
                 {editingBlog?.id === blog.id ? (
                   <BlogForm
                     blog={blog}
-                    onSave={onUpdateBlog}
+                    onSave={(formData) => {
+                      onUpdateBlog({ ...formData, id: blog.id }); // pass the existing blog ID
+                    }}
                     onCancel={() => setEditingBlog(null)}
                   />
                 ) : (
@@ -2029,7 +2046,7 @@ function BlogForm({
       setUploadError("Please fill in title and content")
       return
     }
-    if (!formData.topImage) {
+    if (!formData.topImage && !blog) {
       setUploadError("Please upload a top image")
       return
     }
@@ -2137,7 +2154,7 @@ function BlogForm({
                 }
               }}
               className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              required
+              required={!blog} 
               disabled={isUploadingTop}
             />
             <p className="text-xs text-gray-500 mt-1">Upload the main banner image for the top of the blog post</p>
