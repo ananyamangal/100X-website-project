@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import './globals.css'
 import Navbar from '../components/Navbar';
 
@@ -6,6 +7,13 @@ export const metadata: Metadata = {
   title: 'v0 App',
   description: 'Created with v0',
   generator: 'v0.dev',
+  robots: {
+    index: true,
+    follow: true,
+  },
+  verification: {
+    google: 'MGOgHdnClDvCf-IVmtpccyhPKKtHcbS8W3Xvhd2KYmo',
+  },
 }
 
 export default function RootLayout({
@@ -15,9 +23,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="robots" content="INDEX, FOLLOW" />
+        <meta name="google-site-verification" content="MGOgHdnClDvCf-IVmtpccyhPKKtHcbS8W3Xvhd2KYmo" />
+      </head>
       <body>
         <Navbar />
         {children}
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-GEWH5YB3PS"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-GEWH5YB3PS');
+          `}
+        </Script>
       </body>
     </html>
   )

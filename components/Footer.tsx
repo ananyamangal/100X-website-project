@@ -62,10 +62,15 @@ export default function Footer() {
           </div>
         </div>
         <div className="text-center text-gray-500 text-sm border-t border-gray-800 pt-8">
-          <div className="flex justify-center items-center space-x-4 flex-wrap gap-2">
+          <div className="flex justify-center items-center space-x-4 flex-wrap gap-2 mb-4">
             <span>&copy; {new Date().getFullYear()} 100X Circle Pvt Ltd. All rights reserved.</span>
             <Link href="/sitemap.xml" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Sitemap</Link>
             <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
+          </div>
+          <div>
+            <p className="text-gray-600 text-[10px] leading-relaxed">
+              fogging machine, fogging machine price, fogger, fogger machine price, thermal fogging machine, Double barrel fogging machine, best thermal fogging machine, fogging machine in bihar, fogging machine in delhi, fogging machine in india, fogging machine in mumbai, fogging machine pune, thermal fogging machine manufacturer in india, fogging machine in uttar pradesh, Best foggers, Foggers india, giant fogging machine, Mosquito fogger
+            </p>
           </div>
         </div>
       </div>

@@ -1220,24 +1220,31 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 mb-4 md:mb-0">
-              &copy; 2025 100X Circle Pvt Ltd.
-            </p>
-            <div className="flex space-x-6 text-gray-400 text-sm">
-              <a href="#" className="hover:text-green-400 transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="hover:text-green-400 transition-colors">
-                Terms of Service
-              </a>
-              <a href="#" className="hover:text-green-400 transition-colors">
-                FTP Access
-              </a>
-              <Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">
-                Sitemap
-              </Link>
-              <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
+          <div className="border-t border-gray-800 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+              <p className="text-gray-400 mb-4 md:mb-0">
+                &copy; 2025 100X Circle Pvt Ltd.
+              </p>
+              <div className="flex space-x-6 text-gray-400 text-sm">
+                <a href="#" className="hover:text-green-400 transition-colors">
+                  Privacy Policy
+                </a>
+                <a href="#" className="hover:text-green-400 transition-colors">
+                  Terms of Service
+                </a>
+                <a href="#" className="hover:text-green-400 transition-colors">
+                  FTP Access
+                </a>
+                <Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">
+                  Sitemap
+                </Link>
+                <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-gray-600 text-[10px] leading-relaxed">
+                fogging machine, fogging machine price, fogger, fogger machine price, thermal fogging machine, Double barrel fogging machine, best thermal fogging machine, fogging machine in bihar, fogging machine in delhi, fogging machine in india, fogging machine in mumbai, fogging machine pune, thermal fogging machine manufacturer in india, fogging machine in uttar pradesh, Best foggers, Foggers india, giant fogging machine, Mosquito fogger
+              </p>
             </div>
           </div>
         </div>
