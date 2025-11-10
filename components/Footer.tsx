@@ -49,6 +49,7 @@ export default function Footer() {
               <li><Link href="/products" className="hover:text-green-400 transition-colors">Products</Link></li>
               <li><Link href="/about" className="hover:text-green-400 transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="hover:text-green-400 transition-colors">Contact</Link></li>
+              <li><Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">Sitemap</Link></li>
             </ul>
           </div>
           <div>
@@ -61,8 +62,9 @@ export default function Footer() {
           </div>
         </div>
         <div className="text-center text-gray-500 text-sm border-t border-gray-800 pt-8">
-          <div className="flex justify-center items-center space-x-4">
+          <div className="flex justify-center items-center space-x-4 flex-wrap gap-2">
             <span>&copy; {new Date().getFullYear()} 100X Circle Pvt Ltd. All rights reserved.</span>
+            <Link href="/sitemap.xml" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Sitemap</Link>
             <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
           </div>
         </div>

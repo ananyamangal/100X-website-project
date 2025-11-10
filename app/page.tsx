@@ -1196,6 +1196,11 @@ export default function HomePage() {
                     Blog
                   </button>
                 </li>
+                <li>
+                  <Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">
+                    Sitemap
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -1229,6 +1234,9 @@ export default function HomePage() {
               <a href="#" className="hover:text-green-400 transition-colors">
                 FTP Access
               </a>
+              <Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">
+                Sitemap
+              </Link>
               <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
             </div>
           </div>
