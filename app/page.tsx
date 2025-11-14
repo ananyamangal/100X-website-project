@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import Head from "next/head"
 import Link from "next/link"
 import {
   Menu,
@@ -912,7 +913,15 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <Head>
+        <title>Best thermal & giant fogging machine manufacturer in Delhi, Uttar Pradesh, Bihar, Mumbai, Pune India | Mosquito Fogger | 100x Circle</title>
+        <meta
+          name="description"
+          content="Discover 100x Circle – the best thermal & giant fogging machine manufacturer in Delhi, Uttar Pradesh, Bihar, Mumbai, and Pune, India. Our high-performance mosquito foggers ensure superior pest control, durability, and efficiency for industrial and residential use. Connect with us!"
+        />
+      </Head>
+      <div className="min-h-screen bg-white">
       {/* Brochure Form Modal */}
       {showBrochureForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -1264,7 +1273,8 @@ export default function HomePage() {
         <MessageCircle size={30} />
         <span className="font-semibold">WhatsApp Us</span>
       </button>
-    </div>
+      </div>
+    </>
   )
 }
 

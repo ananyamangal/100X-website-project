@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Head from 'next/head';
 import { useParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,19 @@ const badgeLogoMap: Record<string, string> = {
   'Eco Friendly': '/Logos clipart 2/Ecofreidly.png',
   'Ecofreidly': '/Logos clipart 2/Ecofreidly.png',
   'BIS Approved': '/Logos clipart 2/BIS approved.png',
+};
+
+const PRODUCT_META: Record<string, { title: string; description: string }> = {
+  'power-tiller': {
+    title: 'Power Tiller in Delhi | 100x Circle',
+    description:
+      'Looking for the best Power Tiller in Delhi? 100x Circle offers high-performance, durable, and affordable power tillers designed to make farming easier and more efficient. Explore our range of advanced agricultural machines today!',
+  },
+  'vehicle-mounted-fogging-machine': {
+    title: 'Vehicle Mounted Fogging Machine in Delhi | 100x Circle',
+    description:
+      '100x Circle offers the best Vehicle Mounted Fogging Machine in Delhi, designed for large-scale mosquito control and disinfection. Our high-performance foggers ensure powerful spray coverage, durability, and easy operation for municipal and industrial use.',
+  },
 };
 
 function Header() {
@@ -102,10 +116,12 @@ function Header() {
 }
 
 export default function ProductDetailPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const [product, setProduct] = useState<any>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const pageMeta = id ? PRODUCT_META[id] : undefined;
 
   // Carousel auto-scroll
   useEffect(() => {
@@ -153,6 +169,13 @@ export default function ProductDetailPage() {
   const thumbnails = getThumbnails();
 
   return (
+    <>
+      {pageMeta && (
+        <Head>
+          <title>{pageMeta.title}</title>
+          <meta name="description" content={pageMeta.description} />
+        </Head>
+      )}
     <div className="pt-32 min-h-screen bg-gray-50">
       <Header />
       <div className="container mx-auto px-4 py-12">
@@ -351,5 +374,6 @@ export default function ProductDetailPage() {
         )}
       </div>
     </div>
+    </>
   );
 } 
