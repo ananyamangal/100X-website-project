@@ -4,9 +4,10 @@ import './globals.css'
 import Navbar from '../components/Navbar';
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title:
+    'Best thermal & giant fogging machine manufacturer in Delhi, Uttar Pradesh, Bihar, Mumbai, Pune India | Mosquito Fogger | 100x Circle',
+  description:
+    'Discover 100x Circle – the best thermal & giant fogging machine manufacturer in Delhi, Uttar Pradesh, Bihar, Mumbai, and Pune, India. Our high-performance mosquito foggers ensure superior pest control, durability, and efficiency for industrial and residential use. Connect with us!',
   robots: {
     index: true,
     follow: true,
