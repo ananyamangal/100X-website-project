@@ -799,7 +799,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <div className="font-semibold text-gray-800">Phone</div>
-                    <div className="text-gray-600"><a href="tel:+917827229116" className="underline hover:text-green-600">+91 7827229116</a></div>
+                    <div className="text-gray-600"><a href="tel:+917827229116" className="underline hover:text-green-600" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a></div>
                     <div className="text-gray-600"><a href="tel:+918178567520" className="underline hover:text-green-600">+91 8178567520</a></div>
                     <div className="text-sm text-gray-500">Mon-Sat: 9:00 AM - 6:00 PM</div>
                   </div>
@@ -964,7 +964,7 @@ export default function HomePage() {
               </span>
               <span className="flex items-center">
                 <MessageCircle size={18} className="mr-2" />
-                <a href="tel:+917827229116" className="underline hover:text-green-200">+91 7827229116</a>
+                <a href="tel:+917827229116" className="underline hover:text-green-200" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a>
               </span>
               <span className="flex items-center">
                 <MessageCircle size={18} className="mr-2" />
@@ -1217,7 +1217,7 @@ export default function HomePage() {
               <h4 className="font-semibold mb-6 text-lg">Contact Info</h4>
               <div className="space-y-4 text-gray-400">
                 <p className="flex items-center">
-                  <Phone className="mr-3" size={16} /> <a href="tel:+917827229116" className="underline hover:text-green-400">+91 7827229116</a>
+                  <Phone className="mr-3" size={16} /> <a href="tel:+917827229116" className="underline hover:text-green-400" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a>
                 </p>
                 <p className="flex items-center">
                   <Phone className="mr-3" size={16} /> <a href="tel:+918178567520" className="underline hover:text-green-400">+91 8178567520</a>

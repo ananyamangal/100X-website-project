@@ -45,7 +45,7 @@ function Header() {
             </span>
             <span className="flex items-center">
               <MessageCircle size={18} className="mr-2" />
-              <a href="tel:+917827229116" className="underline hover:text-green-200">+91 7827229116</a>
+              <a href="tel:+917827229116" className="underline hover:text-green-200" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a>
             </span>
             <span className="flex items-center">
               <MessageCircle size={18} className="mr-2" />

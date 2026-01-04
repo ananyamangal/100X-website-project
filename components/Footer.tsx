@@ -56,7 +56,7 @@ export default function Footer() {
             <h4 className="font-semibold mb-6 text-lg">Contact</h4>
             <ul className="space-y-3 text-gray-400">
               <li>Email: 100xcircle@gmail.com</li>
-              <li>Phone: +91 7827229116</li>
+              <li>Phone: <a href="tel:+917827229116" className="hover:text-green-400 transition-colors" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a></li>
               <li>Location: Sector 7, IMT Manesar, Gurgaon</li>
             </ul>
           </div>

@@ -40,6 +40,9 @@ export default function RootLayout({
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'AW-17730009010');
+            gtag('config', 'AW-17730009010/0N2CCMvmudwbELLvqYZC', {
+              'phone_conversion_number': '7827229116'
+            });
           `}
         </Script>
         <Navbar />
