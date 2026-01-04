@@ -18,6 +18,18 @@
       gtag('config', 'AW-17730009010/0N2CCMvmudwbELLvqYZC', {
         'phone_conversion_number': '7827229116'
       });
+      function gtag_report_conversion(url) {
+        var callback = function () {
+          if (typeof(url) != 'undefined') {
+            window.location = url;
+          }
+        };
+        gtag('event', 'conversion', {
+            'send_to': 'AW-17730009010/d5fWCOSUvtwbELLvqYZC',
+            'event_callback': callback
+        });
+        return false;
+      }
     </script>
 </head>
 <body>
@@ -83,7 +95,7 @@
                                 <li>Adjustable nozzle system</li>
                                 <li>Fuel-efficient engine</li>
                             </ul>
-                            <a href="https://wa.me/91XXXXXXXXXX?text=I'm%20interested%20in%20the%20Professional%20Fogging%20Machine" class="btn btn-primary">Contact to Order</a>
+                            <a href="https://wa.me/91XXXXXXXXXX?text=I'm%20interested%20in%20the%20Professional%20Fogging%20Machine" class="btn btn-primary" onclick="return gtag_report_conversion('https://wa.me/91XXXXXXXXXX?text=I\'m%20interested%20in%20the%20Professional%20Fogging%20Machine');">Contact to Order</a>
                         </div>
                     </article>
 
@@ -97,7 +109,7 @@
                                 <li>8-hour battery life</li>
                                 <li>Variable pressure control</li>
                             </ul>
-                            <a href="https://wa.me/91XXXXXXXXXX?text=I'm%20interested%20in%20the%20Battery%20Powered%20Sprayer" class="btn btn-primary">Contact to Order</a>
+                            <a href="https://wa.me/91XXXXXXXXXX?text=I'm%20interested%20in%20the%20Battery%20Powered%20Sprayer" class="btn btn-primary" onclick="return gtag_report_conversion('https://wa.me/91XXXXXXXXXX?text=I\'m%20interested%20in%20the%20Battery%20Powered%20Sprayer');">Contact to Order</a>
                         </div>
                     </article>
 
@@ -111,7 +123,7 @@
                                 <li>Multi-speed transmission</li>
                                 <li>Durable steel construction</li>
                             </ul>
-                            <a href="https://wa.me/91XXXXXXXXXX?text=I'm%20interested%20in%20the%20Heavy%20Duty%20Power%20Tiller" class="btn btn-primary">Contact to Order</a>
+                            <a href="https://wa.me/91XXXXXXXXXX?text=I'm%20interested%20in%20the%20Heavy%20Duty%20Power%20Tiller" class="btn btn-primary" onclick="return gtag_report_conversion('https://wa.me/91XXXXXXXXXX?text=I\'m%20interested%20in%20the%20Heavy%20Duty%20Power%20Tiller');">Contact to Order</a>
                         </div>
                     </article>
                 </div>
@@ -126,7 +138,7 @@
             <div class="container">
                 <h2>Ready to Transform Your Farming?</h2>
                 <p>Get in touch with our experts to find the perfect equipment for your agricultural needs.</p>
-                <a href="contact.html" class="btn btn-primary">Get Started Today</a>
+                <a href="contact.html" class="btn btn-primary" onclick="return gtag_report_conversion('contact.html');">Get Started Today</a>
             </div>
         </section>
     </main>

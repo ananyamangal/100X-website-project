@@ -373,6 +373,11 @@ export default function HomePage() {
     const subject = formData.get("subject")
     const message = formData.get("message")
 
+    // Track conversion
+    if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
+      (window as any).gtag_report_conversion()
+    }
+
     // Save submission to backend
     await fetch("/api/submissions", {
       method: "POST",
@@ -1009,6 +1014,9 @@ export default function HomePage() {
                 className="text-gray-700 hover:text-green-600 transition-colors"
                 onClick={e => {
                   e.preventDefault();
+                  if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
+                    (window as any).gtag_report_conversion();
+                  }
                   scrollToContact();
                 }}
               >
@@ -1067,6 +1075,9 @@ export default function HomePage() {
                   className="text-gray-700"
                   onClick={e => {
                     e.preventDefault();
+                    if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
+                      (window as any).gtag_report_conversion();
+                    }
                     setIsMenuOpen(false);
                     scrollToContact();
                   }}
@@ -1194,6 +1205,9 @@ export default function HomePage() {
                     className="hover:text-green-400 transition-colors"
                     onClick={e => {
                       e.preventDefault();
+                      if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
+                        (window as any).gtag_report_conversion();
+                      }
                       scrollToContact();
                     }}
                   >
@@ -1469,12 +1483,15 @@ function ProductDetailPage({
               size="lg"
               variant="secondary"
               className="bg-white text-green-600 hover:bg-gray-100"
-              onClick={() =>
+              onClick={() => {
+                if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
+                  (window as any).gtag_report_conversion();
+                }
                 window.open(
                   `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`,
                   "_blank",
                 )
-              }
+              }}
             >
               <MessageCircle className="mr-2" size={20} />
               Contact Sales Team

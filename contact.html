@@ -18,6 +18,18 @@
       gtag('config', 'AW-17730009010/0N2CCMvmudwbELLvqYZC', {
         'phone_conversion_number': '7827229116'
       });
+      function gtag_report_conversion(url) {
+        var callback = function () {
+          if (typeof(url) != 'undefined') {
+            window.location = url;
+          }
+        };
+        gtag('event', 'conversion', {
+            'send_to': 'AW-17730009010/d5fWCOSUvtwbELLvqYZC',
+            'event_callback': callback
+        });
+        return false;
+      }
     </script>
 </head>
 <body>
@@ -140,7 +152,7 @@
                                 <textarea id="message" name="message" rows="5" placeholder="Please describe your requirements or questions..." required></textarea>
                             </div>
 
-                            <button type="submit" class="btn btn-primary">Send Message</button>
+                            <button type="submit" class="btn btn-primary" onclick="return gtag_report_conversion();">Send Message</button>
                         </form>
                     </div>
                 </div>
@@ -153,7 +165,7 @@
             <div class="container">
                 <h2>Need Immediate Assistance?</h2>
                 <p>For urgent inquiries or immediate support, contact us directly via WhatsApp</p>
-                <a href="https://wa.me/91XXXXXXXXXX?text=Hello,%20I%20need%20immediate%20assistance%20with%20agricultural%20equipment." class="btn btn-primary">
+                <a href="https://wa.me/91XXXXXXXXXX?text=Hello,%20I%20need%20immediate%20assistance%20with%20agricultural%20equipment." class="btn btn-primary" onclick="return gtag_report_conversion('https://wa.me/91XXXXXXXXXX?text=Hello,%20I%20need%20immediate%20assistance%20with%20agricultural%20equipment.');">
                     <i class="fab fa-whatsapp"></i> Chat Now on WhatsApp
                 </a>
             </div>

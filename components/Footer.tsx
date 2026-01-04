@@ -48,7 +48,7 @@ export default function Footer() {
               <li><Link href="/" className="hover:text-green-400 transition-colors">Home</Link></li>
               <li><Link href="/products" className="hover:text-green-400 transition-colors">Products</Link></li>
               <li><Link href="/about" className="hover:text-green-400 transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-green-400 transition-colors">Contact</Link></li>
+              <li><Link href="/contact" className="hover:text-green-400 transition-colors" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) { (window as any).gtag_report_conversion(); } }}>Contact</Link></li>
               <li><Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">Sitemap</Link></li>
             </ul>
           </div>

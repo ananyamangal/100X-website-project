@@ -18,6 +18,18 @@
       gtag('config', 'AW-17730009010/0N2CCMvmudwbELLvqYZC', {
         'phone_conversion_number': '7827229116'
       });
+      function gtag_report_conversion(url) {
+        var callback = function () {
+          if (typeof(url) != 'undefined') {
+            window.location = url;
+          }
+        };
+        gtag('event', 'conversion', {
+            'send_to': 'AW-17730009010/d5fWCOSUvtwbELLvqYZC',
+            'event_callback': callback
+        });
+        return false;
+      }
     </script>
 </head>
 <body>
@@ -185,7 +197,7 @@
             <div class="container">
                 <h2>Ready to Experience the 100X Difference?</h2>
                 <p>Join thousands of satisfied curstomers who trust 100X for their agricultural equipment needs.</p>
-                <a href="contact.html" class="btn btn-primary">Get in Touch</a>
+                <a href="contact.html" class="btn btn-primary" onclick="return gtag_report_conversion('contact.html');">Get in Touch</a>
             </div>
         </section>
     </main>

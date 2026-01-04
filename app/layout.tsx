@@ -43,6 +43,18 @@ export default function RootLayout({
             gtag('config', 'AW-17730009010/0N2CCMvmudwbELLvqYZC', {
               'phone_conversion_number': '7827229116'
             });
+            function gtag_report_conversion(url) {
+              var callback = function () {
+                if (typeof(url) != 'undefined') {
+                  window.location = url;
+                }
+              };
+              gtag('event', 'conversion', {
+                  'send_to': 'AW-17730009010/d5fWCOSUvtwbELLvqYZC',
+                  'event_callback': callback
+              });
+              return false;
+            }
           `}
         </Script>
         <Navbar />
