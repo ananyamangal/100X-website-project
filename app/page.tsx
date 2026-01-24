@@ -174,37 +174,11 @@ export default function HomePage() {
     "100 X Results",
   ]
 
-  // Default hero slides (fallback)
-  const defaultHeroSlides = [
-    {
-      image: "/banner.jpeg",
-      title: "Revolutionary Fogging Technology",
-      subtitle: "Advanced pest control solutions for modern agriculture",
-    },
-    {
-      image: "/banner.jpeg",
-      title: "Precision Battery Sprayers",
-      subtitle: "Eco-friendly spraying with unmatched efficiency",
-    },
-    {
-      image: "/banner.jpeg",
-      title: "Heavy-Duty Power Tillers",
-      subtitle: "Built for the toughest farming conditions",
-    },
-    {
-      image: "/banner.jpeg",
-      title: "Complete Solutions",
-      subtitle: "[YOUR NEW TEXT HERE]",
-    },
-  ]
-
-  // Use banners from API or fallback to default
+  // Use banners from API only
   // The first banner (order 0 or lowest order) is the default loading banner
-  const heroSlides = banners.length > 0 ? 
-    banners
-      .filter(b => b.isActive && b.image) // Only show active banners with images
-      .sort((a, b) => (a.order || 0) - (b.order || 0)) 
-    : defaultHeroSlides
+  const heroSlides = banners
+    .filter(b => b.isActive && b.image) // Only show active banners with images
+    .sort((a, b) => (a.order || 0) - (b.order || 0))
 
   // Fetch products from API
   useEffect(() => {
@@ -264,7 +238,7 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
-    if (heroSlides.length === 0) return;
+    if (heroSlides.length === 0 || heroSlides.length === 1) return;
     
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
@@ -462,9 +436,9 @@ export default function HomePage() {
 
   const renderHomePage = () => {
     // Ensure we have valid slides and currentSlide is within bounds
-    const validSlides = heroSlides.length > 0 ? heroSlides : defaultHeroSlides;
-    const safeCurrentSlide = Math.max(0, Math.min(currentSlide, validSlides.length - 1));
-    const currentSlideData = validSlides[safeCurrentSlide] || defaultHeroSlides[0];
+    const validSlides = heroSlides;
+    const safeCurrentSlide = heroSlides.length > 0 ? Math.max(0, Math.min(currentSlide, heroSlides.length - 1)) : 0;
+    const currentSlideData = heroSlides.length > 0 ? heroSlides[safeCurrentSlide] : null;
 
     return (
     <>
@@ -473,11 +447,15 @@ export default function HomePage() {
         {/* Banner Images - Desktop View */}
         <div className="hidden md:block min-h-screen relative">
           <div className="absolute inset-0">
-            <img
-              src={currentSlideData?.image || "/banner.jpeg"}
-              alt="Agricultural equipment"
-              className="w-full h-full object-cover transition-all duration-1000"
-            />
+            {currentSlideData?.image ? (
+              <img
+                src={currentSlideData.image}
+                alt="Agricultural equipment"
+                className="w-full h-full object-cover transition-all duration-1000"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-green-600 to-green-800"></div>
+            )}
             {/* Very subtle overlay for text readability while maintaining brightness */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-transparent"></div>
           </div>
@@ -540,11 +518,15 @@ export default function HomePage() {
           {/* Banner Images - Mobile View */}
           <div className="relative h-80">
             <div className="absolute inset-0">
-              <img
-                src={currentSlideData?.image || "/banner.jpeg"}
-                alt="Agricultural equipment"
-                className="w-full h-full object-cover transition-all duration-1000"
-              />
+              {currentSlideData?.image ? (
+                <img
+                  src={currentSlideData.image}
+                  alt="Agricultural equipment"
+                  className="w-full h-full object-cover transition-all duration-1000"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-green-600 to-green-800"></div>
+              )}
               {/* No overlay for mobile to maintain full brightness */}
             </div>
           </div>
