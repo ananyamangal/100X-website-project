@@ -199,6 +199,7 @@ export default function HomePage() {
   ]
 
   // Use banners from API or fallback to default
+  // The first banner (order 0 or lowest order) is the default loading banner
   const heroSlides = banners.length > 0 ? 
     banners
       .filter(b => b.isActive && b.image) // Only show active banners with images

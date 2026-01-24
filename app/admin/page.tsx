@@ -1914,6 +1914,11 @@ function BannersTab({
   editingBanner: Banner | null
   setEditingBanner: (banner: Banner | null) => void
 }) {
+  // Get the default banner (first banner with order 0 or lowest order)
+  const sortedBanners = banners.sort((a, b) => a.order - b.order)
+  const defaultBanner = sortedBanners.find(b => b.isActive && b.order === 0) || sortedBanners.find(b => b.isActive) || sortedBanners[0]
+  const otherBanners = sortedBanners.filter(b => b.id !== defaultBanner?.id)
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -1935,79 +1940,153 @@ function BannersTab({
           banner={null}
           onSave={onAddBanner}
           onCancel={() => setIsAddingBanner(false)}
+          isDefault={banners.length === 0}
         />
       )}
 
-      <div className="grid gap-6">
-        {banners
-          .sort((a, b) => a.order - b.order)
-          .map((banner) => (
-            <Card key={banner.id} className="overflow-hidden">
-              <CardContent className="p-0">
-                {editingBanner?.id === banner.id ? (
-                  <BannerForm
-                    banner={banner}
-                    onSave={onUpdateBanner}
-                    onCancel={() => setEditingBanner(null)}
-                  />
-                ) : (
-                  <div className="flex">
-                    <div className="w-64 h-40 flex-shrink-0">
-                      <img
-                        src={banner.image}
-                        alt="Banner"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">Banner Image</h3>
-                          <div className="flex items-center space-x-4 text-sm text-gray-500">
-                            <span>Order: {banner.order}</span>
-                            <span>Status: {banner.isActive ? 'Active' : 'Inactive'}</span>
-                          </div>
+      {/* Default Banner Section - The first banner that loads on the website */}
+      {defaultBanner && (
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Badge className="bg-green-600 text-white px-3 py-1">Default Banner</Badge>
+            <p className="text-sm text-gray-600">This is the first banner that appears when the website loads</p>
+          </div>
+          <Card className="overflow-hidden border-2 border-green-500">
+            <CardContent className="p-0">
+              {editingBanner?.id === defaultBanner.id ? (
+                <BannerForm
+                  banner={defaultBanner}
+                  onSave={onUpdateBanner}
+                  onCancel={() => setEditingBanner(null)}
+                  isDefault={true}
+                />
+              ) : (
+                <div className="flex">
+                  <div className="w-64 h-40 flex-shrink-0">
+                    <img
+                      src={defaultBanner.image}
+                      alt="Default Banner"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Default Banner (Loading Page)</h3>
+                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          <span>Order: {defaultBanner.order}</span>
+                          <span>Status: {defaultBanner.isActive ? 'Active' : 'Inactive'}</span>
+                          <span className="text-green-600 font-semibold">✓ This banner shows first</span>
                         </div>
-                        <div className="flex space-x-2">
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEditingBanner(defaultBanner)}
+                          className="bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
+                        >
+                          <Edit className="mr-1" size={14} />
+                          Edit Default Banner
+                        </Button>
+                        {otherBanners.length > 0 && (
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => setEditingBanner(banner)}
-                          >
-                            <Edit className="mr-1" size={14} />
-                            Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => onDeleteBanner(banner.id!)}
+                            onClick={() => onDeleteBanner(defaultBanner.id!)}
                             className="text-red-600 hover:text-red-700"
                           >
                             <Trash2 className="mr-1" size={14} />
                             Delete
                           </Button>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-      </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Other Banners Section */}
+      {otherBanners.length > 0 && (
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Additional Banners</h3>
+            <p className="text-sm text-gray-600">These banners appear in the carousel after the default banner</p>
+          </div>
+          <div className="grid gap-6">
+            {otherBanners.map((banner) => (
+              <Card key={banner.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  {editingBanner?.id === banner.id ? (
+                    <BannerForm
+                      banner={banner}
+                      onSave={onUpdateBanner}
+                      onCancel={() => setEditingBanner(null)}
+                    />
+                  ) : (
+                    <div className="flex">
+                      <div className="w-64 h-40 flex-shrink-0">
+                        <img
+                          src={banner.image}
+                          alt="Banner"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Banner Image</h3>
+                            <div className="flex items-center space-x-4 text-sm text-gray-500">
+                              <span>Order: {banner.order}</span>
+                              <span>Status: {banner.isActive ? 'Active' : 'Inactive'}</span>
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setEditingBanner(banner)}
+                            >
+                              <Edit className="mr-1" size={14} />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => onDeleteBanner(banner.id!)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="mr-1" size={14} />
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       {banners.length === 0 && !isAddingBanner && (
         <Card>
           <CardContent className="p-12 text-center">
             <Image className="mx-auto mb-4 text-gray-400" size={48} />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No Banners Yet</h3>
-            <p className="text-gray-600 mb-4">Add your first banner to display on the homepage</p>
+            <p className="text-gray-600 mb-4">Add your first banner to display on the homepage. This will be the default banner that loads first.</p>
             <Button
               onClick={() => setIsAddingBanner(true)}
               className="bg-green-600 hover:bg-green-700"
             >
               <Plus className="mr-2" size={16} />
-              Add First Banner
+              Add Default Banner
             </Button>
           </CardContent>
         </Card>
@@ -2295,14 +2374,16 @@ function BannerForm({
   banner,
   onSave,
   onCancel,
+  isDefault = false,
 }: {
   banner?: Banner | null
   onSave: (banner: any) => void
   onCancel: () => void
+  isDefault?: boolean
 }) {
   const [formData, setFormData] = useState({
     image: banner?.image || "",
-    order: banner?.order || 1,
+    order: banner?.order || (isDefault ? 0 : 1),
     isActive: banner?.isActive ?? true,
   })
   const [isUploading, setIsUploading] = useState(false)
@@ -2314,12 +2395,24 @@ function BannerForm({
       setUploadError("Please upload a banner image")
       return
     }
+    // Ensure default banner has order 0
+    if (isDefault) {
+      formData.order = 0
+    }
     onSave(formData)
   }
 
   return (
-    <Card>
+    <Card className={isDefault ? "border-2 border-green-500" : ""}>
       <CardContent className="p-6">
+        {isDefault && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center space-x-2">
+              <Badge className="bg-green-600 text-white">Default Banner</Badge>
+              <p className="text-sm text-gray-700">This banner will be the first one to appear when the website loads</p>
+            </div>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
@@ -2408,10 +2501,15 @@ function BannerForm({
                 type="number"
                 value={formData.order}
                 onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
-                min="1"
+                min={isDefault ? "0" : "1"}
                 required
+                disabled={isDefault}
               />
-              <p className="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
+              <p className="text-xs text-gray-500 mt-1">
+                {isDefault 
+                  ? "Default banner is always order 0 (appears first)" 
+                  : "Lower numbers appear first"}
+              </p>
             </div>
           </div>
           
