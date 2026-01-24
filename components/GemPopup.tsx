@@ -7,11 +7,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
 const WHATSAPP = "917827229116"
-// 30–45 seconds in production; 3 seconds in development for easier testing
-const getDelayMs = () =>
-  typeof process !== "undefined" && process.env.NODE_ENV === "development"
-    ? 3000
-    : 30000 + Math.random() * 15000
+// 15 seconds
+const getDelayMs = () => 15000
 const STORAGE_KEY = "gem-popup-dismissed"
 
 export default function GemPopup() {

@@ -3,6 +3,7 @@ import Script from 'next/script'
 import './globals.css'
 import Navbar from '../components/Navbar'
 import GemPopup from '@/components/GemPopup'
+import VideoPopup from '@/components/VideoPopup'
 
 export const metadata: Metadata = {
   title:
@@ -31,6 +32,7 @@ export default function RootLayout({
       </head>
       <body>
         <GemPopup />
+        <VideoPopup />
         {/* Google tag (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17730009010"

@@ -22,6 +22,7 @@ import {
   Check,
   CheckCircle,
   Award,
+  Video,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -945,6 +946,17 @@ function AdminDashboardContent() {
                 <Users className="mr-3" size={20} />
                 Our Customers
               </button>
+              <button
+                onClick={() => setActiveTab("videoPopup")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "videoPopup"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Video className="mr-3" size={20} />
+                Video Popup
+              </button>
             </nav>
           </div>
 
@@ -1033,6 +1045,7 @@ function AdminDashboardContent() {
                 setEditingCustomer={setEditingCustomer}
               />
             )}
+            {activeTab === "videoPopup" && <VideoPopupTab />}
           </div>
         </div>
       </div>
@@ -3265,6 +3278,82 @@ function CustomersTab({
           </CardContent>
         </Card>
       )}
+    </div>
+  )
+}
+
+// Video Popup Tab Component
+function VideoPopupTab() {
+  const [youtubeUrl, setYoutubeUrl] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+
+  useEffect(() => {
+    fetch("/api/video-popup")
+      .then((res) => res.json())
+      .then((data) => setYoutubeUrl(data?.youtubeUrl || ""))
+      .catch(() => setYoutubeUrl(""))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+    setMessage(null)
+    try {
+      const res = await fetch("/api/admin/video-popup", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ youtubeUrl: youtubeUrl.trim() }),
+      })
+      if (res.ok) {
+        setMessage({ type: "success", text: "Video popup URL saved. It will appear in the bottom-right (above WhatsApp) for visitors." })
+      } else {
+        setMessage({ type: "error", text: "Failed to save" })
+      }
+    } catch {
+      setMessage({ type: "error", text: "Failed to save" })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return <div className="text-gray-500">Loading…</div>
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Video Popup</h2>
+        <p className="text-gray-600">
+          Set a YouTube link for the small portrait video that plays muted in the bottom-right corner when visitors land on the site (above the WhatsApp button). Leave empty to hide it.
+        </p>
+      </div>
+      <Card>
+        <CardContent className="p-6">
+          <form onSubmit={handleSave} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">YouTube link</label>
+              <Input
+                type="url"
+                placeholder="e.g. https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                className="w-full max-w-xl"
+              />
+            </div>
+            {message && (
+              <p className={message.type === "success" ? "text-green-600" : "text-red-600"}>{message.text}</p>
+            )}
+            <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={saving}>
+              {saving ? "Saving…" : "Save"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }
