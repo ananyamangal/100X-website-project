@@ -517,6 +517,112 @@ function AdminDashboardContent() {
     }
   }
 
+  // Add accreditation
+  const handleAddAccreditation = async (newAccreditation: Omit<Accreditation, "id" | "createdAt" | "updatedAt" | "_id">) => {
+    try {
+      const res = await fetch("/api/admin/accreditations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(newAccreditation),
+      })
+      if (res.ok) {
+        const created = await res.json()
+        setAccreditations([...accreditations, {
+          ...created,
+          id: created._id,
+        }])
+        setIsAddingAccreditation(false)
+        setNotification({type: 'success', message: 'Accreditation added successfully!'})
+        setTimeout(() => setNotification(null), 3000)
+      } else {
+        setNotification({type: 'error', message: 'Failed to add accreditation'})
+        setTimeout(() => setNotification(null), 3000)
+      }
+    } catch (error) {
+      console.error("Error adding accreditation:", error)
+      setNotification({type: 'error', message: 'Error adding accreditation'})
+      setTimeout(() => setNotification(null), 3000)
+    }
+  }
+
+  // Update accreditation
+  const handleUpdateAccreditation = async (updatedAccreditation: Accreditation) => {
+    if (!updatedAccreditation.id) {
+      console.error("Accreditation ID is missing! Cannot update.");
+      setNotification({ type: 'error', message: 'Accreditation ID is missing' });
+      setTimeout(() => setNotification(null), 3000);
+      return;
+    }
+    
+    try {
+      const res = await fetch(`/api/admin/accreditations/${updatedAccreditation.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(updatedAccreditation),
+      })
+      
+      if (res.ok) {
+        // Refetch to get updated order
+        const fetchRes = await fetch("/api/admin/accreditations")
+        const data = await fetchRes.json()
+        setAccreditations(
+          Array.isArray(data)
+            ? data.map((a: any) => ({
+                ...a,
+                id: a._id,
+              }))
+            : []
+        )
+        setEditingAccreditation(null)
+        setNotification({ type: 'success', message: 'Accreditation updated successfully!' });
+        setTimeout(() => setNotification(null), 3000);
+      } else {
+        setNotification({ type: 'error', message: 'Failed to update accreditation' });
+        setTimeout(() => setNotification(null), 3000);
+      }
+    } catch (error) {
+      console.error("Error updating accreditation:", error);
+      setNotification({ type: 'error', message: 'Error updating accreditation' });
+      setTimeout(() => setNotification(null), 3000);
+    }
+  }
+
+  // Delete accreditation
+  const handleDeleteAccreditation = async (accreditationId: string) => {
+    if (confirm("Are you sure you want to delete this accreditation?")) {
+      try {
+        const res = await fetch(`/api/admin/accreditations/${accreditationId}`, {
+          method: "DELETE",
+          credentials: "include",
+        })
+        if (res.ok) {
+          // Refetch to get updated order
+          const fetchRes = await fetch("/api/admin/accreditations")
+          const data = await fetchRes.json()
+          setAccreditations(
+            Array.isArray(data)
+              ? data.map((a: any) => ({
+                  ...a,
+                  id: a._id,
+                }))
+              : []
+          )
+          setNotification({type: 'success', message: 'Accreditation deleted successfully!'})
+          setTimeout(() => setNotification(null), 3000)
+        } else {
+          setNotification({type: 'error', message: 'Failed to delete accreditation'})
+          setTimeout(() => setNotification(null), 3000)
+        }
+      } catch (error) {
+        console.error("Error deleting accreditation:", error)
+        setNotification({type: 'error', message: 'Error deleting accreditation'})
+        setTimeout(() => setNotification(null), 3000)
+      }
+    }
+  }
+
   // Utility function to clean up empty categories
   const cleanupEmptyCategories = (currentProducts: Product[]) => {
     const remainingCategories = new Set(currentProducts.map(p => p.category))
