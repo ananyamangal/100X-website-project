@@ -259,8 +259,6 @@ export default function HomePage() {
   const [customers, setCustomers] = useState<any[]>([])
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [bannersLoading, setBannersLoading] = useState(true)
-  const [showGemPopup, setShowGemPopup] = useState(false)
-  const [gemMobile, setGemMobile] = useState("")
 
   const changingPhrases = [
     "100 X your Productivity",
@@ -427,15 +425,6 @@ export default function HomePage() {
     return () => clearInterval(timer)
   }, [])
 
-  // GeM / ISI / WHO popup after 30–45 seconds (once per session, unless previously dismissed)
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    if (localStorage.getItem("gem-popup-dismissed")) return
-    const delay = 30000 + Math.random() * 15000 // 30–45 seconds
-    const t = setTimeout(() => setShowGemPopup(true), delay)
-    return () => clearTimeout(t)
-  }, [])
-
   // Default blog posts (fallback)
   const defaultBlogPosts = [
     {
@@ -560,24 +549,6 @@ export default function HomePage() {
     setShowBrochureForm(false)
     setBrochureFormData({ name: "", phone: "", productName: "" })
     alert("Brochure download started! We'll contact you soon with more details.")
-  }
-
-  const handleGemNoThanks = () => {
-    if (typeof window !== "undefined") localStorage.setItem("gem-popup-dismissed", "true")
-    setShowGemPopup(false)
-  }
-
-  const handleGemTalkToOem = () => {
-    const whatsappNumber = "917827229116"
-    const msg = `Hi, I need help selecting GeM / ISI / WHO compliant fogging machine. I'm interested in GeM reseller code or Bulk & institutional pricing.${gemMobile.trim() ? ` My number: ${gemMobile.trim()}` : ""}`
-    fetch("/api/submissions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "GeM Popup", phone: gemMobile.trim() || "Not shared", type: "gem_popup" }),
-    }).catch(() => {})
-    if (typeof window !== "undefined") localStorage.setItem("gem-popup-dismissed", "true")
-    setShowGemPopup(false)
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`, "_blank")
   }
 
   const renderPage = () => {
@@ -1115,47 +1086,6 @@ export default function HomePage() {
                   </Button>
                 </div>
               </form>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* GeM / ISI / WHO Popup - after 30–45 seconds */}
-      {showGemPopup && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-          <Card className="w-full max-w-lg">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-3">
-                Need help selecting GeM / ISI / WHO compliant fogging machine?
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Talk directly to OEM for GeM reseller code or for Bulk & institutional pricing.
-              </p>
-              <p className="text-sm font-medium text-gray-700 mb-2">Share your Mobile number for GeM support.</p>
-              <Input
-                type="tel"
-                placeholder="e.g. 9876543210"
-                value={gemMobile}
-                onChange={(e) => setGemMobile(e.target.value)}
-                className="p-3 mb-5"
-              />
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleGemTalkToOem}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                >
-                  <MessageCircle className="mr-2" size={18} />
-                  Talk to OEM
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleGemNoThanks}
-                  className="bg-transparent"
-                >
-                  No Thanks
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </div>

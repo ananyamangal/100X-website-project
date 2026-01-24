@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import './globals.css'
-import Navbar from '../components/Navbar';
+import Navbar from '../components/Navbar'
+import GemPopup from '@/components/GemPopup'
 
 export const metadata: Metadata = {
   title:
@@ -29,6 +30,7 @@ export default function RootLayout({
         <meta name="google-site-verification" content="MGOgHdnClDvCf-IVmtpccyhPKKtHcbS8W3Xvhd2KYmo" />
       </head>
       <body>
+        <GemPopup />
         {/* Google tag (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17730009010"
