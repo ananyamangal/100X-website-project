@@ -17,6 +17,8 @@ export interface Product {
   youtubeLink?: string; // Added YouTube link field
   whatsappMessageText: string;
   brochureUrl?: string;
+  slideshowInterval?: number; // Time in milliseconds between product image slides
+  order?: number; // Display order (lower numbers appear first, 0 is top)
   createdAt?: string;
   updatedAt?: string;
 } 

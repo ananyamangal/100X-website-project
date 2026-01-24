@@ -7,6 +7,7 @@ interface Banner {
   image: string;
   order: number;
   isActive: boolean;
+  slideshowInterval?: number; // Time in milliseconds between slides
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -15,6 +16,7 @@ interface BannerInput {
   image: string;
   order?: number;
   isActive?: boolean;
+  slideshowInterval?: number;
 }
 
 // GET - Fetch all banners
@@ -45,6 +47,7 @@ export async function POST(request: NextRequest) {
     const newBanner = {
       ...bannerData,
       isActive: bannerData.isActive ?? true,
+      slideshowInterval: bannerData.slideshowInterval ?? 4000, // Default 4 seconds
       createdAt: new Date(),
       updatedAt: new Date()
     };

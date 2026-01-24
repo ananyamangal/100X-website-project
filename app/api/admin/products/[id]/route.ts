@@ -43,6 +43,57 @@ export async function PUT(request: NextRequest, context: { params?: { id?: strin
     const productData: Product = await request.json();
     const client = await clientPromise;
     const db = client.db();
+    
+    // Get the current product to check if order is changing
+    const currentProduct = await db.collection("products").findOne({ _id: new ObjectId(id) });
+    if (!currentProduct) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    
+    const oldOrder = currentProduct.order !== undefined ? currentProduct.order : null;
+    const newOrder = productData.order !== undefined ? productData.order : null;
+    
+    // If order is being changed, shift other products accordingly
+    if (oldOrder !== null && newOrder !== null && oldOrder !== newOrder) {
+      if (newOrder < oldOrder) {
+        // Moving up: shift products between newOrder and oldOrder down by 1
+        await db.collection("products").updateMany(
+          { 
+            _id: { $ne: new ObjectId(id) },
+            order: { $gte: newOrder, $lt: oldOrder }
+          },
+          { $inc: { order: 1 } }
+        );
+      } else {
+        // Moving down: shift products between oldOrder and newOrder up by 1
+        await db.collection("products").updateMany(
+          { 
+            _id: { $ne: new ObjectId(id) },
+            order: { $gt: oldOrder, $lte: newOrder }
+          },
+          { $inc: { order: -1 } }
+        );
+      }
+    } else if (oldOrder === null && newOrder !== null) {
+      // Product didn't have an order, now it does - shift products at/after newOrder
+      await db.collection("products").updateMany(
+        { 
+          _id: { $ne: new ObjectId(id) },
+          order: { $gte: newOrder }
+        },
+        { $inc: { order: 1 } }
+      );
+    } else if (oldOrder !== null && newOrder === null) {
+      // Product had an order, now it doesn't - shift products after oldOrder down by 1
+      await db.collection("products").updateMany(
+        { 
+          _id: { $ne: new ObjectId(id) },
+          order: { $gt: oldOrder }
+        },
+        { $inc: { order: -1 } }
+      );
+    }
+    
     const result = await db.collection("products").findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set: { ...productData, updatedAt: new Date().toISOString() } },

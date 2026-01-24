@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { Product } from "@/lib/productModel";
+import { ObjectId } from "mongodb";
 
 // GET all products
 export async function GET(request: NextRequest) {
   try {
     const client = await clientPromise;
     const db = client.db();
-    const products = await db.collection("products").find({}).toArray();
+    const products = await db.collection("products")
+      .find({})
+      .sort({ order: 1, createdAt: -1 }) // Sort by order first, then by creation date
+      .toArray();
     return NextResponse.json(products);
   } catch (error) {
     console.error("❌ Error in GET /api/admin/products:", error);
@@ -20,9 +24,34 @@ export async function POST(request: NextRequest) {
   try {
     const productData: Product = await request.json();
     const now = new Date().toISOString();
-    const newProduct = { ...productData, createdAt: now, updatedAt: now };
     const client = await clientPromise;
     const db = client.db();
+    
+    // Determine the order for the new product
+    let order: number;
+    if (productData.order !== undefined && productData.order !== null) {
+      // If order is specified, shift all products with order >= specified order up by 1
+      order = productData.order;
+      await db.collection("products").updateMany(
+        { order: { $gte: order } },
+        { $inc: { order: 1 } }
+      );
+    } else {
+      // If no order specified, find the minimum order and set new product to order - 1 (top)
+      const minOrderProduct = await db.collection("products")
+        .find({})
+        .sort({ order: 1 })
+        .limit(1)
+        .toArray();
+      
+      if (minOrderProduct.length > 0 && minOrderProduct[0].order !== undefined) {
+        order = minOrderProduct[0].order - 1;
+      } else {
+        order = 0; // First product gets order 0
+      }
+    }
+    
+    const newProduct = { ...productData, order, createdAt: now, updatedAt: now };
     const result = await db.collection("products").insertOne(newProduct);
     return NextResponse.json({ ...newProduct, _id: result.insertedId }, { status: 201 });
   } catch (error) {

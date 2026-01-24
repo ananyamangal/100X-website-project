@@ -6,6 +6,7 @@ interface BannerUpdate {
   image?: string;
   order?: number;
   isActive?: boolean;
+  slideshowInterval?: number;
 }
 
 // PUT - Update a specific banner

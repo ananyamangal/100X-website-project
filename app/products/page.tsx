@@ -44,7 +44,15 @@ export default function AllProductsPage() {
     fetch('/api/admin/products')
       .then(res => res.json())
       .then(data => {
-        setProducts(Array.isArray(data) ? data : []);
+        const productsList = Array.isArray(data) ? data : [];
+        // Sort by order (lower numbers first), then by creation date
+        productsList.sort((a: any, b: any) => {
+          const orderA = a.order !== undefined ? a.order : Infinity;
+          const orderB = b.order !== undefined ? b.order : Infinity;
+          if (orderA !== orderB) return orderA - orderB;
+          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        });
+        setProducts(productsList);
         setLoading(false);
       });
   }, []);

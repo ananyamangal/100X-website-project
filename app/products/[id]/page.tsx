@@ -126,9 +126,11 @@ export default function ProductDetailPage() {
   // Carousel auto-scroll
   useEffect(() => {
     if (!product?.imageUrls?.length) return;
+    // Use product's slideshow interval or default to 3000ms (3 seconds)
+    const intervalTime = product.slideshowInterval || 3000;
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % product.imageUrls.length);
-    }, 3000);
+    }, intervalTime);
     return () => clearInterval(interval);
   }, [product]);
 

@@ -76,6 +76,60 @@ const badgeLogoMap: Record<string, string> = {
   'BIS Approved': '/Logos clipart 2/BIS approved.png',
 };
 
+function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const logosPerView = 4;
+  const totalGroups = Math.ceil(accreditations.length / logosPerView);
+
+  useEffect(() => {
+    if (accreditations.length === 0 || totalGroups <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => {
+        // Move to next group, or loop back to start
+        if (prev >= totalGroups - 1) {
+          return 0; // Loop back to start
+        }
+        return prev + 1;
+      });
+    }, 3000); // Change every 3 seconds
+    
+    return () => clearInterval(interval);
+  }, [accreditations.length, totalGroups]);
+
+  if (accreditations.length === 0) return null;
+
+  return (
+    <section className="py-12 bg-gray-50 overflow-hidden">
+      <div className="container mx-auto px-4">
+        <div className="relative overflow-hidden">
+          <div 
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{
+              transform: `translateX(-${currentIndex * (100 / logosPerView)}%)`,
+            }}
+          >
+            {accreditations.map((accreditation, index) => (
+              <div
+                key={accreditation._id || accreditation.id || index}
+                className="flex-shrink-0 px-4"
+                style={{ width: `${100 / logosPerView}%` }}
+              >
+                <div className="bg-white rounded-lg p-6 h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+                  <img
+                    src={accreditation.logo}
+                    alt="Accreditation"
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function YoutubeShortsCarousel() {
   const [shorts, setShorts] = useState<string[]>([]);
@@ -163,6 +217,7 @@ export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([])
   const [banners, setBanners] = useState<any[]>([])
   const [blogPosts, setBlogPosts] = useState<any[]>([])
+  const [accreditations, setAccreditations] = useState<any[]>([])
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [bannersLoading, setBannersLoading] = useState(true)
 
@@ -196,6 +251,13 @@ export default function HomePage() {
                   : [],
             }))
           : [];
+        // Sort by order (lower numbers first), then by creation date
+        normalized.sort((a: any, b: any) => {
+          const orderA = a.order !== undefined ? a.order : Infinity;
+          const orderB = b.order !== undefined ? b.order : Infinity;
+          if (orderA !== orderB) return orderA - orderB;
+          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        });
         setProducts(normalized);
       })
   }, [])
@@ -250,14 +312,36 @@ export default function HomePage() {
       });
   }, [])
 
+  // Fetch accreditations from API
+  useEffect(() => {
+    fetch("/api/admin/accreditations")
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log('Accreditations fetched:', data);
+        setAccreditations(Array.isArray(data) ? data.filter((a: any) => a.isActive).sort((a: any, b: any) => (a.order || 0) - (b.order || 0)) : []);
+      })
+      .catch(error => {
+        console.error('Error fetching accreditations:', error);
+        setAccreditations([]);
+      });
+  }, [])
+
   useEffect(() => {
     if (heroSlides.length === 0 || heroSlides.length === 1) return;
     
+    // Use the slideshow interval from the first banner, or default to 4000ms (4 seconds)
+    const interval = heroSlides[0]?.slideshowInterval || 4000;
+    
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
-    }, 4000)
+    }, interval)
     return () => clearInterval(timer)
-  }, [heroSlides.length])
+  }, [heroSlides.length, heroSlides])
 
   // Handle hash-based navigation (e.g., /#about, /#contact)
   useEffect(() => {
@@ -689,6 +773,9 @@ export default function HomePage() {
       </section>
 
       <YoutubeShortsCarousel />
+
+      {/* Accreditations Autoscroll Bar */}
+      <AccreditationsScroll accreditations={accreditations} />
 
       {/* Reviews Carousel Section */}
       <section className="py-24 bg-white">

@@ -21,6 +21,7 @@ import {
   Image,
   Check,
   CheckCircle,
+  Award,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -51,6 +52,8 @@ interface Product {
   whatsappMessageText: string;
   category: string;
   inStock: boolean;
+  slideshowInterval?: number; // Time in milliseconds between product image slides
+  order?: number; // Display order (lower numbers appear first, 0 is top)
   createdAt?: string;
   updatedAt?: string;
   brochureUrl?: string;
@@ -60,6 +63,17 @@ interface Banner {
   _id?: string;
   id?: string;
   image: string;
+  order: number;
+  isActive: boolean;
+  slideshowInterval?: number; // Time in milliseconds between slides
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface Accreditation {
+  _id?: string;
+  id?: string;
+  logo: string;
   order: number;
   isActive: boolean;
   createdAt?: string;
@@ -140,12 +154,15 @@ function AdminDashboardContent() {
   const [products, setProducts] = useState<Product[]>([])
   const [banners, setBanners] = useState<Banner[]>([])
   const [blogs, setBlogs] = useState<BlogPost[]>([])
+  const [accreditations, setAccreditations] = useState<Accreditation[]>([])
   const [isAddingProduct, setIsAddingProduct] = useState(false)
   const [isAddingBanner, setIsAddingBanner] = useState(false)
   const [isAddingBlog, setIsAddingBlog] = useState(false)
+  const [isAddingAccreditation, setIsAddingAccreditation] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null)
+  const [editingAccreditation, setEditingAccreditation] = useState<Accreditation | null>(null)
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null)
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
@@ -234,6 +251,27 @@ function AdminDashboardContent() {
       .catch(error => {
         console.error("Error fetching blogs:", error);
         setBlogs([]);
+      });
+  }, [])
+
+  // Fetch accreditations from API
+  useEffect(() => {
+    fetch("/api/admin/accreditations")
+      .then(res => res.json())
+      .then(data => {
+        console.log("Accreditation API data:", data);
+        setAccreditations(
+          Array.isArray(data)
+            ? data.map((a: any) => ({
+                ...a,
+                id: a._id,
+              }))
+            : []
+        )
+      })
+      .catch(error => {
+        console.error("Error fetching accreditations:", error);
+        setAccreditations([]);
       });
   }, [])
 
@@ -664,6 +702,17 @@ function AdminDashboardContent() {
                 <FileText className="mr-3" size={20} />
                 Submissions
               </button>
+              <button
+                onClick={() => setActiveTab("accreditations")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "accreditations"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Award className="mr-3" size={20} />
+                Accreditations
+              </button>
             </nav>
           </div>
 
@@ -728,6 +777,18 @@ function AdminDashboardContent() {
               />
             )}
             {activeTab === "submissions" && <SubmissionsTab />}
+            {activeTab === "accreditations" && (
+              <AccreditationsTab
+                accreditations={accreditations}
+                onAddAccreditation={handleAddAccreditation}
+                onUpdateAccreditation={handleUpdateAccreditation}
+                onDeleteAccreditation={handleDeleteAccreditation}
+                isAddingAccreditation={isAddingAccreditation}
+                setIsAddingAccreditation={setIsAddingAccreditation}
+                editingAccreditation={editingAccreditation}
+                setEditingAccreditation={setEditingAccreditation}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -896,7 +957,16 @@ function ProductsTab({
 
       {/* Products List */}
       <div className="space-y-4">
-        {products.map((product, index) => (
+        {products
+          .sort((a, b) => {
+            // Sort by order first (lower numbers first), then by creation date if order is same
+            const orderA = a.order !== undefined ? a.order : Infinity;
+            const orderB = b.order !== undefined ? b.order : Infinity;
+            if (orderA !== orderB) return orderA - orderB;
+            // If orders are equal, newest first
+            return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+          })
+          .map((product, index) => (
           <Card key={product.id || product._id || index} className="overflow-hidden">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
@@ -941,6 +1011,7 @@ function ProductsTab({
                         {product.rating} ({product.reviewsCount} reviews)
                       </span>
                       <span>Category: {product.category}</span>
+                      <span className="font-semibold text-blue-600">Order: {product.order !== undefined ? product.order : 'Top'}</span>
                     </div>
                   </div>
                 </div>
@@ -1142,6 +1213,8 @@ function ProductForm({
     whatsappMessageText: product?.whatsappMessageText || "",
     category: product?.category || "",
     brochureUrl: product?.brochureUrl || "",
+    slideshowInterval: product?.slideshowInterval || 5000, // Default 5 seconds
+    order: product?.order !== undefined ? product.order : undefined, // Order field
   })
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingBrochure, setUploadingBrochure] = useState(false);
@@ -1436,6 +1509,35 @@ function ProductForm({
               placeholder="I'm interested in the [Product Name]"
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Product Image Slideshow Timer (seconds)</label>
+            <Input
+              type="number"
+              value={formData.slideshowInterval ? formData.slideshowInterval / 1000 : 5}
+              onChange={(e) => setFormData({ ...formData, slideshowInterval: parseInt(e.target.value) * 1000 })}
+              min="1"
+              max="30"
+              required
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Time between product image slides in seconds (1-30 seconds). Only applies if product has multiple images.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+            <Input
+              type="number"
+              value={formData.order !== undefined ? formData.order : ""}
+              onChange={(e) => setFormData({ ...formData, order: e.target.value === "" ? undefined : parseInt(e.target.value) })}
+              min="0"
+              placeholder="Leave empty for top position"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Lower numbers appear first (0 is top). Leave empty to place at top. Existing products will shift down automatically.
+            </p>
           </div>
 
           <div className="flex justify-end space-x-4">
@@ -2385,6 +2487,7 @@ function BannerForm({
     image: banner?.image || "",
     order: banner?.order || (isDefault ? 0 : 1),
     isActive: banner?.isActive ?? true,
+    slideshowInterval: banner?.slideshowInterval || 4000, // Default 4 seconds
   })
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState("")
@@ -2513,6 +2616,21 @@ function BannerForm({
             </div>
           </div>
           
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Slideshow Timer (seconds)</label>
+            <Input
+              type="number"
+              value={formData.slideshowInterval ? formData.slideshowInterval / 1000 : 4}
+              onChange={(e) => setFormData({ ...formData, slideshowInterval: parseInt(e.target.value) * 1000 })}
+              min="1"
+              max="30"
+              required
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Time between banner slides in seconds (1-30 seconds)
+            </p>
+          </div>
+          
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -2534,6 +2652,277 @@ function BannerForm({
             >
               <Save className="mr-2" size={16} />
               {isUploading ? 'Uploading...' : (banner ? 'Update Banner' : 'Add Banner')}
+            </Button>
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isUploading}>
+              <X className="mr-2" size={16} />
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  )
+}
+
+// Accreditations Tab Component
+function AccreditationsTab({
+  accreditations,
+  onAddAccreditation,
+  onUpdateAccreditation,
+  onDeleteAccreditation,
+  isAddingAccreditation,
+  setIsAddingAccreditation,
+  editingAccreditation,
+  setEditingAccreditation,
+}: {
+  accreditations: Accreditation[]
+  onAddAccreditation: (accreditation: Omit<Accreditation, "id" | "createdAt" | "updatedAt" | "_id">) => void
+  onUpdateAccreditation: (accreditation: Accreditation) => void
+  onDeleteAccreditation: (id: string) => void
+  isAddingAccreditation: boolean
+  setIsAddingAccreditation: (value: boolean) => void
+  editingAccreditation: Accreditation | null
+  setEditingAccreditation: (accreditation: Accreditation | null) => void
+}) {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Accreditations Management</h2>
+          <p className="text-gray-600">Manage accreditation logos that appear in the autoscroll bar</p>
+        </div>
+        <Button
+          onClick={() => setIsAddingAccreditation(true)}
+          className="bg-green-600 hover:bg-green-700"
+        >
+          <Plus className="mr-2" size={16} />
+          Add Accreditation
+        </Button>
+      </div>
+
+      {isAddingAccreditation && (
+        <AccreditationForm
+          accreditation={null}
+          onSave={onAddAccreditation}
+          onCancel={() => setIsAddingAccreditation(false)}
+        />
+      )}
+
+      <div className="grid gap-6">
+        {accreditations
+          .sort((a, b) => a.order - b.order)
+          .map((accreditation) => (
+            <Card key={accreditation.id} className="overflow-hidden">
+              <CardContent className="p-0">
+                {editingAccreditation?.id === accreditation.id ? (
+                  <AccreditationForm
+                    accreditation={accreditation}
+                    onSave={onUpdateAccreditation}
+                    onCancel={() => setEditingAccreditation(null)}
+                  />
+                ) : (
+                  <div className="flex">
+                    <div className="w-48 h-32 flex-shrink-0 bg-gray-100 flex items-center justify-center p-4">
+                      <img
+                        src={accreditation.logo}
+                        alt="Accreditation logo"
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                    <div className="flex-1 p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">Accreditation Logo</h3>
+                          <div className="flex items-center space-x-4 text-sm text-gray-500">
+                            <span>Order: {accreditation.order}</span>
+                            <span>Status: {accreditation.isActive ? 'Active' : 'Inactive'}</span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingAccreditation(accreditation)}
+                          >
+                            <Edit className="mr-1" size={14} />
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => onDeleteAccreditation(accreditation.id!)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="mr-1" size={14} />
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+      </div>
+
+      {accreditations.length === 0 && !isAddingAccreditation && (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Award className="mx-auto mb-4 text-gray-400" size={48} />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Accreditations Yet</h3>
+            <p className="text-gray-600 mb-4">Add accreditation logos to display in the autoscroll bar</p>
+            <Button
+              onClick={() => setIsAddingAccreditation(true)}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Plus className="mr-2" size={16} />
+              Add First Accreditation
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+// Accreditation Form Component
+function AccreditationForm({
+  accreditation,
+  onSave,
+  onCancel,
+}: {
+  accreditation?: Accreditation | null
+  onSave: (accreditation: any) => void
+  onCancel: () => void
+}) {
+  const [formData, setFormData] = useState({
+    logo: accreditation?.logo || "",
+    order: accreditation?.order !== undefined ? accreditation.order : undefined,
+    isActive: accreditation?.isActive ?? true,
+  })
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState("")
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formData.logo) {
+      setUploadError("Please upload a logo")
+      return
+    }
+    onSave(formData)
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Accreditation Logo</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                if (e.target.files && e.target.files[0]) {
+                  const file = e.target.files[0];
+                  setUploadError("");
+                  setIsUploading(true);
+                  
+                  const formDataCloud = new FormData();
+                  formDataCloud.append("file", file);
+                  formDataCloud.append("upload_preset", "product_uploads");
+                  
+                  try {
+                    const res = await fetch(
+                      "https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload",
+                      {
+                        method: "POST",
+                        body: formDataCloud,
+                      }
+                    );
+                    
+                    if (!res.ok) {
+                      throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+                    }
+                    
+                    const data = await res.json();
+                    if (data.secure_url) {
+                      setFormData({ ...formData, logo: data.secure_url });
+                      setUploadError("");
+                    } else {
+                      throw new Error("No secure URL returned from Cloudinary");
+                    }
+                  } catch (error) {
+                    console.error('Error uploading image:', error);
+                    setUploadError(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                  } finally {
+                    setIsUploading(false);
+                  }
+                }
+              }}
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              required
+              disabled={isUploading}
+            />
+            <p className="text-xs text-gray-500 mt-1">Upload an accreditation logo image</p>
+            
+            {isUploading && (
+              <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-600">Uploading image...</p>
+              </div>
+            )}
+            
+            {uploadError && (
+              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">{uploadError}</p>
+              </div>
+            )}
+            
+            {formData.logo && !uploadError && (
+              <div className="mt-2">
+                <img 
+                  src={formData.logo} 
+                  alt="Logo preview" 
+                  className="w-32 h-32 object-contain rounded-lg border bg-gray-50 p-2"
+                />
+                <p className="text-xs text-green-600 mt-1">✓ Logo uploaded successfully</p>
+              </div>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+            <Input
+              type="number"
+              value={formData.order !== undefined ? formData.order : ""}
+              onChange={(e) => setFormData({ ...formData, order: e.target.value === "" ? undefined : parseInt(e.target.value) })}
+              min="0"
+              placeholder="Leave empty for end of list"
+            />
+            <p className="text-xs text-gray-500 mt-1">Lower numbers appear first. Leave empty to add at the end.</p>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="isActiveAccreditation"
+              checked={formData.isActive}
+              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+              className="rounded border-gray-300"
+            />
+            <label htmlFor="isActiveAccreditation" className="text-sm font-medium text-gray-700">
+              Active (visible in autoscroll bar)
+            </label>
+          </div>
+          
+          <div className="flex space-x-3">
+            <Button 
+              type="submit" 
+              className="bg-green-600 hover:bg-green-700"
+              disabled={isUploading || !formData.logo}
+            >
+              <Save className="mr-2" size={16} />
+              {isUploading ? 'Uploading...' : (accreditation ? 'Update Accreditation' : 'Add Accreditation')}
             </Button>
             <Button type="button" variant="outline" onClick={onCancel} disabled={isUploading}>
               <X className="mr-2" size={16} />

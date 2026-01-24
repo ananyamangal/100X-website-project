@@ -43,11 +43,13 @@ export default function ProductCard({
 
   useEffect(() => {
     if (!images || images.length <= 1) return;
+    // Use product's slideshow interval or default to 5000ms (5 seconds)
+    const intervalTime = product.slideshowInterval || 5000;
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 5000); // slow slideshow
+    }, intervalTime);
     return () => clearInterval(interval);
-  }, [images]);
+  }, [images, product.slideshowInterval]);
 
   return (
     <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg">
