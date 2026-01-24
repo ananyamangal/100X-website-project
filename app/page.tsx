@@ -164,6 +164,7 @@ export default function HomePage() {
   const [banners, setBanners] = useState<any[]>([])
   const [blogPosts, setBlogPosts] = useState<any[]>([])
   const [phraseIndex, setPhraseIndex] = useState(0)
+  const [bannersLoading, setBannersLoading] = useState(true)
 
   const changingPhrases = [
     "100 X your Productivity",
@@ -201,6 +202,14 @@ export default function HomePage() {
 
   // Fetch banners from API
   useEffect(() => {
+    setBannersLoading(true);
+    
+    // Add timeout to prevent hanging
+    const timeoutId = setTimeout(() => {
+      setBannersLoading(false);
+      console.warn('Banner fetch timeout - using fallback');
+    }, 3000); // 3 second timeout
+    
     fetch("/api/admin/banners")
       .then(res => {
         if (!res.ok) {
@@ -209,12 +218,16 @@ export default function HomePage() {
         return res.json();
       })
       .then(data => {
+        clearTimeout(timeoutId);
         console.log('Banners fetched:', data);
         setBanners(Array.isArray(data) ? data : []);
+        setBannersLoading(false);
       })
       .catch(error => {
+        clearTimeout(timeoutId);
         console.error('Error fetching banners:', error);
         setBanners([]);
+        setBannersLoading(false);
       });
   }, [])
 
@@ -447,15 +460,11 @@ export default function HomePage() {
         {/* Banner Images - Desktop View */}
         <div className="hidden md:block min-h-screen relative">
           <div className="absolute inset-0">
-            {currentSlideData?.image ? (
-              <img
-                src={currentSlideData.image}
-                alt="Agricultural equipment"
-                className="w-full h-full object-cover transition-all duration-1000"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-green-600 to-green-800"></div>
-            )}
+            <img
+              src={bannersLoading ? "/banner.jpeg" : (currentSlideData?.image || "/banner.jpeg")}
+              alt="Agricultural equipment"
+              className="w-full h-full object-cover transition-all duration-1000"
+            />
             {/* Very subtle overlay for text readability while maintaining brightness */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-transparent"></div>
           </div>
@@ -518,15 +527,11 @@ export default function HomePage() {
           {/* Banner Images - Mobile View */}
           <div className="relative h-80">
             <div className="absolute inset-0">
-              {currentSlideData?.image ? (
-                <img
-                  src={currentSlideData.image}
-                  alt="Agricultural equipment"
-                  className="w-full h-full object-cover transition-all duration-1000"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-green-600 to-green-800"></div>
-              )}
+              <img
+                src={bannersLoading ? "/banner.jpeg" : (currentSlideData?.image || "/banner.jpeg")}
+                alt="Agricultural equipment"
+                className="w-full h-full object-cover transition-all duration-1000"
+              />
               {/* No overlay for mobile to maintain full brightness */}
             </div>
           </div>
