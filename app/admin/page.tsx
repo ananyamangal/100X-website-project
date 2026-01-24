@@ -80,6 +80,16 @@ interface Accreditation {
   updatedAt?: string;
 }
 
+interface Customer {
+  _id?: string;
+  id?: string;
+  logo: string;
+  order: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface BlogPost {
   _id?: string;
   id?: string;
@@ -155,14 +165,17 @@ function AdminDashboardContent() {
   const [banners, setBanners] = useState<Banner[]>([])
   const [blogs, setBlogs] = useState<BlogPost[]>([])
   const [accreditations, setAccreditations] = useState<Accreditation[]>([])
+  const [customers, setCustomers] = useState<Customer[]>([])
   const [isAddingProduct, setIsAddingProduct] = useState(false)
   const [isAddingBanner, setIsAddingBanner] = useState(false)
   const [isAddingBlog, setIsAddingBlog] = useState(false)
   const [isAddingAccreditation, setIsAddingAccreditation] = useState(false)
+  const [isAddingCustomer, setIsAddingCustomer] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null)
   const [editingAccreditation, setEditingAccreditation] = useState<Accreditation | null>(null)
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null)
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
@@ -272,6 +285,24 @@ function AdminDashboardContent() {
       .catch(error => {
         console.error("Error fetching accreditations:", error);
         setAccreditations([]);
+      });
+  }, [])
+
+  // Fetch customers from API
+  useEffect(() => {
+    fetch("/api/admin/customers")
+      .then(res => res.json())
+      .then(data => {
+        console.log("Customer API data:", data);
+        setCustomers(
+          Array.isArray(data)
+            ? data.map((c: any) => ({ ...c, id: c._id }))
+            : []
+        );
+      })
+      .catch(error => {
+        console.error("Error fetching customers:", error);
+        setCustomers([]);
       });
   }, [])
 
@@ -623,6 +654,90 @@ function AdminDashboardContent() {
     }
   }
 
+  // Add customer
+  const handleAddCustomer = async (newCustomer: Omit<Customer, "id" | "createdAt" | "updatedAt" | "_id">) => {
+    try {
+      const res = await fetch("/api/admin/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(newCustomer),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        setCustomers([...customers, { ...created, id: created._id }]);
+        setIsAddingCustomer(false);
+        setNotification({ type: 'success', message: 'Customer added successfully!' });
+        setTimeout(() => setNotification(null), 3000);
+      } else {
+        setNotification({ type: 'error', message: 'Failed to add customer' });
+        setTimeout(() => setNotification(null), 3000);
+      }
+    } catch (error) {
+      console.error("Error adding customer:", error);
+      setNotification({ type: 'error', message: 'Error adding customer' });
+      setTimeout(() => setNotification(null), 3000);
+    }
+  }
+
+  // Update customer
+  const handleUpdateCustomer = async (updatedCustomer: Customer) => {
+    if (!updatedCustomer.id) {
+      setNotification({ type: 'error', message: 'Customer ID is missing' });
+      setTimeout(() => setNotification(null), 3000);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/customers/${updatedCustomer.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(updatedCustomer),
+      });
+      if (res.ok) {
+        const fetchRes = await fetch("/api/admin/customers");
+        const data = await fetchRes.json();
+        setCustomers(Array.isArray(data) ? data.map((c: any) => ({ ...c, id: c._id })) : []);
+        setEditingCustomer(null);
+        setNotification({ type: 'success', message: 'Customer updated successfully!' });
+        setTimeout(() => setNotification(null), 3000);
+      } else {
+        setNotification({ type: 'error', message: 'Failed to update customer' });
+        setTimeout(() => setNotification(null), 3000);
+      }
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      setNotification({ type: 'error', message: 'Error updating customer' });
+      setTimeout(() => setNotification(null), 3000);
+    }
+  }
+
+  // Delete customer
+  const handleDeleteCustomer = async (customerId: string) => {
+    if (confirm("Are you sure you want to delete this customer?")) {
+      try {
+        const res = await fetch(`/api/admin/customers/${customerId}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+        if (res.ok) {
+          const fetchRes = await fetch("/api/admin/customers");
+          const data = await fetchRes.json();
+          setCustomers(Array.isArray(data) ? data.map((c: any) => ({ ...c, id: c._id })) : []);
+          setNotification({ type: 'success', message: 'Customer deleted successfully!' });
+          setTimeout(() => setNotification(null), 3000);
+        } else {
+          setNotification({ type: 'error', message: 'Failed to delete customer' });
+          setTimeout(() => setNotification(null), 3000);
+        }
+      } catch (error) {
+        console.error("Error deleting customer:", error);
+        setNotification({ type: 'error', message: 'Error deleting customer' });
+        setTimeout(() => setNotification(null), 3000);
+      }
+    }
+  }
+
   // Utility function to clean up empty categories
   const cleanupEmptyCategories = (currentProducts: Product[]) => {
     const remainingCategories = new Set(currentProducts.map(p => p.category))
@@ -819,6 +934,17 @@ function AdminDashboardContent() {
                 <Award className="mr-3" size={20} />
                 Accreditations
               </button>
+              <button
+                onClick={() => setActiveTab("customers")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "customers"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Users className="mr-3" size={20} />
+                Our Customers
+              </button>
             </nav>
           </div>
 
@@ -893,6 +1019,18 @@ function AdminDashboardContent() {
                 setIsAddingAccreditation={setIsAddingAccreditation}
                 editingAccreditation={editingAccreditation}
                 setEditingAccreditation={setEditingAccreditation}
+              />
+            )}
+            {activeTab === "customers" && (
+              <CustomersTab
+                customers={customers}
+                onAddCustomer={handleAddCustomer}
+                onUpdateCustomer={handleUpdateCustomer}
+                onDeleteCustomer={handleDeleteCustomer}
+                isAddingCustomer={isAddingCustomer}
+                setIsAddingCustomer={setIsAddingCustomer}
+                editingCustomer={editingCustomer}
+                setEditingCustomer={setEditingCustomer}
               />
             )}
           </div>
@@ -3033,6 +3171,205 @@ function AccreditationForm({
             <Button type="button" variant="outline" onClick={onCancel} disabled={isUploading}>
               <X className="mr-2" size={16} />
               Cancel
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  )
+}
+
+// Customers Tab Component
+function CustomersTab({
+  customers,
+  onAddCustomer,
+  onUpdateCustomer,
+  onDeleteCustomer,
+  isAddingCustomer,
+  setIsAddingCustomer,
+  editingCustomer,
+  setEditingCustomer,
+}: {
+  customers: Customer[]
+  onAddCustomer: (c: Omit<Customer, "id" | "createdAt" | "updatedAt" | "_id">) => void
+  onUpdateCustomer: (c: Customer) => void
+  onDeleteCustomer: (id: string) => void
+  isAddingCustomer: boolean
+  setIsAddingCustomer: (v: boolean) => void
+  editingCustomer: Customer | null
+  setEditingCustomer: (c: Customer | null) => void
+}) {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Our Customers Management</h2>
+          <p className="text-gray-600">Manage customer logos that appear in the Our Customers bar above the footer</p>
+        </div>
+        <Button onClick={() => setIsAddingCustomer(true)} className="bg-green-600 hover:bg-green-700">
+          <Plus className="mr-2" size={16} />
+          Add Customer
+        </Button>
+      </div>
+
+      {isAddingCustomer && (
+        <CustomerForm customer={null} onSave={onAddCustomer} onCancel={() => setIsAddingCustomer(false)} />
+      )}
+
+      <div className="grid gap-6">
+        {customers.sort((a, b) => a.order - b.order).map((c) => (
+          <Card key={c.id} className="overflow-hidden">
+            <CardContent className="p-0">
+              {editingCustomer?.id === c.id ? (
+                <CustomerForm customer={c} onSave={onUpdateCustomer} onCancel={() => setEditingCustomer(null)} />
+              ) : (
+                <div className="flex">
+                  <div className="w-48 h-32 flex-shrink-0 bg-gray-100 flex items-center justify-center p-4">
+                    <img src={c.logo} alt="Customer logo" className="max-w-full max-h-full object-contain" />
+                  </div>
+                  <div className="flex-1 p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Customer Logo</h3>
+                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          <span>Order: {c.order}</span>
+                          <span>Status: {c.isActive ? 'Active' : 'Inactive'}</span>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button size="sm" variant="outline" onClick={() => setEditingCustomer(c)}>
+                          <Edit className="mr-1" size={14} /> Edit
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => onDeleteCustomer(c.id!)} className="text-red-600 hover:text-red-700">
+                          <Trash2 className="mr-1" size={14} /> Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {customers.length === 0 && !isAddingCustomer && (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Users className="mx-auto mb-4 text-gray-400" size={48} />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Customers Yet</h3>
+            <p className="text-gray-600 mb-4">Add customer logos to display in the Our Customers bar above the footer</p>
+            <Button onClick={() => setIsAddingCustomer(true)} className="bg-green-600 hover:bg-green-700">
+              <Plus className="mr-2" size={16} /> Add First Customer
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+// Customer Form Component
+function CustomerForm({
+  customer,
+  onSave,
+  onCancel,
+}: {
+  customer?: Customer | null
+  onSave: (c: any) => void
+  onCancel: () => void
+}) {
+  const [formData, setFormData] = useState({
+    logo: customer?.logo || "",
+    order: customer?.order !== undefined ? customer.order : undefined,
+    isActive: customer?.isActive ?? true,
+  })
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState("")
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formData.logo) {
+      setUploadError("Please upload a logo")
+      return
+    }
+    onSave(formData)
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Customer Logo</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                if (e.target.files?.[0]) {
+                  const file = e.target.files[0]
+                  setUploadError("")
+                  setIsUploading(true)
+                  const fd = new FormData()
+                  fd.append("file", file)
+                  fd.append("upload_preset", "product_uploads")
+                  try {
+                    const res = await fetch("https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload", { method: "POST", body: fd })
+                    if (!res.ok) throw new Error(`Upload failed: ${res.status}`)
+                    const data = await res.json()
+                    if (data.secure_url) {
+                      setFormData((prev) => ({ ...prev, logo: data.secure_url }))
+                      setUploadError("")
+                    } else throw new Error("No secure URL")
+                  } catch (err) {
+                    setUploadError(`Failed: ${err instanceof Error ? err.message : "Unknown"}`)
+                  } finally {
+                    setIsUploading(false)
+                  }
+                }
+              }}
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              required
+              disabled={isUploading}
+            />
+            <p className="text-xs text-gray-500 mt-1">Upload a customer logo image</p>
+            {isUploading && <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-600">Uploading...</div>}
+            {uploadError && <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{uploadError}</div>}
+            {formData.logo && !uploadError && (
+              <div className="mt-2">
+                <img src={formData.logo} alt="Preview" className="w-32 h-32 object-contain rounded-lg border bg-gray-50 p-2" />
+                <p className="text-xs text-green-600 mt-1">✓ Logo uploaded</p>
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+            <Input
+              type="number"
+              value={formData.order !== undefined ? formData.order : ""}
+              onChange={(e) => setFormData({ ...formData, order: e.target.value === "" ? undefined : parseInt(e.target.value) })}
+              min="0"
+              placeholder="Leave empty for end of list"
+            />
+            <p className="text-xs text-gray-500 mt-1">Lower numbers appear first.</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="isActiveCustomer"
+              checked={formData.isActive}
+              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+              className="rounded border-gray-300"
+            />
+            <label htmlFor="isActiveCustomer" className="text-sm font-medium text-gray-700">Active (visible in Our Customers bar)</label>
+          </div>
+          <div className="flex space-x-3">
+            <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={isUploading || !formData.logo}>
+              <Save className="mr-2" size={16} />
+              {isUploading ? "Uploading..." : (customer ? "Update Customer" : "Add Customer")}
+            </Button>
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isUploading}>
+              <X className="mr-2" size={16} /> Cancel
             </Button>
           </div>
         </form>

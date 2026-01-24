@@ -131,6 +131,44 @@ function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
   );
 }
 
+function OurCustomersScroll({ customers }: { customers: any[] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const logosPerView = 4;
+  const totalGroups = Math.ceil(customers.length / logosPerView);
+
+  useEffect(() => {
+    if (customers.length === 0 || totalGroups <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev >= totalGroups - 1 ? 0 : prev + 1));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [customers.length, totalGroups]);
+
+  if (customers.length === 0) return null;
+
+  return (
+    <section className="py-12 bg-gray-50 overflow-hidden">
+      <div className="container mx-auto px-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-8">OUR CUSTOMERS</h2>
+        <div className="relative overflow-hidden">
+          <div
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${currentIndex * (100 / logosPerView)}%)` }}
+          >
+            {customers.map((c, i) => (
+              <div key={c._id || c.id || i} className="flex-shrink-0 px-4" style={{ width: `${100 / logosPerView}%` }}>
+                <div className="bg-white rounded-lg p-6 h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+                  <img src={c.logo} alt="Customer" className="max-w-full max-h-full object-contain" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function YoutubeShortsCarousel() {
   const [shorts, setShorts] = useState<string[]>([]);
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -218,6 +256,7 @@ export default function HomePage() {
   const [banners, setBanners] = useState<any[]>([])
   const [blogPosts, setBlogPosts] = useState<any[]>([])
   const [accreditations, setAccreditations] = useState<any[]>([])
+  const [customers, setCustomers] = useState<any[]>([])
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [bannersLoading, setBannersLoading] = useState(true)
 
@@ -328,6 +367,22 @@ export default function HomePage() {
       .catch(error => {
         console.error('Error fetching accreditations:', error);
         setAccreditations([]);
+      });
+  }, [])
+
+  // Fetch customers from API
+  useEffect(() => {
+    fetch("/api/admin/customers")
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        setCustomers(Array.isArray(data) ? data.filter((c: any) => c.isActive).sort((a: any, b: any) => (a.order || 0) - (b.order || 0)) : []);
+      })
+      .catch(error => {
+        console.error('Error fetching customers:', error);
+        setCustomers([]);
       });
   }, [])
 
@@ -724,6 +779,9 @@ export default function HomePage() {
         </button>
       </section>
 
+      {/* Accreditations Autoscroll Bar - just above Our Products */}
+      <AccreditationsScroll accreditations={accreditations} />
+
       {/* Products Section */}
       <section id="products" className="py-24">
         <div className="container mx-auto px-4">
@@ -773,9 +831,6 @@ export default function HomePage() {
       </section>
 
       <YoutubeShortsCarousel />
-
-      {/* Accreditations Autoscroll Bar */}
-      <AccreditationsScroll accreditations={accreditations} />
 
       {/* Reviews Carousel Section */}
       <section className="py-24 bg-white">
@@ -979,6 +1034,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Our Customers bar - right above footer */}
+      <OurCustomersScroll customers={customers} />
     </>
   )
   }
