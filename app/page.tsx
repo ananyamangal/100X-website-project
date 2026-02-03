@@ -64,6 +64,25 @@ interface Product {
   updatedAt?: string;
 }
 
+// Helper: stable date formatting (avoids locale-based hydration mismatches)
+const formatDate = (value: string | Date | undefined) => {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const year = d.getUTCFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+const getYouTubeId = (url: string): string | null => {
+  if (!url || typeof url !== "string") return null;
+  const match = url.match(
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/
+  );
+  return match ? match[1] : null;
+};
+
 // Add this mapping at the top of the file, after imports
 const badgeLogoMap: Record<string, string> = {
   'Korean Technology': '/Logos clipart 2/Korean Technology.png',
@@ -77,45 +96,25 @@ const badgeLogoMap: Record<string, string> = {
 };
 
 function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const logosPerView = 4;
-  const totalGroups = Math.ceil(accreditations.length / logosPerView);
-
-  useEffect(() => {
-    if (accreditations.length === 0 || totalGroups <= 1) return;
-    
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => {
-        // Move to next group, or loop back to start
-        if (prev >= totalGroups - 1) {
-          return 0; // Loop back to start
-        }
-        return prev + 1;
-      });
-    }, 3000); // Change every 3 seconds
-    
-    return () => clearInterval(interval);
-  }, [accreditations.length, totalGroups]);
-
   if (accreditations.length === 0) return null;
+
+  const logosPerView = 4;
+  const extendedAccreditations = [...accreditations, ...accreditations];
 
   return (
     <section className="py-12 bg-gray-50 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="relative overflow-hidden">
           <div 
-            className="flex transition-transform duration-500 ease-in-out"
-            style={{
-              transform: `translateX(-${currentIndex * (100 / logosPerView)}%)`,
-            }}
+            className="flex animate-logo-marquee"
           >
-            {accreditations.map((accreditation, index) => (
+            {extendedAccreditations.map((accreditation, index) => (
               <div
-                key={accreditation._id || accreditation.id || index}
+                key={index}
                 className="flex-shrink-0 px-4"
                 style={{ width: `${100 / logosPerView}%` }}
               >
-                <div className="bg-white rounded-lg p-6 h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
                   <img
                     src={accreditation.logo}
                     alt="Accreditation"
@@ -132,19 +131,10 @@ function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
 }
 
 function OurCustomersScroll({ customers }: { customers: any[] }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const logosPerView = 4;
-  const totalGroups = Math.ceil(customers.length / logosPerView);
-
-  useEffect(() => {
-    if (customers.length === 0 || totalGroups <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev >= totalGroups - 1 ? 0 : prev + 1));
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [customers.length, totalGroups]);
-
   if (customers.length === 0) return null;
+
+  const logosPerView = 4;
+  const extendedCustomers = [...customers, ...customers];
 
   return (
     <section className="py-12 bg-gray-50 overflow-hidden">
@@ -152,12 +142,11 @@ function OurCustomersScroll({ customers }: { customers: any[] }) {
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-8">OUR CUSTOMERS</h2>
         <div className="relative overflow-hidden">
           <div
-            className="flex transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateX(-${currentIndex * (100 / logosPerView)}%)` }}
+            className="flex animate-logo-marquee"
           >
-            {customers.map((c, i) => (
-              <div key={c._id || c.id || i} className="flex-shrink-0 px-4" style={{ width: `${100 / logosPerView}%` }}>
-                <div className="bg-white rounded-lg p-6 h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+            {extendedCustomers.map((c, i) => (
+              <div key={i} className="flex-shrink-0 px-4" style={{ width: `${100 / logosPerView}%` }}>
+                <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
                   <img src={c.logo} alt="Customer" className="max-w-full max-h-full object-contain" />
                 </div>
               </div>
@@ -215,15 +204,18 @@ function YoutubeShortsCarousel() {
             style={{ scrollBehavior: 'smooth' }}
           >
             {shorts.map((id) => (
-              <div key={id} className="min-w-[320px] max-w-xs flex-shrink-0 rounded-xl overflow-hidden shadow-lg bg-black">
+              <div
+                key={id}
+                className="flex-shrink-0 rounded-xl overflow-hidden shadow-lg bg-black w-[70vw] max-w-xs sm:w-[320px] sm:min-w-[320px]"
+              >
                 <iframe
-                  width="320"
-                  height="568"
+                  width="100%"
+                  height="100%"
                   src={`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&controls=0&loop=1&playlist=${id}`}
                   title="YouTube Short"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="w-full h-[568px] border-0"
+                  className="w-full aspect-[9/16] border-0"
                 ></iframe>
               </div>
             ))}
@@ -832,6 +824,9 @@ export default function HomePage() {
 
       <YoutubeShortsCarousel />
 
+      {/* Our Customers bar - above Customer Reviews */}
+      <OurCustomersScroll customers={customers} />
+
       {/* Reviews Carousel Section */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
@@ -862,8 +857,11 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {displayBlogPosts.slice(0, 3).map((post) => (
-              <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300">
+          {displayBlogPosts.slice(0, 3).map((post, index) => (
+            <Card
+              key={post.id || post._id || post.slug || index}
+              className="overflow-hidden hover:shadow-xl transition-all duration-300"
+            >
                 <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
                 
                 
@@ -881,7 +879,7 @@ export default function HomePage() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Calendar size={16} className="text-gray-400" />
-                      <span className="text-sm text-gray-600">{new Date(post.date).toLocaleDateString()}</span>
+                      <span className="text-sm text-gray-600">{formatDate(post.date)}</span>
                     </div>
                   </div>
                   <Button
@@ -999,44 +997,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-green-600 to-green-700 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative z-10 container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Boost Your Business?</h2>
-          <p className="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
-            Join thousands of successful customers who have transformed their operations with 100X equipment.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              variant="secondary"
-              className="bg-white text-green-600 hover:bg-gray-100 text-lg px-8 py-4"
-              onClick={() =>
-                window.open(
-                  `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`,
-                  "_blank",
-                )
-              }
-            >
-              <MessageCircle className="mr-2" size={20} />
-              Get Free Consultation
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-2 border-white text-white hover:bg-white hover:text-green-600 text-lg px-8 py-4 bg-transparent"
-              onClick={() => handleBrochureDownload("Complete Product Catalog")}
-            >
-              <Download className="mr-2" size={20} />
-              Download Catalog
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Customers bar - right above footer */}
-      <OurCustomersScroll customers={customers} />
     </>
   )
   }
@@ -1298,8 +1258,8 @@ export default function HomePage() {
             <div>
               <h4 className="font-semibold mb-6 text-lg">Products</h4>
               <ul className="space-y-3 text-gray-400">
-                {products.slice(0, 5).map((product) => (
-                  <li key={product.id}>
+              {products.slice(0, 5).map((product, index) => (
+                <li key={product.id || product._id || index}>
                     <button
                       onClick={() => {
                         setSelectedProduct(product.id ?? null)
@@ -1440,13 +1400,16 @@ function ProductDetailPage({
   whatsappNumber: string
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [videoClosed, setVideoClosed] = useState(false);
 
   const handleImageClick = (index: number) => {
     setCurrentImageIndex(index);
   };
 
+  const videoId = product.youtubeLink ? getYouTubeId(product.youtubeLink) : null;
+
   return (
-    <div className="pt-32 min-h-screen bg-gray-50">
+    <div className="pt-32 min-h-screen bg-gray-50 relative">
       <div className="container mx-auto px-4 py-12">
         {/* Breadcrumb */}
         <div className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
@@ -1657,6 +1620,31 @@ function ProductDetailPage({
           </Button>
         </div>
       </div>
+      {videoId && !videoClosed && (
+        <div
+          className="fixed right-6 bottom-24 z-[51] flex flex-col items-end gap-1"
+          style={{ bottom: "7rem" }}
+        >
+          <button
+            onClick={() => setVideoClosed(true)}
+            className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors -mb-1 z-10"
+            aria-label="Close video"
+          >
+            <X size={18} />
+          </button>
+          <div className="w-[200px] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black">
+            <div className="aspect-[9/16] w-full">
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}`}
+                title="Product video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1913,8 +1901,12 @@ function BlogPage({
 
         {/* Blog Posts Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {filteredPosts.map((post) => (
-            <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer" onClick={() => setSelectedBlog(post)}>
+        {filteredPosts.map((post, index) => (
+          <Card
+            key={post.id || post._id || post.slug || index}
+            className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+            onClick={() => setSelectedBlog(post)}
+          >
               <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-3">
@@ -1933,7 +1925,7 @@ function BlogPage({
                   <div className="flex items-center space-x-2">
                     <Calendar size={16} className="text-gray-400" />
                     <span className="text-sm text-gray-600">
-                      {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : (post.date || "2024-01-01")}
+                      {post.publishedAt ? formatDate(post.publishedAt) : formatDate(post.date || "2024-01-01")}
                     </span>
                   </div>
                 </div>
@@ -2023,7 +2015,7 @@ function BlogArticlePage({
                   <div className="flex items-center space-x-2 text-gray-500">
                     <Calendar size={16} />
                     <span className="text-sm">
-                      {blog.publishedAt ? new Date(blog.publishedAt).toLocaleDateString() : (blog.date || "2024-01-01")}
+                      {blog.publishedAt ? formatDate(blog.publishedAt) : formatDate(blog.date || "2024-01-01")}
                     </span>
                   </div>
                 </div>

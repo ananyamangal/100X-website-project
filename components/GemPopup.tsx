@@ -45,6 +45,30 @@ export default function GemPopup() {
     setShow(false)
   }
 
+  const submitNumber = () => {
+    const trimmed = mobile.trim()
+    if (!trimmed) {
+      alert("Please enter your mobile number before submitting.")
+      return
+    }
+
+    fetch("/api/submissions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "GeM Popup",
+        phone: trimmed,
+        type: "gem_popup_submit_only",
+      }),
+    }).catch(() => {})
+
+    try {
+      localStorage.setItem(STORAGE_KEY, "true")
+    } catch {}
+    setShow(false)
+    alert("Thank you! Our team will contact you shortly.")
+  }
+
   const talkToOem = () => {
     const msg = `Hi, I need help selecting GeM / ISI / WHO compliant fogging machine. I'm interested in GeM reseller code or Bulk & institutional pricing.${mobile.trim() ? ` My number: ${mobile.trim()}` : ""}`
     fetch("/api/submissions", {
@@ -83,6 +107,12 @@ export default function GemPopup() {
             onChange={(e) => setMobile(e.target.value)}
             className="p-3 mb-5"
           />
+          <Button
+            onClick={submitNumber}
+            className="w-full mb-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 text-base"
+          >
+            Submit
+          </Button>
           <div className="flex gap-3">
             <Button onClick={talkToOem} className="flex-1 bg-green-600 hover:bg-green-700">
               <MessageCircle className="mr-2" size={18} />

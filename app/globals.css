@@ -10,6 +10,10 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  .animate-logo-marquee {
+    animation: logo-marquee 18s linear infinite;
+  }
 }
 
 @layer base {
@@ -90,5 +94,14 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@keyframes logo-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
   }
 }

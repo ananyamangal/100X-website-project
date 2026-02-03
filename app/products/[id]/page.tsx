@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Download, MessageCircle, Star, CheckCircle, Menu, X } from 'lucide-react';
 import Link from 'next/link';
+import { X as CloseIcon } from 'lucide-react';
 
 const badgeLogoMap: Record<string, string> = {
   'Korean Technology': '/Logos clipart 2/Korean Technology.png',
@@ -32,6 +33,14 @@ const PRODUCT_META: Record<string, { title: string; description: string }> = {
       '100x Circle offers the best Vehicle Mounted Fogging Machine in Delhi, designed for large-scale mosquito control and disinfection. Our high-performance foggers ensure powerful spray coverage, durability, and easy operation for municipal and industrial use.',
   },
 };
+
+function getYouTubeId(url: string): string | null {
+  if (!url || typeof url !== 'string') return null;
+  const match = url.match(
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/
+  );
+  return match ? match[1] : null;
+}
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -121,6 +130,9 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<any>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [transformOrigin, setTransformOrigin] = useState('center center');
+  const [videoClosed, setVideoClosed] = useState(false);
   const pageMeta = id ? PRODUCT_META[id] : undefined;
 
   // Carousel auto-scroll
@@ -170,6 +182,8 @@ export default function ProductDetailPage() {
   };
   const thumbnails = getThumbnails();
 
+  const videoId = product.youtubeLink ? getYouTubeId(product.youtubeLink) : null;
+
   return (
     <>
       {pageMeta && (
@@ -178,7 +192,7 @@ export default function ProductDetailPage() {
           <meta name="description" content={pageMeta.description} />
         </Head>
       )}
-    <div className="pt-32 min-h-screen bg-gray-50">
+    <div className="pt-32 min-h-screen bg-gray-50 relative">
       <Header />
       <div className="container mx-auto px-4 py-12">
         <div className="mb-8">
@@ -193,12 +207,28 @@ export default function ProductDetailPage() {
           <div>
             <div className="relative w-full flex flex-col items-center">
               {/* Main Image */}
-              <div className="relative w-full flex items-center justify-center">
+              <div
+                className="relative w-full flex items-center justify-center overflow-hidden rounded-2xl"
+                onMouseMove={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * 100;
+                  const y = ((e.clientY - rect.top) / rect.height) * 100;
+                  const clampedX = Math.min(100, Math.max(0, x));
+                  const clampedY = Math.min(100, Math.max(0, y));
+                  setTransformOrigin(`${clampedX}% ${clampedY}%`);
+                  setIsZoomed(true);
+                }}
+                onMouseLeave={() => setIsZoomed(false)}
+              >
                 <img
                   src={images[currentImageIndex] || '/placeholder.svg'}
                   alt={product.name}
-                  className="max-h-[400px] w-auto h-auto object-contain"
-                  style={{ width: '100%', borderRadius: '1rem' }}
+                  className="max-h-[400px] w-auto h-auto object-contain transition-transform duration-200 ease-out"
+                  style={{
+                    width: '100%',
+                    transform: isZoomed ? 'scale(2)' : 'scale(1)',
+                    transformOrigin,
+                  }}
                 />
                 {/* Left/Right Arrows */}
                 {images.length > 1 && (
@@ -375,6 +405,31 @@ export default function ProductDetailPage() {
           </div>
         )}
       </div>
+      {videoId && !videoClosed && (
+        <div
+          className="fixed right-6 bottom-24 z-[51] flex flex-col items-end gap-1"
+          style={{ bottom: '7rem' }}
+        >
+          <button
+            onClick={() => setVideoClosed(true)}
+            className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors -mb-1 z-10"
+            aria-label="Close video"
+          >
+            <CloseIcon size={18} />
+          </button>
+          <div className="w-[200px] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black">
+            <div className="aspect-[9/16] w-full">
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}`}
+                title="Product video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </>
   );
