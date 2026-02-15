@@ -14,6 +14,11 @@ body {
   .animate-logo-marquee {
     animation: logo-marquee 9s linear infinite;
   }
+  @media (max-width: 768px) {
+    .animate-logo-marquee {
+      animation-duration: 5s;
+    }
+  }
 }
 
 @layer base {

@@ -60,6 +60,7 @@ interface Product {
   whatsappMessageText: string;
   category: string;
   inStock: boolean;
+  brochureUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -254,7 +255,7 @@ export default function HomePage() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null)
   const [selectedBlog, setSelectedBlog] = useState<any | null>(null)
   const [showBrochureForm, setShowBrochureForm] = useState(false)
-  const [brochureFormData, setBrochureFormData] = useState({ name: "", phone: "", productName: "" })
+  const [brochureFormData, setBrochureFormData] = useState<{ name: string; phone: string; productName: string; brochureUrl?: string }>({ name: "", phone: "", productName: "" })
   const [products, setProducts] = useState<Product[]>([])
   const [banners, setBanners] = useState<any[]>([])
   const [blogPosts, setBlogPosts] = useState<any[]>([])
@@ -530,8 +531,8 @@ export default function HomePage() {
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`, "_blank")
   }
 
-  const handleBrochureDownload = (productName: string) => {
-    setBrochureFormData({ ...brochureFormData, productName })
+  const handleBrochureDownload = (productName: string, brochureUrl?: string) => {
+    setBrochureFormData({ ...brochureFormData, productName, brochureUrl })
     setShowBrochureForm(true)
   }
 
@@ -548,21 +549,17 @@ export default function HomePage() {
       body: JSON.stringify({ name, phone, productName: brochureFormData.productName, type: "brochure" }),
     })
 
-    // Create dummy PDF download
-    const link = document.createElement("a")
-    link.href = "/placeholder.pdf" // This would be your actual PDF URL
-    link.download = `${brochureFormData.productName}-Brochure.pdf`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    if (brochureFormData.brochureUrl) {
+      // Open Cloudinary PDF in new tab (browser will show or download)
+      window.open(brochureFormData.brochureUrl, "_blank")
+      alert("Brochure opened! We'll contact you soon with more details.")
+    } else {
+      alert("This brochure isn't available for download yet. We've noted your interest and will contact you shortly.")
+    }
 
-    // Send WhatsApp message
-    const whatsappMessage = `Brochure Downloaded:\nProduct: ${brochureFormData.productName}\nName: ${name}\nPhone: ${phone}\nPlease follow up with detailed information.`
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`, "_blank")
-
     setShowBrochureForm(false)
     setBrochureFormData({ name: "", phone: "", productName: "" })
-    alert("Brochure download started! We'll contact you soon with more details.")
   }
 
   const renderPage = () => {
@@ -860,7 +857,7 @@ export default function HomePage() {
                   key={product._id || product.id || index}
                   product={product}
                   onViewDetails={() => {}}
-                  onBrochureDownload={() => handleBrochureDownload(product.name)}
+                  onBrochureDownload={() => handleBrochureDownload(product.name, product.brochureUrl)}
                 />
               ))}
             </div>
@@ -872,7 +869,7 @@ export default function HomePage() {
                     key={product._id || product.id || index}
                     product={product}
                     onViewDetails={() => {}}
-                    onBrochureDownload={() => handleBrochureDownload(product.name)}
+                    onBrochureDownload={() => handleBrochureDownload(product.name, product.brochureUrl)}
                   />
                 ))}
               </div>
@@ -1462,7 +1459,7 @@ function ProductDetailPage({
   product: any
   setCurrentPage: (page: string) => void
   setSelectedProduct: (id: string | null) => void
-  onBrochureDownload: (productName: string) => void
+  onBrochureDownload: (productName: string, brochureUrl?: string) => void
   whatsappNumber: string
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -1571,7 +1568,7 @@ function ProductDetailPage({
                 size="lg"
                 variant="outline"
                 className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent"
-                onClick={() => onBrochureDownload(product.name)}
+                onClick={() => onBrochureDownload(product.name, product.brochureUrl)}
               >
                 <Download className="mr-2" size={20} />
                 Download Brochure
@@ -1662,7 +1659,7 @@ function ProductDetailPage({
               size="lg"
               variant="outline"
               className="border-2 border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
-              onClick={() => onBrochureDownload(product.name)}
+              onClick={() => onBrochureDownload(product.name, product.brochureUrl)}
             >
               <Download className="mr-2" size={20} />
               Download Technical Specs
