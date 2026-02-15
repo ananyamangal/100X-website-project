@@ -113,10 +113,10 @@ function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
             {extendedAccreditations.map((accreditation, index) => (
               <div
                 key={`acc-${index}-${(accreditation as any)._id ?? accreditation.logo ?? index}`}
-                className="flex-shrink-0 px-3 md:px-4"
+                className="flex-shrink-0 px-1 md:px-4 max-md:!w-1/3"
                 style={{ width: `${itemWidthPercent}%` }}
               >
-                <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow min-h-0">
+                <div className="bg-white rounded-lg p-1.5 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow min-h-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={accreditation.logo || LOGO_PLACEHOLDER}
@@ -149,8 +149,8 @@ function OurCustomersScroll({ customers }: { customers: any[] }) {
         <div className="relative overflow-hidden">
           <div className="flex animate-logo-marquee">
             {extendedCustomers.map((c, i) => (
-              <div key={`cust-${i}-${c._id ?? c.logo ?? i}`} className="flex-shrink-0 px-3 md:px-4" style={{ width: `${itemWidthPercent}%` }}>
-                <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow min-h-0">
+              <div key={`cust-${i}-${c._id ?? c.logo ?? i}`} className="flex-shrink-0 px-1 md:px-4 max-md:!w-1/3" style={{ width: `${itemWidthPercent}%` }}>
+                <div className="bg-white rounded-lg p-1.5 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow min-h-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={c.logo || LOGO_PLACEHOLDER}
