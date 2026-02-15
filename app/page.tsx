@@ -103,21 +103,21 @@ function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
   const itemWidthPercent = 100 / n;
 
   return (
-    <section className="py-12 bg-gray-50 overflow-hidden">
-      <div className="container mx-auto px-4">
+    <section className="py-6 md:py-12 bg-gray-50 overflow-hidden">
+      <div className="container mx-auto px-2 md:px-4">
         <div className="relative overflow-hidden">
           <div className="flex animate-logo-marquee">
             {extendedAccreditations.map((accreditation, index) => (
               <div
                 key={`acc-${index}-${(accreditation as any)._id ?? accreditation.logo ?? index}`}
-                className="flex-shrink-0 px-4"
+                className="flex-shrink-0 px-2 md:px-4"
                 style={{ width: `${itemWidthPercent}%` }}
               >
-                <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="bg-white rounded-lg p-2 md:p-6 h-14 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
                   <img
                     src={accreditation.logo || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Crect fill="%23e5e7eb" width="80" height="80" rx="8"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%239ca3af" font-size="10"%3ELogo%3C/text%3E%3C/svg%3E'}
                     alt="Accreditation"
-                    className="max-w-full max-h-full object-contain"
+                    className="max-w-full max-h-full object-contain w-10 h-10 md:w-auto md:h-auto"
                   />
                 </div>
               </div>
@@ -137,18 +137,18 @@ function OurCustomersScroll({ customers }: { customers: any[] }) {
   const itemWidthPercent = 100 / n;
 
   return (
-    <section className="py-12 bg-gray-50 overflow-hidden">
-      <div className="container mx-auto px-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-8">OUR CUSTOMERS</h2>
+    <section className="py-6 md:py-12 bg-gray-50 overflow-hidden">
+      <div className="container mx-auto px-2 md:px-4">
+        <h2 className="text-xl md:text-3xl font-bold text-gray-800 text-center mb-4 md:mb-8">OUR CUSTOMERS</h2>
         <div className="relative overflow-hidden">
           <div className="flex animate-logo-marquee">
             {extendedCustomers.map((c, i) => (
-              <div key={`cust-${i}-${c._id ?? c.logo ?? i}`} className="flex-shrink-0 px-4" style={{ width: `${itemWidthPercent}%` }}>
-                <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+              <div key={`cust-${i}-${c._id ?? c.logo ?? i}`} className="flex-shrink-0 px-2 md:px-4" style={{ width: `${itemWidthPercent}%` }}>
+                <div className="bg-white rounded-lg p-2 md:p-6 h-14 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
                   <img
                     src={c.logo || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Crect fill="%23e5e7eb" width="80" height="80" rx="8"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%239ca3af" font-size="10"%3ELogo%3C/text%3E%3C/svg%3E'}
                     alt="Customer"
-                    className="max-w-full max-h-full object-contain"
+                    className="max-w-full max-h-full object-contain w-10 h-10 md:w-auto md:h-auto"
                   />
                 </div>
               </div>
@@ -708,6 +708,24 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* Slide indicators - Mobile: very small dots below the image */}
+          <div className="flex justify-center items-center gap-2 py-2 bg-gray-100/90">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                aria-label={`Go to slide ${index + 1} of ${heroSlides.length}`}
+                aria-current={index === currentSlide ? "true" : undefined}
+                onClick={() => setCurrentSlide(index)}
+                className={`rounded-full transition-colors p-2 ${
+                  index === currentSlide ? "bg-green-600" : "bg-gray-400/70"
+                }`}
+              >
+                <span className="block w-1.5 h-1.5 min-w-[6px] min-h-[6px] rounded-full bg-inherit" />
+              </button>
+            ))}
+          </div>
+
           {/* Content Below Banner - Mobile View */}
           <div className="bg-white py-12">
             <div className="container mx-auto px-4">
@@ -770,24 +788,6 @@ export default function HomePage() {
                 index === currentSlide ? "bg-green-400" : "bg-white/50 hover:bg-white/70"
               }`}
             />
-          ))}
-        </div>
-
-        {/* Slide Indicators - Mobile (tap dots to go to slide) */}
-        <div className="md:hidden absolute top-72 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              aria-label={`Go to slide ${index + 1} of ${heroSlides.length}`}
-              aria-current={index === currentSlide ? "true" : undefined}
-              onClick={() => setCurrentSlide(index)}
-              className={`min-w-[44px] min-h-[44px] p-2 -m-2 rounded-full transition-all flex items-center justify-center ${
-                index === currentSlide ? "bg-green-600" : "bg-white/70"
-              }`}
-            >
-              <span className={`block w-3 h-3 rounded-full ${index === currentSlide ? "bg-green-600" : "bg-white/90"}`} />
-            </button>
           ))}
         </div>
 
@@ -1689,14 +1689,14 @@ function ProductDetailPage({
           >
             <X size={18} />
           </button>
-          <div className="w-[200px] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black">
-            <div className="aspect-[9/16] w-full">
+          <div className="w-[280px] sm:w-[320px] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black">
+            <div className="aspect-video w-full relative">
               <iframe
                 src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}`}
                 title="Product video"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                className="w-full h-full"
+                className="absolute inset-0 w-full h-full"
               />
             </div>
           </div>

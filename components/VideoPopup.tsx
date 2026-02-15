@@ -42,14 +42,14 @@ export default function VideoPopup() {
       >
         <X size={18} />
       </button>
-      <div className="w-[200px] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black">
-        <div className="aspect-[9/16] w-full">
+      <div className="w-[280px] sm:w-[320px] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black">
+        <div className="aspect-video w-full relative">
           <iframe
             src={embed}
             title="Video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="w-full h-full"
+            className="absolute inset-0 w-full h-full"
           />
         </div>
       </div>
