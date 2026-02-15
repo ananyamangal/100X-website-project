@@ -1,49 +1,49 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
+import { usePathname } from "next/navigation"
 import { MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
 const WHATSAPP = "917827229116"
-// 15 seconds
-const getDelayMs = () => 15000
-const STORAGE_KEY = "gem-popup-dismissed"
+const DELAY_MS = 5000 // 5 seconds after page load
 
 export default function GemPopup() {
+  const pathname = usePathname()
   const [show, setShow] = useState(false)
   const [mobile, setMobile] = useState("")
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Show popup after delay on every load/navigation. No localStorage – always show again on refresh even if user closed it.
   useEffect(() => {
     if (typeof window === "undefined") return
+    if (pathname != null && String(pathname).startsWith("/admin")) return
 
-    // ?showgem=1 in URL forces the popup (ignores localStorage, 2s delay) for testing
-    const forceShow = /showgem=1/.test(window.location.search || "")
-    if (forceShow) {
-      const t = setTimeout(() => setShow(true), 2000)
-      return () => clearTimeout(t)
-    }
-
-    let dismissed = false
-    try {
-      dismissed = !!localStorage.getItem(STORAGE_KEY)
-    } catch {
-      // ignore localStorage errors (e.g. private mode)
-    }
-    if (dismissed) return
-
-    const delay = getDelayMs()
-    const t = setTimeout(() => setShow(true), delay)
-    return () => clearTimeout(t)
-  }, [])
-
-  const dismiss = () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, "true")
-    } catch {}
     setShow(false)
-  }
+
+    const forceShow = /showgem=1/.test(window.location.search || "")
+    const delay = forceShow ? 2000 : DELAY_MS
+
+    // Defer so we're past hydration; then show after delay
+    const start = setTimeout(() => {
+      timerRef.current = setTimeout(() => {
+        timerRef.current = null
+        setShow(true)
+      }, delay)
+    }, 100)
+
+    return () => {
+      clearTimeout(start)
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+    }
+  }, [pathname])
+
+  const dismiss = () => setShow(false)
 
   const submitNumber = () => {
     const trimmed = mobile.trim()
@@ -62,9 +62,6 @@ export default function GemPopup() {
       }),
     }).catch(() => {})
 
-    try {
-      localStorage.setItem(STORAGE_KEY, "true")
-    } catch {}
     setShow(false)
     alert("Thank you! Our team will contact you shortly.")
   }
@@ -80,9 +77,6 @@ export default function GemPopup() {
         type: "gem_popup",
       }),
     }).catch(() => {})
-    try {
-      localStorage.setItem(STORAGE_KEY, "true")
-    } catch {}
     setShow(false)
     window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank")
   }

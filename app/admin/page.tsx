@@ -1772,14 +1772,18 @@ function ProductForm({
             <label className="block text-sm font-medium text-gray-700 mb-2">Product Image Slideshow Timer (seconds)</label>
             <Input
               type="number"
-              value={formData.slideshowInterval ? formData.slideshowInterval / 1000 : 5}
-              onChange={(e) => setFormData({ ...formData, slideshowInterval: parseInt(e.target.value) * 1000 })}
-              min="1"
-              max="30"
+              value={formData.slideshowInterval != null ? Math.round(formData.slideshowInterval / 1000) : 5}
+              onChange={(e) => {
+                const seconds = parseInt(e.target.value, 10)
+                const ms = Number.isNaN(seconds) ? 5000 : Math.max(1, Math.min(30, seconds)) * 1000
+                setFormData({ ...formData, slideshowInterval: ms })
+              }}
+              min={1}
+              max={30}
               required
             />
             <p className="text-xs text-gray-500 mt-1">
-              Time between product image slides in seconds (1-30 seconds). Only applies if product has multiple images.
+              Time between product image slides in <strong>seconds</strong> (1–30). Only applies if product has multiple images.
             </p>
           </div>
 
@@ -2877,14 +2881,18 @@ function BannerForm({
             <label className="block text-sm font-medium text-gray-700 mb-2">Slideshow Timer (seconds)</label>
             <Input
               type="number"
-              value={formData.slideshowInterval ? formData.slideshowInterval / 1000 : 4}
-              onChange={(e) => setFormData({ ...formData, slideshowInterval: parseInt(e.target.value) * 1000 })}
-              min="1"
-              max="30"
+              value={formData.slideshowInterval != null ? Math.round(formData.slideshowInterval / 1000) : 4}
+              onChange={(e) => {
+                const seconds = parseInt(e.target.value, 10)
+                const ms = Number.isNaN(seconds) ? 4000 : Math.max(1, Math.min(30, seconds)) * 1000
+                setFormData({ ...formData, slideshowInterval: ms })
+              }}
+              min={1}
+              max={30}
               required
             />
             <p className="text-xs text-gray-500 mt-1">
-              Time between banner slides in seconds (1-30 seconds)
+              Time between banner slides in <strong>seconds</strong> (1–30).
             </p>
           </div>
           
