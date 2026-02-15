@@ -12,7 +12,7 @@ body {
   }
 
   .animate-logo-marquee {
-    animation: logo-marquee 18s linear infinite;
+    animation: logo-marquee 9s linear infinite;
   }
 }
 

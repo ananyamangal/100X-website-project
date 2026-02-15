@@ -356,7 +356,7 @@ export default function HomePage() {
       })
       .then(data => {
         console.log('Accreditations fetched:', data);
-        setAccreditations(Array.isArray(data) ? data.filter((a: any) => a.isActive).sort((a: any, b: any) => (a.order || 0) - (b.order || 0)) : []);
+        setAccreditations(Array.isArray(data) ? data.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0)) : []);
       })
       .catch(error => {
         console.error('Error fetching accreditations:', error);
@@ -380,7 +380,7 @@ export default function HomePage() {
         return res.json();
       })
       .then(data => {
-        setCustomers(Array.isArray(data) ? data.filter((c: any) => c.isActive).sort((a: any, b: any) => (a.order || 0) - (b.order || 0)) : []);
+        setCustomers(Array.isArray(data) ? data.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0)) : []);
       })
       .catch(error => {
         console.error('Error fetching customers:', error);
