@@ -947,6 +947,17 @@ function AdminDashboardContent() {
                 Our Customers
               </button>
               <button
+                onClick={() => setActiveTab("aboutUs")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "aboutUs"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Award className="mr-3" size={20} />
+                About Us Page
+              </button>
+              <button
                 onClick={() => setActiveTab("videoPopup")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "videoPopup"
@@ -992,7 +1003,7 @@ function AdminDashboardContent() {
                 setEditingBanner={setEditingBanner}
               />
             )}
-            {activeTab === "content" && <ContentTab />}
+            {activeTab === "content" && <ContentTab setActiveTab={setActiveTab} />}
             {activeTab === "categories" && (
               <CategoriesTab
                 categories={categories}
@@ -1045,6 +1056,7 @@ function AdminDashboardContent() {
                 setEditingCustomer={setEditingCustomer}
               />
             )}
+            {activeTab === "aboutUs" && <AboutUsTab />}
             {activeTab === "videoPopup" && <VideoPopupTab />}
           </div>
         </div>
@@ -1934,7 +1946,7 @@ function AnalyticsTab({ products }: { products: Product[] }) {
 }
 
 // Content Tab Component
-function ContentTab() {
+function ContentTab({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
   return (
     <div className="space-y-6">
       <div>
@@ -1948,7 +1960,7 @@ function ContentTab() {
             <CardTitle>Company Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button className="w-full justify-start bg-transparent" variant="outline">
+            <Button type="button" className="w-full justify-start bg-transparent" variant="outline" onClick={() => setActiveTab("aboutUs")}>
               <Edit className="mr-2" size={16} />
               Edit About Us Page
             </Button>
@@ -3286,6 +3298,243 @@ function CustomersTab({
           </CardContent>
         </Card>
       )}
+    </div>
+  )
+}
+
+// About Us Page Tab Component
+const ABOUT_DEFAULTS = {
+  heroBadge: 'About Us',
+  heroTitle: 'About 100X Circle Pvt Ltd',
+  journeyHeading: 'Our Journey',
+  journeyParagraph1: '',
+  journeyList: '',
+  journeyParagraph2: '',
+  journeyStat1Value: '2015',
+  journeyStat1Label: 'Founded',
+  journeyStat2Value: '10K+',
+  journeyStat2Label: 'Happy customers',
+  journeyImage: '/new.png',
+  foundationHeading: 'Our Foundation',
+  foundationSubtext: 'The principles that guide our work and define our commitment to excellence.',
+  missionTitle: 'Mission',
+  missionDescription: '',
+  visionTitle: 'Vision',
+  visionDescription: '',
+  valuesTitle: 'Values',
+  valuesDescription: '',
+  manufacturingHeading: 'Manufacturing Excellence',
+  manufacturingParagraph: '',
+  manufacturingStat1Value: 'ISO',
+  manufacturingStat1Label: 'Certified',
+  manufacturingStat2Value: '99.5%',
+  manufacturingStat2Label: 'Quality Rate',
+  manufacturingStat3Value: '24/7',
+  manufacturingStat3Label: 'Production',
+  manufacturingStat4Value: '50+',
+  manufacturingStat4Label: 'Products',
+  manufacturingImage: '/production.png',
+}
+
+function AboutUsTab() {
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+  const [uploadingJourney, setUploadingJourney] = useState(false)
+  const [uploadingManufacturing, setUploadingManufacturing] = useState(false)
+  const [form, setForm] = useState<Record<string, string>>({ ...ABOUT_DEFAULTS })
+
+  useEffect(() => {
+    fetch("/api/about-page")
+      .then((res) => res.json())
+      .then((data) => setForm((prev) => ({ ...ABOUT_DEFAULTS, ...prev, ...data })))
+      .catch(() => setForm({ ...ABOUT_DEFAULTS }))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+    setMessage(null)
+    try {
+      const res = await fetch("/api/admin/about-page", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(form),
+      })
+      if (res.ok) {
+        setMessage({ type: "success", text: "About Us page saved successfully." })
+      } else {
+        setMessage({ type: "error", text: "Failed to save" })
+      }
+    } catch {
+      setMessage({ type: "error", text: "Failed to save" })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const uploadImage = async (file: File, field: 'journeyImage' | 'manufacturingImage') => {
+    const setUploading = field === 'journeyImage' ? setUploadingJourney : setUploadingManufacturing
+    setUploading(true)
+    const fd = new FormData()
+    fd.append("file", file)
+    fd.append("upload_preset", "product_uploads")
+    try {
+      const res = await fetch("https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload", { method: "POST", body: fd })
+      if (!res.ok) throw new Error("Upload failed")
+      const data = await res.json()
+      if (data.secure_url) setForm((prev) => ({ ...prev, [field]: data.secure_url }))
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  if (loading) return <div className="text-gray-500">Loading…</div>
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">About Us Page</h2>
+        <p className="text-gray-600">Edit the content and images shown on the About Us section of the website.</p>
+      </div>
+      <form onSubmit={handleSave} className="space-y-8">
+        {/* Hero */}
+        <Card>
+          <CardHeader><CardTitle>Hero section</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Badge text</label>
+              <Input value={form.heroBadge || ''} onChange={(e) => setForm((p) => ({ ...p, heroBadge: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <Input value={form.heroTitle || ''} onChange={(e) => setForm((p) => ({ ...p, heroTitle: e.target.value }))} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Journey */}
+        <Card>
+          <CardHeader><CardTitle>Our Journey</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Section heading</label>
+              <Input value={form.journeyHeading || ''} onChange={(e) => setForm((p) => ({ ...p, journeyHeading: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">First paragraph</label>
+              <Textarea value={form.journeyParagraph1 || ''} onChange={(e) => setForm((p) => ({ ...p, journeyParagraph1: e.target.value }))} rows={4} className="w-full" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bullet list (one item per line)</label>
+              <Textarea value={form.journeyList || ''} onChange={(e) => setForm((p) => ({ ...p, journeyList: e.target.value }))} rows={5} placeholder="Item 1&#10;Item 2" className="w-full" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Second paragraph</label>
+              <Textarea value={form.journeyParagraph2 || ''} onChange={(e) => setForm((p) => ({ ...p, journeyParagraph2: e.target.value }))} rows={3} className="w-full" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stat 1 value</label>
+                <Input value={form.journeyStat1Value || ''} onChange={(e) => setForm((p) => ({ ...p, journeyStat1Value: e.target.value }))} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stat 1 label</label>
+                <Input value={form.journeyStat1Label || ''} onChange={(e) => setForm((p) => ({ ...p, journeyStat1Label: e.target.value }))} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stat 2 value</label>
+                <Input value={form.journeyStat2Value || ''} onChange={(e) => setForm((p) => ({ ...p, journeyStat2Value: e.target.value }))} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stat 2 label</label>
+                <Input value={form.journeyStat2Label || ''} onChange={(e) => setForm((p) => ({ ...p, journeyStat2Label: e.target.value }))} />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Journey image</label>
+              <input type="file" accept="image/*" className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-green-600 file:text-white" disabled={uploadingJourney} onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], 'journeyImage')} />
+              {form.journeyImage && <p className="text-xs text-gray-500 mt-1">Current: {form.journeyImage}</p>}
+              {uploadingJourney && <p className="text-sm text-blue-600">Uploading…</p>}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Foundation: Mission, Vision, Values */}
+        <Card>
+          <CardHeader><CardTitle>Our Foundation (Mission, Vision, Values)</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Section heading</label>
+              <Input value={form.foundationHeading || ''} onChange={(e) => setForm((p) => ({ ...p, foundationHeading: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Subtext</label>
+              <Input value={form.foundationSubtext || ''} onChange={(e) => setForm((p) => ({ ...p, foundationSubtext: e.target.value }))} className="w-full" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mission title</label>
+              <Input value={form.missionTitle || ''} onChange={(e) => setForm((p) => ({ ...p, missionTitle: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mission description</label>
+              <Textarea value={form.missionDescription || ''} onChange={(e) => setForm((p) => ({ ...p, missionDescription: e.target.value }))} rows={3} className="w-full" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Vision title</label>
+              <Input value={form.visionTitle || ''} onChange={(e) => setForm((p) => ({ ...p, visionTitle: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Vision description</label>
+              <Textarea value={form.visionDescription || ''} onChange={(e) => setForm((p) => ({ ...p, visionDescription: e.target.value }))} rows={3} className="w-full" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Values title</label>
+              <Input value={form.valuesTitle || ''} onChange={(e) => setForm((p) => ({ ...p, valuesTitle: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Values description</label>
+              <Textarea value={form.valuesDescription || ''} onChange={(e) => setForm((p) => ({ ...p, valuesDescription: e.target.value }))} rows={3} className="w-full" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Manufacturing */}
+        <Card>
+          <CardHeader><CardTitle>Manufacturing Excellence</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Heading</label>
+              <Input value={form.manufacturingHeading || ''} onChange={(e) => setForm((p) => ({ ...p, manufacturingHeading: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Paragraph</label>
+              <Textarea value={form.manufacturingParagraph || ''} onChange={(e) => setForm((p) => ({ ...p, manufacturingParagraph: e.target.value }))} rows={4} className="w-full" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex gap-2">
+                  <Input placeholder="Value" value={form[`manufacturingStat${i}Value`] || ''} onChange={(e) => setForm((p) => ({ ...p, [`manufacturingStat${i}Value`]: e.target.value }))} />
+                  <Input placeholder="Label" value={form[`manufacturingStat${i}Label`] || ''} onChange={(e) => setForm((p) => ({ ...p, [`manufacturingStat${i}Label`]: e.target.value }))} />
+                </div>
+              ))}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Manufacturing image</label>
+              <input type="file" accept="image/*" className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-green-600 file:text-white" disabled={uploadingManufacturing} onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0], 'manufacturingImage')} />
+              {form.manufacturingImage && <p className="text-xs text-gray-500 mt-1">Current: {form.manufacturingImage}</p>}
+              {uploadingManufacturing && <p className="text-sm text-blue-600">Uploading…</p>}
+            </div>
+          </CardContent>
+        </Card>
+
+        {message && <p className={message.type === "success" ? "text-green-600" : "text-red-600"}>{message.text}</p>}
+        <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={saving}>{saving ? "Saving…" : "Save About Us Page"}</Button>
+      </form>
     </div>
   )
 }

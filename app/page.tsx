@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Head from "next/head"
 import Link from "next/link"
 import {
@@ -251,6 +251,8 @@ export default function HomePage() {
   const [customers, setCustomers] = useState<any[]>([])
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [bannersLoading, setBannersLoading] = useState(true)
+  const [aboutPageContent, setAboutPageContent] = useState<Record<string, string> | null>(null)
+  const bannerTouchStartX = useRef<number | null>(null)
 
   const changingPhrases = [
     "100 X your Productivity",
@@ -362,6 +364,14 @@ export default function HomePage() {
       });
   }, [])
 
+  // Fetch about page content (editable in admin)
+  useEffect(() => {
+    fetch("/api/about-page")
+      .then((res) => res.json())
+      .then((data) => setAboutPageContent(data))
+      .catch(() => setAboutPageContent(null))
+  }, [])
+
   // Fetch customers from API
   useEffect(() => {
     fetch("/api/admin/customers")
@@ -378,17 +388,18 @@ export default function HomePage() {
       });
   }, [])
 
+  // Banner slideshow: use stable numeric deps so the interval isn't cleared every render. Normalize timer to ms (admin may have saved seconds).
+  const slideCount = heroSlides.length
+  const rawInterval = heroSlides[0]?.slideshowInterval ?? 4000
+  const intervalMs = rawInterval > 0 && rawInterval < 1000 ? rawInterval * 1000 : Math.max(1000, rawInterval)
+
   useEffect(() => {
-    if (heroSlides.length === 0 || heroSlides.length === 1) return;
-    
-    // Use the slideshow interval from the first banner, or default to 4000ms (4 seconds)
-    const interval = heroSlides[0]?.slideshowInterval || 4000;
-    
+    if (slideCount === 0 || slideCount === 1) return
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
-    }, interval)
+      setCurrentSlide((prev) => (prev + 1) % slideCount)
+    }, intervalMs)
     return () => clearInterval(timer)
-  }, [heroSlides.length, heroSlides])
+  }, [slideCount, intervalMs])
 
   // Handle hash-based navigation (e.g., /#about, /#contact)
   useEffect(() => {
@@ -560,7 +571,7 @@ export default function HomePage() {
           />
         )
       case "about":
-        return <AboutPage setCurrentPage={setCurrentPage} />
+        return <AboutPage setCurrentPage={setCurrentPage} content={aboutPageContent} />
       case "product":
         return selectedProduct ? (
           <ProductDetailPage
@@ -588,16 +599,30 @@ export default function HomePage() {
     <>
       {/* Hero Section with Image Slider */}
       <section id="home" className="pt-32 relative overflow-hidden">
-        {/* Banner Images - Desktop View */}
+        {/* Banner Images - Desktop View (swipeable on touch devices, arrows always) */}
         <div className="hidden md:block min-h-screen relative">
-          <div className="absolute inset-0">
+          <div
+            className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing"
+            onTouchStart={(e) => { bannerTouchStartX.current = e.touches[0].clientX }}
+            onTouchEnd={(e) => {
+              const start = bannerTouchStartX.current;
+              if (start == null) return;
+              bannerTouchStartX.current = null;
+              const end = e.changedTouches[0].clientX;
+              const diff = start - end;
+              if (heroSlides.length <= 1) return;
+              if (diff > 50) setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+              else if (diff < -50) setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+            }}
+          >
             <img
               src={bannersLoading ? "/banner.jpeg" : (currentSlideData?.image || "/banner.jpeg")}
               alt="Agricultural equipment"
-              className="w-full h-full object-cover transition-all duration-1000"
+              className="w-full h-full object-cover transition-all duration-1000 pointer-events-none select-none"
+              draggable={false}
             />
             {/* Very subtle overlay for text readability while maintaining brightness */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-transparent pointer-events-none"></div>
           </div>
 
           <div className="relative z-10 container mx-auto px-4 flex items-center min-h-screen">
@@ -655,13 +680,27 @@ export default function HomePage() {
 
         {/* Mobile View - Banner First, Then Content */}
         <div className="md:hidden">
-          {/* Banner Images - Mobile View */}
+          {/* Banner Images - Mobile View (swipeable) */}
           <div className="relative h-80">
-            <div className="absolute inset-0">
+            <div
+              className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing"
+              onTouchStart={(e) => { bannerTouchStartX.current = e.touches[0].clientX }}
+              onTouchEnd={(e) => {
+                const start = bannerTouchStartX.current;
+                if (start == null) return;
+                bannerTouchStartX.current = null;
+                const end = e.changedTouches[0].clientX;
+                const diff = start - end;
+                if (heroSlides.length <= 1) return;
+                if (diff > 50) setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+                else if (diff < -50) setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+              }}
+            >
               <img
                 src={bannersLoading ? "/banner.jpeg" : (currentSlideData?.image || "/banner.jpeg")}
                 alt="Agricultural equipment"
-                className="w-full h-full object-cover transition-all duration-1000"
+                className="w-full h-full object-cover transition-all duration-1000 pointer-events-none select-none"
+                draggable={false}
               />
               {/* No overlay for mobile to maintain full brightness */}
             </div>
@@ -716,56 +755,72 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Slide Indicators - Desktop */}
-        <div className="hidden md:block absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
+        {/* Slide Indicators - Desktop (click dots to go to slide) */}
+        <div className="hidden md:block absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
           {heroSlides.map((_, index) => (
             <button
               key={index}
+              type="button"
+              aria-label={`Go to slide ${index + 1} of ${heroSlides.length}`}
+              aria-current={index === currentSlide ? "true" : undefined}
               onClick={() => setCurrentSlide(index)}
-              className={`w-4 h-4 rounded-full transition-all ${
-                index === currentSlide ? "bg-green-400" : "bg-white/50"
+              className={`w-4 h-4 rounded-full transition-all hover:scale-110 ${
+                index === currentSlide ? "bg-green-400" : "bg-white/50 hover:bg-white/70"
               }`}
             />
           ))}
         </div>
 
-        {/* Slide Indicators - Mobile */}
-        <div className="md:hidden absolute top-72 left-1/2 transform -translate-x-1/2 flex space-x-3">
+        {/* Slide Indicators - Mobile (tap dots to go to slide) */}
+        <div className="md:hidden absolute top-72 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
           {heroSlides.map((_, index) => (
             <button
               key={index}
+              type="button"
+              aria-label={`Go to slide ${index + 1} of ${heroSlides.length}`}
+              aria-current={index === currentSlide ? "true" : undefined}
               onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
+              className={`min-w-[44px] min-h-[44px] p-2 -m-2 rounded-full transition-all flex items-center justify-center ${
                 index === currentSlide ? "bg-green-600" : "bg-white/70"
               }`}
-            />
+            >
+              <span className={`block w-3 h-3 rounded-full ${index === currentSlide ? "bg-green-600" : "bg-white/90"}`} />
+            </button>
           ))}
         </div>
 
-        {/* Slide Navigation - Desktop */}
+        {/* Slide Navigation - Desktop (previous/next buttons) */}
         <button
+          type="button"
+          aria-label="Previous banner"
           onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-          className="hidden md:block absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
+          className="hidden md:block absolute left-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
         >
           <ChevronLeft size={24} />
         </button>
         <button
+          type="button"
+          aria-label="Next banner"
           onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-          className="hidden md:block absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
+          className="hidden md:block absolute right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
         >
           <ChevronRight size={24} />
         </button>
 
-        {/* Slide Navigation - Mobile */}
+        {/* Slide Navigation - Mobile (previous/next buttons) */}
         <button
+          type="button"
+          aria-label="Previous banner"
           onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-          className="md:hidden absolute left-4 top-40 transform -translate-y-1/2 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all"
+          className="md:hidden absolute left-4 top-40 transform -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
           <ChevronLeft size={20} />
         </button>
         <button
+          type="button"
+          aria-label="Next banner"
           onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-          className="md:hidden absolute right-4 top-40 transform -translate-y-1/2 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all"
+          className="md:hidden absolute right-4 top-40 transform -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
           <ChevronRight size={20} />
         </button>
@@ -1649,125 +1704,88 @@ function ProductDetailPage({
   )
 }
 
-// About Page Component
-function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void }) {
-  const milestones = [
-    { year: "2015", title: "Company Founded", description: "Started with a vision to revolutionize agriculture" },
-    { year: "2017", title: "First 1000 Customers", description: "Reached our first major milestone" },
-    { year: "2019", title: "National Expansion", description: "Expanded operations across 10 states" },
-    { year: "2021", title: "Technology Innovation", description: "Launched precision agriculture solutions" },
-    { year: "2023", title: "10,000+ curstomers", description: "Serving over 10,000 satisfied curstomers" },
-    {
-      year: "2024",
-      title: "Digital Transformation",
-      description: "Complete web solutions for agricultural businesses",
-    },
-  ]
-
+// About Page Component (content from admin /api/about-page)
+function AboutPage({ setCurrentPage, content }: { setCurrentPage: (page: string) => void; content: Record<string, string> | null }) {
+  const c = content || {}
+  const heroBadge = c.heroBadge ?? "About Us"
+  const heroTitle = c.heroTitle ?? "About 100X Circle Pvt Ltd"
+  const journeyHeading = c.journeyHeading ?? "Our Journey"
+  const journeyParagraph1 = c.journeyParagraph1 ?? ""
+  const journeyList = c.journeyList ?? ""
+  const journeyParagraph2 = c.journeyParagraph2 ?? ""
+  const journeyStat1Value = c.journeyStat1Value ?? "2015"
+  const journeyStat1Label = c.journeyStat1Label ?? "Founded"
+  const journeyStat2Value = c.journeyStat2Value ?? "10K+"
+  const journeyStat2Label = c.journeyStat2Label ?? "Happy customers"
+  const journeyImage = c.journeyImage ?? "/new.png"
+  const foundationHeading = c.foundationHeading ?? "Our Foundation"
+  const foundationSubtext = c.foundationSubtext ?? "The principles that guide our work and define our commitment to excellence."
+  const missionTitle = c.missionTitle ?? "Mission"
+  const missionDescription = c.missionDescription ?? ""
+  const visionTitle = c.visionTitle ?? "Vision"
+  const visionDescription = c.visionDescription ?? ""
+  const valuesTitle = c.valuesTitle ?? "Values"
+  const valuesDescription = c.valuesDescription ?? ""
+  const manufacturingHeading = c.manufacturingHeading ?? "Manufacturing Excellence"
+  const manufacturingParagraph = c.manufacturingParagraph ?? ""
+  const manufacturingImage = c.manufacturingImage ?? "/production.png"
+  const journeyListItems = journeyList ? journeyList.split("\n").filter((line) => line.trim()) : []
   const values = [
-    {
-      icon: Target,
-      title: "Mission",
-      description:
-        "To empower curstomers with innovative, reliable, and affordable agricultural equipment that enhances productivity, reduces labor intensity, and contributes to sustainable farming practices.",
-    },
-    {
-      icon: Eye,
-      title: "Vision",
-      description:
-        "To be the leading provider of agricultural equipment solutions, driving the transformation of farming practices through technology, innovation, and unwavering commitment to farmer success.",
-    },
-    {
-      icon: Heart,
-      title: "Values",
-      description:
-        "Quality, integrity, innovation, and customer-centricity form the foundation of everything we do. We believe in building lasting relationships based on trust and mutual success.",
-    },
+    { icon: Target, title: missionTitle, description: missionDescription },
+    { icon: Eye, title: visionTitle, description: visionDescription },
+    { icon: Heart, title: valuesTitle, description: valuesDescription },
   ]
-
-  const team = [
-    {
-      name: "Rajesh Kumar",
-      position: "Founder & CEO",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
-      description: "20+ years experience in agricultural engineering and business development.",
-    },
-    {
-      name: "Priya Sharma",
-      position: "Head of Engineering",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=300&h=300&fit=crop&crop=face",
-      description: "Expert in precision agriculture technology and product development.",
-    },
-    {
-      name: "Amit Singh",
-      position: "Operations Director",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face",
-      description: "Specialist in supply chain management and quality control.",
-    },
+  const manufacturingStats = [
+    { value: c.manufacturingStat1Value ?? "ISO", label: c.manufacturingStat1Label ?? "Certified", bg: "bg-blue-50", text: "text-blue-600" },
+    { value: c.manufacturingStat2Value ?? "99.5%", label: c.manufacturingStat2Label ?? "Quality Rate", bg: "bg-green-50", text: "text-green-600" },
+    { value: c.manufacturingStat3Value ?? "24/7", label: c.manufacturingStat3Label ?? "Production", bg: "bg-purple-50", text: "text-purple-600" },
+    { value: c.manufacturingStat4Value ?? "50+", label: c.manufacturingStat4Label ?? "Products", bg: "bg-orange-50", text: "text-orange-600" },
   ]
 
   return (
     <div className="pt-32 min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-12">
-        {/* About Header */}
         <div className="text-center mb-20">
-          <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">About Us</Badge>
-          <h1 className="text-5xl font-bold text-gray-800 mb-6">About 100X Circle Pvt Ltd</h1>
-        
+          <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">{heroBadge}</Badge>
+          <h1 className="text-5xl font-bold text-gray-800 mb-6">{heroTitle}</h1>
         </div>
 
-        {/* Company Story */}
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
           <div>
-            <h2 className="text-4xl font-bold text-gray-800 mb-6">Our Journey</h2>
-            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-            100X Circle Pvt Ltd is India's fast-growing OEM of advanced fogging machines, agri implements, and airport ground equipment. Located at Sector 7, IMT Manesar, Gurgaon, we proudly uphold the 'Make in India' mission by delivering CE-certified, ISO 9001-compliant, and W.H.O-compliant solutions for both public and private sectors. Our brand '100X' stands for innovation, reliability, and scalable performance across segments
-            </p>
-            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Our range includes:
-            </p>
-            <ul className="text-lg text-gray-600 mb-6 leading-relaxed">
-                            <li>Thermal Fogging Machines (Portable & Vehicle-Mounted)</li>
-                            <li>Bio-Foggers for sensitive applications</li>
-                            <li>Mini Fogging Machines for compact operations</li>
-                            <li>Complete Agricultural Machinery line</li>
-                            <li>Heavy-duty Airport Baggage Trolleys</li>
-                          </ul>
-               <br></br>         
-            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-            Tested in approved labs, our machines are available and listed on the Government e-Marketplace (GeM) and widely used by defense forces, municipal bodies, and agriculture departments. 100X Circle is UDYAM/MSME registered and offers authorized dealership support across India.
-
-            </p>
+            <h2 className="text-4xl font-bold text-gray-800 mb-6">{journeyHeading}</h2>
+            {journeyParagraph1 && <p className="text-lg text-gray-600 mb-6 leading-relaxed">{journeyParagraph1}</p>}
+            {journeyListItems.length > 0 && (
+              <>
+                <p className="text-lg text-gray-600 mb-2 leading-relaxed">Our range includes:</p>
+                <ul className="text-lg text-gray-600 mb-6 leading-relaxed list-disc list-inside">
+                  {journeyListItems.map((item, i) => <li key={i}>{item.trim()}</li>)}
+                </ul>
+              </>
+            )}
+            {journeyParagraph2 && <p className="text-lg text-gray-600 mb-8 leading-relaxed">{journeyParagraph2}</p>}
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center p-6 bg-green-50 rounded-xl">
-                <div className="text-3xl font-bold text-green-600 mb-2">2015</div>
-                <div className="text-gray-600">Founded</div>
+                <div className="text-3xl font-bold text-green-600 mb-2">{journeyStat1Value}</div>
+                <div className="text-gray-600">{journeyStat1Label}</div>
               </div>
               <div className="text-center p-6 bg-green-50 rounded-xl">
-                <div className="text-3xl font-bold text-green-600 mb-2">10K+</div>
-                <div className="text-gray-600">Happy curstomers</div>
+                <div className="text-3xl font-bold text-green-600 mb-2">{journeyStat2Value}</div>
+                <div className="text-gray-600">{journeyStat2Label}</div>
               </div>
             </div>
           </div>
           <div className="relative">
-            <img
-              src="/new.png"
-              alt="About 100X Circle Pvt Ltd"
-              className="w-full rounded-2xl shadow-2xl"
-            />
+            <img src={journeyImage} alt={heroTitle} className="w-full rounded-2xl shadow-2xl" />
             <div className="absolute -top-6 -left-6 w-24 h-24 bg-green-600 rounded-2xl flex items-center justify-center">
               <Award className="text-white" size={32} />
             </div>
           </div>
         </div>
 
-        {/* Mission, Vision, Values */}
         <div className="mb-20">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Foundation</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The principles that guide our work and define our commitment to excellence.
-            </p>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">{foundationHeading}</h2>
+            {foundationSubtext && <p className="text-xl text-gray-600 max-w-3xl mx-auto">{foundationSubtext}</p>}
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {values.map((value, index) => (
@@ -1784,53 +1802,28 @@ function AboutPage({ setCurrentPage }: { setCurrentPage: (page: string) => void 
           </div>
         </div>
 
-        {/* Manufacturing Excellence */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Manufacturing Excellence</h2>
-              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                Our state-of-the-art manufacturing facility combines traditional craftsmanship with modern technology to
-                produce equipment of the highest quality. Every product undergoes rigorous testing to
-                ensure durability and performance in real field conditions.
-              </p>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">{manufacturingHeading}</h2>
+              {manufacturingParagraph && <p className="text-lg text-gray-600 mb-6 leading-relaxed">{manufacturingParagraph}</p>}
               <div className="grid grid-cols-2 gap-6">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">ISO</div>
-                  <div className="text-sm text-gray-600">Certified</div>
-                </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600 mb-1">99.5%</div>
-                  <div className="text-sm text-gray-600">Quality Rate</div>
-                </div>
-                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600 mb-1">24/7</div>
-                  <div className="text-sm text-gray-600">Production</div>
-                </div>
-                <div className="text-center p-4 bg-orange-50 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600 mb-1">50+</div>
-                  <div className="text-sm text-gray-600">Products</div>
-                </div>
+                {manufacturingStats.map((stat, i) => (
+                  <div key={i} className={`text-center p-4 rounded-lg ${stat.bg}`}>
+                    <div className={`text-2xl font-bold ${stat.text} mb-1`}>{stat.value}</div>
+                    <div className="text-sm text-gray-600">{stat.label}</div>
+                  </div>
+                ))}
               </div>
             </div>
             <div>
-              <img
-                src="/production.png"
-                alt="Manufacturing facility"
-                className="w-full rounded-xl shadow-lg"
-              />
+              <img src={manufacturingImage} alt="Manufacturing facility" className="w-full rounded-xl shadow-lg" />
             </div>
           </div>
         </div>
 
-        {/* Back to Home */}
         <div className="text-center">
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={() => setCurrentPage("home")}
-            className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent"
-          >
+          <Button size="lg" variant="outline" onClick={() => setCurrentPage("home")} className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent">
             <ChevronLeft className="mr-2" size={20} />
             Back to Home
           </Button>
