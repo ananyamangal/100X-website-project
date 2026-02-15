@@ -264,6 +264,7 @@ export default function HomePage() {
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [bannersLoading, setBannersLoading] = useState(true)
   const [aboutPageContent, setAboutPageContent] = useState<Record<string, string> | null>(null)
+  const [mainBrochureUrl, setMainBrochureUrl] = useState<string | null>(null)
   const bannerTouchStartX = useRef<number | null>(null)
 
   const changingPhrases = [
@@ -382,6 +383,14 @@ export default function HomePage() {
       .then((res) => res.json())
       .then((data) => setAboutPageContent(data))
       .catch(() => setAboutPageContent(null))
+  }, [])
+
+  // Fetch main website brochure URL (used for "Complete Product Catalog" in header)
+  useEffect(() => {
+    fetch("/api/brochure")
+      .then((res) => res.json())
+      .then((data) => setMainBrochureUrl(data?.mainBrochureUrl ?? null))
+      .catch(() => setMainBrochureUrl(null))
   }, [])
 
   // Fetch customers from API
@@ -1188,7 +1197,7 @@ export default function HomePage() {
               </button>
               <Button
                 className="bg-green-600 hover:bg-green-700"
-                onClick={() => handleBrochureDownload("Complete Product Catalog")}
+                onClick={() => handleBrochureDownload("Complete Product Catalog", mainBrochureUrl ?? undefined)}
               >
                 <Download size={16} className="mr-2" />
                 Brochure

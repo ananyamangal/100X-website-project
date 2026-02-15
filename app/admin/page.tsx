@@ -23,6 +23,7 @@ import {
   CheckCircle,
   Award,
   Video,
+  Download,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -968,6 +969,17 @@ function AdminDashboardContent() {
                 <Video className="mr-3" size={20} />
                 Video Popup
               </button>
+              <button
+                onClick={() => setActiveTab("brochure")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "brochure"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Download className="mr-3" size={20} />
+                Brochure
+              </button>
             </nav>
           </div>
 
@@ -1058,6 +1070,7 @@ function AdminDashboardContent() {
             )}
             {activeTab === "aboutUs" && <AboutUsTab />}
             {activeTab === "videoPopup" && <VideoPopupTab />}
+            {activeTab === "brochure" && <BrochureTab />}
           </div>
         </div>
       </div>
@@ -1680,33 +1693,50 @@ function ProductForm({
             )}
           </div>
 
-          <div>
+          <div className="p-4 rounded-lg border-2 border-dashed border-green-200 bg-green-50/50">
             <label className="block text-sm font-medium text-gray-700 mb-2">Product Brochure (PDF)</label>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={async (e) => {
-                if (e.target.files && e.target.files[0]) {
-                  setUploadingBrochure(true);
-                  const file = e.target.files[0];
-                  const formDataCloud = new FormData();
-                  formDataCloud.append("file", file);
-                  formDataCloud.append("upload_preset", "product_uploads");
-                  const res = await fetch(
-                    "https://api.cloudinary.com/v1_1/dhbvzugv6/raw/upload",
-                    {
-                      method: "POST",
-                      body: formDataCloud,
+            <p className="text-xs text-gray-500 mb-3">Optional. Upload a PDF brochure for this product. Visitors can download it from the product card or product detail page.</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="cursor-pointer">
+                <span className="inline-flex items-center px-3 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-medium">
+                  {uploadingBrochure ? "Uploading…" : "Choose PDF file"}
+                </span>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={async (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setUploadingBrochure(true);
+                      const file = e.target.files[0];
+                      const formDataCloud = new FormData();
+                      formDataCloud.append("file", file);
+                      formDataCloud.append("upload_preset", "product_uploads");
+                      const res = await fetch(
+                        "https://api.cloudinary.com/v1_1/dhbvzugv6/raw/upload",
+                        { method: "POST", body: formDataCloud }
+                      );
+                      const data = await res.json();
+                      setFormData(prev => ({ ...prev, brochureUrl: data.secure_url || prev.brochureUrl }));
+                      setUploadingBrochure(false);
                     }
-                  );
-                  const data = await res.json();
-                  setFormData(prev => ({ ...prev, brochureUrl: data.secure_url }));
-                  setUploadingBrochure(false);
-                }
-              }}
-            />
-            {uploadingBrochure && <span>Uploading brochure...</span>}
-            {formData.brochureUrl && <a href={formData.brochureUrl} target="_blank" rel="noopener noreferrer">View Brochure</a>}
+                  }}
+                  className="hidden"
+                  disabled={uploadingBrochure}
+                />
+              </label>
+              {formData.brochureUrl && (
+                <>
+                  <a href={formData.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline text-sm">View Brochure</a>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, brochureUrl: "" }))}
+                    className="text-sm text-gray-500 hover:text-red-600"
+                  >
+                    Remove
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
           <div>
@@ -3535,6 +3565,134 @@ function AboutUsTab() {
         {message && <p className={message.type === "success" ? "text-green-600" : "text-red-600"}>{message.text}</p>}
         <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={saving}>{saving ? "Saving…" : "Save About Us Page"}</Button>
       </form>
+    </div>
+  )
+}
+
+// Brochure Tab Component – main website brochure (e.g. "Complete Product Catalog") + note about product brochures
+function BrochureTab() {
+  const [mainBrochureUrl, setMainBrochureUrl] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+
+  useEffect(() => {
+    fetch("/api/admin/brochure")
+      .then((res) => res.json())
+      .then((data) => setMainBrochureUrl(data?.mainBrochureUrl || ""))
+      .catch(() => setMainBrochureUrl(""))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || file.type !== "application/pdf") {
+      setMessage({ type: "error", text: "Please select a PDF file." })
+      return
+    }
+    setUploading(true)
+    setMessage(null)
+    try {
+      const formDataCloud = new FormData()
+      formDataCloud.append("file", file)
+      formDataCloud.append("upload_preset", "product_uploads")
+      const res = await fetch("https://api.cloudinary.com/v1_1/dhbvzugv6/raw/upload", {
+        method: "POST",
+        body: formDataCloud,
+      })
+      const data = await res.json()
+      if (data.secure_url) {
+        setMainBrochureUrl(data.secure_url)
+        setMessage({ type: "success", text: "PDF uploaded. Click Save to use it as the main website brochure." })
+      } else {
+        setMessage({ type: "error", text: "Upload failed. Check Cloudinary preset allows raw/PDF uploads." })
+      }
+    } catch {
+      setMessage({ type: "error", text: "Upload failed." })
+    } finally {
+      setUploading(false)
+      e.target.value = ""
+    }
+  }
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+    setMessage(null)
+    try {
+      const res = await fetch("/api/admin/brochure", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mainBrochureUrl: mainBrochureUrl.trim() }),
+      })
+      if (res.ok) {
+        setMessage({ type: "success", text: "Main website brochure saved. It will be used when visitors click the header \"Brochure\" (Complete Product Catalog)." })
+      } else {
+        setMessage({ type: "error", text: "Failed to save." })
+      }
+    } catch {
+      setMessage({ type: "error", text: "Failed to save." })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return <div className="text-gray-500">Loading…</div>
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Brochure</h2>
+        <p className="text-gray-600">
+          Upload the <strong>main website brochure</strong> (e.g. Complete Product Catalog PDF). This is used when visitors click the &quot;Brochure&quot; button in the header. For <strong>per-product brochures</strong>, go to <strong>Products</strong> → Edit a product and use the &quot;Product Brochure (PDF)&quot; section there.
+        </p>
+      </div>
+      <Card>
+        <CardContent className="p-6">
+          <form onSubmit={handleSave} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Main website brochure (PDF)</label>
+              <div className="flex flex-wrap items-center gap-4">
+                <label className="cursor-pointer">
+                  <span className="inline-flex items-center px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-medium">
+                    {uploading ? "Uploading…" : "Choose PDF file"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={handleFileChange}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                </label>
+                {mainBrochureUrl && (
+                  <>
+                    <a href={mainBrochureUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline text-sm">
+                      View current brochure
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setMainBrochureUrl("")}
+                      className="text-sm text-gray-500 hover:text-red-600"
+                    >
+                      Clear
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+            {message && (
+              <p className={message.type === "success" ? "text-green-600" : "text-red-600"}>{message.text}</p>
+            )}
+            <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={saving}>
+              {saving ? "Saving…" : "Save"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }
