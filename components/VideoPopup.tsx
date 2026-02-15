@@ -11,6 +11,7 @@ function getYouTubeId(url: string): string | null {
 
 export default function VideoPopup() {
   const [youtubeUrl, setYoutubeUrl] = useState<string | null>(null)
+  const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait")
   const [closed, setClosed] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -20,8 +21,12 @@ export default function VideoPopup() {
       .then((data) => {
         const u = data?.youtubeUrl
         setYoutubeUrl(u && String(u).trim() ? String(u).trim() : null)
+        setOrientation(data?.orientation === "landscape" ? "landscape" : "portrait")
       })
-      .catch(() => setYoutubeUrl(null))
+      .catch(() => {
+        setYoutubeUrl(null)
+        setOrientation("portrait")
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -29,6 +34,7 @@ export default function VideoPopup() {
   if (loading || !videoId || closed) return null
 
   const embed = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}`
+  const isPortrait = orientation === "portrait"
 
   return (
     <div
@@ -42,8 +48,12 @@ export default function VideoPopup() {
       >
         <X size={18} />
       </button>
-      <div className="w-[280px] sm:w-[320px] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black">
-        <div className="aspect-video w-full relative">
+      <div
+        className={`overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black ${
+          isPortrait ? "w-[200px] sm:w-[220px]" : "w-[280px] sm:w-[320px]"
+        }`}
+      >
+        <div className={`w-full relative ${isPortrait ? "aspect-[9/16]" : "aspect-video"}`}>
           <iframe
             src={embed}
             title="Video"

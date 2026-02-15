@@ -3542,6 +3542,7 @@ function AboutUsTab() {
 // Video Popup Tab Component
 function VideoPopupTab() {
   const [youtubeUrl, setYoutubeUrl] = useState("")
+  const [portrait, setPortrait] = useState(true)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
@@ -3549,8 +3550,14 @@ function VideoPopupTab() {
   useEffect(() => {
     fetch("/api/video-popup")
       .then((res) => res.json())
-      .then((data) => setYoutubeUrl(data?.youtubeUrl || ""))
-      .catch(() => setYoutubeUrl(""))
+      .then((data) => {
+        setYoutubeUrl(data?.youtubeUrl || "")
+        setPortrait(data?.orientation !== "landscape")
+      })
+      .catch(() => {
+        setYoutubeUrl("")
+        setPortrait(true)
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -3563,10 +3570,13 @@ function VideoPopupTab() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ youtubeUrl: youtubeUrl.trim() }),
+        body: JSON.stringify({
+          youtubeUrl: youtubeUrl.trim(),
+          orientation: portrait ? "portrait" : "landscape",
+        }),
       })
       if (res.ok) {
-        setMessage({ type: "success", text: "Video popup URL saved. It will appear in the bottom-right (above WhatsApp) for visitors." })
+        setMessage({ type: "success", text: "Video popup saved. It will appear in the bottom-right (above WhatsApp) for visitors." })
       } else {
         setMessage({ type: "error", text: "Failed to save" })
       }
@@ -3586,7 +3596,7 @@ function VideoPopupTab() {
       <div>
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Video Popup</h2>
         <p className="text-gray-600">
-          Set a YouTube link for the small portrait video that plays muted in the bottom-right corner when visitors land on the site (above the WhatsApp button). Leave empty to hide it.
+          Set a YouTube link for the small video that plays muted in the bottom-right corner when visitors land on the site (above the WhatsApp button). Leave empty to hide it.
         </p>
       </div>
       <Card>
@@ -3601,6 +3611,18 @@ function VideoPopupTab() {
                 onChange={(e) => setYoutubeUrl(e.target.value)}
                 className="w-full max-w-xl"
               />
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="video-popup-portrait"
+                checked={portrait}
+                onChange={(e) => setPortrait(e.target.checked)}
+                className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+              />
+              <label htmlFor="video-popup-portrait" className="text-sm font-medium text-gray-700">
+                Portrait (vertical video, e.g. Shorts). Uncheck for landscape.
+              </label>
             </div>
             {message && (
               <p className={message.type === "success" ? "text-green-600" : "text-red-600"}>{message.text}</p>
