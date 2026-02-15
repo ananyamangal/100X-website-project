@@ -98,25 +98,24 @@ const badgeLogoMap: Record<string, string> = {
 function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
   if (accreditations.length === 0) return null;
 
-  const logosPerView = 4;
+  const n = accreditations.length;
   const extendedAccreditations = [...accreditations, ...accreditations];
+  const itemWidthPercent = 100 / n;
 
   return (
     <section className="py-12 bg-gray-50 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="relative overflow-hidden">
-          <div 
-            className="flex animate-logo-marquee"
-          >
+          <div className="flex animate-logo-marquee">
             {extendedAccreditations.map((accreditation, index) => (
               <div
-                key={index}
+                key={`acc-${index}-${(accreditation as any)._id ?? accreditation.logo ?? index}`}
                 className="flex-shrink-0 px-4"
-                style={{ width: `${100 / logosPerView}%` }}
+                style={{ width: `${itemWidthPercent}%` }}
               >
                 <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
                   <img
-                    src={accreditation.logo}
+                    src={accreditation.logo || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Crect fill="%23e5e7eb" width="80" height="80" rx="8"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%239ca3af" font-size="10"%3ELogo%3C/text%3E%3C/svg%3E'}
                     alt="Accreditation"
                     className="max-w-full max-h-full object-contain"
                   />
@@ -133,21 +132,24 @@ function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
 function OurCustomersScroll({ customers }: { customers: any[] }) {
   if (customers.length === 0) return null;
 
-  const logosPerView = 4;
+  const n = customers.length;
   const extendedCustomers = [...customers, ...customers];
+  const itemWidthPercent = 100 / n;
 
   return (
     <section className="py-12 bg-gray-50 overflow-hidden">
       <div className="container mx-auto px-4">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-8">OUR CUSTOMERS</h2>
         <div className="relative overflow-hidden">
-          <div
-            className="flex animate-logo-marquee"
-          >
+          <div className="flex animate-logo-marquee">
             {extendedCustomers.map((c, i) => (
-              <div key={i} className="flex-shrink-0 px-4" style={{ width: `${100 / logosPerView}%` }}>
+              <div key={`cust-${i}-${c._id ?? c.logo ?? i}`} className="flex-shrink-0 px-4" style={{ width: `${itemWidthPercent}%` }}>
                 <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
-                  <img src={c.logo} alt="Customer" className="max-w-full max-h-full object-contain" />
+                  <img
+                    src={c.logo || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Crect fill="%23e5e7eb" width="80" height="80" rx="8"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%239ca3af" font-size="10"%3ELogo%3C/text%3E%3C/svg%3E'}
+                    alt="Customer"
+                    className="max-w-full max-h-full object-contain"
+                  />
                 </div>
               </div>
             ))}
