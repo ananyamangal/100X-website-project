@@ -95,6 +95,9 @@ const badgeLogoMap: Record<string, string> = {
   'BIS Approved': '/Logos clipart 2/BIS approved.png',
 };
 
+const LOGO_PLACEHOLDER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect fill='%23e5e7eb' width='80' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='10'%3ELogo%3C/text%3E%3C/svg%3E";
+
 function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
   if (accreditations.length === 0) return null;
 
@@ -113,11 +116,14 @@ function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
                 className="flex-shrink-0 px-3 md:px-4"
                 style={{ width: `${itemWidthPercent}%` }}
               >
-                <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow min-h-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={accreditation.logo || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Crect fill="%23e5e7eb" width="80" height="80" rx="8"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%239ca3af" font-size="10"%3ELogo%3C/text%3E%3C/svg%3E'}
+                    src={accreditation.logo || LOGO_PLACEHOLDER}
                     alt="Accreditation"
-                    className="max-w-full max-h-full object-contain w-16 h-16 md:w-auto md:h-auto"
+                    className="object-contain max-w-full max-h-full min-h-0 min-w-0 w-full h-full"
+                    loading="eager"
+                    onError={(e) => { e.currentTarget.src = LOGO_PLACEHOLDER }}
                   />
                 </div>
               </div>
@@ -144,11 +150,14 @@ function OurCustomersScroll({ customers }: { customers: any[] }) {
           <div className="flex animate-logo-marquee">
             {extendedCustomers.map((c, i) => (
               <div key={`cust-${i}-${c._id ?? c.logo ?? i}`} className="flex-shrink-0 px-3 md:px-4" style={{ width: `${itemWidthPercent}%` }}>
-                <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="bg-white rounded-lg p-3 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow min-h-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={c.logo || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Crect fill="%23e5e7eb" width="80" height="80" rx="8"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%239ca3af" font-size="10"%3ELogo%3C/text%3E%3C/svg%3E'}
+                    src={c.logo || LOGO_PLACEHOLDER}
                     alt="Customer"
-                    className="max-w-full max-h-full object-contain w-16 h-16 md:w-auto md:h-auto"
+                    className="object-contain max-w-full max-h-full min-h-0 min-w-0 w-full h-full"
+                    loading="eager"
+                    onError={(e) => { e.currentTarget.src = LOGO_PLACEHOLDER }}
                   />
                 </div>
               </div>
