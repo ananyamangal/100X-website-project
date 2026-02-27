@@ -1,6 +1,7 @@
 export interface BlogPost {
   _id?: string;
   id?: string;
+  order?: number; // Display order (lower numbers appear first)
   title: string;
   excerpt: string;
   content: string;
@@ -15,6 +16,7 @@ export interface BlogPost {
 }
 
 export interface BlogInput {
+  order?: number;
   title: string;
   excerpt: string;
   content: string;

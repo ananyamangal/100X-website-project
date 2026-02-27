@@ -501,7 +501,12 @@ export default function HomePage() {
   const displayBlogPosts = blogPosts.length > 0 ? 
     blogPosts
       .filter(b => b.isPublished) // Only show published blogs
-      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      .sort((a, b) => {
+        const orderA = a.order !== undefined ? a.order : Infinity
+        const orderB = b.order !== undefined ? b.order : Infinity
+        if (orderA !== orderB) return orderA - orderB
+        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      })
     : defaultBlogPosts
 
   const stats = [

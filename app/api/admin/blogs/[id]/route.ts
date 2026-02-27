@@ -3,6 +3,7 @@ import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
 interface BlogUpdate {
+  order?: number;
   title?: string;
   excerpt?: string;
   content?: string;
@@ -23,9 +24,18 @@ export async function PUT(
     const db = client.db();
     const updateData: BlogUpdate = await request.json();
     
-    const updatedBlog = {
-      ...updateData,
-      updatedAt: new Date()
+    const updatedAt = new Date();
+    const updatedBlog: BlogUpdate & { updatedAt: Date } = {
+      ...(typeof updateData.title === 'string' ? { title: updateData.title } : {}),
+      ...(typeof updateData.excerpt === 'string' ? { excerpt: updateData.excerpt } : {}),
+      ...(typeof updateData.content === 'string' ? { content: updateData.content } : {}),
+      ...(typeof updateData.topImage === 'string' ? { topImage: updateData.topImage } : {}),
+      ...(Array.isArray(updateData.inlineImages) ? { inlineImages: updateData.inlineImages } : {}),
+      ...(typeof updateData.category === 'string' ? { category: updateData.category } : {}),
+      ...(typeof updateData.author === 'string' ? { author: updateData.author } : {}),
+      ...(typeof updateData.isPublished === 'boolean' ? { isPublished: updateData.isPublished } : {}),
+      ...(typeof updateData.order === 'number' ? { order: updateData.order } : {}),
+      updatedAt,
     };
     
     const result = await db.collection('blogs').updateOne(
@@ -37,7 +47,8 @@ export async function PUT(
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
     
-    return NextResponse.json({ success: true });
+    const blog = await db.collection('blogs').findOne({ _id: new ObjectId(params.id) });
+    return NextResponse.json(blog);
   } catch (error) {
     console.error('Error updating blog:', error);
     return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 });

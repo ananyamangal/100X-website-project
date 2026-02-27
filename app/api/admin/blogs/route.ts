@@ -7,9 +7,18 @@ export async function GET() {
   try {
     const client = await clientPromise;
     const db = client.db();
-    const blogs = await db.collection('blogs')
-      .find({})
-      .sort({ publishedAt: -1 })
+    const blogs = await db
+      .collection('blogs')
+      .aggregate([
+        { $match: {} },
+        {
+          $addFields: {
+            orderSort: { $ifNull: ['$order', Number.MAX_SAFE_INTEGER] },
+          },
+        },
+        { $sort: { orderSort: 1, publishedAt: -1 } },
+        { $project: { orderSort: 0 } },
+      ])
       .toArray();
     
     return NextResponse.json(blogs);
@@ -27,13 +36,19 @@ export async function POST(request: NextRequest) {
     const blogData: BlogInput = await request.json();
     
     // Set default values
-    const newBlog = {
+    const newBlog: any = {
       ...blogData,
       inlineImages: blogData.inlineImages || [], // Ensure inlineImages is an array
       publishedAt: new Date().toISOString(),
       createdAt: new Date(),
       updatedAt: new Date()
     };
+
+    if (typeof blogData.order === 'number') {
+      newBlog.order = blogData.order;
+    } else {
+      delete newBlog.order;
+    }
     
     const result = await db.collection('blogs').insertOne(newBlog);
     

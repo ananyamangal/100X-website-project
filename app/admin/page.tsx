@@ -95,6 +95,7 @@ interface Customer {
 interface BlogPost {
   _id?: string;
   id?: string;
+  order?: number; // Display order (lower numbers appear first)
   title: string;
   excerpt: string;
   content: string;
@@ -2234,7 +2235,12 @@ function BlogsTab({
 
       <div className="grid gap-6">
         {blogs
-          .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+          .sort((a, b) => {
+            const orderA = a.order !== undefined ? a.order : Number.POSITIVE_INFINITY
+            const orderB = b.order !== undefined ? b.order : Number.POSITIVE_INFINITY
+            if (orderA !== orderB) return orderA - orderB
+            return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+          })
           .map((blog) => (
             <Card key={blog.id} className="overflow-hidden">
               <CardContent className="p-0">
@@ -2278,6 +2284,9 @@ function BlogsTab({
                       </div>
                       <p className="text-gray-600 mb-2 line-clamp-2">{blog.excerpt}</p>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <span>
+                          Order: {blog.order !== undefined ? blog.order : "—"}
+                        </span>
                         <span>Category: {blog.category}</span>
                         <span>Author: {blog.author}</span>
                         <span>Published: {new Date(blog.publishedAt).toLocaleDateString()}</span>
@@ -2511,6 +2520,7 @@ function BlogForm({
   onCancel: () => void
 }) {
   const [formData, setFormData] = useState({
+    order: blog?.order ?? undefined,
     title: blog?.title || "",
     excerpt: blog?.excerpt || "",
     content: blog?.content || "",
@@ -2541,7 +2551,22 @@ function BlogForm({
     <Card>
       <CardContent className="p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Blog Order (Number)</label>
+              <Input
+                type="number"
+                value={formData.order ?? ""}
+                onChange={(e) => {
+                  const raw = e.target.value
+                  const num = raw === "" ? undefined : Number(raw)
+                  setFormData({ ...formData, order: Number.isFinite(num) ? num : undefined })
+                }}
+                placeholder="e.g., 1"
+                min={0}
+              />
+              <p className="text-xs text-gray-500 mt-1">Lower numbers show first (1, then 3, then 4)</p>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Blog Title</label>
               <Input
