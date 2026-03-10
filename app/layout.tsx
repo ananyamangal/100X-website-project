@@ -33,6 +33,7 @@ export default function RootLayout({
       <head>
         <meta name="robots" content="INDEX, FOLLOW" />
         <meta name="google-site-verification" content="7yMHOjyWo4oTSZpe1JQP0P7CR1t0dxuHSVufT6u065A" />
+        <link rel="icon" href="/logo-main.png" sizes="48x48" />
       </head>
       <body>
         <GemPopup />
