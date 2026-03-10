@@ -146,7 +146,7 @@ function OurCustomersScroll({ customers }: { customers: any[] }) {
   return (
     <section className="py-6 md:py-12 bg-gray-50 overflow-hidden">
       <div className="container mx-auto px-2 md:px-4">
-        <h2 className="text-xl md:text-3xl font-bold text-gray-800 text-center mb-4 md:mb-8">OUR CUSTOMERS</h2>
+        <p className="text-xl md:text-3xl font-bold text-gray-800 text-center mb-4 md:mb-8">OUR CUSTOMERS</p>
         <div className="relative overflow-hidden">
           <div className="flex animate-logo-marquee">
             {extendedCustomers.map((c, i) => (
@@ -193,9 +193,15 @@ function YoutubeShortsCarousel() {
           <Badge className="mb-6 bg-red-100 text-red-800 hover:bg-red-200 text-lg px-6 py-2">
             YouTube Shorts
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Product Demo and Videos</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Watch our latest product demos, tips, and more on YouTube Shorts!
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Fogging Machine Supplier - Watch Real Product Demos</h2>
+          <p className="text-xl text-gray-600 max-w-5xl mx-auto">
+            As a trusted fogging machine supplier, 100x shares real product demo videos to help you understand machine performance before buying.
+          </p>
+          <p className="text-xl text-gray-600 max-w-5xl mx-auto">
+            Watch our latest demos, working guides, and quick tips to see fog output, coverage area, and ease of use in real conditions. Our videos showcase thermal and pulse jet fogging machines used for mosquito control, public health, and commercial pest management across India.
+          </p>
+          <p className="text-xl text-gray-600 max-w-5xl mx-auto">
+            Explore our YouTube Shorts to stay updated and choose the right fogging machine with confidence.
           </p>
         </div>
         <div className="relative">
@@ -289,13 +295,13 @@ export default function HomePage() {
       .then(data => {
         const normalized = Array.isArray(data)
           ? data.map((p: any) => ({
-              ...p,
-              imageUrls: Array.isArray(p.imageUrls)
-                ? p.imageUrls
-                : p.imageUrl
-                  ? [p.imageUrl]
-                  : [],
-            }))
+            ...p,
+            imageUrls: Array.isArray(p.imageUrls)
+              ? p.imageUrls
+              : p.imageUrl
+                ? [p.imageUrl]
+                : [],
+          }))
           : [];
         // Sort by order (lower numbers first), then by creation date
         normalized.sort((a: any, b: any) => {
@@ -311,13 +317,13 @@ export default function HomePage() {
   // Fetch banners from API
   useEffect(() => {
     setBannersLoading(true);
-    
+
     // Add timeout to prevent hanging
     const timeoutId = setTimeout(() => {
       setBannersLoading(false);
       console.warn('Banner fetch timeout - using fallback');
     }, 3000); // 3 second timeout
-    
+
     fetch("/api/admin/banners")
       .then(res => {
         if (!res.ok) {
@@ -498,7 +504,7 @@ export default function HomePage() {
   ]
 
   // Use blogs from API or fallback to default
-  const displayBlogPosts = blogPosts.length > 0 ? 
+  const displayBlogPosts = blogPosts.length > 0 ?
     blogPosts
       .filter(b => b.isPublished) // Only show published blogs
       .sort((a, b) => {
@@ -514,7 +520,7 @@ export default function HomePage() {
     { number: "500+", label: "products", icon: Package },
     { number: "50+", label: "distributors", icon: BarChart3 },
     { number: "10+", label: "Years Industry Experience", icon: Award },
-    
+
   ]
 
   const businessEmail = "100xcircle@gmail.com"
@@ -586,8 +592,8 @@ export default function HomePage() {
             setSelectedBlog={setSelectedBlog}
           />
         ) : (
-          <BlogPage 
-            blogPosts={displayBlogPosts} 
+          <BlogPage
+            blogPosts={displayBlogPosts}
             setCurrentPage={setCurrentPage}
             setSelectedBlog={setSelectedBlog}
           />
@@ -618,92 +624,12 @@ export default function HomePage() {
     const currentSlideData = heroSlides.length > 0 ? heroSlides[safeCurrentSlide] : null;
 
     return (
-    <>
-      {/* Hero Section with Image Slider */}
-      <section id="home" className="pt-32 relative overflow-hidden">
-        {/* Banner Images - Desktop View (swipeable on touch devices, arrows always) */}
-        <div className="hidden md:block min-h-screen relative">
-          <div
-            className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing"
-            onTouchStart={(e) => { bannerTouchStartX.current = e.touches[0].clientX }}
-            onTouchEnd={(e) => {
-              const start = bannerTouchStartX.current;
-              if (start == null) return;
-              bannerTouchStartX.current = null;
-              const end = e.changedTouches[0].clientX;
-              const diff = start - end;
-              if (heroSlides.length <= 1) return;
-              if (diff > 50) setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-              else if (diff < -50) setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-            }}
-          >
-            <img
-              src={bannersLoading ? "/banner.jpeg" : (currentSlideData?.image || "/banner.jpeg")}
-              alt="Agricultural equipment"
-              className="w-full h-full object-cover transition-all duration-1000 pointer-events-none select-none"
-              draggable={false}
-            />
-            {/* Very subtle overlay for text readability while maintaining brightness */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-transparent pointer-events-none"></div>
-          </div>
+      <>
 
-          <div className="relative z-10 container mx-auto px-4 flex items-center min-h-screen">
-            <div className="grid md:grid-cols-2 gap-8 items-center w-full">
-              {/* Text Content - Left Side */}
-              <div className="text-white text-center md:text-left">
-                <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
-                  Certified Professional Products 
-                </Badge>
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
-                  100X – <span className="text-green-400">Built</span> with Technology
-                </h1>
-                <div className="text-xl md:text-2xl lg:text-3xl font-bold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
-                  {changingPhrases[phraseIndex]}
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center md:justify-start mb-8">
-                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
-                    <Link href="#products" className="flex items-center">
-                      Explore Products <ArrowRight className="ml-2" size={20} />
-                    </Link>
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-lg px-8 py-4 bg-transparent"
-                    onClick={() =>
-                      window.open(
-                        "https://www.youtube.com/@100Xcircle",
-                        "_blank",
-                      )
-                    }
-                  >
-                    <Play className="mr-2" size={20} />
-                    Watch Demo
-                  </Button>
-                </div>
-
-                {/* Stats Section - Left Side Only */}
-                <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-md mx-auto md:mx-0">
-                  {stats.map((stat, index) => (
-                    <div key={index} className="text-center md:text-left">
-                      <div className="text-3xl font-bold text-green-400 mb-2">{stat.number}</div>
-                      <div className="text-sm text-gray-300">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Empty Right Side on Desktop */}
-              <div className="hidden md:block">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile View - Banner First, Then Content */}
-        <div className="md:hidden">
-          {/* Banner Images - Mobile View (swipeable) */}
-          <div className="relative h-80">
+        {/* Hero Section with Image Slider */}
+        <section id="home" className="pt-32 relative overflow-hidden">
+          {/* Banner Images - Desktop View (swipeable on touch devices, arrows always) */}
+          <div className="hidden md:block min-h-screen relative">
             <div
               className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing"
               onTouchStart={(e) => { bannerTouchStartX.current = e.touches[0].clientX }}
@@ -724,12 +650,168 @@ export default function HomePage() {
                 className="w-full h-full object-cover transition-all duration-1000 pointer-events-none select-none"
                 draggable={false}
               />
-              {/* No overlay for mobile to maintain full brightness */}
+              {/* Very subtle overlay for text readability while maintaining brightness */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-transparent pointer-events-none"></div>
+            </div>
+
+            <div className="relative z-10 container mx-auto px-4 flex items-center min-h-screen">
+              <div className="grid md:grid-cols-2 gap-8 items-center w-full">
+                {/* Text Content - Left Side */}
+                <div className="text-white text-center md:text-left">
+                  <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
+                    Certified Professional Products
+                  </Badge>
+                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+                    100X – <span className="text-green-400">Thermal</span>  Fogging Machine Manufacturer
+                  </h1>
+                  <div className="text-xl md:text-2xl lg:text-3xl font-bold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
+                    {changingPhrases[phraseIndex]}
+                  </div>
+                  <p className="hidden">
+                    100x Circle is a trusted thermal fogging machine manufacturer offering high-performance solutions for effective mosquito and pest control. We design and manufacture durable fogging machines that deliver powerful output, uniform fog distribution, and long-lasting performance for both industrial and residential applications.
+                  </p>
+                  <p className="hidden">
+                    Our thermal fogging machines are built with high-quality components to ensure reliability, fuel efficiency, and easy operation. Whether you need equipment for municipal use, agriculture, mosquito eradication, warehouses, factories, or vector borne disease control programs, we provide machines that meet professional standards and field requirements.
+                  </p>
+                  <p className="hidden">
+                    At 100x, we focus on innovation, safety, and customer satisfaction. We serve clients across India with timely support and dependable products. If you are looking for an advanced thermal fogging machine manufacturer you can trust, connect with us today for expert guidance and the right solution for your needs.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center md:justify-start mb-8">
+                    <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
+                      <Link href="#products" className="flex items-center">
+                        Explore Products <ArrowRight className="ml-2" size={20} />
+                      </Link>
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-lg px-8 py-4 bg-transparent"
+                      onClick={() =>
+                        window.open(
+                          "https://www.youtube.com/@100Xcircle",
+                          "_blank",
+                        )
+                      }
+                    >
+                      <Play className="mr-2" size={20} />
+                      Watch Demo
+                    </Button>
+                  </div>
+
+                  {/* Stats Section - Left Side Only */}
+                  <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-md mx-auto md:mx-0">
+                    {stats.map((stat, index) => (
+                      <div key={index} className="text-center md:text-left">
+                        <div className="text-3xl font-bold text-green-400 mb-2">{stat.number}</div>
+                        <div className="text-sm text-gray-300">{stat.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Empty Right Side on Desktop */}
+                <div className="hidden md:block">
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Slide indicators - Mobile: very small dots below the image */}
-          <div className="flex justify-center items-center gap-2 py-2 bg-gray-100/90">
+          {/* Mobile View - Banner First, Then Content */}
+          <div className="md:hidden">
+            {/* Banner Images - Mobile View (swipeable) */}
+            <div className="relative h-80">
+              <div
+                className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing"
+                onTouchStart={(e) => { bannerTouchStartX.current = e.touches[0].clientX }}
+                onTouchEnd={(e) => {
+                  const start = bannerTouchStartX.current;
+                  if (start == null) return;
+                  bannerTouchStartX.current = null;
+                  const end = e.changedTouches[0].clientX;
+                  const diff = start - end;
+                  if (heroSlides.length <= 1) return;
+                  if (diff > 50) setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+                  else if (diff < -50) setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+                }}
+              >
+                <img
+                  src={bannersLoading ? "/banner.jpeg" : (currentSlideData?.image || "/banner.jpeg")}
+                  alt="Agricultural equipment"
+                  className="w-full h-full object-cover transition-all duration-1000 pointer-events-none select-none"
+                  draggable={false}
+                />
+                {/* No overlay for mobile to maintain full brightness */}
+              </div>
+            </div>
+
+            {/* Slide indicators - Mobile: very small dots below the image */}
+            <div className="flex justify-center items-center gap-2 py-2 bg-gray-100/90">
+              {heroSlides.map((_, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  aria-label={`Go to slide ${index + 1} of ${heroSlides.length}`}
+                  aria-current={index === currentSlide ? "true" : undefined}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`rounded-full transition-colors p-2 ${index === currentSlide ? "bg-green-600" : "bg-gray-400/70"
+                    }`}
+                >
+                  <span className="block w-1.5 h-1.5 min-w-[6px] min-h-[6px] rounded-full bg-inherit" />
+                </button>
+              ))}
+            </div>
+
+            {/* Content Below Banner - Mobile View */}
+            <div className="bg-white py-12">
+              <div className="container mx-auto px-4">
+                <div className="text-center">
+                  <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
+                    Certified Professional Products
+                  </Badge>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-6 leading-tight">
+                    100X – <span className="text-green-600">Thermal</span>  Fogging Machine Manufacturer
+                  </h2>
+                  <div className="text-xl font-bold text-green-600 mb-6 min-h-[2rem] transition-all duration-500">
+                    {changingPhrases[phraseIndex]}
+                  </div>
+                  <div className="flex flex-col gap-4 justify-center mb-8">
+                    <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
+                      <Link href="#products" className="flex items-center justify-center">
+                        Explore Products <ArrowRight className="ml-2" size={20} />
+                      </Link>
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-lg px-8 py-4 bg-transparent"
+                      onClick={() =>
+                        window.open(
+                          "https://www.youtube.com/@100Xcircle",
+                          "_blank",
+                        )
+                      }
+                    >
+                      <Play className="mr-2" size={20} />
+                      Watch Demo
+                    </Button>
+                  </div>
+
+                  {/* Stats Section - Mobile View */}
+                  <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
+                    {stats.map((stat, index) => (
+                      <div key={index} className="text-center">
+                        <div className="text-3xl font-bold text-green-600 mb-2">{stat.number}</div>
+                        <div className="text-sm text-gray-600">{stat.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Slide Indicators - Desktop (click dots to go to slide) */}
+          <div className="hidden md:block absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
             {heroSlides.map((_, index) => (
               <button
                 key={index}
@@ -737,345 +819,289 @@ export default function HomePage() {
                 aria-label={`Go to slide ${index + 1} of ${heroSlides.length}`}
                 aria-current={index === currentSlide ? "true" : undefined}
                 onClick={() => setCurrentSlide(index)}
-                className={`rounded-full transition-colors p-2 ${
-                  index === currentSlide ? "bg-green-600" : "bg-gray-400/70"
-                }`}
-              >
-                <span className="block w-1.5 h-1.5 min-w-[6px] min-h-[6px] rounded-full bg-inherit" />
-              </button>
+                className={`w-4 h-4 rounded-full transition-all hover:scale-110 ${index === currentSlide ? "bg-green-400" : "bg-white/50 hover:bg-white/70"
+                  }`}
+              />
             ))}
           </div>
 
-          {/* Content Below Banner - Mobile View */}
-          <div className="bg-white py-12">
-            <div className="container mx-auto px-4">
-              <div className="text-center">
-                <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
-                  Certified Professional Products 
-                </Badge>
-                <h1 className="text-3xl font-bold text-gray-800 mb-6 leading-tight">
-                  100X – <span className="text-green-600">Built</span> with Technology
-                </h1>
-                <div className="text-xl font-bold text-green-600 mb-6 min-h-[2rem] transition-all duration-500">
-                  {changingPhrases[phraseIndex]}
-                </div>
-                <div className="flex flex-col gap-4 justify-center mb-8">
-                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
-                    <Link href="#products" className="flex items-center justify-center">
-                      Explore Products <ArrowRight className="ml-2" size={20} />
-                    </Link>
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-lg px-8 py-4 bg-transparent"
-                    onClick={() =>
-                      window.open(
-                        "https://www.youtube.com/@100Xcircle",
-                        "_blank",
-                      )
-                    }
-                  >
-                    <Play className="mr-2" size={20} />
-                    Watch Demo
-                  </Button>
-                </div>
+          {/* Slide Navigation - Desktop (previous/next buttons) */}
+          <button
+            type="button"
+            aria-label="Previous banner"
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
+            className="hidden md:block absolute left-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button
+            type="button"
+            aria-label="Next banner"
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
+            className="hidden md:block absolute right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
+          >
+            <ChevronRight size={24} />
+          </button>
 
-                {/* Stats Section - Mobile View */}
-                <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
-                  {stats.map((stat, index) => (
-                    <div key={index} className="text-center">
-                      <div className="text-3xl font-bold text-green-600 mb-2">{stat.number}</div>
-                      <div className="text-sm text-gray-600">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          {/* Slide Navigation - Mobile (previous/next buttons) */}
+          <button
+            type="button"
+            aria-label="Previous banner"
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
+            className="md:hidden absolute left-4 top-40 transform -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <button
+            type="button"
+            aria-label="Next banner"
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
+            className="md:hidden absolute right-4 top-40 transform -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </section>
+
+        {/* Accreditations Autoscroll Bar - just above Our Products */}
+        <AccreditationsScroll accreditations={accreditations} />
+
+        {/* Products Section */}
+        <section id="products" className="py-24">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-20">
+              <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
+                Our Products
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Buy GeM Approved OEM of Fogging Machines at Best Prices</h2>
+              <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
+                We provide a wide range of high-quality fogging machines designed to meet different industrial and commercial needs across India. At 100x Circle, you can easily <a className="text-blue-500" href="https://www.100xcircle.com/">buy industrial fogging machines online</a> from a complete selection of advanced and reliable products.
+              </p>
+              <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
+                Our range includes thermal fogging machines, giant foggers, and heavy-duty industrial models suitable for mosquito control, pest management, agriculture, warehouses, factories, and public health operations. Each machine is manufactured using durable components and pulse jet engine technology to ensure powerful output, uniform fog dispersion, and long-lasting performance.
+              </p>
+              <p className="text-xl text-gray-600 max-w-5xl mx-auto">
+                We focus on efficiency, easy operation, and strong after-sales support so that our customers receive dependable solutions for every application. Explore our product range and buy industrial fogging machines online with confidence today.
+              </p>
             </div>
-          </div>
-        </div>
 
-        {/* Slide Indicators - Desktop (click dots to go to slide) */}
-        <div className="hidden md:block absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              aria-label={`Go to slide ${index + 1} of ${heroSlides.length}`}
-              aria-current={index === currentSlide ? "true" : undefined}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-4 h-4 rounded-full transition-all hover:scale-110 ${
-                index === currentSlide ? "bg-green-400" : "bg-white/50 hover:bg-white/70"
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Slide Navigation - Desktop (previous/next buttons) */}
-        <button
-          type="button"
-          aria-label="Previous banner"
-          onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-          className="hidden md:block absolute left-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
-        >
-          <ChevronLeft size={24} />
-        </button>
-        <button
-          type="button"
-          aria-label="Next banner"
-          onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-          className="hidden md:block absolute right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
-        >
-          <ChevronRight size={24} />
-        </button>
-
-        {/* Slide Navigation - Mobile (previous/next buttons) */}
-        <button
-          type="button"
-          aria-label="Previous banner"
-          onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-          className="md:hidden absolute left-4 top-40 transform -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <button
-          type="button"
-          aria-label="Next banner"
-          onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-          className="md:hidden absolute right-4 top-40 transform -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
-        >
-          <ChevronRight size={20} />
-        </button>
-      </section>
-
-      {/* Accreditations Autoscroll Bar - just above Our Products */}
-      <AccreditationsScroll accreditations={accreditations} />
-
-      {/* Products Section */}
-      <section id="products" className="py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-20">
-            <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
-              Our Products
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Wide Range of Products</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover our comprehensive range of prodcust designed to boost productivity and efficiency.
-            </p>
-          </div>
-
-          {products.length <= 6 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((product, index) => (
-                <ProductCard
-                  key={product._id || product.id || index}
-                  product={product}
-                  onViewDetails={() => {}}
-                  onBrochureDownload={() => handleBrochureDownload(product.name, product.brochureUrl)}
-                />
-              ))}
-            </div>
-          ) : (
-            <>
+            {products.length <= 6 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {products.slice(0, 6).map((product, index) => (
+                {products.map((product, index) => (
                   <ProductCard
                     key={product._id || product.id || index}
                     product={product}
-                    onViewDetails={() => {}}
+                    onViewDetails={() => { }}
                     onBrochureDownload={() => handleBrochureDownload(product.name, product.brochureUrl)}
                   />
                 ))}
               </div>
-              <div className="flex justify-center mt-8">
-                <Link href="/products">
-                  <Button className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
-                    View All Products
-                  </Button>
-                </Link>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-
-      <YoutubeShortsCarousel />
-
-      {/* Our Customers bar - above Customer Reviews */}
-      <OurCustomersScroll customers={customers} />
-
-      {/* Reviews Carousel Section */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge className="mb-6 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-lg px-6 py-2">
-              Customer Reviews
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">What Our Customers Say</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Hear from real customers about their experience with 100X Circle Pvt Ltd.
-            </p>
-          </div>
-          <ReviewsCarousel />
-        </div>
-      </section>
-
-      {/* Blog Preview Section */}
-      <section className="py-24 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-20">
-            <Badge className="mb-6 bg-purple-100 text-purple-800 hover:bg-purple-200 text-lg px-6 py-2">
-              Latest Blog Posts
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Industry Insights & Tips</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Stay updated with the latest usage techniques, equipment guides, and industry insights
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {displayBlogPosts.slice(0, 3).map((post, index) => (
-            <Card
-              key={post.id || post._id || post.slug || index}
-              className="overflow-hidden hover:shadow-xl transition-all duration-300"
-            >
-                <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
-                
-                
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <Badge variant="secondary">{post.category}</Badge>
-                    <span className="text-sm text-gray-500">{post.readTime}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{post.title}</h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <User size={16} className="text-gray-400" />
-                      <span className="text-sm text-gray-600">{post.author}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Calendar size={16} className="text-gray-400" />
-                      <span className="text-sm text-gray-600">{formatDate(post.date)}</span>
-                    </div>
-                  </div>
-                  <Button
-  className="w-full bg-purple-600 hover:bg-purple-700"
-  onClick={() => {
-    setSelectedBlog(post)
-    setCurrentPage("blog")
-  }}
->
-  Read Full Article <ArrowRight className="ml-2" size={16} />
-</Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-purple-600 text-purple-600 hover:bg-purple-50 bg-transparent"
-              onClick={() => setCurrentPage("blog")}
-            >
-              View All Blog Posts <ArrowRight className="ml-2" size={20} />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Form Section */}
-      <section id="contact" className="py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-20">
-            <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
-              Get In Touch
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Contact Us</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Ready to transform your work? Get in touch with our experts today!
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-8">Contact Information</h3>
-              <div className="space-y-6">
-                <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <Phone className="text-green-600" size={24} />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-800">Phone</div>
-                    <div className="text-gray-600"><a href="tel:+917827229116" className="underline hover:text-green-600" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a></div>
-                    <div className="text-gray-600"><a href="tel:+918178567520" className="underline hover:text-green-600">+91 8178567520</a></div>
-                    <div className="text-sm text-gray-500">Mon-Sat: 9:00 AM - 6:00 PM</div>
-                  </div>
+            ) : (
+              <>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {products.slice(0, 6).map((product, index) => (
+                    <ProductCard
+                      key={product._id || product.id || index}
+                      product={product}
+                      onViewDetails={() => { }}
+                      onBrochureDownload={() => handleBrochureDownload(product.name, product.brochureUrl)}
+                    />
+                  ))}
                 </div>
-
-                <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <Mail className="text-green-600" size={24} />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-800">Business Email</div>
-                    <div className="text-gray-600"><a href="mailto:100xcircle@gmail.com" className="underline hover:text-green-600">100xcircle@gmail.com</a></div>
-                  </div>
+                <div className="flex justify-center mt-8">
+                  <Link href="/products">
+                    <Button className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
+                      View All Products
+                    </Button>
+                  </Link>
                 </div>
+              </>
+            )}
+          </div>
+        </section>
 
-                <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <MapPin className="text-green-600" size={24} />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-800">Address</div>
-                    <div className="text-gray-600">UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana</div>
-                  </div>
-                </div>
-              </div>
+        <YoutubeShortsCarousel />
+
+        {/* Our Customers bar - above Customer Reviews */}
+        <OurCustomersScroll customers={customers} />
+
+        {/* Reviews Carousel Section */}
+        <section className="py-24 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <Badge className="mb-6 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-lg px-6 py-2">
+                Customer Reviews
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Trusted Fogging Machine Supplier – What Our Customers Say</h2>
+              <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
+                As a reliable <a className="text-blue-500" href="https://www.100xcircle.com/">fogging machine supplier</a>, 100X Circle Pvt Ltd values real feedback from customers across India. Our clients share their experiences about product quality, performance, durability, and after-sales support.
+              </p>
+              <p className="text-xl text-gray-600 max-w-5xl mx-auto">
+                From industrial users to municipal projects, customers appreciate our powerful fog output, easy operation, and long-lasting machines. Their reviews reflect our commitment to delivering dependable fogging solutions for effective pest and mosquito control.
+              </p>
+            </div>
+            <ReviewsCarousel />
+          </div>
+        </section>
+
+        {/* Blog Preview Section */}
+        <section className="py-24 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-20">
+              <Badge className="mb-6 bg-purple-100 text-purple-800 hover:bg-purple-200 text-lg px-6 py-2">
+                Latest Blog Posts
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Mosquito Fogging Machine Manufacturer – Industry Insights & Tips</h2>
+              <p className="text-xl text-gray-600 max-w-5xl mx-auto mb-4">
+                As a leading <a className="text-blue-500" href="https://www.100xcircle.com/">mosquito fogging machine manufacturer</a>, 100x Circle shares practical industry insights, usage techniques, and expert guidance to help you get the best performance from your equipment.
+              </p>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Stay updated with the latest fogging methods, maintenance tips, safety practices, and application guides for effective disinfection and pest control. Our insights are designed to help industries, Municipalities, Nagar Nigam, Nagar Palika & Panchayats to improve efficiency, coverage, and long-term machine performance.
+              </p>
             </div>
 
-            {/* Contact Form */}
-            <Card className="border-0 shadow-xl">
-              <CardContent className="p-10">
-                <h3 className="text-3xl font-bold text-gray-800 mb-8">Send us a Message</h3>
-                <form onSubmit={handleContactSubmit} className="space-y-7 text-lg">
-                  <div className="grid grid-cols-2 gap-5">
-                    <Input name="firstName" placeholder="First Name" required className="p-5 text-lg" />
-                    <Input name="lastName" placeholder="Last Name" required className="p-5 text-lg" />
-                  </div>
-                  <Input name="phone" type="tel" placeholder="Phone Number" required className="p-5 text-lg" />
-                  <Input name="email" type="email" placeholder="Email Address" required className="p-5 text-lg" />
-                  <select
-                    name="subject"
-                    className="w-full p-5 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    required
-                  >
-                    <option value="">Select Product Interest</option>
-                    {products.map((product) => (
-                      <option key={product._id || product.id || product.name} value={product.name}>
-                        {product.name}
-                      </option>
-                    ))}
-                    <option value="general">General Inquiry</option>
-                    <option value="support">Technical Support</option>
-                    <option value="dealer">Dealer Partnership</option>
-                  </select>
-                  <Textarea name="message" placeholder="Your Message" rows={6} required className="p-5 text-lg resize-none" />
-                  <Button type="submit" size="lg" className="w-full bg-green-600 hover:bg-green-700 text-xl py-6">
-                    Send Message via WhatsApp <MessageCircle className="ml-2" size={22} />
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {displayBlogPosts.slice(0, 3).map((post, index) => (
+                <Card
+                  key={post.id || post._id || post.slug || index}
+                  className="overflow-hidden hover:shadow-xl transition-all duration-300"
+                >
+                  <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
 
-    </>
-  )
+
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <Badge variant="secondary">{post.category}</Badge>
+                      <span className="text-sm text-gray-500">{post.readTime}</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{post.title}</h3>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <User size={16} className="text-gray-400" />
+                        <span className="text-sm text-gray-600">{post.author}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Calendar size={16} className="text-gray-400" />
+                        <span className="text-sm text-gray-600">{formatDate(post.date)}</span>
+                      </div>
+                    </div>
+                    <Button
+                      className="w-full bg-purple-600 hover:bg-purple-700"
+                      onClick={() => {
+                        setSelectedBlog(post)
+                        setCurrentPage("blog")
+                      }}
+                    >
+                      Read Full Article <ArrowRight className="ml-2" size={16} />
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-purple-600 text-purple-600 hover:bg-purple-50 bg-transparent"
+                onClick={() => setCurrentPage("blog")}
+              >
+                View All Blog Posts <ArrowRight className="ml-2" size={20} />
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Form Section */}
+        <section id="contact" className="py-24">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-20">
+              <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
+                Get In Touch
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Contact Us</h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Ready to transform your work? Get in touch with our experts today!
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-12">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-8">Contact Information</h3>
+                <div className="space-y-6">
+                  <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                      <Phone className="text-green-600" size={24} />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-800">Phone</div>
+                      <div className="text-gray-600"><a href="tel:+917827229116" className="underline hover:text-green-600" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a></div>
+                      <div className="text-gray-600"><a href="tel:+918178567520" className="underline hover:text-green-600">+91 8178567520</a></div>
+                      <div className="text-sm text-gray-500">Mon-Sat: 9:00 AM - 6:00 PM</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                      <Mail className="text-green-600" size={24} />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-800">Business Email</div>
+                      <div className="text-gray-600"><a href="mailto:100xcircle@gmail.com" className="underline hover:text-green-600">100xcircle@gmail.com</a></div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                      <MapPin className="text-green-600" size={24} />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-800">Address</div>
+                      <div className="text-gray-600">UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Form */}
+              <Card className="border-0 shadow-xl">
+                <CardContent className="p-10">
+                  <h3 className="text-3xl font-bold text-gray-800 mb-8">Send us a Message</h3>
+                  <form onSubmit={handleContactSubmit} className="space-y-7 text-lg">
+                    <div className="grid grid-cols-2 gap-5">
+                      <Input name="firstName" placeholder="First Name" required className="p-5 text-lg" />
+                      <Input name="lastName" placeholder="Last Name" required className="p-5 text-lg" />
+                    </div>
+                    <Input name="phone" type="tel" placeholder="Phone Number" required className="p-5 text-lg" />
+                    <Input name="email" type="email" placeholder="Email Address" required className="p-5 text-lg" />
+                    <select
+                      name="subject"
+                      className="w-full p-5 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      required
+                    >
+                      <option value="">Select Product Interest</option>
+                      {products.map((product) => (
+                        <option key={product._id || product.id || product.name} value={product.name}>
+                          {product.name}
+                        </option>
+                      ))}
+                      <option value="general">General Inquiry</option>
+                      <option value="support">Technical Support</option>
+                      <option value="dealer">Dealer Partnership</option>
+                    </select>
+                    <Textarea name="message" placeholder="Your Message" rows={6} required className="p-5 text-lg resize-none" />
+                    <Button type="submit" size="lg" className="w-full bg-green-600 hover:bg-green-700 text-xl py-6">
+                      Send Message via WhatsApp <MessageCircle className="ml-2" size={22} />
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+      </>
+    )
   }
 
   // Helper to scroll to contact section
@@ -1090,373 +1116,370 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>Best thermal & giant fogging machine manufacturer in Delhi, Uttar Pradesh, Bihar, Mumbai, Pune India | Mosquito Fogger | 100x Circle</title>
+        <title>Best Thermal Fogging Machine Manufacturer | 100x Circle</title>
         <meta
           name="description"
           content="Discover 100x Circle – the best thermal & giant fogging machine manufacturer in Delhi, Uttar Pradesh, Bihar, Mumbai, and Pune, India. Our high-performance mosquito foggers ensure superior pest control, durability, and efficiency for industrial and residential use. Connect with us!"
         />
       </Head>
       <div className="min-h-screen bg-white">
-      {/* Brochure Form Modal */}
-      {showBrochureForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Download Brochure</h3>
-              <p className="text-gray-600 mb-6">Please provide your details to download the brochure for:</p>
-              <p className="font-semibold text-green-600 mb-6">{brochureFormData.productName}</p>
-              <form onSubmit={handleBrochureFormSubmit} className="space-y-4">
-                <Input name="name" placeholder="Your Full Name" required className="p-3" />
-                <Input name="phone" type="tel" placeholder="Phone Number" required className="p-3" />
-                <div className="flex gap-3">
-                  <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">
-                    <Download className="mr-2" size={16} />
-                    Download Now
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowBrochureForm(false)}
-                    className="bg-transparent"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Header */}
-      <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-lg z-50 border-b">
-        {/* Top Bar */}
-        <div className="bg-green-600 text-white py-3">
-          <div className="container mx-auto px-4 flex justify-center items-center">
-            <div className="flex flex-wrap items-center gap-6 text-lg font-semibold justify-center">
-              <span className="flex items-center">
-                WhatsApp Us for queries
-              </span>
-              <span className="flex items-center">
-                <MessageCircle size={18} className="mr-2" />
-                <a href="tel:+917827229116" className="underline hover:text-green-200" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a>
-              </span>
-              <span className="flex items-center">
-                <MessageCircle size={18} className="mr-2" />
-                <a href="tel:+918178567520" className="underline hover:text-green-200">+91 8178567520</a>
-              </span>
-            </div>
+        {/* Brochure Form Modal */}
+        {showBrochureForm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Download Brochure</h3>
+                <p className="text-gray-600 mb-6">Please provide your details to download the brochure for:</p>
+                <p className="font-semibold text-green-600 mb-6">{brochureFormData.productName}</p>
+                <form onSubmit={handleBrochureFormSubmit} className="space-y-4">
+                  <Input name="name" placeholder="Your Full Name" required className="p-3" />
+                  <Input name="phone" type="tel" placeholder="Phone Number" required className="p-3" />
+                  <div className="flex gap-3">
+                    <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">
+                      <Download className="mr-2" size={16} />
+                      Download Now
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowBrochureForm(false)}
+                      className="bg-transparent"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
           </div>
-        </div>
+        )}
 
-        <nav className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <button onClick={() => setCurrentPage("home")} className="flex items-center space-x-3">
-              <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
-              <div className="flex flex-col">
-                <span className="text-base md:text-lg text-black font-bold">Circle Pvt Ltd.</span>
+        {/* Header */}
+        <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-lg z-50 border-b">
+          {/* Top Bar */}
+          <div className="bg-green-600 text-white py-3">
+            <div className="container mx-auto px-4 flex justify-center items-center">
+              <div className="flex flex-wrap items-center gap-6 text-lg font-semibold justify-center">
+                <span className="flex items-center">
+                  WhatsApp Us for queries
+                </span>
+                <span className="flex items-center">
+                  <MessageCircle size={18} className="mr-2" />
+                  <a href="tel:+917827229116" className="underline hover:text-green-200" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a>
+                </span>
+                <span className="flex items-center">
+                  <MessageCircle size={18} className="mr-2" />
+                  <a href="tel:+918178567520" className="underline hover:text-green-200">+91 8178567520</a>
+                </span>
               </div>
-            </button>
-
-            {/* Desktop Menu */}
-            <div className="hidden lg:flex items-center space-x-8">
-              <button
-                onClick={() => setCurrentPage("home")}
-                className={`font-semibold transition-colors ${
-                  currentPage === "home" ? "text-green-600" : "text-gray-700 hover:text-green-600"
-                }`}
-              >
-                Home
-              </button>
-              <Link href="/products" className="text-gray-700 hover:text-green-600 transition-colors">
-                Products
-              </Link>
-              <button
-                onClick={() => setCurrentPage("about")}
-                className={`transition-colors ${
-                  currentPage === "about" ? "text-green-600 font-semibold" : "text-gray-700 hover:text-green-600"
-                }`}
-              >
-                About Us
-              </button>
-              <a
-                href="#contact"
-                className="text-gray-700 hover:text-green-600 transition-colors"
-                onClick={e => {
-                  e.preventDefault();
-                  if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
-                    (window as any).gtag_report_conversion();
-                  }
-                  scrollToContact();
-                }}
-              >
-                Contact
-              </a>
-              <button
-                onClick={() => setCurrentPage("blog")}
-                className={`transition-colors ${
-                  currentPage === "blog" ? "text-green-600 font-semibold" : "text-gray-700 hover:text-green-600"
-                }`}
-              >
-                Blog
-              </button>
-              <Button
-                className="bg-green-600 hover:bg-green-700"
-                onClick={() => handleBrochureDownload("Complete Product Catalog", mainBrochureUrl ?? undefined)}
-              >
-                <Download size={16} className="mr-2" />
-                Brochure
-              </Button>
             </div>
-
-            {/* Mobile Menu Button */}
-            <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
           </div>
 
-          {/* Mobile Menu */}
-          {isMenuOpen && (
-            <div className="lg:hidden mt-4 pb-4 border-t">
-              <div className="flex flex-col space-y-4 pt-4">
+          <nav className="container mx-auto px-4 py-4">
+            <div className="flex justify-between items-center">
+              <button onClick={() => setCurrentPage("home")} className="flex items-center space-x-3">
+                <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
+                <div className="flex flex-col">
+                  <span className="text-base md:text-lg text-black font-bold">Circle Pvt Ltd.</span>
+                </div>
+              </button>
+
+              {/* Desktop Menu */}
+              <div className="hidden lg:flex items-center space-x-8">
                 <button
-                  onClick={() => {
-                    setCurrentPage("home")
-                    setIsMenuOpen(false)
-                  }}
-                  className="text-left text-green-600 font-semibold"
+                  onClick={() => setCurrentPage("home")}
+                  className={`font-semibold transition-colors ${currentPage === "home" ? "text-green-600" : "text-gray-700 hover:text-green-600"
+                    }`}
                 >
                   Home
                 </button>
-                <Link href="/products" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/products" className="text-gray-700 hover:text-green-600 transition-colors">
                   Products
                 </Link>
                 <button
-                  onClick={() => {
-                    setCurrentPage("about")
-                    setIsMenuOpen(false)
-                  }}
-                  className="text-left text-gray-700"
+                  onClick={() => setCurrentPage("about")}
+                  className={`transition-colors ${currentPage === "about" ? "text-green-600 font-semibold" : "text-gray-700 hover:text-green-600"
+                    }`}
                 >
                   About Us
                 </button>
-                <Link
+                <a
                   href="#contact"
-                  className="text-gray-700"
+                  className="text-gray-700 hover:text-green-600 transition-colors"
                   onClick={e => {
                     e.preventDefault();
                     if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
                       (window as any).gtag_report_conversion();
                     }
-                    setIsMenuOpen(false);
                     scrollToContact();
                   }}
                 >
                   Contact
-                </Link>
+                </a>
                 <button
-                  onClick={() => {
-                    setCurrentPage("blog")
-                    setIsMenuOpen(false)
-                  }}
-                  className="text-left text-gray-700"
+                  onClick={() => setCurrentPage("blog")}
+                  className={`transition-colors ${currentPage === "blog" ? "text-green-600 font-semibold" : "text-gray-700 hover:text-green-600"
+                    }`}
                 >
                   Blog
                 </button>
+                <Button
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={() => handleBrochureDownload("Complete Product Catalog", mainBrochureUrl ?? undefined)}
+                >
+                  <Download size={16} className="mr-2" />
+                  Brochure
+                </Button>
               </div>
-            </div>
-          )}
-        </nav>
-      </header>
 
-      {/* Main Content */}
-      <main>{renderPage()}</main>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div>
-              <div className="flex items-center space-x-3 mb-6">
-                <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
-                <div>
-                  <h3 className="text-xl font-bold">100X</h3>
-                  <p className="text-green-400 text-sm">Certified professional products</p>
-                </div>
-              </div>
-              <p className="text-gray-400 mb-6">
-                Leading manufacturer of premium products across India.
-              </p>
-              {/* Social Media Links */}
-              <div className="flex space-x-4">
-                <a
-                  href="https://facebook.com/100x"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer"
-                >
-                  <Facebook size={20} />
-                </a>
-                <a
-                  href="https://twitter.com/100x"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-400 transition-colors cursor-pointer"
-                >
-                  <Twitter size={20} />
-                </a>
-                <a
-                  href="https://instagram.com/100x"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors cursor-pointer"
-                >
-                  <Instagram size={20} />
-                </a>
-                <a
-                  href="https://linkedin.com/company/100x"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors cursor-pointer"
-                >
-                  <Linkedin size={20} />
-                </a>
-                <a
-                  href="https://youtube.com/100x"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer"
-                >
-                  <Youtube size={20} />
-                </a>
-              </div>
+              {/* Mobile Menu Button */}
+              <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
 
-            <div>
-              <h4 className="font-semibold mb-6 text-lg">Products</h4>
-              <ul className="space-y-3 text-gray-400">
-              {products.slice(0, 5).map((product, index) => (
-                <li key={product.id || product._id || index}>
-                    <button
-                      onClick={() => {
-                        setSelectedProduct(product.id ?? null)
-                        setCurrentPage("product")
-                      }}
-                      className="hover:text-green-400 transition-colors text-left"
-                    >
-                      {product.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-6 text-lg">Quick Links</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li>
-                  <button onClick={() => setCurrentPage("home")} className="hover:text-green-400 transition-colors">
+            {/* Mobile Menu */}
+            {isMenuOpen && (
+              <div className="lg:hidden mt-4 pb-4 border-t">
+                <div className="flex flex-col space-y-4 pt-4">
+                  <button
+                    onClick={() => {
+                      setCurrentPage("home")
+                      setIsMenuOpen(false)
+                    }}
+                    className="text-left text-green-600 font-semibold"
+                  >
                     Home
                   </button>
-                </li>
-                <li>
-                  <Link href="/products" className="hover:text-green-400 transition-colors">
+                  <Link href="/products" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
                     Products
                   </Link>
-                </li>
-                <li>
-                  <button onClick={() => setCurrentPage("about")} className="hover:text-green-400 transition-colors">
+                  <button
+                    onClick={() => {
+                      setCurrentPage("about")
+                      setIsMenuOpen(false)
+                    }}
+                    className="text-left text-gray-700"
+                  >
                     About Us
                   </button>
-                </li>
-                <li>
                   <Link
                     href="#contact"
-                    className="hover:text-green-400 transition-colors"
+                    className="text-gray-700"
                     onClick={e => {
                       e.preventDefault();
                       if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
                         (window as any).gtag_report_conversion();
                       }
+                      setIsMenuOpen(false);
                       scrollToContact();
                     }}
                   >
                     Contact
                   </Link>
-                </li>
-                <li>
-                  <button onClick={() => setCurrentPage("blog")} className="hover:text-green-400 transition-colors">
+                  <button
+                    onClick={() => {
+                      setCurrentPage("blog")
+                      setIsMenuOpen(false)
+                    }}
+                    className="text-left text-gray-700"
+                  >
                     Blog
                   </button>
-                </li>
-                <li>
+                </div>
+              </div>
+            )}
+          </nav>
+        </header>
+
+        {/* Main Content */}
+        <main>{renderPage()}</main>
+
+        {/* Footer */}
+        <footer className="bg-gray-900 text-white py-16">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              <div>
+                <div className="flex items-center space-x-3 mb-6">
+                  <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
+                  <div>
+                    <h3 className="text-xl font-bold">100X</h3>
+                    <p className="text-green-400 text-sm">Certified professional products</p>
+                  </div>
+                </div>
+                <p className="text-gray-400 mb-6">
+                  Leading manufacturer of premium products across India.
+                </p>
+                {/* Social Media Links */}
+                <div className="flex space-x-4">
+                  <a
+                    href="https://facebook.com/100x"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer"
+                  >
+                    <Facebook size={20} />
+                  </a>
+                  <a
+                    href="https://twitter.com/100x"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-400 transition-colors cursor-pointer"
+                  >
+                    <Twitter size={20} />
+                  </a>
+                  <a
+                    href="https://instagram.com/100x"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors cursor-pointer"
+                  >
+                    <Instagram size={20} />
+                  </a>
+                  <a
+                    href="https://linkedin.com/company/100x"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors cursor-pointer"
+                  >
+                    <Linkedin size={20} />
+                  </a>
+                  <a
+                    href="https://youtube.com/100x"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer"
+                  >
+                    <Youtube size={20} />
+                  </a>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-6 text-lg">Products</h4>
+                <ul className="space-y-3 text-gray-400">
+                  {products.slice(0, 5).map((product, index) => (
+                    <li key={product.id || product._id || index}>
+                      <button
+                        onClick={() => {
+                          setSelectedProduct(product.id ?? null)
+                          setCurrentPage("product")
+                        }}
+                        className="hover:text-green-400 transition-colors text-left"
+                      >
+                        {product.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-6 text-lg">Quick Links</h4>
+                <ul className="space-y-3 text-gray-400">
+                  <li>
+                    <button onClick={() => setCurrentPage("home")} className="hover:text-green-400 transition-colors">
+                      Home
+                    </button>
+                  </li>
+                  <li>
+                    <Link href="/products" className="hover:text-green-400 transition-colors">
+                      Products
+                    </Link>
+                  </li>
+                  <li>
+                    <button onClick={() => setCurrentPage("about")} className="hover:text-green-400 transition-colors">
+                      About Us
+                    </button>
+                  </li>
+                  <li>
+                    <Link
+                      href="#contact"
+                      className="hover:text-green-400 transition-colors"
+                      onClick={e => {
+                        e.preventDefault();
+                        if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
+                          (window as any).gtag_report_conversion();
+                        }
+                        scrollToContact();
+                      }}
+                    >
+                      Contact
+                    </Link>
+                  </li>
+                  <li>
+                    <button onClick={() => setCurrentPage("blog")} className="hover:text-green-400 transition-colors">
+                      Blog
+                    </button>
+                  </li>
+                  <li>
+                    <Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">
+                      Sitemap
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-6 text-lg">Contact Info</h4>
+                <div className="space-y-4 text-gray-400">
+                  <p className="flex items-center">
+                    <Phone className="mr-3" size={16} /> <a href="tel:+917827229116" className="underline hover:text-green-400" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a>
+                  </p>
+                  <p className="flex items-center">
+                    <Phone className="mr-3" size={16} /> <a href="tel:+918178567520" className="underline hover:text-green-400">+91 8178567520</a>
+                  </p>
+                  <p className="flex items-start">
+                    <MapPin className="mr-3 mt-1" size={16} /> UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-800 pt-8">
+              <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+                <p className="text-gray-400 mb-4 md:mb-0">
+                  &copy; 2025 100X Circle Pvt Ltd.
+                </p>
+                <div className="flex space-x-6 text-gray-400 text-sm">
+                  <a href="#" className="hover:text-green-400 transition-colors">
+                    Privacy Policy
+                  </a>
+                  <a href="#" className="hover:text-green-400 transition-colors">
+                    Terms of Service
+                  </a>
+                  <a href="#" className="hover:text-green-400 transition-colors">
+                    FTP Access
+                  </a>
                   <Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">
                     Sitemap
                   </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-6 text-lg">Contact Info</h4>
-              <div className="space-y-4 text-gray-400">
-                <p className="flex items-center">
-                  <Phone className="mr-3" size={16} /> <a href="tel:+917827229116" className="underline hover:text-green-400" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a>
-                </p>
-                <p className="flex items-center">
-                  <Phone className="mr-3" size={16} /> <a href="tel:+918178567520" className="underline hover:text-green-400">+91 8178567520</a>
-                </p>
-                <p className="flex items-start">
-                  <MapPin className="mr-3 mt-1" size={16} /> UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana
+                  <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
+                </div>
+              </div>
+              <div className="text-center">
+                <p className="text-gray-600 text-[10px] leading-relaxed">
+                  fogging machine, fogging machine price, fogger, fogger machine price, thermal fogging machine, Double barrel fogging machine, best thermal fogging machine, fogging machine in bihar, fogging machine in delhi, fogging machine in india, fogging machine in mumbai, fogging machine pune, thermal fogging machine manufacturer in india, fogging machine in uttar pradesh, Best foggers, Foggers india, giant fogging machine, Mosquito fogger
                 </p>
               </div>
             </div>
           </div>
+        </footer>
 
-          <div className="border-t border-gray-800 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-              <p className="text-gray-400 mb-4 md:mb-0">
-                &copy; 2025 100X Circle Pvt Ltd.
-              </p>
-              <div className="flex space-x-6 text-gray-400 text-sm">
-                <a href="#" className="hover:text-green-400 transition-colors">
-                  Privacy Policy
-                </a>
-                <a href="#" className="hover:text-green-400 transition-colors">
-                  Terms of Service
-                </a>
-                <a href="#" className="hover:text-green-400 transition-colors">
-                  FTP Access
-                </a>
-                <Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">
-                  Sitemap
-                </Link>
-                <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
-              </div>
-            </div>
-            <div className="text-center">
-              <p className="text-gray-600 text-[10px] leading-relaxed">
-                fogging machine, fogging machine price, fogger, fogger machine price, thermal fogging machine, Double barrel fogging machine, best thermal fogging machine, fogging machine in bihar, fogging machine in delhi, fogging machine in india, fogging machine in mumbai, fogging machine pune, thermal fogging machine manufacturer in india, fogging machine in uttar pradesh, Best foggers, Foggers india, giant fogging machine, Mosquito fogger
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* WhatsApp Floating Button */}
-      <button
-        onClick={() =>
-          window.open(
-            `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`,
-            "_blank",
-          )
-        }
-        className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white px-7 py-5 rounded-full shadow-2xl transition-all duration-500 hover:scale-110 z-50 animate-pulse flex items-center gap-3 text-lg md:text-xl"
-        aria-label="Contact us on WhatsApp"
-      >
-        <MessageCircle size={30} />
-        <span className="font-semibold">WhatsApp Us</span>
-      </button>
+        {/* WhatsApp Floating Button */}
+        <button
+          onClick={() =>
+            window.open(
+              `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`,
+              "_blank",
+            )
+          }
+          className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white px-7 py-5 rounded-full shadow-2xl transition-all duration-500 hover:scale-110 z-50 animate-pulse flex items-center gap-3 text-lg md:text-xl"
+          aria-label="Contact us on WhatsApp"
+        >
+          <MessageCircle size={30} />
+          <span className="font-semibold">WhatsApp Us</span>
+        </button>
       </div>
     </>
   )
@@ -1530,15 +1553,14 @@ function ProductDetailPage({
               {(product.badges || [product.badge]).map((badge: string, index: number) => (
                 <Badge
                   key={index}
-                  className={`$${
-                    badge === "Best Seller"
-                      ? "bg-red-500 hover:bg-red-600"
-                      : badge === "Eco-Friendly"
-                        ? "bg-green-500 hover:bg-green-600"
-                        : badge === "New Launch"
-                          ? "bg-blue-500 hover:bg-blue-600"
-                          : "bg-orange-500 hover:bg-orange-600"
-                  } flex items-center gap-2`}
+                  className={`$${badge === "Best Seller"
+                    ? "bg-red-500 hover:bg-red-600"
+                    : badge === "Eco-Friendly"
+                      ? "bg-green-500 hover:bg-green-600"
+                      : badge === "New Launch"
+                        ? "bg-blue-500 hover:bg-blue-600"
+                        : "bg-orange-500 hover:bg-orange-600"
+                    } flex items-center gap-2`}
                 >
                   {badgeLogoMap[badge] && (
                     <img src={badgeLogoMap[badge]} alt={badge + ' logo'} className="inline-block w-6 h-6 object-contain mr-1" />
@@ -1617,9 +1639,9 @@ function ProductDetailPage({
                 {product.youtubeLink && (
                   <div className="flex justify-between items-center py-3 border-b border-gray-200">
                     <span className="text-gray-600">YouTube Demo:</span>
-                    <a 
-                      href={product.youtubeLink} 
-                      target="_blank" 
+                    <a
+                      href={product.youtubeLink}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="font-semibold text-blue-600 hover:text-blue-800 underline"
                     >
@@ -1916,12 +1938,12 @@ function BlogPage({
 
         {/* Blog Posts Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-        {filteredPosts.map((post, index) => (
-          <Card
-            key={post.id || post._id || post.slug || index}
-            className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
-            onClick={() => setSelectedBlog(post)}
-          >
+          {filteredPosts.map((post, index) => (
+            <Card
+              key={post.id || post._id || post.slug || index}
+              className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => setSelectedBlog(post)}
+            >
               <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-3">
@@ -1945,14 +1967,14 @@ function BlogPage({
                   </div>
                 </div>
                 <Button
-  className="w-full bg-purple-600 hover:bg-purple-700"
-  onClick={() => {
-    setSelectedBlog(post)
-    setCurrentPage("blog")
-  }}
->
-  Read Full Article <ArrowRight className="ml-2" size={16} />
-</Button>
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  onClick={() => {
+                    setSelectedBlog(post)
+                    setCurrentPage("blog")
+                  }}
+                >
+                  Read Full Article <ArrowRight className="ml-2" size={16} />
+                </Button>
 
               </CardContent>
             </Card>

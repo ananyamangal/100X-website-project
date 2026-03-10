@@ -51,6 +51,14 @@ export default function ProductCard({
     return () => clearInterval(interval);
   }, [images, product.slideshowInterval]);
 
+  function slugify(text: string) {
+    return text
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  }
+
   return (
     <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg">
       <div className="relative overflow-hidden">
@@ -75,15 +83,14 @@ export default function ProductCard({
           {(product.badges || [product.badge]).slice(0, 3).map((badge, index) => (
             <Badge
               key={index}
-              className={`$${
-                badge === 'Best Seller'
+              className={`$${badge === 'Best Seller'
                   ? 'bg-red-500 hover:bg-red-600'
                   : badge === 'Eco-Friendly'
-                  ? 'bg-green-500 hover:bg-green-600'
-                  : badge === 'New Launch'
-                  ? 'bg-blue-500 hover:bg-blue-600'
-                  : 'bg-orange-500 hover:bg-orange-600'
-              } flex items-center gap-1 px-2 py-1 text-xs whitespace-nowrap`}
+                    ? 'bg-green-500 hover:bg-green-600'
+                    : badge === 'New Launch'
+                      ? 'bg-blue-500 hover:bg-blue-600'
+                      : 'bg-orange-500 hover:bg-orange-600'
+                } flex items-center gap-1 px-2 py-1 text-xs whitespace-nowrap`}
             >
               {badgeLogoMap[badge] && (
                 <img
@@ -111,7 +118,7 @@ export default function ProductCard({
       </div>
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-3">
-          <Link href={`/products/${product._id || product.id}`}>
+          <Link href={`/${slugify(product.name || product.name)}`}>
             <h3 className="text-xl font-bold text-gray-800 group-hover:text-green-600 transition-colors cursor-pointer hover:underline">
               {product.name}
             </h3>
@@ -134,7 +141,7 @@ export default function ProductCard({
             asChild
             className="flex-1 bg-green-600 hover:bg-green-700"
           >
-            <Link href={`/products/${product._id || product.id}`}>
+            <Link href={`/${slugify(product.name || product.name)}`}>
               View Details
             </Link>
           </Button>
