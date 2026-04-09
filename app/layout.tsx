@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.100xcircle.com',
   },
-  keywords: " thermal fogging machine manufacturer, cold fogging machine, buy industrial fogging machine online, vehicle mounted fogging machine manufacturer, pest control fogging machine supplier india, Fogging machine supplier in India, mosquito fogging machine manufacturer"
+  keywords: "mosquito foggers India, thermal fogging machine manufacturer, giant foggers, pest control equipment suppliers, industrial fogging machines,industrial sprayers, public health solutions, mosquito control solutions, 100x Circle"
 }
 
 export default function RootLayout({

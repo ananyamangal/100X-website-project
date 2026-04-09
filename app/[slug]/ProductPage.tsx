@@ -121,6 +121,9 @@ interface ProductMeta {
     content1?: ContentSection;
     content2?: ContentSection;
     content3?: ContentSection;
+    content4?: ContentSection;
+    content5?: ContentSection;
+    content6?: ContentSection;
 }
 
 const PRODUCT_META: Record<string, ProductMeta> = {
@@ -148,8 +151,22 @@ const PRODUCT_META: Record<string, ProductMeta> = {
                 "We focus on delivering certified products that offer long-term value, efficient pest control, and cost-effective performance for both commercial and residential use. Contact us to get the latest price and bulk order details."
             ]
         },
+        content4: {
+            h2: "100XTFS50: Buy Thermal and Cold Fogging Machine in India",
+            p: [
+                "The 100XTFS50 sets itself apart with its robust technical architecture, making it a leading choice for any industrial thermal cold fogger supplier. This versatile machine boasts powerful 100XTFS50 machine specifications designed for both efficiency and durability. "
+            ]
+        },
+        content5: {
+            h2: "Applications for Your 100XTFS50 Fogging Machine: Pest Control, Disinfection, and More",
+            p: [
+                "The 100XTFS50 model offers a diverse range of applications, making it an indispensable tool across various sectors. As a highly effective **pest control fogger**, it excels in mosquito and vector control, playing a critical role in preventing diseases like dengue and malaria by rapidly reducing insect populations in outdoor and semi-enclosed areas. Its fine mist ensures excellent penetration and coverage, reaching hidden breeding grounds."
+                , "Beyond pest management, this unit serves as a powerful **disinfection fogging machine**. It's ideal for public health sanitation in a multitude of environments, including hospitals, schools, warehouses, and offices. The ability to disperse disinfectants thoroughly helps to minimize the spread of pathogens, ensuring safer and more hygienic conditions. This **thermal cold fogger**'s versatility allows for precision in applying germicides where traditional cleaning methods may fall short."
+                , "Furthermore, the 100XTFS50 is robust **agricultural fogging equipment**. Farmers can leverage it for crucial crop protection against pests and diseases, and for maintaining optimal livestock hygiene. From treating greenhouses to sanitizing barns, its efficiency helps safeguard agricultural investments and promote healthier animal environments. These varied **thermal cold fogger applications** underscore its immense value."
+            ]
+        },
     },
-    "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400": {
+    "100xdb400-double-barrel-thermal-fogging-machine-vehicle-mountable": {
         content1: {
             h2: "Heavy Duty Vehicle Mount Fogging Machine Supplier",
             p: [
@@ -171,6 +188,19 @@ const PRODUCT_META: Record<string, ProductMeta> = {
             p: [
                 "The Double Barrel Fogging Machine is built with advanced technology and trusted certifications to ensure powerful performance and reliability for large-scale fogging operations.",
                 "This machine is designed for high coverage, durability, and efficient mosquito and vector control in urban and rural areas.",
+            ]
+        },
+        content4: {
+            h2: "Introduction to the 100XDB400 Double Barrel Thermal Fogging Machine",
+            p: [
+                "Introducing the revolutionary 100XDB400, a premier industrial double barrel thermal fogger designed to redefine efficiency in vector control. As a leading double barrel thermal fogging machine supplier in India, 100x Circle proudly presents this heavy-duty vehicle-mounted fogging machine, engineered for demanding applications across India. Its innovative 'double barrel' capability significantly boosts output and coverage, making it the ideal vehicle-mounted thermal fogging machine India for large-scale operations. This robust vector control fogging equipment ensures unparalleled performance and reliability, solidifying its position as the top choice for industrial-grade pest management."
+            ]
+        },
+        content5: {
+            h2: "Key Features and Technical Specifications",
+            p: [
+                "Our heavy-duty vehicle-mounted fogging machine, specifically designed for industrial applications in India, boasts impressive technical specifications ensuring superior performance and durability. At its core lies a robust 30 HP engine, delivering exceptional power output for demanding tasks. This industrial double barrel fogger is engineered for efficiency, with optimized fuel consumption of just 2.5 liters per hour, making it an economical choice for extensive operations. It achieves an outstanding fogging output rate of 100 liters per hour, guaranteeing rapid and comprehensive treatment.",
+                "The machine features a substantial fogging solution capacity of 100 liters within its corrosion-resistant stainless steel tank, complemented by a 20-liter fuel tank, allowing for extended operation without frequent refills. Its dimensions (L 1200mm, W 700mm, H 800mm) and an unladen weight of 150 kg ensure a compact yet sturdy build, facilitating straightforward vehicle mounting. The innovative double barrel system is a key advantage, amplifying coverage and efficiency by simultaneously discharging fog from two outlets, significantly reducing treatment time. This vehicle-mounted fogging equipment is built with high-grade stainless steel for enduring durability, making these thermal fogger specifications ideal for challenging environments."
             ]
         },
     },
@@ -196,6 +226,18 @@ const PRODUCT_META: Record<string, ProductMeta> = {
             p: [
                 "The Stainless Steel Fogger is built with precision technology to deliver consistent and powerful fog output for professional pest control operations. Designed for durability, its stainless steel construction ensures corrosion resistance and long-term performance in demanding field conditions.",
                 "This model is suitable for government departments and authorized buyers. It is also a budget-friendly solution that offers strong performance, reliable operation, and excellent value for public health, agriculture, and industrial fogging applications across India.",
+            ]
+        },
+        content4: {
+            h2: "Product Overview: 100x Circle Stainless Steel Tank Thermal Fogger (Model 100X-SSMA20)",
+            p: [
+                "Discover the ultimate solution for pest control and sanitation with our 100x Circle Stainless Steel Tank Thermal Fogger (Model 100X-SSMA20)! If you're looking to Buy Stainless Steel Tank Thermal Fogger in India, this model is engineered for exceptional performance. Its robust construction ensures it is a truly durable thermal fogger India, designed to withstand rigorous use. Experience unparalleled effectiveness in various applications, from agricultural pest management to public health initiatives. This thermal fogger with stainless steel tank guarantees longevity and reliable operation, making it an indispensable tool for professionals nationwide.",
+            ]
+        },
+        content5: {
+            h2: "Why Choose Our Stainless Steel Thermal Fogger?",
+            p: [
+                "Choosing our thermal fogger means investing in superior quality built for Indian conditions. Our durable thermal fogger India stands out with its robust stainless steel tank, offering unparalleled corrosion resistance—a critical advantage in India's varied climates and when using diverse chemicals. This high-grade material ensures exceptional longevity and maintains hygiene, unlike less durable alternatives. Beyond the tank, the overall build quality is meticulously engineered for reliability, featuring a powerful engine designed for consistent, efficient performance. Operators will appreciate the intuitive controls, making it an incredibly user-friendly thermal fogger with stainless steel tank. This corrosion resistant equipment is not just a purchase; it's a long-term solution for effective pest and germ control.",
             ]
         },
     }
@@ -409,6 +451,26 @@ export default function ProductDetailPage() {
                         </div>
                     </div>
                 </div>
+                {pageMeta && pageMeta.content4 && (
+                    < div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{pageMeta.content4.h2}</h2>
+                        <div className="space-y-4">
+                            {pageMeta.content4.p.map((paragraph: string, index: number) => (
+                                <p key={index} className="text-gray-700 font-medium">{paragraph}</p>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                {pageMeta && pageMeta.content5 && (
+                    < div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{pageMeta.content5.h2}</h2>
+                        <div className="space-y-4">
+                            {pageMeta.content5.p.map((paragraph: string, index: number) => (
+                                <p key={index} className="text-gray-700 font-medium">{paragraph}</p>
+                            ))}
+                        </div>
+                    </div>
+                )}
                 {pageMeta && pageMeta.content1 && (
                     < div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
                         <h2 className="text-2xl font-bold text-gray-800 mb-6">{pageMeta.content1.h2}</h2>

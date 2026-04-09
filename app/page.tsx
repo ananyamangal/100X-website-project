@@ -459,7 +459,7 @@ export default function HomePage() {
   const defaultBlogPosts = [
     {
       id: 1,
-      title: "Top 10 Equipment Maintenance Tips for 2024",
+      title: "Worker maintaining a thermal fogging machine, illustrating 'Top 10 Equipment Maintenance Tips for 2024'",
       excerpt:
         "Learn essential maintenance practices to extend the life of your farming equipment and maximize productivity.",
       image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=250&fit=crop",
@@ -470,7 +470,7 @@ export default function HomePage() {
     },
     {
       id: 2,
-      title: "Battery vs Fuel-Powered Sprayers: Which is Right for Your Farm?",
+      title: "Image comparing battery-powered and fuel-powered agricultural sprayers, relevant to 'Battery vs Fuel-Powered Sprayers: Which is Right for Your Farm?'",
       excerpt:
         "Compare the pros and cons of battery and fuel-powered sprayers to make the best choice for your agricultural needs.",
       image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=250&fit=crop",
@@ -481,7 +481,7 @@ export default function HomePage() {
     },
     {
       id: 3,
-      title: "Precision Agriculture: How Modern Equipment is Changing Farming",
+      title: "Drone flying over a field, symbolizing 'Precision Agriculture: How Modern Equipment is Changing Farming'",
       excerpt:
         "Discover how precision agriculture technology is revolutionizing farming practices and increasing crop yields.",
       image: "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=400&h=250&fit=crop",
@@ -646,7 +646,7 @@ export default function HomePage() {
             >
               <img
                 src={bannersLoading ? "/banner.jpeg" : (currentSlideData?.image || "/banner.jpeg")}
-                alt="Agricultural equipment"
+                alt="100x Circle Banner: High-Performance Thermal Fogging Machines for Agriculture & Pest Control"
                 className="w-full h-full object-cover transition-all duration-1000 pointer-events-none select-none"
                 draggable={false}
               />
@@ -662,7 +662,7 @@ export default function HomePage() {
                     Certified Professional Products
                   </Badge>
                   <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
-                    100X – <span className="text-green-400">Thermal</span>  Fogging Machine Manufacturer
+                    100x Circle : <span className="text-green-400">Leading Thermal Fogging </span>  Machine Manufacturer in India
                   </h1>
                   <div className="text-xl md:text-2xl lg:text-3xl font-bold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
                     {changingPhrases[phraseIndex]}
@@ -769,7 +769,7 @@ export default function HomePage() {
                     Certified Professional Products
                   </Badge>
                   <h2 className="text-3xl font-bold text-gray-800 mb-6 leading-tight">
-                    100X – <span className="text-green-600">Thermal</span>  Fogging Machine Manufacturer
+                    100x Circle : <span className="text-green-600">Leading Thermal Fogging</span> Machine Manufacturer in India
                   </h2>
                   <div className="text-xl font-bold text-green-600 mb-6 min-h-[2rem] transition-all duration-500">
                     {changingPhrases[phraseIndex]}
@@ -872,7 +872,7 @@ export default function HomePage() {
               <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
                 Our Products
               </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Buy GeM Approved OEM of Fogging Machines at Best Prices</h2>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Explore Our Range: Buy Industrial Thermal Fogging Machines Online</h2>
               <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
                 We provide a wide range of high-quality fogging machines designed to meet different industrial and commercial needs across India. At 100x Circle, you can easily <a className="text-blue-500" href="https://www.100xcircle.com/">buy industrial fogging machines online</a> from a complete selection of advanced and reliable products.
               </p>
@@ -931,7 +931,7 @@ export default function HomePage() {
               <Badge className="mb-6 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-lg px-6 py-2">
                 Customer Reviews
               </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Trusted Fogging Machine Supplier – What Our Customers Say</h2>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Trusted Thermal Fogging Machine Supplier: Customer Testimonials</h2>
               <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
                 As a reliable <a className="text-blue-500" href="https://www.100xcircle.com/">fogging machine supplier</a>, 100X Circle Pvt Ltd values real feedback from customers across India. Our clients share their experiences about product quality, performance, durability, and after-sales support.
               </p>
@@ -1116,10 +1116,11 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>Best Thermal Fogging Machine Manufacturer | 100x Circle</title>
+        <title>Thermal Fogging Machine Manufacturer & Supplier | 100x Circle
+        </title>
         <meta
           name="description"
-          content="Discover 100x Circle – the best thermal & giant fogging machine manufacturer in Delhi, Uttar Pradesh, Bihar, Mumbai, and Pune, India. Our high-performance mosquito foggers ensure superior pest control, durability, and efficiency for industrial and residential use. Connect with us!"
+          content="100x Circle, India’s leading thermal fogging machine manufacturer. High-performance mosquito foggers and agricultural pest control. Get expert guidance today!"
         />
       </Head>
       <div className="min-h-screen bg-white">
@@ -1303,7 +1304,6 @@ export default function HomePage() {
                 <div className="flex items-center space-x-3 mb-6">
                   <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
                   <div>
-                    <h3 className="text-xl font-bold">100X</h3>
                     <p className="text-green-400 text-sm">Certified professional products</p>
                   </div>
                 </div>
@@ -1321,7 +1321,7 @@ export default function HomePage() {
                     <Facebook size={20} />
                   </a>
                   <a
-                    href="https://twitter.com/100x"
+                    href="https://x.com/100x"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-400 transition-colors cursor-pointer"
@@ -1439,7 +1439,7 @@ export default function HomePage() {
             <div className="border-t border-gray-800 pt-8">
               <div className="flex flex-col md:flex-row justify-between items-center mb-4">
                 <p className="text-gray-400 mb-4 md:mb-0">
-                  &copy; 2025 100X Circle Pvt Ltd.
+                  &copy; 2026 100X Circle Pvt Ltd.
                 </p>
                 <div className="flex space-x-6 text-gray-400 text-sm">
                   <a href="#" className="hover:text-green-400 transition-colors">
@@ -1464,6 +1464,21 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+          <p style={{ display: 'none' }}>pest control equipment India,
+            industrial fogging solutions,
+            mosquito control machines,
+            cold fogging machine ,
+            agricultural spraying equipment,
+            thermal fogging machine manufacturer in India,
+            industrial thermal fogging equipment India,
+            public health fogging solutions India,
+            agricultural fogging machines India,
+            best thermal foggers manufacturer,
+            fogging machine supplier India,
+            pest control fogging machine supplier india,
+            Fogging machine supplier in India,
+            mosquito fogging machine manufacturer,
+            thermal fogging machines for industrial use India</p>
         </footer>
 
         {/* WhatsApp Floating Button */}
