@@ -29,6 +29,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { AdminRichTextEditor } from "@/components/admin/AdminRichTextEditor"
+import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -1286,7 +1288,7 @@ function ProductsTab({
                         )}
                       </div>
                     </div>
-                    <p className="text-gray-600 mb-2">{product.shortDescription}</p>
+                    <p className="text-gray-600 mb-2 line-clamp-2">{plainTextFromHtml(product.shortDescription || "")}</p>
                     <div className="flex items-center space-x-4 text-sm text-gray-500">
                       <span className="font-semibold text-green-600">{product.priceRange}</span>
                       <span className="flex items-center">
@@ -1501,9 +1503,15 @@ function ProductForm({
   })
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingBrochure, setUploadingBrochure] = useState(false);
+  const [descriptionError, setDescriptionError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setDescriptionError("")
+    if (!plainTextFromHtml(formData.shortDescription || "").trim() || !plainTextFromHtml(formData.detailedDescription || "").trim()) {
+      setDescriptionError("Please add both short and detailed descriptions (not only empty formatting).")
+      return
+    }
     const productData = {
       ...formData,
       features: formData.features.split("\n").filter((f) => f.trim()),
@@ -1522,6 +1530,7 @@ function ProductForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {descriptionError && <p className="text-sm text-red-600">{descriptionError}</p>}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Product Name</label>
@@ -1742,21 +1751,19 @@ function ProductForm({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Short Description</label>
-            <Textarea
+            <AdminRichTextEditor
               value={formData.shortDescription}
-              onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-              rows={3}
-              required
+              onChange={(v) => setFormData({ ...formData, shortDescription: v })}
+              placeholder="Brief product summary…"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Detailed Description</label>
-            <Textarea
+            <AdminRichTextEditor
               value={formData.detailedDescription}
-              onChange={(e) => setFormData({ ...formData, detailedDescription: e.target.value })}
-              rows={4}
-              required
+              onChange={(v) => setFormData({ ...formData, detailedDescription: v })}
+              placeholder="Full product details…"
             />
           </div>
 
@@ -2282,7 +2289,7 @@ function BlogsTab({
                           </Button>
                         </div>
                       </div>
-                      <p className="text-gray-600 mb-2 line-clamp-2">{blog.excerpt}</p>
+                      <p className="text-gray-600 mb-2 line-clamp-2">{plainTextFromHtml(blog.excerpt || "")}</p>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>
                           Order: {blog.order !== undefined ? blog.order : "—"}
@@ -2536,8 +2543,12 @@ function BlogForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.title || !formData.content) {
+    if (!formData.title || !plainTextFromHtml(formData.content || "").trim()) {
       setUploadError("Please fill in title and content")
+      return
+    }
+    if (!plainTextFromHtml(formData.excerpt || "").trim()) {
+      setUploadError("Please fill in excerpt")
       return
     }
     if (!formData.topImage && !blog) {
@@ -2589,23 +2600,20 @@ function BlogForm({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Excerpt</label>
-            <Textarea
+            <AdminRichTextEditor
               value={formData.excerpt}
-              onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+              onChange={(v) => setFormData({ ...formData, excerpt: v })}
               placeholder="Brief description of the blog post"
-              rows={3}
-              required
             />
+            <p className="text-xs text-gray-500 mt-1">Shown on blog cards as plain text preview.</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-            <Textarea
+            <AdminRichTextEditor
               value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              placeholder="Write your blog content here..."
-              rows={10}
-              required
+              onChange={(v) => setFormData({ ...formData, content: v })}
+              placeholder="Write your blog content here…"
             />
           </div>
 
@@ -2783,7 +2791,14 @@ function BlogForm({
             <Button 
               type="submit" 
               className="bg-green-600 hover:bg-green-700"
-              disabled={isUploadingTop || isUploadingInline || !formData.title || !formData.content || !formData.topImage}
+              disabled={
+                isUploadingTop ||
+                isUploadingInline ||
+                !formData.title ||
+                !plainTextFromHtml(formData.content || "").trim() ||
+                !plainTextFromHtml(formData.excerpt || "").trim() ||
+                !formData.topImage
+              }
             >
               <Save className="mr-2" size={16} />
               {(isUploadingTop || isUploadingInline) ? 'Uploading...' : (blog ? 'Update Blog' : 'Add Blog')}
@@ -3482,7 +3497,10 @@ function AboutUsTab() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">First paragraph</label>
-              <Textarea value={form.journeyParagraph1 || ''} onChange={(e) => setForm((p) => ({ ...p, journeyParagraph1: e.target.value }))} rows={4} className="w-full" />
+              <AdminRichTextEditor
+                value={form.journeyParagraph1 || ""}
+                onChange={(v) => setForm((p) => ({ ...p, journeyParagraph1: v }))}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Bullet list (one item per line)</label>
@@ -3490,7 +3508,10 @@ function AboutUsTab() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Second paragraph</label>
-              <Textarea value={form.journeyParagraph2 || ''} onChange={(e) => setForm((p) => ({ ...p, journeyParagraph2: e.target.value }))} rows={3} className="w-full" />
+              <AdminRichTextEditor
+                value={form.journeyParagraph2 || ""}
+                onChange={(v) => setForm((p) => ({ ...p, journeyParagraph2: v }))}
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -3537,7 +3558,10 @@ function AboutUsTab() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mission description</label>
-              <Textarea value={form.missionDescription || ''} onChange={(e) => setForm((p) => ({ ...p, missionDescription: e.target.value }))} rows={3} className="w-full" />
+              <AdminRichTextEditor
+                value={form.missionDescription || ""}
+                onChange={(v) => setForm((p) => ({ ...p, missionDescription: v }))}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Vision title</label>
@@ -3545,7 +3569,10 @@ function AboutUsTab() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Vision description</label>
-              <Textarea value={form.visionDescription || ''} onChange={(e) => setForm((p) => ({ ...p, visionDescription: e.target.value }))} rows={3} className="w-full" />
+              <AdminRichTextEditor
+                value={form.visionDescription || ""}
+                onChange={(v) => setForm((p) => ({ ...p, visionDescription: v }))}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Values title</label>
@@ -3553,7 +3580,10 @@ function AboutUsTab() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Values description</label>
-              <Textarea value={form.valuesDescription || ''} onChange={(e) => setForm((p) => ({ ...p, valuesDescription: e.target.value }))} rows={3} className="w-full" />
+              <AdminRichTextEditor
+                value={form.valuesDescription || ""}
+                onChange={(v) => setForm((p) => ({ ...p, valuesDescription: v }))}
+              />
             </div>
           </CardContent>
         </Card>
@@ -3568,7 +3598,10 @@ function AboutUsTab() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Paragraph</label>
-              <Textarea value={form.manufacturingParagraph || ''} onChange={(e) => setForm((p) => ({ ...p, manufacturingParagraph: e.target.value }))} rows={4} className="w-full" />
+              <AdminRichTextEditor
+                value={form.manufacturingParagraph || ""}
+                onChange={(v) => setForm((p) => ({ ...p, manufacturingParagraph: v }))}
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((i) => (

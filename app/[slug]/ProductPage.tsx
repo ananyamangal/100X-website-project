@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Download, MessageCircle, Star, CheckCircle, Menu, X } from 'lucide-react';
 import Link from 'next/link';
+import { RichContent } from '@/components/RichContent';
 import { X as CloseIcon } from 'lucide-react';
 
 const badgeLogoMap: Record<string, string> = {
@@ -381,7 +382,9 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
                         <div className="text-3xl font-bold text-green-600 mb-6">{product.priceRange}</div>
-                        <p className="text-lg text-gray-600 mb-8 leading-relaxed">{product.detailedDescription}</p>
+                        <div className="text-lg text-gray-600 mb-8 leading-relaxed">
+                            <RichContent html={product.detailedDescription || ''} />
+                        </div>
                         <div className="flex flex-col sm:flex-row gap-4 mb-8">
                             <Button
                                 size="lg"

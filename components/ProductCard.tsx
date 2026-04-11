@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { Star } from 'lucide-react';
 import Link from 'next/link';
+import { plainTextFromHtml } from '@/lib/rich-text';
 
 // Map badge to logo if needed (copy logic from homepage)
 const badgeLogoMap: Record<string, string> = {
@@ -127,7 +128,7 @@ export default function ProductCard({
             <div className="text-lg font-bold text-green-600">{product.priceRange}</div>
           </div>
         </div>
-        <p className="text-gray-600 mb-4 line-clamp-2">{product.detailedDescription}</p>
+        <p className="text-gray-600 mb-4 line-clamp-2">{plainTextFromHtml(product.detailedDescription || '')}</p>
         <div className="space-y-2 mb-6">
           {product.features?.slice(0, 3).map((feature: string, idx: number) => (
             <div key={idx} className="flex items-center text-sm text-gray-600">

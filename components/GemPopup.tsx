@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
 const WHATSAPP = "917827229116"
-const DELAY_MS = 5000 // 5 seconds after page load
+const DELAY_MS = 20000 // 20 seconds after page load
 
 export default function GemPopup() {
   const pathname = usePathname()

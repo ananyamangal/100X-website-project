@@ -40,6 +40,8 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import ProductCard from '@/components/ProductCard'
+import { RichContent } from "@/components/RichContent"
+import { plainTextFromHtml } from "@/lib/rich-text"
 
 // Product interface to match backend
 interface Product {
@@ -974,7 +976,7 @@ export default function HomePage() {
                       <span className="text-sm text-gray-500">{post.readTime}</span>
                     </div>
                     <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{post.title}</h3>
-                    <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{plainTextFromHtml(post.excerpt || "")}</p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <User size={16} className="text-gray-400" />
@@ -1584,7 +1586,9 @@ function ProductDetailPage({
               </div>
             </div>
             <div className="text-3xl font-bold text-green-600 mb-6">{product.priceRange}</div>
-            <p className="text-lg text-gray-600 mb-8 leading-relaxed">{product.detailedDescription}</p>
+            <div className="text-lg text-gray-600 mb-8 leading-relaxed">
+              <RichContent html={product.detailedDescription || ""} />
+            </div>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <Button
@@ -1797,7 +1801,11 @@ function AboutPage({ setCurrentPage, content }: { setCurrentPage: (page: string)
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
           <div>
             <h2 className="text-4xl font-bold text-gray-800 mb-6">{journeyHeading}</h2>
-            {journeyParagraph1 && <p className="text-lg text-gray-600 mb-6 leading-relaxed">{journeyParagraph1}</p>}
+            {journeyParagraph1 && (
+              <div className="text-lg text-gray-600 mb-6 leading-relaxed">
+                <RichContent html={journeyParagraph1} />
+              </div>
+            )}
             {journeyListItems.length > 0 && (
               <>
                 <p className="text-lg text-gray-600 mb-2 leading-relaxed">Our range includes:</p>
@@ -1806,7 +1814,11 @@ function AboutPage({ setCurrentPage, content }: { setCurrentPage: (page: string)
                 </ul>
               </>
             )}
-            {journeyParagraph2 && <p className="text-lg text-gray-600 mb-8 leading-relaxed">{journeyParagraph2}</p>}
+            {journeyParagraph2 && (
+              <div className="text-lg text-gray-600 mb-8 leading-relaxed">
+                <RichContent html={journeyParagraph2} />
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center p-6 bg-green-50 rounded-xl">
                 <div className="text-3xl font-bold text-green-600 mb-2">{journeyStat1Value}</div>
@@ -1839,7 +1851,9 @@ function AboutPage({ setCurrentPage, content }: { setCurrentPage: (page: string)
                     <value.icon className="text-green-600" size={36} />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-800 mb-4">{value.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{value.description}</p>
+                  <div className="text-gray-600 leading-relaxed">
+                    <RichContent html={value.description} />
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -1850,7 +1864,11 @@ function AboutPage({ setCurrentPage, content }: { setCurrentPage: (page: string)
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold text-gray-800 mb-6">{manufacturingHeading}</h2>
-              {manufacturingParagraph && <p className="text-lg text-gray-600 mb-6 leading-relaxed">{manufacturingParagraph}</p>}
+              {manufacturingParagraph && (
+                <div className="text-lg text-gray-600 mb-6 leading-relaxed">
+                  <RichContent html={manufacturingParagraph} />
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-6">
                 {manufacturingStats.map((stat, i) => (
                   <div key={i} className={`text-center p-4 rounded-lg ${stat.bg}`}>
@@ -1893,9 +1911,11 @@ function BlogPage({
   const categories = ["All", "Maintenance", "Equipment Guide", "Technology", "Seasonal Tips"]
 
   const filteredPosts = blogPosts.filter((post) => {
+    const excerptText = plainTextFromHtml(post.excerpt || "").toLowerCase()
+    const contentText = plainTextFromHtml(post.content || "").toLowerCase()
+    const q = searchTerm.toLowerCase()
     const matchesSearch =
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
+      post.title.toLowerCase().includes(q) || excerptText.includes(q) || contentText.includes(q)
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory
     return matchesSearch && matchesCategory
   })
@@ -1953,7 +1973,7 @@ function BlogPage({
                 <h3 className="text-xl font-bold text-gray-800 mb-3 hover:text-purple-600 transition-colors cursor-pointer">
                   {post.title}
                 </h3>
-                <p className="text-gray-600 mb-4">{post.excerpt}</p>
+                <p className="text-gray-600 mb-4 line-clamp-4">{plainTextFromHtml(post.excerpt || "")}</p>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
                     <User size={16} className="text-gray-400" />
@@ -2065,15 +2085,13 @@ function BlogArticlePage({
               </h1>
 
               {/* Article Excerpt */}
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                {blog.excerpt}
-              </p>
+              <div className="text-xl text-gray-600 mb-8 leading-relaxed">
+                <RichContent html={blog.excerpt || ""} className="text-xl text-gray-600" />
+              </div>
 
               {/* Article Content */}
-              <div className="prose prose-lg max-w-none">
-                <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {blog.content}
-                </div>
+              <div className="text-gray-700">
+                <RichContent html={blog.content || ""} className="text-lg text-gray-700" />
               </div>
 
               {/* Inline Images */}
