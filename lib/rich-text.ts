@@ -1,7 +1,7 @@
-import DOMPurify from "isomorphic-dompurify"
+import sanitizeHtml from "sanitize-html"
 
-const SANITIZE: Parameters<typeof DOMPurify.sanitize>[1] = {
-  ALLOWED_TAGS: [
+const SANITIZE: sanitizeHtml.IOptions = {
+  allowedTags: [
     "p",
     "br",
     "strong",
@@ -22,12 +22,19 @@ const SANITIZE: Parameters<typeof DOMPurify.sanitize>[1] = {
     "span",
     "div",
   ],
-  ALLOWED_ATTR: ["href", "target", "rel", "class"],
+  allowedAttributes: {
+    a: ["href", "target", "rel", "class"],
+    span: ["class"],
+    div: ["class"],
+    p: ["class"],
+  },
+  allowedSchemes: ["http", "https", "mailto", "tel"],
+  allowProtocolRelative: false,
 }
 
 export function sanitizeRichHtml(html: string): string {
   if (!html || typeof html !== "string") return ""
-  return DOMPurify.sanitize(html, SANITIZE)
+  return sanitizeHtml(html, SANITIZE)
 }
 
 export function isProbablyRichHtml(s: string): boolean {
@@ -39,6 +46,6 @@ export function isProbablyRichHtml(s: string): boolean {
 /** Plain text for search, cards, and line-clamp previews */
 export function plainTextFromHtml(html: string): string {
   if (!html) return ""
-  const text = DOMPurify.sanitize(html, { ALLOWED_TAGS: [] })
+  const text = sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} })
   return text.replace(/\s+/g, " ").trim()
 }
