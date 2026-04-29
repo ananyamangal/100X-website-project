@@ -31,69 +31,64 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google Tag Manager */}
+        <Script id="gtm-head" strategy="beforeInteractive">
+          {`
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-5JMGCKRW');
+          `}
+        </Script>
         <meta name="robots" content="INDEX, FOLLOW" />
         <meta name="google-site-verification" content="7yMHOjyWo4oTSZpe1JQP0P7CR1t0dxuHSVufT6u065A" />
         <link rel="icon" href="/logo-main.png" sizes="48x48" />
       </head>
       <body>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-5JMGCKRW"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <GemPopup />
         <VideoPopup />
-        {/* Google tag (gtag.js) */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-17730009010"
-          strategy="afterInteractive"
-        />
-        <Script id="google-ads" strategy="afterInteractive">
+        {/* Push WhatsApp clicks to dataLayer for GTM conversion tracking */}
+        <Script id="whatsapp-click-tracker" strategy="afterInteractive">
           {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'AW-17730009010');
-            gtag('config', 'AW-17730009010/0N2CCMvmudwbELLvqYZC', {
-              'phone_conversion_number': '7827229116'
-            });
-            function gtag_report_conversion(url) {
-              var callback = function () {
-                if (typeof(url) != 'undefined') {
-                  window.location = url;
-                }
-              };
-              gtag('event', 'conversion', {
-                  'send_to': 'AW-17730009010/d5fWCOSUvtwbELLvqYZC',
-                  'event_callback': callback
+            document.addEventListener('click', function (event) {
+              var target = event.target;
+              if (!target) return;
+              var link = target.closest && target.closest('a[href]');
+              if (!link) return;
+              var href = (link.getAttribute('href') || '').toLowerCase();
+              if (href.indexOf('wa.me') === -1 && href.indexOf('whatsapp') === -1) return;
+              window.dataLayer = window.dataLayer || [];
+              window.dataLayer.push({
+                event: 'whatsapp_click',
+                whatsapp_url: link.href || href
               });
+            });
+
+            // Backward compatibility: legacy code still calls these functions.
+            window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
+            window.gtag_report_conversion = window.gtag_report_conversion || function(url) {
+              window.dataLayer = window.dataLayer || [];
+              window.dataLayer.push({
+                event: 'legacy_conversion_call',
+                conversion_url: url || ''
+              });
+              if (url) window.location = url;
               return false;
-            }
+            };
           `}
         </Script>
         <Navbar />
         {children}
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-GEWH5YB3PS"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-GEWH5YB3PS');
-          `}
-        </Script>
-        {/* Google Analytics - Additional Tag */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-7EXHP2B0SD"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics-2" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-7EXHP2B0SD');
-          `}
-        </Script>
       </body>
     </html>
   )
