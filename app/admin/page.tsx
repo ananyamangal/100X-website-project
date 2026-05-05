@@ -24,6 +24,9 @@ import {
   Award,
   Video,
   Download,
+  GripVertical,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -566,6 +569,49 @@ function AdminDashboardContent() {
     }
   }
 
+  // Reorder blogs by drag/drop or move buttons
+  const handleReorderBlogs = async (orderedBlogIds: string[]) => {
+    const blogById = new Map(blogs.map((blog) => [String(blog.id), blog]))
+    const reorderedBlogs = orderedBlogIds
+      .map((id) => blogById.get(String(id)))
+      .filter((blog): blog is BlogPost => Boolean(blog))
+
+    if (reorderedBlogs.length !== blogs.length) {
+      setNotification({ type: "error", message: "Unable to reorder all blogs. Please refresh and try again." })
+      setTimeout(() => setNotification(null), 3000)
+      return
+    }
+
+    const previousBlogs = blogs
+    const normalizedBlogs = reorderedBlogs.map((blog, index) => ({
+      ...blog,
+      order: index,
+    }))
+    setBlogs(normalizedBlogs)
+
+    try {
+      await Promise.all(
+        normalizedBlogs.map((blog) =>
+          fetch(`/api/admin/blogs/${blog.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ order: blog.order }),
+          }).then((res) => {
+            if (!res.ok) throw new Error(`Failed updating order for blog ${blog.id}`)
+          }),
+        ),
+      )
+      setNotification({ type: "success", message: "Blog order updated successfully!" })
+      setTimeout(() => setNotification(null), 3000)
+    } catch (error) {
+      console.error("Error reordering blogs:", error)
+      setBlogs(previousBlogs)
+      setNotification({ type: "error", message: "Failed to save blog order. Changes were reverted." })
+      setTimeout(() => setNotification(null), 3000)
+    }
+  }
+
   // Add accreditation
   const handleAddAccreditation = async (newAccreditation: Omit<Accreditation, "id" | "createdAt" | "updatedAt" | "_id">) => {
     try {
@@ -1053,6 +1099,7 @@ function AdminDashboardContent() {
                 onAddBlog={handleAddBlog}
                 onUpdateBlog={handleUpdateBlog}
                 onDeleteBlog={handleDeleteBlog}
+                onReorderBlogs={handleReorderBlogs}
                 isAddingBlog={isAddingBlog}
                 setIsAddingBlog={setIsAddingBlog}
                 editingBlog={editingBlog}
@@ -2215,6 +2262,7 @@ function BlogsTab({
   onAddBlog,
   onUpdateBlog,
   onDeleteBlog,
+  onReorderBlogs,
   isAddingBlog,
   setIsAddingBlog,
   editingBlog,
@@ -2224,11 +2272,65 @@ function BlogsTab({
   onAddBlog: (blog: Omit<BlogPost, "id" | "createdAt" | "updatedAt" | "_id">) => void
   onUpdateBlog: (blog: BlogPost) => void
   onDeleteBlog: (id: string) => void
+  onReorderBlogs: (orderedBlogIds: string[]) => Promise<void>
   isAddingBlog: boolean
   setIsAddingBlog: (value: boolean) => void
   editingBlog: BlogPost | null
   setEditingBlog: (blog: BlogPost | null) => void
 }) {
+  const [draggedBlogId, setDraggedBlogId] = useState<string | null>(null)
+  const [isReordering, setIsReordering] = useState(false)
+
+  const sortedBlogs = [...blogs].sort((a, b) => {
+    const orderA = a.order !== undefined ? a.order : Number.POSITIVE_INFINITY
+    const orderB = b.order !== undefined ? b.order : Number.POSITIVE_INFINITY
+    if (orderA !== orderB) return orderA - orderB
+    return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  })
+
+  const commitNewOrder = async (orderedBlogs: BlogPost[]) => {
+    setIsReordering(true)
+    try {
+      await onReorderBlogs(orderedBlogs.map((blog) => String(blog.id)))
+    } finally {
+      setIsReordering(false)
+    }
+  }
+
+  const moveBlog = async (blogId: string, direction: "up" | "down") => {
+    if (isReordering) return
+    const currentIndex = sortedBlogs.findIndex((blog) => String(blog.id) === String(blogId))
+    if (currentIndex === -1) return
+
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1
+    if (targetIndex < 0 || targetIndex >= sortedBlogs.length) return
+
+    const reordered = [...sortedBlogs]
+    const [moved] = reordered.splice(currentIndex, 1)
+    reordered.splice(targetIndex, 0, moved)
+    await commitNewOrder(reordered)
+  }
+
+  const handleDrop = async (targetBlogId: string) => {
+    if (!draggedBlogId || draggedBlogId === targetBlogId || isReordering) {
+      setDraggedBlogId(null)
+      return
+    }
+
+    const fromIndex = sortedBlogs.findIndex((blog) => String(blog.id) === String(draggedBlogId))
+    const toIndex = sortedBlogs.findIndex((blog) => String(blog.id) === String(targetBlogId))
+    if (fromIndex === -1 || toIndex === -1) {
+      setDraggedBlogId(null)
+      return
+    }
+
+    const reordered = [...sortedBlogs]
+    const [moved] = reordered.splice(fromIndex, 1)
+    reordered.splice(toIndex, 0, moved)
+    setDraggedBlogId(null)
+    await commitNewOrder(reordered)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -2254,15 +2356,20 @@ function BlogsTab({
       )}
 
       <div className="grid gap-6">
-        {blogs
-          .sort((a, b) => {
-            const orderA = a.order !== undefined ? a.order : Number.POSITIVE_INFINITY
-            const orderB = b.order !== undefined ? b.order : Number.POSITIVE_INFINITY
-            if (orderA !== orderB) return orderA - orderB
-            return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-          })
-          .map((blog) => (
-            <Card key={blog.id} className="overflow-hidden">
+        {sortedBlogs.map((blog, index) => (
+            <Card
+              key={blog.id}
+              className={cn(
+                "overflow-hidden transition-all",
+                draggedBlogId === String(blog.id) ? "opacity-50 ring-2 ring-green-400" : "",
+                isReordering ? "pointer-events-none opacity-80" : "",
+              )}
+              draggable={editingBlog?.id !== blog.id && !isReordering}
+              onDragStart={() => setDraggedBlogId(String(blog.id))}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={() => void handleDrop(String(blog.id))}
+              onDragEnd={() => setDraggedBlogId(null)}
+            >
               <CardContent className="p-0">
                 {editingBlog?.id === blog.id ? (
                   <BlogForm
@@ -2283,8 +2390,37 @@ function BlogsTab({
                     </div>
                     <div className="flex-1 p-6">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-xl font-bold text-gray-900">{blog.title}</h3>
+                        <div className="flex items-start gap-3">
+                          <button
+                            type="button"
+                            className="mt-1 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+                            title="Drag to reorder"
+                            aria-label="Drag to reorder blog"
+                            disabled={isReordering}
+                          >
+                            <GripVertical size={18} />
+                          </button>
+                          <h3 className="text-xl font-bold text-gray-900">{blog.title}</h3>
+                        </div>
                         <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => void moveBlog(String(blog.id), "up")}
+                            disabled={isReordering || index === 0}
+                            title="Move up"
+                          >
+                            <ArrowUp size={14} />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => void moveBlog(String(blog.id), "down")}
+                            disabled={isReordering || index === sortedBlogs.length - 1}
+                            title="Move down"
+                          >
+                            <ArrowDown size={14} />
+                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
