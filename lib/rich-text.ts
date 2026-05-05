@@ -32,20 +32,28 @@ const SANITIZE: sanitizeHtml.IOptions = {
   allowProtocolRelative: false,
 }
 
-export function sanitizeRichHtml(html: string): string {
-  if (!html || typeof html !== "string") return ""
-  return sanitizeHtml(html, SANITIZE)
+export function sanitizeRichHtml(html: string | unknown): string {
+  const str = asHtmlInput(html)
+  if (!str) return ""
+  return sanitizeHtml(str, SANITIZE)
 }
 
-export function isProbablyRichHtml(s: string): boolean {
-  const t = s.trim()
+function asHtmlInput(s: unknown): string {
+  if (typeof s === "string") return s
+  if (s == null) return ""
+  return String(s)
+}
+
+export function isProbablyRichHtml(s: string | unknown): boolean {
+  const t = asHtmlInput(s).trim()
   if (!t) return false
   return /<[a-z][\s\S]*>/i.test(t)
 }
 
 /** Plain text for search, cards, and line-clamp previews */
-export function plainTextFromHtml(html: string): string {
-  if (!html) return ""
-  const text = sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} })
+export function plainTextFromHtml(html: string | unknown): string {
+  const str = asHtmlInput(html)
+  if (!str) return ""
+  const text = sanitizeHtml(str, { allowedTags: [], allowedAttributes: {} })
   return text.replace(/\s+/g, " ").trim()
 }

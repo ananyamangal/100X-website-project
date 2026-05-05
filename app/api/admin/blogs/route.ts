@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { BlogInput } from '@/lib/blogModel';
+import { serializeBlog, serializeBlogs } from '@/lib/blogSerialize';
 
 // GET - Fetch all blog posts
 export async function GET() {
@@ -21,7 +22,7 @@ export async function GET() {
       ])
       .toArray();
     
-    return NextResponse.json(blogs);
+    return NextResponse.json(serializeBlogs(blogs as unknown[]));
   } catch (error) {
     console.error('Error fetching blogs:', error);
     return NextResponse.json({ error: 'Failed to fetch blogs' }, { status: 500 });
@@ -52,10 +53,11 @@ export async function POST(request: NextRequest) {
     
     const result = await db.collection('blogs').insertOne(newBlog);
     
-    return NextResponse.json({
+    const inserted = {
       ...newBlog,
-      _id: result.insertedId
-    });
+      _id: result.insertedId,
+    } as Record<string, unknown>;
+    return NextResponse.json(serializeBlog(inserted));
   } catch (error) {
     console.error('Error creating blog:', error);
     return NextResponse.json({ error: 'Failed to create blog' }, { status: 500 });

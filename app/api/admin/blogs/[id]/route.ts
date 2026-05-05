@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { serializeBlog } from '@/lib/blogSerialize';
 
 interface BlogUpdate {
   order?: number;
@@ -48,7 +49,10 @@ export async function PUT(
     }
     
     const blog = await db.collection('blogs').findOne({ _id: new ObjectId(params.id) });
-    return NextResponse.json(blog);
+    if (!blog) {
+      return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
+    }
+    return NextResponse.json(serializeBlog(blog as unknown as Record<string, unknown>));
   } catch (error) {
     console.error('Error updating blog:', error);
     return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 });

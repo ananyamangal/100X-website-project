@@ -261,7 +261,7 @@ function AdminDashboardContent() {
           Array.isArray(data)
             ? data.map((b: any) => ({
                 ...b,
-                id: b._id,
+                id: typeof b?.id === 'string' ? b.id : typeof b?._id === 'string' ? b._id : String(b?._id ?? ''),
               }))
             : []
         )
@@ -508,10 +508,23 @@ function AdminDashboardContent() {
         const updated = await res.json();
   
         // 3️⃣ Update blogs state with the new data
-        setBlogs(blogs.map(b => b.id === updated._id ? {
-          ...updated,
-          id: updated._id,
-        } : b));
+        const updId =
+          typeof (updated as any)?.id === 'string'
+            ? (updated as any).id
+            : typeof updated._id === 'string'
+              ? updated._id
+              : String((updated as any)?._id ?? '')
+        setBlogs(
+          blogs.map((b) =>
+            String(b.id) === String(updId)
+              ? {
+                  ...updated,
+                  id: updId,
+                  _id: updId,
+                }
+              : b,
+          ),
+        )
   
         setEditingBlog(null);
         setNotification({ type: 'success', message: 'Blog updated successfully!' });

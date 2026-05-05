@@ -508,12 +508,14 @@ export default function HomePage() {
   // Use blogs from API or fallback to default
   const displayBlogPosts = blogPosts.length > 0 ?
     blogPosts
-      .filter(b => b.isPublished) // Only show published blogs
+      .filter((b) => Boolean(b.isPublished))
       .sort((a, b) => {
-        const orderA = a.order !== undefined ? a.order : Infinity
-        const orderB = b.order !== undefined ? b.order : Infinity
+        const orderA = typeof a.order === 'number' && Number.isFinite(a.order) ? a.order : Infinity
+        const orderB = typeof b.order === 'number' && Number.isFinite(b.order) ? b.order : Infinity
         if (orderA !== orderB) return orderA - orderB
-        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+        const ta = new Date(a.publishedAt as string).getTime()
+        const tb = new Date(b.publishedAt as string).getTime()
+        return tb - ta
       })
     : defaultBlogPosts
 
@@ -1914,8 +1916,9 @@ function BlogPage({
     const excerptText = plainTextFromHtml(post.excerpt || "").toLowerCase()
     const contentText = plainTextFromHtml(post.content || "").toLowerCase()
     const q = searchTerm.toLowerCase()
+    const titleText = String(post.title ?? "").toLowerCase()
     const matchesSearch =
-      post.title.toLowerCase().includes(q) || excerptText.includes(q) || contentText.includes(q)
+      titleText.includes(q) || excerptText.includes(q) || contentText.includes(q)
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory
     return matchesSearch && matchesCategory
   })
@@ -2095,7 +2098,7 @@ function BlogArticlePage({
               </div>
 
               {/* Inline Images */}
-              {blog.inlineImages && blog.inlineImages.length > 0 && (
+              {Array.isArray(blog.inlineImages) && blog.inlineImages.length > 0 && (
                 <div className="mt-8 space-y-6">
                   <h3 className="text-2xl font-bold text-gray-900 mb-4">Related Images</h3>
                   <div className="grid md:grid-cols-2 gap-6">

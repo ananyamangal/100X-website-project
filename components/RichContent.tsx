@@ -10,9 +10,10 @@ type RichContentProps = {
  * Renders admin-authored HTML safely, or plain text (legacy) with preserved line breaks.
  */
 export function RichContent({ html, className }: RichContentProps) {
-  if (!html) return null
-  if (!isProbablyRichHtml(html)) {
-    return <div className={cn("whitespace-pre-wrap", className)}>{html}</div>
+  const safe = typeof html === "string" ? html : html == null ? "" : String(html)
+  if (!safe) return null
+  if (!isProbablyRichHtml(safe)) {
+    return <div className={cn("whitespace-pre-wrap", className)}>{safe}</div>
   }
   return (
     <div
@@ -27,7 +28,7 @@ export function RichContent({ html, className }: RichContentProps) {
         "[&_span.ql-size-small]:text-sm [&_span.ql-size-large]:text-xl [&_span.ql-size-huge]:text-2xl",
         className
       )}
-      dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }}
+      dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(safe) }}
     />
   )
 }
