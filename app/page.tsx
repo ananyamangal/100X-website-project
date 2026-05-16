@@ -1,31 +1,22 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import Head from "next/head"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   Menu,
   X,
   Phone,
-  Mail,
-  MapPin,
   Download,
   MessageCircle,
   ArrowRight,
   Star,
   Users,
   Award,
-  Shield,
   ChevronRight,
   Play,
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Youtube,
   Calendar,
   User,
-  Search,
   ChevronLeft,
   CheckCircle,
   Target,
@@ -38,10 +29,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import ProductCard from '@/components/ProductCard'
 import { RichContent } from "@/components/RichContent"
+import ContactSection from "@/components/ContactSection"
 import { plainTextFromHtml } from "@/lib/rich-text"
+import { blogPostSlug } from "@/lib/blogSlug"
 
 // Product interface to match backend
 interface Product {
@@ -257,11 +249,11 @@ function YoutubeShortsCarousel() {
 }
 
 export default function HomePage() {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentPage, setCurrentPage] = useState("home")
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null)
-  const [selectedBlog, setSelectedBlog] = useState<any | null>(null)
   const [showBrochureForm, setShowBrochureForm] = useState(false)
   const [brochureFormData, setBrochureFormData] = useState<{ name: string; phone: string; productName: string; brochureUrl?: string }>({ name: "", phone: "", productName: "" })
   const [products, setProducts] = useState<Product[]>([])
@@ -271,7 +263,6 @@ export default function HomePage() {
   const [customers, setCustomers] = useState<any[]>([])
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [bannersLoading, setBannersLoading] = useState(true)
-  const [aboutPageContent, setAboutPageContent] = useState<Record<string, string> | null>(null)
   const [mainBrochureUrl, setMainBrochureUrl] = useState<string | null>(null)
   const bannerTouchStartX = useRef<number | null>(null)
 
@@ -385,14 +376,6 @@ export default function HomePage() {
       });
   }, [])
 
-  // Fetch about page content (editable in admin)
-  useEffect(() => {
-    fetch("/api/about-page")
-      .then((res) => res.json())
-      .then((data) => setAboutPageContent(data))
-      .catch(() => setAboutPageContent(null))
-  }, [])
-
   // Fetch main website brochure URL (used for "Complete Product Catalog" in header)
   useEffect(() => {
     fetch("/api/brochure")
@@ -430,25 +413,21 @@ export default function HomePage() {
     return () => clearInterval(timer)
   }, [slideCount, intervalMs])
 
-  // Handle hash-based navigation (e.g., /#about, /#contact)
+  // Handle legacy hash links (e.g., /#about, /#contact)
   useEffect(() => {
     const handleHashNavigation = () => {
-      const hash = typeof window !== 'undefined' ? window.location.hash : ''
-      if (hash === '#about') {
-        setCurrentPage('about')
-      } else if (hash === '#contact') {
-        setCurrentPage('home')
-        setTimeout(() => {
-          const el = document.getElementById('contact')
-          if (el) el.scrollIntoView({ behavior: 'smooth' })
-        }, 100)
+      const hash = typeof window !== "undefined" ? window.location.hash : ""
+      if (hash === "#about") {
+        router.push("/about")
+      } else if (hash === "#contact") {
+        router.push("/contact-us")
       }
     }
 
     handleHashNavigation()
-    window.addEventListener('hashchange', handleHashNavigation)
-    return () => window.removeEventListener('hashchange', handleHashNavigation)
-  }, [])
+    window.addEventListener("hashchange", handleHashNavigation)
+    return () => window.removeEventListener("hashchange", handleHashNavigation)
+  }, [router])
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -530,31 +509,6 @@ export default function HomePage() {
   const businessEmail = "100xcircle@gmail.com"
   const whatsappNumber = "917827229116"
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const formData = new FormData(e.target as HTMLFormElement)
-    const name = formData.get("name")
-    const phone = formData.get("phone")
-    const email = formData.get("email")
-    const subject = formData.get("subject")
-    const message = formData.get("message")
-
-    // Track conversion
-    if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
-      (window as any).gtag_report_conversion()
-    }
-
-    // Save submission to backend
-    await fetch("/api/submissions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, phone, email, subject, message, type: "contact" }),
-    })
-
-    const whatsappMessage = `New Contact Form Submission:\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nSubject: ${subject}\nMessage: ${message}`
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`, "_blank")
-  }
-
   const handleBrochureDownload = (productName: string, brochureUrl?: string) => {
     setBrochureFormData({ ...brochureFormData, productName, brochureUrl })
     setShowBrochureForm(true)
@@ -588,22 +542,6 @@ export default function HomePage() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case "blog":
-        return selectedBlog ? (
-          <BlogArticlePage
-            blog={selectedBlog}
-            setCurrentPage={setCurrentPage}
-            setSelectedBlog={setSelectedBlog}
-          />
-        ) : (
-          <BlogPage
-            blogPosts={displayBlogPosts}
-            setCurrentPage={setCurrentPage}
-            setSelectedBlog={setSelectedBlog}
-          />
-        )
-      case "about":
-        return <AboutPage setCurrentPage={setCurrentPage} content={aboutPageContent} />
       case "product":
         return selectedProduct ? (
           <ProductDetailPage
@@ -989,15 +927,19 @@ export default function HomePage() {
                         <span className="text-sm text-gray-600">{formatDate(post.date)}</span>
                       </div>
                     </div>
-                    <Button
-                      className="w-full bg-purple-600 hover:bg-purple-700"
-                      onClick={() => {
-                        setSelectedBlog(post)
-                        setCurrentPage("blog")
-                      }}
-                    >
-                      Read Full Article <ArrowRight className="ml-2" size={16} />
-                    </Button>
+                    {blogPosts.length > 0 ? (
+                      <Button className="w-full bg-purple-600 hover:bg-purple-700" asChild>
+                        <Link href={`/blog/${blogPostSlug(post)}`}>
+                          Read Full Article <ArrowRight className="ml-2" size={16} />
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button className="w-full bg-purple-600 hover:bg-purple-700" asChild>
+                        <Link href="/blog">
+                          View Blog <ArrowRight className="ml-2" size={16} />
+                        </Link>
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -1008,124 +950,24 @@ export default function HomePage() {
                 size="lg"
                 variant="outline"
                 className="border-purple-600 text-purple-600 hover:bg-purple-50 bg-transparent"
-                onClick={() => setCurrentPage("blog")}
+                asChild
               >
-                View All Blog Posts <ArrowRight className="ml-2" size={20} />
+                <Link href="/blog">
+                  View All Blog Posts <ArrowRight className="ml-2" size={20} />
+                </Link>
               </Button>
             </div>
           </div>
         </section>
 
-        {/* Contact Form Section */}
-        <section id="contact" className="py-24">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-20">
-              <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
-                Get In Touch
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Contact Us</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Ready to transform your work? Get in touch with our experts today!
-              </p>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-12">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-8">Contact Information</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <Phone className="text-green-600" size={24} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-800">Phone</div>
-                      <div className="text-gray-600"><a href="tel:+917827229116" className="underline hover:text-green-600" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a></div>
-                      <div className="text-gray-600"><a href="tel:+918178567520" className="underline hover:text-green-600">+91 8178567520</a></div>
-                      <div className="text-sm text-gray-500">Mon-Sat: 9:00 AM - 6:00 PM</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <Mail className="text-green-600" size={24} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-800">Business Email</div>
-                      <div className="text-gray-600"><a href="mailto:100xcircle@gmail.com" className="underline hover:text-green-600">100xcircle@gmail.com</a></div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-lg">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <MapPin className="text-green-600" size={24} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-800">Address</div>
-                      <div className="text-gray-600">UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact Form */}
-              <Card className="border-0 shadow-xl">
-                <CardContent className="p-10">
-                  <h3 className="text-3xl font-bold text-gray-800 mb-8">Send us a Message</h3>
-                  <form onSubmit={handleContactSubmit} className="space-y-7 text-lg">
-                    <div className="grid grid-cols-2 gap-5">
-                      <Input name="firstName" placeholder="First Name" required className="p-5 text-lg" />
-                      <Input name="lastName" placeholder="Last Name" required className="p-5 text-lg" />
-                    </div>
-                    <Input name="phone" type="tel" placeholder="Phone Number" required className="p-5 text-lg" />
-                    <Input name="email" type="email" placeholder="Email Address" required className="p-5 text-lg" />
-                    <select
-                      name="subject"
-                      className="w-full p-5 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      required
-                    >
-                      <option value="">Select Product Interest</option>
-                      {products.map((product) => (
-                        <option key={product._id || product.id || product.name} value={product.name}>
-                          {product.name}
-                        </option>
-                      ))}
-                      <option value="general">General Inquiry</option>
-                      <option value="support">Technical Support</option>
-                      <option value="dealer">Dealer Partnership</option>
-                    </select>
-                    <Textarea name="message" placeholder="Your Message" rows={6} required className="p-5 text-lg resize-none" />
-                    <Button type="submit" size="lg" className="w-full bg-green-600 hover:bg-green-700 text-xl py-6">
-                      Send Message via WhatsApp <MessageCircle className="ml-2" size={22} />
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+        <ContactSection products={products} />
 
       </>
     )
   }
 
-  // Helper to scroll to contact section
-  const scrollToContact = () => {
-    setCurrentPage("home");
-    setTimeout(() => {
-      const el = document.getElementById("contact");
-      if (el) el.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  };
-
   return (
     <>
-      <Head>
-        <title>Best Thermal Fogging Machine Manufacturer | 100x Circle</title>
-        <meta
-          name="description"
-          content="Discover 100x Circle – the best thermal & giant fogging machine manufacturer in Delhi, Uttar Pradesh, Bihar, Mumbai, and Pune, India. Our high-performance mosquito foggers ensure superior pest control, durability, and efficiency for industrial and residential use. Connect with us!"
-        />
-      </Head>
       <div className="min-h-screen bg-white">
         {/* Brochure Form Modal */}
         {showBrochureForm && (
@@ -1181,12 +1023,12 @@ export default function HomePage() {
 
           <nav className="container mx-auto px-4 py-4">
             <div className="flex justify-between items-center">
-              <button onClick={() => setCurrentPage("home")} className="flex items-center space-x-3">
+              <Link href="/" className="flex items-center space-x-3">
                 <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
                 <div className="flex flex-col">
                   <span className="text-base md:text-lg text-black font-bold">Circle Pvt Ltd.</span>
                 </div>
-              </button>
+              </Link>
 
               {/* Desktop Menu */}
               <div className="hidden lg:flex items-center space-x-8">
@@ -1200,33 +1042,23 @@ export default function HomePage() {
                 <Link href="/products" className="text-gray-700 hover:text-green-600 transition-colors">
                   Products
                 </Link>
-                <button
-                  onClick={() => setCurrentPage("about")}
-                  className={`transition-colors ${currentPage === "about" ? "text-green-600 font-semibold" : "text-gray-700 hover:text-green-600"
-                    }`}
-                >
+                <Link href="/about" className="text-gray-700 hover:text-green-600 transition-colors">
                   About Us
-                </button>
-                <a
-                  href="#contact"
+                </Link>
+                <Link
+                  href="/contact-us"
                   className="text-gray-700 hover:text-green-600 transition-colors"
-                  onClick={e => {
-                    e.preventDefault();
-                    if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
-                      (window as any).gtag_report_conversion();
+                  onClick={() => {
+                    if (typeof window !== "undefined" && (window as any).gtag_report_conversion) {
+                      ;(window as any).gtag_report_conversion()
                     }
-                    scrollToContact();
                   }}
                 >
                   Contact
-                </a>
-                <button
-                  onClick={() => setCurrentPage("blog")}
-                  className={`transition-colors ${currentPage === "blog" ? "text-green-600 font-semibold" : "text-gray-700 hover:text-green-600"
-                    }`}
-                >
+                </Link>
+                <Link href="/blog" className="text-gray-700 hover:text-green-600 transition-colors">
                   Blog
-                </button>
+                </Link>
                 <Button
                   className="bg-green-600 hover:bg-green-700"
                   onClick={() => handleBrochureDownload("Complete Product Catalog", mainBrochureUrl ?? undefined)}
@@ -1258,38 +1090,24 @@ export default function HomePage() {
                   <Link href="/products" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
                     Products
                   </Link>
-                  <button
-                    onClick={() => {
-                      setCurrentPage("about")
-                      setIsMenuOpen(false)
-                    }}
-                    className="text-left text-gray-700"
-                  >
+                  <Link href="/about" className="text-left text-gray-700" onClick={() => setIsMenuOpen(false)}>
                     About Us
-                  </button>
+                  </Link>
                   <Link
-                    href="#contact"
+                    href="/contact-us"
                     className="text-gray-700"
-                    onClick={e => {
-                      e.preventDefault();
-                      if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
-                        (window as any).gtag_report_conversion();
+                    onClick={() => {
+                      if (typeof window !== "undefined" && (window as any).gtag_report_conversion) {
+                        ;(window as any).gtag_report_conversion()
                       }
-                      setIsMenuOpen(false);
-                      scrollToContact();
+                      setIsMenuOpen(false)
                     }}
                   >
                     Contact
                   </Link>
-                  <button
-                    onClick={() => {
-                      setCurrentPage("blog")
-                      setIsMenuOpen(false)
-                    }}
-                    className="text-left text-gray-700"
-                  >
+                  <Link href="/blog" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
                     Blog
-                  </button>
+                  </Link>
                 </div>
               </div>
             )}
@@ -1298,177 +1116,6 @@ export default function HomePage() {
 
         {/* Main Content */}
         <main>{renderPage()}</main>
-
-        {/* Footer */}
-        <footer className="bg-gray-900 text-white py-16">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-              <div>
-                <div className="flex items-center space-x-3 mb-6">
-                  <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
-                  <div>
-                    <h3 className="text-xl font-bold">100X</h3>
-                    <p className="text-green-400 text-sm">Certified professional products</p>
-                  </div>
-                </div>
-                <p className="text-gray-400 mb-6">
-                  Leading manufacturer of premium products across India.
-                </p>
-                {/* Social Media Links */}
-                <div className="flex space-x-4">
-                  <a
-                    href="https://facebook.com/100x"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer"
-                  >
-                    <Facebook size={20} />
-                  </a>
-                  <a
-                    href="https://twitter.com/100x"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-400 transition-colors cursor-pointer"
-                  >
-                    <Twitter size={20} />
-                  </a>
-                  <a
-                    href="https://instagram.com/100x"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors cursor-pointer"
-                  >
-                    <Instagram size={20} />
-                  </a>
-                  <a
-                    href="https://linkedin.com/company/100x"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors cursor-pointer"
-                  >
-                    <Linkedin size={20} />
-                  </a>
-                  <a
-                    href="https://youtube.com/100x"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer"
-                  >
-                    <Youtube size={20} />
-                  </a>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-6 text-lg">Products</h4>
-                <ul className="space-y-3 text-gray-400">
-                  {products.slice(0, 5).map((product, index) => (
-                    <li key={product.id || product._id || index}>
-                      <button
-                        onClick={() => {
-                          setSelectedProduct(product.id ?? null)
-                          setCurrentPage("product")
-                        }}
-                        className="hover:text-green-400 transition-colors text-left"
-                      >
-                        {product.name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-6 text-lg">Quick Links</h4>
-                <ul className="space-y-3 text-gray-400">
-                  <li>
-                    <button onClick={() => setCurrentPage("home")} className="hover:text-green-400 transition-colors">
-                      Home
-                    </button>
-                  </li>
-                  <li>
-                    <Link href="/products" className="hover:text-green-400 transition-colors">
-                      Products
-                    </Link>
-                  </li>
-                  <li>
-                    <button onClick={() => setCurrentPage("about")} className="hover:text-green-400 transition-colors">
-                      About Us
-                    </button>
-                  </li>
-                  <li>
-                    <Link
-                      href="#contact"
-                      className="hover:text-green-400 transition-colors"
-                      onClick={e => {
-                        e.preventDefault();
-                        if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) {
-                          (window as any).gtag_report_conversion();
-                        }
-                        scrollToContact();
-                      }}
-                    >
-                      Contact
-                    </Link>
-                  </li>
-                  <li>
-                    <button onClick={() => setCurrentPage("blog")} className="hover:text-green-400 transition-colors">
-                      Blog
-                    </button>
-                  </li>
-                  <li>
-                    <Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">
-                      Sitemap
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-6 text-lg">Contact Info</h4>
-                <div className="space-y-4 text-gray-400">
-                  <p className="flex items-center">
-                    <Phone className="mr-3" size={16} /> <a href="tel:+917827229116" className="underline hover:text-green-400" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a>
-                  </p>
-                  <p className="flex items-center">
-                    <Phone className="mr-3" size={16} /> <a href="tel:+918178567520" className="underline hover:text-green-400">+91 8178567520</a>
-                  </p>
-                  <p className="flex items-start">
-                    <MapPin className="mr-3 mt-1" size={16} /> UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-800 pt-8">
-              <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-                <p className="text-gray-400 mb-4 md:mb-0">
-                  &copy; 2025 100X Circle Pvt Ltd.
-                </p>
-                <div className="flex space-x-6 text-gray-400 text-sm">
-                  <a href="#" className="hover:text-green-400 transition-colors">
-                    Privacy Policy
-                  </a>
-                  <a href="#" className="hover:text-green-400 transition-colors">
-                    Terms of Service
-                  </a>
-                  <a href="#" className="hover:text-green-400 transition-colors">
-                    FTP Access
-                  </a>
-                  <Link href="/sitemap.xml" className="hover:text-green-400 transition-colors">
-                    Sitemap
-                  </Link>
-                  <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
-                </div>
-              </div>
-              <div className="text-center">
-                <p className="text-gray-600 text-[10px] leading-relaxed">
-                  fogging machine, fogging machine price, fogger, fogger machine price, thermal fogging machine, Double barrel fogging machine, best thermal fogging machine, fogging machine in bihar, fogging machine in delhi, fogging machine in india, fogging machine in mumbai, fogging machine pune, thermal fogging machine manufacturer in india, fogging machine in uttar pradesh, Best foggers, Foggers india, giant fogging machine, Mosquito fogger
-                </p>
-              </div>
-            </div>
-          </div>
-        </footer>
 
         {/* WhatsApp Floating Button */}
         <button
@@ -1750,399 +1397,6 @@ function ProductDetailPage({
           </div>
         </div>
       )}
-    </div>
-  )
-}
-
-// About Page Component (content from admin /api/about-page)
-function AboutPage({ setCurrentPage, content }: { setCurrentPage: (page: string) => void; content: Record<string, string> | null }) {
-  const c = content || {}
-  const heroBadge = c.heroBadge ?? "About Us"
-  const heroTitle = c.heroTitle ?? "About 100X Circle Pvt Ltd"
-  const journeyHeading = c.journeyHeading ?? "Our Journey"
-  const journeyParagraph1 = c.journeyParagraph1 ?? ""
-  const journeyList = c.journeyList ?? ""
-  const journeyParagraph2 = c.journeyParagraph2 ?? ""
-  const journeyStat1Value = c.journeyStat1Value ?? "2015"
-  const journeyStat1Label = c.journeyStat1Label ?? "Founded"
-  const journeyStat2Value = c.journeyStat2Value ?? "10K+"
-  const journeyStat2Label = c.journeyStat2Label ?? "Happy customers"
-  const journeyImage = c.journeyImage ?? "/new.png"
-  const foundationHeading = c.foundationHeading ?? "Our Foundation"
-  const foundationSubtext = c.foundationSubtext ?? "The principles that guide our work and define our commitment to excellence."
-  const missionTitle = c.missionTitle ?? "Mission"
-  const missionDescription = c.missionDescription ?? ""
-  const visionTitle = c.visionTitle ?? "Vision"
-  const visionDescription = c.visionDescription ?? ""
-  const valuesTitle = c.valuesTitle ?? "Values"
-  const valuesDescription = c.valuesDescription ?? ""
-  const manufacturingHeading = c.manufacturingHeading ?? "Manufacturing Excellence"
-  const manufacturingParagraph = c.manufacturingParagraph ?? ""
-  const manufacturingImage = c.manufacturingImage ?? "/production.png"
-  const journeyListItems = journeyList ? journeyList.split("\n").filter((line) => line.trim()) : []
-  const values = [
-    { icon: Target, title: missionTitle, description: missionDescription },
-    { icon: Eye, title: visionTitle, description: visionDescription },
-    { icon: Heart, title: valuesTitle, description: valuesDescription },
-  ]
-  const manufacturingStats = [
-    { value: c.manufacturingStat1Value ?? "ISO", label: c.manufacturingStat1Label ?? "Certified", bg: "bg-blue-50", text: "text-blue-600" },
-    { value: c.manufacturingStat2Value ?? "99.5%", label: c.manufacturingStat2Label ?? "Quality Rate", bg: "bg-green-50", text: "text-green-600" },
-    { value: c.manufacturingStat3Value ?? "24/7", label: c.manufacturingStat3Label ?? "Production", bg: "bg-purple-50", text: "text-purple-600" },
-    { value: c.manufacturingStat4Value ?? "50+", label: c.manufacturingStat4Label ?? "Products", bg: "bg-orange-50", text: "text-orange-600" },
-  ]
-
-  return (
-    <div className="pt-32 min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-20">
-          <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">{heroBadge}</Badge>
-          <h1 className="text-5xl font-bold text-gray-800 mb-6">{heroTitle}</h1>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-          <div>
-            <h2 className="text-4xl font-bold text-gray-800 mb-6">{journeyHeading}</h2>
-            {journeyParagraph1 && (
-              <div className="text-lg text-gray-600 mb-6 leading-relaxed">
-                <RichContent html={journeyParagraph1} />
-              </div>
-            )}
-            {journeyListItems.length > 0 && (
-              <>
-                <p className="text-lg text-gray-600 mb-2 leading-relaxed">Our range includes:</p>
-                <ul className="text-lg text-gray-600 mb-6 leading-relaxed list-disc list-inside">
-                  {journeyListItems.map((item, i) => <li key={i}>{item.trim()}</li>)}
-                </ul>
-              </>
-            )}
-            {journeyParagraph2 && (
-              <div className="text-lg text-gray-600 mb-8 leading-relaxed">
-                <RichContent html={journeyParagraph2} />
-              </div>
-            )}
-            <div className="grid grid-cols-2 gap-6">
-              <div className="text-center p-6 bg-green-50 rounded-xl">
-                <div className="text-3xl font-bold text-green-600 mb-2">{journeyStat1Value}</div>
-                <div className="text-gray-600">{journeyStat1Label}</div>
-              </div>
-              <div className="text-center p-6 bg-green-50 rounded-xl">
-                <div className="text-3xl font-bold text-green-600 mb-2">{journeyStat2Value}</div>
-                <div className="text-gray-600">{journeyStat2Label}</div>
-              </div>
-            </div>
-          </div>
-          <div className="relative">
-            <img src={journeyImage} alt={heroTitle} className="w-full rounded-2xl shadow-2xl" />
-            <div className="absolute -top-6 -left-6 w-24 h-24 bg-green-600 rounded-2xl flex items-center justify-center">
-              <Award className="text-white" size={32} />
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-20">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">{foundationHeading}</h2>
-            {foundationSubtext && <p className="text-xl text-gray-600 max-w-3xl mx-auto">{foundationSubtext}</p>}
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {values.map((value, index) => (
-              <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
-                <CardContent className="p-8">
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <value.icon className="text-green-600" size={36} />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4">{value.title}</h3>
-                  <div className="text-gray-600 leading-relaxed">
-                    <RichContent html={value.description} />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">{manufacturingHeading}</h2>
-              {manufacturingParagraph && (
-                <div className="text-lg text-gray-600 mb-6 leading-relaxed">
-                  <RichContent html={manufacturingParagraph} />
-                </div>
-              )}
-              <div className="grid grid-cols-2 gap-6">
-                {manufacturingStats.map((stat, i) => (
-                  <div key={i} className={`text-center p-4 rounded-lg ${stat.bg}`}>
-                    <div className={`text-2xl font-bold ${stat.text} mb-1`}>{stat.value}</div>
-                    <div className="text-sm text-gray-600">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <img src={manufacturingImage} alt="Manufacturing facility" className="w-full rounded-xl shadow-lg" />
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center">
-          <Button size="lg" variant="outline" onClick={() => setCurrentPage("home")} className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent">
-            <ChevronLeft className="mr-2" size={20} />
-            Back to Home
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Blog Page Component
-function BlogPage({
-  blogPosts,
-  setCurrentPage,
-  setSelectedBlog,
-}: {
-  blogPosts: any[]
-  setCurrentPage: (page: string) => void
-  setSelectedBlog: (blog: any) => void
-}) {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("All")
-
-  const categories = ["All", "Maintenance", "Equipment Guide", "Technology", "Seasonal Tips"]
-
-  const filteredPosts = blogPosts.filter((post) => {
-    const excerptText = plainTextFromHtml(post.excerpt || "").toLowerCase()
-    const contentText = plainTextFromHtml(post.content || "").toLowerCase()
-    const q = searchTerm.toLowerCase()
-    const titleText = String(post.title ?? "").toLowerCase()
-    const matchesSearch =
-      titleText.includes(q) || excerptText.includes(q) || contentText.includes(q)
-    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory
-    return matchesSearch && matchesCategory
-  })
-
-  return (
-    <div className="pt-32 min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-12">
-        {/* Blog Header */}
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-purple-100 text-purple-800 hover:bg-purple-200">Blog</Badge>
-          <h1 className="text-5xl font-bold text-gray-800 mb-4">Latest Insights & Tips</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Stay updated with the latest technology, equipment guides, and industry insights from our experts
-          </p>
-        </div>
-
-        {/* Search and Filter */}
-        <div className="flex flex-col md:flex-row gap-4 mb-12">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <Input
-              placeholder="Search blog posts..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 py-3"
-            />
-          </div>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-          >
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Blog Posts Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {filteredPosts.map((post, index) => (
-            <Card
-              key={post.id || post._id || post.slug || index}
-              className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
-              onClick={() => setSelectedBlog(post)}
-            >
-              <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <Badge variant="secondary">{post.category}</Badge>
-                  <span className="text-sm text-gray-500">{post.readTime || "5 min read"}</span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3 hover:text-purple-600 transition-colors cursor-pointer">
-                  {post.title}
-                </h3>
-                <p className="text-gray-600 mb-4 line-clamp-4">{plainTextFromHtml(post.excerpt || "")}</p>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
-                    <User size={16} className="text-gray-400" />
-                    <span className="text-sm text-gray-600">{post.author}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Calendar size={16} className="text-gray-400" />
-                    <span className="text-sm text-gray-600">
-                      {post.publishedAt ? formatDate(post.publishedAt) : formatDate(post.date || "2024-01-01")}
-                    </span>
-                  </div>
-                </div>
-                <Button
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  onClick={() => {
-                    setSelectedBlog(post)
-                    setCurrentPage("blog")
-                  }}
-                >
-                  Read Full Article <ArrowRight className="ml-2" size={16} />
-                </Button>
-
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Back to Home */}
-        <div className="text-center">
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={() => setCurrentPage("home")}
-            className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent"
-          >
-            <ChevronLeft className="mr-2" size={20} />
-            Back to Home
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Blog Article Page Component
-function BlogArticlePage({
-  blog,
-  setCurrentPage,
-  setSelectedBlog,
-}: {
-  blog: any
-  setCurrentPage: (page: string) => void
-  setSelectedBlog: (blog: any) => void
-}) {
-  return (
-    <div className="pt-32 min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-12">
-        {/* Breadcrumb */}
-        <div className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
-          <button onClick={() => setCurrentPage("home")} className="hover:text-green-600">
-            Home
-          </button>
-          <span>/</span>
-          <button onClick={() => setSelectedBlog(null)} className="hover:text-green-600">
-            Blog
-          </button>
-          <span>/</span>
-          <span className="text-gray-900">{blog.title}</span>
-        </div>
-
-        {/* Article Header */}
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            {/* Article Top Image */}
-            <div className="relative h-96">
-              <img
-                src={blog.topImage || blog.image || "/placeholder.svg"}
-                alt={blog.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/10"></div>
-            </div>
-
-            {/* Article Content */}
-            <div className="p-8 md:p-12">
-              {/* Article Meta */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-4">
-                  <Badge variant="secondary" className="text-sm">
-                    {blog.category}
-                  </Badge>
-                  <div className="flex items-center space-x-2 text-gray-500">
-                    <User size={16} />
-                    <span className="text-sm">{blog.author}</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-gray-500">
-                    <Calendar size={16} />
-                    <span className="text-sm">
-                      {blog.publishedAt ? formatDate(blog.publishedAt) : formatDate(blog.date || "2024-01-01")}
-                    </span>
-                  </div>
-                </div>
-                <span className="text-sm text-gray-500">{blog.readTime || "5 min read"}</span>
-              </div>
-
-              {/* Article Title */}
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                {blog.title}
-              </h1>
-
-              {/* Article Excerpt */}
-              <div className="text-xl text-gray-600 mb-8 leading-relaxed">
-                <RichContent html={blog.excerpt || ""} className="text-xl text-gray-600" />
-              </div>
-
-              {/* Article Content */}
-              <div className="text-gray-700">
-                <RichContent html={blog.content || ""} className="text-lg text-gray-700" />
-              </div>
-
-              {/* Inline Images */}
-              {Array.isArray(blog.inlineImages) && blog.inlineImages.length > 0 && (
-                <div className="mt-8 space-y-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Related Images</h3>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {blog.inlineImages.map((imageUrl: string, idx: number) => (
-                      <div key={idx} className="rounded-xl overflow-hidden shadow-lg">
-                        <img
-                          src={imageUrl}
-                          alt={`Blog image ${idx + 1}`}
-                          className="w-full h-auto object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Article Footer */}
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <span className="text-green-600 font-semibold text-lg">
-                        {blog.author?.charAt(0) || "A"}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900">{blog.author}</p>
-                      <p className="text-sm text-gray-500">Article Author</p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    onClick={() => setSelectedBlog(null)}
-                    className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent"
-                  >
-                    <ChevronLeft className="mr-2" size={20} />
-                    Back to Blog
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

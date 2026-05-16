@@ -1,10 +1,29 @@
-export default function AboutPage() {
-  return (
-    <div className="pt-32 min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-5xl font-bold text-gray-800 mb-4">About Us</h1>
-        <p className="text-lg text-gray-600">This is the About Us page. Replace with your real content.</p>
+"use client"
+
+import { useEffect, useState } from "react"
+import AboutPageContent from "@/components/AboutPageContent"
+
+export default function AboutRoutePage() {
+  const [content, setContent] = useState<Record<string, string> | null>(null)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/about-page")
+      .then((res) => (res.ok ? res.json() : {}))
+      .then((data) => {
+        setContent(data && typeof data === "object" ? (data as Record<string, string>) : {})
+      })
+      .catch(() => setContent({}))
+      .finally(() => setReady(true))
+  }, [])
+
+  if (!ready || content === null) {
+    return (
+      <div className="pt-32 min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Loading…</p>
       </div>
-    </div>
-  );
-} 
+    )
+  }
+
+  return <AboutPageContent content={content} />
+}

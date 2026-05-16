@@ -1,18 +1,12 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Menu, X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const pathname = usePathname();
-  const isHome = pathname === '/';
-
-  // Helper for nav links
-  const aboutLink = isHome ? '#about' : '/about';
-  const contactLink = isHome ? '#contact' : '/#contact';
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const contactLink = "/contact-us"
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-sm border-b">
@@ -30,8 +24,14 @@ export default function Navbar() {
           <Link href="/products" className="text-gray-700 hover:text-green-600 transition-colors">
             Products
           </Link>
+          <Link href="/about" className="text-gray-700 hover:text-green-600 transition-colors">
+            About
+          </Link>
           <Link href={contactLink} className="text-gray-700 hover:text-green-600 transition-colors">
             Contact
+          </Link>
+          <Link href="/blog" className="text-gray-700 hover:text-green-600 transition-colors">
+            Blog
           </Link>
           <Button className="bg-green-600 hover:bg-green-700">
             <Download size={16} className="mr-2" />
@@ -53,8 +53,14 @@ export default function Navbar() {
             <Link href="/products" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
               Products
             </Link>
+            <Link href="/about" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+              About
+            </Link>
             <Link href={contactLink} className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
               Contact
+            </Link>
+            <Link href="/blog" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+              Blog
             </Link>
             <Button className="bg-green-600 hover:bg-green-700" onClick={() => setIsMenuOpen(false)}>
               <Download size={16} className="mr-2" />

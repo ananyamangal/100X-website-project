@@ -151,7 +151,7 @@ export default function AllProductsPage() {
               <a href="/#about" className="text-gray-700 hover:text-green-600 transition-colors">
                 About Us
               </a>
-              <Link href="/#contact" className="text-gray-700 hover:text-green-600 transition-colors" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) { (window as any).gtag_report_conversion(); } }}>
+              <Link href="/contact-us" className="text-gray-700 hover:text-green-600 transition-colors" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) { (window as any).gtag_report_conversion(); } }}>
                 Contact
               </Link>
               <Button className="bg-green-600 hover:bg-green-700">
@@ -179,7 +179,7 @@ export default function AllProductsPage() {
                 <a href="/#about" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
                   About Us
                 </a>
-                <Link href="/#contact" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/contact-us" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
                   Contact
                 </Link>
                 <Button className="bg-green-600 hover:bg-green-700" onClick={() => setIsMenuOpen(false)}>

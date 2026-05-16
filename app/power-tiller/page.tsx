@@ -1,10 +1,25 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { SITE_URL, SITE_NAME, defaultOgImage } from '@/lib/seo/site-config'
 
 export const metadata: Metadata = {
   title: 'Power Tiller in Delhi | 100x Circle',
   description:
     'Looking for the best Power Tiller in Delhi? 100x Circle offers high-performance, durable power tillers designed for efficient soil preparation and long-term field use. Contact us today to explore specifications, pricing, and dealer support.',
+  alternates: { canonical: `${SITE_URL}/power-tiller` },
+  openGraph: {
+    title: `Power Tiller Delhi | ${SITE_NAME}`,
+    url: `${SITE_URL}/power-tiller`,
+    siteName: SITE_NAME,
+    locale: 'en_IN',
+    type: 'website',
+    images: [{ url: defaultOgImage }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Power Tiller | ${SITE_NAME}`,
+    description: 'Fuel-efficient power tillers for Indian farms.',
+  },
 }
 
 export default function PowerTillerPage() {

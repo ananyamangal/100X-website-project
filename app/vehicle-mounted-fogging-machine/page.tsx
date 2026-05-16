@@ -1,10 +1,25 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { SITE_URL, SITE_NAME, defaultOgImage } from '@/lib/seo/site-config'
 
 export const metadata: Metadata = {
   title: 'Vehicle Mounted Fogging Machine in Delhi | 100x Circle',
   description:
     '100x Circle offers the best vehicle mounted fogging machine in Delhi, designed for large-area mosquito control and public health campaigns. Our machines deliver powerful fog output, reliable performance, and are ideal for municipalities, pest control services, and industrial campuses.',
+  alternates: { canonical: `${SITE_URL}/vehicle-mounted-fogging-machine` },
+  openGraph: {
+    title: `Vehicle Mounted Fogger Delhi | ${SITE_NAME}`,
+    url: `${SITE_URL}/vehicle-mounted-fogging-machine`,
+    siteName: SITE_NAME,
+    locale: 'en_IN',
+    type: 'website',
+    images: [{ url: defaultOgImage }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Vehicle Fogging Machine | ${SITE_NAME}`,
+    description: 'Large-area mosquito control fogging systems.',
+  },
 }
 
 export default function VehicleMountedFoggingMachinePage() {
