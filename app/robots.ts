@@ -20,6 +20,9 @@ export default function robots(): MetadataRoute.Robots {
           // Conversion / funnel pages — no SEO value, waste of crawl budget.
           "/brochure-thank-you",
           "/thank-you",
+          // Internal previews of work-in-progress designs (e.g. /preview/2026).
+          "/preview",
+          "/preview/",
           // Common crawl traps via query strings (UTM, click ids, preview).
           "/*?utm_*",
           "/*?fbclid=*",
