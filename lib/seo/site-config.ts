@@ -7,6 +7,8 @@ export const SITE_NAME = "100x Circle"
 export const SITE_NAME_LEGAL = "100X Circle Pvt Ltd"
 
 export const BUSINESS = {
+  /** WhatsApp (and wa.me) — E.164 digits without + */
+  whatsappE164: "917827229116",
   phonePrimary: "+91-7827229116",
   phoneSecondary: "+91-8178567520",
   email: "100xcircle@gmail.com",

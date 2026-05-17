@@ -2,9 +2,31 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { Submission } from '@/lib/submissionModel';
 
+function stripBotFields(body: Record<string, unknown>): { rest: Record<string, unknown>; honeypot: boolean } {
+  const {
+    website,
+    company_website: companyWebsite,
+    hp,
+    url: urlHp,
+    ...rest
+  } = body;
+  const honeypot =
+    (typeof website === 'string' && website.trim() !== '') ||
+    (typeof companyWebsite === 'string' && companyWebsite.trim() !== '') ||
+    (typeof hp === 'string' && hp.trim() !== '') ||
+    (typeof urlHp === 'string' && urlHp.trim() !== '');
+  return { rest, honeypot };
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const data: Submission = await request.json();
+    const raw = (await request.json()) as Record<string, unknown>;
+    const { rest, honeypot } = stripBotFields(raw);
+    if (honeypot) {
+      return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
+    }
+
+    const data = rest as unknown as Submission;
     const { _id, ...submissionData } = data;
     const now = new Date().toISOString();
     const submission = { ...submissionData, createdAt: now };

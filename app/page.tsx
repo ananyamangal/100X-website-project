@@ -24,6 +24,7 @@ import {
   Heart,
   Package,
   BarChart3,
+  Loader2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -32,8 +33,11 @@ import { Input } from "@/components/ui/input"
 import ProductCard from '@/components/ProductCard'
 import { RichContent } from "@/components/RichContent"
 import ContactSection from "@/components/ContactSection"
+import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
+import { BUSINESS } from "@/lib/seo/site-config"
+import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
 
 // Product interface to match backend
 interface Product {
@@ -256,6 +260,8 @@ export default function HomePage() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null)
   const [showBrochureForm, setShowBrochureForm] = useState(false)
   const [brochureFormData, setBrochureFormData] = useState<{ name: string; phone: string; productName: string; brochureUrl?: string }>({ name: "", phone: "", productName: "" })
+  const [brochureSubmitting, setBrochureSubmitting] = useState(false)
+  const [brochureFormError, setBrochureFormError] = useState<string | null>(null)
   const [products, setProducts] = useState<Product[]>([])
   const [banners, setBanners] = useState<any[]>([])
   const [blogPosts, setBlogPosts] = useState<any[]>([])
@@ -506,38 +512,82 @@ export default function HomePage() {
 
   ]
 
-  const businessEmail = "100xcircle@gmail.com"
-  const whatsappNumber = "917827229116"
+  const whatsappNumber = BUSINESS.whatsappE164
 
   const handleBrochureDownload = (productName: string, brochureUrl?: string) => {
+    setBrochureFormError(null)
     setBrochureFormData({ ...brochureFormData, productName, brochureUrl })
     setShowBrochureForm(true)
   }
 
-  const handleBrochureFormSubmit = async (e: React.FormEvent) => {
+  const handleBrochureFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formData = new FormData(e.target as HTMLFormElement)
-    const name = formData.get("name") as string
-    const phone = formData.get("phone") as string
+    setBrochureFormError(null)
+    const form = e.currentTarget
+    const formData = new FormData(form)
+    const name = String(formData.get("name") ?? "").trim()
+    const phone = String(formData.get("phone") ?? "").trim()
+    const hp = String(formData.get("company_website") ?? "").trim()
 
-    // Save submission to backend
-    await fetch("/api/submissions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, phone, productName: brochureFormData.productName, type: "brochure" }),
-    })
-
-    if (brochureFormData.brochureUrl) {
-      // Open Cloudinary PDF in new tab (browser will show or download)
-      window.open(brochureFormData.brochureUrl, "_blank")
-      alert("Brochure opened! We'll contact you soon with more details.")
-    } else {
-      alert("This brochure isn't available for download yet. We've noted your interest and will contact you shortly.")
+    if (!name || !phone) {
+      setBrochureFormError("Please enter your name and phone number.")
+      return
+    }
+    const digits = phone.replace(/\D/g, "")
+    if (digits.length < 10 || digits.length > 15) {
+      setBrochureFormError("Please enter a valid phone number (10–15 digits).")
+      return
+    }
+    if (hp) {
+      setBrochureFormError("Something went wrong. Please try again.")
+      return
     }
 
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`, "_blank")
-    setShowBrochureForm(false)
-    setBrochureFormData({ name: "", phone: "", productName: "" })
+    setBrochureSubmitting(true)
+    pushDataLayer({
+      event: "brochure_form_submit_attempt",
+      product: brochureFormData.productName,
+    })
+
+    try {
+      const attribution = getPersistedAttribution()
+      const res = await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          phone,
+          productName: brochureFormData.productName,
+          type: "brochure",
+          attribution,
+          form_page_url: window.location.href,
+          form_page_path: window.location.pathname,
+          company_website: hp,
+        }),
+      })
+      if (!res.ok) throw new Error("Failed to save")
+
+      setBrochureLeadContext({
+        productName: brochureFormData.productName,
+        brochureUrl: brochureFormData.brochureUrl || "",
+        product: brochureFormData.productName,
+        has_brochure_file: Boolean(brochureFormData.brochureUrl),
+      })
+
+      pushDataLayer({
+        event: "brochure_form_success",
+        product: brochureFormData.productName,
+      })
+
+      form.reset()
+      setShowBrochureForm(false)
+      setBrochureFormData({ name: "", phone: "", productName: "", brochureUrl: undefined })
+      router.push("/brochure-thank-you")
+    } catch {
+      setBrochureFormError("We could not save your request. Please try again or contact us by phone.")
+    } finally {
+      setBrochureSubmitting(false)
+    }
   }
 
   const renderPage = () => {
@@ -974,22 +1024,44 @@ export default function HomePage() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-md">
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Download Brochure</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Download brochure</h3>
                 <p className="text-gray-600 mb-6">Please provide your details to download the brochure for:</p>
                 <p className="font-semibold text-green-600 mb-6">{brochureFormData.productName}</p>
-                <form onSubmit={handleBrochureFormSubmit} className="space-y-4">
-                  <Input name="name" placeholder="Your Full Name" required className="p-3" />
-                  <Input name="phone" type="tel" placeholder="Phone Number" required className="p-3" />
-                  <div className="flex gap-3">
-                    <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">
-                      <Download className="mr-2" size={16} />
-                      Download Now
+                <form onSubmit={handleBrochureFormSubmit} className="relative space-y-4">
+                  <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+                    <label htmlFor="brochure-hp-website">Company website</label>
+                    <input id="brochure-hp-website" name="company_website" type="text" tabIndex={-1} autoComplete="off" />
+                  </div>
+                  <Input name="name" placeholder="Your full name" required className="p-3 min-h-[48px]" disabled={brochureSubmitting} />
+                  <Input name="phone" type="tel" placeholder="Phone number" required className="p-3 min-h-[48px]" disabled={brochureSubmitting} />
+                  {brochureFormError ? (
+                    <p className="text-sm text-red-600" role="alert">
+                      {brochureFormError}
+                    </p>
+                  ) : null}
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700 min-h-[48px]" disabled={brochureSubmitting}>
+                      {brochureSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 animate-spin" size={16} aria-hidden />
+                          Submitting…
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2" size={16} aria-hidden />
+                          Continue
+                        </>
+                      )}
                     </Button>
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => setShowBrochureForm(false)}
-                      className="bg-transparent"
+                      onClick={() => {
+                        setBrochureFormError(null)
+                        setShowBrochureForm(false)
+                      }}
+                      className="bg-transparent min-h-[48px]"
+                      disabled={brochureSubmitting}
                     >
                       Cancel
                     </Button>
@@ -1115,22 +1187,14 @@ export default function HomePage() {
         </header>
 
         {/* Main Content */}
-        <main>{renderPage()}</main>
+        {/* Main content (root layout already exposes a landmark <main>) */}
+        <div>{renderPage()}</div>
 
-        {/* WhatsApp Floating Button */}
-        <button
-          onClick={() =>
-            window.open(
-              `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`,
-              "_blank",
-            )
-          }
-          className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white px-7 py-5 rounded-full shadow-2xl transition-all duration-500 hover:scale-110 z-50 animate-pulse flex items-center gap-3 text-lg md:text-xl"
-          aria-label="Contact us on WhatsApp"
-        >
-          <MessageCircle size={30} />
-          <span className="font-semibold">WhatsApp Us</span>
-        </button>
+        <WhatsAppFloatingButton
+          waNumber={BUSINESS.whatsappE164}
+          displayPhone="+91 78272 29116"
+          phoneDigitsForEvents="7827229116"
+        />
       </div>
     </>
   )
