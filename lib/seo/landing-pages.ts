@@ -113,6 +113,526 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
       ],
     },
   },
+  // ─── GeM / Government / OEM authority page ───────────────────────────
+  "gem-approved-fogging-machine-oem": {
+    slug: "gem-approved-fogging-machine-oem",
+    type: "gem",
+    metadata: {
+      title: "GeM Approved OEM for Fogging Machines | 100x Circle",
+      description:
+        "100x Circle is a GeM-approved OEM manufacturer for fogging machines (Q2 category). OEM reseller code, spec-compliant machines, factory pricing, Pan-India supply.",
+      keywords:
+        "gem approved fogging machine oem, gem oem reseller code fogging machine, gem q2 category fogging machine, government fogging machine supplier, oem authorization fogging machine india",
+    },
+    hero: {
+      eyebrow: "GeM Q2 Category — Fogging Machines",
+      navBadge: "GeM Approved OEM",
+      headline: [
+        { text: "Sell Fogging Machines on" },
+        { text: "GeM Portal", accent: "green" },
+        { text: "with" },
+        { text: "Approved OEM Support", accent: "yellow" },
+      ],
+      sub: "100x Circle is a GeM-approved OEM manufacturer for Fogging Machines (Q2 category). Get OEM Reseller Code, GeM-compliant machines, and direct factory pricing — everything you need to start winning government orders.",
+      primary: { label: "Register as Reseller", href: "#landing-form", track: "gem_hero_primary" },
+      secondary: {
+        label: "WhatsApp Us",
+        href:
+          "https://wa.me/917827229116?text=Hi%2C%20I%20am%20a%20GeM%20reseller%20and%20interested%20in%20OEM%20code%20for%20Fogging%20Machines",
+        track: "gem_hero_whatsapp",
+      },
+    },
+    sections: [
+      {
+        kind: "trust-strip",
+        metrics: [
+          { value: "10,000+", label: "Happy customers" },
+          { value: "50+", label: "Active distributors" },
+          { value: "10+", label: "Years experience" },
+          { value: "GeM Q2", label: "OEM certified" },
+          { value: "Pan India", label: "Supply & support" },
+        ],
+      },
+      {
+        kind: "benefits-grid",
+        eyebrow: "Why partner with us",
+        title: "Everything a GeM reseller needs in one place",
+        items: [
+          { icon: "🏛️", title: "GeM-Approved OEM Status", description: "Registered and approved on GeM portal for Fogging Machines under Q2 — your listings get full compliance credibility from day one." },
+          { icon: "📄", title: "OEM Reseller Code Support", description: "We issue the OEM Reseller Authorization Code you need to list our machines on your GeM seller account." },
+          { icon: "✅", title: "Spec-Compliant Catalogue", description: "Every machine meets GeM technical specifications — no rejections, no compliance back-and-forth, guaranteed delivery on government orders." },
+          { icon: "💰", title: "Direct Factory Pricing", description: "Direct supply from our Gurugram plant with no middlemen — maximise your margin on every GeM order you fulfil." },
+          { icon: "🚚", title: "Pan-India Delivery", description: "We deliver across India — Bihar, UP, Maharashtra, Karnataka, the North-East and everywhere in between, on time, with dispatch documents." },
+          { icon: "🤝", title: "Dedicated Reseller Support", description: "Account manager, GST invoices, dispatch documents, and everything needed to close your GeM orders smoothly." },
+        ],
+      },
+      {
+        kind: "process-timeline",
+        eyebrow: "Process",
+        title: "How to get started",
+        steps: [
+          { title: "Fill the reseller registration form", description: "Share your GeM Seller ID, GST number, and company details. Takes under two minutes." },
+          { title: "We verify and reach out", description: "Our team verifies your GeM seller profile and calls back within 24 hours to begin the OEM authorization process." },
+          { title: "Receive OEM Reseller Authorization", description: "We share the OEM code, technical catalogue, and pricing so you can list our machines on your GeM account immediately." },
+          { title: "Start winning GeM orders", description: "Bid on government tenders, win orders, we ship directly. You earn the margin — hassle-free." },
+        ],
+      },
+      {
+        kind: "form",
+        variant: "reseller",
+        eyebrow: "Reseller registration",
+        title: "Register now and get OEM code",
+        sub: "Limited reseller slots open this quarter — register today to secure your OEM authorization and start listing on GeM.",
+        checklist: [
+          "GeM Q2 category OEM authorization",
+          "Spec-compliant machine catalogue",
+          "Best price quote within 24 hours",
+          "Dedicated GeM support team access",
+          "GST invoice + dispatch documents",
+        ],
+      },
+      {
+        kind: "case-studies",
+        eyebrow: "Trusted by public health teams",
+        title: "Recent government & municipal deployments",
+        items: [
+          { client: "Municipal Corporation, Tier-1 city", location: "North India", result: "120 thermal foggers delivered against GeM order; full coverage in monsoon vector-control drive." },
+          { client: "State Health Department", location: "Eastern India", result: "Vehicle-mounted units deployed across 14 districts for dengue / chikungunya control." },
+          { client: "Cantonment Board", location: "Western India", result: "SS-tank thermal foggers procured for year-round campus and quarters sanitation." },
+        ],
+      },
+    ],
+    faqs: [
+      { q: "What is 'GeM-approved OEM' and why does it matter for resellers?", a: "GeM-approved OEM means 100x Circle is registered on the Government e-Marketplace as the original manufacturer for our fogging machine SKUs. Resellers can list these SKUs on their own GeM seller account once we issue an OEM Reseller Authorization Code — without that authorization, your listing is non-compliant and gets rejected at order acceptance." },
+      { q: "Which GeM category are 100x Circle fogging machines listed under?", a: "Q2 — Pest Control Equipment / Fogging Machines. Our SKUs include thermal foggers, cold (ULV) foggers, vehicle-mounted units, and stainless-steel-tank variants — all spec-mapped to the active GeM technical sheets." },
+      { q: "Do I need to be a registered GeM seller before applying for OEM code?", a: "Yes. You'll need an active GeM Seller ID and a valid GSTIN before we can issue the OEM Reseller Authorization. If you're new to GeM, we can guide you to the registration flow but the seller account itself has to be in your name." },
+      { q: "Is there any fee to become an authorized GeM reseller?", a: "No — there is no joining fee. We earn through the wholesale rate we offer; you earn the difference between our rate and your GeM listing price." },
+      { q: "How quickly will I receive the OEM authorization after I register?", a: "Typically within 24–48 hours of receiving your registration. Our team verifies your GeM seller profile, GST status, and basic KYC before issuing the OEM code." },
+    ],
+    relatedLandingSlugs: [
+      "thermal-and-cold-fogging-machine-100xtfs50",
+      "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+    ],
+  },
+
+  // ─── State page: Uttar Pradesh ───────────────────────────────────────
+  "fogging-machine-supplier-in-uttar-pradesh": {
+    slug: "fogging-machine-supplier-in-uttar-pradesh",
+    type: "state",
+    metadata: {
+      title: "Fogging Machine Supplier in Uttar Pradesh | 100x Circle",
+      description:
+        "100x Circle supplies thermal & vehicle-mounted fogging machines across Uttar Pradesh. Lucknow, Kanpur, Varanasi, Agra, Noida — direct factory dispatch, GST invoice, tender support.",
+      keywords:
+        "fogging machine supplier in uttar pradesh, thermal fogging machine in up, mosquito fogging machine lucknow, vehicle mounted fogger up, fogging machine kanpur varanasi agra noida",
+    },
+    hero: {
+      eyebrow: "Uttar Pradesh Supply Network",
+      headline: "Fogging Machine Supplier in Uttar Pradesh",
+      sub: "100x Circle dispatches thermal, cold, and vehicle-mounted fogging machines across Uttar Pradesh — from Lucknow and Kanpur to Varanasi, Agra, and Noida. Tender-ready quotes, GST invoices, and dedicated support for municipal corporations, dealers, and pest-control companies.",
+      primary: { label: "Get UP Tender Quote", href: "#landing-form", track: "up_hero_primary" },
+      secondary: {
+        label: "Call Us Now",
+        href: "tel:+917827229116",
+        track: "up_hero_call",
+      },
+    },
+    sections: [
+      {
+        kind: "trust-strip",
+        metrics: [
+          { value: "1,500+", label: "UP customers" },
+          { value: "75+", label: "Districts served" },
+          { value: "24–72h", label: "Dispatch time" },
+          { value: "GST", label: "Invoiced supply" },
+          { value: "Pan-UP", label: "After-sales support" },
+        ],
+      },
+      {
+        kind: "benefits-grid",
+        eyebrow: "Why UP buyers choose 100x Circle",
+        title: "Dispatch, compliance, and support — built for UP",
+        items: [
+          { icon: "📦", title: "Fast dispatch to all UP districts", description: "We ship from Gurugram with 24–72 hour transit for most UP destinations. Bulk orders coordinated directly with the district logistics lead." },
+          { icon: "🏛️", title: "Tender & GeM ready", description: "We're a GeM-approved OEM. Tender documents, technical specs, compliance certificates, and authorization letters are ready when you need them." },
+          { icon: "🛠️", title: "After-sales support across UP", description: "On-call technical support in English and Hindi, spares dispatched directly, video walkthroughs for first-time field teams." },
+          { icon: "💼", title: "Channel partner programme", description: "Dealer and distributor slots open across UP — Lucknow, Kanpur, Varanasi, Agra, Noida, Meerut, Allahabad, and Tier-2 cities." },
+        ],
+      },
+      {
+        kind: "recommended-products",
+        eyebrow: "Most-requested in UP",
+        title: "Machines our UP buyers pick",
+        slugs: [
+          "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+          "thermal-and-cold-fogging-machine-100xtfs50",
+          "thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
+        ],
+      },
+      {
+        kind: "case-studies",
+        eyebrow: "UP deployments",
+        title: "Recent supply across Uttar Pradesh",
+        items: [
+          { client: "Municipal Corporation (Lucknow region)", location: "Lucknow, UP", result: "Vehicle-mounted thermal foggers deployed pre-monsoon for ward-level mosquito control." },
+          { client: "Health Department, Tier-2 city", location: "Western UP", result: "SS-tank thermal foggers supplied for hospital + market disinfection drives." },
+          { client: "Cantonment Board", location: "Eastern UP", result: "Double-barrel vehicle-mounted system fulfilling year-round fogging for the cantonment area." },
+        ],
+      },
+      {
+        kind: "form",
+        variant: "tender-quote",
+        eyebrow: "Tender / quote request",
+        title: "Get a UP-ready quote in 24 hours",
+        sub: "Share your tender reference, machine requirement, and delivery district. We respond within 24 hours with quote, compliance docs, and timeline.",
+        checklist: [
+          "Tender-compliant technical spec sheets",
+          "GST-invoiced direct factory dispatch",
+          "On-site briefing for field teams (if required)",
+          "OEM authorization letter for resellers",
+        ],
+      },
+      {
+        kind: "cta-band",
+        band: {
+          heading: "Need to speak to someone in UP today?",
+          sub: "Our sales team answers 9 AM – 6 PM IST every working day.",
+          primary: { label: "Call +91 78272 29116", href: "tel:+917827229116" },
+          secondary: { label: "WhatsApp", href: "https://wa.me/917827229116?text=I%27m%20in%20Uttar%20Pradesh%20and%20want%20a%20quote%20for%20fogging%20machines" },
+        },
+      },
+    ],
+    faqs: [
+      { q: "Do you supply fogging machines to all districts in Uttar Pradesh?", a: "Yes — we dispatch from our Gurugram facility to every UP district. Transit time is typically 24–72 hours depending on the destination and freight option. Bulk and tender orders get a confirmed delivery commitment in the quote." },
+      { q: "Are 100x Circle machines acceptable for UP tenders and GeM listings?", a: "Yes. We're a GeM-approved OEM for fogging machines and our SKUs map to the standard tender technical specifications used by municipal corporations and state health departments in UP. We provide all supporting documents — OEM authorization letter, GST invoice, dispatch challan, warranty certificate." },
+      { q: "Do you offer dealer or distributor opportunities in Uttar Pradesh?", a: "Yes — we onboard dealers across UP. Reach out via the form above with your city, current business, and target volume. Margins, territory exclusivity, and onboarding are discussed in the first call." },
+      { q: "What after-sales support do UP customers get?", a: "On-call technical support in English and Hindi, spare-parts dispatch from Gurugram, troubleshooting videos for first-time field teams, and on-site assistance for large institutional buyers." },
+    ],
+    relatedLandingSlugs: [
+      "gem-approved-fogging-machine-oem",
+      "dengue-control-fogging-machine",
+      "thermal-vs-cold-fogging-machine",
+    ],
+  },
+
+  // ─── Use-case page: Dengue control ───────────────────────────────────
+  "dengue-control-fogging-machine": {
+    slug: "dengue-control-fogging-machine",
+    type: "use-case",
+    metadata: {
+      title: "Dengue Control Fogging Machine | 100x Circle",
+      description:
+        "Thermal & cold fogging machines proven for dengue mosquito control — Aedes aegypti suppression for municipal corporations, housing societies, and public health teams across India.",
+      keywords:
+        "dengue control fogging machine, aedes aegypti control fogger, dengue mosquito fogging machine india, public health fogging machine, vector control fogging equipment",
+    },
+    hero: {
+      eyebrow: "Vector Control — Dengue & Chikungunya",
+      headline: [
+        { text: "Stop Dengue at the" },
+        { text: "Source", accent: "green" },
+        { text: "with proven fogging machines" },
+      ],
+      sub: "Aedes aegypti — the dengue vector — breeds close to homes and bites by day. The right fogger, the right droplet size, and the right application window break the transmission cycle. Here's what 100x Circle deploys for dengue control across municipal corporations, housing societies, and public health teams.",
+      primary: { label: "Get a Dengue Control Quote", href: "#landing-form", track: "dengue_hero_primary" },
+      secondary: {
+        label: "WhatsApp the Team",
+        href: "https://wa.me/917827229116?text=Hi%2C%20I%20need%20a%20fogging%20machine%20for%20dengue%20control",
+        track: "dengue_hero_whatsapp",
+      },
+    },
+    sections: [
+      {
+        kind: "trust-strip",
+        metrics: [
+          { value: "Aedes", label: "Aegypti targeted" },
+          { value: "10–25μm", label: "Optimal droplet size" },
+          { value: "Dawn / Dusk", label: "Application window" },
+          { value: "Pan-India", label: "Public-health supply" },
+        ],
+      },
+      {
+        kind: "benefits-grid",
+        eyebrow: "Why thermal fogging works for dengue",
+        title: "What you actually need for a dengue drive",
+        items: [
+          { icon: "🦟", title: "Targets adult Aedes aegypti", description: "Thermal fogging produces a dense, visible fog with droplet sizes that contact resting and flying adult mosquitoes — including the day-biting Aedes responsible for dengue." },
+          { icon: "🌫️", title: "Penetrates dense canopy and structures", description: "The hot fog drifts into vegetation, drains, water-storage cover areas, and shaded breeding spots where ULV alone misses." },
+          { icon: "⚡", title: "Wide coverage per hour", description: "A vehicle-mounted double-barrel unit can fog several kilometres of road per hour — practical for ward-level municipal drives." },
+          { icon: "🧪", title: "Compatible with approved insecticides", description: "Use any CIB-approved adulticide (pyrethroid, malathion, etc.) — our machines are calibrated for standard dilution rates." },
+          { icon: "🚐", title: "Vehicle-mountable or portable", description: "Pick the form factor that fits — vehicle-mounted for city-wide ward drives, SS-tank portable for housing societies and hospital campuses." },
+          { icon: "🛠️", title: "Field-tested durability", description: "Pulse-jet engines, stainless components, and serviceable parts — built to survive monsoon-season daily operation." },
+        ],
+      },
+      {
+        kind: "process-timeline",
+        eyebrow: "Deployment workflow",
+        title: "How a dengue fogging drive should run",
+        steps: [
+          { title: "Identify hot-spot wards", description: "Use dengue case data and previous-season hot-spots to prioritise wards. Aedes is a peridomestic mosquito — focus on residential clusters, schools, hospitals, and water-storage areas." },
+          { title: "Schedule for dawn or dusk", description: "Aedes aegypti is most active in cooler twilight hours. Fogging during these windows maximises contact with active adults and reduces wasted insecticide." },
+          { title: "Run the right form factor for the area", description: "Vehicle-mounted double-barrel for streets and open wards; portable thermal foggers for parks, hospital campuses, schools, and society compounds." },
+          { title: "Pair with breeding-source reduction", description: "Fogging suppresses adult populations; it does not eliminate breeding. Run alongside container clean-up and larvicide treatment for sustained control." },
+        ],
+      },
+      {
+        kind: "recommended-products",
+        eyebrow: "Recommended for dengue",
+        title: "Picks for vector-control teams",
+        slugs: [
+          "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+          "thermal-and-cold-fogging-machine-100xtfs50",
+          "thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
+        ],
+      },
+      {
+        kind: "case-studies",
+        eyebrow: "Public health deployments",
+        title: "Used in real dengue drives",
+        items: [
+          { client: "Municipal Health Office", location: "North India", result: "Pre-monsoon ward-by-ward thermal fogging using double-barrel vehicle-mounted units." },
+          { client: "Cantonment Health Cell", location: "Western India", result: "SS-tank portable foggers across campus quarters, schools, and the cantonment hospital." },
+          { client: "Residents' Welfare Association cluster", location: "Tier-1 city", result: "Twice-weekly society-level fogging during dengue season with operator training." },
+        ],
+      },
+      {
+        kind: "form",
+        variant: "use-case-quote",
+        eyebrow: "Quote request",
+        title: "Get a dengue-control quote in 24 hours",
+        sub: "Tell us the area you cover, expected frequency, and any current bottleneck. We'll respond with a recommended model, indicative price, and delivery timeline.",
+        checklist: [
+          "Model recommendation based on coverage area",
+          "Indicative pricing in INR (with GST)",
+          "Operator training video links",
+          "After-sales contact for your region",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Is thermal fogging the right choice for dengue control?", a: "For adult Aedes aegypti suppression — yes. Thermal fogging produces a dense visible cloud with droplet sizes (typically 10–25 μm) that contact resting and flying adults. For closed-room disinfection or sensitive areas where heat and visible fog are unwanted, cold (ULV) fogging is preferred. Most municipal dengue programmes combine both based on environment." },
+      { q: "When during the day should we run a dengue fogging drive?", a: "Dawn (5:30–7:00 AM) and dusk (5:30–7:30 PM) are optimal. Aedes aegypti is most active in cooler twilight hours, so droplet-mosquito contact is highest. Midday fogging wastes insecticide due to high evaporation and low mosquito activity." },
+      { q: "Which 100x Circle model do most municipal corporations choose for dengue drives?", a: "The Double Barrel Thermal Fogging Machine (100XDB400) for vehicle-mounted ward-level coverage, paired with portable thermal units (TFS50 or SSMA20) for parks, hospitals, schools, and society compounds that the vehicle can't enter." },
+      { q: "Do you supply CIB-approved insecticide or just the machine?", a: "We supply the equipment and calibrate it for standard insecticide dilution rates. Procurement of the insecticide itself is handled by the health department or pest-control operator, typically a CIB-approved adulticide such as a pyrethroid or malathion formulation." },
+    ],
+    relatedLandingSlugs: [
+      "thermal-vs-cold-fogging-machine",
+      "fogging-machine-supplier-in-uttar-pradesh",
+      "gem-approved-fogging-machine-oem",
+    ],
+  },
+
+  // ─── Comparison page: Thermal vs Cold fogging ────────────────────────
+  "thermal-vs-cold-fogging-machine": {
+    slug: "thermal-vs-cold-fogging-machine",
+    type: "comparison",
+    metadata: {
+      title: "Thermal vs Cold Fogging Machine — Which to Buy | 100x Circle",
+      description:
+        "Compare thermal and cold (ULV) fogging machines side-by-side: droplet size, coverage, indoor vs outdoor use, insecticide compatibility, ideal buyer. Buyer's guide from 100x Circle.",
+      keywords:
+        "thermal vs cold fogging machine, thermal vs ulv fogger, which fogging machine to buy, cold fogger vs thermal fogger, fogging machine comparison india",
+    },
+    hero: {
+      eyebrow: "Buyer Comparison",
+      headline: [
+        { text: "Thermal vs Cold Fogging:" },
+        { text: "Which Fits Your Use Case?", accent: "green" },
+      ],
+      sub: "Both thermal and cold (ULV) fogging machines have a place — but the wrong choice wastes insecticide and frustrates field teams. Here's the side-by-side comparison we walk every buyer through.",
+      primary: { label: "Talk to a Specialist", href: "/contact-us", track: "compare_hero_primary" },
+      secondary: {
+        label: "WhatsApp Question",
+        href: "https://wa.me/917827229116?text=Hi%2C%20I%20want%20help%20choosing%20between%20thermal%20and%20cold%20fogging",
+        track: "compare_hero_whatsapp",
+      },
+    },
+    sections: [
+      {
+        kind: "trust-strip",
+        metrics: [
+          { value: "10+ yrs", label: "Manufacturing both" },
+          { value: "GeM", label: "Q2 OEM" },
+          { value: "INR", label: "Direct factory pricing" },
+          { value: "Pan India", label: "Supply + support" },
+        ],
+      },
+      {
+        kind: "benefits-grid",
+        eyebrow: "Start with the question",
+        title: "Indoor disinfection or outdoor mosquito control?",
+        items: [
+          { icon: "🦟", title: "Outdoor adult mosquito control", description: "Thermal fogging wins. Dense visible cloud penetrates vegetation, drains, and structures where Aedes and Culex rest." },
+          { icon: "🏥", title: "Indoor disinfection / sensitive areas", description: "Cold (ULV) fogging wins. No heat, no visible cloud, lower chemical drift — ideal for hospitals, food-handling areas, server rooms." },
+          { icon: "🌾", title: "Agriculture & horticulture pest control", description: "Either can work — thermal for open fields and orchards, cold for greenhouses and chemical-sensitive crops." },
+        ],
+      },
+      {
+        kind: "comparison-table",
+        eyebrow: "Side-by-side",
+        title: "Thermal fogger vs cold (ULV) fogger",
+        columns: ["Thermal Fogging", "Cold (ULV) Fogging"],
+        rows: [
+          { label: "Droplet size", cells: ["~10–25 μm (warm fog)", "~5–50 μm (cold mist)"] },
+          { label: "Visible cloud", cells: ["Yes, dense", "Minimal / invisible"] },
+          { label: "Heat", cells: ["Hot (uses pulse-jet)", "Cold (mechanical pressure)"] },
+          { label: "Indoor use", cells: ["Not recommended (heat + visibility)", "Yes — preferred"], highlight: 1 },
+          { label: "Outdoor mosquito control", cells: ["Preferred (dense cloud penetrates)", "Possible but less effective"], highlight: 0 },
+          { label: "Insecticide carrier", cells: ["Oil-based", "Water-based or oil-based"] },
+          { label: "Per-hour coverage", cells: ["High (esp. vehicle-mounted)", "Moderate"], highlight: 0 },
+          { label: "Operator skill", cells: ["Higher (heat safety)", "Lower"] },
+          { label: "Typical use case", cells: ["Municipal vector control, parks, drains", "Hospital / school / warehouse disinfection"] },
+          { label: "100x Circle model", cells: ["DB400 (vehicle-mounted) / SSMA20", "TFS50 (supports both modes)"] },
+        ],
+        note: "Most municipal vector-control programmes deploy both — thermal for outdoor ward drives, cold for institutional disinfection. The TFS50 supports both modes in a single unit.",
+      },
+      {
+        kind: "recommended-products",
+        eyebrow: "Pick from these",
+        title: "100x Circle models referenced above",
+        slugs: [
+          "thermal-and-cold-fogging-machine-100xtfs50",
+          "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+          "thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
+        ],
+      },
+      {
+        kind: "cta-band",
+        band: {
+          heading: "Still unsure which one fits your operation?",
+          sub: "Tell our team the use case, area, and frequency — we'll recommend the right form factor and quote indicative pricing.",
+          primary: { label: "Request a Recommendation", href: "/contact-us" },
+          secondary: { label: "Call +91 78272 29116", href: "tel:+917827229116" },
+        },
+      },
+    ],
+    faqs: [
+      { q: "If I can only buy one machine, which type covers more use cases?", a: "The thermal & cold combo unit (100XTFS50) — it supports both thermal and cold (ULV) modes in a single machine. For most buyers who need flexibility across outdoor mosquito control and indoor disinfection, this is the most versatile single-machine choice." },
+      { q: "Is cold (ULV) fogging safer for indoor use than thermal?", a: "Yes. Cold fogging produces no heat and a minimal visible cloud, so it's appropriate for occupied or sensitive indoor environments — hospitals, schools, server rooms, food-handling areas. Thermal fogging is generally restricted to outdoor or empty-area use because of the heat and visibility." },
+      { q: "Do thermal and cold foggers use the same insecticide?", a: "Both can use CIB-approved adulticides, but thermal foggers typically need an oil-based carrier (for clean vaporisation), while cold foggers work with either oil- or water-based carriers. We provide dilution guidance with every machine." },
+      { q: "What about agricultural and greenhouse pest control?", a: "Thermal fogging suits open fields and orchards (better penetration through canopy). Cold fogging suits greenhouses and chemical-sensitive crops where heat or visible drift is undesirable. Many large farms run both for different blocks." },
+    ],
+    relatedLandingSlugs: [
+      "dengue-control-fogging-machine",
+      "gem-approved-fogging-machine-oem",
+      "fogging-machine-buying-guide",
+    ],
+  },
+
+  // ─── Buyer guide ─────────────────────────────────────────────────────
+  "fogging-machine-buying-guide": {
+    slug: "fogging-machine-buying-guide",
+    type: "guide",
+    metadata: {
+      title: "Fogging Machine Buying Guide (India) | 100x Circle",
+      description:
+        "How to choose the right fogging machine in India: form factor, droplet size, coverage, certification, after-sales. A practical buyer guide from 100x Circle's manufacturing team.",
+      keywords:
+        "fogging machine buying guide india, how to choose fogging machine, fogging machine buyer guide, thermal fogger buying guide, ulv fogger buying guide",
+    },
+    hero: {
+      eyebrow: "Buyer Guide",
+      headline: "Fogging Machine Buying Guide for India",
+      sub: "A practical, vendor-honest guide to choosing the right fogging machine — written by 100x Circle's manufacturing team for municipal buyers, pest-control operators, dealers, and large institutional procurement.",
+      primary: { label: "Get the Checklist by Email", href: "#landing-form", track: "guide_hero_primary" },
+      secondary: { label: "Browse Products", href: "/products", track: "guide_hero_browse" },
+    },
+    sections: [
+      {
+        kind: "rich-text",
+        h2: "Start with the use case, not the catalogue",
+        paragraphs: [
+          "The single biggest reason buyers regret a fogging-machine purchase is choosing on price or brochure spec instead of use case. A double-barrel vehicle-mounted unit is overkill for a 4-acre poultry farm; a portable thermal fogger is the wrong tool for ward-level municipal vector control.",
+          "Before you read another spec sheet, write down: who operates the machine (trained crew or rotating staff?), where it runs (open street, hospital corridor, greenhouse?), how often (daily monsoon drives or twice a year?), and what's the chemical of choice. The right form factor follows from those answers.",
+        ],
+      },
+      {
+        kind: "benefits-grid",
+        eyebrow: "Five things buyers should actually check",
+        title: "Spec sheet shortcuts that don't matter — and what does",
+        items: [
+          { icon: "🎯", title: "Droplet size, not just 'fog density'", description: "10–25 μm thermal droplets are ideal for adult mosquito contact. ULV droplets vary 5–50 μm. Brochure-friendly 'dense fog' claims tell you little — ask for actual droplet distribution data." },
+          { icon: "⏱️", title: "Per-hour coverage at real dilution rates", description: "Vendor specs assume ideal lab conditions. Ask what the machine covers per hour at the dilution rate your insecticide actually requires." },
+          { icon: "🛠️", title: "Spares availability and service network", description: "A fogger is a maintenance-active machine. If the vendor can't ship spares within a week to your state, factor in downtime cost before you compare prices." },
+          { icon: "📜", title: "BIS / GeM compliance + warranty terms", description: "For tender and institutional orders, OEM certification and GeM compliance matter more than discount. Verify the warranty document — call the vendor's after-sales line before you buy." },
+          { icon: "🇮🇳", title: "India-suitable engine + materials", description: "Pulse-jet engines and stainless-steel components built for Indian field conditions outlast imported aluminium-tank units in monsoon-heavy operation." },
+        ],
+      },
+      {
+        kind: "process-timeline",
+        eyebrow: "Decision framework",
+        title: "5-step buying process",
+        steps: [
+          { title: "Define the use case in writing", description: "Operator skill, environment, frequency, target pest, insecticide of choice. Reject any vendor recommendation that doesn't reference all five." },
+          { title: "Shortlist 2–3 form factors", description: "Portable thermal, SS-tank thermal, vehicle-mounted double-barrel, ULV cold. Most use cases narrow to one or two candidates." },
+          { title: "Request a demo or video walkthrough", description: "A 5-minute operating demo — even by video — reveals more than any brochure. Ask to see start-up, fog density, fuel/chemical refill, and shutdown." },
+          { title: "Compare on total cost of operation", description: "Sticker price + insecticide consumption + spares + downtime. The cheapest machine often costs the most over 3 years." },
+          { title: "Pilot before you scale", description: "If you're buying for 10+ machines, get one first, run it for a season, then place the bulk order. Vendors that resist this aren't worth the risk." },
+        ],
+      },
+      {
+        kind: "comparison-table",
+        eyebrow: "Form-factor matrix",
+        title: "Which form factor for which use case?",
+        columns: ["Portable Thermal", "SS-Tank Thermal", "Vehicle-Mounted Double-Barrel", "Cold (ULV)"],
+        rows: [
+          { label: "Municipal ward drive", cells: ["—", "Limited", "Best", "—"], highlight: 2 },
+          { label: "Hospital / school disinfection", cells: ["—", "—", "—", "Best"], highlight: 3 },
+          { label: "Housing society / RWA", cells: ["Good", "Best", "Overkill", "Possible"], highlight: 1 },
+          { label: "Poultry / dairy farm", cells: ["Good", "Best", "Overkill", "Good"], highlight: 1 },
+          { label: "Greenhouse / agri", cells: ["Limited", "Good", "—", "Best"], highlight: 3 },
+          { label: "Warehouse / grain storage", cells: ["Limited", "Good", "—", "Best"], highlight: 3 },
+        ],
+        note: "\"Best\" = the form factor we'd recommend first; \"Good\" = workable; \"—\" = not a fit.",
+      },
+      {
+        kind: "recommended-products",
+        eyebrow: "100x Circle range",
+        title: "Our current production line",
+        slugs: [
+          "thermal-and-cold-fogging-machine-100xtfs50",
+          "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+          "thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
+        ],
+      },
+      {
+        kind: "form",
+        variant: "guide-download",
+        eyebrow: "Get the checklist",
+        title: "Get the buyer checklist by email",
+        sub: "We'll send a single-page PDF buyer checklist plus our latest catalogue. No follow-up calls unless you ask for one.",
+        checklist: [
+          "1-page buyer checklist (PDF)",
+          "Latest 100x Circle catalogue",
+          "Spec-sheet comparison templates",
+          "Optional 1-on-1 specialist consultation",
+        ],
+      },
+      {
+        kind: "cta-band",
+        band: {
+          heading: "Want a vendor-honest recommendation for your operation?",
+          sub: "Tell us your use case — we'll recommend a form factor first, then pricing.",
+          primary: { label: "Talk to a Specialist", href: "/contact-us" },
+          secondary: { label: "WhatsApp +91 78272 29116", href: "https://wa.me/917827229116" },
+        },
+      },
+    ],
+    faqs: [
+      { q: "What's the most common buyer mistake when choosing a fogging machine?", a: "Buying on sticker price without considering total cost of operation. The cheapest machine often consumes more insecticide per hectare, breaks down more often, and is harder to service — adding up to multiples of the purchase price over 3 years. The right comparison is delivered-cost-per-hectare-per-year, not unit price." },
+      { q: "Should I buy a thermal fogger or a cold (ULV) fogger?", a: "Use case decides. Thermal is better for outdoor mosquito control — its dense, hot fog penetrates vegetation and drains. Cold (ULV) is better for indoor disinfection, sensitive environments, and water-based chemicals. Many buyers need both — see our thermal-vs-cold comparison page for details." },
+      { q: "How important is BIS or GeM certification when buying for an institution?", a: "Critical for tender and government orders. For municipal corporations, health departments, and any GeM listing, you need an OEM-certified, spec-compliant machine — or the order will be rejected at acceptance. For private buyers (housing societies, farms, pest control firms), certification matters less than warranty + spares availability." },
+      { q: "How long should a quality fogging machine last?", a: "A well-built thermal fogger with regular maintenance lasts 7–10 years of field use. Pulse-jet engines and stainless-steel components are the long-life parts; consumables (spark plugs, fuel filters, gaskets) need annual replacement. Walk away from any vendor that quotes a warranty under 12 months." },
+      { q: "Where can I see 100x Circle machines in action before buying?", a: "We share operator demo videos with every quote. For institutional buyers (10+ unit orders), we arrange in-person demos at our Gurugram facility or coordinate a visit to a nearby deployment site." },
+    ],
+    relatedLandingSlugs: [
+      "thermal-vs-cold-fogging-machine",
+      "dengue-control-fogging-machine",
+      "gem-approved-fogging-machine-oem",
+    ],
+  },
+
+  // ─── Existing product landings (back-compat) ────────────────────────
   "thermal-fogging-machine-with-stainless-steel-tank-100xssma20": {
     slug: "thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
     type: "product",
