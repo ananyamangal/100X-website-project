@@ -79,7 +79,7 @@ export default function WhatsAppFloatingButton({
     <div
       ref={containerRef}
       className={cn(
-        "group fixed bottom-6 right-6 z-[70] flex flex-col items-end gap-2",
+        "group fixed bottom-6 right-6 z-[70] hidden md:flex md:flex-col items-end gap-2",
         "max-w-[calc(100vw-3rem)]",
         className,
       )}

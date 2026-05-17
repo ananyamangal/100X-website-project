@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Download, MessageCircle, Star, CheckCircle, 
 import Link from 'next/link';
 import { RichContent } from '@/components/RichContent';
 import { X as CloseIcon } from 'lucide-react';
+import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
 
 const badgeLogoMap: Record<string, string> = {
   'Korean Technology': '/Logos clipart 2/Korean Technology.png',
@@ -170,6 +171,11 @@ export default function ProductDetailClient({ productId }: { productId: string }
 
   return (
     <div className="pt-32 min-h-screen bg-gray-50 relative">
+      <MobileCtaOverride
+        audience="product"
+        productName={product?.name}
+        whatsappMessage={product?.whatsappMessageText}
+      />
       <Header />
       <div className="container mx-auto px-4 py-12">
         <div className="mb-8">

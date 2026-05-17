@@ -9,6 +9,8 @@ import SiteFooter from '@/components/SiteFooter'
 import GlobalJsonLd from '@/components/seo/GlobalJsonLd'
 import UtmPersist from '@/components/UtmPersist'
 import { Toaster } from '@/components/ui/sonner'
+import { MobileCtaProvider } from '@/components/cta/MobileCtaContext'
+import MobileCtaBar from '@/components/cta/MobileCtaBar'
 import { SITE_URL, SITE_NAME, defaultOgImage } from '@/lib/seo/site-config'
 
 export const viewport: Viewport = {
@@ -208,11 +210,14 @@ export default function RootLayout({
             };
           `}
         </Script>
-        <Navbar />
-        <main id="main-content" tabIndex={-1}>
-          {children}
-        </main>
-        <SiteFooter />
+        <MobileCtaProvider>
+          <Navbar />
+          <main id="main-content" tabIndex={-1}>
+            {children}
+          </main>
+          <SiteFooter />
+          <MobileCtaBar />
+        </MobileCtaProvider>
         <Toaster richColors position="top-right" closeButton />
       </body>
     </html>

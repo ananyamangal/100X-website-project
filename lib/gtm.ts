@@ -17,6 +17,7 @@ export const ATTRIBUTION_STORAGE_KEY = "attribution_v1"
 
 export const CONTACT_LEAD_CTX_KEY = "contact_lead_ctx"
 export const BROCHURE_LEAD_CTX_KEY = "brochure_lead_ctx"
+export const QUOTE_LEAD_CTX_KEY = "quote_lead_ctx"
 
 export type PersistedAttribution = Record<string, string>
 
@@ -107,6 +108,26 @@ export function setBrochureLeadContext(ctx: Record<string, unknown>): void {
 
 export function readBrochureLeadContext(): Record<string, unknown> | null {
   const raw = sessionStorage.getItem(BROCHURE_LEAD_CTX_KEY)
+  if (!raw) return null
+  try {
+    return JSON.parse(raw) as Record<string, unknown>
+  } catch {
+    return null
+  }
+}
+
+export function setQuoteLeadContext(ctx: Record<string, unknown>): void {
+  sessionStorage.setItem(
+    QUOTE_LEAD_CTX_KEY,
+    JSON.stringify({
+      ...ctx,
+      saved_at: new Date().toISOString(),
+    }),
+  )
+}
+
+export function readQuoteLeadContext(): Record<string, unknown> | null {
+  const raw = sessionStorage.getItem(QUOTE_LEAD_CTX_KEY)
   if (!raw) return null
   try {
     return JSON.parse(raw) as Record<string, unknown>
