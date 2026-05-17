@@ -60,13 +60,35 @@ export const CTA_COPY: Record<Audience, CopySet> = {
   },
 }
 
-const TENDER_KEYWORDS = ["gem", "tender", "government", "govt", "institutional"]
+const TENDER_KEYWORDS = [
+  "gem",
+  "tender",
+  "government",
+  "govt",
+  "institutional",
+  "municipal",
+  "panchayat",
+]
 const DISTRIBUTOR_KEYWORDS = ["dealer", "distributor", "partner", "reseller"]
+
+/**
+ * Routes treated as product pages.
+ *   - Strings ending in `/` match by prefix (the Mongo catalogue).
+ *   - Strings without a trailing `/` match exactly so we don't
+ *     accidentally classify `/power-tiller-supplier-in-up` as product
+ *     when we add that state landing later.
+ */
 const PRODUCT_PREFIXES = [
   "/products/",
   "/power-tiller",
   "/vehicle-mounted-fogging-machine",
 ]
+
+function matchesProductPrefix(p: string): boolean {
+  return PRODUCT_PREFIXES.some((prefix) =>
+    prefix.endsWith("/") ? p.startsWith(prefix) : p === prefix,
+  )
+}
 
 // Top-level SEO slug pages (single path segment) carrying any of these tokens
 // are treated as product pages so the bar shows "Get Price" on first paint
@@ -79,6 +101,28 @@ const PRODUCT_SLUG_KEYWORDS = [
   "barrel",
   "sprayer",
   "mistblower",
+]
+
+/**
+ * Slug-substring patterns that DOWNGRADE a product-keyword match back to
+ * the "default" audience. These signal content / location / comparison
+ * pages where the visitor is browsing — they want "Get Quote" (a generic
+ * enquiry), not "Get Price" (a SKU-level intent).
+ *
+ * Examples that flip product → default:
+ *   /fogging-machine-supplier-in-uttar-pradesh   (state, "-in-")
+ *   /thermal-vs-cold-fogging-machine             (comparison, "-vs-")
+ *   /fogging-machine-buying-guide                (guide, "buying-guide")
+ *   /fogging-machine-supplier-lucknow            (city, "supplier")
+ */
+const NON_PRODUCT_SLUG_PATTERNS = [
+  "-vs-",
+  "buying-guide",
+  "-guide",
+  "supplier-in-",
+  "-supplier-",
+  "-supplier",
+  "-in-",
 ]
 
 // Single-segment top-level routes that are deliberately NOT products
@@ -104,17 +148,17 @@ export function detectAudienceFromPath(pathname: string | null | undefined): Aud
 
   if (DISTRIBUTOR_KEYWORDS.some((k) => p.includes(k))) return "distributor"
   if (TENDER_KEYWORDS.some((k) => p.includes(k))) return "tender"
-  if (PRODUCT_PREFIXES.some((prefix) => p === prefix || p.startsWith(prefix))) {
-    return "product"
-  }
+  if (matchesProductPrefix(p)) return "product"
 
   // SEO product slug fallback: top-level single-segment route, not on the
-  // non-product allow-list, containing at least one product keyword.
+  // non-product allow-list, containing at least one product keyword AND
+  // none of the content/location/comparison override patterns.
   const segments = p.split("/").filter(Boolean)
   if (
     segments.length === 1 &&
     !NON_PRODUCT_TOP_LEVEL.has(p) &&
-    PRODUCT_SLUG_KEYWORDS.some((k) => p.includes(k))
+    PRODUCT_SLUG_KEYWORDS.some((k) => p.includes(k)) &&
+    !NON_PRODUCT_SLUG_PATTERNS.some((pat) => p.includes(pat))
   ) {
     return "product"
   }
