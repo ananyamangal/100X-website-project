@@ -7,16 +7,17 @@ export function ProductLandingJsonLd({ slug }: { slug: string }) {
   const def = getLandingPage(slug)
   if (!def) return null
   const url = `${SITE_URL}/${slug}`
-  const name = def.title.split("|")[0]?.trim() || def.title
-  const ogImage = def.ogImage
-    ? def.ogImage.startsWith("http")
-      ? def.ogImage
-      : `${SITE_URL}${def.ogImage.startsWith("/") ? "" : "/"}${def.ogImage}`
+  const name = def.metadata.title.split("|")[0]?.trim() || def.metadata.title
+  const og = def.metadata.ogImage
+  const ogImage = og
+    ? og.startsWith("http")
+      ? og
+      : `${SITE_URL}${og.startsWith("/") ? "" : "/"}${og}`
     : `${SITE_URL}/logo-main.png`
   return (
     <ProductJsonLd
       name={name}
-      description={def.description}
+      description={def.metadata.description}
       images={[ogImage]}
       url={url}
       sku={slug}

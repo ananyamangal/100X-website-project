@@ -2,7 +2,8 @@ import type { MetadataRoute } from "next"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { getPublicBlogs } from "@/lib/blogsQuery"
 import { getAllProductsForSitemap } from "@/lib/productsQuery"
-import { SEO_PRODUCT_SLUGS } from "@/lib/seo/seo-product-slugs"
+import { getAllLandingPages } from "@/lib/seo/landing-pages"
+import { DEFAULT_SITEMAP_BY_TYPE } from "@/lib/seo/landing-types"
 import { blogPostSlug } from "@/lib/blogSlug"
 
 /**
@@ -46,12 +47,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: r.priority,
   }))
 
-  for (const slug of SEO_PRODUCT_SLUGS) {
+  for (const def of getAllLandingPages()) {
+    const fallback = DEFAULT_SITEMAP_BY_TYPE[def.type]
     entries.push({
-      url: `${SITE_URL}/${slug}`,
+      url: `${SITE_URL}/${def.slug}`,
       lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.9,
+      changeFrequency: def.sitemap?.changeFrequency ?? fallback.changeFrequency,
+      priority: def.sitemap?.priority ?? fallback.priority,
     })
   }
 
