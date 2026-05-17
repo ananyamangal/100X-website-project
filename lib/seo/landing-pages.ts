@@ -1,56 +1,60 @@
 /**
  * Canonical registry for SEO landing pages routed under `/[slug]`.
  *
- * Single source of truth: title, description, keywords, hero copy, body
- * content blocks. The sitemap, metadata builder, on-page content, and
- * the mobile-CTA audience detection all read from here, so launching a
- * new landing page is a **one-file edit** in this module.
+ * Single source of truth: page type, theme, metadata, hero copy, body
+ * sections, FAQs, related links. The sitemap, metadata builder, on-page
+ * content, structured data, breadcrumbs, related-product filtering, the
+ * audience-aware mobile-CTA bar, and the footer "Popular Products" column
+ * all read from here. Launching a new landing page is a **one-file edit**.
  *
  * To add a landing page:
- *   1. Add a new entry to `LANDING_PAGES` below.
- *   2. (Optional) If the slug needs a redirect from an old URL, add it
- *      to `next.config.mjs::redirects`.
- *   3. Sitemap, metadata, structured data, breadcrumbs, related-product
- *      filtering, and the audience-aware sticky CTA bar pick it up
- *      automatically — no other file changes required.
+ *   1. Append an entry to `LANDING_PAGES` below.
+ *   2. (Optional) Add a permanent redirect from any legacy URL in
+ *      `next.config.mjs::redirects`.
+ *   3. Everything else picks the new page up automatically.
+ *
+ * Section vocabulary lives in `./landing-types.ts`.
  */
 
-export type ContentSection = {
-  /** Section heading rendered as <h2>. */
-  h2: string
-  /** Paragraphs rendered in order; each becomes a <p>. */
-  p: string[]
-}
+import { DEFAULT_THEME_BY_TYPE, type LandingPageDef } from "./landing-types"
 
-export type LandingPageDef = {
-  /** URL slug (no leading slash). Becomes /<slug>. */
-  slug: string
-  /** <title> + OG title. Keep under 60 chars where possible. */
-  title: string
-  /** Meta description + OG description. Keep under 155 chars. */
-  description: string
-  /** Optional comma-separated keyword string for the keywords meta. */
-  keywords?: string
-  /**
-   * Per-product narrative blocks. They render at fixed positions in
-   * the page (before features, after applications, before badges) so
-   * keep them named rather than an array.
-   */
-  content1?: ContentSection
-  content2?: ContentSection
-  content3?: ContentSection
-  /** Optional absolute or site-relative OG image override. */
-  ogImage?: string
-}
+// ─── Re-exports so existing consumers don't need to update import paths ──
+export type { LandingPageDef }
+export {
+  DEFAULT_THEME_BY_TYPE,
+  DEFAULT_SITEMAP_BY_TYPE,
+  FORM_SUBMISSION_TYPE,
+} from "./landing-types"
+export type {
+  LandingType,
+  LandingTheme,
+  LandingSection,
+  LandingFormVariant,
+  HeroBlock,
+  HeroHeadlinePart,
+  TrustMetric,
+  BenefitItem,
+  ProcessStep,
+  ComparisonRow,
+  CaseStudy,
+  FaqEntry,
+  CtaBandData,
+} from "./landing-types"
+
+/** Legacy alias retained for any external imports. */
+export type ContentSection = NonNullable<LandingPageDef["content1"]>
 
 export const LANDING_PAGES: Record<string, LandingPageDef> = {
   "thermal-and-cold-fogging-machine-100xtfs50": {
     slug: "thermal-and-cold-fogging-machine-100xtfs50",
-    title: "Buy Thermal and Cold Fogging Machine | 100x Circle",
-    description:
-      "Buy thermal and cold fogging machines from 100x Circle. High-performance, durable foggers for mosquito control and industrial use across India. Contact us today!",
-    keywords:
-      "buy thermal and cold fogging machine, fogging machine price in india, thermal cold fogger manufacturer india, industrial thermal cold fogging machine supplier, mosquito fogging machine price, order thermal fogging machine",
+    type: "product",
+    metadata: {
+      title: "Buy Thermal and Cold Fogging Machine | 100x Circle",
+      description:
+        "Buy thermal and cold fogging machines from 100x Circle. High-performance, durable foggers for mosquito control and industrial use across India. Contact us today!",
+      keywords:
+        "buy thermal and cold fogging machine, fogging machine price in india, thermal cold fogger manufacturer india, industrial thermal cold fogging machine supplier, mosquito fogging machine price, order thermal fogging machine",
+    },
     content1: {
       h2: "Industrial Thermal Cold Fogging Machine Supplier",
       p: [
@@ -77,11 +81,14 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
   },
   "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400": {
     slug: "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
-    title: "Buy Double Barrel Thermal Fogging Machine | 100x Circle",
-    description:
-      "Buy Double Barrel Thermal Fogging Machine from 100x Circle. High-power, durable fogger for industrial mosquito control and public health use. Contact us today!",
-    keywords:
-      "buy double barrel thermal fogging machine, vehicle mounted thermal fogger manufacturer india, vehicle mounted fogging machine, heavy duty vehicle mount fogging machine supplier, double barrel fogging machine",
+    type: "product",
+    metadata: {
+      title: "Buy Double Barrel Thermal Fogging Machine | 100x Circle",
+      description:
+        "Buy Double Barrel Thermal Fogging Machine from 100x Circle. High-power, durable fogger for industrial mosquito control and public health use. Contact us today!",
+      keywords:
+        "buy double barrel thermal fogging machine, vehicle mounted thermal fogger manufacturer india, vehicle mounted fogging machine, heavy duty vehicle mount fogging machine supplier, double barrel fogging machine",
+    },
     content1: {
       h2: "Heavy Duty Vehicle Mount Fogging Machine Supplier",
       p: [
@@ -108,11 +115,14 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
   },
   "thermal-fogging-machine-with-stainless-steel-tank-100xssma20": {
     slug: "thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
-    title: "Buy Stainless Steel Tank Thermal Fogger | 100x Circle",
-    description:
-      "Buy Stainless Steel Tank Thermal Fogger from 100x Circle. Durable, rust-resistant design with powerful fog output for effective mosquito control. Contact us today!",
-    keywords:
-      "buy stainless steel tank thermal fogger, stainless steel tank fogging machine manufacturer india, SS tank thermal fogging machine supplier, stainless steel fogger price, thermal fogging machine with stainless steel tank, SS fogging machine price",
+    type: "product",
+    metadata: {
+      title: "Buy Stainless Steel Tank Thermal Fogger | 100x Circle",
+      description:
+        "Buy Stainless Steel Tank Thermal Fogger from 100x Circle. Durable, rust-resistant design with powerful fog output for effective mosquito control. Contact us today!",
+      keywords:
+        "buy stainless steel tank thermal fogger, stainless steel tank fogging machine manufacturer india, SS tank thermal fogging machine supplier, stainless steel fogger price, thermal fogging machine with stainless steel tank, SS fogging machine price",
+    },
     content1: {
       h2: "SS Tank Thermal Fogging Machine Supplier",
       p: [
@@ -155,6 +165,11 @@ export function getAllLandingPages(): LandingPageDef[] {
 export function getLandingDisplayName(slug: string): string | undefined {
   const def = LANDING_PAGES[slug]
   if (!def) return undefined
-  const [head] = def.title.split("|")
-  return (head || def.title).trim()
+  const [head] = def.metadata.title.split("|")
+  return (head || def.metadata.title).trim()
+}
+
+/** Resolve effective theme for a landing — registry override wins. */
+export function getLandingTheme(def: LandingPageDef) {
+  return def.theme ?? DEFAULT_THEME_BY_TYPE[def.type]
 }

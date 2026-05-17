@@ -7,7 +7,7 @@ import {
 } from "./landing-pages"
 
 /**
- * @deprecated Read from `LANDING_PAGES` in `./landing-pages.ts` directly.
+ * @deprecated Read from `LANDING_PAGES[slug].metadata` directly.
  * Kept as a re-export so older imports continue to resolve.
  */
 export const PRODUCT_LANDING_META: Record<
@@ -17,9 +17,9 @@ export const PRODUCT_LANDING_META: Record<
   Object.entries(LANDING_PAGES).map(([slug, def]) => [
     slug,
     {
-      title: def.title,
-      description: def.description,
-      keywords: def.keywords,
+      title: def.metadata.title,
+      description: def.metadata.description,
+      keywords: def.metadata.keywords,
     },
   ]),
 )
@@ -27,7 +27,7 @@ export const PRODUCT_LANDING_META: Record<
 export { SITE_URL }
 
 function resolveOgImage(def: LandingPageDef | undefined): string {
-  const raw = def?.ogImage
+  const raw = def?.metadata.ogImage
   if (!raw) return `${SITE_URL}/logo-main.png`
   if (raw.startsWith("http")) return raw
   return `${SITE_URL}${raw.startsWith("/") ? "" : "/"}${raw}`
@@ -35,11 +35,11 @@ function resolveOgImage(def: LandingPageDef | undefined): string {
 
 export function productLandingMetadata(slug: string): Metadata {
   const def = getLandingPage(slug)
-  const title = def?.title ?? "Product | 100x Circle"
+  const title = def?.metadata.title ?? "Product | 100x Circle"
   const description =
-    def?.description ??
+    def?.metadata.description ??
     "Thermal fogging machines and agricultural equipment from 100x Circle, India."
-  const keywords = def?.keywords
+  const keywords = def?.metadata.keywords
   const url = `${SITE_URL}/${slug}`
   const ogImage = resolveOgImage(def)
   return {
