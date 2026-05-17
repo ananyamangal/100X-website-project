@@ -10,6 +10,7 @@ import {
 import type { FaqEntry, LandingPageDef, LandingSection } from "@/lib/seo/landing-types"
 
 import LandingThemeProvider from "./LandingThemeProvider"
+import BreadcrumbNav from "./BreadcrumbNav"
 import HeroBlock from "./HeroBlock"
 import TrustStripBlock from "./TrustStripBlock"
 import BenefitsGridBlock from "./BenefitsGridBlock"
@@ -179,6 +180,7 @@ export default async function LandingRenderer({ slug }: Props) {
       <BreadcrumbJsonLd items={breadcrumb} />
       <MobileCtaOverride audience={audience} productName={getLandingDisplayName(def.slug)} />
       <LandingThemeProvider theme={theme}>
+        <BreadcrumbNav items={breadcrumb} />
         {def.hero ? <HeroBlock hero={def.hero} theme={theme} /> : null}
         {sections.map((s, i) => renderSection(s, def, i))}
 
