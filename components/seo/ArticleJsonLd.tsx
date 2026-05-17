@@ -50,18 +50,8 @@ export function ArticleJsonLd({
   )
 }
 
-export function BreadcrumbJsonLd(items: { name: string; url: string }[]) {
-  const data = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: items.map((item, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      name: item.name,
-      item: item.url,
-    })),
-  }
-  return (
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
-  )
-}
+// BreadcrumbList helper now lives in its own component to fix the broken
+// JSX call signature (it was defined as a positional-arg function but
+// invoked with `<BreadcrumbJsonLd items={[...]} />` everywhere).
+export { BreadcrumbJsonLd } from "./BreadcrumbJsonLd"
+export type { BreadcrumbItem } from "./BreadcrumbJsonLd"
