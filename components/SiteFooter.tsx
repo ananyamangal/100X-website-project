@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Mail, MapPin, Phone, Youtube } from "lucide-react"
+import { getAllLandingPages, getLandingDisplayName } from "@/lib/seo/landing-pages"
 
 const YOUTUBE_CHANNEL = "https://www.youtube.com/@100Xcircle"
 
@@ -30,11 +31,24 @@ export default function SiteFooter() {
             </div>
           </div>
           <div>
-            <h4 className="font-semibold mb-6 text-lg">Products</h4>
+            <h4 className="font-semibold mb-6 text-lg">Popular Products</h4>
             <ul className="space-y-3 text-gray-400">
+              {getAllLandingPages().map((def) => (
+                <li key={def.slug}>
+                  <Link
+                    href={`/${def.slug}`}
+                    className="hover:text-green-400 transition-colors line-clamp-2"
+                  >
+                    {getLandingDisplayName(def.slug) ?? def.slug}
+                  </Link>
+                </li>
+              ))}
               <li>
-                <Link href="/products" className="hover:text-green-400 transition-colors">
-                  All Products
+                <Link
+                  href="/products"
+                  className="hover:text-green-400 transition-colors font-semibold text-green-400"
+                >
+                  View all products →
                 </Link>
               </li>
             </ul>

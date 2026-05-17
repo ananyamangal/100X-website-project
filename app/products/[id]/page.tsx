@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import ProductDetailClient from "./ProductDetailClient"
 import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
+import RelatedProductsSection from "@/components/RelatedProductsSection"
 import { getProductById } from "@/lib/productsQuery"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
@@ -95,6 +96,9 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
         </>
       ) : null}
       <ProductDetailClient productId={id} />
+      {product ? (
+        <RelatedProductsSection category={category} excludeId={id} limit={4} />
+      ) : null}
     </>
   )
 }

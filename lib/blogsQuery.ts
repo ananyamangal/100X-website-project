@@ -39,3 +39,28 @@ export async function getAllBlogSlugs() {
   const blogs = await getPublicBlogs()
   return blogs.map((b) => ({ slug: blogPostSlug(b) }))
 }
+
+/**
+ * Fetch up to `limit` other published posts in the same category as the
+ * given slug. Used by the related-posts surface on blog detail pages.
+ * Falls back to "most recent other posts" when the source post has no
+ * category, so the related rail is rarely empty.
+ */
+export async function getRelatedBlogPosts(
+  category: string | undefined,
+  excludeSlug: string,
+  limit = 3,
+) {
+  const blogs = await getPublicBlogs()
+  const filtered = blogs.filter((b) => blogPostSlug(b) !== excludeSlug)
+  if (category) {
+    const sameCat = filtered.filter(
+      (b) => typeof b.category === "string" && b.category === category,
+    )
+    if (sameCat.length >= limit) return sameCat.slice(0, limit)
+    // Fill remaining slots with most-recent other posts so the rail is full.
+    const others = filtered.filter((b) => !sameCat.includes(b))
+    return [...sameCat, ...others].slice(0, limit)
+  }
+  return filtered.slice(0, limit)
+}
