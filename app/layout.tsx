@@ -8,6 +8,7 @@ import VideoPopup from '@/components/VideoPopup'
 import SiteFooter from '@/components/SiteFooter'
 import GlobalJsonLd from '@/components/seo/GlobalJsonLd'
 import UtmPersist from '@/components/UtmPersist'
+import { Toaster } from '@/components/ui/sonner'
 import { SITE_URL, SITE_NAME, defaultOgImage } from '@/lib/seo/site-config'
 
 export const viewport: Viewport = {
@@ -94,7 +95,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <Script id="gtm-head" strategy="beforeInteractive">
+        <Script id="gtm-head" strategy="afterInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -212,6 +213,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <Toaster richColors position="top-right" closeButton />
       </body>
     </html>
   )
