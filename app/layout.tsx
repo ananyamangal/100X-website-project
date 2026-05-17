@@ -1,8 +1,19 @@
 import type { Metadata, Viewport } from 'next'
+import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import { Suspense } from 'react'
 import './globals.css'
 import Navbar from '../components/Navbar'
+
+// Premium body + display typeface. Single weight family file kept small;
+// variable axis covers 100–900 so the redesigned headlines can use 700/800
+// without an extra HTTP request. Exposed as `var(--font-sans)` so existing
+// Arial fallback in globals.css inherits it automatically.
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+})
 import GemPopup from '@/components/GemPopup'
 import VideoPopup from '@/components/VideoPopup'
 import SiteFooter from '@/components/SiteFooter'
@@ -96,7 +107,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en-IN">
+    <html lang="en-IN" className={inter.variable}>
       <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
