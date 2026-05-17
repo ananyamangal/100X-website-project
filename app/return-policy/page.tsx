@@ -5,7 +5,7 @@ import { SITE_URL, SITE_NAME, defaultOgImage } from "@/lib/seo/site-config"
 export const metadata: Metadata = {
   title: "Return Policy | 100x Circle",
   description: "Return and refund policy for 100X Circle products.",
-  alternates: { canonical: `${SITE_URL}/return-policy` },
+  alternates: { canonical: "/return-policy" },
   openGraph: {
     title: `Return Policy | ${SITE_NAME}`,
     url: `${SITE_URL}/return-policy`,

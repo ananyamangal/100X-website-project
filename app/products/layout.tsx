@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "Browse thermal fogging machines, sprayers, tillers, and industrial equipment from 100x Circle — manufacturer and supplier across India.",
   alternates: {
-    canonical: `${SITE_URL}/products`,
+    canonical: "/products",
   },
   openGraph: {
     title: `Products | ${SITE_NAME}`,

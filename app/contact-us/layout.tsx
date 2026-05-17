@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Contact Us | 100x Circle",
   description:
     "Contact 100x Circle for thermal fogging machines, dealer enquiries, and technical support. Phone, email, and WhatsApp — Sector 7, IMT Manesar, Gurugram.",
-  alternates: { canonical: `${SITE_URL}/contact-us` },
+  alternates: { canonical: "/contact-us" },
   openGraph: {
     title: `Contact Us | ${SITE_NAME}`,
     description: "Reach our sales and support team for fogging equipment across India.",

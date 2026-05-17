@@ -14,7 +14,7 @@ export const metadata = {
   title: "Fogging Machine Industry Blog | 100x Circle",
   description:
     "Practical tips, maintenance guides, and industry insights from 100x Circle — thermal fogging machine manufacturer serving customers across India.",
-  alternates: { canonical: `${SITE_URL}/blog` },
+  alternates: { canonical: "/blog" },
   openGraph: {
     title: `Industry Blog | ${SITE_NAME}`,
     description:

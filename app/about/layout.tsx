@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "About Us | 100x Circle",
   description:
     "Learn about 100x Circle Pvt Ltd — thermal fogging machine manufacturer, mission, manufacturing excellence, and commitment to public health and agriculture across India.",
-  alternates: { canonical: `${SITE_URL}/about` },
+  alternates: { canonical: "/about" },
   openGraph: {
     title: `About Us | ${SITE_NAME}`,
     description:

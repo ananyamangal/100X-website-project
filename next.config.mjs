@@ -1,9 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  trailingSlash: false,
 
   async redirects() {
     return [
+      // Non-www -> www host normalization. Canonical origin lives at
+      // https://www.100xcircle.com (matches SITE_URL in lib/seo/site-config.ts).
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: '100xcircle.com' }],
+        destination: 'https://www.100xcircle.com/:path*',
+        permanent: true,
+      },
       {
         source: '/contact',
         destination: '/contact-us',

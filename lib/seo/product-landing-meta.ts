@@ -39,7 +39,7 @@ export function productLandingMetadata(slug: string): Metadata {
     description: pageMeta.description,
     keywords: pageMeta.keywords,
     alternates: {
-      canonical: url,
+      canonical: `/${slug}`,
     },
     openGraph: {
       title: pageMeta.title,

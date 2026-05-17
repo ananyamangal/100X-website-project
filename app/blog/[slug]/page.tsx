@@ -48,7 +48,7 @@ export async function generateMetadata({
   return {
     title: `${blog.title} | 100x Circle`,
     description: desc || "Industry insights from 100x Circle.",
-    alternates: { canonical: url },
+    alternates: { canonical: `/blog/${slug}` },
     openGraph: {
       title: String(blog.title),
       description: desc,

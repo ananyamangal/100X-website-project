@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Vehicle Mounted Fogging Machine in Delhi | 100x Circle',
   description:
     '100x Circle offers the best vehicle mounted fogging machine in Delhi, designed for large-area mosquito control and public health campaigns. Our machines deliver powerful fog output, reliable performance, and are ideal for municipalities, pest control services, and industrial campuses.',
-  alternates: { canonical: `${SITE_URL}/vehicle-mounted-fogging-machine` },
+  alternates: { canonical: "/vehicle-mounted-fogging-machine" },
   openGraph: {
     title: `Vehicle Mounted Fogger Delhi | ${SITE_NAME}`,
     url: `${SITE_URL}/vehicle-mounted-fogging-machine`,

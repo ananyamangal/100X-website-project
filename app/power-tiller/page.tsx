@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Power Tiller in Delhi | 100x Circle',
   description:
     'Looking for the best Power Tiller in Delhi? 100x Circle offers high-performance, durable power tillers designed for efficient soil preparation and long-term field use. Contact us today to explore specifications, pricing, and dealer support.',
-  alternates: { canonical: `${SITE_URL}/power-tiller` },
+  alternates: { canonical: "/power-tiller" },
   openGraph: {
     title: `Power Tiller Delhi | ${SITE_NAME}`,
     url: `${SITE_URL}/power-tiller`,
