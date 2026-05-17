@@ -119,9 +119,10 @@ function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={accreditation.logo || LOGO_PLACEHOLDER}
-                    alt="Accreditation"
+                    alt={accreditation.name ? `${accreditation.name} certification` : "Industry certification"}
                     className="object-contain max-w-full max-h-full min-h-0 min-w-0 w-full h-full"
-                    loading="eager"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => { e.currentTarget.src = LOGO_PLACEHOLDER }}
                   />
                 </div>
@@ -153,9 +154,10 @@ function OurCustomersScroll({ customers }: { customers: any[] }) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={c.logo || LOGO_PLACEHOLDER}
-                    alt="Customer"
+                    alt={c.name ? `${c.name} — 100x Circle customer` : "100x Circle customer"}
                     className="object-contain max-w-full max-h-full min-h-0 min-w-0 w-full h-full"
-                    loading="eager"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => { e.currentTarget.src = LOGO_PLACEHOLDER }}
                   />
                 </div>
@@ -434,6 +436,21 @@ export default function HomePage() {
     window.addEventListener("hashchange", handleHashNavigation)
     return () => window.removeEventListener("hashchange", handleHashNavigation)
   }, [router])
+
+  // Close mobile menu and brochure modal on Escape; never close the modal mid-submit.
+  useEffect(() => {
+    if (!isMenuOpen && !showBrochureForm) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      if (isMenuOpen) setIsMenuOpen(false)
+      if (showBrochureForm && !brochureSubmitting) {
+        setBrochureFormError(null)
+        setShowBrochureForm(false)
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [isMenuOpen, showBrochureForm, brochureSubmitting])
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -1021,10 +1038,20 @@ export default function HomePage() {
       <div className="min-h-screen bg-white">
         {/* Brochure Form Modal */}
         {showBrochureForm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-md">
+          <div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="brochure-modal-title"
+            onClick={() => {
+              if (brochureSubmitting) return
+              setBrochureFormError(null)
+              setShowBrochureForm(false)
+            }}
+          >
+            <Card className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Download brochure</h3>
+                <h3 id="brochure-modal-title" className="text-xl font-bold text-gray-800 mb-4">Download brochure</h3>
                 <p className="text-gray-600 mb-6">Please provide your details to download the brochure for:</p>
                 <p className="font-semibold text-green-600 mb-6">{brochureFormData.productName}</p>
                 <form onSubmit={handleBrochureFormSubmit} className="relative space-y-4">
@@ -1141,14 +1168,21 @@ export default function HomePage() {
               </div>
 
               {/* Mobile Menu Button */}
-              <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              <button
+                type="button"
+                className="lg:hidden p-2 -mr-2 text-gray-700 hover:text-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 rounded-md"
+                aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={isMenuOpen}
+                aria-controls="home-mobile-menu"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
               </button>
             </div>
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-              <div className="lg:hidden mt-4 pb-4 border-t">
+              <div id="home-mobile-menu" className="lg:hidden mt-4 pb-4 border-t">
                 <div className="flex flex-col space-y-4 pt-4">
                   <button
                     onClick={() => {

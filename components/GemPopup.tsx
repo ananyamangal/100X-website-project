@@ -45,6 +45,15 @@ export default function GemPopup() {
 
   const dismiss = () => setShow(false)
 
+  useEffect(() => {
+    if (!show) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShow(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [show])
+
   const submitNumber = () => {
     const trimmed = mobile.trim()
     if (!trimmed) {
@@ -84,10 +93,16 @@ export default function GemPopup() {
   if (!show) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-      <Card className="w-full max-w-lg">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="gem-popup-title"
+      onClick={dismiss}
+    >
+      <Card className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
         <CardContent className="p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-3">
+          <h3 id="gem-popup-title" className="text-xl font-bold text-gray-800 mb-3">
             Need help selecting GeM / ISI / WHO compliant fogging machine?
           </h3>
           <p className="text-gray-600 mb-4">

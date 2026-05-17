@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,15 @@ import { Button } from '@/components/ui/button';
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const contactLink = "/contact-us"
+
+  useEffect(() => {
+    if (!isMenuOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsMenuOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [isMenuOpen])
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-sm border-b">
@@ -39,13 +48,20 @@ export default function Navbar() {
           </Button>
         </div>
         {/* Mobile Menu Button */}
-        <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        <button
+          type="button"
+          className="lg:hidden p-2 -mr-2 text-gray-700 hover:text-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 rounded-md"
+          aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={isMenuOpen}
+          aria-controls="navbar-mobile-menu"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {isMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
         </button>
       </nav>
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-white shadow-md border-t">
+        <div id="navbar-mobile-menu" className="lg:hidden bg-white shadow-md border-t">
           <div className="flex flex-col space-y-4 p-4">
             <Link href="/" className="text-left text-green-600 font-semibold" onClick={() => setIsMenuOpen(false)}>
               Home
@@ -71,4 +87,4 @@ export default function Navbar() {
       )}
     </header>
   );
-} 
+}

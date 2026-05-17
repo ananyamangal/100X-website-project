@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Phone, MapPin, Youtube } from "lucide-react"
+import { Mail, MapPin, Phone, Youtube } from "lucide-react"
 
 const YOUTUBE_CHANNEL = "https://www.youtube.com/@100Xcircle"
 
@@ -77,16 +77,26 @@ export default function SiteFooter() {
           <div>
             <h4 className="font-semibold mb-6 text-lg">Contact</h4>
             <ul className="space-y-3 text-gray-400">
-              <li>Email: 100xcircle@gmail.com</li>
               <li className="flex items-start gap-2">
-                <Phone className="mt-1 shrink-0" size={16} />
+                <Mail className="mt-1 shrink-0" size={16} aria-hidden="true" />
+                <a
+                  href="mailto:100xcircle@gmail.com"
+                  className="hover:text-green-400 transition-colors break-all"
+                >
+                  100xcircle@gmail.com
+                </a>
+              </li>
+              <li className="flex items-start gap-2">
+                <Phone className="mt-1 shrink-0" size={16} aria-hidden="true" />
                 <a href="tel:+917827229116" className="hover:text-green-400 transition-colors">
                   +91 7827229116
                 </a>
               </li>
               <li className="flex items-start gap-2">
-                <MapPin className="mt-1 shrink-0" size={16} />
-                <span>UG, 398, Sector 7, IMT Manesar, Gurugram</span>
+                <MapPin className="mt-1 shrink-0" size={16} aria-hidden="true" />
+                <address className="not-italic">
+                  UG, 398, Sector 7, IMT Manesar, Gurugram
+                </address>
               </li>
             </ul>
           </div>
