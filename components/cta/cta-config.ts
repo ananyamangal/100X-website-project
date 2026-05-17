@@ -68,6 +68,36 @@ const PRODUCT_PREFIXES = [
   "/vehicle-mounted-fogging-machine",
 ]
 
+// Top-level SEO slug pages (single path segment) carrying any of these tokens
+// are treated as product pages so the bar shows "Get Price" on first paint
+// instead of waiting for the client-side per-page override to fire.
+const PRODUCT_SLUG_KEYWORDS = [
+  "fogging",
+  "fogger",
+  "tiller",
+  "mounted",
+  "barrel",
+  "sprayer",
+  "mistblower",
+]
+
+// Single-segment top-level routes that are deliberately NOT products
+// (catalogue, content, policy, thank-you pages). Used to gate the
+// slug-keyword fallback so a future /fogging-knowledge blog or similar
+// content route isn't mis-classified.
+const NON_PRODUCT_TOP_LEVEL = new Set([
+  "/blog",
+  "/about",
+  "/contact-us",
+  "/products",
+  "/privacy-policy",
+  "/terms-and-conditions",
+  "/return-policy",
+  "/shipping-policy",
+  "/brochure-thank-you",
+  "/thank-you",
+])
+
 export function detectAudienceFromPath(pathname: string | null | undefined): Audience {
   if (!pathname) return "default"
   const p = pathname.toLowerCase()
@@ -77,5 +107,17 @@ export function detectAudienceFromPath(pathname: string | null | undefined): Aud
   if (PRODUCT_PREFIXES.some((prefix) => p === prefix || p.startsWith(prefix))) {
     return "product"
   }
+
+  // SEO product slug fallback: top-level single-segment route, not on the
+  // non-product allow-list, containing at least one product keyword.
+  const segments = p.split("/").filter(Boolean)
+  if (
+    segments.length === 1 &&
+    !NON_PRODUCT_TOP_LEVEL.has(p) &&
+    PRODUCT_SLUG_KEYWORDS.some((k) => p.includes(k))
+  ) {
+    return "product"
+  }
+
   return "default"
 }
