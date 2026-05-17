@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL, SITE_NAME, defaultOgImage } from '@/lib/seo/site-config'
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd'
 
 export const metadata: Metadata = {
   title: 'Power Tiller in Delhi | 100x Circle',
   description:
     'Looking for the best Power Tiller in Delhi? 100x Circle offers high-performance, durable power tillers designed for efficient soil preparation and long-term field use. Contact us today to explore specifications, pricing, and dealer support.',
-  alternates: { canonical: `${SITE_URL}/power-tiller` },
+  alternates: { canonical: "/power-tiller" },
   openGraph: {
     title: `Power Tiller Delhi | ${SITE_NAME}`,
     url: `${SITE_URL}/power-tiller`,
@@ -25,6 +26,13 @@ export const metadata: Metadata = {
 export default function PowerTillerPage() {
   return (
     <main className="min-h-screen bg-white pt-32 pb-16">
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Products', url: '/products' },
+          { name: 'Power Tiller in Delhi', url: '/power-tiller' },
+        ]}
+      />
       <section className="container mx-auto px-4 max-w-5xl">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           Power Tiller in Delhi

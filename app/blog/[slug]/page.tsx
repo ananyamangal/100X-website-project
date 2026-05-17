@@ -5,7 +5,9 @@ import { Calendar, ChevronLeft, User } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { RichContent } from "@/components/RichContent"
-import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/ArticleJsonLd"
+import { ArticleJsonLd } from "@/components/seo/ArticleJsonLd"
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
+import RelatedPostsSection from "@/components/RelatedPostsSection"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { getBlogBySlug } from "@/lib/blogsQuery"
 import { blogPostSlug } from "@/lib/blogSlug"
@@ -48,7 +50,7 @@ export async function generateMetadata({
   return {
     title: `${blog.title} | 100x Circle`,
     description: desc || "Industry insights from 100x Circle.",
-    alternates: { canonical: url },
+    alternates: { canonical: `/blog/${slug}` },
     openGraph: {
       title: String(blog.title),
       description: desc,
@@ -180,6 +182,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </div>
         </article>
       </div>
+      <RelatedPostsSection
+        category={typeof blog.category === "string" ? blog.category : undefined}
+        excludeSlug={slug}
+        limit={3}
+      />
     </div>
   )
 }

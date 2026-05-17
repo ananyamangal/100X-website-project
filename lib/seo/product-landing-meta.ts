@@ -1,59 +1,67 @@
 import type { Metadata } from "next"
 import { SITE_URL } from "@/lib/seo/site-config"
+import {
+  LANDING_PAGES,
+  getLandingPage,
+  type LandingPageDef,
+} from "./landing-pages"
 
+/**
+ * @deprecated Read from `LANDING_PAGES` in `./landing-pages.ts` directly.
+ * Kept as a re-export so older imports continue to resolve.
+ */
 export const PRODUCT_LANDING_META: Record<
   string,
   { title: string; description: string; keywords?: string }
-> = {
-  "thermal-and-cold-fogging-machine-100xtfs50": {
-    title: "Buy Thermal and Cold Fogging Machine | 100x Circle",
-    description:
-      "Buy thermal and cold fogging machines from 100x Circle. High-performance, durable foggers for mosquito control and industrial use across India. Contact us today!",
-    keywords:
-      "buy thermal and cold fogging machine, fogging machine price in india, thermal cold fogger manufacturer india, industrial thermal cold fogging machine supplier, mosquito fogging machine price, order thermal fogging machine",
-  },
-  "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400": {
-    title: "Buy Double Barrel Thermal Fogging Machine | 100x Circle",
-    description:
-      "Buy Double Barrel Thermal Fogging Machine from 100x Circle. High-power, durable fogger for industrial mosquito control and public health use. Contact us today!",
-    keywords:
-      "buy double barrel thermal fogging machine, vehicle mounted thermal fogger manufacturer india, vehicle mounted fogging machine, heavy duty vehicle mount fogging machine supplier, double barrel fogging machine",
-  },
-  "thermal-fogging-machine-with-stainless-steel-tank-100xssma20": {
-    title: "Buy Stainless Steel Tank Thermal Fogger | 100x Circle",
-    description:
-      "Buy Stainless Steel Tank Thermal Fogger from 100x Circle. Durable, rust-resistant design with powerful fog output for effective mosquito control. Contact us today!",
-    keywords:
-      "buy stainless steel tank thermal fogger, stainless steel tank fogging machine manufacturer india, SS tank thermal fogging machine supplier, stainless steel fogger price, thermal fogging machine with stainless steel tank, SS fogging machine price",
-  },
+> = Object.fromEntries(
+  Object.entries(LANDING_PAGES).map(([slug, def]) => [
+    slug,
+    {
+      title: def.title,
+      description: def.description,
+      keywords: def.keywords,
+    },
+  ]),
+)
+
+export { SITE_URL }
+
+function resolveOgImage(def: LandingPageDef | undefined): string {
+  const raw = def?.ogImage
+  if (!raw) return `${SITE_URL}/logo-main.png`
+  if (raw.startsWith("http")) return raw
+  return `${SITE_URL}${raw.startsWith("/") ? "" : "/"}${raw}`
 }
 
 export function productLandingMetadata(slug: string): Metadata {
-  const pageMeta = PRODUCT_LANDING_META[slug] || {
-    title: "Product | 100x Circle",
-    description: "Thermal fogging machines and agricultural equipment from 100x Circle, India.",
-  }
+  const def = getLandingPage(slug)
+  const title = def?.title ?? "Product | 100x Circle"
+  const description =
+    def?.description ??
+    "Thermal fogging machines and agricultural equipment from 100x Circle, India."
+  const keywords = def?.keywords
   const url = `${SITE_URL}/${slug}`
+  const ogImage = resolveOgImage(def)
   return {
-    title: pageMeta.title,
-    description: pageMeta.description,
-    keywords: pageMeta.keywords,
+    title,
+    description,
+    keywords,
     alternates: {
-      canonical: url,
+      canonical: `/${slug}`,
     },
     openGraph: {
-      title: pageMeta.title,
-      description: pageMeta.description,
+      title,
+      description,
       url,
       siteName: "100x Circle",
       locale: "en_IN",
       type: "website",
-      images: [{ url: `${SITE_URL}/logo-main.png` }],
+      images: [{ url: ogImage }],
     },
     twitter: {
       card: "summary_large_image",
-      title: pageMeta.title,
-      description: pageMeta.description,
+      title,
+      description,
     },
   }
 }

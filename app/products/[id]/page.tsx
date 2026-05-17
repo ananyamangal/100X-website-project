@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import ProductDetailClient from "./ProductDetailClient"
 import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
+import RelatedProductsSection from "@/components/RelatedProductsSection"
 import { getProductById } from "@/lib/productsQuery"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
@@ -37,7 +39,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: url },
+    alternates: { canonical: `/products/${id}` },
     openGraph: {
       title,
       description,
@@ -60,20 +62,43 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
   const product = await getProductById(id)
   const url = `${SITE_URL}/products/${id}`
   const imgs = product ? absolutizeImages((product.imageUrls as string[]) || []) : []
+  const productName = product ? String(product.name) : ""
+  const category = product && typeof product.category === "string" ? product.category : undefined
+  const rating = product && typeof product.rating === "number" ? product.rating : undefined
+  const reviewsCount =
+    product && typeof product.reviewsCount === "number" ? product.reviewsCount : undefined
+  const priceRange =
+    product && typeof product.priceRange === "string" ? product.priceRange : undefined
 
   return (
     <>
       {product ? (
-        <ProductJsonLd
-          name={String(product.name)}
-          description={String(product.shortDescription || product.detailedDescription || "")}
-          images={imgs.length ? imgs : [`${SITE_URL}/logo-main.png`]}
-          url={url}
-          sku={String(product._id ?? id)}
-          inStock={product.inStock !== false}
-        />
+        <>
+          <ProductJsonLd
+            name={productName}
+            description={String(product.shortDescription || product.detailedDescription || "")}
+            images={imgs.length ? imgs : [`${SITE_URL}/logo-main.png`]}
+            url={url}
+            sku={String(product._id ?? id)}
+            inStock={product.inStock !== false}
+            rating={rating}
+            reviewsCount={reviewsCount}
+            priceRange={priceRange}
+            category={category}
+          />
+          <BreadcrumbJsonLd
+            items={[
+              { name: "Home", url: "/" },
+              { name: "Products", url: "/products" },
+              { name: productName, url: `/products/${id}` },
+            ]}
+          />
+        </>
       ) : null}
       <ProductDetailClient productId={id} />
+      {product ? (
+        <RelatedProductsSection category={category} excludeId={id} limit={4} />
+      ) : null}
     </>
   )
 }

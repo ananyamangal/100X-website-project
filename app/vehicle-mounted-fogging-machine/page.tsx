@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL, SITE_NAME, defaultOgImage } from '@/lib/seo/site-config'
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd'
 
 export const metadata: Metadata = {
   title: 'Vehicle Mounted Fogging Machine in Delhi | 100x Circle',
   description:
     '100x Circle offers the best vehicle mounted fogging machine in Delhi, designed for large-area mosquito control and public health campaigns. Our machines deliver powerful fog output, reliable performance, and are ideal for municipalities, pest control services, and industrial campuses.',
-  alternates: { canonical: `${SITE_URL}/vehicle-mounted-fogging-machine` },
+  alternates: { canonical: "/vehicle-mounted-fogging-machine" },
   openGraph: {
     title: `Vehicle Mounted Fogger Delhi | ${SITE_NAME}`,
     url: `${SITE_URL}/vehicle-mounted-fogging-machine`,
@@ -25,6 +26,13 @@ export const metadata: Metadata = {
 export default function VehicleMountedFoggingMachinePage() {
   return (
     <main className="min-h-screen bg-white pt-32 pb-16">
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Products', url: '/products' },
+          { name: 'Vehicle Mounted Fogging Machine in Delhi', url: '/vehicle-mounted-fogging-machine' },
+        ]}
+      />
       <section className="container mx-auto px-4 max-w-5xl">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           Vehicle Mounted Fogging Machine in Delhi

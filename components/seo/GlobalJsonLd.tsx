@@ -13,6 +13,23 @@ const organization = {
   },
   email: BUSINESS.email,
   telephone: [BUSINESS.phonePrimary, BUSINESS.phoneSecondary],
+  contactPoint: [
+    {
+      "@type": "ContactPoint",
+      telephone: BUSINESS.phonePrimary,
+      contactType: "sales",
+      email: BUSINESS.email,
+      areaServed: "IN",
+      availableLanguage: ["en", "hi"],
+    },
+    {
+      "@type": "ContactPoint",
+      telephone: BUSINESS.phoneSecondary,
+      contactType: "customer support",
+      areaServed: "IN",
+      availableLanguage: ["en", "hi"],
+    },
+  ],
   sameAs: [BUSINESS.youtube],
 }
 
@@ -57,6 +74,10 @@ const website = {
   name: SITE_NAME,
   publisher: { "@id": `${SITE_URL}/#organization` },
   inLanguage: "en-IN",
+  // SearchAction is intentionally omitted — there is no server-side
+  // search endpoint that resolves `?q={search_term_string}` today.
+  // Adding the action without an implementation would mislead crawlers
+  // and isn't a sitelinks-search prerequisite that GSC would honour.
 }
 
 export default function GlobalJsonLd() {

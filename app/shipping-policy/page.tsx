@@ -5,7 +5,7 @@ import { SITE_URL, SITE_NAME, defaultOgImage } from "@/lib/seo/site-config"
 export const metadata: Metadata = {
   title: "Shipping Policy | 100x Circle",
   description: "Shipping and delivery information for 100X Circle orders.",
-  alternates: { canonical: `${SITE_URL}/shipping-policy` },
+  alternates: { canonical: "/shipping-policy" },
   openGraph: {
     title: `Shipping Policy | ${SITE_NAME}`,
     url: `${SITE_URL}/shipping-policy`,

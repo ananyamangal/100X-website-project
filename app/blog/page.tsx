@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { getPublicBlogs } from "@/lib/blogsQuery"
 import { blogPostSlug } from "@/lib/blogSlug"
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
+import { ItemListJsonLd } from "@/components/seo/ItemListJsonLd"
 
 import { SITE_URL, SITE_NAME, defaultOgImage } from "@/lib/seo/site-config"
 
@@ -14,7 +16,7 @@ export const metadata = {
   title: "Fogging Machine Industry Blog | 100x Circle",
   description:
     "Practical tips, maintenance guides, and industry insights from 100x Circle — thermal fogging machine manufacturer serving customers across India.",
-  alternates: { canonical: `${SITE_URL}/blog` },
+  alternates: { canonical: "/blog" },
   openGraph: {
     title: `Industry Blog | ${SITE_NAME}`,
     description:
@@ -45,9 +47,33 @@ function formatDate(value: string | Date | undefined) {
 
 export default async function BlogIndexPage() {
   const posts = await getPublicBlogs()
+  const itemListEntries: { name: string; url: string; image?: string }[] = []
+  for (const p of posts.slice(0, 20)) {
+    const slug = blogPostSlug(p)
+    if (!slug) continue
+    const title = typeof p.title === "string" ? p.title : ""
+    const topImage =
+      typeof p.topImage === "string" && p.topImage ? p.topImage : undefined
+    itemListEntries.push({
+      name: title || "Blog post",
+      url: `/blog/${slug}`,
+      image: topImage,
+    })
+  }
 
   return (
     <div className="pt-32 min-h-screen bg-gray-50">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "/" },
+          { name: "Blog", url: "/blog" },
+        ]}
+      />
+      <ItemListJsonLd
+        name="100x Circle blog — fogging machine insights"
+        url="/blog"
+        items={itemListEntries}
+      />
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-purple-100 text-purple-800 hover:bg-purple-200">Blog</Badge>

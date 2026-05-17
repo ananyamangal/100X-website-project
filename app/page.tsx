@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input"
 import ProductCard from '@/components/ProductCard'
 import { RichContent } from "@/components/RichContent"
 import ContactSection from "@/components/ContactSection"
+import FAQSection from "@/components/FAQSection"
 import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
@@ -1026,6 +1027,8 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        <FAQSection />
 
         <ContactSection products={products} />
 

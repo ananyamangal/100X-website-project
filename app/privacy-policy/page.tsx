@@ -5,7 +5,7 @@ import { SITE_URL, SITE_NAME, defaultOgImage } from "@/lib/seo/site-config"
 export const metadata: Metadata = {
   title: "Privacy Policy | 100x Circle",
   description: "Privacy policy for 100X Circle Pvt Ltd.",
-  alternates: { canonical: `${SITE_URL}/privacy-policy` },
+  alternates: { canonical: "/privacy-policy" },
   openGraph: {
     title: `Privacy Policy | ${SITE_NAME}`,
     url: `${SITE_URL}/privacy-policy`,

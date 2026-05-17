@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { RichContent } from '@/components/RichContent';
 import { X as CloseIcon } from 'lucide-react';
 import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
+import { getLandingPage, type LandingPageDef } from '@/lib/seo/landing-pages';
 
 const badgeLogoMap: Record<string, string> = {
     'Korean Technology': '/Logos clipart 2/Korean Technology.png',
@@ -114,94 +115,10 @@ function Header() {
     );
 }
 
-interface ContentSection {
-    h2: string;
-    p: string[];
-}
-
-interface ProductMeta {
-    content1?: ContentSection;
-    content2?: ContentSection;
-    content3?: ContentSection;
-}
-
-const PRODUCT_META: Record<string, ProductMeta> = {
-    "thermal-and-cold-fogging-machine-100xtfs50": {
-        content1: {
-            h2: "Industrial Thermal Cold Fogging Machine Supplier",
-            p: [
-                "As a trusted industrial thermal cold fogging machine supplier, 100x Circle offers high-performance machines designed for strong fog output, durability, and ease of operation. Our models are suitable for industrial areas, municipalities, warehouses, farms, and large-scale pest control projects.",
-            ]
-        },
-        content2: {
-            h2: "Thermal Cold Fogger Manufacturer  – Wide Applications",
-            p: [
-                "As a leading thermal cold fogger manufacturer, 100x Circle provides machines that are widely used across multiple industries for effective fogging and disinfection.",
-                "Our foggers are commonly used for public health and vector control by municipal corporations, panchayats, hospitals, schools, housing societies, parks, stadiums, and other public institutions to control mosquitoes and harmful insects.",
-                "In agriculture and horticulture, the thermal and cold fogging machine helps in pest control for crop fields, greenhouses, and plantations. It is suitable for applying insecticides, fungicides, and disinfectants on crops, fruits, and vegetables.",
-                "These machines are also used for warehouse and grain storage disinfection, helping maintain hygiene and prevent contamination. In animal husbandry and veterinary applications, foggers support disease prevention by controlling flies, ticks, and mosquitoes in poultry farms, dairy units, and animal shelters.",
-                "For sanitization and disinfection, cold fogging allows safe indoor and outdoor treatment using water-based solutions, making it ideal for commercial and industrial Spaces."
-            ]
-        },
-        content3: {
-            h2: "Fogging Machine Product Certifications & Features",
-            p: [
-                "If you are looking for the best fogging machine,  100x Circle offers high-quality machines at competitive and budget-friendly rates without compromising on performance.",
-                "We focus on delivering certified products that offer long-term value, efficient pest control, and cost-effective performance for both commercial and residential use. Contact us to get the latest price and bulk order details."
-            ]
-        },
-    },
-    "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400": {
-        content1: {
-            h2: "Heavy Duty Vehicle Mount Fogging Machine Supplier",
-            p: [
-                "As a trusted heavy duty vehicle mount fogging machine supplier, 100x Circle offers powerful and reliable solutions for large-scale mosquito and pest control operations. Our vehicle mount fogging machines are specially designed for wide-area coverage, making them ideal for municipal corporations, public health departments, and industrial zones.",
-                "The double barrel system ensures dense and high fog output, allowing faster treatment of cities, villages, factories, and rural areas. Built with a strong pulse jet engine and durable stainless steel components, the machine delivers long-lasting performance even in demanding field conditions.",
-                "Our heavy duty vehicle mount fogging machine is suitable for public health drives, emergency vector control programs, and large outdoor fogging projects across India. With high efficiency, strong coverage, and dependable build quality, it is a practical solution for professional use.",
-            ]
-        },
-        content2: {
-            h2: "Vehicle Mounted Thermal Fogger Manufacturer - Wide Applications",
-            p: [
-                "Vehicle Mounted Thermal Fogger Manufacturer, designs high-performance machines built for large-area mosquito and pest control operations. Our vehicle mountable models are specially engineered to deliver dense fog output with strong coverage, making them ideal for municipal corporations, public health departments, and professional pest control agencies.",
-                "The Double Barrel Thermal Fogging Machine – 100XDB400 is designed for mounting on vehicles, allowing fast movement and efficient fogging across cities, villages, industrial areas, and rural regions. Its powerful pulse jet engine technology ensures consistent performance, while the durable stainless steel components provide long service life even in demanding field conditions.",
-                "We focus on quality manufacturing, reliable performance, and user-friendly operation to support large-scale vector control and emergency fogging drives across India.",
-            ]
-        },
-        content3: {
-            h2: "Double Barrel Fogging Machine Product Certifications & Features",
-            p: [
-                "The Double Barrel Fogging Machine is built with advanced technology and trusted certifications to ensure powerful performance and reliability for large-scale fogging operations.",
-                "This machine is designed for high coverage, durability, and efficient mosquito and vector control in urban and rural areas.",
-            ]
-        },
-    },
-    "thermal-fogging-machine-with-stainless-steel-tank-100xssma20": {
-        content1: {
-            h2: "SS Tank Thermal Fogging Machine Supplier",
-            p: [
-                "The SS Tank Thermal Fogging Machine is designed for powerful mosquito and pest control with long-lasting durability. Built with high-quality stainless steel tanks, this model ensures better resistance to rust and corrosion, making it ideal for regular outdoor and industrial use.",
-                "This machine features a portable hand-carried design, allowing easy handling and smooth movement across different locations. As a thermal fogger, it produces dense and uniform fog that helps cover large areas effectively, making it suitable for public health drives, warehouses, farms, factories, and residential societies.",
-                "In addition, this model is built for consistent field performance with low maintenance requirements. Its strong engine technology ensures efficient fuel use and steady fog output, helping professionals complete fogging operations quickly and effectively. It is a practical choice for municipalities, pest control agencies, and industrial users looking for a dependable stainless steel thermal fogging machine.",
-            ]
-        },
-        content2: {
-            h2: "Stainless Steel Tank Fogging Machine Manufacturer - Wide Applications",
-            p: [
-                "Stainless steel tank fogging machine manufacturer provides reliable fogging solutions for a wide range of applications across India. Our machines are widely used for public health and vector control by municipal corporations, panchayats, hospitals, schools, housing societies, parks, stadiums, and other public institutions to control mosquitoes and harmful insects effectively.",
-                "In the agriculture and horticulture sector, our stainless steel tank fogging machines support pest control in crop fields, greenhouses, and plantations. They are suitable for the application of fungicides, insecticides, and disinfectants on crops, fruits, and vegetables, helping improve plant protection and productivity. The durable SS tank design ensures safe handling of chemicals and long-term performance in field conditions.",
-                "These machines are also ideal for warehouse and storage disinfection, including grain silos and storage units, to maintain hygiene and prevent contamination. In animal husbandry and veterinary applications, foggers help reduce disease transmission among livestock by controlling flies, ticks, and mosquitoes in poultry farms, dairy units, animal sheds, and stables.",
-            ]
-        },
-        content3: {
-            h2: "Stainless Steel Fogger Product Certifications & Features",
-            p: [
-                "The Stainless Steel Fogger is built with precision technology to deliver consistent and powerful fog output for professional pest control operations. Designed for durability, its stainless steel construction ensures corrosion resistance and long-term performance in demanding field conditions.",
-                "This model is suitable for government departments and authorized buyers. It is also a budget-friendly solution that offers strong performance, reliable operation, and excellent value for public health, agriculture, and industrial fogging applications across India.",
-            ]
-        },
-    }
-};
+// Landing-page narrative content is sourced from the single registry at
+// `lib/seo/landing-pages.ts`. Adding a new landing page is a one-file edit
+// there — this component renders whatever it finds.
+type ProductMeta = Pick<LandingPageDef, "content1" | "content2" | "content3">;
 
 export default function ProductDetailPage() {
     const params = useParams();
@@ -213,7 +130,7 @@ export default function ProductDetailPage() {
     const [transformOrigin, setTransformOrigin] = useState('center center');
     const [videoClosed, setVideoClosed] = useState(false);
 
-    const pageMeta = slug && PRODUCT_META[slug] ? PRODUCT_META[slug] : undefined;
+    const pageMeta: ProductMeta | undefined = slug ? getLandingPage(slug) : undefined;
 
     // Carousel auto-scroll
     useEffect(() => {
