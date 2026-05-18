@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { Calendar, User } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { plainTextFromHtml } from "@/lib/rich-text"
@@ -7,6 +8,11 @@ import { getPublicBlogs } from "@/lib/blogsQuery"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import { ItemListJsonLd } from "@/components/seo/ItemListJsonLd"
+import {
+  blogStr,
+  blogOptStr,
+  blogImageSrc,
+} from "@/lib/blogFieldGuards"
 
 import { SITE_URL, SITE_NAME, defaultOgImage } from "@/lib/seo/site-config"
 
@@ -35,9 +41,10 @@ export const metadata = {
   },
 } satisfies Metadata
 
-function formatDate(value: string | Date | undefined) {
-  if (!value) return ""
-  const d = new Date(value)
+function formatDate(value: unknown) {
+  const s = blogOptStr(value)
+  if (!s) return ""
+  const d = new Date(s)
   if (Number.isNaN(d.getTime())) return ""
   const day = String(d.getUTCDate()).padStart(2, "0")
   const month = String(d.getUTCMonth() + 1).padStart(2, "0")
@@ -46,14 +53,21 @@ function formatDate(value: string | Date | undefined) {
 }
 
 export default async function BlogIndexPage() {
-  const posts = await getPublicBlogs()
+  // Hard guard: if getPublicBlogs throws (Mongo timeout, etc.) we
+  // still render the empty-state branch rather than crash the route.
+  let posts: Array<Record<string, unknown>> = []
+  try {
+    posts = await getPublicBlogs()
+  } catch {
+    posts = []
+  }
+
   const itemListEntries: { name: string; url: string; image?: string }[] = []
   for (const p of posts.slice(0, 20)) {
     const slug = blogPostSlug(p)
     if (!slug) continue
-    const title = typeof p.title === "string" ? p.title : ""
-    const topImage =
-      typeof p.topImage === "string" && p.topImage ? p.topImage : undefined
+    const title = blogStr(p.title)
+    const topImage = blogOptStr(p.topImage)
     itemListEntries.push({
       name: title || "Blog post",
       url: `/blog/${slug}`,
@@ -109,36 +123,46 @@ export default async function BlogIndexPage() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {posts.map((post, index) => (
-              <Card key={post._id || index} className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
-                <Link href={`/blog/${blogPostSlug(post)}`} className="block">
-                  <img
-                    src={post.topImage || "/placeholder.svg"}
-                    alt={String(post.title)}
-                    className="w-full h-48 object-cover"
-                  />
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge variant="secondary">{post.category}</Badge>
-                      <span className="text-sm text-gray-500">{(post as { readTime?: string }).readTime || "5 min read"}</span>
-                    </div>
-                    <h2 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{post.title}</h2>
-                    <p className="text-gray-600 mb-4 line-clamp-4">{plainTextFromHtml(post.excerpt || "")}</p>
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <span className="flex items-center gap-1">
-                        <User size={16} className="text-gray-400" />
-                        {post.author}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar size={16} className="text-gray-400" />
-                        {formatDate(post.publishedAt)}
-                      </span>
-                    </div>
-                    <span className="mt-4 inline-block text-purple-600 font-semibold text-sm">Read article →</span>
-                  </CardContent>
-                </Link>
-              </Card>
-            ))}
+            {posts.map((post, index) => {
+              const id = blogOptStr(post._id) ?? String(index)
+              const title = blogStr(post.title, "Blog post")
+              const excerpt = blogStr(post.excerpt)
+              const category = blogStr(post.category)
+              const author = blogStr(post.author)
+              const readTime = blogOptStr((post as { readTime?: unknown }).readTime) ?? "5 min read"
+              const slug = blogPostSlug(post)
+              if (!slug) return null
+              return (
+                <Card key={id} className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
+                  <Link href={`/blog/${slug}`} className="block">
+                    <img
+                      src={blogImageSrc(post.topImage)}
+                      alt={title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-3">
+                        {category ? <Badge variant="secondary">{category}</Badge> : <span />}
+                        <span className="text-sm text-gray-500">{readTime}</span>
+                      </div>
+                      <h2 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{title}</h2>
+                      <p className="text-gray-600 mb-4 line-clamp-4">{plainTextFromHtml(excerpt)}</p>
+                      <div className="flex items-center justify-between text-sm text-gray-600">
+                        <span className="flex items-center gap-1">
+                          <User size={16} aria-hidden className="text-gray-400" />
+                          {author || "100x Circle"}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar size={16} aria-hidden className="text-gray-400" />
+                          {formatDate(post.publishedAt)}
+                        </span>
+                      </div>
+                      <span className="mt-4 inline-block text-purple-600 font-semibold text-sm">Read article →</span>
+                    </CardContent>
+                  </Link>
+                </Card>
+              )
+            })}
           </div>
         )}
 

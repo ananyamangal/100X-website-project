@@ -12,17 +12,34 @@ import { plainTextFromHtml } from "@/lib/rich-text"
 import { getBlogBySlug } from "@/lib/blogsQuery"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { SITE_URL, defaultOgImage } from "@/lib/seo/site-config"
+import {
+  blogStr,
+  blogOptStr,
+  blogStrArr,
+  blogFirstChar,
+  blogSafeStartsWith,
+  blogImageSrc,
+} from "@/lib/blogFieldGuards"
 
 export const dynamic = "force-dynamic"
 
-function formatDate(value: string | Date | undefined) {
-  if (!value) return ""
-  const d = new Date(value)
+function formatDate(value: unknown) {
+  const s = blogOptStr(value)
+  if (!s) return ""
+  const d = new Date(s)
   if (Number.isNaN(d.getTime())) return ""
   const day = String(d.getUTCDate()).padStart(2, "0")
   const month = String(d.getUTCMonth() + 1).padStart(2, "0")
   const year = d.getUTCFullYear()
   return `${day}/${month}/${year}`
+}
+
+/** Resolve a blog cover image to an absolute URL safely. */
+function resolveCoverImage(topImage: unknown): string {
+  const src = blogOptStr(topImage)
+  if (!src) return defaultOgImage
+  if (blogSafeStartsWith(src, "http")) return src
+  return `${SITE_URL}${blogSafeStartsWith(src, "/") ? "" : "/"}${src}`
 }
 
 export async function generateMetadata({
@@ -31,38 +48,45 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug: rawSlug } = await params
-  const blog = await getBlogBySlug(rawSlug)
+
+  // Defensive: getBlogBySlug shouldn't throw, but if the DB is dark we
+  // must still emit a valid Metadata object — never let metadata
+  // generation crash the route.
+  let blog: Record<string, unknown> | null = null
+  try {
+    blog = await getBlogBySlug(rawSlug)
+  } catch {
+    blog = null
+  }
+
   if (!blog) {
     return {
       title: "Blog | 100x Circle",
       robots: { index: false, follow: true },
     }
   }
-  const desc = plainTextFromHtml(blog.excerpt || "").slice(0, 155)
-  const slug = blogPostSlug(blog)
+  const title = blogStr(blog.title, "Blog post")
+  const desc = plainTextFromHtml(blogStr(blog.excerpt)).slice(0, 155)
+  const slug = blogPostSlug(blog) || rawSlug
   const url = `${SITE_URL}/blog/${slug}`
-  const img = blog.topImage
-    ? blog.topImage.startsWith("http")
-      ? blog.topImage
-      : `${SITE_URL}${String(blog.topImage).startsWith("/") ? "" : "/"}${blog.topImage}`
-    : defaultOgImage
+  const img = resolveCoverImage(blog.topImage)
 
   return {
-    title: `${blog.title} | 100x Circle`,
+    title: `${title} | 100x Circle`,
     description: desc || "Industry insights from 100x Circle.",
     alternates: { canonical: `/blog/${slug}` },
     openGraph: {
-      title: String(blog.title),
+      title,
       description: desc,
       url,
       siteName: "100x Circle",
       locale: "en_IN",
       type: "article",
-      images: [{ url: img, alt: String(blog.title) }],
+      images: [{ url: img, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
-      title: String(blog.title),
+      title,
       description: desc || undefined,
       images: [img],
     },
@@ -71,29 +95,47 @@ export async function generateMetadata({
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug: rawSlug } = await params
-  const blog = await getBlogBySlug(rawSlug)
+
+  // Hard guard around the DB read.
+  let blog: Record<string, unknown> | null = null
+  try {
+    blog = await getBlogBySlug(rawSlug)
+  } catch {
+    blog = null
+  }
   if (!blog) notFound()
 
-  const slug = blogPostSlug(blog)
+  // All field reads go through guards. Mongo can return any of these
+  // as undefined, an object, or a non-string primitive — none of which
+  // is allowed as a React child.
+  const title = blogStr(blog.title, "Blog post")
+  const excerpt = blogStr(blog.excerpt)
+  const content = blogStr(blog.content)
+  const author = blogStr(blog.author, "100x Circle")
+  const category = blogStr(blog.category)
+  const publishedAtStr = blogOptStr(blog.publishedAt)
+  const readTime = blogOptStr((blog as { readTime?: unknown }).readTime) ?? "5 min read"
+  const slug = blogPostSlug(blog) || rawSlug
   const pageUrl = `${SITE_URL}/blog/${slug}`
-  const inlineImages = Array.isArray(blog.inlineImages) ? (blog.inlineImages as string[]) : []
-  const topImg = blog.topImage ? String(blog.topImage) : undefined
+  const inlineImages = blogStrArr(blog.inlineImages)
+  const coverSrc = blogImageSrc(blog.topImage)
+  const topImgForJsonLd = blogOptStr(blog.topImage)
 
   return (
     <div className="pt-32 min-h-screen bg-gray-50">
       <ArticleJsonLd
-        title={String(blog.title)}
-        description={String(blog.excerpt || blog.content || "")}
+        title={title}
+        description={excerpt || content}
         url={pageUrl}
-        image={topImg}
-        datePublished={typeof blog.publishedAt === "string" ? blog.publishedAt : undefined}
-        authorName={typeof blog.author === "string" ? blog.author : undefined}
+        image={topImgForJsonLd}
+        datePublished={publishedAtStr}
+        authorName={author}
       />
       <BreadcrumbJsonLd
         items={[
           { name: "Home", url: SITE_URL },
           { name: "Blog", url: `${SITE_URL}/blog` },
-          { name: String(blog.title), url: pageUrl },
+          { name: title, url: pageUrl },
         ]}
       />
       <div className="container mx-auto px-4 py-12">
@@ -106,15 +148,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             Blog
           </Link>
           <span aria-hidden>/</span>
-          <span className="text-gray-900 line-clamp-1">{blog.title}</span>
+          <span className="text-gray-900 line-clamp-1">{title}</span>
         </nav>
 
         <article className="max-w-4xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="relative h-72 md:h-96">
               <img
-                src={blog.topImage || "/placeholder.svg"}
-                alt={String(blog.title)}
+                src={coverSrc}
+                alt={title}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-black/10" />
@@ -122,25 +164,27 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             <div className="p-8 md:p-12">
               <div className="flex flex-wrap items-center gap-4 mb-6 text-gray-500">
-                <Badge variant="secondary" className="text-sm">
-                  {blog.category}
-                </Badge>
+                {category ? (
+                  <Badge variant="secondary" className="text-sm">
+                    {category}
+                  </Badge>
+                ) : null}
                 <span className="flex items-center gap-2 text-sm">
                   <User size={16} aria-hidden />
-                  {blog.author}
+                  {author}
                 </span>
-                <time dateTime={typeof blog.publishedAt === "string" ? blog.publishedAt : undefined} className="flex items-center gap-2 text-sm">
+                <time dateTime={publishedAtStr} className="flex items-center gap-2 text-sm">
                   <Calendar size={16} aria-hidden />
-                  {formatDate(blog.publishedAt)}
+                  {formatDate(publishedAtStr)}
                 </time>
-                <span className="text-sm">{(blog as { readTime?: string }).readTime || "5 min read"}</span>
+                <span className="text-sm">{readTime}</span>
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">{blog.title}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">{title}</h1>
 
-              {blog.excerpt ? <RichContent html={String(blog.excerpt)} className="text-xl text-gray-600 mb-8" /> : null}
+              {excerpt ? <RichContent html={excerpt} className="text-xl text-gray-600 mb-8" /> : null}
 
-              {blog.content ? <RichContent html={String(blog.content)} className="text-lg text-gray-700" /> : null}
+              {content ? <RichContent html={content} className="text-lg text-gray-700" /> : null}
 
               {inlineImages.length > 0 && (
                 <div className="mt-8 space-y-6">
@@ -150,7 +194,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                       <div key={idx} className="rounded-xl overflow-hidden shadow-lg">
                         <img
                           src={imageUrl}
-                          alt={`Illustration ${idx + 1} for ${String(blog.title)}`}
+                          alt={`Illustration ${idx + 1} for ${title}`}
                           className="w-full h-auto object-cover"
                           loading="lazy"
                           decoding="async"
@@ -164,10 +208,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div className="mt-12 pt-8 border-t border-gray-200 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center" aria-hidden>
-                    <span className="text-green-600 font-semibold text-lg">{blog.author?.charAt(0) || "A"}</span>
+                    <span className="text-green-600 font-semibold text-lg">{blogFirstChar(author)}</span>
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{blog.author}</p>
+                    <p className="font-semibold text-gray-900">{author}</p>
                     <p className="text-sm text-gray-500">Article Author</p>
                   </div>
                 </div>
@@ -183,7 +227,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </article>
       </div>
       <RelatedPostsSection
-        category={typeof blog.category === "string" ? blog.category : undefined}
+        category={category || undefined}
         excludeSlug={slug}
         limit={3}
       />
