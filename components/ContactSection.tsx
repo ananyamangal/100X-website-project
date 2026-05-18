@@ -128,7 +128,7 @@ export default function ContactSection({
   }
 
   return (
-    <section id={id} className="py-24 bg-white">
+    <section id={id} className="py-24 md:py-32 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 md:mb-20">
           <span className="inline-block mb-6 rounded-full bg-green-100 px-4 py-2 text-lg font-medium text-green-800">

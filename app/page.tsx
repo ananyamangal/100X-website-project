@@ -188,7 +188,7 @@ function YoutubeShortsCarousel() {
   }, []);
   if (!shorts.length) return null;
   return (
-    <section className="py-24 bg-gray-50 relative">
+    <section className="py-16 md:py-20 bg-gray-50 relative">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <Badge className="mb-6 bg-red-100 text-red-800 hover:bg-red-200 text-lg px-6 py-2">
@@ -876,7 +876,7 @@ export default function HomePage() {
         <AccreditationsScroll accreditations={accreditations} />
 
         {/* Products Section */}
-        <section id="products" className="py-24">
+        <section id="products" className="py-16 md:py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20">
               <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
@@ -935,7 +935,7 @@ export default function HomePage() {
         <OurCustomersScroll customers={customers} />
 
         {/* Reviews Carousel Section */}
-        <section className="py-24 bg-white">
+        <section className="py-16 md:py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <Badge className="mb-6 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-lg px-6 py-2">
@@ -954,7 +954,7 @@ export default function HomePage() {
         </section>
 
         {/* Blog Preview Section */}
-        <section className="py-24 bg-gray-50">
+        <section className="py-16 md:py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20">
               <Badge className="mb-6 bg-purple-100 text-purple-800 hover:bg-purple-200 text-lg px-6 py-2">
