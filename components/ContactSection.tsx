@@ -226,36 +226,56 @@ export default function ContactSection({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <Input name="firstName" placeholder="First name" required className="p-5 text-lg min-h-[52px]" />
-                  <Input name="lastName" placeholder="Last name" required className="p-5 text-lg min-h-[52px]" />
+                  <div>
+                    <label htmlFor="contact-firstName" className="sr-only">First name</label>
+                    <Input id="contact-firstName" name="firstName" placeholder="First name" required autoComplete="given-name" className="p-5 text-lg min-h-[52px]" />
+                  </div>
+                  <div>
+                    <label htmlFor="contact-lastName" className="sr-only">Last name</label>
+                    <Input id="contact-lastName" name="lastName" placeholder="Last name" required autoComplete="family-name" className="p-5 text-lg min-h-[52px]" />
+                  </div>
                 </div>
-                <Input name="phone" type="tel" placeholder="Phone number" required className="p-5 text-lg min-h-[52px]" />
-                <Input name="email" type="email" placeholder="Email address" required className="p-5 text-lg min-h-[52px]" />
-                <select
-                  name="subject"
-                  className="w-full min-h-[52px] p-5 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
-                  required
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select product interest
-                  </option>
-                  {products.map((product) => (
-                    <option key={product._id || product.id || product.name} value={product.name}>
-                      {product.name}
+                <div>
+                  <label htmlFor="contact-phone" className="sr-only">Phone number</label>
+                  <Input id="contact-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="Phone number" required className="p-5 text-lg min-h-[52px]" />
+                </div>
+                <div>
+                  <label htmlFor="contact-email" className="sr-only">Email address</label>
+                  <Input id="contact-email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="Email address" required className="p-5 text-lg min-h-[52px]" />
+                </div>
+                <div>
+                  <label htmlFor="contact-subject" className="sr-only">Product interest</label>
+                  <select
+                    id="contact-subject"
+                    name="subject"
+                    className="w-full min-h-[52px] p-5 text-lg border border-gray-300 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 focus-visible:border-transparent bg-white"
+                    required
+                    defaultValue=""
+                  >
+                    <option value="" disabled>
+                      Select product interest
                     </option>
-                  ))}
-                  <option value="general">General inquiry</option>
-                  <option value="support">Technical support</option>
-                  <option value="dealer">Dealer partnership</option>
-                </select>
-                <Textarea
-                  name="message"
-                  placeholder="Your message"
-                  rows={6}
-                  required
-                  className="p-5 text-lg resize-y min-h-[140px]"
-                />
+                    {products.map((product) => (
+                      <option key={product._id || product.id || product.name} value={product.name}>
+                        {product.name}
+                      </option>
+                    ))}
+                    <option value="general">General inquiry</option>
+                    <option value="support">Technical support</option>
+                    <option value="dealer">Dealer partnership</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="contact-message" className="sr-only">Your message</label>
+                  <Textarea
+                    id="contact-message"
+                    name="message"
+                    placeholder="Your message"
+                    rows={6}
+                    required
+                    className="p-5 text-lg resize-y min-h-[140px]"
+                  />
+                </div>
 
                 {error ? (
                   <p className="text-base text-red-600" role="alert">

@@ -731,7 +731,7 @@ export default function HomePage() {
           {/* Mobile View - Banner First, Then Content */}
           <div className="md:hidden">
             {/* Banner Images - Mobile View (swipeable) */}
-            <div className="relative h-80">
+            <div className="relative h-64 sm:h-72">
               <div
                 className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing"
                 onTouchStart={(e) => { bannerTouchStartX.current = e.touches[0].clientX }}
