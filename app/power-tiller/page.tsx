@@ -47,10 +47,10 @@ export default function PowerTillerPage() {
           or explore all our agricultural equipment on the products page.
         </p>
 
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-3">
           <Link
             href="/products"
-            className="inline-flex items-center justify-center rounded-md bg-green-600 px-6 py-3 text-base font-semibold text-white hover:bg-green-700 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-green-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
           >
             View All Products
           </Link>
@@ -58,7 +58,7 @@ export default function PowerTillerPage() {
             href="https://wa.me/917827229116?text=I%27m%20interested%20in%20the%20100x%20Circle%20Power%20Tiller.%20Please%20share%20details."
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-md border border-green-600 px-6 py-3 text-base font-semibold text-green-700 hover:bg-green-50 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-green-600 bg-white px-6 py-3 text-base font-semibold text-green-700 transition-all hover:-translate-y-0.5 hover:bg-green-50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
           >
             Chat on WhatsApp
           </a>
