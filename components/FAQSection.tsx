@@ -1,5 +1,6 @@
 "use client"
 
+import * as Accordion from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"
 
 type Faq = {
@@ -71,24 +72,29 @@ export default function FAQSection() {
           </p>
         </div>
 
-        <div className="divide-y divide-gray-200 rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <Accordion.Root
+          type="single"
+          collapsible
+          className="divide-y divide-gray-200 rounded-2xl border border-gray-200 bg-white shadow-sm"
+        >
           {FAQS.map((f, i) => (
-            <details
-              key={i}
-              className="group p-5 md:p-6 [&_summary::-webkit-details-marker]:hidden"
-            >
-              <summary className="flex cursor-pointer items-start justify-between gap-4 text-left font-semibold text-gray-900 marker:hidden">
-                <span className="text-base md:text-lg">{f.q}</span>
-                <ChevronDown
-                  size={20}
-                  aria-hidden="true"
-                  className="mt-1 shrink-0 text-green-700 transition-transform duration-200 group-open:rotate-180"
-                />
-              </summary>
-              <p className="mt-3 text-gray-700 leading-relaxed">{f.a}</p>
-            </details>
+            <Accordion.Item key={i} value={`faq-${i}`}>
+              <Accordion.Header className="flex">
+                <Accordion.Trigger className="group flex w-full items-start justify-between gap-4 p-5 md:p-6 text-left font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 focus-visible:ring-inset rounded-2xl [&[data-state=open]]:text-green-700">
+                  <span className="text-base md:text-lg leading-snug">{f.q}</span>
+                  <ChevronDown
+                    size={20}
+                    aria-hidden="true"
+                    className="mt-1 shrink-0 text-green-700 transition-transform duration-200 group-data-[state=open]:rotate-180"
+                  />
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content className="overflow-hidden text-gray-700 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+                <p className="px-5 md:px-6 pb-5 md:pb-6 leading-relaxed">{f.a}</p>
+              </Accordion.Content>
+            </Accordion.Item>
           ))}
-        </div>
+        </Accordion.Root>
       </div>
 
       <script

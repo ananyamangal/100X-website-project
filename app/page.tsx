@@ -25,7 +25,9 @@ import {
   Package,
   BarChart3,
   Loader2,
+  Quote,
 } from "lucide-react"
+import useEmblaCarousel from "embla-carousel-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -188,7 +190,7 @@ function YoutubeShortsCarousel() {
   }, []);
   if (!shorts.length) return null;
   return (
-    <section className="py-24 bg-gray-50 relative">
+    <section className="py-16 md:py-20 bg-gray-50 relative">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <Badge className="mb-6 bg-red-100 text-red-800 hover:bg-red-200 text-lg px-6 py-2">
@@ -729,7 +731,7 @@ export default function HomePage() {
           {/* Mobile View - Banner First, Then Content */}
           <div className="md:hidden">
             {/* Banner Images - Mobile View (swipeable) */}
-            <div className="relative h-80">
+            <div className="relative h-64 sm:h-72">
               <div
                 className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing"
                 onTouchStart={(e) => { bannerTouchStartX.current = e.touches[0].clientX }}
@@ -876,7 +878,7 @@ export default function HomePage() {
         <AccreditationsScroll accreditations={accreditations} />
 
         {/* Products Section */}
-        <section id="products" className="py-24">
+        <section id="products" className="py-16 md:py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20">
               <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
@@ -894,7 +896,24 @@ export default function HomePage() {
               </p>
             </div>
 
-            {products.length <= 6 ? (
+            {products.length === 0 ? (
+              // Graceful fallback when the products API returns no rows
+              // (e.g. Mongo unreachable from a dev environment). In
+              // production this branch is never hit because Mongo serves
+              // the live catalogue.
+              <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/60 py-14 px-6 text-center">
+                <p className="mx-auto max-w-2xl text-base md:text-lg text-gray-600 leading-relaxed">
+                  Browse our complete catalogue of industrial fogging machines, vehicle-mounted systems, and agricultural equipment.
+                </p>
+                <div className="mt-7 flex justify-center">
+                  <Button asChild size="lg" className="bg-green-600 hover:bg-green-700">
+                    <Link href="/products">
+                      View All Products <ArrowRight className="ml-2" size={18} />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            ) : products.length <= 6 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {products.map((product, index) => (
                   <ProductCard
@@ -935,7 +954,7 @@ export default function HomePage() {
         <OurCustomersScroll customers={customers} />
 
         {/* Reviews Carousel Section */}
-        <section className="py-24 bg-white">
+        <section className="py-16 md:py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <Badge className="mb-6 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-lg px-6 py-2">
@@ -954,7 +973,7 @@ export default function HomePage() {
         </section>
 
         {/* Blog Preview Section */}
-        <section className="py-24 bg-gray-50">
+        <section className="py-16 md:py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20">
               <Badge className="mb-6 bg-purple-100 text-purple-800 hover:bg-purple-200 text-lg px-6 py-2">
@@ -1541,22 +1560,95 @@ function ReviewsCarousel() {
     },
   ];
 
+  const [emblaRef, embla] = useEmblaCarousel({ align: "start", loop: false, skipSnaps: false });
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+  const [selected, setSelected] = useState(0);
+
+  const refreshState = React.useCallback(() => {
+    if (!embla) return;
+    setCanPrev(embla.canScrollPrev());
+    setCanNext(embla.canScrollNext());
+    setSelected(embla.selectedScrollSnap());
+  }, [embla]);
+
+  useEffect(() => {
+    if (!embla) return;
+    refreshState();
+    embla.on("select", refreshState);
+    embla.on("reInit", refreshState);
+  }, [embla, refreshState]);
+
   return (
     <div className="relative max-w-7xl mx-auto">
-      <div className="flex items-center justify-center mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 w-full overflow-x-auto">
+      <div className="overflow-hidden" ref={emblaRef}>
+        <ul className="flex list-none -ml-4 md:-ml-6">
           {reviews.map((review, idx) => (
-            <Card key={idx} className="p-6 text-center shadow-xl border-0 flex flex-col items-center min-h-[260px] max-w-[320px] mx-auto">
-              <img
-                src={review.avatar}
-                alt={review.name}
-                className="w-16 h-16 rounded-full mb-3 object-cover border-2 border-yellow-200"
-              />
-              <h3 className="text-lg font-bold text-gray-800 mb-1 line-clamp-1">{review.name}</h3>
-              <p className="text-sm text-gray-500 mb-2 line-clamp-1">{review.title}</p>
-              <p className="text-base text-gray-700 italic line-clamp-6">"{review.review}"</p>
-            </Card>
+            <li
+              key={idx}
+              className="basis-full md:basis-1/2 lg:basis-1/3 shrink-0 grow-0 pl-4 md:pl-6"
+            >
+              <Card className="h-full border border-gray-200 shadow-sm p-7 md:p-8 flex flex-col">
+                <Quote className="text-green-600/70 mb-4" size={24} aria-hidden="true" />
+                <p className="text-base text-gray-700 leading-relaxed line-clamp-6 italic flex-1">
+                  "{review.review}"
+                </p>
+                <div className="mt-6 flex items-center gap-3 border-t border-gray-100 pt-5">
+                  <img
+                    src={review.avatar}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-11 h-11 rounded-full object-cover border border-gray-200 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-gray-900 line-clamp-1">{review.name}</div>
+                    <div className="text-xs text-gray-500 line-clamp-1">{review.title}</div>
+                  </div>
+                </div>
+              </Card>
+            </li>
           ))}
+        </ul>
+      </div>
+
+      <div className="mt-8 flex items-center justify-between">
+        <div className="flex items-center gap-2" aria-label="Review slide indicators">
+          {reviews.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Go to review ${i + 1}`}
+              aria-current={selected === i}
+              onClick={() => embla?.scrollTo(i)}
+              className={
+                selected === i
+                  ? "h-1.5 w-6 rounded-full bg-green-600 transition-all"
+                  : "h-1.5 w-1.5 rounded-full bg-gray-300 transition-all hover:bg-gray-400"
+              }
+            />
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            aria-label="Previous review"
+            disabled={!canPrev}
+            onClick={() => embla?.scrollPrev()}
+            className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white text-gray-700 transition-all hover:border-green-600 hover:text-green-700 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+          >
+            <ChevronLeft size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            aria-label="Next review"
+            disabled={!canNext}
+            onClick={() => embla?.scrollNext()}
+            className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white text-gray-700 transition-all hover:border-green-600 hover:text-green-700 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+          >
+            <ChevronRight size={18} aria-hidden="true" />
+          </button>
         </div>
       </div>
     </div>

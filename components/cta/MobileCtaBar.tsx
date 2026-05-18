@@ -105,10 +105,15 @@ export default function MobileCtaBar() {
             aria-haspopup={isContactPage ? undefined : "dialog"}
             aria-expanded={isContactPage ? undefined : quoteOpen}
             data-gtm="cta_quote"
-            className="inline-flex min-h-[52px] items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white px-2 text-slate-900 font-semibold text-[15px] transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
+            className="inline-flex min-h-[52px] items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white px-2 text-slate-900 font-semibold transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
           >
-            <FileText size={18} aria-hidden="true" />
-            <span className="truncate">{copy.quote}</span>
+            <FileText size={16} aria-hidden="true" className="shrink-0" />
+            {/* Smaller text for the long "Request Tender Quote" label so it
+                doesn't truncate on 360-375px phones. Other labels (Get Quote /
+                Get Price / Become Distributor) stay at the standard size. */}
+            <span className={copy.quote.length > 12 ? "truncate text-[12px]" : "truncate text-[15px]"}>
+              {copy.quote}
+            </span>
           </button>
         </div>
       </div>

@@ -84,7 +84,29 @@ export default async function BlogIndexPage() {
         </div>
 
         {posts.length === 0 ? (
-          <p className="text-center text-gray-600 py-16">New articles will appear here soon.</p>
+          // Empty state. Shown when getPublicBlogs() returns no rows
+          // (typically: DB unreachable from this environment, or no
+          // posts have been published yet). Production with active
+          // posts never renders this branch.
+          <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-16 px-6 text-center max-w-3xl mx-auto">
+            <p className="mx-auto max-w-xl text-base md:text-lg text-gray-600 leading-relaxed">
+              New industry insights, maintenance guides, and application tips are on the way. In the meantime, explore our product range or get in touch with our team.
+            </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/products"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-green-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              >
+                Browse Products
+              </Link>
+              <Link
+                href="/contact-us"
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-800 transition-all hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-600 focus-visible:ring-offset-2"
+              >
+                Contact Us
+              </Link>
+            </div>
+          </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {posts.map((post, index) => (
