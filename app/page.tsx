@@ -988,24 +988,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {displayBlogPosts.length === 0 ? (
-              // Graceful fallback when /api/admin/blogs returns no rows.
-              // Production with Mongo reachable never hits this branch.
-              <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-14 px-6 text-center mb-12">
-                <p className="mx-auto max-w-2xl text-base md:text-lg text-gray-600 leading-relaxed">
-                  Industry insights, maintenance guides, and application tips coming soon. Visit the blog to see all published articles.
-                </p>
-                <div className="mt-7 flex justify-center">
-                  <Button asChild size="lg" variant="outline" className="border-purple-600 text-purple-700 hover:bg-purple-50 bg-transparent">
-                    <Link href="/blog">
-                      Visit the blog <ArrowRight className="ml-2" size={18} />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            ) : null}
-
-            <div className={displayBlogPosts.length === 0 ? "hidden" : "grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"}>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               {displayBlogPosts.slice(0, 3).map((post, index) => (
                 <Card
                   key={post.id || post._id || post.slug || index}
