@@ -1,7 +1,20 @@
 "use client"
 
 import Link from "next/link"
-import { Award, ChevronLeft, Eye, Heart, Target } from "lucide-react"
+import {
+  Award,
+  CheckCircle,
+  ChevronLeft,
+  Eye,
+  Factory,
+  HandHeart,
+  Heart,
+  ShieldCheck,
+  Target,
+  Truck,
+  Users,
+  Wrench,
+} from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -143,6 +156,155 @@ export default function AboutPageContent({
             </div>
           </div>
         </div>
+
+        {/* ─── Agency-supplied expansion (Tab 3) ──────────────────────────
+            Mission / Vision / Commitment as a 3-column block, followed by
+            What-Sets-Us-Apart bullets and a Public-Health-Solutions
+            narrative. Existing CMS-driven Foundation cards above stay
+            untouched so populated admin content keeps rendering. */}
+        <section
+          aria-labelledby="about-purpose-heading"
+          className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12 mb-12"
+        >
+          <div className="text-center mb-10">
+            <h2
+              id="about-purpose-heading"
+              className="text-3xl md:text-4xl font-bold text-gray-800 mb-3"
+            >
+              Mission, Vision &amp; Commitment
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Why we build what we build, and the standards every machine has to meet.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div>
+              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                <Target size={22} aria-hidden="true" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Our Mission</h3>
+              <p className="text-gray-700 leading-relaxed mb-3">
+                Deliver high-performance fogging and agricultural equipment that improves productivity, reduces operational effort, and supports critical public-health and agricultural activities across India.
+              </p>
+              <ul className="space-y-2 text-gray-700 leading-relaxed list-none">
+                {[
+                  "Reliable fogging machines for public health and pest-control programmes",
+                  "Efficient agricultural spraying and fogging solutions for farmers",
+                  "Effective equipment for municipal disease-control operations",
+                  "Reduced downtime and lower maintenance cost over the lifetime",
+                  "Long-term performance through strong engineering + quality control",
+                ].map((item) => (
+                  <li key={item} className="flex items-start text-sm">
+                    <CheckCircle size={16} aria-hidden="true" className="mt-1 mr-2 shrink-0 text-green-600" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
+                <Eye size={22} aria-hidden="true" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Our Vision</h3>
+              <p className="text-gray-700 leading-relaxed mb-3">
+                Become India's most trusted, performance-driven manufacturer of fogging machines and field equipment — with products that are:
+              </p>
+              <ul className="space-y-2 text-gray-700 leading-relaxed list-none">
+                {[
+                  "Durable under extreme field conditions",
+                  "Easy to operate for everyday users",
+                  "Cost-efficient over long-term usage",
+                  "Supported by strong after-sales service networks",
+                ].map((item) => (
+                  <li key={item} className="flex items-start text-sm">
+                    <CheckCircle size={16} aria-hidden="true" className="mt-1 mr-2 shrink-0 text-blue-600" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                <HandHeart size={22} aria-hidden="true" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Our Commitment</h3>
+              <p className="text-gray-700 leading-relaxed">
+                We build machines that work consistently, efficiently, and reliably. Whether it's a municipal fogging operation, an agricultural spraying requirement, or industrial pest control, our goal is that our customers can depend on their equipment without interruption.
+              </p>
+              <p className="mt-3 text-gray-700 leading-relaxed">
+                We don't just manufacture machines — we build long-term solutions that support India's health, agriculture, and infrastructure needs.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          aria-labelledby="about-sets-apart-heading"
+          className="mb-12"
+        >
+          <div className="text-center mb-10">
+            <h2
+              id="about-sets-apart-heading"
+              className="text-3xl md:text-4xl font-bold text-gray-800 mb-3"
+            >
+              What Sets 100X Circle Apart
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Field-driven engineering, not catalogue-driven assembly.
+            </p>
+          </div>
+          <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 list-none">
+            {[
+              { icon: Factory, text: "Engineered specifically for Indian field conditions, not adapted from imported designs." },
+              { icon: ShieldCheck, text: "In-house manufacturing with strict multi-stage quality testing before dispatch." },
+              { icon: Wrench, text: "Strong focus on fuel efficiency and operational cost reduction over the machine's lifetime." },
+              { icon: Award, text: "Heavy-duty construction for long service life under demanding field conditions." },
+              { icon: Users, text: "Easy-maintenance design so field operators can service equipment without specialised tools." },
+              { icon: Truck, text: "Pan-India distribution and service support across 50+ locations." },
+            ].map(({ icon: Icon, text }) => (
+              <li key={text}>
+                <div className="h-full rounded-2xl border border-gray-200 bg-white p-6">
+                  <Icon size={22} aria-hidden="true" className="text-green-700 mb-3" />
+                  <p className="text-gray-700 leading-relaxed">{text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section
+          aria-labelledby="about-public-health-heading"
+          className="bg-green-50 rounded-2xl border border-green-100 p-8 md:p-12 mb-12"
+        >
+          <h2
+            id="about-public-health-heading"
+            className="text-3xl md:text-4xl font-bold text-gray-800 mb-3"
+          >
+            Public Health Fogging Solutions — A Core Responsibility
+          </h2>
+          <p className="text-lg text-gray-700 leading-relaxed mb-6 max-w-3xl">
+            Vector-borne diseases such as dengue, malaria, and encephalitis remain a major concern in India. Effective fogging operations play a critical role in controlling these outbreaks — and that mission is at the heart of everything we manufacture.
+          </p>
+          <p className="text-lg text-gray-700 leading-relaxed mb-6 max-w-3xl">
+            Our public health fogging solutions are designed for:
+          </p>
+          <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3 list-none mb-2">
+            {[
+              "Large-scale municipal operations",
+              "Emergency disease control campaigns",
+              "Rural and urban fogging drives",
+              "Continuous high-output usage during peak seasons",
+            ].map((item) => (
+              <li key={item} className="flex items-start text-gray-700">
+                <CheckCircle size={18} aria-hidden="true" className="mt-1 mr-2.5 shrink-0 text-green-600" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-gray-700 leading-relaxed max-w-3xl">
+            Our vehicle-mounted and high-capacity fogging machines allow operators to cover large areas quickly and efficiently, reducing response time during critical health situations.
+          </p>
+        </section>
 
         <div className="text-center">
           <Button size="lg" variant="outline" asChild className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent">
