@@ -195,27 +195,35 @@ export default function AllProductsPage() {
       {/* Spacer for fixed header */}
       <div className="pt-32" />
       <div className="container mx-auto px-4 py-12">
-        <div className="mb-10 text-center">
-          <h1 className="text-5xl font-bold text-gray-800 mb-4">All Products</h1>
-          <p className="text-lg text-gray-600">
-            Browse our complete range of products. Use the categories below to filter.
-            {categories.length > 0 && (
-              <div className="mt-4">
-                <span className="text-sm text-gray-500 block mb-2">Available categories:</span>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {categories.map((category, index) => (
-                    <span 
-                      key={category} 
-                      className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium"
-                    >
-                      {category}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+        {/* Intro — agency-supplied copy. Keyword-targeted but lightly cleaned
+            (removed "Our fogging machines product range by 100X Circle is
+            designed to deliver..." stuffed phrasing). */}
+        <header className="mb-10 md:mb-14 text-center max-w-4xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-5 leading-tight">
+            Complete Range of Fogging Machines and Agricultural Equipment by 100X Circle
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+            Finding the right fogging machine for a specific job is not always straightforward. The application, the scale of coverage, the terrain, and the type of formulation all influence which machine performs best. 100X Circle manufactures a complete product range so you can choose a machine precisely matched to your requirements rather than settling for a compromise.
           </p>
-        </div>
+          <p className="mt-4 text-lg md:text-xl text-gray-600 leading-relaxed">
+            Our lineup spans vehicle-mounted industrial foggers, portable stainless steel tank foggers, thermal and cold combination foggers, and a full complement of agricultural machinery — power weeders, tillers, sprayers, and brush cutters. Every product is manufactured at our Gurugram facility and backed by direct manufacturer support.
+          </p>
+          {categories.length > 0 && (
+            <div className="mt-7">
+              <span className="text-sm text-gray-500 block mb-2">Available categories:</span>
+              <div className="flex flex-wrap justify-center gap-2">
+                {categories.map((category) => (
+                  <span
+                    key={category}
+                    className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium"
+                  >
+                    {category}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </header>
         {/* Category Filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
           <Button
