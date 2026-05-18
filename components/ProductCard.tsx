@@ -62,16 +62,30 @@ export default function ProductCard({
 
   return (
     <Card className="group overflow-hidden border border-gray-200 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-      <div className="relative overflow-hidden">
+      {/* Whole image area (image + dots + badges + star) is now a single
+          clickable link to the product detail page. Badges and the star
+          chip render inside the link via pointer-events-none + relative
+          z-0 so they remain visible without intercepting clicks; the
+          carousel-dots stay non-interactive (decorative only). */}
+      <Link
+        href={`/${slugify(product.name || product.name)}`}
+        aria-label={`View details for ${product.name}`}
+        className="block relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 focus-visible:ring-inset"
+      >
         <div className="relative w-full aspect-[4/3] overflow-hidden bg-white">
           <img
             src={images[currentImageIndex]}
             alt={product.name}
-            className="w-full h-full object-contain p-4 transition-all duration-700"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-[1.02]"
           />
         </div>
         {images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 bg-white/70 rounded-full px-2 py-1">
+          <div
+            aria-hidden="true"
+            className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 bg-white/70 rounded-full px-2 py-1 pointer-events-none"
+          >
             {images.slice(0, 5).map((_, idx) => (
               <span
                 key={idx}
@@ -80,7 +94,7 @@ export default function ProductCard({
             ))}
           </div>
         )}
-        <div className="absolute top-4 left-4 flex flex-wrap gap-1 max-w-[calc(100%-2rem)]">
+        <div className="absolute top-4 left-4 flex flex-wrap gap-1 max-w-[calc(100%-2rem)] pointer-events-none">
           {(product.badges || [product.badge]).slice(0, 3).map((badge, index) => (
             <Badge
               key={index}
@@ -109,14 +123,17 @@ export default function ProductCard({
             </Badge>
           )}
         </div>
-        <div className="absolute top-3 right-3 rounded-md bg-white px-2.5 py-1 shadow-sm ring-1 ring-gray-200">
+        <div
+          aria-hidden="true"
+          className="absolute top-3 right-3 rounded-md bg-white px-2.5 py-1 shadow-sm ring-1 ring-gray-200 pointer-events-none"
+        >
           <div className="flex items-center gap-1">
-            <Star className="text-amber-400 fill-current" size={14} aria-hidden="true" />
+            <Star className="text-amber-400 fill-current" size={14} />
             <span className="text-sm font-semibold text-gray-900 tabular-nums">{product.rating}</span>
             <span className="text-xs text-gray-500 tabular-nums">({product.reviewsCount})</span>
           </div>
         </div>
-      </div>
+      </Link>
       <CardContent className="p-6 md:p-7">
         <div className="flex items-start justify-between gap-3 mb-3">
           <Link href={`/${slugify(product.name || product.name)}`} className="min-w-0 flex-1">

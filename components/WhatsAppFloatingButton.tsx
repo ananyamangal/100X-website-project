@@ -94,7 +94,7 @@ export default function WhatsAppFloatingButton({
         )}
         role="tooltip"
       >
-        <div className="font-semibold text-green-700">WhatsApp Us</div>
+        <div className="font-semibold text-green-700">Chat on WhatsApp</div>
         <div className="mt-1 tabular-nums text-gray-700">{displayPhone}</div>
         <a
           href={telHref}
@@ -109,7 +109,7 @@ export default function WhatsAppFloatingButton({
       <button
         type="button"
         className={cn(
-          "group flex min-h-[56px] min-w-[56px] shrink-0 items-center gap-3 rounded-full bg-green-600 px-5 py-3 text-white shadow-lg",
+          "flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-green-600 text-white shadow-lg",
           "transition-colors duration-200 hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-800",
         )}
         data-gtm="whatsapp_float"
@@ -118,8 +118,7 @@ export default function WhatsAppFloatingButton({
         aria-expanded={mobileExpanded}
         onClick={handleFabClick}
       >
-        <MessageCircle size={28} className="shrink-0" aria-hidden />
-        <span className="hidden font-semibold sm:inline">WhatsApp Us</span>
+        <MessageCircle size={26} className="shrink-0" aria-hidden />
       </button>
     </div>
   )

@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Download } from 'lucide-react';
+import { Download, Menu, MessageCircle, Phone, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { BUSINESS } from '@/lib/seo/site-config';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
@@ -13,6 +14,12 @@ const NAV_LINKS = [
   { href: '/contact-us', label: 'Contact' },
   { href: '/blog', label: 'Blog' },
 ] as const
+
+// Pre-computed so we don't re-encode on every render.
+const TEL_HREF = `tel:${BUSINESS.phonePrimary.replace(/\s+/g, '')}`
+const WA_HREF = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(
+  "Hi 100x Circle, I'd like to know more about your fogging machines.",
+)}`
 
 function isActive(pathname: string | null, href: string) {
   if (!pathname) return false
@@ -41,6 +48,38 @@ export default function Navbar() {
     return () => document.removeEventListener('keydown', onKey)
   }, [isMenuOpen])
 
+  // Compact icon-only Call + WhatsApp buttons. Used in both the desktop
+  // and mobile navbar so contact actions are always one tap away once
+  // the green utility-strip is removed. Wrapped with
+  // data-gtm-location="navbar" so the global click listener auto-fires
+  // phone_click / whatsapp_click with the right location field.
+  const contactIcons = (
+    <div
+      data-gtm-location="navbar"
+      className="flex items-center gap-1"
+      aria-label="Quick contact"
+    >
+      <a
+        href={TEL_HREF}
+        aria-label={`Call ${BUSINESS.phonePrimary}`}
+        data-gtm="nav_call"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+      >
+        <Phone size={18} aria-hidden="true" />
+      </a>
+      <a
+        href={WA_HREF}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat on WhatsApp"
+        data-gtm="nav_whatsapp"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+      >
+        <MessageCircle size={18} aria-hidden="true" />
+      </a>
+    </div>
+  )
+
   return (
     <header
       className={cn(
@@ -50,7 +89,7 @@ export default function Navbar() {
           : 'bg-white border-b border-transparent',
       )}
     >
-      <nav className="container mx-auto px-4 py-3.5 md:py-4 flex items-center justify-between">
+      <nav className="container mx-auto px-4 py-3.5 md:py-4 flex items-center justify-between gap-3">
         <Link
           href="/"
           aria-label="100x Circle home"
@@ -62,6 +101,7 @@ export default function Navbar() {
           </span>
         </Link>
 
+        {/* Desktop: nav links + Brochure */}
         <div className="hidden lg:flex items-center gap-7">
           {NAV_LINKS.map((l) => {
             const active = isActive(pathname, l.href)
@@ -74,7 +114,6 @@ export default function Navbar() {
                   'relative text-sm font-medium transition-colors',
                   'focus-visible:outline-none focus-visible:text-green-700',
                   active ? 'text-green-700' : 'text-gray-700 hover:text-green-600',
-                  // Underline anchored to baseline; only shown for the active route.
                   "after:absolute after:left-0 after:-bottom-1.5 after:h-[2px] after:bg-green-600 after:transition-all",
                   active ? 'after:w-full' : 'after:w-0',
                 )}
@@ -83,22 +122,26 @@ export default function Navbar() {
               </Link>
             )
           })}
-          <Button className="bg-green-600 hover:bg-green-700 ml-1">
+        </div>
+
+        {/* Right cluster: contact icons (always visible) + Brochure (desktop) + hamburger (mobile) */}
+        <div className="flex items-center gap-1 md:gap-2">
+          {contactIcons}
+          <Button className="hidden lg:inline-flex bg-green-600 hover:bg-green-700 ml-1">
             <Download size={16} className="mr-2" aria-hidden="true" />
             Brochure
           </Button>
+          <button
+            type="button"
+            className="lg:hidden p-2 -mr-2 ml-1 text-gray-700 hover:text-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 rounded-md transition-colors"
+            aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={isMenuOpen}
+            aria-controls="navbar-mobile-menu"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
+          </button>
         </div>
-
-        <button
-          type="button"
-          className="lg:hidden p-2 -mr-2 text-gray-700 hover:text-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 rounded-md transition-colors"
-          aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          aria-expanded={isMenuOpen}
-          aria-controls="navbar-mobile-menu"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
-        </button>
       </nav>
 
       {isMenuOpen && (

@@ -113,22 +113,8 @@ export default function AllProductsPage() {
 
       {/* Header (same as Home page) */}
       <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-lg z-50 border-b">
-        {/* Top Bar */}
-        <div className="bg-green-600 text-white py-3">
-          <div className="container mx-auto px-4 flex justify-center items-center">
-            <div className="flex flex-wrap items-center gap-6 text-lg font-semibold justify-center">
-              <span className="flex items-center">WhatsApp Us for queries</span>
-              <span className="flex items-center">
-                <MessageCircle size={18} className="mr-2" />
-                <a href="tel:+917827229116" className="underline hover:text-green-200" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag) { (window as any).gtag('event', 'conversion', { 'send_to': 'AW-17730009010/0N2CCMvmudwbELLvqYZC' }); } }}>+91 7827229116</a>
-              </span>
-              <span className="flex items-center">
-                <MessageCircle size={18} className="mr-2" />
-                <a href="tel:+918178567520" className="underline hover:text-green-200">+91 8178567520</a>
-              </span>
-            </div>
-          </div>
-        </div>
+        {/* Green utility bar removed — phone + WhatsApp now live in the
+            global Navbar as compact icon buttons. */}
 
         {/* Navbar */}
         <nav className="container mx-auto px-4 py-4">
