@@ -8,6 +8,18 @@ function normalize(text: string) {
         .replace(/[^a-z0-9]+/g, "")
 }
 
+// Order-independent fallback: a product renamed in admin (e.g. moving the
+// model number from end to start) shouldn't break the existing SEO slug.
+function tokenSig(text: string) {
+    return text
+        .toLowerCase()
+        .replace(/&/g, "and")
+        .split(/[^a-z0-9]+/)
+        .filter(Boolean)
+        .sort()
+        .join("|")
+}
+
 export async function GET(request: NextRequest, context: { params?: { slug?: string } }) {
     try {
         const params = await context.params;
@@ -19,9 +31,11 @@ export async function GET(request: NextRequest, context: { params?: { slug?: str
         const db = client.db();
         const products = await db.collection("products").find().toArray()
 
-        const product = products.find(
-            p => normalize(p.name) === normalize(slug)
-        )
+        const slugNorm = normalize(slug);
+        const slugSig = tokenSig(slug);
+        const product =
+            products.find(p => normalize(p.name) === slugNorm) ||
+            products.find(p => tokenSig(p.name) === slugSig)
 
         if (!product) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
