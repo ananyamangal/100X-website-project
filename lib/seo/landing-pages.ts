@@ -315,6 +315,107 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
     ],
   },
 
+  // ─── State page: Bihar ────────────────────────────────────────────────
+  "fogging-machine-supplier-in-bihar": {
+    slug: "fogging-machine-supplier-in-bihar",
+    type: "state",
+    metadata: {
+      title: "Fogging Machine Supplier in Bihar | 100x Circle",
+      description:
+        "100x Circle supplies thermal & vehicle-mounted fogging machines across Bihar — Patna, Muzaffarpur, Gaya, Bhagalpur, Darbhanga. Local stock, tender support, GST-invoiced dispatch.",
+      keywords:
+        "fogging machine supplier in bihar, thermal fogging machine in bihar, mosquito fogging machine patna, vehicle mounted fogger bihar, fogging machine muzaffarpur gaya bhagalpur",
+    },
+    hero: {
+      eyebrow: "Bihar & Eastern India Supply Network",
+      headline: "Fogging Machine Supplier in Bihar",
+      sub: "Seasonal flooding, dense populations, and recurring mosquito-borne disease drives make Bihar one of India's highest-demand zones for fogging equipment. 100x Circle has been supplying thermal, cold, and vehicle-mounted machines to Bihar's government health departments and private pest-control operators for over a decade — with local stock, GST invoicing, and on-the-ground support.",
+      primary: { label: "Get a Bihar Tender Quote", href: "#landing-form", track: "bihar_hero_primary" },
+      secondary: {
+        label: "Call Us Now",
+        href: "tel:+917827229116",
+        track: "bihar_hero_call",
+      },
+    },
+    sections: [
+      {
+        kind: "trust-strip",
+        metrics: [
+          { value: "10+ yrs", label: "Supplying Bihar" },
+          { value: "Local", label: "Stock points" },
+          { value: "24–72h", label: "Dispatch time" },
+          { value: "GST", label: "Invoiced supply" },
+          { value: "Hindi", label: "Field-team support" },
+        ],
+      },
+      {
+        kind: "benefits-grid",
+        eyebrow: "Why Bihar buyers choose 100x Circle",
+        title: "Built for Bihar's terrain, season, and tender process",
+        items: [
+          { icon: "📦", title: "Local stock — short wait times", description: "Machines stocked at distribution points in Bihar so customers don't wait for long transits from our Gurugram facility. Most in-stock models dispatch within 24–72 hours." },
+          { icon: "🌧️", title: "Built for Bihar's climate", description: "Engineered to handle the heat, humidity, monsoon flooding, and rough terrain typical of field operations across Bihar and Jharkhand — not a generic spec sheet." },
+          { icon: "🏛️", title: "Tender & GeM ready", description: "GeM-approved OEM. Full tender dossier — technical specs, compliance certificates, OEM authorisation letter, GST-invoiced dispatch — supplied with every quote." },
+          { icon: "🤝", title: "Local setup + training support", description: "On-the-ground team for initial setup, operator training in Hindi, and routine maintenance guidance. Spare parts dispatched directly from Gurugram." },
+        ],
+      },
+      {
+        kind: "recommended-products",
+        eyebrow: "Most-requested in Bihar",
+        title: "Machines our Bihar buyers pick",
+        slugs: [
+          "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+          "thermal-and-cold-fogging-machine-100xtfs50",
+          "thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
+        ],
+      },
+      {
+        kind: "case-studies",
+        eyebrow: "Bihar deployments",
+        title: "Recent supply across Bihar and Jharkhand",
+        items: [
+          { client: "District Health Department", location: "Central Bihar", result: "Pre-monsoon dengue control drive — vehicle-mounted double-barrel units across multiple blocks." },
+          { client: "Private pest-control operator", location: "Patna & Muzaffarpur", result: "SS-tank thermal foggers deployed for housing societies, hospitals, and commercial sites." },
+          { client: "Agricultural cooperative", location: "North Bihar", result: "Portable thermal foggers for crop protection and farm-level pest control across cooperative member farms." },
+        ],
+      },
+      {
+        kind: "form",
+        variant: "tender-quote",
+        eyebrow: "Tender / quote request",
+        title: "Get a Bihar-ready quote in 24 hours",
+        sub: "Share your tender reference, machine requirement, and delivery district. We respond within 24 hours with quote, compliance documentation, and dispatch timeline.",
+        checklist: [
+          "Tender-compliant technical spec sheets",
+          "GST-invoiced direct factory dispatch",
+          "On-site briefing for field teams (if required)",
+          "OEM authorisation letter for resellers",
+        ],
+      },
+      {
+        kind: "cta-band",
+        band: {
+          heading: "Need to speak to someone in Bihar today?",
+          sub: "Our sales team answers 9 AM – 6 PM IST every working day.",
+          primary: { label: "Call +91 78272 29116", href: "tel:+917827229116" },
+          secondary: { label: "WhatsApp", href: "https://wa.me/917827229116?text=I%27m%20in%20Bihar%20and%20want%20a%20quote%20for%20fogging%20machines" },
+        },
+      },
+    ],
+    faqs: [
+      { q: "Do you stock fogging machines locally in Bihar?", a: "Yes — we maintain distribution points in Bihar so customers placing an order don't have to wait for transit from our Gurugram facility. Most in-stock models dispatch within 24–72 hours of confirmed order. Bulk and tender orders get a confirmed delivery commitment as part of the quote." },
+      { q: "Which 100x Circle fogger is most commonly supplied to municipal corporations in Bihar?", a: "The Double Barrel Vehicle-Mounted Thermal Fogging Machine (100XDB400) for city-wide and ward-level mosquito control drives, often paired with portable SS-tank thermal foggers (100XSSMA20) for parks, hospitals, schools, and residential clusters where the vehicle can't enter." },
+      { q: "Are 100x Circle machines acceptable for Bihar government tenders and GeM listings?", a: "Yes. We're a GeM-approved OEM for fogging machines and our SKUs map to the standard tender technical specifications used by Bihar municipal corporations, Nagar Nigams, panchayats, and the state health department. Every supply includes the OEM authorisation letter, GST invoice, dispatch challan, and warranty certificate procurement teams need." },
+      { q: "Do you offer dealer or distributor opportunities in Bihar?", a: "Yes — channel partner slots are open across Bihar (Patna, Muzaffarpur, Gaya, Bhagalpur, Darbhanga, and Tier-2 cities). Reach out via the form above with your city, current business, and target volume — margins, territory, and onboarding are discussed in the first call." },
+      { q: "What after-sales support do Bihar customers get?", a: "On-call technical support in English and Hindi, spare-parts dispatch from Gurugram, troubleshooting videos for first-time field teams, and on-site assistance for large institutional buyers. Our team has conducted operator training for Bihar health departments and can arrange the same for your team upon request." },
+    ],
+    relatedLandingSlugs: [
+      "gem-approved-fogging-machine-oem",
+      "fogging-machine-supplier-in-uttar-pradesh",
+      "dengue-control-fogging-machine",
+    ],
+  },
+
   // ─── Use-case page: Dengue control ───────────────────────────────────
   "dengue-control-fogging-machine": {
     slug: "dengue-control-fogging-machine",
