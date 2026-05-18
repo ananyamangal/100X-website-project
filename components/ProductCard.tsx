@@ -61,7 +61,7 @@ export default function ProductCard({
   }
 
   return (
-    <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 border-0 shadow-lg">
+    <Card className="group overflow-hidden border border-gray-200 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0">
       <div className="relative overflow-hidden">
         <div className="relative w-full aspect-[4/3] overflow-hidden bg-white">
           <img
@@ -84,14 +84,14 @@ export default function ProductCard({
           {(product.badges || [product.badge]).slice(0, 3).map((badge, index) => (
             <Badge
               key={index}
-              className={`$${badge === 'Best Seller'
+              className={`${badge === 'Best Seller'
                   ? 'bg-red-500 hover:bg-red-600'
                   : badge === 'Eco-Friendly'
                     ? 'bg-green-500 hover:bg-green-600'
                     : badge === 'New Launch'
                       ? 'bg-blue-500 hover:bg-blue-600'
                       : 'bg-orange-500 hover:bg-orange-600'
-                } flex items-center gap-1 px-2 py-1 text-xs whitespace-nowrap`}
+                } text-white flex items-center gap-1 px-2 py-1 text-xs whitespace-nowrap shadow-sm`}
             >
               {badgeLogoMap[badge] && (
                 <img
@@ -109,38 +109,40 @@ export default function ProductCard({
             </Badge>
           )}
         </div>
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
-          <div className="flex items-center space-x-1">
-            <Star className="text-yellow-400 fill-current" size={16} />
-            <span className="text-sm font-semibold">{product.rating}</span>
-            <span className="text-xs text-gray-600">({product.reviewsCount})</span>
+        <div className="absolute top-3 right-3 rounded-md bg-white px-2.5 py-1 shadow-sm ring-1 ring-gray-200">
+          <div className="flex items-center gap-1">
+            <Star className="text-amber-400 fill-current" size={14} aria-hidden="true" />
+            <span className="text-sm font-semibold text-gray-900 tabular-nums">{product.rating}</span>
+            <span className="text-xs text-gray-500 tabular-nums">({product.reviewsCount})</span>
           </div>
         </div>
       </div>
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-3">
-          <Link href={`/${slugify(product.name || product.name)}`}>
-            <h3 className="text-xl font-bold text-gray-800 group-hover:text-green-600 transition-colors cursor-pointer hover:underline">
+      <CardContent className="p-6 md:p-7">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <Link href={`/${slugify(product.name || product.name)}`} className="min-w-0 flex-1">
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 leading-snug group-hover:text-green-700 transition-colors line-clamp-2">
               {product.name}
             </h3>
           </Link>
-          <div className="text-right">
-            <div className="text-lg font-bold text-green-600">{product.priceRange}</div>
-          </div>
-        </div>
-        <p className="text-gray-600 mb-4 line-clamp-2">{plainTextFromHtml(product.detailedDescription || '')}</p>
-        <div className="space-y-2 mb-6">
-          {product.features?.slice(0, 3).map((feature: string, idx: number) => (
-            <div key={idx} className="flex items-center text-sm text-gray-600">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-3"></div>
-              {feature}
+          {product.priceRange ? (
+            <div className="shrink-0 text-right">
+              <div className="text-base md:text-lg font-bold text-green-700 tabular-nums">{product.priceRange}</div>
             </div>
-          ))}
+          ) : null}
         </div>
-        <div className="flex gap-3">
+        <p className="text-sm md:text-base text-gray-600 mb-5 line-clamp-2 leading-relaxed">{plainTextFromHtml(product.detailedDescription || '')}</p>
+        <ul className="space-y-1.5 mb-6 list-none">
+          {product.features?.slice(0, 3).map((feature: string, idx: number) => (
+            <li key={idx} className="flex items-start text-sm text-gray-700">
+              <span aria-hidden="true" className="mt-2 mr-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500"></span>
+              <span className="line-clamp-1">{feature}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="flex gap-2.5">
           <Button
             asChild
-            className="flex-1 bg-green-600 hover:bg-green-700"
+            className="flex-1 bg-green-600 hover:bg-green-700 shadow-sm transition-shadow hover:shadow-md"
           >
             <Link href={`/${slugify(product.name || product.name)}`}>
               View Details
@@ -148,10 +150,11 @@ export default function ProductCard({
           </Button>
           <Button
             variant="outline"
-            className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent"
+            className="border-green-600 text-green-700 hover:bg-green-50 bg-transparent"
             onClick={onBrochureDownload}
+            aria-label={`Download brochure for ${product.name}`}
           >
-            <Download size={16} className="mr-2" />
+            <Download size={16} className="mr-2" aria-hidden="true" />
             Brochure
           </Button>
         </div>
