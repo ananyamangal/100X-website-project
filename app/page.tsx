@@ -9,14 +9,10 @@ import {
   Phone,
   Download,
   MessageCircle,
-  ArrowRight,
   Star,
   Users,
   Award,
   ChevronRight,
-  Play,
-  Calendar,
-  User,
   ChevronLeft,
   CheckCircle,
   Target,
@@ -25,18 +21,21 @@ import {
   Package,
   BarChart3,
   Loader2,
-  Quote,
 } from "lucide-react"
-import useEmblaCarousel from "embla-carousel-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import ProductCard from '@/components/ProductCard'
 import { RichContent } from "@/components/RichContent"
 import ContactSection from "@/components/ContactSection"
 import FAQSection from "@/components/FAQSection"
 import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton"
+import AccreditationsStrip from "@/components/home/AccreditationsStrip"
+import ManufacturerIntroBlock from "@/components/home/ManufacturerIntroBlock"
+import BlogBlock from "@/components/home/BlogBlock"
+import TrustBlock from "@/components/home/TrustBlock"
+import ProductsBlock from "@/components/home/ProductsBlock"
+import HeroBlock from "@/components/home/HeroBlock"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { BUSINESS } from "@/lib/seo/site-config"
@@ -66,17 +65,6 @@ interface Product {
   updatedAt?: string;
 }
 
-// Helper: stable date formatting (avoids locale-based hydration mismatches)
-const formatDate = (value: string | Date | undefined) => {
-  if (!value) return "";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "";
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const year = d.getUTCFullYear();
-  return `${day}/${month}/${year}`;
-};
-
 const getYouTubeId = (url: string): string | null => {
   if (!url || typeof url !== "string") return null;
   const match = url.match(
@@ -99,44 +87,6 @@ const badgeLogoMap: Record<string, string> = {
 
 const LOGO_PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect fill='%23e5e7eb' width='80' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='10'%3ELogo%3C/text%3E%3C/svg%3E";
-
-function AccreditationsScroll({ accreditations }: { accreditations: any[] }) {
-  if (accreditations.length === 0) return null;
-
-  const n = accreditations.length;
-  const extendedAccreditations = [...accreditations, ...accreditations];
-  const itemWidthPercent = 100 / n;
-
-  return (
-    <section className="py-6 md:py-12 bg-gray-50 overflow-hidden">
-      <div className="container mx-auto px-2 md:px-4">
-        <div className="relative overflow-hidden">
-          <div className="flex animate-logo-marquee">
-            {extendedAccreditations.map((accreditation, index) => (
-              <div
-                key={`acc-${index}-${(accreditation as any)._id ?? accreditation.logo ?? index}`}
-                className="flex-shrink-0 px-1 md:px-4 max-md:!w-1/3"
-                style={{ width: `${itemWidthPercent}%` }}
-              >
-                <div className="bg-white rounded-lg p-1.5 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow min-h-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={accreditation.logo || LOGO_PLACEHOLDER}
-                    alt={accreditation.name ? `${accreditation.name} certification` : "Industry certification"}
-                    className="object-contain max-w-full max-h-full min-h-0 min-w-0 w-full h-full"
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => { e.currentTarget.src = LOGO_PLACEHOLDER }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function OurCustomersScroll({ customers }: { customers: any[] }) {
   if (customers.length === 0) return null;
@@ -639,489 +589,33 @@ export default function HomePage() {
       <>
 
         {/* Hero Section with Image Slider */}
-        <section id="home" className="pt-32 relative overflow-hidden">
-          {/* Banner Images - Desktop View (swipeable on touch devices, arrows always) */}
-          <div className="hidden md:block min-h-screen relative">
-            <div
-              className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing"
-              onTouchStart={(e) => { bannerTouchStartX.current = e.touches[0].clientX }}
-              onTouchEnd={(e) => {
-                const start = bannerTouchStartX.current;
-                if (start == null) return;
-                bannerTouchStartX.current = null;
-                const end = e.changedTouches[0].clientX;
-                const diff = start - end;
-                if (heroSlides.length <= 1) return;
-                if (diff > 50) setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-                else if (diff < -50) setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-              }}
-            >
-              <img
-                src={bannersLoading ? "/banner.jpeg" : (currentSlideData?.image || "/banner.jpeg")}
-                alt="Agricultural equipment"
-                className="w-full h-full object-cover transition-all duration-1000 pointer-events-none select-none"
-                draggable={false}
-              />
-              {/* Very subtle overlay for text readability while maintaining brightness */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-transparent pointer-events-none"></div>
-            </div>
-
-            <div className="relative z-10 container mx-auto px-4 flex items-center min-h-screen">
-              <div className="grid md:grid-cols-2 gap-8 items-center w-full">
-                {/* Text Content - Left Side */}
-                <div className="text-white text-center md:text-left">
-                  <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
-                    Certified Professional Products
-                  </Badge>
-                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
-                    100X – <span className="text-green-400">Thermal</span>  Fogging Machine Manufacturer
-                  </h1>
-                  <div className="text-xl md:text-2xl lg:text-3xl font-bold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
-                    {changingPhrases[phraseIndex]}
-                  </div>
-                  <p className="hidden">
-                    100x Circle is a trusted thermal fogging machine manufacturer offering high-performance solutions for effective mosquito and pest control. We design and manufacture durable fogging machines that deliver powerful output, uniform fog distribution, and long-lasting performance for both industrial and residential applications.
-                  </p>
-                  <p className="hidden">
-                    Our thermal fogging machines are built with high-quality components to ensure reliability, fuel efficiency, and easy operation. Whether you need equipment for municipal use, agriculture, mosquito eradication, warehouses, factories, or vector borne disease control programs, we provide machines that meet professional standards and field requirements.
-                  </p>
-                  <p className="hidden">
-                    At 100x, we focus on innovation, safety, and customer satisfaction. We serve clients across India with timely support and dependable products. If you are looking for an advanced thermal fogging machine manufacturer you can trust, connect with us today for expert guidance and the right solution for your needs.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center md:justify-start mb-8">
-                    <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
-                      <Link href="#products" className="flex items-center">
-                        Explore Products <ArrowRight className="ml-2" size={20} />
-                      </Link>
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-lg px-8 py-4 bg-transparent"
-                      onClick={() =>
-                        window.open(
-                          "https://www.youtube.com/@100Xcircle",
-                          "_blank",
-                        )
-                      }
-                    >
-                      <Play className="mr-2" size={20} />
-                      Watch Demo
-                    </Button>
-                  </div>
-
-                  {/* Stats Section - Left Side Only */}
-                  <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-md mx-auto md:mx-0">
-                    {stats.map((stat, index) => (
-                      <div key={index} className="text-center md:text-left">
-                        <div className="text-3xl font-bold text-green-400 mb-2">{stat.number}</div>
-                        <div className="text-sm text-gray-300">{stat.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Empty Right Side on Desktop */}
-                <div className="hidden md:block">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile View - Banner First, Then Content */}
-          <div className="md:hidden">
-            {/* Banner Images - Mobile View (swipeable) */}
-            <div className="relative h-64 sm:h-72">
-              <div
-                className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing"
-                onTouchStart={(e) => { bannerTouchStartX.current = e.touches[0].clientX }}
-                onTouchEnd={(e) => {
-                  const start = bannerTouchStartX.current;
-                  if (start == null) return;
-                  bannerTouchStartX.current = null;
-                  const end = e.changedTouches[0].clientX;
-                  const diff = start - end;
-                  if (heroSlides.length <= 1) return;
-                  if (diff > 50) setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-                  else if (diff < -50) setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-                }}
-              >
-                <img
-                  src={bannersLoading ? "/banner.jpeg" : (currentSlideData?.image || "/banner.jpeg")}
-                  alt="Agricultural equipment"
-                  className="w-full h-full object-cover transition-all duration-1000 pointer-events-none select-none"
-                  draggable={false}
-                />
-                {/* No overlay for mobile to maintain full brightness */}
-              </div>
-            </div>
-
-            {/* Slide indicators - Mobile: very small dots below the image */}
-            <div className="flex justify-center items-center gap-2 py-2 bg-gray-100/90">
-              {heroSlides.map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  aria-label={`Go to slide ${index + 1} of ${heroSlides.length}`}
-                  aria-current={index === currentSlide ? "true" : undefined}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`rounded-full transition-colors p-2 ${index === currentSlide ? "bg-green-600" : "bg-gray-400/70"
-                    }`}
-                >
-                  <span className="block w-1.5 h-1.5 min-w-[6px] min-h-[6px] rounded-full bg-inherit" />
-                </button>
-              ))}
-            </div>
-
-            {/* Content Below Banner - Mobile View */}
-            <div className="bg-white py-12">
-              <div className="container mx-auto px-4">
-                <div className="text-center">
-                  <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
-                    Certified Professional Products
-                  </Badge>
-                  <h2 className="text-3xl font-bold text-gray-800 mb-6 leading-tight">
-                    100X – <span className="text-green-600">Thermal</span>  Fogging Machine Manufacturer
-                  </h2>
-                  <div className="text-xl font-bold text-green-600 mb-6 min-h-[2rem] transition-all duration-500">
-                    {changingPhrases[phraseIndex]}
-                  </div>
-                  <div className="flex flex-col gap-4 justify-center mb-8">
-                    <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
-                      <Link href="#products" className="flex items-center justify-center">
-                        Explore Products <ArrowRight className="ml-2" size={20} />
-                      </Link>
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-lg px-8 py-4 bg-transparent"
-                      onClick={() =>
-                        window.open(
-                          "https://www.youtube.com/@100Xcircle",
-                          "_blank",
-                        )
-                      }
-                    >
-                      <Play className="mr-2" size={20} />
-                      Watch Demo
-                    </Button>
-                  </div>
-
-                  {/* Stats Section - Mobile View */}
-                  <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
-                    {stats.map((stat, index) => (
-                      <div key={index} className="text-center">
-                        <div className="text-3xl font-bold text-green-600 mb-2">{stat.number}</div>
-                        <div className="text-sm text-gray-600">{stat.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Slide Indicators - Desktop (click dots to go to slide) */}
-          <div className="hidden md:block absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
-            {heroSlides.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                aria-label={`Go to slide ${index + 1} of ${heroSlides.length}`}
-                aria-current={index === currentSlide ? "true" : undefined}
-                onClick={() => setCurrentSlide(index)}
-                className={`w-4 h-4 rounded-full transition-all hover:scale-110 ${index === currentSlide ? "bg-green-400" : "bg-white/50 hover:bg-white/70"
-                  }`}
-              />
-            ))}
-          </div>
-
-          {/* Slide Navigation - Desktop (previous/next buttons) */}
-          <button
-            type="button"
-            aria-label="Previous banner"
-            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-            className="hidden md:block absolute left-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          <button
-            type="button"
-            aria-label="Next banner"
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-            className="hidden md:block absolute right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-4 rounded-full transition-all"
-          >
-            <ChevronRight size={24} />
-          </button>
-
-          {/* Slide Navigation - Mobile (previous/next buttons) */}
-          <button
-            type="button"
-            aria-label="Previous banner"
-            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-            className="md:hidden absolute left-4 top-40 transform -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            type="button"
-            aria-label="Next banner"
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-            className="md:hidden absolute right-4 top-40 transform -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 text-gray-800 p-3 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </section>
+        <HeroBlock
+          heroSlides={heroSlides}
+          currentSlide={currentSlide}
+          setCurrentSlide={setCurrentSlide}
+          currentSlideData={currentSlideData}
+          bannersLoading={bannersLoading}
+          bannerTouchStartX={bannerTouchStartX}
+          stats={stats}
+          changingPhrases={changingPhrases}
+          phraseIndex={phraseIndex}
+        />
 
         {/* Accreditations Autoscroll Bar - just above Our Products */}
-        <AccreditationsScroll accreditations={accreditations} />
+        <AccreditationsStrip accreditations={accreditations} />
 
-        {/* Manufacturer Intro — visible SEO content with agency-supplied copy
-            (Bihar copy lives on /fogging-machine-supplier-in-bihar, not here;
-            phrasing softened from the agency draft to remove a combative
-            competitor line and a 'trusts'/'trusted' typo). */}
-        <section className="py-16 md:py-20 bg-white" aria-labelledby="manufacturer-intro-heading">
-          <div className="container mx-auto px-4 max-w-5xl">
-            <div className="text-center mb-12 md:mb-14">
-              <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
-                Trusted Manufacturer
-              </Badge>
-              <h2
-                id="manufacturer-intro-heading"
-                className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-6 leading-tight"
-              >
-                Trusted Thermal Fogging Machine Manufacturer in India
-              </h2>
-              <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-                When it comes to reliable, field-ready fogging equipment, 100X Circle has built its reputation one machine at a time. As a dedicated thermal fogging machine manufacturer in India, we design and supply high-performance foggers that work hard under real-world conditions — from dense urban neighbourhoods to open agricultural fields.
-              </p>
-              <p className="mt-4 text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-                Every machine that leaves our facility in Gurugram is designed and built for Indian field conditions, with attention to durability, fuel efficiency, and ease of use. That approach has earned us the trust of over 10,000 customers across India, including municipalities, Nagar Nigams, agricultural cooperatives, and private pest control operators.
-              </p>
-            </div>
+        <ManufacturerIntroBlock />
 
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12 mb-12">
-              <div>
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
-                  Public Health Fogging Solutions
-                </h3>
-                <p className="text-gray-700 leading-relaxed">
-                  India faces a persistent challenge with vector-borne diseases such as dengue, malaria, and chikungunya. Municipal bodies, Nagar Panchayats, and public health departments require equipment that can cover large areas quickly without breakdowns. 100X Circle manufactures industrial thermal fogging equipment trusted for large-scale mosquito control drives, with pulse-jet technology that penetrates thick vegetation, open drains, and construction sites where conventional spraying cannot reach.
-                </p>
-                <p className="mt-3 text-gray-700 leading-relaxed">
-                  We are a GeM-approved OEM supplier, which means government bodies can procure our machines directly through the Government e-Marketplace. Our operations extend across Bihar, Uttar Pradesh, Delhi, Maharashtra, Gujarat, and beyond — with active distributors in more than 50 locations.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
-                  Agricultural Fogging Machines for Farm-Level Use
-                </h3>
-                <p className="text-gray-700 leading-relaxed">
-                  The need for fogging in agriculture goes beyond pest control. Farmers use thermal foggers to apply fungicides, pesticides, and plant growth regulators across orchards, paddy fields, and vegetable farms. 100X Circle manufactures agricultural fogging machines used by farmers across India. Our lightweight, portable models can be operated by a single person without a trained technician, making them practical for individual farm use as well as cooperative operations.
-                </p>
-                <p className="mt-3 text-gray-700 leading-relaxed">
-                  Our agricultural spraying equipment handles diesel-based and water-based formulations, giving farmers the flexibility to use it across different crop-protection needs throughout the season.
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-gray-200 bg-gray-50/60 p-7 md:p-9">
-              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-5 text-center">
-                Why Choose 100X Circle
-              </h3>
-              <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3 list-none">
-                {[
-                  "10+ years of focused manufacturing experience in fogging equipment",
-                  "GeM-approved OEM status for direct government procurement",
-                  "Pulse-jet engine technology for consistent, powerful fog output",
-                  "50+ active distributors across India for local support",
-                  "Full range covering vehicle-mounted, portable, and combination foggers",
-                  "Direct warranty and after-sales service from the manufacturer",
-                ].map((item) => (
-                  <li key={item} className="flex items-start text-gray-700">
-                    <CheckCircle
-                      size={18}
-                      aria-hidden="true"
-                      className="mt-1 mr-2.5 shrink-0 text-green-600"
-                    />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* Products Section */}
-        <section id="products" className="py-16 md:py-20">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-20">
-              <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
-                Our Products
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Buy GeM Approved OEM of Fogging Machines at Best Prices</h2>
-              <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
-                We provide a wide range of high-quality fogging machines designed to meet different industrial and commercial needs across India. At 100x Circle, you can easily <a className="text-blue-500" href="https://www.100xcircle.com/">buy industrial fogging machines online</a> from a complete selection of advanced and reliable products.
-              </p>
-              <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
-                Our range includes thermal fogging machines, giant foggers, and heavy-duty industrial models suitable for mosquito control, pest management, agriculture, warehouses, factories, and public health operations. Each machine is manufactured using durable components and pulse jet engine technology to ensure powerful output, uniform fog dispersion, and long-lasting performance.
-              </p>
-              <p className="text-xl text-gray-600 max-w-5xl mx-auto">
-                We focus on efficiency, easy operation, and strong after-sales support so that our customers receive dependable solutions for every application. Explore our product range and buy industrial fogging machines online with confidence today.
-              </p>
-            </div>
-
-            {products.length === 0 ? (
-              // Graceful fallback when the products API returns no rows
-              // (e.g. Mongo unreachable from a dev environment). In
-              // production this branch is never hit because Mongo serves
-              // the live catalogue.
-              <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/60 py-14 px-6 text-center">
-                <p className="mx-auto max-w-2xl text-base md:text-lg text-gray-600 leading-relaxed">
-                  Browse our complete catalogue of industrial fogging machines, vehicle-mounted systems, and agricultural equipment.
-                </p>
-                <div className="mt-7 flex justify-center">
-                  <Button asChild size="lg" className="bg-green-600 hover:bg-green-700">
-                    <Link href="/products">
-                      View All Products <ArrowRight className="ml-2" size={18} />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            ) : products.length <= 6 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {products.map((product, index) => (
-                  <ProductCard
-                    key={product._id || product.id || index}
-                    product={product}
-                    onViewDetails={() => { }}
-                    onBrochureDownload={() => handleBrochureDownload(product.name, product.brochureUrl)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {products.slice(0, 6).map((product, index) => (
-                    <ProductCard
-                      key={product._id || product.id || index}
-                      product={product}
-                      onViewDetails={() => { }}
-                      onBrochureDownload={() => handleBrochureDownload(product.name, product.brochureUrl)}
-                    />
-                  ))}
-                </div>
-                <div className="flex justify-center mt-8">
-                  <Link href="/products">
-                    <Button className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
-                      View All Products
-                    </Button>
-                  </Link>
-                </div>
-              </>
-            )}
-          </div>
-        </section>
+        <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
 
         <YoutubeShortsCarousel />
 
         {/* Our Customers bar - above Customer Reviews */}
         <OurCustomersScroll customers={customers} />
 
-        {/* Reviews Carousel Section */}
-        <section className="py-16 md:py-20 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <Badge className="mb-6 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-lg px-6 py-2">
-                Customer Reviews
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Trusted Fogging Machine Supplier – What Our Customers Say</h2>
-              <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
-                As a reliable <a className="text-blue-500" href="https://www.100xcircle.com/">fogging machine supplier</a>, 100X Circle Pvt Ltd values real feedback from customers across India. Our clients share their experiences about product quality, performance, durability, and after-sales support.
-              </p>
-              <p className="text-xl text-gray-600 max-w-5xl mx-auto">
-                From industrial users to municipal projects, customers appreciate our powerful fog output, easy operation, and long-lasting machines. Their reviews reflect our commitment to delivering dependable fogging solutions for effective pest and mosquito control.
-              </p>
-            </div>
-            <ReviewsCarousel />
-          </div>
-        </section>
+        <TrustBlock />
 
-        {/* Blog Preview Section */}
-        <section className="py-16 md:py-20 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-20">
-              <Badge className="mb-6 bg-purple-100 text-purple-800 hover:bg-purple-200 text-lg px-6 py-2">
-                Latest Blog Posts
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Mosquito Fogging Machine Manufacturer – Industry Insights & Tips</h2>
-              <p className="text-xl text-gray-600 max-w-5xl mx-auto mb-4">
-                As a leading <a className="text-blue-500" href="https://www.100xcircle.com/">mosquito fogging machine manufacturer</a>, 100x Circle shares practical industry insights, usage techniques, and expert guidance to help you get the best performance from your equipment.
-              </p>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Stay updated with the latest fogging methods, maintenance tips, safety practices, and application guides for effective disinfection and pest control. Our insights are designed to help industries, Municipalities, Nagar Nigam, Nagar Palika & Panchayats to improve efficiency, coverage, and long-term machine performance.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {displayBlogPosts.slice(0, 3).map((post, index) => (
-                <Card
-                  key={post.id || post._id || post.slug || index}
-                  className="overflow-hidden hover:shadow-xl transition-all duration-300"
-                >
-                  <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
-
-
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge variant="secondary">{post.category}</Badge>
-                      <span className="text-sm text-gray-500">{post.readTime}</span>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{post.title}</h3>
-                    <p className="text-gray-600 mb-4 line-clamp-3">{plainTextFromHtml(post.excerpt || "")}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <User size={16} className="text-gray-400" />
-                        <span className="text-sm text-gray-600">{post.author}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Calendar size={16} className="text-gray-400" />
-                        <span className="text-sm text-gray-600">{formatDate(post.date)}</span>
-                      </div>
-                    </div>
-                    {blogPosts.length > 0 ? (
-                      <Button className="w-full bg-purple-600 hover:bg-purple-700" asChild>
-                        <Link href={`/blog/${blogPostSlug(post)}`}>
-                          Read Full Article <ArrowRight className="ml-2" size={16} />
-                        </Link>
-                      </Button>
-                    ) : (
-                      <Button className="w-full bg-purple-600 hover:bg-purple-700" asChild>
-                        <Link href="/blog">
-                          View Blog <ArrowRight className="ml-2" size={16} />
-                        </Link>
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="text-center">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-purple-600 text-purple-600 hover:bg-purple-50 bg-transparent"
-                asChild
-              >
-                <Link href="/blog">
-                  View All Blog Posts <ArrowRight className="ml-2" size={20} />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
+        <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />
 
         <FAQSection />
 
@@ -1579,138 +1073,4 @@ function ProductDetailPage({
       )}
     </div>
   )
-}
-
-function ReviewsCarousel() {
-  const reviews = [
-    {
-      name: "Ramesh S.",
-      title: "EcoCare Pest Services, Bihar & Jharkhand",
-      review:
-        "We've been using 100X fogging machines for over a year now in our pest control business across Bihar and Jharkhand. The coverage and performance are excellent, especially in dense residential areas. Easy to operate, low maintenance, and highly effective in mosquito control. Definitely recommended for professional use.",
-      avatar: "/review-avatars/review1.jpg",
-    },
-    {
-      name: "Dr. Meena Verma",
-      title: "Public Health Officer, UP",
-      review:
-        "100X's Double Barrel Fogging Machine was a game-changer during our dengue prevention drives. It covers large areas in less time, and the pulse jet technology really improves the fog output. Our teams found it reliable and easy to handle in both urban and rural campaigns.",
-      avatar: "/review-avatars/review3.jpg",
-    },
-    {
-      name: "Vijay Kumar",
-      title: "Farmer from Muzaffarpur, Bihar",
-      review:
-        "I bought the 100X power weeder last season for my vegetable farm. It's strong, fuel-efficient, and saved me a lot of labor. Even my son can handle it without much training. Great support from the company too!",
-      avatar: "/review-avatars/review5.jpg",
-    },
-    {
-      name: "Ramdas Yadav",
-      title: "Agri Cooperative Leader, UP",
-      review:
-        "Our cooperative purchased 2 tillers  from 100X for shared farming. These machines are robust and ideal for small and medium farms. We're happy with the results and cost savings. Many farmers in our group are planning to buy their own now.",
-      avatar: "/review-avatars/review2.jpg",
-    },
-    {
-      name: "Mahesh Patel",
-      title: "Gujarat",
-      review:
-        "I've used different machines from 100X – from hand carried foggers to vehicle mounted type foggers . All products are solid, well-engineered, and suited for Indian conditions. Their double barrel fogger especially stands out for its fog throw and area coverage.",
-      avatar: "/review-avatars/review4.jpg",
-    },
-  ];
-
-  const [emblaRef, embla] = useEmblaCarousel({ align: "start", loop: false, skipSnaps: false });
-  const [canPrev, setCanPrev] = useState(false);
-  const [canNext, setCanNext] = useState(false);
-  const [selected, setSelected] = useState(0);
-
-  const refreshState = React.useCallback(() => {
-    if (!embla) return;
-    setCanPrev(embla.canScrollPrev());
-    setCanNext(embla.canScrollNext());
-    setSelected(embla.selectedScrollSnap());
-  }, [embla]);
-
-  useEffect(() => {
-    if (!embla) return;
-    refreshState();
-    embla.on("select", refreshState);
-    embla.on("reInit", refreshState);
-  }, [embla, refreshState]);
-
-  return (
-    <div className="relative max-w-7xl mx-auto">
-      <div className="overflow-hidden" ref={emblaRef}>
-        <ul className="flex list-none -ml-4 md:-ml-6">
-          {reviews.map((review, idx) => (
-            <li
-              key={idx}
-              className="basis-full md:basis-1/2 lg:basis-1/3 shrink-0 grow-0 pl-4 md:pl-6"
-            >
-              <Card className="h-full border border-gray-200 shadow-sm p-7 md:p-8 flex flex-col">
-                <Quote className="text-green-600/70 mb-4" size={24} aria-hidden="true" />
-                <p className="text-base text-gray-700 leading-relaxed line-clamp-6 italic flex-1">
-                  "{review.review}"
-                </p>
-                <div className="mt-6 flex items-center gap-3 border-t border-gray-100 pt-5">
-                  <img
-                    src={review.avatar}
-                    alt=""
-                    aria-hidden="true"
-                    loading="lazy"
-                    decoding="async"
-                    className="w-11 h-11 rounded-full object-cover border border-gray-200 shrink-0"
-                  />
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-gray-900 line-clamp-1">{review.name}</div>
-                    <div className="text-xs text-gray-500 line-clamp-1">{review.title}</div>
-                  </div>
-                </div>
-              </Card>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mt-8 flex items-center justify-between">
-        <div className="flex items-center gap-2" aria-label="Review slide indicators">
-          {reviews.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Go to review ${i + 1}`}
-              aria-current={selected === i}
-              onClick={() => embla?.scrollTo(i)}
-              className={
-                selected === i
-                  ? "h-1.5 w-6 rounded-full bg-green-600 transition-all"
-                  : "h-1.5 w-1.5 rounded-full bg-gray-300 transition-all hover:bg-gray-400"
-              }
-            />
-          ))}
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-label="Previous review"
-            disabled={!canPrev}
-            onClick={() => embla?.scrollPrev()}
-            className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white text-gray-700 transition-all hover:border-green-600 hover:text-green-700 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
-          >
-            <ChevronLeft size={18} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="Next review"
-            disabled={!canNext}
-            onClick={() => embla?.scrollNext()}
-            className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white text-gray-700 transition-all hover:border-green-600 hover:text-green-700 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
-          >
-            <ChevronRight size={18} aria-hidden="true" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 }
