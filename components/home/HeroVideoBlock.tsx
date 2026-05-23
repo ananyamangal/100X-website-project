@@ -6,9 +6,8 @@ import { ArrowRight, MessageCircle, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BUSINESS } from "@/lib/seo/site-config"
 
-// Placeholder video ID — replace with the real demo video ID from @100Xcircle.
-// The component is set up so swapping this single constant is enough.
-const HERO_VIDEO_ID = "REPLACE_WITH_HERO_VIDEO_ID"
+// Hero demo from @100Xcircle: https://www.youtube.com/shorts/ZiVGNkvAI9g
+const HERO_VIDEO_ID = "ZiVGNkvAI9g"
 
 interface Props {
   youtubeId?: string;
