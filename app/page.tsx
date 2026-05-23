@@ -39,6 +39,7 @@ import ProductsBlock from "@/components/home/ProductsBlock"
 import HeroBlock from "@/components/home/HeroBlock"
 import HeroVideoBlock from "@/components/home/HeroVideoBlock"
 import SectionConnector from "@/components/home/SectionConnector"
+import StatesServedBlock from "@/components/home/StatesServedBlock"
 import HomepageJsonLd from "@/components/seo/HomepageJsonLd"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
@@ -632,6 +633,8 @@ export default function HomePage() {
         <SectionConnector eyebrow="In Their Words" text="Reviews from the field." />
 
         <TrustBlock />
+
+        <StatesServedBlock />
 
         <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />
 
