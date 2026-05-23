@@ -39,6 +39,7 @@ import ProductsBlock from "@/components/home/ProductsBlock"
 import HeroBlock from "@/components/home/HeroBlock"
 import HeroVideoBlock from "@/components/home/HeroVideoBlock"
 import SectionConnector from "@/components/home/SectionConnector"
+import HomepageJsonLd from "@/components/seo/HomepageJsonLd"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { BUSINESS } from "@/lib/seo/site-config"
@@ -151,7 +152,7 @@ function YoutubeShortsCarousel() {
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Fogging Machine Supplier - Watch Real Product Demos</h2>
           <p className="text-xl text-gray-600 max-w-5xl mx-auto">
-            As a trusted fogging machine supplier, 100x shares real product demo videos to help you understand machine performance before buying.
+            100X Circle shares real product demo videos to help you understand machine performance before buying.
           </p>
           <p className="text-xl text-gray-600 max-w-5xl mx-auto">
             Watch our latest demos, working guides, and quick tips to see fog output, coverage area, and ease of use in real conditions. Our videos showcase thermal and pulse jet fogging machines used for mosquito control, public health, and commercial pest management across India.
@@ -590,6 +591,8 @@ export default function HomePage() {
 
     return (
       <>
+
+        <HomepageJsonLd />
 
         {/* Hero Section with Image Slider */}
         <HeroBlock
