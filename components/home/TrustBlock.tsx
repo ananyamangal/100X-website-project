@@ -145,6 +145,20 @@ export default function TrustBlock() {
     <section className="py-16 md:py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 md:mb-14">
+          <div className="flex flex-wrap justify-center items-center gap-3 mb-4 text-xs md:text-sm text-gray-500">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
+              Field reviews
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
+              Real customers
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
+              Verified deployments
+            </span>
+          </div>
           <Badge className="mb-6 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-lg px-6 py-2">
             Customer Reviews
           </Badge>

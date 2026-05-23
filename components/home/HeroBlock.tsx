@@ -2,9 +2,10 @@
 
 import React from "react"
 import Link from "next/link"
-import { ArrowRight, ChevronLeft, ChevronRight, Play } from "lucide-react"
+import { ArrowRight, ChevronLeft, ChevronRight, MessageCircle, Play } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { BUSINESS } from "@/lib/seo/site-config"
 
 interface HeroSlide {
   image?: string;
@@ -40,6 +41,9 @@ export default function HeroBlock({
   changingPhrases,
   phraseIndex,
 }: Props) {
+  const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(
+    "Hi, I'd like to discuss 100x Circle fogging machines."
+  )}`
   return (
     <section id="home" className="pt-32 relative overflow-hidden">
       {/* Banner Images - Desktop View (swipeable on touch devices, arrows always) */}
@@ -101,7 +105,33 @@ export default function HeroBlock({
                   <Play className="mr-2" size={20} />
                   Watch Demo
                 </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 text-lg px-8 py-4 bg-transparent"
+                >
+                  <a href={waHref} target="_blank" rel="noopener noreferrer" data-gtm="cta_whatsapp" data-gtm-location="hero_desktop" className="flex items-center">
+                    <MessageCircle className="mr-2" size={20} />
+                    WhatsApp
+                  </a>
+                </Button>
               </div>
+
+              <p className="text-xs md:text-sm text-gray-300 mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 max-w-md mx-auto md:mx-0">
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400" aria-hidden="true" />
+                  GeM-approved OEM
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400" aria-hidden="true" />
+                  Made in India
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400" aria-hidden="true" />
+                  10,000+ buyers
+                </span>
+              </p>
 
               {/* Stats Section - Left Side Only */}
               <div className="grid grid-cols-2 gap-6 md:gap-10 max-w-md mx-auto md:mx-0">
@@ -199,7 +229,33 @@ export default function HeroBlock({
                   <Play className="mr-2" size={20} />
                   Watch Demo
                 </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-lg px-8 py-4 bg-transparent"
+                >
+                  <a href={waHref} target="_blank" rel="noopener noreferrer" data-gtm="cta_whatsapp" data-gtm-location="hero_mobile" className="flex items-center justify-center">
+                    <MessageCircle className="mr-2" size={20} />
+                    WhatsApp
+                  </a>
+                </Button>
               </div>
+
+              <p className="text-xs text-gray-600 mb-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 max-w-md mx-auto">
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
+                  GeM-approved OEM
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
+                  Made in India
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
+                  10,000+ buyers
+                </span>
+              </p>
 
               {/* Stats Section - Mobile View */}
               <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">

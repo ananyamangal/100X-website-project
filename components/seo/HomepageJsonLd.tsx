@@ -55,6 +55,54 @@ export default function HomepageJsonLd({ heroVideoId }: Props) {
     ],
   })
 
+  items.push({
+    "@context": "https://schema.org",
+    "@type": "Service",
+    serviceType: "Pulse-Jet Thermal Fogging Equipment Supply",
+    provider: {
+      "@type": "Organization",
+      name: "100x Circle Pvt Ltd",
+    },
+    areaServed: {
+      "@type": "Country",
+      name: "India",
+    },
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Fogging Equipment Programs",
+      itemListElement: [
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Municipal & Government Procurement (GeM)",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Dealer & Distributor Partnership",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Export & International Buyers",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Industrial & Estate Buyers",
+          },
+        },
+      ],
+    },
+  })
+
   return (
     <>
       {items.map((item, i) => (

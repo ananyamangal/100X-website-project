@@ -40,6 +40,36 @@ const FAQS: Faq[] = [
     a:
       "Yes — we partner with dealers, distributors, and channel partners across Indian states. Reach out via the contact form or WhatsApp with your location and channel experience, and we'll share margins, territory availability, and onboarding details.",
   },
+  {
+    q: "How does a pulse-jet thermal fogger differ from a knapsack or boom sprayer?",
+    a:
+      "A pulse-jet thermal fogger uses a high-frequency combustion chamber to vapourise the chemical solution into sub-50-micron droplets that drift on air currents into voids, foliage, and drains. Knapsack and boom sprayers produce larger droplets that fall to ground level — better for direct foliar application but limited in reach and coverage. Thermal foggers are the standard for outdoor vector control and area-wide disinfection.",
+  },
+  {
+    q: "What droplet size do 100x Circle thermal foggers produce, and why does it matter?",
+    a:
+      "Our pulse-jet foggers produce droplets in the sub-50-micron range (typically 0.5–40 μm depending on chemical and engine setting). Droplets below 50 μm stay airborne long enough to penetrate vegetation, drains, and voids that conventional spraying cannot reach. Larger droplets fall too quickly; smaller droplets evaporate before deposition. This range is the sweet spot for vector control efficacy.",
+  },
+  {
+    q: "Can 100x Circle fogging machines be used in agriculture for fungicide and pesticide application?",
+    a:
+      "Yes. Our agricultural thermal foggers apply fungicides, pesticides, and plant growth regulators across orchards, paddy fields, polyhouses, and vegetable farms. The machines handle both oil-based and water-based formulations. Single-operator portable models are commonly used by individual farmers and cooperatives; larger vehicle-mounted units serve estate-scale operations.",
+  },
+  {
+    q: "How does the GeM listing process work for municipal procurement of 100x Circle equipment?",
+    a:
+      "100x Circle is a registered OEM on the Government e-Marketplace (GeM). Government departments, Nagar Nigams, Nagar Palikas, Panchayats, and PSUs can search our catalogue on gem.gov.in and place direct purchase orders without separate tendering for catalogue items. For volume contracts and rate contracts, share your indent on WhatsApp or contact form — we respond with GeM-ready documentation, GST invoices, and compliance certificates.",
+  },
+  {
+    q: "What margins and territory exclusivity do you offer to dealers and distributors?",
+    a:
+      "Dealer and distributor margins depend on category, volume commitment, and territory. We work with both exclusive and non-exclusive arrangements across Indian states. Active distributors get marketing collateral, training, demo-machine support, and lead routing for their territory. Send your location, current channel experience, and target volume to start the onboarding conversation.",
+  },
+  {
+    q: "Do you export 100x Circle fogging machines outside India, and what are the international shipping options?",
+    a:
+      "Yes. We ship to buyers in South Asia, Africa, and the Middle East — including municipal corporations, NGO health programs, and private pest-control operators. Standard incoterms are FOB Mumbai/Nhava Sheva and EXW Gurugram; CIF and DDP can be arranged for larger orders. Compliance documents (commercial invoice, packing list, certificate of origin, BIS where applicable) are issued by our export desk.",
+  },
 ]
 
 export default function FAQSection() {
