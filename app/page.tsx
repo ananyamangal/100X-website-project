@@ -37,6 +37,7 @@ import BlogBlock from "@/components/home/BlogBlock"
 import TrustBlock from "@/components/home/TrustBlock"
 import SpecialisedBuyersBlock from "@/components/home/SpecialisedBuyersBlock"
 import ProductsBlock from "@/components/home/ProductsBlock"
+import ManufacturingAuthorityBlock from "@/components/home/ManufacturingAuthorityBlock"
 import HeroBlock from "@/components/home/HeroBlock"
 import HeroVideoBlock from "@/components/home/HeroVideoBlock"
 import SectionConnector from "@/components/home/SectionConnector"
@@ -631,6 +632,8 @@ export default function HomePage() {
         <SectionConnector eyebrow="The Range" text="From handheld to vehicle-mounted." />
 
         <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
+
+        <ManufacturingAuthorityBlock />
 
         <InlineInquiryCTA
           text="Compare models or request a tailored quote for your tender."
