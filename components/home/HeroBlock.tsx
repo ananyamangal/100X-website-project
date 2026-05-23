@@ -78,20 +78,11 @@ export default function HeroBlock({
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
                 100X – <span className="text-green-400">Thermal</span>  Fogging Machine Manufacturer
               </h1>
-              <div className="text-xl md:text-2xl lg:text-3xl font-bold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
+              <div className="text-lg md:text-xl lg:text-2xl font-semibold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
                 {changingPhrases[phraseIndex]}
               </div>
-              <p className="hidden">
-                100x Circle is a trusted thermal fogging machine manufacturer offering high-performance solutions for effective mosquito and pest control. We design and manufacture durable fogging machines that deliver powerful output, uniform fog distribution, and long-lasting performance for both industrial and residential applications.
-              </p>
-              <p className="hidden">
-                Our thermal fogging machines are built with high-quality components to ensure reliability, fuel efficiency, and easy operation. Whether you need equipment for municipal use, agriculture, mosquito eradication, warehouses, factories, or vector borne disease control programs, we provide machines that meet professional standards and field requirements.
-              </p>
-              <p className="hidden">
-                At 100x, we focus on innovation, safety, and customer satisfaction. We serve clients across India with timely support and dependable products. If you are looking for an advanced thermal fogging machine manufacturer you can trust, connect with us today for expert guidance and the right solution for your needs.
-              </p>
               <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center md:justify-start mb-8">
-                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
+                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-5 shadow-lg shadow-green-900/20">
                   <Link href="#products" className="flex items-center">
                     Explore Products <ArrowRight className="ml-2" size={20} />
                   </Link>
@@ -113,7 +104,7 @@ export default function HeroBlock({
               </div>
 
               {/* Stats Section - Left Side Only */}
-              <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-md mx-auto md:mx-0">
+              <div className="grid grid-cols-2 gap-6 md:gap-10 max-w-md mx-auto md:mx-0">
                 {stats.map((stat, index) => (
                   <div key={index} className="text-center md:text-left">
                     <div className="text-3xl font-bold text-green-400 mb-2">{stat.number}</div>
@@ -179,17 +170,17 @@ export default function HeroBlock({
         <div className="bg-white py-12">
           <div className="container mx-auto px-4">
             <div className="text-center">
-              <Badge className="mb-6 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
+              <Badge className="mb-4 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
                 Certified Professional Products
               </Badge>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6 leading-tight">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4 leading-tight">
                 100X – <span className="text-green-600">Thermal</span>  Fogging Machine Manufacturer
               </h2>
-              <div className="text-xl font-bold text-green-600 mb-6 min-h-[2rem] transition-all duration-500">
+              <div className="text-lg font-semibold text-green-600 mb-4 min-h-[2rem] transition-all duration-500">
                 {changingPhrases[phraseIndex]}
               </div>
               <div className="flex flex-col gap-4 justify-center mb-8">
-                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
+                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-5 shadow-lg shadow-green-900/20">
                   <Link href="#products" className="flex items-center justify-center">
                     Explore Products <ArrowRight className="ml-2" size={20} />
                   </Link>
