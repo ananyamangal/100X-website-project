@@ -31,6 +31,91 @@ const organization = {
     },
   ],
   sameAs: [BUSINESS.youtube],
+  foundingDate: "2014",
+  foundingLocation: {
+    "@type": "Place",
+    name: "Gurugram, Haryana, India",
+  },
+  description:
+    "100X Circle is an Indian OEM manufacturer of pulse-jet thermal fogging machines for municipal vector control and agricultural use. GeM-listed, ISO-grade build, distributed across 50+ Indian locations and exported across South Asia, Africa, and the Middle East.",
+  keywords: [
+    "thermal fogging machine manufacturer",
+    "pulse jet fogging machine",
+    "GeM approved OEM",
+    "vector control equipment",
+    "agricultural fogging machine",
+  ].join(", "),
+  knowsAbout: [
+    "Pulse-jet thermal fogging",
+    "Vector-borne disease control",
+    "Municipal mosquito control",
+    "Agricultural crop protection",
+    "Government e-Marketplace procurement",
+  ],
+  makesOffer: {
+    "@type": "OfferCatalog",
+    name: "100X Circle Fogging Equipment",
+    itemListElement: [
+      {
+        "@type": "OfferCatalog",
+        name: "Municipal Vector-Control Foggers",
+        itemListElement: [
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Product",
+              name: "Vehicle-Mounted Thermal Fogging Machines",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Product",
+              name: "Double-Barrel Thermal Foggers",
+            },
+          },
+        ],
+      },
+      {
+        "@type": "OfferCatalog",
+        name: "Agricultural Foggers",
+        itemListElement: [
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Product",
+              name: "Portable Pulse-Jet Foggers",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Product",
+              name: "Power Tillers and Sprayers",
+            },
+          },
+        ],
+      },
+    ],
+  },
+  areaServed: [
+    {
+      "@type": "Country",
+      name: "India",
+    },
+    {
+      "@type": "AdministrativeArea",
+      name: "South Asia",
+    },
+    {
+      "@type": "AdministrativeArea",
+      name: "Middle East",
+    },
+    {
+      "@type": "AdministrativeArea",
+      name: "Africa",
+    },
+  ],
 }
 
 const localBusiness = {
