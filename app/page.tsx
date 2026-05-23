@@ -36,6 +36,7 @@ import BlogBlock from "@/components/home/BlogBlock"
 import TrustBlock from "@/components/home/TrustBlock"
 import ProductsBlock from "@/components/home/ProductsBlock"
 import HeroBlock from "@/components/home/HeroBlock"
+import HeroVideoBlock from "@/components/home/HeroVideoBlock"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { BUSINESS } from "@/lib/seo/site-config"
@@ -600,6 +601,8 @@ export default function HomePage() {
           changingPhrases={changingPhrases}
           phraseIndex={phraseIndex}
         />
+
+        <HeroVideoBlock />
 
         {/* Accreditations Autoscroll Bar - just above Our Products */}
         <AccreditationsStrip accreditations={accreditations} />
