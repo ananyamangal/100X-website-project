@@ -35,6 +35,7 @@ import ManufacturerIntroBlock from "@/components/home/ManufacturerIntroBlock"
 import TechnologyBlock from "@/components/home/TechnologyBlock"
 import BlogBlock from "@/components/home/BlogBlock"
 import TrustBlock from "@/components/home/TrustBlock"
+import SpecialisedBuyersBlock from "@/components/home/SpecialisedBuyersBlock"
 import ProductsBlock from "@/components/home/ProductsBlock"
 import HeroBlock from "@/components/home/HeroBlock"
 import HeroVideoBlock from "@/components/home/HeroVideoBlock"
@@ -645,6 +646,8 @@ export default function HomePage() {
         <SectionConnector eyebrow="In Their Words" text="Reviews from the field." />
 
         <TrustBlock />
+
+        <SpecialisedBuyersBlock />
 
         <InlineInquiryCTA
           text="Join 10,000+ buyers — municipal, agricultural, and industrial — already running 100X equipment."
