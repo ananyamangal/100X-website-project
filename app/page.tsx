@@ -32,10 +32,14 @@ import FAQSection from "@/components/FAQSection"
 import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton"
 import AccreditationsStrip from "@/components/home/AccreditationsStrip"
 import ManufacturerIntroBlock from "@/components/home/ManufacturerIntroBlock"
+import TechnologyBlock from "@/components/home/TechnologyBlock"
 import BlogBlock from "@/components/home/BlogBlock"
 import TrustBlock from "@/components/home/TrustBlock"
 import ProductsBlock from "@/components/home/ProductsBlock"
 import HeroBlock from "@/components/home/HeroBlock"
+import HeroVideoBlock from "@/components/home/HeroVideoBlock"
+import SectionConnector from "@/components/home/SectionConnector"
+import HomepageJsonLd from "@/components/seo/HomepageJsonLd"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { BUSINESS } from "@/lib/seo/site-config"
@@ -148,7 +152,7 @@ function YoutubeShortsCarousel() {
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Fogging Machine Supplier - Watch Real Product Demos</h2>
           <p className="text-xl text-gray-600 max-w-5xl mx-auto">
-            As a trusted fogging machine supplier, 100x shares real product demo videos to help you understand machine performance before buying.
+            100X Circle shares real product demo videos to help you understand machine performance before buying.
           </p>
           <p className="text-xl text-gray-600 max-w-5xl mx-auto">
             Watch our latest demos, working guides, and quick tips to see fog output, coverage area, and ease of use in real conditions. Our videos showcase thermal and pulse jet fogging machines used for mosquito control, public health, and commercial pest management across India.
@@ -588,6 +592,8 @@ export default function HomePage() {
     return (
       <>
 
+        <HomepageJsonLd />
+
         {/* Hero Section with Image Slider */}
         <HeroBlock
           heroSlides={heroSlides}
@@ -601,10 +607,20 @@ export default function HomePage() {
           phraseIndex={phraseIndex}
         />
 
+        <HeroVideoBlock />
+
+        <SectionConnector eyebrow="Built for India" text="A decade of manufacturing for the field." />
+
         {/* Accreditations Autoscroll Bar - just above Our Products */}
         <AccreditationsStrip accreditations={accreditations} />
 
         <ManufacturerIntroBlock />
+
+        <SectionConnector eyebrow="The Technology" text="Inside every 100X fogger." />
+
+        <TechnologyBlock />
+
+        <SectionConnector eyebrow="The Range" text="From handheld to vehicle-mounted." />
 
         <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
 
@@ -612,6 +628,8 @@ export default function HomePage() {
 
         {/* Our Customers bar - above Customer Reviews */}
         <OurCustomersScroll customers={customers} />
+
+        <SectionConnector eyebrow="In Their Words" text="Reviews from the field." />
 
         <TrustBlock />
 
