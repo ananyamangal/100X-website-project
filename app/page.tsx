@@ -38,6 +38,7 @@ import TrustBlock from "@/components/home/TrustBlock"
 import ProductsBlock from "@/components/home/ProductsBlock"
 import HeroBlock from "@/components/home/HeroBlock"
 import HeroVideoBlock from "@/components/home/HeroVideoBlock"
+import SectionConnector from "@/components/home/SectionConnector"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { BUSINESS } from "@/lib/seo/site-config"
@@ -605,12 +606,18 @@ export default function HomePage() {
 
         <HeroVideoBlock />
 
+        <SectionConnector eyebrow="Built for India" text="A decade of manufacturing for the field." />
+
         {/* Accreditations Autoscroll Bar - just above Our Products */}
         <AccreditationsStrip accreditations={accreditations} />
 
         <ManufacturerIntroBlock />
 
+        <SectionConnector eyebrow="The Technology" text="Inside every 100X fogger." />
+
         <TechnologyBlock />
+
+        <SectionConnector eyebrow="The Range" text="From handheld to vehicle-mounted." />
 
         <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
 
@@ -618,6 +625,8 @@ export default function HomePage() {
 
         {/* Our Customers bar - above Customer Reviews */}
         <OurCustomersScroll customers={customers} />
+
+        <SectionConnector eyebrow="In Their Words" text="Reviews from the field." />
 
         <TrustBlock />
 
