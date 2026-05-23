@@ -2,8 +2,9 @@
 
 import React from "react"
 import Link from "next/link"
-import { ArrowRight, Play } from "lucide-react"
+import { ArrowRight, MessageCircle, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { BUSINESS } from "@/lib/seo/site-config"
 
 // Placeholder video ID — replace with the real demo video ID from @100Xcircle.
 // The component is set up so swapping this single constant is enough.
@@ -57,7 +58,7 @@ export default function HeroVideoBlock({ youtubeId = HERO_VIDEO_ID }: Props) {
           )}
         </div>
 
-        <div className="mt-10 flex justify-center">
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button
             asChild
             size="lg"
@@ -66,6 +67,24 @@ export default function HeroVideoBlock({ youtubeId = HERO_VIDEO_ID }: Props) {
             <Link href="/contact-us" className="flex items-center">
               Talk to Our Team <ArrowRight className="ml-2" size={20} />
             </Link>
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-lg px-8 py-4 bg-transparent"
+          >
+            <a
+              href={`https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent("Hi, I saw the demo video on your homepage and would like to discuss further.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-gtm="cta_whatsapp"
+              data-gtm-location="hero_video"
+              className="flex items-center"
+            >
+              <MessageCircle className="mr-2" size={20} />
+              WhatsApp
+            </a>
           </Button>
         </div>
       </div>
