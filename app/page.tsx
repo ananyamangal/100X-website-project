@@ -39,6 +39,9 @@ import SpecialisedBuyersBlock from "@/components/home/SpecialisedBuyersBlock"
 import ProductsBlock from "@/components/home/ProductsBlock"
 import ManufacturingAuthorityBlock from "@/components/home/ManufacturingAuthorityBlock"
 import HeroBlock from "@/components/home/HeroBlock"
+import RFQHeroPanel from "@/components/forms/RFQHeroPanel"
+import RFQMidPageBlock from "@/components/forms/RFQMidPageBlock"
+import RFQFloatingRibbon from "@/components/forms/RFQFloatingRibbon"
 import HeroVideoBlock from "@/components/home/HeroVideoBlock"
 import SectionConnector from "@/components/home/SectionConnector"
 import StatesServedBlock from "@/components/home/StatesServedBlock"
@@ -609,6 +612,7 @@ export default function HomePage() {
           stats={stats}
           changingPhrases={changingPhrases}
           phraseIndex={phraseIndex}
+          rfqSlot={<RFQHeroPanel />}
         />
 
         <HeroVideoBlock />
@@ -623,6 +627,8 @@ export default function HomePage() {
         <SectionConnector eyebrow="The Technology" text="Inside every 100X fogger." />
 
         <TechnologyBlock />
+
+        <RFQMidPageBlock />
 
         <InlineInquiryCTA
           text="Need this technology for your municipality, farm, or estate?"
@@ -844,6 +850,7 @@ export default function HomePage() {
         {/* Main content (root layout already exposes a landmark <main>) */}
         <div>{renderPage()}</div>
 
+        <RFQFloatingRibbon />
         <WhatsAppFloatingButton
           waNumber={BUSINESS.whatsappE164}
           displayPhone="+91 78272 29116"
