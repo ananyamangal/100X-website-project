@@ -19,10 +19,7 @@ export default function ManufacturerIntroBlock() {
             Trusted Thermal Fogging Machine Manufacturer in India
           </h2>
           <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-            When it comes to reliable, field-ready fogging equipment, 100X Circle has built its reputation one machine at a time. As a dedicated thermal fogging machine manufacturer in India, we design and supply high-performance foggers that work hard under real-world conditions — from dense urban neighbourhoods to open agricultural fields.
-          </p>
-          <p className="mt-4 text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-            Every machine that leaves our facility in Gurugram is designed and built for Indian field conditions, with attention to durability, fuel efficiency, and ease of use. That approach has earned us the trust of over 10,000 customers across India, including municipalities, Nagar Nigams, agricultural cooperatives, and private pest control operators.
+            100X Circle designs and manufactures field-ready thermal foggers from our Gurugram facility — trusted by 10,000+ customers including municipalities, Nagar Nigams, agricultural cooperatives, and private pest-control operators. GeM-approved OEM, Made in India, with active distributors in 50+ locations.
           </p>
         </div>
 
@@ -32,10 +29,7 @@ export default function ManufacturerIntroBlock() {
               Public Health Fogging Solutions
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              India faces a persistent challenge with vector-borne diseases such as dengue, malaria, and chikungunya. Municipal bodies, Nagar Panchayats, and public health departments require equipment that can cover large areas quickly without breakdowns. 100X Circle manufactures industrial thermal fogging equipment trusted for large-scale mosquito control drives, with pulse-jet technology that penetrates thick vegetation, open drains, and construction sites where conventional spraying cannot reach.
-            </p>
-            <p className="mt-3 text-gray-700 leading-relaxed">
-              We are a GeM-approved OEM supplier, which means government bodies can procure our machines directly through the Government e-Marketplace. Our operations extend across Bihar, Uttar Pradesh, Delhi, Maharashtra, Gujarat, and beyond — with active distributors in more than 50 locations.
+              Industrial thermal fogging equipment built for large-scale mosquito control drives. Pulse-jet technology penetrates thick vegetation, open drains, and construction sites where conventional spraying cannot reach. GeM-procurable for municipal bodies, Nagar Panchayats, and public health departments across Bihar, UP, Delhi, Maharashtra, Gujarat, and beyond.
             </p>
           </div>
           <div>
@@ -43,10 +37,7 @@ export default function ManufacturerIntroBlock() {
               Agricultural Fogging Machines for Farm-Level Use
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              The need for fogging in agriculture goes beyond pest control. Farmers use thermal foggers to apply fungicides, pesticides, and plant growth regulators across orchards, paddy fields, and vegetable farms. 100X Circle manufactures agricultural fogging machines used by farmers across India. Our lightweight, portable models can be operated by a single person without a trained technician, making them practical for individual farm use as well as cooperative operations.
-            </p>
-            <p className="mt-3 text-gray-700 leading-relaxed">
-              Our agricultural spraying equipment handles diesel-based and water-based formulations, giving farmers the flexibility to use it across different crop-protection needs throughout the season.
+              Lightweight, single-operator foggers used by farmers across India to apply fungicides, pesticides, and plant growth regulators across orchards, paddy fields, and vegetable farms. Handles both diesel-based and water-based formulations.
             </p>
           </div>
         </div>
