@@ -42,19 +42,13 @@ export default function ProductsBlock({ products, onBrochureDownload }: Props) {
   return (
     <section id="products" className="py-16 md:py-20">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-20">
+        <div className="text-center mb-14 md:mb-16">
           <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
             Our Products
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Buy GeM Approved OEM of Fogging Machines at Best Prices</h2>
-          <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
-            We provide a wide range of high-quality fogging machines designed to meet different industrial and commercial needs across India. At 100x Circle, you can easily <a className="text-blue-500" href="https://www.100xcircle.com/">buy industrial fogging machines online</a> from a complete selection of advanced and reliable products.
-          </p>
-          <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
-            Our range includes thermal fogging machines, giant foggers, and heavy-duty industrial models suitable for mosquito control, pest management, agriculture, warehouses, factories, and public health operations. Each machine is manufactured using durable components and pulse jet engine technology to ensure powerful output, uniform fog dispersion, and long-lasting performance.
-          </p>
-          <p className="text-xl text-gray-600 max-w-5xl mx-auto">
-            We focus on efficiency, easy operation, and strong after-sales support so that our customers receive dependable solutions for every application. Explore our product range and buy industrial fogging machines online with confidence today.
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            GeM-approved fogging machines built for municipal vector control, agricultural spraying, and industrial pest management. Manufactured in India with full after-sales support — <a className="text-green-700 underline-offset-2 hover:underline" href="https://www.100xcircle.com/">buy industrial fogging machines online</a>.
           </p>
         </div>
 
@@ -76,7 +70,7 @@ export default function ProductsBlock({ products, onBrochureDownload }: Props) {
             </div>
           </div>
         ) : products.length <= 6 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {products.map((product, index) => (
               <ProductCard
                 key={product._id || product.id || index}
@@ -88,7 +82,7 @@ export default function ProductsBlock({ products, onBrochureDownload }: Props) {
           </div>
         ) : (
           <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {products.slice(0, 6).map((product, index) => (
                 <ProductCard
                   key={product._id || product.id || index}
@@ -98,12 +92,12 @@ export default function ProductsBlock({ products, onBrochureDownload }: Props) {
                 />
               ))}
             </div>
-            <div className="flex justify-center mt-8">
-              <Link href="/products">
-                <Button className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
-                  View All Products
-                </Button>
-              </Link>
+            <div className="flex justify-center mt-10">
+              <Button asChild className="bg-green-600 hover:bg-green-700 text-lg px-8 py-5 shadow-lg shadow-green-900/15">
+                <Link href="/products" className="flex items-center">
+                  View All Products <ArrowRight className="ml-2" size={20} />
+                </Link>
+              </Button>
             </div>
           </>
         )}
