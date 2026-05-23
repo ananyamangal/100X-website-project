@@ -28,6 +28,7 @@ interface Props {
   stats: Stat[];
   changingPhrases: string[];
   phraseIndex: number;
+  rfqSlot?: React.ReactNode;
 }
 
 export default function HeroBlock({
@@ -40,6 +41,7 @@ export default function HeroBlock({
   stats,
   changingPhrases,
   phraseIndex,
+  rfqSlot,
 }: Props) {
   const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(
     "Hi, I'd like to discuss 100x Circle fogging machines."
@@ -146,6 +148,7 @@ export default function HeroBlock({
 
             {/* Empty Right Side on Desktop */}
             <div className="hidden md:block">
+              {rfqSlot}
             </div>
           </div>
         </div>
@@ -266,6 +269,7 @@ export default function HeroBlock({
                   </div>
                 ))}
               </div>
+              {rfqSlot}
             </div>
           </div>
         </div>
