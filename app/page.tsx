@@ -13,8 +13,6 @@ import {
   Users,
   Award,
   ChevronRight,
-  Calendar,
-  User,
   ChevronLeft,
   CheckCircle,
   Target,
@@ -66,17 +64,6 @@ interface Product {
   createdAt?: string;
   updatedAt?: string;
 }
-
-// Helper: stable date formatting (avoids locale-based hydration mismatches)
-const formatDate = (value: string | Date | undefined) => {
-  if (!value) return "";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "";
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const year = d.getUTCFullYear();
-  return `${day}/${month}/${year}`;
-};
 
 const getYouTubeId = (url: string): string | null => {
   if (!url || typeof url !== "string") return null;
