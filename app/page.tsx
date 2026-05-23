@@ -40,6 +40,7 @@ import HeroBlock from "@/components/home/HeroBlock"
 import HeroVideoBlock from "@/components/home/HeroVideoBlock"
 import SectionConnector from "@/components/home/SectionConnector"
 import StatesServedBlock from "@/components/home/StatesServedBlock"
+import InlineInquiryCTA from "@/components/home/InlineInquiryCTA"
 import HomepageJsonLd from "@/components/seo/HomepageJsonLd"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
@@ -621,9 +622,20 @@ export default function HomePage() {
 
         <TechnologyBlock />
 
+        <InlineInquiryCTA
+          text="Need this technology for your municipality, farm, or estate?"
+          whatsappMessage="Hi, I just read about your pulse-jet thermal fogging technology and would like to discuss requirements."
+        />
+
         <SectionConnector eyebrow="The Range" text="From handheld to vehicle-mounted." />
 
         <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
+
+        <InlineInquiryCTA
+          text="Compare models or request a tailored quote for your tender."
+          whatsappMessage="Hi, I'd like a quote tailored to my use case (please mention: municipal / agricultural / industrial / export)."
+          tone="dark"
+        />
 
         <YoutubeShortsCarousel />
 
@@ -633,6 +645,11 @@ export default function HomePage() {
         <SectionConnector eyebrow="In Their Words" text="Reviews from the field." />
 
         <TrustBlock />
+
+        <InlineInquiryCTA
+          text="Join 10,000+ buyers — municipal, agricultural, and industrial — already running 100X equipment."
+          whatsappMessage="Hi, I'd like to talk to your team about 100x Circle fogging machines."
+        />
 
         <StatesServedBlock />
 
