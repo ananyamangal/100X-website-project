@@ -32,6 +32,7 @@ import FAQSection from "@/components/FAQSection"
 import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton"
 import AccreditationsStrip from "@/components/home/AccreditationsStrip"
 import ManufacturerIntroBlock from "@/components/home/ManufacturerIntroBlock"
+import TechnologyBlock from "@/components/home/TechnologyBlock"
 import BlogBlock from "@/components/home/BlogBlock"
 import TrustBlock from "@/components/home/TrustBlock"
 import ProductsBlock from "@/components/home/ProductsBlock"
@@ -608,6 +609,8 @@ export default function HomePage() {
         <AccreditationsStrip accreditations={accreditations} />
 
         <ManufacturerIntroBlock />
+
+        <TechnologyBlock />
 
         <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
 
