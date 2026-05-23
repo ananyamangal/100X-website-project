@@ -48,24 +48,23 @@ export default function Navbar() {
     return () => document.removeEventListener('keydown', onKey)
   }, [isMenuOpen])
 
-  // Compact icon-only Call + WhatsApp buttons. Used in both the desktop
-  // and mobile navbar so contact actions are always one tap away once
-  // the green utility-strip is removed. Wrapped with
-  // data-gtm-location="navbar" so the global click listener auto-fires
+  // Call + WhatsApp buttons with text labels on desktop (md+), icon-only on mobile.
+  // Wrapped with data-gtm-location="navbar" so the global click listener auto-fires
   // phone_click / whatsapp_click with the right location field.
   const contactIcons = (
     <div
       data-gtm-location="navbar"
-      className="flex items-center gap-1"
+      className="flex items-center gap-1 md:gap-2"
       aria-label="Quick contact"
     >
       <a
         href={TEL_HREF}
         aria-label={`Call ${BUSINESS.phonePrimary}`}
         data-gtm="nav_call"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+        className="inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-gray-700 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
       >
         <Phone size={18} aria-hidden="true" />
+        <span className="hidden md:inline text-sm font-semibold">Call Now</span>
       </a>
       <a
         href={WA_HREF}
@@ -73,9 +72,10 @@ export default function Navbar() {
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
         data-gtm="nav_whatsapp"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+        className="inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-gray-700 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
       >
         <MessageCircle size={18} aria-hidden="true" />
+        <span className="hidden md:inline text-sm font-semibold">WhatsApp Us</span>
       </a>
     </div>
   )
