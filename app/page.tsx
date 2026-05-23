@@ -40,6 +40,7 @@ import ProductsBlock from "@/components/home/ProductsBlock"
 import ManufacturingAuthorityBlock from "@/components/home/ManufacturingAuthorityBlock"
 import HeroBlock from "@/components/home/HeroBlock"
 import RFQHeroPanel from "@/components/forms/RFQHeroPanel"
+import RFQMidPageBlock from "@/components/forms/RFQMidPageBlock"
 import HeroVideoBlock from "@/components/home/HeroVideoBlock"
 import SectionConnector from "@/components/home/SectionConnector"
 import StatesServedBlock from "@/components/home/StatesServedBlock"
@@ -625,6 +626,8 @@ export default function HomePage() {
         <SectionConnector eyebrow="The Technology" text="Inside every 100X fogger." />
 
         <TechnologyBlock />
+
+        <RFQMidPageBlock />
 
         <InlineInquiryCTA
           text="Need this technology for your municipality, farm, or estate?"
