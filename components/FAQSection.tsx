@@ -70,6 +70,26 @@ const FAQS: Faq[] = [
     a:
       "Yes. We ship to buyers in South Asia, Africa, and the Middle East — including municipal corporations, NGO health programs, and private pest-control operators. Standard incoterms are FOB Mumbai/Nhava Sheva and EXW Gurugram; CIF and DDP can be arranged for larger orders. Compliance documents (commercial invoice, packing list, certificate of origin, BIS where applicable) are issued by our export desk.",
   },
+  {
+    q: "What documents do you provide for tender submission and GeM purchase orders?",
+    a:
+      "We provide complete tender-ready documentation: GST invoice, OEM authorization letter, BIS certificate (where applicable), test reports, warranty letter, performance certificate from a comparable past supply, and ISO compliance documentation. Documents are issued within 48 hours of RFQ confirmation; complex tenders with custom configurations may take longer.",
+  },
+  {
+    q: "Can you supply on rate contracts to municipal corporations and state government departments?",
+    a:
+      "Yes. We hold rate contracts with municipal corporations across India and supply on annual rate contracts to state public-health departments. Share your RC requirement (validity, indicative volume, delivery schedule) and we'll prepare a rate-contract proposal aligned to your procurement cycle.",
+  },
+  {
+    q: "What is the minimum order quantity for dealer/distributor onboarding?",
+    a:
+      "Dealer onboarding typically starts with a 10-machine pilot order to qualify the territory; some categories (small portable foggers) start lower. Distributor agreements usually have annual volume commitments aligned to territory size. Margins and exclusivity terms scale with volume — share your business profile and territory for specific numbers.",
+  },
+  {
+    q: "Do you provide training and demo support for dealers and large institutional buyers?",
+    a:
+      "Yes. We provide hands-on operator training at delivery, a demo machine for the first 30 days of dealer onboarding, video and PDF training material in English and Hindi, and remote troubleshooting support. For larger institutional buyers, we send a field engineer for first-deployment commissioning at no extra cost.",
+  },
 ]
 
 export default function FAQSection() {
