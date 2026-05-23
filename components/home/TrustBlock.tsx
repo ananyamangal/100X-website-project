@@ -144,17 +144,31 @@ export default function TrustBlock() {
   return (
     <section className="py-16 md:py-20 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 md:mb-14">
           <Badge className="mb-6 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-lg px-6 py-2">
             Customer Reviews
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Trusted Fogging Machine Supplier – What Our Customers Say</h2>
-          <p className="text-xl text-gray-600 max-w-5xl mb-4 mx-auto">
-            As a reliable <a className="text-blue-500" href="https://www.100xcircle.com/">fogging machine supplier</a>, 100X Circle Pvt Ltd values real feedback from customers across India. Our clients share their experiences about product quality, performance, durability, and after-sales support.
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Trusted by 10,000+ customers — including municipal bodies, Nagar Nigams, and farm cooperatives across Bihar, UP, Gujarat, and beyond. Field reviews from the people running our machines every day.
           </p>
-          <p className="text-xl text-gray-600 max-w-5xl mx-auto">
-            From industrial users to municipal projects, customers appreciate our powerful fog output, easy operation, and long-lasting machines. Their reviews reflect our commitment to delivering dependable fogging solutions for effective pest and mosquito control.
-          </p>
+        </div>
+        <div className="grid sm:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto mb-12 md:mb-16">
+          {[
+            { label: "GeM-approved OEM", sub: "Direct government procurement" },
+            { label: "Made in India", sub: "Gurugram manufacturing facility" },
+            { label: "10,000+ customers", sub: "Municipalities, Nagar Nigams, farmers" },
+          ].map((cue) => (
+            <div
+              key={cue.label}
+              className="rounded-xl border border-gray-200 bg-white p-5 text-center shadow-sm"
+            >
+              <div className="text-base md:text-lg font-bold text-gray-900 mb-1">
+                {cue.label}
+              </div>
+              <div className="text-xs md:text-sm text-gray-600">{cue.sub}</div>
+            </div>
+          ))}
         </div>
         <ReviewsCarousel />
       </div>
