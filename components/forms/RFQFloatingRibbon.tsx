@@ -1,11 +1,12 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { FileText, X } from "lucide-react"
 import RFQForm from "./RFQForm"
 
 export default function RFQFloatingRibbon() {
   const [open, setOpen] = useState(false)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (!open) return
@@ -16,6 +17,7 @@ export default function RFQFloatingRibbon() {
     // Prevent background scroll while open
     const prev = document.body.style.overflow
     document.body.style.overflow = "hidden"
+    closeButtonRef.current?.focus()
     return () => {
       document.removeEventListener("keydown", onKey)
       document.body.style.overflow = prev
@@ -57,6 +59,7 @@ export default function RFQFloatingRibbon() {
                 <p className="text-sm text-gray-600 mt-1">Government, municipal, dealer, and bulk orders.</p>
               </div>
               <button
+                ref={closeButtonRef}
                 type="button"
                 aria-label="Close RFQ form"
                 className="-mr-2 -mt-2 rounded-md p-2 text-gray-500 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"

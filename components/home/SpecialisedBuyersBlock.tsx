@@ -76,7 +76,7 @@ export default function SpecialisedBuyersBlock() {
             return (
               <div
                 key={p.title}
-                className="rounded-2xl border border-gray-200 bg-gray-50/60 p-6 md:p-8 hover:shadow-md transition-shadow flex flex-col"
+                className="rounded-2xl border border-gray-200 bg-gray-50/60 p-6 md:p-7 hover:shadow-md transition-shadow flex flex-col"
               >
                 <div className="flex items-center gap-3 mb-4">
                   <span className="grid place-items-center w-11 h-11 rounded-xl bg-green-600/10 ring-1 ring-green-600/20">

@@ -1,10 +1,11 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import Link from "next/link"
 import { ArrowRight, MessageCircle, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BUSINESS } from "@/lib/seo/site-config"
+import HeroVideoModal from "./HeroVideoModal"
 
 // Hero demo from @100Xcircle: https://www.youtube.com/shorts/ZiVGNkvAI9g
 const HERO_VIDEO_ID = "ZiVGNkvAI9g"
@@ -15,6 +16,9 @@ interface Props {
 
 export default function HeroVideoBlock({ youtubeId = HERO_VIDEO_ID }: Props) {
   const isPlaceholder = youtubeId === "REPLACE_WITH_HERO_VIDEO_ID"
+  const [open, setOpen] = useState(false)
+  const posterSrc = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`
+
   return (
     <section
       className="relative bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 py-16 md:py-24 overflow-hidden"
@@ -46,14 +50,29 @@ export default function HeroVideoBlock({ youtubeId = HERO_VIDEO_ID }: Props) {
               </div>
             </div>
           ) : (
-            <iframe
-              className="aspect-video w-full border-0"
-              src={`https://www.youtube.com/embed/${youtubeId}?modestbranding=1&rel=0`}
-              title="100X Fogging Machine Demo"
-              loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              aria-label="Play 100X Fogging Machine demo video"
+              data-gtm="hero_video_open"
+              className="group relative block w-full aspect-video focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={posterSrc}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+              <span className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <span className="absolute inset-0 grid place-items-center">
+                <span className="grid place-items-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-green-600/95 text-white shadow-2xl ring-4 ring-white/20 group-hover:scale-110 transition-transform">
+                  <Play size={28} className="ml-0.5" aria-hidden="true" />
+                </span>
+              </span>
+            </button>
           )}
         </div>
 
@@ -87,6 +106,10 @@ export default function HeroVideoBlock({ youtubeId = HERO_VIDEO_ID }: Props) {
           </Button>
         </div>
       </div>
+
+      {!isPlaceholder && (
+        <HeroVideoModal open={open} onClose={() => setOpen(false)} youtubeId={youtubeId} />
+      )}
     </section>
   )
 }

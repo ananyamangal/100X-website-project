@@ -332,9 +332,12 @@ export default function RFQForm({
               </button>
             </span>
           ) : (
-            <span className="inline-flex items-center text-sm text-gray-600">
-              <Upload className="mr-2" size={16} aria-hidden="true" />
-              Drop a file here or click to upload
+            <span className="flex flex-col items-center gap-1 text-sm text-gray-600">
+              <span className="inline-flex items-center">
+                <Upload className="mr-2" size={16} aria-hidden="true" />
+                Drop a file here or click to upload
+              </span>
+              <span className="text-xs text-gray-500">PDF, DOC, DOCX, XLS, XLSX — up to 10MB</span>
             </span>
           )}
         </div>
@@ -358,11 +361,15 @@ export default function RFQForm({
         </label>
       </div>
 
-      {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
+      {error && (
+        <p id="rfq-form-error" className="text-sm text-red-600 -mx-1 px-3 py-2 rounded-lg bg-red-50 border border-red-200" role="alert">
+          {error}
+        </p>
+      )}
 
       <Button
         type="submit"
-        className="w-full bg-green-600 hover:bg-green-700 min-h-[48px] text-base font-semibold shadow-md"
+        className="w-full bg-green-600 hover:bg-green-700 min-h-[48px] text-base font-semibold shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
         disabled={submitting || uploading}
       >
         {submitting ? (
