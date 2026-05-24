@@ -34,6 +34,48 @@ export async function getProductById(id: string): Promise<Record<string, unknown
   }
 }
 
+function normalizeSlugLike(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "")
+}
+
+function tokenSig(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+    .sort()
+    .join("|")
+}
+
+/**
+ * Returns true if a product whose name matches the given slug exists in
+ * the DB. Matches by full normalised form first, then by token-sorted
+ * signature (so admin renames don't break existing SEO slugs).
+ */
+export async function productExistsBySlug(slug: string): Promise<boolean> {
+  try {
+    const client = await clientPromise
+    const db = client.db()
+    const products = await db
+      .collection("products")
+      .find({}, { projection: { name: 1 } })
+      .toArray()
+    const slugNorm = normalizeSlugLike(slug)
+    const slugSig = tokenSig(slug)
+    return products.some((p) => {
+      const name = typeof p.name === "string" ? p.name : ""
+      if (!name) return false
+      return normalizeSlugLike(name) === slugNorm || tokenSig(name) === slugSig
+    })
+  } catch {
+    return false
+  }
+}
+
 export async function getAllProductIds(): Promise<string[]> {
   try {
     const client = await clientPromise

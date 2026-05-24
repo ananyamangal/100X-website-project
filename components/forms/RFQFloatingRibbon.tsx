@@ -1,12 +1,21 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from "react"
+import { usePathname } from "next/navigation"
 import { FileText, X } from "lucide-react"
 import RFQForm from "./RFQForm"
 
+// Routes that should NOT show the floating ribbon (admin tooling, success
+// pages, etc.). Match by prefix.
+const HIDE_ON_PREFIXES = ["/admin", "/thank-you", "/brochure-thank-you"]
+
 export default function RFQFloatingRibbon() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+
+  const hidden = pathname ? HIDE_ON_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/")) : false
+  if (hidden) return null
 
   useEffect(() => {
     if (!open) return

@@ -39,7 +39,6 @@ import ManufacturingAuthorityBlock from "@/components/home/ManufacturingAuthorit
 import HeroBlock from "@/components/home/HeroBlock"
 import RFQHeroPanel from "@/components/forms/RFQHeroPanel"
 import RFQMidPageBlock from "@/components/forms/RFQMidPageBlock"
-import RFQFloatingRibbon from "@/components/forms/RFQFloatingRibbon"
 import SectionConnector from "@/components/home/SectionConnector"
 import StatesServedBlock from "@/components/home/StatesServedBlock"
 import InlineInquiryCTA from "@/components/home/InlineInquiryCTA"
@@ -740,7 +739,6 @@ export default function HomePage() {
         {/* Main content (root layout already exposes a landmark <main>) */}
         <div>{renderPage()}</div>
 
-        <RFQFloatingRibbon />
         <WhatsAppFloatingButton
           waNumber={BUSINESS.whatsappE164}
           displayPhone="+91 78272 29116"

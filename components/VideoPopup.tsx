@@ -53,7 +53,11 @@ export default function VideoPopup() {
   if (!videoId) return null
   const orientation = config.orientation
 
-  const embed = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}`
+  // Lock the player down: loop the same video, hide YouTube branding/related,
+  // disable keyboard controls, kill annotations. Prevents the player from
+  // advancing into "up next" suggestions which looked like the video
+  // randomly changing.
+  const embed = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}&rel=0&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0`
   const isPortrait = orientation === "portrait"
 
   return (
