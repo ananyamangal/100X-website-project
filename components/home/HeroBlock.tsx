@@ -212,7 +212,7 @@ export default function HeroBlock({
               <div className="text-lg font-semibold text-green-600 mb-4 min-h-[2rem] transition-all duration-500">
                 {changingPhrases[phraseIndex]}
               </div>
-              <div className="flex flex-col gap-4 justify-center mb-8">
+              <div className="flex flex-col gap-3 justify-center mb-6">
                 <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-5 shadow-lg shadow-green-900/20">
                   <Link href="#products" className="flex items-center justify-center">
                     Explore Products <ArrowRight className="ml-2" size={20} />
@@ -245,7 +245,7 @@ export default function HeroBlock({
                 </Button>
               </div>
 
-              <p className="text-xs text-gray-600 mb-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 max-w-md mx-auto">
+              <p className="text-xs text-gray-600 mb-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 max-w-md mx-auto">
                 <span className="inline-flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
                   GeM-approved OEM
