@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useCallback, useRef, useState } from "react"
-import Link from "next/link"
-import { Loader2, Upload, X, FileText, MessageCircle, Phone, Download } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Loader2, Upload, X, FileText, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -43,37 +43,60 @@ interface UploadedFile {
 interface Props {
   /** Visual variant. "card" = white surface with border; "panel" = compact for hero side panel. */
   variant?: "card" | "panel";
-  /** Optional default product preselect. */
-  defaultProduct?: ProductOption;
+  /** Optional default product preselect (e.g. when opened from a product page). */
+  defaultProduct?: ProductOption | string;
   /** Optional pre-fill organization/dept context. */
   defaultOrganization?: string;
   /** Telemetry location label so we know where the form lives. */
   location: string;
-  /** Optional callback invoked after successful submit. */
-  onSuccess?: () => void;
 }
 
 const PHONE_RE = /^[0-9+\-()\s]{10,18}$/
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const WA_HREF = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(
-  "Hi 100x Circle, I just submitted an RFQ — please confirm receipt.",
-)}`
-const TEL_HREF = `tel:${BUSINESS.phonePrimary.replace(/\s+/g, "")}`
+function buildWhatsAppMessage(fields: {
+  product: string;
+  quantity: string;
+  name: string;
+  phone: string;
+  email: string;
+  organization: string;
+  cityState: string;
+  description: string;
+  gemAuth: boolean;
+  dealerInquiry: boolean;
+  uploadUrl: string | null;
+}): string {
+  const lines = [
+    "*New RFQ — 100x Circle*",
+    "",
+    `Product: ${fields.product}`,
+    fields.quantity ? `Quantity: ${fields.quantity}` : "",
+    `Name: ${fields.name}`,
+    `Phone: ${fields.phone}`,
+    fields.email ? `Email: ${fields.email}` : "",
+    fields.organization ? `Organization: ${fields.organization}` : "",
+    fields.cityState ? `City/State: ${fields.cityState}` : "",
+    fields.description ? `Notes: ${fields.description}` : "",
+    `GeM auth: ${fields.gemAuth ? "Yes" : "No"}`,
+    `Dealer inquiry: ${fields.dealerInquiry ? "Yes" : "No"}`,
+    fields.uploadUrl ? `File: ${fields.uploadUrl}` : "",
+  ].filter(Boolean)
+  return lines.join("\n")
+}
 
 export default function RFQForm({
   variant = "card",
   defaultProduct,
   defaultOrganization,
   location,
-  onSuccess,
 }: Props) {
+  const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
-  const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState<UploadedFile | null>(null)
-  const [product, setProduct] = useState<ProductOption | "">(defaultProduct ?? "")
+  const [product, setProduct] = useState<string>(defaultProduct ?? "")
   const [quantity, setQuantity] = useState("")
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
@@ -83,21 +106,11 @@ export default function RFQForm({
   const [description, setDescription] = useState("")
   const [gemAuth, setGemAuth] = useState(false)
   const [dealerInquiry, setDealerInquiry] = useState(false)
+  const [showOptional, setShowOptional] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const reset = () => {
-    setProduct(defaultProduct ?? "")
-    setQuantity("")
-    setName("")
-    setPhone("")
-    setEmail("")
-    setOrganization(defaultOrganization ?? "")
-    setCityState("")
-    setDescription("")
-    setGemAuth(false)
-    setDealerInquiry(false)
-    setUploaded(null)
-  }
+  // Stage 2 (contact + extras) appears once a product is selected.
+  const stage2Visible = Boolean(product)
 
   const handleFile = useCallback(async (file: File | null | undefined) => {
     if (!file) return
@@ -128,8 +141,8 @@ export default function RFQForm({
       setError("Please select a product of interest.")
       return
     }
-    if (!name.trim() || !phone.trim() || !email.trim() || !organization.trim() || !cityState.trim()) {
-      setError("Please fill all required fields.")
+    if (!name.trim() || !phone.trim()) {
+      setError("Please share your name and phone number so we can contact you.")
       return
     }
     const digits = phone.replace(/[^0-9]/g, "")
@@ -137,8 +150,8 @@ export default function RFQForm({
       setError("Please enter a valid phone number (10–15 digits).")
       return
     }
-    if (!EMAIL_RE.test(email)) {
-      setError("Please enter a valid email address.")
+    if (email.trim() && !EMAIL_RE.test(email)) {
+      setError("Please enter a valid email address (or leave it blank).")
       return
     }
 
@@ -147,20 +160,42 @@ export default function RFQForm({
 
     setSubmitting(true)
     pushDataLayer({ event: "rfq_form_submit_attempt", location, product })
+
+    // Build the WhatsApp message and open the wa.me link immediately so the
+    // popup is initiated inside the user gesture (avoids popup blockers).
+    const waMessage = buildWhatsAppMessage({
+      product,
+      quantity,
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
+      organization: organization.trim(),
+      cityState: cityState.trim(),
+      description: description.trim(),
+      gemAuth,
+      dealerInquiry,
+      uploadUrl: uploaded?.url ?? null,
+    })
+    const waUrl = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waMessage)}`
+    if (typeof window !== "undefined") {
+      window.open(waUrl, "_blank", "noopener,noreferrer")
+    }
+
+    // Fire the server submission. Email + DB save both happen here; either
+    // succeeding is enough to claim delivery (we already opened WhatsApp).
     try {
-      const res = await fetch("/api/submissions", {
+      await fetch("/api/rfq-submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: "rfq",
           product,
           quantity,
           name: name.trim(),
           phone: phone.trim(),
-          email: email.trim(),
-          organization: organization.trim(),
-          cityState: cityState.trim(),
-          description: description.trim(),
+          email: email.trim() || undefined,
+          organization: organization.trim() || undefined,
+          cityState: cityState.trim() || undefined,
+          description: description.trim() || undefined,
           gemAuthRequired: gemAuth,
           dealerInquiry,
           uploadUrl: uploaded?.url ?? null,
@@ -173,46 +208,38 @@ export default function RFQForm({
           company_website: honeypot,
         }),
       })
-      if (!res.ok) throw new Error(`Submission failed with status ${res.status}`)
-
-      setQuoteLeadContext({
-        audience: gemAuth ? "tender" : dealerInquiry ? "distributor" : "default",
-        product,
-        name: name.trim(),
-        phone: phone.trim(),
-      })
-      pushDataLayer({
-        event: "rfq_submit",
-        lead_type: "rfq",
-        location,
-        product,
-        audience: gemAuth ? "tender" : dealerInquiry ? "distributor" : "default",
-        value: QUOTE_LEAD_VALUE_INR,
-        currency: "INR",
-      })
-      pushDataLayer({
-        event: "generate_lead",
-        lead_type: "rfq",
-        location,
-        product,
-        value: QUOTE_LEAD_VALUE_INR,
-        currency: "INR",
-      })
-
-      setSuccess(true)
-      onSuccess?.()
-      reset()
-    } catch {
-      setError("We couldn't save your request. Please try again or call us.")
-    } finally {
-      setSubmitting(false)
+      // We don't gate the user's flow on the response body — WhatsApp is
+      // already open and they'll land on /thank-you either way.
+    } catch (err) {
+      // Network/server error: don't block. WhatsApp tab is already open.
+      console.error("RFQ submit network error:", err)
     }
-  }
 
-  if (success) {
-    return (
-      <SuccessScreen variant={variant} onReset={() => setSuccess(false)} />
-    )
+    setQuoteLeadContext({
+      audience: gemAuth ? "tender" : dealerInquiry ? "distributor" : "default",
+      product,
+      name: name.trim(),
+      phone: phone.trim(),
+    })
+    pushDataLayer({
+      event: "rfq_submit",
+      lead_type: "rfq",
+      location,
+      product,
+      audience: gemAuth ? "tender" : dealerInquiry ? "distributor" : "default",
+      value: QUOTE_LEAD_VALUE_INR,
+      currency: "INR",
+    })
+    pushDataLayer({
+      event: "generate_lead",
+      lead_type: "rfq",
+      location,
+      product,
+      value: QUOTE_LEAD_VALUE_INR,
+      currency: "INR",
+    })
+
+    router.push("/thank-you?type=rfq")
   }
 
   const isPanel = variant === "panel"
@@ -223,7 +250,7 @@ export default function RFQForm({
       className={
         isPanel
           ? "space-y-3 rounded-2xl bg-white/95 backdrop-blur p-5 md:p-6 shadow-xl ring-1 ring-black/5"
-          : "space-y-4 rounded-2xl bg-white p-6 md:p-8 shadow-md ring-1 ring-gray-200"
+          : "space-y-4 rounded-2xl bg-white p-5 md:p-6 shadow-md ring-1 ring-gray-200"
       }
       noValidate
     >
@@ -235,118 +262,36 @@ export default function RFQForm({
 
       {!isPanel && (
         <div className="mb-1">
-          <h3 className="text-xl md:text-2xl font-bold text-gray-900">Request a Quote</h3>
-          <p className="text-sm text-gray-600 mt-1">Tender, GeM, dealer &amp; bulk inquiries.</p>
+          <h3 className="text-lg md:text-xl font-bold text-gray-900">Request a Quote</h3>
+          <p className="text-xs md:text-sm text-gray-600 mt-0.5">Tender, GeM, dealer &amp; bulk inquiries.</p>
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 gap-3">
-        <div className="sm:col-span-2">
-          <Label htmlFor="rfq-product" required>Interested Product</Label>
-          <Select value={product} onValueChange={(v) => setProduct(v as ProductOption)}>
-            <SelectTrigger id="rfq-product" className="min-h-[44px]">
-              <SelectValue placeholder="Select a product" />
-            </SelectTrigger>
-            <SelectContent>
-              {PRODUCT_OPTIONS.map((p) => (
-                <SelectItem key={p} value={p}>{p}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label htmlFor="rfq-qty" required>Quantity</Label>
-          <Input id="rfq-qty" name="quantity" inputMode="numeric" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="e.g. 10" className="min-h-[44px]" />
-        </div>
-        <div>
-          <Label htmlFor="rfq-name" required>Name</Label>
-          <Input id="rfq-name" name="name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="min-h-[44px]" />
-        </div>
-        <div>
-          <Label htmlFor="rfq-phone" required>Phone</Label>
-          <Input id="rfq-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="min-h-[44px]" />
-        </div>
-        <div>
-          <Label htmlFor="rfq-email" required>Email</Label>
-          <Input id="rfq-email" name="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="min-h-[44px]" />
-        </div>
-        <div>
-          <Label htmlFor="rfq-org" required>Organization / Department</Label>
-          <Input id="rfq-org" name="organization" autoComplete="organization" value={organization} onChange={(e) => setOrganization(e.target.value)} className="min-h-[44px]" />
-        </div>
-        <div>
-          <Label htmlFor="rfq-loc" required>City / State</Label>
-          <Input id="rfq-loc" name="cityState" autoComplete="address-level2" value={cityState} onChange={(e) => setCityState(e.target.value)} className="min-h-[44px]" />
-        </div>
+      {/* STAGE 1 — always visible */}
+      <div>
+        <Label htmlFor="rfq-product" required>Interested Product</Label>
+        <Select value={product} onValueChange={(v) => setProduct(v)}>
+          <SelectTrigger id="rfq-product" className="min-h-[44px]">
+            <SelectValue placeholder="Select a product" />
+          </SelectTrigger>
+          <SelectContent>
+            {PRODUCT_OPTIONS.map((p) => (
+              <SelectItem key={p} value={p}>{p}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div>
-        <Label htmlFor="rfq-desc">Requirement description</Label>
-        <Textarea
-          id="rfq-desc"
-          name="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={isPanel ? 2 : 3}
-          placeholder="Use case, specifications, timeline, delivery location..."
-        />
-      </div>
-
-      <div>
-        <Label>Upload specifications / tender (PDF, DOC, DOCX, XLS, XLSX — max 10MB)</Label>
-        <div
-          onDragOver={(e) => { e.preventDefault() }}
-          onDrop={(e) => {
-            e.preventDefault()
-            handleFile(e.dataTransfer.files?.[0])
-          }}
-          onClick={() => fileInputRef.current?.click()}
-          className="mt-1 cursor-pointer rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/60 px-4 py-5 text-center hover:border-green-600 hover:bg-green-50/40 transition-colors"
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault()
-              fileInputRef.current?.click()
-            }
-          }}
-          aria-label="Upload specifications or tender document"
-        >
-          {uploading ? (
-            <span className="inline-flex items-center text-sm text-gray-600">
-              <Loader2 className="mr-2 animate-spin" size={16} aria-hidden="true" />
-              Uploading…
-            </span>
-          ) : uploaded ? (
-            <span className="inline-flex items-center gap-2 text-sm text-gray-800">
-              <FileText size={16} className="text-green-700" aria-hidden="true" />
-              <span className="font-medium truncate max-w-[14rem]">{uploaded.name}</span>
-              <button
-                type="button"
-                aria-label="Remove uploaded file"
-                onClick={(e) => { e.stopPropagation(); setUploaded(null) }}
-                className="text-gray-500 hover:text-red-600"
-              >
-                <X size={16} aria-hidden="true" />
-              </button>
-            </span>
-          ) : (
-            <span className="flex flex-col items-center gap-1 text-sm text-gray-600">
-              <span className="inline-flex items-center">
-                <Upload className="mr-2" size={16} aria-hidden="true" />
-                Drop a file here or click to upload
-              </span>
-              <span className="text-xs text-gray-500">PDF, DOC, DOCX, XLS, XLSX — up to 10MB</span>
-            </span>
-          )}
-        </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf,.doc,.docx,.xls,.xlsx"
-          className="sr-only"
-          onChange={(e) => handleFile(e.target.files?.[0])}
+        <Label htmlFor="rfq-qty">Quantity</Label>
+        <Input
+          id="rfq-qty"
+          name="quantity"
+          inputMode="numeric"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          placeholder="e.g. 10"
+          className="min-h-[44px]"
         />
       </div>
 
@@ -361,6 +306,130 @@ export default function RFQForm({
         </label>
       </div>
 
+      {/* STAGE 2 — appears after product selected */}
+      {stage2Visible && (
+        <>
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-xs text-gray-500 mb-2">Your contact</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="rfq-name" required>Name</Label>
+                <Input id="rfq-name" name="name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="min-h-[44px]" />
+              </div>
+              <div>
+                <Label htmlFor="rfq-phone" required>Phone</Label>
+                <Input id="rfq-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="min-h-[44px]" />
+              </div>
+            </div>
+          </div>
+
+          {/* Collapsible optional details */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowOptional((v) => !v)}
+              aria-expanded={showOptional}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 hover:text-green-800"
+            >
+              <ChevronDown
+                size={14}
+                aria-hidden="true"
+                className={`transition-transform ${showOptional ? "rotate-180" : ""}`}
+              />
+              {showOptional ? "Hide optional details" : "Add more details (optional)"}
+            </button>
+          </div>
+
+          {showOptional && (
+            <div className="space-y-3">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="rfq-email">Email</Label>
+                  <Input id="rfq-email" name="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="min-h-[44px]" />
+                </div>
+                <div>
+                  <Label htmlFor="rfq-org">Organization / Department</Label>
+                  <Input id="rfq-org" name="organization" autoComplete="organization" value={organization} onChange={(e) => setOrganization(e.target.value)} className="min-h-[44px]" />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="rfq-loc">City / State</Label>
+                  <Input id="rfq-loc" name="cityState" autoComplete="address-level2" value={cityState} onChange={(e) => setCityState(e.target.value)} className="min-h-[44px]" />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="rfq-desc">Requirement description</Label>
+                <Textarea
+                  id="rfq-desc"
+                  name="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={isPanel ? 2 : 3}
+                  placeholder="Use case, specifications, timeline, delivery location..."
+                />
+              </div>
+
+              <div>
+                <Label>Upload specifications / tender (optional)</Label>
+                <div
+                  onDragOver={(e) => { e.preventDefault() }}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    handleFile(e.dataTransfer.files?.[0])
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-1 cursor-pointer rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/60 px-4 py-4 text-center hover:border-green-600 hover:bg-green-50/40 transition-colors"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault()
+                      fileInputRef.current?.click()
+                    }
+                  }}
+                  aria-label="Upload specifications or tender document"
+                >
+                  {uploading ? (
+                    <span className="inline-flex items-center text-sm text-gray-600">
+                      <Loader2 className="mr-2 animate-spin" size={16} aria-hidden="true" />
+                      Uploading…
+                    </span>
+                  ) : uploaded ? (
+                    <span className="inline-flex items-center gap-2 text-sm text-gray-800">
+                      <FileText size={16} className="text-green-700" aria-hidden="true" />
+                      <span className="font-medium truncate max-w-[14rem]">{uploaded.name}</span>
+                      <button
+                        type="button"
+                        aria-label="Remove uploaded file"
+                        onClick={(e) => { e.stopPropagation(); setUploaded(null) }}
+                        className="text-gray-500 hover:text-red-600"
+                      >
+                        <X size={16} aria-hidden="true" />
+                      </button>
+                    </span>
+                  ) : (
+                    <span className="flex flex-col items-center gap-0.5 text-sm text-gray-600">
+                      <span className="inline-flex items-center">
+                        <Upload className="mr-2" size={16} aria-hidden="true" />
+                        Drop a file here or click to upload
+                      </span>
+                      <span className="text-xs text-gray-500">PDF, DOC, DOCX, XLS, XLSX — up to 10MB</span>
+                    </span>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx"
+                  className="sr-only"
+                  onChange={(e) => handleFile(e.target.files?.[0])}
+                />
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
       {error && (
         <p id="rfq-form-error" className="text-sm text-red-600 -mx-1 px-3 py-2 rounded-lg bg-red-50 border border-red-200" role="alert">
           {error}
@@ -370,7 +439,7 @@ export default function RFQForm({
       <Button
         type="submit"
         className="w-full bg-green-600 hover:bg-green-700 min-h-[48px] text-base font-semibold shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
-        disabled={submitting || uploading}
+        disabled={submitting || uploading || !product}
       >
         {submitting ? (
           <>
@@ -395,53 +464,5 @@ function Label({ htmlFor, required, children }: { htmlFor?: string; required?: b
       {children}
       {required && <span aria-hidden="true" className="text-red-600 ml-0.5">*</span>}
     </label>
-  )
-}
-
-function SuccessScreen({ variant, onReset }: { variant: "card" | "panel"; onReset: () => void }) {
-  const isPanel = variant === "panel"
-  return (
-    <div
-      className={
-        isPanel
-          ? "rounded-2xl bg-white/95 backdrop-blur p-6 md:p-7 shadow-xl ring-1 ring-black/5 text-center"
-          : "rounded-2xl bg-white p-8 md:p-10 shadow-md ring-1 ring-gray-200 text-center"
-      }
-    >
-      <div className="mx-auto w-14 h-14 rounded-full bg-green-100 grid place-items-center mb-4">
-        <FileText className="text-green-700" size={24} aria-hidden="true" />
-      </div>
-      <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">Thank you!</h3>
-      <p className="text-sm md:text-base text-gray-600 mb-6">
-        Our team will contact you shortly with a quote and next steps.
-      </p>
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-3">
-        <Button asChild className="bg-green-600 hover:bg-green-700 min-h-[44px]">
-          <a href={WA_HREF} target="_blank" rel="noopener noreferrer" data-gtm="cta_whatsapp" data-gtm-location="rfq_success">
-            <MessageCircle className="mr-2" size={16} />
-            WhatsApp Us
-          </a>
-        </Button>
-        <Button asChild variant="outline" className="min-h-[44px]">
-          <a href={TEL_HREF} data-gtm="cta_call" data-gtm-location="rfq_success">
-            <Phone className="mr-2" size={16} />
-            Call Now
-          </a>
-        </Button>
-        <Button asChild variant="ghost" className="min-h-[44px]">
-          <Link href="/contact-us#brochure">
-            <Download className="mr-2" size={16} />
-            Download Brochure
-          </Link>
-        </Button>
-      </div>
-      <button
-        type="button"
-        onClick={onReset}
-        className="text-xs text-gray-500 underline-offset-2 hover:underline"
-      >
-        Submit another RFQ
-      </button>
-    </div>
   )
 }
