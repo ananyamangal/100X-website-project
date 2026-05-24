@@ -628,6 +628,10 @@ export default function HomePage() {
         {/* Accreditations Autoscroll Bar - just above Our Products */}
         <AccreditationsStrip accreditations={accreditations} />
 
+        <SectionConnector eyebrow="The Range" text="From handheld to vehicle-mounted." />
+
+        <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
+
         <ManufacturerIntroBlock />
 
         <SectionConnector eyebrow="The Technology" text="Inside every 100X fogger." />
@@ -635,10 +639,6 @@ export default function HomePage() {
         <TechnologyBlock />
 
         <RFQMidPageBlock />
-
-        <SectionConnector eyebrow="The Range" text="From handheld to vehicle-mounted." />
-
-        <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
 
         <ManufacturingAuthorityBlock />
 
@@ -737,110 +737,9 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Header */}
-        <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-lg z-50 border-b">
-          {/* Green utility bar removed — phone + WhatsApp now live in the
-              global Navbar as compact icon buttons. */}
-
-          <nav className="container mx-auto px-4 py-4">
-            <div className="flex justify-between items-center">
-              <Link href="/" className="flex items-center space-x-3">
-                <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
-                <div className="flex flex-col">
-                  <span className="text-base md:text-lg text-black font-bold">Circle Pvt Ltd.</span>
-                </div>
-              </Link>
-
-              {/* Desktop Menu */}
-              <div className="hidden lg:flex items-center space-x-8">
-                <button
-                  onClick={() => setCurrentPage("home")}
-                  className={`font-semibold transition-colors ${currentPage === "home" ? "text-green-600" : "text-gray-700 hover:text-green-600"
-                    }`}
-                >
-                  Home
-                </button>
-                <Link href="/products" className="text-gray-700 hover:text-green-600 transition-colors">
-                  Products
-                </Link>
-                <Link href="/about" className="text-gray-700 hover:text-green-600 transition-colors">
-                  About Us
-                </Link>
-                <Link
-                  href="/contact-us"
-                  className="text-gray-700 hover:text-green-600 transition-colors"
-                  onClick={() => {
-                    if (typeof window !== "undefined" && (window as any).gtag_report_conversion) {
-                      ;(window as any).gtag_report_conversion()
-                    }
-                  }}
-                >
-                  Contact
-                </Link>
-                <Link href="/blog" className="text-gray-700 hover:text-green-600 transition-colors">
-                  Blog
-                </Link>
-                <Button
-                  className="bg-green-600 hover:bg-green-700"
-                  onClick={() => handleBrochureDownload("Complete Product Catalog", mainBrochureUrl ?? undefined)}
-                >
-                  <Download size={16} className="mr-2" />
-                  Brochure
-                </Button>
-              </div>
-
-              {/* Mobile Menu Button */}
-              <button
-                type="button"
-                className="lg:hidden p-2 -mr-2 text-gray-700 hover:text-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 rounded-md"
-                aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-                aria-expanded={isMenuOpen}
-                aria-controls="home-mobile-menu"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                {isMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
-              </button>
-            </div>
-
-            {/* Mobile Menu */}
-            {isMenuOpen && (
-              <div id="home-mobile-menu" className="lg:hidden mt-4 pb-4 border-t">
-                <div className="flex flex-col space-y-4 pt-4">
-                  <button
-                    onClick={() => {
-                      setCurrentPage("home")
-                      setIsMenuOpen(false)
-                    }}
-                    className="text-left text-green-600 font-semibold"
-                  >
-                    Home
-                  </button>
-                  <Link href="/products" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
-                    Products
-                  </Link>
-                  <Link href="/about" className="text-left text-gray-700" onClick={() => setIsMenuOpen(false)}>
-                    About Us
-                  </Link>
-                  <Link
-                    href="/contact-us"
-                    className="text-gray-700"
-                    onClick={() => {
-                      if (typeof window !== "undefined" && (window as any).gtag_report_conversion) {
-                        ;(window as any).gtag_report_conversion()
-                      }
-                      setIsMenuOpen(false)
-                    }}
-                  >
-                    Contact
-                  </Link>
-                  <Link href="/blog" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
-                    Blog
-                  </Link>
-                </div>
-              </div>
-            )}
-          </nav>
-        </header>
+        {/* Header — global Navbar from app/layout.tsx renders site-wide; the
+            previously duplicated inline header on this route was overlapping
+            the Navbar and hiding the Call / WhatsApp buttons. */}
 
         {/* Main Content */}
         {/* Main content (root layout already exposes a landmark <main>) */}

@@ -26,16 +26,20 @@ export default function RFQFloatingRibbon() {
 
   return (
     <>
-      {/* Vertical ribbon — desktop only */}
+      {/* Vertical ribbon — visible on all viewports. Mobile gets a shorter
+          "RFQ" label; desktop expands to "RFQ / Tender Inquiry". MobileCtaBar
+          sits at the bottom so this ribbon at the mid-left doesn't collide. */}
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Open RFQ / Tender inquiry form"
+        aria-label="Submit RFQ / Tender inquiry"
         data-gtm="rfq_ribbon_open"
-        className="hidden md:flex fixed left-0 top-1/2 -translate-y-1/2 z-[60] origin-left rotate-180 [writing-mode:vertical-rl] items-center gap-2 px-3 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold tracking-wide shadow-lg rounded-tr-xl rounded-br-xl text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-700"
+        className="flex fixed left-0 top-1/2 -translate-y-1/2 z-[60] origin-left rotate-180 [writing-mode:vertical-rl] items-center gap-1.5 md:gap-2 px-2 md:px-3 py-3 md:py-4 bg-green-600 hover:bg-green-700 text-white font-semibold tracking-wide shadow-lg rounded-tr-xl rounded-br-xl text-xs md:text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-700"
       >
-        <FileText size={16} aria-hidden="true" />
-        <span>RFQ / Tender Inquiry</span>
+        <FileText size={14} aria-hidden="true" className="md:hidden" />
+        <FileText size={16} aria-hidden="true" className="hidden md:block" />
+        <span className="md:hidden">Submit RFQ</span>
+        <span className="hidden md:inline">RFQ / Tender Inquiry</span>
       </button>
 
       {/* Slide-over modal */}

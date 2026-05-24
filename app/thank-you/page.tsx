@@ -97,8 +97,14 @@ export default function ThankYouPage() {
                 Chat on WhatsApp
               </a>
             </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/products">Browse products</Link>
+            <Button asChild size="lg" variant="outline" className="border-green-600 text-green-700 hover:bg-green-50">
+              <a href={`tel:${BUSINESS.phonePrimary.replace(/\s+/g, "")}`} data-gtm="cta_call" data-gtm-location="thank_you_page">
+                <Phone className="mr-2 h-5 w-5" aria-hidden />
+                Call Now
+              </a>
+            </Button>
+            <Button asChild size="lg" variant="ghost">
+              <Link href="/contact-us">Contact Us</Link>
             </Button>
           </div>
         </div>

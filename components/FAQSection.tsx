@@ -2,6 +2,7 @@
 
 import * as Accordion from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 type Faq = {
   q: string
@@ -110,15 +111,14 @@ export default function FAQSection() {
     <section className="py-16 md:py-24 bg-white" aria-labelledby="faq-heading">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-10 md:mb-14">
-          <span className="inline-block mb-3 text-sm font-semibold uppercase tracking-wider text-green-700">
+          <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-200 text-base px-5 py-1.5">
             Frequently Asked Questions
-          </span>
-          <h2 id="faq-heading" className="text-3xl md:text-4xl font-bold text-gray-900">
-            Fogging machines, tenders, and after-sales — answered.
+          </Badge>
+          <h2 id="faq-heading" className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+            Procurement, Operations & After-Sales — Answered
           </h2>
-          <p className="mt-3 text-gray-600 max-w-2xl mx-auto">
-            Quick answers for buyers, municipal teams, and dealers exploring
-            100x Circle equipment.
+          <p className="mt-4 text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Practical answers for government buyers, municipal teams, dealers, and field operators evaluating 100X Circle equipment.
           </p>
         </div>
 
@@ -130,8 +130,8 @@ export default function FAQSection() {
           {FAQS.map((f, i) => (
             <Accordion.Item key={i} value={`faq-${i}`}>
               <Accordion.Header className="flex">
-                <Accordion.Trigger className="group flex w-full items-start justify-between gap-4 p-5 md:p-6 text-left font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 focus-visible:ring-inset rounded-2xl [&[data-state=open]]:text-green-700">
-                  <span className="text-base md:text-lg leading-snug">{f.q}</span>
+                <Accordion.Trigger className="group flex w-full items-start justify-between gap-4 px-5 md:px-6 py-4 md:py-5 text-left font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 focus-visible:ring-inset rounded-2xl [&[data-state=open]]:text-green-700">
+                  <span className="text-base md:text-[17px] leading-snug">{f.q}</span>
                   <ChevronDown
                     size={20}
                     aria-hidden="true"
@@ -140,7 +140,7 @@ export default function FAQSection() {
                 </Accordion.Trigger>
               </Accordion.Header>
               <Accordion.Content className="overflow-hidden text-gray-700 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
-                <p className="px-5 md:px-6 pb-5 md:pb-6 leading-relaxed">{f.a}</p>
+                <p className="px-5 md:px-6 pb-5 md:pb-6 text-sm md:text-base text-gray-700 leading-relaxed">{f.a}</p>
               </Accordion.Content>
             </Accordion.Item>
           ))}
