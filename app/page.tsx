@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import {
   Menu,
   X,
@@ -27,13 +28,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { RichContent } from "@/components/RichContent"
+import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton"
 import ContactSection from "@/components/ContactSection"
 import FAQSection from "@/components/FAQSection"
-import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton"
 import AccreditationsStrip from "@/components/home/AccreditationsStrip"
 import ManufacturerIntroBlock from "@/components/home/ManufacturerIntroBlock"
 import TechnologyBlock from "@/components/home/TechnologyBlock"
-import BlogBlock from "@/components/home/BlogBlock"
 import TrustBlock from "@/components/home/TrustBlock"
 import SpecialisedBuyersBlock from "@/components/home/SpecialisedBuyersBlock"
 import ProductsBlock from "@/components/home/ProductsBlock"
@@ -51,6 +51,11 @@ import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
+
+// Dynamic imports for below-fold components (code-split JS bundles)
+const BlogBlock = dynamic(() => import("@/components/home/BlogBlock"))
+const FAQSection = dynamic(() => import("@/components/FAQSection"))
+const ContactSection = dynamic(() => import("@/components/ContactSection"))
 
 // Product interface to match backend
 interface Product {
@@ -195,6 +200,7 @@ function YoutubeShortsCarousel() {
                   height="100%"
                   src={`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&controls=0&loop=1&playlist=${id}`}
                   title="YouTube Short"
+                  loading="lazy"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="w-full aspect-[9/16] border-0"
