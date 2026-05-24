@@ -93,12 +93,9 @@ export default function Navbar() {
         <Link
           href="/"
           aria-label="100x Circle home"
-          className="flex items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+          className="flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
         >
-          <img src="/logo-main.png" alt="" aria-hidden="true" className="w-14 h-auto md:w-16" />
-          <span className="text-xl md:text-2xl font-bold tracking-tight text-green-700">
-            100X
-          </span>
+          <img src="/logo-main.png" alt="100x Circle" className="w-16 h-auto md:w-20" />
         </Link>
 
         {/* Desktop: nav links + Brochure */}
@@ -111,11 +108,9 @@ export default function Navbar() {
                 href={l.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'relative text-sm font-medium transition-colors',
+                  'text-sm font-medium transition-colors',
                   'focus-visible:outline-none focus-visible:text-green-700',
                   active ? 'text-green-700' : 'text-gray-700 hover:text-green-600',
-                  "after:absolute after:left-0 after:-bottom-1.5 after:h-[2px] after:bg-green-600 after:transition-all",
-                  active ? 'after:w-full' : 'after:w-0',
                 )}
               >
                 {l.label}

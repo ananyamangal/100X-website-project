@@ -16,10 +16,17 @@ function getYouTubeId(url: string): string | null {
 }
 
 export default function VideoPopup() {
-  const [youtubeUrl, setYoutubeUrl] = useState<string | null>(FALLBACK_HERO_VIDEO_URL)
-  const [orientation, setOrientation] = useState<"portrait" | "landscape">(FALLBACK_HERO_ORIENTATION)
+  // Important: keep both pieces of "what to render" in one state so we
+  // commit URL + orientation atomically. Initialising to null + loading
+  // true means the iframe is NOT rendered until we know which video to
+  // play — eliminates the fallback → admin-config flash that looked
+  // like "the video keeps changing".
+  const [config, setConfig] = useState<{
+    url: string;
+    orientation: "portrait" | "landscape";
+  } | null>(null)
   const [closed, setClosed] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetch("/api/video-popup")
@@ -27,18 +34,24 @@ export default function VideoPopup() {
       .then((data) => {
         const u = data?.youtubeUrl
         if (u && String(u).trim()) {
-          setYoutubeUrl(String(u).trim())
-          setOrientation(data?.orientation === "landscape" ? "landscape" : "portrait")
+          setConfig({
+            url: String(u).trim(),
+            orientation: data?.orientation === "landscape" ? "landscape" : "portrait",
+          })
+        } else {
+          setConfig({ url: FALLBACK_HERO_VIDEO_URL, orientation: FALLBACK_HERO_ORIENTATION })
         }
-        // else: keep the fallback hero video already set.
       })
       .catch(() => {
-        // Network/admin API error — keep the fallback.
+        setConfig({ url: FALLBACK_HERO_VIDEO_URL, orientation: FALLBACK_HERO_ORIENTATION })
       })
+      .finally(() => setLoading(false))
   }, [])
 
-  const videoId = getYouTubeId(youtubeUrl || "")
-  if (loading || !videoId || closed) return null
+  if (loading || !config || closed) return null
+  const videoId = getYouTubeId(config.url)
+  if (!videoId) return null
+  const orientation = config.orientation
 
   const embed = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}`
   const isPortrait = orientation === "portrait"

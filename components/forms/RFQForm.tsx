@@ -280,7 +280,7 @@ export default function RFQForm({
           <SelectTrigger id="rfq-product" className="min-h-[44px]">
             <SelectValue placeholder="Select a product" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-[120]">
             {PRODUCT_OPTIONS.map((p) => (
               <SelectItem key={p} value={p}>{p}</SelectItem>
             ))}
