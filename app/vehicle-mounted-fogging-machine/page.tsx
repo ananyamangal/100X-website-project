@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL, SITE_NAME, defaultOgImage } from '@/lib/seo/site-config'
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd'
+import RFQForm from '@/components/forms/RFQForm'
 
 export const metadata: Metadata = {
   title: 'Vehicle Mounted Fogging Machine in Delhi | 100x Circle',
@@ -62,6 +63,25 @@ export default function VehicleMountedFoggingMachinePage() {
           >
             Chat on WhatsApp
           </a>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 max-w-3xl mt-16" id="rfq">
+        <div className="rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-xl p-6 md:p-10">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              Request a Quote for Vehicle Mounted Fogger
+            </h2>
+            <p className="text-sm md:text-base text-gray-600">
+              Tender, GeM, dealer &amp; bulk inquiries — we&apos;ll respond within 48 hours.
+            </p>
+          </div>
+          <RFQForm
+            variant="card"
+            defaultProduct="Vehicle Mounted Fogger"
+            defaultDescription="Inquiring about: Vehicle Mounted Fogging Machine"
+            location="landing_vehicle_mounted_fogging"
+          />
         </div>
       </section>
     </main>
