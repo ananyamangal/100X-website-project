@@ -47,6 +47,8 @@ interface Props {
   defaultProduct?: ProductOption | string;
   /** Optional pre-fill organization/dept context. */
   defaultOrganization?: string;
+  /** Optional pre-fill description (e.g. "Inquiring about: <product-name>"). */
+  defaultDescription?: string;
   /** Telemetry location label so we know where the form lives. */
   location: string;
 }
@@ -89,6 +91,7 @@ export default function RFQForm({
   variant = "card",
   defaultProduct,
   defaultOrganization,
+  defaultDescription,
   location,
 }: Props) {
   const router = useRouter()
@@ -103,7 +106,7 @@ export default function RFQForm({
   const [email, setEmail] = useState("")
   const [organization, setOrganization] = useState(defaultOrganization ?? "")
   const [cityState, setCityState] = useState("")
-  const [description, setDescription] = useState("")
+  const [description, setDescription] = useState(defaultDescription ?? "")
   const [gemAuth, setGemAuth] = useState(false)
   const [dealerInquiry, setDealerInquiry] = useState(false)
   const [showOptional, setShowOptional] = useState(false)
@@ -111,6 +114,9 @@ export default function RFQForm({
 
   // Stage 2 (contact + extras) appears once a product is selected.
   const stage2Visible = Boolean(product)
+  // When the form launches with a description prefilled (product pages), expand
+  // the optional section so the user can see/edit it instead of hiding it.
+  const [optionalForcedOpen] = useState(Boolean(defaultDescription))
 
   const handleFile = useCallback(async (file: File | null | undefined) => {
     if (!file) return
@@ -340,7 +346,7 @@ export default function RFQForm({
             </button>
           </div>
 
-          {showOptional && (
+          {(showOptional || optionalForcedOpen) && (
             <div className="space-y-3">
               <div className="grid sm:grid-cols-2 gap-3">
                 <div>
