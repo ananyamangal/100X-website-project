@@ -87,6 +87,15 @@ export default function HeroBlock({
               <div className="text-lg md:text-xl lg:text-2xl font-semibold text-green-400 mb-4 min-h-[2.5rem] transition-all duration-500">
                 {changingPhrases[phraseIndex]}
               </div>
+
+              {/* RFQ form — shown above the CTA stack on the FIRST banner only,
+                  so it doesn't compete with subsequent slides. */}
+              {currentSlide === 0 && rfqSlot ? (
+                <div className="mb-6 md:max-w-md">
+                  {rfqSlot}
+                </div>
+              ) : null}
+
               <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center md:justify-start mb-8">
                 <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-5 shadow-lg shadow-green-900/20">
                   <Link href="#products" className="flex items-center">
@@ -146,10 +155,9 @@ export default function HeroBlock({
               </div>
             </div>
 
-            {/* Empty Right Side on Desktop */}
-            <div className="hidden md:block">
-              {rfqSlot}
-            </div>
+            {/* Right side of the grid is intentionally left empty — the banner
+                image shows through. RFQ panel now lives in the left column. */}
+            <div className="hidden md:block" aria-hidden="true" />
           </div>
         </div>
       </div>
@@ -212,6 +220,14 @@ export default function HeroBlock({
               <div className="text-lg font-semibold text-green-600 mb-4 min-h-[2rem] transition-all duration-500">
                 {changingPhrases[phraseIndex]}
               </div>
+
+              {/* Mobile: RFQ collapsible above CTAs, first banner only. */}
+              {currentSlide === 0 && rfqSlot ? (
+                <div className="mb-5">
+                  {rfqSlot}
+                </div>
+              ) : null}
+
               <div className="flex flex-col gap-3 justify-center mb-6">
                 <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-5 shadow-lg shadow-green-900/20">
                   <Link href="#products" className="flex items-center justify-center">
@@ -269,7 +285,6 @@ export default function HeroBlock({
                   </div>
                 ))}
               </div>
-              {rfqSlot}
             </div>
           </div>
         </div>

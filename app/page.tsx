@@ -42,7 +42,6 @@ import HeroBlock from "@/components/home/HeroBlock"
 import RFQHeroPanel from "@/components/forms/RFQHeroPanel"
 import RFQMidPageBlock from "@/components/forms/RFQMidPageBlock"
 import RFQFloatingRibbon from "@/components/forms/RFQFloatingRibbon"
-import HeroVideoBlock from "@/components/home/HeroVideoBlock"
 import SectionConnector from "@/components/home/SectionConnector"
 import StatesServedBlock from "@/components/home/StatesServedBlock"
 import InlineInquiryCTA from "@/components/home/InlineInquiryCTA"
@@ -620,8 +619,6 @@ export default function HomePage() {
           phraseIndex={phraseIndex}
           rfqSlot={<RFQHeroPanel />}
         />
-
-        <HeroVideoBlock />
 
         <SectionConnector eyebrow="Built for India" text="A decade of manufacturing for the field." />
 

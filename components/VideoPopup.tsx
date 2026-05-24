@@ -3,6 +3,12 @@
 import React, { useState, useEffect } from "react"
 import { X } from "lucide-react"
 
+// Fallback when admin hasn't configured /api/video-popup — uses the hero
+// demo so the floating video popup is visible by default. Replaces the
+// in-page HeroVideoBlock that used to render this video full-width.
+const FALLBACK_HERO_VIDEO_URL = "https://www.youtube.com/shorts/ZiVGNkvAI9g"
+const FALLBACK_HERO_ORIENTATION: "portrait" | "landscape" = "portrait"
+
 function getYouTubeId(url: string): string | null {
   if (!url || typeof url !== "string") return null
   const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/)
@@ -10,24 +16,25 @@ function getYouTubeId(url: string): string | null {
 }
 
 export default function VideoPopup() {
-  const [youtubeUrl, setYoutubeUrl] = useState<string | null>(null)
-  const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait")
+  const [youtubeUrl, setYoutubeUrl] = useState<string | null>(FALLBACK_HERO_VIDEO_URL)
+  const [orientation, setOrientation] = useState<"portrait" | "landscape">(FALLBACK_HERO_ORIENTATION)
   const [closed, setClosed] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetch("/api/video-popup")
       .then((res) => res.json())
       .then((data) => {
         const u = data?.youtubeUrl
-        setYoutubeUrl(u && String(u).trim() ? String(u).trim() : null)
-        setOrientation(data?.orientation === "landscape" ? "landscape" : "portrait")
+        if (u && String(u).trim()) {
+          setYoutubeUrl(String(u).trim())
+          setOrientation(data?.orientation === "landscape" ? "landscape" : "portrait")
+        }
+        // else: keep the fallback hero video already set.
       })
       .catch(() => {
-        setYoutubeUrl(null)
-        setOrientation("portrait")
+        // Network/admin API error — keep the fallback.
       })
-      .finally(() => setLoading(false))
   }, [])
 
   const videoId = getYouTubeId(youtubeUrl || "")
