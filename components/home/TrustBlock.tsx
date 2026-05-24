@@ -175,7 +175,7 @@ export default function TrustBlock() {
           ].map((cue) => (
             <div
               key={cue.label}
-              className="rounded-xl border border-gray-200 bg-white p-5 text-center shadow-sm"
+              className="rounded-2xl border border-gray-200 bg-white p-5 text-center shadow-sm"
             >
               <div className="text-base md:text-lg font-bold text-gray-900 mb-1">
                 {cue.label}

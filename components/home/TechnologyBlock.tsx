@@ -109,7 +109,7 @@ export default function TechnologyBlock() {
           })}
         </ol>
 
-        <div className="rounded-3xl bg-gradient-to-b from-gray-950 to-gray-900 p-8 md:p-12">
+        <div className="rounded-3xl bg-gradient-to-b from-gray-950 to-gray-900 p-8 md:p-10">
           <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-8 md:mb-10">
             Why pulse-jet beats conventional spraying
           </h3>
