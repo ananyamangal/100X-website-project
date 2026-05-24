@@ -636,11 +636,6 @@ export default function HomePage() {
 
         <RFQMidPageBlock />
 
-        <InlineInquiryCTA
-          text="Need this technology for your municipality, farm, or estate?"
-          whatsappMessage="Hi, I just read about your pulse-jet thermal fogging technology and would like to discuss requirements."
-        />
-
         <SectionConnector eyebrow="The Range" text="From handheld to vehicle-mounted." />
 
         <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
@@ -663,11 +658,6 @@ export default function HomePage() {
         <TrustBlock />
 
         <SpecialisedBuyersBlock />
-
-        <InlineInquiryCTA
-          text="Join 10,000+ buyers — municipal, agricultural, and industrial — already running 100X equipment."
-          whatsappMessage="Hi, I'd like to talk to your team about 100x Circle fogging machines."
-        />
 
         <StatesServedBlock />
 
