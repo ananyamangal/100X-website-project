@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import useEmblaCarousel from "embla-carousel-react"
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react"
+import { ChevronLeft, ChevronRight, Quote, ShieldCheck, MapPin, Building2, Globe2, Factory, BadgeCheck } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 
@@ -184,6 +184,35 @@ export default function TrustBlock() {
             </div>
           ))}
         </div>
+
+        <div className="rounded-3xl border border-gray-200 bg-gray-50/60 px-5 py-6 md:px-8 md:py-7 max-w-5xl mx-auto mb-12 md:mb-16">
+          <p className="text-center text-xs md:text-sm uppercase tracking-widest text-green-700 font-semibold mb-5">
+            Manufacturer Authority
+          </p>
+          <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-5 list-none">
+            {[
+              { icon: BadgeCheck, label: "GeM OEM" },
+              { icon: MapPin, label: "Made in India" },
+              { icon: Building2, label: "Government Supply" },
+              { icon: Globe2, label: "Export Capability" },
+              { icon: Factory, label: "In-house Manufacturing" },
+              { icon: ShieldCheck, label: "ISO-grade Build" },
+            ].map((c) => {
+              const Icon = c.icon
+              return (
+                <li key={c.label} className="flex flex-col items-center text-center gap-2">
+                  <span className="grid place-items-center w-10 h-10 rounded-xl bg-white ring-1 ring-gray-200 shadow-sm">
+                    <Icon size={18} className="text-green-700" aria-hidden="true" />
+                  </span>
+                  <span className="text-xs md:text-sm font-semibold text-gray-800 leading-tight">
+                    {c.label}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+
         <ReviewsCarousel />
       </div>
     </section>
