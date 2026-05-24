@@ -10,6 +10,7 @@ import { RichContent } from '@/components/RichContent';
 import { X as CloseIcon } from 'lucide-react';
 import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
 import { getLandingPage, type LandingPageDef } from '@/lib/seo/landing-pages';
+import RFQForm from '@/components/forms/RFQForm';
 
 const badgeLogoMap: Record<string, string> = {
     'Korean Technology': '/Logos clipart 2/Korean Technology.png',
@@ -405,6 +406,26 @@ export default function ProductDetailPage() {
                         </div>
                     </div>
                 )}
+
+                {/* RFQ form pre-filled for this product */}
+                <div className="bg-gradient-to-b from-gray-50 to-white rounded-2xl shadow-xl p-6 md:p-10 mb-12" id="rfq">
+                    <div className="max-w-2xl mx-auto">
+                        <div className="text-center mb-8">
+                            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                                Request a Quote for {product.name}
+                            </h3>
+                            <p className="text-sm md:text-base text-gray-600">
+                                Tender, GeM, dealer &amp; bulk inquiries — we&apos;ll respond within 48 hours.
+                            </p>
+                        </div>
+                        <RFQForm
+                            variant="card"
+                            defaultProduct="Custom Requirement"
+                            defaultDescription={`Inquiring about: ${product.name}`}
+                            location={`product_landing_${slug ?? "unknown"}`}
+                        />
+                    </div>
+                </div>
 
                 {/* Badges Section */}
                 {(product.badges || [product.badge]).length > 0 && (
