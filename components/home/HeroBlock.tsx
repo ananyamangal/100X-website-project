@@ -88,9 +88,10 @@ export default function HeroBlock({
                 {changingPhrases[phraseIndex]}
               </div>
 
-              {/* RFQ form — shown above the CTA stack on the FIRST banner only,
-                  so it doesn't compete with subsequent slides. */}
-              {currentSlide === 0 && rfqSlot ? (
+              {/* RFQ form above the CTA stack. Lives only in the hero section
+                  (this component is the "1st banner"); auto-slideshow does
+                  NOT hide it. */}
+              {rfqSlot ? (
                 <div className="mb-6 md:max-w-md">
                   {rfqSlot}
                 </div>
@@ -221,8 +222,8 @@ export default function HeroBlock({
                 {changingPhrases[phraseIndex]}
               </div>
 
-              {/* Mobile: RFQ collapsible above CTAs, first banner only. */}
-              {currentSlide === 0 && rfqSlot ? (
+              {/* Mobile: RFQ collapsible above CTAs. */}
+              {rfqSlot ? (
                 <div className="mb-5">
                   {rfqSlot}
                 </div>
