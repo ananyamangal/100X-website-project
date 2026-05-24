@@ -1929,6 +1929,47 @@ function ProductForm({
 
 // Analytics Tab Component
 function AnalyticsTab({ products }: { products: Product[] }) {
+  const [submissions, setSubmissions] = useState<any[]>([])
+  const [submissionsLoading, setSubmissionsLoading] = useState(true)
+
+  useEffect(() => {
+    fetch("/api/submissions")
+      .then((res) => res.json())
+      .then((data) => {
+        setSubmissions(Array.isArray(data) ? data : [])
+        setSubmissionsLoading(false)
+      })
+      .catch(() => setSubmissionsLoading(false))
+  }, [])
+
+  // Lead aggregations
+  const now = Date.now()
+  const dayMs = 24 * 60 * 60 * 1000
+  const within = (s: any, ms: number) => {
+    if (!s.createdAt) return false
+    const t = new Date(s.createdAt).getTime()
+    return Number.isFinite(t) && now - t < ms
+  }
+  const last24h = submissions.filter((s) => within(s, dayMs)).length
+  const last7d = submissions.filter((s) => within(s, 7 * dayMs)).length
+  const last30d = submissions.filter((s) => within(s, 30 * dayMs)).length
+
+  const byType = submissions.reduce<Record<string, number>>((acc, s) => {
+    const t = s.type || "unknown"
+    acc[t] = (acc[t] || 0) + 1
+    return acc
+  }, {})
+  const byLocation = submissions.reduce<Record<string, number>>((acc, s) => {
+    const loc = s.location_label || s.form_page_path || "unknown"
+    acc[loc] = (acc[loc] || 0) + 1
+    return acc
+  }, {})
+  const rfqLeads = submissions.filter((s) => s.type === "rfq")
+  const rfqTender = rfqLeads.filter((s) => s.gemAuthRequired).length
+  const rfqDealer = rfqLeads.filter((s) => s.dealerInquiry).length
+  const topLocations = Object.entries(byLocation).sort((a, b) => b[1] - a[1]).slice(0, 6)
+  const totalSubmissions = submissions.length
+
   const categoryStats = products.reduce(
     (acc, product) => {
       acc[product.category] = (acc[product.category] || 0) + 1
@@ -1953,9 +1994,105 @@ function AnalyticsTab({ products }: { products: Product[] }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Analytics & Insights</h2>
-        <p className="text-gray-600">Analyze your product performance and catalog statistics</p>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Analytics &amp; Insights</h2>
+        <p className="text-gray-600">Lead activity, conversion funnel, and catalog statistics</p>
       </div>
+
+      {/* Lead Analytics */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Lead Analytics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {submissionsLoading ? (
+            <div className="text-sm text-gray-500">Loading submissions…</div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <div className="text-xs uppercase tracking-wider text-gray-500 mb-1">Total leads</div>
+                  <div className="text-3xl font-bold text-gray-900">{totalSubmissions}</div>
+                </div>
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <div className="text-xs uppercase tracking-wider text-gray-500 mb-1">Last 24h</div>
+                  <div className="text-3xl font-bold text-green-700">{last24h}</div>
+                </div>
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <div className="text-xs uppercase tracking-wider text-gray-500 mb-1">Last 7 days</div>
+                  <div className="text-3xl font-bold text-green-700">{last7d}</div>
+                </div>
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <div className="text-xs uppercase tracking-wider text-gray-500 mb-1">Last 30 days</div>
+                  <div className="text-3xl font-bold text-green-700">{last30d}</div>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">By submission type</h3>
+                  {Object.entries(byType).length === 0 ? (
+                    <p className="text-sm text-gray-500">No submissions yet.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {Object.entries(byType).sort((a, b) => b[1] - a[1]).map(([t, count]) => {
+                        const pct = totalSubmissions ? (count / totalSubmissions) * 100 : 0
+                        return (
+                          <div key={t} className="flex items-center gap-3">
+                            <div className="text-sm capitalize w-44 text-gray-700">{t}</div>
+                            <div className="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden">
+                              <div className="h-full bg-green-600" style={{ width: `${pct}%` }} />
+                            </div>
+                            <div className="text-sm font-semibold text-gray-900 w-10 text-right">{count}</div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">By form location (top 6)</h3>
+                  {topLocations.length === 0 ? (
+                    <p className="text-sm text-gray-500">No location data yet.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {topLocations.map(([loc, count]) => {
+                        const pct = totalSubmissions ? (count / totalSubmissions) * 100 : 0
+                        return (
+                          <div key={loc} className="flex items-center gap-3">
+                            <div className="text-xs text-gray-700 w-44 truncate" title={loc}>{loc}</div>
+                            <div className="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden">
+                              <div className="h-full bg-blue-600" style={{ width: `${pct}%` }} />
+                            </div>
+                            <div className="text-sm font-semibold text-gray-900 w-10 text-right">{count}</div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {rfqLeads.length > 0 ? (
+                <div className="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-gray-100">
+                  <div>
+                    <div className="text-xs uppercase tracking-wider text-gray-500 mb-1">RFQ leads</div>
+                    <div className="text-2xl font-bold text-gray-900">{rfqLeads.length}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs uppercase tracking-wider text-gray-500 mb-1">Tender / GeM</div>
+                    <div className="text-2xl font-bold text-yellow-700">{rfqTender}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs uppercase tracking-wider text-gray-500 mb-1">Dealer inquiries</div>
+                    <div className="text-2xl font-bold text-purple-700">{rfqDealer}</div>
+                  </div>
+                </div>
+              ) : null}
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
@@ -2201,59 +2338,227 @@ function CategoriesTab({
 }
 
 function SubmissionsTab() {
-  const [submissions, setSubmissions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [submissions, setSubmissions] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [typeFilter, setTypeFilter] = useState<string>("all")
+  const [search, setSearch] = useState("")
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+
   useEffect(() => {
     fetch("/api/submissions")
       .then((res) => res.json())
       .then((data) => {
-        setSubmissions(Array.isArray(data) ? data : []);
-        setLoading(false);
-      });
-  }, []);
+        setSubmissions(Array.isArray(data) ? data : [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
+
+  const types = Array.from(new Set(submissions.map((s) => s.type).filter(Boolean))).sort()
+
+  const filtered = submissions.filter((s) => {
+    if (typeFilter !== "all" && s.type !== typeFilter) return false
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      const haystack = [
+        s.name, s.phone, s.email, s.product, s.productName,
+        s.organization, s.cityState, s.description, s.message, s.location_label,
+      ].filter(Boolean).join(" ").toLowerCase()
+      if (!haystack.includes(q)) return false
+    }
+    return true
+  })
+
+  function downloadCsv() {
+    const headers = [
+      "createdAt", "type", "name", "phone", "email",
+      "product", "productName", "quantity", "organization", "cityState",
+      "description", "message", "subject",
+      "gemAuthRequired", "dealerInquiry",
+      "uploadUrl", "uploadName",
+      "form_page_path", "form_page_url", "location_label",
+    ]
+    const csvEscape = (v: unknown) => {
+      const s = v === null || v === undefined ? "" : typeof v === "object" ? JSON.stringify(v) : String(v)
+      if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`
+      return s
+    }
+    const lines = [headers.join(",")]
+    for (const s of filtered) {
+      lines.push(headers.map((h) => csvEscape(s[h])).join(","))
+    }
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `submissions-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const typeBadgeClass = (t: string) => {
+    switch (t) {
+      case "rfq": return "bg-green-100 text-green-800"
+      case "brochure": return "bg-blue-100 text-blue-800"
+      case "sticky_quote_request": return "bg-purple-100 text-purple-800"
+      default: return "bg-gray-100 text-gray-800"
+    }
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">User Submissions</h2>
-        <p className="text-gray-600">All contact and brochure download submissions from users</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">User Submissions</h2>
+          <p className="text-gray-600">
+            All RFQ, brochure, sticky-quote, and contact submissions — {submissions.length} total
+            {filtered.length !== submissions.length ? ` (showing ${filtered.length})` : ""}
+          </p>
+        </div>
+        <Button onClick={downloadCsv} variant="outline" disabled={!filtered.length}>
+          <Download className="mr-2" size={16} />
+          Export CSV
+        </Button>
       </div>
+
+      <div className="flex gap-3 flex-wrap items-center">
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+          className="h-10 rounded-md border border-gray-300 bg-white px-3 text-sm"
+        >
+          <option value="all">All types ({submissions.length})</option>
+          {types.map((t) => (
+            <option key={t} value={t}>
+              {t} ({submissions.filter((s) => s.type === t).length})
+            </option>
+          ))}
+        </select>
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search name, phone, email, product, organization…"
+          className="max-w-md"
+        />
+      </div>
+
       {loading ? (
-        <div>Loading...</div>
+        <div className="text-gray-500">Loading submissions…</div>
+      ) : filtered.length === 0 ? (
+        <div className="text-gray-500 rounded-lg border border-dashed border-gray-200 bg-gray-50 p-8 text-center">
+          No submissions match this filter.
+        </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border rounded-lg">
-            <thead>
-              <tr>
-                <th className="px-4 py-2 border-b">Date</th>
-                <th className="px-4 py-2 border-b">Name</th>
-                <th className="px-4 py-2 border-b">Phone</th>
-                <th className="px-4 py-2 border-b">Type</th>
-                <th className="px-4 py-2 border-b">Product</th>
-                <th className="px-4 py-2 border-b">Email</th>
-                <th className="px-4 py-2 border-b">Subject</th>
-                <th className="px-4 py-2 border-b">Message</th>
+        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr className="text-left">
+                <th className="px-3 py-2 font-semibold text-gray-700">Date</th>
+                <th className="px-3 py-2 font-semibold text-gray-700">Type</th>
+                <th className="px-3 py-2 font-semibold text-gray-700">Name / Phone</th>
+                <th className="px-3 py-2 font-semibold text-gray-700">Product / Qty</th>
+                <th className="px-3 py-2 font-semibold text-gray-700">Org / City</th>
+                <th className="px-3 py-2 font-semibold text-gray-700">Tags</th>
+                <th className="px-3 py-2 font-semibold text-gray-700">Upload</th>
+                <th className="px-3 py-2 font-semibold text-gray-700"></th>
               </tr>
             </thead>
             <tbody>
-              {submissions.map((s) => (
-                <tr key={s._id ? String(s._id) : `${s.name || ''}-${s.phone || ''}-${s.createdAt || ''}`} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-2 text-xs text-gray-500">{s.createdAt ? new Date(s.createdAt).toLocaleString() : ''}</td>
-                  <td className="px-4 py-2">{s.name}</td>
-                  <td className="px-4 py-2">{s.phone}</td>
-                  <td className="px-4 py-2 capitalize">{s.type}</td>
-                  <td className="px-4 py-2">{s.productName || '-'}</td>
-                  <td className="px-4 py-2">{s.email || '-'}</td>
-                  <td className="px-4 py-2">{s.subject || '-'}</td>
-                  <td className="px-4 py-2 max-w-xs truncate" title={s.message}>{s.message || '-'}</td>
-                </tr>
-              ))}
+              {filtered.map((s) => {
+                const id = s._id ? String(s._id) : `${s.name || ''}-${s.phone || ''}-${s.createdAt || ''}`
+                const isOpen = expanded[id]
+                const product = s.product || s.productName || "—"
+                const notes = s.description || s.message || ""
+                return (
+                  <React.Fragment key={id}>
+                    <tr className="border-t border-gray-100 hover:bg-gray-50">
+                      <td className="px-3 py-2 text-xs text-gray-500 whitespace-nowrap">
+                        {s.createdAt ? new Date(s.createdAt).toLocaleString() : ""}
+                      </td>
+                      <td className="px-3 py-2">
+                        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold capitalize", typeBadgeClass(s.type))}>
+                          {s.type || "—"}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="font-medium text-gray-900">{s.name || "—"}</div>
+                        <div className="text-xs text-gray-500">
+                          {s.phone || ""}
+                          {s.email ? ` · ${s.email}` : ""}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="text-gray-900">{product}</div>
+                        {s.quantity ? <div className="text-xs text-gray-500">qty {s.quantity}</div> : null}
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="text-gray-900">{s.organization || "—"}</div>
+                        <div className="text-xs text-gray-500">{s.cityState || ""}</div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex flex-wrap gap-1">
+                          {s.gemAuthRequired ? <span className="inline-flex rounded-full bg-yellow-100 text-yellow-800 px-2 py-0.5 text-xs font-semibold">GeM</span> : null}
+                          {s.dealerInquiry ? <span className="inline-flex rounded-full bg-purple-100 text-purple-800 px-2 py-0.5 text-xs font-semibold">Dealer</span> : null}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">
+                        {s.uploadUrl ? (
+                          <a
+                            href={s.uploadUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-green-700 hover:underline"
+                            title={s.uploadName || s.uploadUrl}
+                          >
+                            <Download size={14} className="inline mr-1" />
+                            {s.uploadName || "file"}
+                          </a>
+                        ) : "—"}
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <button
+                          type="button"
+                          onClick={() => setExpanded((m) => ({ ...m, [id]: !m[id] }))}
+                          className="text-xs text-gray-500 hover:text-green-700"
+                        >
+                          {isOpen ? "Hide" : "Details"}
+                        </button>
+                      </td>
+                    </tr>
+                    {isOpen ? (
+                      <tr className="bg-gray-50/60">
+                        <td colSpan={8} className="px-4 py-3">
+                          <div className="grid md:grid-cols-2 gap-x-6 gap-y-2 text-xs text-gray-700">
+                            {notes ? (
+                              <div className="md:col-span-2">
+                                <div className="font-semibold text-gray-600 mb-1">Notes</div>
+                                <div className="whitespace-pre-wrap text-gray-800">{notes}</div>
+                              </div>
+                            ) : null}
+                            {s.subject ? <div><span className="font-semibold text-gray-600">Subject:</span> {s.subject}</div> : null}
+                            {s.location_label ? <div><span className="font-semibold text-gray-600">Form location:</span> {s.location_label}</div> : null}
+                            {s.form_page_path ? <div><span className="font-semibold text-gray-600">Page:</span> {s.form_page_path}</div> : null}
+                            {s.attribution ? (
+                              <div className="md:col-span-2">
+                                <div className="font-semibold text-gray-600 mb-1">Attribution</div>
+                                <pre className="overflow-x-auto rounded bg-white border border-gray-200 p-2 text-[11px] leading-snug">
+{JSON.stringify(s.attribution, null, 2)}
+                                </pre>
+                              </div>
+                            ) : null}
+                          </div>
+                        </td>
+                      </tr>
+                    ) : null}
+                  </React.Fragment>
+                )
+              })}
             </tbody>
           </table>
         </div>
       )}
     </div>
-  );
+  )
 }
 
 // Blogs Tab Component
