@@ -63,14 +63,14 @@ const organization = {
           {
             "@type": "Offer",
             itemOffered: {
-              "@type": "Product",
+              "@type": "Service",
               name: "Vehicle-Mounted Thermal Fogging Machines",
             },
           },
           {
             "@type": "Offer",
             itemOffered: {
-              "@type": "Product",
+              "@type": "Service",
               name: "Double-Barrel Thermal Foggers",
             },
           },
@@ -83,14 +83,14 @@ const organization = {
           {
             "@type": "Offer",
             itemOffered: {
-              "@type": "Product",
+              "@type": "Service",
               name: "Portable Pulse-Jet Foggers",
             },
           },
           {
             "@type": "Offer",
             itemOffered: {
-              "@type": "Product",
+              "@type": "Service",
               name: "Power Tillers and Sprayers",
             },
           },
