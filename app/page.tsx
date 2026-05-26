@@ -249,10 +249,12 @@ export default function HomePage() {
     "100 X Results",
   ]
 
-  // Use banners from API only
-  // The first banner (order 0 or lowest order) is the default loading banner
+  // Use banners from API only.
+  // A slide is included if isActive AND has a desktop image available (the API
+  // shim populates desktopBannerImage from the legacy `image` field for older
+  // records). Per-device disable/fallback is handled inside HeroBlock.
   const heroSlides = banners
-    .filter(b => b.isActive && b.image) // Only show active banners with images
+    .filter(b => b.isActive && (b.desktopBannerImage || b.image))
     .sort((a, b) => (a.order || 0) - (b.order || 0))
 
   // Fetch products from API

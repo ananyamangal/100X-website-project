@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import {
   Plus,
   Edit,
@@ -27,6 +27,7 @@ import {
   GripVertical,
   ArrowUp,
   ArrowDown,
+  Loader2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -69,7 +70,26 @@ interface Product {
 interface Banner {
   _id?: string;
   id?: string;
-  image: string;
+  // Legacy: mirror of desktopBannerImage kept for back-compat readers.
+  image?: string;
+  desktopBannerImage?: string;
+  tabletBannerImage?: string;
+  mobileBannerImage?: string;
+  desktopBannerAlt?: string;
+  tabletBannerAlt?: string;
+  mobileBannerAlt?: string;
+  desktopBannerEnabled?: boolean;
+  tabletBannerEnabled?: boolean;
+  mobileBannerEnabled?: boolean;
+  desktopFocalX?: number;
+  desktopFocalY?: number;
+  tabletFocalX?: number;
+  tabletFocalY?: number;
+  mobileFocalX?: number;
+  mobileFocalY?: number;
+  overlayOpacity?: number;
+  textAlign?: "left" | "center" | "right";
+  contentWidth?: "narrow" | "medium" | "wide";
   order: number;
   isActive: boolean;
   slideshowInterval?: number; // Time in milliseconds between slides
@@ -220,7 +240,6 @@ function AdminDashboardContent() {
     fetch("/api/admin/products")
       .then(res => res.json())
       .then(data => {
-        console.log("API data:", data); // Debug log
         setProducts(
           Array.isArray(data)
             ? data.map((p: any) => ({
@@ -242,7 +261,6 @@ function AdminDashboardContent() {
     fetch("/api/admin/banners")
       .then(res => res.json())
       .then(data => {
-        console.log("Banner API data:", data);
         setBanners(
           Array.isArray(data)
             ? data.map((b: any) => ({
@@ -259,7 +277,6 @@ function AdminDashboardContent() {
     fetch("/api/admin/blogs")
       .then(res => res.json())
       .then(data => {
-        console.log("Blog API data:", data);
         setBlogs(
           Array.isArray(data)
             ? data.map((b: any) => ({
@@ -280,7 +297,6 @@ function AdminDashboardContent() {
     fetch("/api/admin/accreditations")
       .then(res => res.json())
       .then(data => {
-        console.log("Accreditation API data:", data);
         setAccreditations(
           Array.isArray(data)
             ? data.map((a: any) => ({
@@ -301,7 +317,6 @@ function AdminDashboardContent() {
     fetch("/api/admin/customers")
       .then(res => res.json())
       .then(data => {
-        console.log("Customer API data:", data);
         setCustomers(
           Array.isArray(data)
             ? data.map((c: any) => ({ ...c, id: c._id }))
@@ -338,17 +353,14 @@ function AdminDashboardContent() {
     
     // Check if the new product has a category that's not in our categories list
     if (newProduct.category && !categories.includes(newProduct.category)) {
-      console.log('Adding new category:', newProduct.category);
       const updatedCategories = [...categories, newProduct.category]
       setCategories(updatedCategories)
-      
+
       // Update localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
-        console.log('Updated localStorage with categories:', updatedCategories);
         // Dispatch custom event to notify other components
         window.dispatchEvent(new Event('categoriesUpdated'))
-        console.log('Dispatched categoriesUpdated event');
       }
     }
     
@@ -1216,7 +1228,7 @@ function DashboardTab({ stats, products }: { stats: any; products: Product[] }) 
                   <p className="text-sm text-gray-600">{product.priceRange}</p>
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  {(product.badges || [product.badge]).slice(0, 2).map((badge, index) => (
+                  {(product.badges || []).slice(0, 2).map((badge, index) => (
                     <Badge
                       key={index}
                       className={`${
@@ -1230,9 +1242,9 @@ function DashboardTab({ stats, products }: { stats: any; products: Product[] }) 
                       {badge}
                     </Badge>
                   ))}
-                  {(product.badges || [product.badge]).length > 2 && (
+                  {(product.badges || []).length > 2 && (
                     <Badge className="bg-gray-100 text-gray-600 text-xs">
-                      +{(product.badges || [product.badge]).length - 2}
+                      +{(product.badges || []).length - 2}
                     </Badge>
                   )}
                 </div>
@@ -1325,7 +1337,7 @@ function ProductsTab({
                     <div className="flex items-center space-x-3 mb-2">
                       <h3 className="text-xl font-bold text-gray-900">{product.name}</h3>
                       <div className="flex flex-wrap gap-2">
-                        {(product.badges || [product.badge]).slice(0, 3).map((badge, index) => (
+                        {(product.badges || []).slice(0, 3).map((badge, index) => (
                           <Badge
                             key={index}
                             className={`${
@@ -1341,9 +1353,9 @@ function ProductsTab({
                             {badge}
                           </Badge>
                         ))}
-                        {(product.badges || [product.badge]).length > 3 && (
+                        {(product.badges || []).length > 3 && (
                           <Badge className="bg-gray-100 text-gray-600">
-                            +{(product.badges || [product.badge]).length - 3} more
+                            +{(product.badges || []).length - 3} more
                           </Badge>
                         )}
                       </div>
@@ -1380,7 +1392,7 @@ function ProductsTab({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onDeleteProduct(product.id)}
+                    onClick={() => onDeleteProduct(product.id ?? product._id ?? "")}
                     className="bg-transparent text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <Trash2 size={16} />
@@ -1980,7 +1992,7 @@ function AnalyticsTab({ products }: { products: Product[] }) {
 
   const badgeStats = products.reduce(
     (acc, product) => {
-      const badges = product.badges || [product.badge];
+      const badges = product.badges || [];
       badges.forEach(badge => {
         if (badge) {
           acc[badge] = (acc[badge] || 0) + 1;
@@ -2688,7 +2700,7 @@ function BlogsTab({
                   <div className="flex">
                     <div className="w-64 h-40 flex-shrink-0">
                       <img
-                        src={blog.topImage || blog.image || "/placeholder.svg"}
+                        src={blog.topImage || "/placeholder.svg"}
                         alt="Blog"
                         className="w-full h-full object-cover"
                       />
@@ -2838,9 +2850,10 @@ function BannersTab({
               ) : (
                 <div className="flex">
                   <div className="w-64 h-40 flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={defaultBanner.image}
-                      alt="Default Banner"
+                      src={defaultBanner.desktopBannerImage || defaultBanner.image}
+                      alt={defaultBanner.desktopBannerAlt || "Default Banner"}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -2890,63 +2903,24 @@ function BannersTab({
         <div className="space-y-4">
           <div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Additional Banners</h3>
-            <p className="text-sm text-gray-600">These banners appear in the carousel after the default banner</p>
+            <p className="text-sm text-gray-600">
+              These banners appear in the carousel after the default banner.{" "}
+              <span className="text-gray-500">Drag the handle on the left to reorder.</span>
+            </p>
           </div>
-          <div className="grid gap-6">
-            {otherBanners.map((banner) => (
-              <Card key={banner.id} className="overflow-hidden">
-                <CardContent className="p-0">
-                  {editingBanner?.id === banner.id ? (
-                    <BannerForm
-                      banner={banner}
-                      onSave={onUpdateBanner}
-                      onCancel={() => setEditingBanner(null)}
-                    />
-                  ) : (
-                    <div className="flex">
-                      <div className="w-64 h-40 flex-shrink-0">
-                        <img
-                          src={banner.image}
-                          alt="Banner"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Banner Image</h3>
-                            <div className="flex items-center space-x-4 text-sm text-gray-500">
-                              <span>Order: {banner.order}</span>
-                              <span>Status: {banner.isActive ? 'Active' : 'Inactive'}</span>
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setEditingBanner(banner)}
-                            >
-                              <Edit className="mr-1" size={14} />
-                              Edit
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => onDeleteBanner(banner.id!)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="mr-1" size={14} />
-                              Delete
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <DraggableBannerList
+            banners={otherBanners}
+            editingBanner={editingBanner}
+            setEditingBanner={setEditingBanner}
+            onUpdateBanner={onUpdateBanner}
+            onDeleteBanner={onDeleteBanner}
+            onAddBanner={onAddBanner}
+            onReorder={(reordered) => {
+              // Persist new ordering one PUT at a time via the existing
+              // per-banner endpoint. Cheap because banner counts are tiny.
+              reordered.forEach((b) => onUpdateBanner({ ...b }))
+            }}
+          />
         </div>
       )}
 
@@ -3269,6 +3243,577 @@ function BlogForm({
 }
 
 // Banner Form Component
+// --- Banner image upload helpers -------------------------------------------
+
+type DeviceKind = "desktop" | "tablet" | "mobile"
+
+const DEVICE_SPECS: Record<DeviceKind, {
+  label: string
+  recommendedW: number
+  recommendedH: number
+  aspectRatio: number
+  aspectTolerance: number // ± fraction allowed before warning
+  aspectLabel: string
+  maxKb: number
+  guidance: string
+  breakpoint: string
+}> = {
+  desktop: {
+    label: "Desktop banner",
+    recommendedW: 1920,
+    recommendedH: 850,
+    aspectRatio: 1920 / 850,
+    aspectTolerance: 0.05,
+    aspectLabel: "~2.25:1 (landscape)",
+    maxKb: 250,
+    breakpoint: "> 1024 px",
+    guidance:
+      "Heading + RFQ form overlay the LEFT column on desktop. Place the focal point (face, machine) toward the RIGHT half so it isn't covered.",
+  },
+  tablet: {
+    label: "Tablet banner",
+    recommendedW: 1200,
+    recommendedH: 900,
+    aspectRatio: 1200 / 900,
+    aspectTolerance: 0.07,
+    aspectLabel: "4:3 (landscape-square)",
+    maxKb: 180,
+    breakpoint: "768 – 1024 px",
+    guidance:
+      "Optional. Shown on tablets and small laptops. Keep the subject roughly centered — content sits below the image on this breakpoint.",
+  },
+  mobile: {
+    label: "Mobile banner",
+    recommendedW: 800,
+    recommendedH: 1200,
+    aspectRatio: 800 / 1200,
+    aspectTolerance: 0.05,
+    aspectLabel: "2:3 (portrait splash)",
+    maxKb: 120,
+    breakpoint: "< 768 px",
+    guidance:
+      "Full-bleed portrait splash above the headline + CTAs. For celebrity creative, frame the FACE in the upper third of the image and use the focal-point picker to pin it.",
+  },
+}
+
+interface BannerImageMeta {
+  width: number
+  height: number
+  sizeKb: number
+}
+
+async function uploadToCloudinary(file: File): Promise<string> {
+  const fd = new FormData()
+  fd.append("file", file)
+  fd.append("upload_preset", "product_uploads")
+  const res = await fetch("https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload", {
+    method: "POST",
+    body: fd,
+  })
+  if (!res.ok) throw new Error(`Upload failed: ${res.status} ${res.statusText}`)
+  const data = await res.json()
+  if (!data?.secure_url) throw new Error("No secure_url returned from Cloudinary")
+  return data.secure_url as string
+}
+
+function readImageMeta(file: File): Promise<BannerImageMeta> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const img = new window.Image()
+    img.onload = () => {
+      const meta = { width: img.naturalWidth, height: img.naturalHeight, sizeKb: file.size / 1024 }
+      URL.revokeObjectURL(url)
+      resolve(meta)
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not read image dimensions")) }
+    img.src = url
+  })
+}
+
+function evaluateBannerImage(meta: BannerImageMeta, device: DeviceKind) {
+  const spec = DEVICE_SPECS[device]
+  const ratio = meta.width / meta.height
+  const ratioDelta = Math.abs(ratio - spec.aspectRatio) / spec.aspectRatio
+  const ratioOk = ratioDelta <= spec.aspectTolerance
+  const sizeOk = meta.sizeKb <= spec.maxKb
+  return { ratio, ratioOk, sizeOk, spec }
+}
+
+// --- Per-device upload card ------------------------------------------------
+
+function BannerImageCard({
+  device,
+  url,
+  alt,
+  enabled,
+  focalX,
+  focalY,
+  onUrlChange,
+  onAltChange,
+  onEnabledChange,
+  onFocalChange,
+  onPreviewChange,
+}: {
+  device: DeviceKind
+  url: string
+  alt: string
+  enabled: boolean
+  focalX: number
+  focalY: number
+  onUrlChange: (u: string) => void
+  onAltChange: (a: string) => void
+  onEnabledChange: (e: boolean) => void
+  onFocalChange: (x: number, y: number) => void
+  onPreviewChange?: (preview: string) => void
+}) {
+  const spec = DEVICE_SPECS[device]
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadingName, setUploadingName] = useState<string | null>(null)
+  const [justUploaded, setJustUploaded] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [meta, setMeta] = useState<BannerImageMeta | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [focalMode, setFocalMode] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const handleFile = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file (JPG, PNG, or WebP).")
+      return
+    }
+    setError(null)
+    setJustUploaded(false)
+    setUploadingName(file.name)
+    setIsUploading(true)
+
+    // Local preview + dimension read happen immediately so the admin can see
+    // the image and any aspect/size warnings BEFORE the Cloudinary round-trip.
+    let localMeta: BannerImageMeta | null = null
+    try {
+      localMeta = await readImageMeta(file)
+      setMeta(localMeta)
+    } catch {
+      // proceed without meta; we'll still upload
+    }
+    if (localMeta) {
+      const reader = new FileReader()
+      reader.onload = (e) => onPreviewChange?.(e.target?.result as string)
+      reader.readAsDataURL(file)
+    }
+
+    try {
+      const secureUrl = await uploadToCloudinary(file)
+      onUrlChange(secureUrl)
+      // Brief success pulse — auto-dismisses after 1.8s.
+      setJustUploaded(true)
+      window.setTimeout(() => setJustUploaded(false), 1800)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed.")
+    } finally {
+      setIsUploading(false)
+      setUploadingName(null)
+    }
+  }
+
+  const evaluation = meta ? evaluateBannerImage(meta, device) : null
+
+  return (
+    <div className={`rounded-2xl border ${enabled ? "border-gray-200 bg-white" : "border-gray-200 bg-gray-50/60 opacity-90"} shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col`}>
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div>
+          <h4 className="text-sm font-semibold text-gray-900">{spec.label}</h4>
+          <p className="text-xs text-gray-500 mt-0.5">
+            <span className="font-medium text-gray-700">{spec.breakpoint}</span> · {spec.recommendedW} × {spec.recommendedH} · {spec.aspectLabel} · ≤ {spec.maxKb} KB
+          </p>
+        </div>
+        <label className="inline-flex items-center gap-2 cursor-pointer select-none shrink-0">
+          <input
+            type="checkbox"
+            checked={enabled}
+            onChange={(e) => onEnabledChange(e.target.checked)}
+            className="rounded border-gray-300"
+          />
+          <span className="text-xs font-medium text-gray-700">Show on {device}</span>
+        </label>
+      </div>
+
+      {/* Drop-zone + preview (or focal-point picker overlay when image present) */}
+      <div
+        onDragOver={(e) => { if (!focalMode) { e.preventDefault(); setIsDragging(true) } }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(e) => {
+          if (focalMode) return
+          e.preventDefault()
+          setIsDragging(false)
+          const file = e.dataTransfer.files?.[0]
+          if (file) handleFile(file)
+        }}
+        onClick={(e) => {
+          if (focalMode) {
+            const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
+            const x = ((e.clientX - rect.left) / rect.width) * 100
+            const y = ((e.clientY - rect.top) / rect.height) * 100
+            onFocalChange(
+              Math.max(0, Math.min(100, Math.round(x))),
+              Math.max(0, Math.min(100, Math.round(y))),
+            )
+            return
+          }
+          inputRef.current?.click()
+        }}
+        onKeyDown={(e) => {
+          if (focalMode) return
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            inputRef.current?.click()
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={focalMode ? `Set focal point for ${spec.label.toLowerCase()}` : `Upload ${spec.label.toLowerCase()}`}
+        aria-busy={isUploading}
+        className={`relative rounded-xl border-2 transition-all duration-200 overflow-hidden flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 ${
+          focalMode
+            ? "border-solid border-amber-400 cursor-crosshair"
+            : "border-dashed cursor-pointer " + (
+                isDragging
+                  ? "border-green-500 bg-green-50 scale-[1.005]"
+                  : justUploaded
+                    ? "border-green-500 bg-green-50/60"
+                    : "border-gray-300 hover:border-green-400 hover:bg-green-50/30 bg-white"
+              )
+        }`}
+        style={{
+          aspectRatio:
+            device === "desktop" ? "1920 / 850" :
+            device === "tablet"  ? "1200 / 900" :
+                                   "800 / 1200",
+        }}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (file) handleFile(file)
+            e.target.value = "" // allow re-selecting the same filename
+          }}
+        />
+        {url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={url}
+            alt={alt || `${spec.label} preview`}
+            className="w-full h-full object-cover pointer-events-none"
+            style={{ objectPosition: `${focalX}% ${focalY}%` }}
+          />
+        ) : (
+          <div className="text-center px-4">
+            <Upload className="mx-auto text-gray-400 mb-2" size={28} aria-hidden />
+            <p className="text-sm font-medium text-gray-700">Drop image here or click to upload</p>
+            <p className="text-xs text-gray-500 mt-1">JPG, PNG, or WebP</p>
+          </div>
+        )}
+        {/* Focal-point reticle (only when an image is loaded). Click anywhere on
+            the image while in focal mode to reposition. */}
+        {url && (
+          <>
+            <div
+              aria-hidden="true"
+              className={`absolute pointer-events-none transition-opacity ${focalMode ? "opacity-100" : "opacity-0"}`}
+              style={{
+                left: `calc(${focalX}% - 14px)`,
+                top: `calc(${focalY}% - 14px)`,
+              }}
+            >
+              <div className="w-7 h-7 rounded-full border-2 border-amber-400 bg-amber-400/20 shadow-[0_0_0_2px_rgba(0,0,0,0.4)]" />
+            </div>
+            {focalMode && (
+              <div className="absolute inset-x-0 top-0 bg-amber-500/95 text-white text-[11px] font-medium px-3 py-1.5 text-center pointer-events-none">
+                Click the image to set focal point — currently {focalX}% / {focalY}%
+              </div>
+            )}
+          </>
+        )}
+        {isUploading && (
+          <div
+            className="absolute inset-0 bg-white/85 backdrop-blur-sm flex flex-col items-center justify-center gap-2 pointer-events-none"
+            role="status"
+            aria-live="polite"
+          >
+            <Loader2 className="animate-spin text-green-600" size={28} aria-hidden />
+            <p className="text-xs font-medium text-gray-700">Uploading…</p>
+            {uploadingName && (
+              <p className="text-[11px] text-gray-500 max-w-[80%] truncate">{uploadingName}</p>
+            )}
+          </div>
+        )}
+        {justUploaded && !isUploading && (
+          <div
+            className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-green-600 text-white text-[10px] font-semibold px-2 py-1 shadow-md transition-opacity"
+            role="status"
+            aria-live="polite"
+          >
+            <Check size={12} aria-hidden />
+            Uploaded
+          </div>
+        )}
+      </div>
+
+      {/* Validation summary — single-line items with consistent icon column. */}
+      <div className="mt-3 space-y-1.5 text-xs" aria-live="polite">
+        {error && (
+          <p className="flex items-start gap-1.5 text-red-700 bg-red-50 border border-red-200 rounded-md px-2 py-1.5">
+            <X size={14} className="shrink-0 mt-0.5" aria-hidden />
+            <span>{error}</span>
+          </p>
+        )}
+        {evaluation && (
+          <>
+            <p className={`flex items-start gap-1.5 ${evaluation.ratioOk ? "text-green-700" : "text-amber-700"}`}>
+              {evaluation.ratioOk
+                ? <Check size={14} className="shrink-0 mt-0.5" aria-hidden />
+                : <span aria-hidden className="shrink-0 mt-0.5 font-semibold">⚠</span>}
+              <span>
+                {meta!.width} × {meta!.height} · ratio {evaluation.ratio.toFixed(2)}:1
+                {!evaluation.ratioOk && ` — recommended ${spec.aspectLabel}; image may be cropped.`}
+              </span>
+            </p>
+            <p className={`flex items-start gap-1.5 ${evaluation.sizeOk ? "text-green-700" : "text-amber-700"}`}>
+              {evaluation.sizeOk
+                ? <Check size={14} className="shrink-0 mt-0.5" aria-hidden />
+                : <span aria-hidden className="shrink-0 mt-0.5 font-semibold">⚠</span>}
+              <span>
+                {meta!.sizeKb.toFixed(0)} KB
+                {!evaluation.sizeOk && ` — over ${spec.maxKb} KB target; consider compressing before upload.`}
+              </span>
+            </p>
+          </>
+        )}
+        {url && !error && !evaluation && (
+          <p className="text-gray-500">Image stored. Re-upload to re-validate dimensions.</p>
+        )}
+      </div>
+
+      {/* Action row */}
+      {url && (
+        <div className="mt-3 flex items-center gap-2 flex-wrap">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => inputRef.current?.click()}
+            disabled={isUploading}
+          >
+            <Upload size={14} className="mr-1.5" aria-hidden />
+            Replace
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={focalMode ? "default" : "outline"}
+            className={focalMode ? "bg-amber-500 hover:bg-amber-600 text-white" : ""}
+            onClick={() => setFocalMode((v) => !v)}
+            disabled={isUploading}
+            aria-pressed={focalMode}
+          >
+            {focalMode ? "Done" : "Set focal point"}
+          </Button>
+          {(focalX !== 50 || focalY !== 50) && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => onFocalChange(50, 50)}
+              disabled={isUploading}
+              className="text-xs text-gray-500"
+            >
+              Reset focal
+            </Button>
+          )}
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 ml-auto"
+            onClick={() => { onUrlChange(""); setMeta(null); setError(null); onFocalChange(50, 50) }}
+            disabled={isUploading}
+          >
+            <X size={14} className="mr-1.5" aria-hidden />
+            Remove
+          </Button>
+        </div>
+      )}
+
+      {/* Alt text */}
+      <div className="mt-4">
+        <label className="block text-xs font-semibold text-gray-700 mb-1">
+          Alt text {device === "desktop" ? "(desktop)" : "(mobile)"}
+        </label>
+        <Input
+          value={alt}
+          onChange={(e) => onAltChange(e.target.value)}
+          placeholder={device === "desktop"
+            ? "e.g. Operator using 100X thermal fogging machine for mosquito control"
+            : "e.g. 100X thermal fogger in action — close-up portrait crop"}
+          className="text-sm"
+        />
+        <p className="text-[11px] text-gray-500 mt-1">Used for SEO and screen-reader accessibility.</p>
+      </div>
+
+      <p className="mt-4 text-[11px] leading-relaxed text-gray-500 bg-gray-50 border border-gray-200 rounded-md px-2.5 py-2">
+        <span className="font-semibold text-gray-700">Crop guidance:</span> {spec.guidance}
+      </p>
+    </div>
+  )
+}
+
+// HTML5 drag-reorder for the non-default banners. Avoids an extra dep.
+// Each card carries a grip handle that initiates drag; dropping over another
+// card swaps their `order` values and pushes the new ordering back via PUT.
+function DraggableBannerList({
+  banners,
+  editingBanner,
+  setEditingBanner,
+  onUpdateBanner,
+  onDeleteBanner,
+  onAddBanner,
+  onReorder,
+}: {
+  banners: Banner[]
+  editingBanner: Banner | null
+  setEditingBanner: (b: Banner | null) => void
+  onUpdateBanner: (banner: Banner) => void
+  onDeleteBanner: (id: string) => void
+  onAddBanner: (banner: Omit<Banner, "id" | "createdAt" | "updatedAt" | "_id">) => void
+  onReorder: (reordered: Banner[]) => void
+}) {
+  const [dragId, setDragId] = useState<string | null>(null)
+  const [overId, setOverId] = useState<string | null>(null)
+
+  const duplicateBanner = (b: Banner) => {
+    const { _id, id, createdAt, updatedAt, ...rest } = b
+    onAddBanner({ ...rest, order: (b.order ?? 0) + 0.5 } as any)
+  }
+
+  const moveItem = (fromId: string, toId: string) => {
+    if (fromId === toId) return
+    const sorted = [...banners].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    const fromIdx = sorted.findIndex((b) => (b.id ?? b._id) === fromId)
+    const toIdx = sorted.findIndex((b) => (b.id ?? b._id) === toId)
+    if (fromIdx === -1 || toIdx === -1) return
+    const [picked] = sorted.splice(fromIdx, 1)
+    sorted.splice(toIdx, 0, picked)
+    const renumbered = sorted.map((b, i) => ({ ...b, order: i + 1 }))
+    onReorder(renumbered)
+  }
+
+  return (
+    <div className="grid gap-4">
+      {banners.map((banner) => {
+        const id = (banner.id ?? banner._id ?? "") as string
+        const isOver = overId === id && dragId !== id
+        return (
+          <Card
+            key={id}
+            className={`overflow-hidden transition ${isOver ? "ring-2 ring-green-500" : ""}`}
+            onDragOver={(e) => { e.preventDefault(); setOverId(id) }}
+            onDrop={(e) => {
+              e.preventDefault()
+              if (dragId) moveItem(dragId, id)
+              setDragId(null); setOverId(null)
+            }}
+          >
+            <CardContent className="p-0">
+              {editingBanner?.id === banner.id ? (
+                <BannerForm
+                  banner={banner}
+                  onSave={onUpdateBanner}
+                  onCancel={() => setEditingBanner(null)}
+                />
+              ) : (
+                <div className="flex">
+                  {/* Drag handle */}
+                  <div
+                    draggable
+                    onDragStart={() => setDragId(id)}
+                    onDragEnd={() => { setDragId(null); setOverId(null) }}
+                    className="flex items-center justify-center w-10 cursor-grab active:cursor-grabbing bg-gray-50 border-r border-gray-200 hover:bg-gray-100"
+                    title="Drag to reorder"
+                    aria-label="Drag handle"
+                  >
+                    <GripVertical className="text-gray-400" size={18} aria-hidden />
+                  </div>
+                  <div className="w-64 h-40 flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={banner.desktopBannerImage || banner.image}
+                      alt={banner.desktopBannerAlt || "Banner"}
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: `${banner.desktopFocalX ?? 50}% ${banner.desktopFocalY ?? 50}%` }}
+                    />
+                  </div>
+                  <div className="flex-1 p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          {banner.desktopBannerAlt || "Banner image"}
+                        </h3>
+                        <div className="flex items-center space-x-4 text-sm text-gray-500 flex-wrap">
+                          <span>Order: {banner.order}</span>
+                          <span>Status: {banner.isActive ? "Active" : "Inactive"}</span>
+                          <span className="text-xs">
+                            Devices:{" "}
+                            <span className={banner.desktopBannerEnabled !== false ? "text-gray-700 font-medium" : "text-gray-400"}>D</span>
+                            {" · "}
+                            <span className={banner.tabletBannerEnabled !== false && banner.tabletBannerImage ? "text-gray-700 font-medium" : "text-gray-400"}>T</span>
+                            {" · "}
+                            <span className={banner.mobileBannerEnabled !== false ? "text-gray-700 font-medium" : "text-gray-400"}>M</span>
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEditingBanner(banner)}
+                        >
+                          <Edit className="mr-1" size={14} />
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => duplicateBanner(banner)}
+                          title="Duplicate this banner"
+                        >
+                          <Plus className="mr-1" size={14} />
+                          Duplicate
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onDeleteBanner(banner.id!)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="mr-1" size={14} />
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )
+      })}
+    </div>
+  )
+}
+
 function BannerForm({
   banner,
   onSave,
@@ -3280,26 +3825,49 @@ function BannerForm({
   onCancel: () => void
   isDefault?: boolean
 }) {
+  // Initial state migrates the legacy single `image` into desktopBannerImage.
   const [formData, setFormData] = useState({
-    image: banner?.image || "",
+    desktopBannerImage: banner?.desktopBannerImage ?? banner?.image ?? "",
+    tabletBannerImage: banner?.tabletBannerImage ?? "",
+    mobileBannerImage: banner?.mobileBannerImage ?? "",
+    desktopBannerAlt: banner?.desktopBannerAlt ?? "",
+    tabletBannerAlt: banner?.tabletBannerAlt ?? "",
+    mobileBannerAlt: banner?.mobileBannerAlt ?? "",
+    desktopBannerEnabled: banner?.desktopBannerEnabled ?? true,
+    tabletBannerEnabled: banner?.tabletBannerEnabled ?? true,
+    mobileBannerEnabled: banner?.mobileBannerEnabled ?? true,
+    desktopFocalX: banner?.desktopFocalX ?? 50,
+    desktopFocalY: banner?.desktopFocalY ?? 50,
+    tabletFocalX: banner?.tabletFocalX ?? 50,
+    tabletFocalY: banner?.tabletFocalY ?? 50,
+    mobileFocalX: banner?.mobileFocalX ?? 50,
+    mobileFocalY: banner?.mobileFocalY ?? 50,
+    overlayOpacity: banner?.overlayOpacity ?? 0.4,
+    textAlign: (banner?.textAlign ?? "left") as "left" | "center" | "right",
+    contentWidth: (banner?.contentWidth ?? "medium") as "narrow" | "medium" | "wide",
     order: banner?.order || (isDefault ? 0 : 1),
     isActive: banner?.isActive ?? true,
-    slideshowInterval: banner?.slideshowInterval || 4000, // Default 4 seconds
+    slideshowInterval: banner?.slideshowInterval || 4000,
   })
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadError, setUploadError] = useState("")
+  const [toast, setToast] = useState<{ kind: "ok" | "err"; text: string } | null>(null)
+  // Auto-dismiss success toasts after 3s; keep error toasts sticky so admin
+  // doesn't miss them.
+  useEffect(() => {
+    if (toast?.kind !== "ok") return
+    const t = window.setTimeout(() => setToast(null), 3000)
+    return () => window.clearTimeout(t)
+  }, [toast])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.image) {
-      setUploadError("Please upload a banner image")
+    if (!formData.desktopBannerImage) {
+      setToast({ kind: "err", text: "Desktop banner image is required." })
       return
     }
-    // Ensure default banner has order 0
-    if (isDefault) {
-      formData.order = 0
-    }
-    onSave(formData)
+    const payload = { ...formData }
+    if (isDefault) payload.order = 0
+    onSave(payload)
+    setToast({ kind: "ok", text: banner ? "Banner updated." : "Banner created." })
   }
 
   return (
@@ -3313,88 +3881,159 @@ function BannerForm({
             </div>
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Banner Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={async (e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    const file = e.target.files[0];
-                    setUploadError("");
-                    setIsUploading(true);
-                    
-                    // Create preview immediately
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                      setFormData({ ...formData, image: e.target?.result as string });
-                    };
-                    reader.readAsDataURL(file);
-                    
-                    const formDataCloud = new FormData();
-                    formDataCloud.append("file", file);
-                    formDataCloud.append("upload_preset", "product_uploads");
-                    
-                    try {
-                      const res = await fetch(
-                        "https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload",
-                        {
-                          method: "POST",
-                          body: formDataCloud,
-                        }
-                      );
-                      
-                      if (!res.ok) {
-                        throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
-                      }
-                      
-                      const data = await res.json();
-                      if (data.secure_url) {
-                        setFormData({ ...formData, image: data.secure_url });
-                        setUploadError("");
-                      } else {
-                        throw new Error("No secure URL returned from Cloudinary");
-                      }
-                    } catch (error) {
-                      console.error('Error uploading image:', error);
-                      setUploadError(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                      // Keep the preview but show error
-                    } finally {
-                      setIsUploading(false);
-                    }
-                  }
-                }}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
-                disabled={isUploading}
-              />
-              <p className="text-xs text-gray-500 mt-1">Upload a banner image from your computer</p>
-              
-              {isUploading && (
-                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-600">Uploading image...</p>
-                </div>
-              )}
-              
-              {uploadError && (
-                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-600">{uploadError}</p>
-                </div>
-              )}
-              
-              {formData.image && !uploadError && (
-                <div className="mt-2">
-                  <img 
-                    src={formData.image} 
-                    alt="Banner preview" 
-                    className="w-full h-32 object-cover rounded-lg border"
-                  />
-                  <p className="text-xs text-green-600 mt-1">✓ Image uploaded successfully</p>
-                </div>
-              )}
+
+        {toast && (
+          <div
+            role={toast.kind === "err" ? "alert" : "status"}
+            aria-live={toast.kind === "err" ? "assertive" : "polite"}
+            className={`mb-4 px-3 py-2 rounded-lg text-sm border flex items-start justify-between gap-3 ${
+              toast.kind === "ok"
+                ? "bg-green-50 border-green-200 text-green-800"
+                : "bg-red-50 border-red-200 text-red-800"
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              {toast.kind === "ok"
+                ? <Check size={14} className="shrink-0" aria-hidden />
+                : <X size={14} className="shrink-0" aria-hidden />}
+              {toast.text}
+            </span>
+            <button
+              type="button"
+              aria-label="Dismiss notification"
+              onClick={() => setToast(null)}
+              className="shrink-0 rounded p-0.5 hover:bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-current"
+            >
+              <X size={14} aria-hidden />
+            </button>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Section header — makes the three device upload zones obviously
+              discoverable. Cards stack at narrow admin widths and only go
+              3-up at 2xl (≥1536px). */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
+              Banner images — one upload per device
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Desktop, tablet, and mobile each get their own creative. Recommended sizes shown on each card. Click an uploaded image and then “Set focal point” to pin where the crop centers.
+            </p>
+          </div>
+          {/* Three device cards. Stack 1-up on most admin widths so each card is
+              clearly visible as its own upload surface; only go 3-up on very
+              wide monitors (2xl ≥ 1536px). */}
+          <div className="grid 2xl:grid-cols-3 gap-5">
+            <BannerImageCard
+              device="desktop"
+              url={formData.desktopBannerImage}
+              alt={formData.desktopBannerAlt}
+              enabled={formData.desktopBannerEnabled}
+              focalX={formData.desktopFocalX}
+              focalY={formData.desktopFocalY}
+              onUrlChange={(u) => setFormData((p) => ({ ...p, desktopBannerImage: u }))}
+              onAltChange={(a) => setFormData((p) => ({ ...p, desktopBannerAlt: a }))}
+              onEnabledChange={(e) => setFormData((p) => ({ ...p, desktopBannerEnabled: e }))}
+              onFocalChange={(x, y) => setFormData((p) => ({ ...p, desktopFocalX: x, desktopFocalY: y }))}
+              onPreviewChange={(preview) => setFormData((p) => ({ ...p, desktopBannerImage: p.desktopBannerImage || preview }))}
+            />
+            <BannerImageCard
+              device="tablet"
+              url={formData.tabletBannerImage}
+              alt={formData.tabletBannerAlt}
+              enabled={formData.tabletBannerEnabled}
+              focalX={formData.tabletFocalX}
+              focalY={formData.tabletFocalY}
+              onUrlChange={(u) => setFormData((p) => ({ ...p, tabletBannerImage: u }))}
+              onAltChange={(a) => setFormData((p) => ({ ...p, tabletBannerAlt: a }))}
+              onEnabledChange={(e) => setFormData((p) => ({ ...p, tabletBannerEnabled: e }))}
+              onFocalChange={(x, y) => setFormData((p) => ({ ...p, tabletFocalX: x, tabletFocalY: y }))}
+              onPreviewChange={(preview) => setFormData((p) => ({ ...p, tabletBannerImage: p.tabletBannerImage || preview }))}
+            />
+            <BannerImageCard
+              device="mobile"
+              url={formData.mobileBannerImage}
+              alt={formData.mobileBannerAlt}
+              enabled={formData.mobileBannerEnabled}
+              focalX={formData.mobileFocalX}
+              focalY={formData.mobileFocalY}
+              onUrlChange={(u) => setFormData((p) => ({ ...p, mobileBannerImage: u }))}
+              onAltChange={(a) => setFormData((p) => ({ ...p, mobileBannerAlt: a }))}
+              onEnabledChange={(e) => setFormData((p) => ({ ...p, mobileBannerEnabled: e }))}
+              onFocalChange={(x, y) => setFormData((p) => ({ ...p, mobileFocalX: x, mobileFocalY: y }))}
+              onPreviewChange={(preview) => setFormData((p) => ({ ...p, mobileBannerImage: p.mobileBannerImage || preview }))}
+            />
+          </div>
+
+          {/* Content layer controls: overlay, alignment, content width */}
+          <div className="rounded-2xl border border-gray-200 bg-gray-50/60 p-5">
+            <div className="flex items-baseline justify-between mb-4">
+              <h4 className="text-sm font-semibold text-gray-900">Hero content layer</h4>
+              <p className="text-xs text-gray-500">How the heading + RFQ form sit over this banner.</p>
             </div>
+            <div className="grid md:grid-cols-3 gap-5">
+              {/* Overlay opacity */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-2">
+                  Overlay darkening: <span className="font-mono">{Math.round(formData.overlayOpacity * 100)}%</span>
+                </label>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={formData.overlayOpacity}
+                  onChange={(e) => setFormData((p) => ({ ...p, overlayOpacity: parseFloat(e.target.value) }))}
+                  className="w-full accent-green-600"
+                />
+                <p className="text-[11px] text-gray-500 mt-1">Darkens the LEFT edge of the banner for text legibility. Use 30–50% for typical photos.</p>
+              </div>
+              {/* Text alignment */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-2">Heading alignment (desktop)</label>
+                <div className="inline-flex rounded-lg border border-gray-300 bg-white p-0.5">
+                  {(["left", "center", "right"] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setFormData((p) => ({ ...p, textAlign: opt }))}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                        formData.textAlign === opt ? "bg-green-600 text-white" : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                      aria-pressed={formData.textAlign === opt}
+                    >
+                      {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[11px] text-gray-500 mt-1">Mobile content is always center-aligned.</p>
+              </div>
+              {/* Content width */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-2">Content column width</label>
+                <div className="inline-flex rounded-lg border border-gray-300 bg-white p-0.5">
+                  {(["narrow", "medium", "wide"] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setFormData((p) => ({ ...p, contentWidth: opt }))}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                        formData.contentWidth === opt ? "bg-green-600 text-white" : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                      aria-pressed={formData.contentWidth === opt}
+                    >
+                      {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[11px] text-gray-500 mt-1">Constrains the heading + form column on desktop.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom row: order + timer + slide-level isActive */}
+          <div className="grid md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
               <Input
@@ -3406,55 +4045,49 @@ function BannerForm({
                 disabled={isDefault}
               />
               <p className="text-xs text-gray-500 mt-1">
-                {isDefault 
-                  ? "Default banner is always order 0 (appears first)" 
-                  : "Lower numbers appear first"}
+                {isDefault ? "Default banner is always order 0" : "Lower numbers appear first"}
               </p>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Slideshow Timer (seconds)</label>
+              <Input
+                type="number"
+                value={formData.slideshowInterval != null ? Math.round(formData.slideshowInterval / 1000) : 4}
+                onChange={(e) => {
+                  const seconds = parseInt(e.target.value, 10)
+                  const ms = Number.isNaN(seconds) ? 4000 : Math.max(1, Math.min(30, seconds)) * 1000
+                  setFormData({ ...formData, slideshowInterval: ms })
+                }}
+                min={1}
+                max={30}
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">Seconds between slides (1–30).</p>
+            </div>
+            <div className="flex items-end">
+              <label className="inline-flex items-center gap-2 cursor-pointer pb-2">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  className="rounded border-gray-300"
+                />
+                <span className="text-sm font-medium text-gray-700">Slide active (kill switch for both devices)</span>
+              </label>
+            </div>
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Slideshow Timer (seconds)</label>
-            <Input
-              type="number"
-              value={formData.slideshowInterval != null ? Math.round(formData.slideshowInterval / 1000) : 4}
-              onChange={(e) => {
-                const seconds = parseInt(e.target.value, 10)
-                const ms = Number.isNaN(seconds) ? 4000 : Math.max(1, Math.min(30, seconds)) * 1000
-                setFormData({ ...formData, slideshowInterval: ms })
-              }}
-              min={1}
-              max={30}
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Time between banner slides in <strong>seconds</strong> (1–30).
-            </p>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="isActive"
-              checked={formData.isActive}
-              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              className="rounded border-gray-300"
-            />
-            <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
-              Active (visible on homepage)
-            </label>
-          </div>
-          
-          <div className="flex space-x-3">
-            <Button 
-              type="submit" 
+
+          <div className="flex space-x-3 pt-2 border-t border-gray-100">
+            <Button
+              type="submit"
               className="bg-green-600 hover:bg-green-700"
-              disabled={isUploading || !formData.image}
+              disabled={!formData.desktopBannerImage}
             >
               <Save className="mr-2" size={16} />
-              {isUploading ? 'Uploading...' : (banner ? 'Update Banner' : 'Add Banner')}
+              {banner ? "Update Banner" : "Add Banner"}
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel} disabled={isUploading}>
+            <Button type="button" variant="outline" onClick={onCancel}>
               <X className="mr-2" size={16} />
               Cancel
             </Button>

@@ -4,6 +4,24 @@ import { ObjectId } from 'mongodb';
 
 interface BannerUpdate {
   image?: string;
+  desktopBannerImage?: string;
+  tabletBannerImage?: string;
+  mobileBannerImage?: string;
+  desktopBannerAlt?: string;
+  tabletBannerAlt?: string;
+  mobileBannerAlt?: string;
+  desktopBannerEnabled?: boolean;
+  tabletBannerEnabled?: boolean;
+  mobileBannerEnabled?: boolean;
+  desktopFocalX?: number;
+  desktopFocalY?: number;
+  tabletFocalX?: number;
+  tabletFocalY?: number;
+  mobileFocalX?: number;
+  mobileFocalY?: number;
+  overlayOpacity?: number;
+  textAlign?: "left" | "center" | "right";
+  contentWidth?: "narrow" | "medium" | "wide";
   order?: number;
   isActive?: boolean;
   slideshowInterval?: number;
@@ -24,11 +42,18 @@ export async function PUT(
     const bannerData: BannerUpdate = await request.json();
     const updatedAt = new Date();
 
+    // Mirror desktopBannerImage into the legacy `image` field on writes so
+    // any reader that still references `image` stays in sync.
+    const writePayload: Record<string, any> = { ...bannerData, updatedAt };
+    if (bannerData.desktopBannerImage !== undefined) {
+      writePayload.image = bannerData.desktopBannerImage;
+    }
+
     const client = await clientPromise;
     const db = client.db();
     const result = await db.collection("banners").updateOne(
       { _id: new ObjectId(id) },
-      { $set: { ...bannerData, updatedAt } }
+      { $set: writePayload }
     );
 
     if (result.matchedCount === 0) {

@@ -121,6 +121,12 @@ export default function RootLayout({
           `}
         </Script>
         <link rel="icon" href="/logo-main.png" sizes="48x48" />
+        {/* Hero banner LCP preload — media-scoped so each viewport only
+            preloads the variant it will actually paint. Small bytes, big
+            LCP win on first paint. */}
+        <link rel="preload" as="image" href="/banner-mobile.jpg" media="(max-width: 767.98px)" />
+        <link rel="preload" as="image" href="/banner-tablet.jpg" media="(min-width: 768px) and (max-width: 1023.98px)" />
+        <link rel="preload" as="image" href="/banner-desktop.jpg" media="(min-width: 1024px)" />
       </head>
       <body className="min-h-screen antialiased">
         <noscript>

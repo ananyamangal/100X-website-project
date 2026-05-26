@@ -257,7 +257,7 @@ export default function ProductDetailPage() {
                     </div>
                     <div>
                         <div className="flex flex-wrap gap-3 mb-4">
-                            {(product.badges || [product.badge]).map((badge, index) => (
+                            {(product.badges || [] as string[]).map((badge: string, index: number) => (
                                 <Badge
                                     key={index}
                                     className={`$${badge === 'Best Seller'

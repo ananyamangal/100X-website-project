@@ -95,7 +95,7 @@ export default function ProductCard({
           </div>
         )}
         <div className="absolute top-4 left-4 flex flex-wrap gap-1 max-w-[calc(100%-2rem)] pointer-events-none">
-          {(product.badges || [product.badge]).slice(0, 3).map((badge, index) => (
+          {(product.badges || [] as string[]).slice(0, 3).map((badge: string, index: number) => (
             <Badge
               key={index}
               className={`${badge === 'Best Seller'

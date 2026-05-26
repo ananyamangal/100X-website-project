@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { X } from "lucide-react"
 
 // Fallback when admin hasn't configured /api/video-popup — uses the hero
@@ -16,6 +17,14 @@ function getYouTubeId(url: string): string | null {
 }
 
 export default function VideoPopup() {
+  // Hide on admin + transactional routes — the popup overlaps edit forms and
+  // confirmation screens.
+  const pathname = usePathname() || ""
+  const hideOnRoute =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/thank-you") ||
+    pathname.startsWith("/brochure-thank-you")
+
   // Important: keep both pieces of "what to render" in one state so we
   // commit URL + orientation atomically. Initialising to null + loading
   // true means the iframe is NOT rendered until we know which video to
@@ -48,7 +57,7 @@ export default function VideoPopup() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading || !config || closed) return null
+  if (hideOnRoute || loading || !config || closed) return null
   const videoId = getYouTubeId(config.url)
   if (!videoId) return null
   const orientation = config.orientation
