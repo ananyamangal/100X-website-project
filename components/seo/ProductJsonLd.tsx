@@ -8,12 +8,16 @@ type Props = {
   url: string
   sku?: string
   inStock?: boolean
-  /** 0-5 star rating; emits AggregateRating when present and >0. */
+  /** 0–5 star rating; emits AggregateRating when present and > 0. */
   rating?: number
   reviewsCount?: number
-  /** Free-form price band, e.g. "₹35,000 - ₹85,000" — only used as a visible offer note. */
+  /**
+   * Free-form price band, e.g. "₹35,000 - ₹85,000".
+   * Numeric values are parsed out and used in the Offer/AggregateOffer block.
+   * If no numeric value can be extracted, offers is omitted entirely.
+   */
   priceRange?: string
-  /** Optional category name; used to label the breadcrumb position. */
+  /** Optional category name. */
   category?: string
 }
 
@@ -21,6 +25,68 @@ function absolutize(url: string): string {
   if (!url) return ""
   if (/^https?:\/\//.test(url)) return url
   return `${SITE_URL}${url.startsWith("/") ? "" : "/"}${url}`
+}
+
+/**
+ * Parse numeric low/high from strings like "₹35,000 - ₹85,000" or "35000".
+ * Returns null when no valid number can be extracted.
+ */
+function parsePriceNums(raw: string): { low: number; high?: number } | null {
+  const nums = raw.replace(/[₹,\s]/g, "").match(/\d+/g)
+  if (!nums || nums.length === 0) return null
+  const low = parseInt(nums[0], 10)
+  if (isNaN(low) || low <= 0) return null
+  const high = nums.length > 1 ? parseInt(nums[1], 10) : undefined
+  return { low, high: high && !isNaN(high) && high > low ? high : undefined }
+}
+
+/**
+ * Build a valid Offer or AggregateOffer node.
+ *
+ * Google requires either `price` (on Offer) or `lowPrice` (on AggregateOffer).
+ * Returns undefined — not null — so JSON.stringify omits the key entirely
+ * when no parseable price is available, preventing invalid empty-offer errors.
+ */
+function buildOffers(
+  url: string,
+  inStock: boolean | undefined,
+  priceRange: string | undefined,
+): Record<string, unknown> | undefined {
+  const availability =
+    inStock === false
+      ? "https://schema.org/OutOfStock"
+      : "https://schema.org/InStock"
+  const abs = absolutize(url)
+
+  if (priceRange) {
+    const parsed = parsePriceNums(priceRange)
+    if (parsed) {
+      if (parsed.high) {
+        // Price range → AggregateOffer with lowPrice + highPrice
+        return {
+          "@type": "AggregateOffer",
+          url: abs,
+          priceCurrency: "INR",
+          lowPrice: parsed.low,
+          highPrice: parsed.high,
+          offerCount: 1,
+          availability,
+        }
+      }
+      // Single numeric price
+      return {
+        "@type": "Offer",
+        url: abs,
+        priceCurrency: "INR",
+        price: parsed.low,
+        availability,
+      }
+    }
+  }
+
+  // No parseable numeric price — omit offers entirely rather than emitting
+  // an incomplete Offer that Google Search Console would flag as an error.
+  return undefined
 }
 
 export function ProductJsonLd({
@@ -64,24 +130,7 @@ export function ProductJsonLd({
       "@type": "Brand",
       name: SITE_NAME,
     },
-    offers: {
-      "@type": "Offer",
-      url: absolutize(url),
-      priceCurrency: "INR",
-      availability:
-        inStock === false
-          ? "https://schema.org/OutOfStock"
-          : "https://schema.org/InStock",
-      priceSpecification:
-        priceRange
-          ? {
-              "@type": "PriceSpecification",
-              priceCurrency: "INR",
-              valueAddedTaxIncluded: false,
-              description: priceRange,
-            }
-          : undefined,
-    },
+    offers: buildOffers(url, inStock, priceRange),
     aggregateRating,
   }
 
