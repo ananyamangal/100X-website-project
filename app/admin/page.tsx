@@ -34,6 +34,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { AdminRichTextEditor } from "@/components/admin/AdminRichTextEditor"
+import { BrandAssetsTab } from "@/components/admin/BrandAssetsTab"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
@@ -1077,6 +1078,17 @@ function AdminDashboardContent() {
                 RFQ Popup
               </button>
               <button
+                onClick={() => setActiveTab("websiteSettings")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "websiteSettings"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <ImageIcon className="mr-3" size={20} />
+                Website Settings
+              </button>
+              <button
                 onClick={() => setActiveTab("settings")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "settings"
@@ -1180,6 +1192,7 @@ function AdminDashboardContent() {
             {activeTab === "videoPopup" && <VideoPopupTab />}
             {activeTab === "brochure" && <BrochureTab />}
             {activeTab === "rfqPopup" && <RFQPopupAdminTab />}
+            {activeTab === "websiteSettings" && <BrandAssetsTab />}
             {activeTab === "settings" && <SettingsTab />}
           </div>
         </div>

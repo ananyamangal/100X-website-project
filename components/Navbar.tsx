@@ -27,7 +27,12 @@ function isActive(pathname: string | null, href: string) {
   return pathname === href || pathname.startsWith(href + '/')
 }
 
-export default function Navbar() {
+interface NavbarProps {
+  logoUrl?: string
+  logoAlt?: string
+}
+
+export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Circle' }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
@@ -91,7 +96,7 @@ export default function Navbar() {
           aria-label="100x Circle home"
           className="flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
         >
-          <img src="/logo-main.png" alt="100x Circle" className="w-16 h-auto md:w-20" />
+          <img src={logoUrl} alt={logoAlt} className="w-16 h-auto md:w-20" />
         </Link>
 
         {/* Desktop: nav links + Brochure */}

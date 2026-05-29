@@ -4,14 +4,19 @@ import { getAllLandingPages, getLandingDisplayName } from "@/lib/seo/landing-pag
 
 const YOUTUBE_CHANNEL = "https://www.youtube.com/@100Xcircle"
 
-export default function SiteFooter() {
+interface SiteFooterProps {
+  logoUrl?: string
+  logoAlt?: string
+}
+
+export default function SiteFooter({ logoUrl = '/logo-main.png', logoAlt = '100X Circle home' }: SiteFooterProps) {
   return (
     <footer className="bg-gray-900 text-white py-16 mt-24">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
             <Link href="/" className="flex items-center space-x-3 mb-6">
-              <img src="/logo-main.png" alt="100X Circle home" className="w-24 h-auto" />
+              <img src={logoUrl} alt={logoAlt} className="w-24 h-auto" />
               <div>
                 <h3 className="text-xl font-bold">100X</h3>
                 <p className="text-green-400 text-sm">Certified professional products</p>

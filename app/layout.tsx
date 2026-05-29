@@ -23,7 +23,8 @@ import UtmPersist from '@/components/UtmPersist'
 import { Toaster } from '@/components/ui/sonner'
 import { MobileCtaProvider } from '@/components/cta/MobileCtaContext'
 import MobileCtaBar from '@/components/cta/MobileCtaBar'
-import { SITE_URL, SITE_NAME, defaultOgImage } from '@/lib/seo/site-config'
+import { SITE_URL, SITE_NAME } from '@/lib/seo/site-config'
+import { getBrandAssets } from '@/lib/brandAssets'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -32,81 +33,95 @@ export const viewport: Viewport = {
   themeColor: '#16a34a',
 }
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title:
-    'Best Thermal Fogging Machine Manufacturer | 100x Circle',
-  description:
-    'Discover 100x Circle — thermal fogging machine manufacturer serving Delhi, Uttar Pradesh, Bihar, Mumbai, Pune, and across India. Industrial mosquito foggers, vehicle-mounted systems, and agricultural equipment.',
-  applicationName: SITE_NAME,
-  authors: [{ name: SITE_NAME, url: SITE_URL }],
-  creator: SITE_NAME,
-  publisher: SITE_NAME,
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+export async function generateMetadata(): Promise<Metadata> {
+  const assets = await getBrandAssets()
+  const ogImage = assets.ogImageUrl.startsWith('/')
+    ? `${SITE_URL}${assets.ogImageUrl}`
+    : assets.ogImageUrl
+  const faviconUrl = assets.faviconUrl.startsWith('/')
+    ? `${SITE_URL}${assets.faviconUrl}`
+    : assets.faviconUrl
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: 'Best Thermal Fogging Machine Manufacturer | 100x Circle',
+    description:
+      'Discover 100x Circle — thermal fogging machine manufacturer serving Delhi, Uttar Pradesh, Bihar, Mumbai, Pune, and across India. Industrial mosquito foggers, vehicle-mounted systems, and agricultural equipment.',
+    applicationName: SITE_NAME,
+    authors: [{ name: SITE_NAME, url: SITE_URL }],
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    robots: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  verification: {
-    google: [
-      '7yMHOjyWo4oTSZpe1JQP0P7CR1t0dxuHSVufT6u065A',
-      'saCxhHF_sk36QWa6G2RxUYaSRHPjAujIOzdLf8X72II',
-    ],
-  },
-  alternates: {
-    canonical: '/',
-  },
-  keywords: [
-    'thermal fogging machine manufacturer',
-    'mosquito fogging machine India',
-    'vehicle mounted fogger',
-    'industrial fogging machine',
-    'pest control equipment supplier',
-    '100x Circle',
-  ],
-  openGraph: {
-    type: 'website',
-    locale: 'en_IN',
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    title: 'Best Thermal Fogging Machine Manufacturer | 100x Circle',
-    description:
-      'High-performance thermal and pulse-jet fogging machines for public health, municipalities, and agriculture — manufactured and supplied across India.',
-    images: [
-      {
-        url: defaultOgImage,
-        width: 1200,
-        height: 630,
-        alt: `${SITE_NAME} — thermal fogging equipment`,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
       },
+    },
+    verification: {
+      google: [
+        '7yMHOjyWo4oTSZpe1JQP0P7CR1t0dxuHSVufT6u065A',
+        'saCxhHF_sk36QWa6G2RxUYaSRHPjAujIOzdLf8X72II',
+      ],
+    },
+    alternates: {
+      canonical: '/',
+    },
+    keywords: [
+      'thermal fogging machine manufacturer',
+      'mosquito fogging machine India',
+      'vehicle mounted fogger',
+      'industrial fogging machine',
+      'pest control equipment supplier',
+      '100x Circle',
     ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Best Thermal Fogging Machine Manufacturer | 100x Circle',
-    description:
-      'Industrial fogging machines and agricultural equipment from 100x Circle — demos, specs, and nationwide support.',
-    images: [defaultOgImage],
-  },
-  category: 'business',
+    icons: {
+      icon: [{ url: faviconUrl, sizes: '48x48' }],
+    },
+    openGraph: {
+      type: 'website',
+      locale: 'en_IN',
+      url: SITE_URL,
+      siteName: SITE_NAME,
+      title: 'Best Thermal Fogging Machine Manufacturer | 100x Circle',
+      description:
+        'High-performance thermal and pulse-jet fogging machines for public health, municipalities, and agriculture — manufactured and supplied across India.',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `${SITE_NAME} — thermal fogging equipment`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Best Thermal Fogging Machine Manufacturer | 100x Circle',
+      description:
+        'Industrial fogging machines and agricultural equipment from 100x Circle — demos, specs, and nationwide support.',
+      images: [ogImage],
+    },
+    category: 'business',
+  }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const brandAssets = await getBrandAssets()
+
   return (
     <html lang="en-IN" className={inter.variable}>
       <head>
@@ -121,7 +136,6 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','GTM-5JMGCKRW');
           `}
         </Script>
-        <link rel="icon" href="/logo-main.png" sizes="48x48" />
         {/* Hero banner LCP preload — media-scoped so each viewport only
             preloads the variant it will actually paint. Small bytes, big
             LCP win on first paint. */}
@@ -234,11 +248,11 @@ export default function RootLayout({
           `}
         </Script>
         <MobileCtaProvider>
-          <Navbar />
+          <Navbar logoUrl={brandAssets.logoUrl} logoAlt={brandAssets.logoAlt} />
           <main id="main-content" tabIndex={-1}>
             {children}
           </main>
-          <SiteFooter />
+          <SiteFooter logoUrl={brandAssets.footerLogoUrl} logoAlt={brandAssets.logoAlt} />
           <MobileCtaBar />
         </MobileCtaProvider>
         <Toaster richColors position="top-right" closeButton />
