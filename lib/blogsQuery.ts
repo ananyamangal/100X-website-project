@@ -32,7 +32,12 @@ export async function getPublicBlogs() {
 
 export async function getBlogBySlug(slug: string) {
   const blogs = await getPublicBlogs()
-  return blogs.find((b) => blogPostSlug(b) === slug) ?? null
+  // Match by explicit slug first, then by generated title+id slug (backward compat)
+  return (
+    blogs.find((b) => typeof b.slug === "string" && b.slug.trim() === slug) ??
+    blogs.find((b) => blogPostSlug(b) === slug) ??
+    null
+  )
 }
 
 export async function getAllBlogSlugs() {

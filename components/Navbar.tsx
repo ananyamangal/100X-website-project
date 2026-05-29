@@ -85,8 +85,8 @@ export default function Navbar() {
       className={cn(
         'fixed top-0 left-0 w-full z-50 transition-[background-color,backdrop-filter,box-shadow,border-color] duration-200',
         scrolled
-          ? 'bg-white/85 backdrop-blur-md shadow-sm border-b border-gray-200'
-          : 'bg-white border-b border-transparent',
+          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200'
+          : 'bg-white border-b border-gray-100',
       )}
     >
       <nav className="container mx-auto px-4 py-3.5 md:py-4 flex items-center justify-between gap-3">

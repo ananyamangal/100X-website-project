@@ -122,7 +122,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const topImgForJsonLd = blogOptStr(blog.topImage)
 
   return (
-    <div className="pt-32 min-h-screen bg-gray-50">
+    <div className="pt-20 min-h-screen bg-gray-50">
       <ArticleJsonLd
         title={title}
         description={excerpt || content}
@@ -138,94 +138,113 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           { name: title, url: pageUrl },
         ]}
       />
-      <div className="container mx-auto px-4 py-12">
-        <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
-          <Link href="/" className="hover:text-green-600">
-            Home
-          </Link>
+
+      {/* Hero cover image — full bleed, responsive height */}
+      {coverSrc ? (
+        <div className="relative w-full h-56 sm:h-72 md:h-[420px] overflow-hidden bg-gray-200">
+          <img
+            src={coverSrc}
+            alt={title}
+            fetchPriority="high"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+        </div>
+      ) : null}
+
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        {/* Breadcrumb */}
+        <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm text-gray-500 mb-6">
+          <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
           <span aria-hidden>/</span>
-          <Link href="/blog" className="hover:text-green-600">
-            Blog
-          </Link>
+          <Link href="/blog" className="hover:text-green-600 transition-colors">Blog</Link>
           <span aria-hidden>/</span>
-          <span className="text-gray-900 line-clamp-1">{title}</span>
+          <span className="text-gray-700 line-clamp-1">{title}</span>
         </nav>
 
-        <article className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div className="relative h-72 md:h-96">
-              <img
-                src={coverSrc}
-                alt={title}
-                className="w-full h-full object-cover"
+        <div className="max-w-3xl mx-auto">
+          <article>
+            {/* Meta row */}
+            <div className="flex flex-wrap items-center gap-3 mb-4 text-gray-500 text-sm">
+              {category ? (
+                <Badge className="bg-green-600 hover:bg-green-700 text-white text-xs font-medium">
+                  {category}
+                </Badge>
+              ) : null}
+              <span className="flex items-center gap-1.5">
+                <User size={14} aria-hidden />
+                {author}
+              </span>
+              <time dateTime={publishedAtStr} className="flex items-center gap-1.5">
+                <Calendar size={14} aria-hidden />
+                {formatDate(publishedAtStr)}
+              </time>
+              <span>{readTime}</span>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-5 leading-tight">
+              {title}
+            </h1>
+
+            {/* Excerpt as lead paragraph */}
+            {excerpt ? (
+              <RichContent
+                html={excerpt}
+                className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed font-medium border-l-4 border-green-500 pl-4"
               />
-              <div className="absolute inset-0 bg-black/10" />
-            </div>
+            ) : null}
 
-            <div className="p-8 md:p-12">
-              <div className="flex flex-wrap items-center gap-4 mb-6 text-gray-500">
-                {category ? (
-                  <Badge variant="secondary" className="text-sm">
-                    {category}
-                  </Badge>
-                ) : null}
-                <span className="flex items-center gap-2 text-sm">
-                  <User size={16} aria-hidden />
-                  {author}
-                </span>
-                <time dateTime={publishedAtStr} className="flex items-center gap-2 text-sm">
-                  <Calendar size={16} aria-hidden />
-                  {formatDate(publishedAtStr)}
-                </time>
-                <span className="text-sm">{readTime}</span>
+            {/* Main content */}
+            {content ? (
+              <div className="prose-container text-base md:text-lg text-gray-700 leading-relaxed">
+                <RichContent html={content} />
               </div>
+            ) : null}
 
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">{title}</h1>
-
-              {excerpt ? <RichContent html={excerpt} className="text-xl text-gray-600 mb-8" /> : null}
-
-              {content ? <RichContent html={content} className="text-lg text-gray-700" /> : null}
-
-              {inlineImages.length > 0 && (
-                <div className="mt-8 space-y-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Related Images</h2>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {inlineImages.map((imageUrl, idx) => (
-                      <div key={idx} className="rounded-xl overflow-hidden shadow-lg">
-                        <img
-                          src={imageUrl}
-                          alt={`Illustration ${idx + 1} for ${title}`}
-                          className="w-full h-auto object-cover"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
-                    ))}
-                  </div>
+            {/* Inline images gallery */}
+            {inlineImages.length > 0 && (
+              <div className="mt-10 space-y-4">
+                <h2 className="text-xl font-bold text-gray-900">Related Images</h2>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {inlineImages.map((imageUrl, idx) => (
+                    <div key={idx} className="rounded-xl overflow-hidden shadow-md">
+                      <img
+                        src={imageUrl}
+                        alt={`Illustration ${idx + 1} for ${title}`}
+                        className="w-full h-auto object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                  ))}
                 </div>
-              )}
-
-              <div className="mt-12 pt-8 border-t border-gray-200 flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center" aria-hidden>
-                    <span className="text-green-600 font-semibold text-lg">{blogFirstChar(author)}</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{author}</p>
-                    <p className="text-sm text-gray-500">Article Author</p>
-                  </div>
-                </div>
-                <Button variant="outline" asChild className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent">
-                  <Link href="/blog">
-                    <ChevronLeft className="mr-2" size={20} />
-                    Back to Blog
-                  </Link>
-                </Button>
               </div>
+            )}
+
+            {/* Author footer + back link */}
+            <div className="mt-12 pt-8 border-t border-gray-200 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 bg-green-100 rounded-full flex items-center justify-center shrink-0" aria-hidden>
+                  <span className="text-green-700 font-bold text-base">{blogFirstChar(author)}</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">{author}</p>
+                  <p className="text-xs text-gray-500">Article Author</p>
+                </div>
+              </div>
+              <Button variant="outline" asChild className="border-gray-300 text-gray-600 hover:bg-gray-50 bg-transparent text-sm">
+                <Link href="/blog">
+                  <ChevronLeft className="mr-1.5" size={16} />
+                  Back to Blog
+                </Link>
+              </Button>
             </div>
-          </div>
-        </article>
+          </article>
+        </div>
       </div>
+
       <RelatedPostsSection
         category={category || undefined}
         excludeSlug={slug}

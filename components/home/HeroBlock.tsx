@@ -187,7 +187,7 @@ export default function HeroBlock({
       aria-label="Hero banner carousel"
       aria-roledescription="carousel"
       tabIndex={-1}
-      className="pt-32 relative overflow-hidden focus:outline-none"
+      className="relative overflow-hidden focus:outline-none"
     >
       {/* CSS-only Ken-Burns slow zoom on hero images. Respects reduced-motion.
           GPU-accelerated transform; no library, no main-thread cost. */}

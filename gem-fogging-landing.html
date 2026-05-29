@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GeM Approved OEM Fogging Machine | 100X Circle</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green: #00c853;
+    --green-dark: #009624;
+    --navy: #0a1628;
+    --navy2: #0e2040;
+    --accent: #ffe600;
+    --text: #e8edf5;
+    --muted: #8a9ab5;
+    --card-bg: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BACKGROUND MESH */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 10% 20%, rgba(0,200,83,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 80%, rgba(255,230,0,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,22,40,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 1px;
+  }
+  .logo span { color: var(--accent); }
+  .nav-badge {
+    background: var(--green);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 80px 24px 60px;
+    text-align: center;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .gem-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,200,83,0.12);
+    border: 1px solid rgba(0,200,83,0.35);
+    border-radius: 30px;
+    padding: 7px 18px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .gem-badge::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.5; transform:scale(1.4); }
+  }
+
+  h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 22px;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+  h1 .highlight { color: var(--green); }
+  h1 .yellow { color: var(--accent); }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 620px;
+    margin: 0 auto 36px;
+    line-height: 1.7;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: var(--green);
+    color: #000;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 14px 30px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 24px rgba(0,200,83,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,200,83,0.45); }
+
+  .btn-wa {
+    background: #25d366;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 14px 26px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 24px rgba(37,211,102,0.3);
+  }
+  .btn-wa:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(37,211,102,0.45); }
+
+  /* TRUST STRIP */
+  .trust-strip {
+    position: relative; z-index:1;
+    display: flex;
+    justify-content: center;
+    gap: 36px;
+    flex-wrap: wrap;
+    padding: 28px 24px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    animation: fadeUp 0.7s 0.4s ease both;
+  }
+  .trust-item {
+    text-align: center;
+  }
+  .trust-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--green);
+  }
+  .trust-label { font-size: 0.78rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* WHY US */
+  .section { position: relative; z-index:1; padding: 70px 24px; max-width: 1060px; margin: 0 auto; }
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--green);
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    font-weight: 700;
+    margin-bottom: 50px;
+    line-height: 1.2;
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  .benefit-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .benefit-card:hover { border-color: rgba(0,200,83,0.4); transform: translateY(-4px); }
+  .benefit-icon {
+    font-size: 2rem;
+    margin-bottom: 14px;
+  }
+  .benefit-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .benefit-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+
+  /* HOW IT WORKS */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 26px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--green), transparent);
+  }
+  .step {
+    display: flex;
+    gap: 24px;
+    padding: 22px 0;
+    position: relative;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 52px; height: 52px;
+    background: var(--navy2);
+    border: 2px solid var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--green);
+    position: relative;
+    z-index: 1;
+  }
+  .step-body {}
+  .step-title { font-family: 'Rajdhani', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; }
+  .step-desc { font-size: 0.87rem; color: var(--muted); line-height: 1.6; }
+
+  /* FORM SECTION */
+  .form-section {
+    position: relative; z-index:1;
+    background: linear-gradient(135deg, rgba(0,200,83,0.07) 0%, rgba(14,32,64,0.8) 100%);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 70px 24px;
+  }
+  .form-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media(max-width:700px){ .form-inner { grid-template-columns: 1fr; } }
+
+  .form-left h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .form-left p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .checklist li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.9rem; color: var(--text);
+  }
+  .checklist li::before {
+    content: '✓';
+    color: var(--green);
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  form { display: flex; flex-direction: column; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 0.8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input::placeholder { color: rgba(138,154,181,0.6); }
+  input:focus, select:focus { border-color: var(--green); }
+  select option { background: var(--navy2); color: var(--text); }
+
+  .submit-btn {
+    background: var(--green);
+    color: #000;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(0,200,83,0.25);
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,200,83,0.4); }
+
+  .form-note {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  /* WHATSAPP FLOAT */
+  .wa-float {
+    position: fixed;
+    bottom: 28px; right: 24px;
+    z-index: 999;
+    background: #25d366;
+    color: #fff;
+    border-radius: 50px;
+    padding: 14px 22px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 28px rgba(37,211,102,0.45);
+    animation: waFloat 3s ease-in-out infinite;
+  }
+  @keyframes waFloat {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index:1;
+    text-align: center;
+    padding: 32px 24px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--green); text-decoration: none; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(22px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--green); color: #000; font-weight: 700;
+    padding: 14px 28px; border-radius: 10px; font-size: 0.95rem;
+    opacity: 0; pointer-events: none; transition: all 0.4s; z-index: 9999;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">100X <span>Circle</span></div>
+  <span class="nav-badge">✅ GeM Approved OEM</span>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="gem-badge">GeM Q2 Category — Fogging Machines</div>
+  <h1>
+    Sell Fogging Machines on<br>
+    <span class="highlight">GeM Portal</span> with<br>
+    <span class="yellow">Approved OEM Support</span>
+  </h1>
+  <p class="hero-sub">
+    100X Circle is a <strong>GeM-approved OEM manufacturer</strong> for Fogging Machines (Q2 category).
+    Get OEM Reseller Code, GeM-compliant machines & direct factory pricing — everything you need to start selling today.
+  </p>
+  <div class="hero-ctas">
+    <a href="#register" class="btn-primary">
+      📋 Register as Reseller
+    </a>
+    <a href="https://wa.me/917827229116?text=Hi%2C%20I%20am%20a%20GeM%20reseller%20and%20interested%20in%20OEM%20code%20for%20Fogging%20Machines" class="btn-wa" target="_blank">
+      💬 WhatsApp Us Now
+    </a>
+  </div>
+</section>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+  <div class="trust-item"><div class="trust-num">10,000+</div><div class="trust-label">Happy Customers</div></div>
+  <div class="trust-item"><div class="trust-num">50+</div><div class="trust-label">Active Distributors</div></div>
+  <div class="trust-item"><div class="trust-num">10+</div><div class="trust-label">Years Experience</div></div>
+  <div class="trust-item"><div class="trust-num">GeM Q2</div><div class="trust-label">OEM Certified</div></div>
+  <div class="trust-item"><div class="trust-num">Pan India</div><div class="trust-label">Supply & Support</div></div>
+</div>
+
+<!-- BENEFITS -->
+<section class="section">
+  <div class="section-label">Why Partner With Us</div>
+  <div class="section-title">Everything a GeM Reseller Needs<br>in One Place</div>
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-icon">🏛️</div>
+      <div class="benefit-title">GeM-Approved OEM Status</div>
+      <div class="benefit-desc">We are a registered and approved OEM on GeM portal for Fogging Machines under Q2 category — giving your listings full compliance credibility.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">📄</div>
+      <div class="benefit-title">OEM Reseller Code Support</div>
+      <div class="benefit-desc">We help you get the OEM Reseller Authorization Code needed to list and sell our fogging machines on your GeM seller account.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">✅</div>
+      <div class="benefit-title">GeM Spec-Compliant Machines</div>
+      <div class="benefit-desc">All machines meet GeM portal technical specifications — no rejections, no compliance headaches, guaranteed delivery on government orders.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">💰</div>
+      <div class="benefit-title">Best Factory Prices</div>
+      <div class="benefit-desc">Direct supply from our Gurugram factory — no middlemen. Maximize your margin on every GeM order you fulfil.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">🚚</div>
+      <div class="benefit-title">Pan-India Delivery</div>
+      <div class="benefit-desc">We supply to all states. Whether your GeM order is from Bihar, UP, Maharashtra or the North-East — we deliver on time.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">🤝</div>
+      <div class="benefit-title">Dedicated Reseller Support</div>
+      <div class="benefit-desc">Dedicated account manager, GST invoices, dispatch documents and everything needed to close your GeM government orders smoothly.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="padding-top:0">
+  <div class="section-label">Process</div>
+  <div class="section-title">How to Get Started</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Fill the Reseller Registration Form</div>
+        <div class="step-desc">Share your GeM Seller ID, GST number, company details. Takes less than 2 minutes.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Our Team Verifies & Contacts You</div>
+        <div class="step-desc">We verify your GeM seller profile and get in touch within 24 hours to initiate the OEM reseller process.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Receive OEM Reseller Authorization</div>
+        <div class="step-desc">We provide you the OEM code and catalogue so you can list our machines on your GeM account immediately.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Start Winning GeM Orders</div>
+        <div class="step-desc">Bid on government tenders, get orders, we supply directly. You earn the margin — hassle-free.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section" id="register">
+  <div class="form-inner">
+    <div class="form-left">
+      <div class="section-label">Reseller Registration</div>
+      <h2>Register Now &<br>Get OEM Code</h2>
+      <p>Limited reseller slots available for Q2 2025. Register today to secure your authorization and start listing fogging machines on GeM.</p>
+      <ul class="checklist">
+        <li>GeM Q2 Category OEM Authorization</li>
+        <li>Spec-Compliant Machine Catalogue</li>
+        <li>Best Price Quote within 24 hrs</li>
+        <li>Dedicated GeM support team access</li>
+        <li>GST Invoice & Dispatch Documents</li>
+      </ul>
+    </div>
+    <div>
+      <form id="resellerForm" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label>Company / Firm Name *</label>
+          <input type="text" name="company" placeholder="Your registered company name" required/>
+        </div>
+        <div class="form-group">
+          <label>Your Name *</label>
+          <input type="text" name="name" placeholder="Contact person name" required/>
+        </div>
+        <div class="form-group">
+          <label>Mobile Number *</label>
+          <input type="tel" name="mobile" placeholder="+91 XXXXX XXXXX" required/>
+        </div>
+        <div class="form-group">
+          <label>City / State *</label>
+          <input type="text" name="city" placeholder="e.g. Lucknow, UP" required/>
+        </div>
+        <div class="form-group">
+          <label>GeM Seller ID *</label>
+          <input type="text" name="gem_id" placeholder="Your GeM portal seller ID" required/>
+        </div>
+        <div class="form-group">
+          <label>GST Number *</label>
+          <input type="text" name="gst" placeholder="15-digit GSTIN" required/>
+        </div>
+        <div class="form-group">
+          <label>Monthly Order Capacity (Approx.)</label>
+          <select name="capacity">
+            <option value="">Select range</option>
+            <option>1–5 machines/month</option>
+            <option>5–20 machines/month</option>
+            <option>20–50 machines/month</option>
+            <option>50+ machines/month</option>
+          </select>
+        </div>
+        <button type="submit" class="submit-btn">📋 Submit Registration →</button>
+        <p class="form-note">🔒 Your details are safe. We don't share your data with anyone.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p style="margin-bottom:8px">
+    <strong style="color:var(--text)">100X Circle Pvt Ltd.</strong> — GeM Approved OEM for Fogging Machines
+  </p>
+  <p>UG, 398, Sector 7, IMT Gurugram, Haryana &nbsp;|&nbsp; 
+    <a href="tel:+917827229116">+91 78272 29116</a> &nbsp;|&nbsp;
+    <a href="https://www.100xcircle.com" target="_blank">100xcircle.com</a>
+  </p>
+  <p style="margin-top:10px; font-size:0.72rem; opacity:0.5;">© 2025 100X Circle Pvt Ltd. All rights reserved.</p>
+</footer>
+
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/917827229116?text=Hi%2C%20I%20am%20a%20GeM%20registered%20seller%20and%20want%20OEM%20code%20for%20Fogging%20Machine%20Q2%20category" class="wa-float" target="_blank">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  Chat on WhatsApp
+</a>
+
+<div id="toast">✅ Registration submitted! We'll contact you within 24 hrs.</div>
+
+<script>
+function handleSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = {
+    company: form.company.value,
+    name: form.name.value,
+    mobile: form.mobile.value,
+    city: form.city.value,
+    gem_id: form.gem_id.value,
+    gst: form.gst.value,
+    capacity: form.capacity.value
+  };
+  // Compose WhatsApp message for lead capture
+  const msg = encodeURIComponent(
+    `*New GeM Reseller Registration*\n\n` +
+    `Company: ${data.company}\n` +
+    `Name: ${data.name}\n` +
+    `Mobile: ${data.mobile}\n` +
+    `City: ${data.city}\n` +
+    `GeM Seller ID: ${data.gem_id}\n` +
+    `GST: ${data.gst}\n` +
+    `Monthly Capacity: ${data.capacity}`
+  );
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 4000);
+  setTimeout(() => {
+    window.open(`https://wa.me/917827229116?text=${msg}`, '_blank');
+  }, 600);
+  form.reset();
+}
+</script>
+</body>
+</html>

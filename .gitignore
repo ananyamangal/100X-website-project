@@ -16,6 +16,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# local dev artifacts
+*.log
+build-output.txt
+dev-server.log
+
 # env files
 .env*
 

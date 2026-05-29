@@ -47,8 +47,8 @@ export default function RFQFloatingRibbon() {
       >
         <FileText size={14} aria-hidden="true" className="md:hidden" />
         <FileText size={16} aria-hidden="true" className="hidden md:block" />
-        <span className="md:hidden">Submit RFQ</span>
-        <span className="hidden md:inline">RFQ / Tender Inquiry</span>
+        <span className="md:hidden">Request for Quotation</span>
+        <span className="hidden md:inline">Request for Quotation</span>
       </button>
 
       {/* Slide-over modal */}
