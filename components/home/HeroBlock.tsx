@@ -3,7 +3,6 @@
 import React, { useEffect, useRef } from "react"
 import Link from "next/link"
 import { ArrowRight, ChevronLeft, ChevronRight, MessageCircle, Play } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { optimizeCloudinary, HERO_BLUR_DATA_URL } from "@/lib/cloudinaryUrl"
@@ -57,18 +56,6 @@ function pickMobileSrc(slide: HeroSlide | null) {
   if (!slide) return MOBILE_FALLBACK
   if (slide.mobileBannerEnabled === false) return MOBILE_FALLBACK
   return slide.mobileBannerImage || slide.desktopBannerImage || slide.image || MOBILE_FALLBACK
-}
-
-const CONTENT_WIDTH_CLASS: Record<NonNullable<HeroSlide["contentWidth"]>, string> = {
-  narrow: "md:max-w-sm",
-  medium: "md:max-w-md",
-  wide: "md:max-w-xl",
-}
-
-const TEXT_ALIGN_CONTENT: Record<NonNullable<HeroSlide["textAlign"]>, string> = {
-  left: "md:text-left",
-  center: "md:text-center",
-  right: "md:text-right",
 }
 
 const TEXT_ALIGN_CTAS: Record<NonNullable<HeroSlide["textAlign"]>, string> = {
@@ -248,76 +235,48 @@ export default function HeroBlock({
           />
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 flex items-center h-full pt-16">
-          <div className={`text-white max-w-2xl ${TEXT_ALIGN_CONTENT[textAlign]}`}>
-            <Badge className="mb-5 bg-green-600 hover:bg-green-700 text-sm px-5 py-1.5 tracking-wide uppercase">
-              Certified Professional Products
-            </Badge>
-            <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 leading-tight drop-shadow-sm">
-              100X – <span className="text-green-400">Thermal</span> Fogging Machine Manufacturer
-            </h1>
-            <div className="text-lg font-semibold text-green-400 mb-5 min-h-[1.75rem] transition-all duration-500">
-              {changingPhrases[phraseIndex]}
-            </div>
-
-            <div className="flex flex-wrap gap-x-5 gap-y-2 mb-6 text-sm text-white/80">
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400" aria-hidden="true" />GeM-approved OEM</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400" aria-hidden="true" />Made in India</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400" aria-hidden="true" />10,000+ Buyers</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400" aria-hidden="true" />ISO Certified</span>
-            </div>
-
-            <div className="grid grid-cols-4 gap-3 mb-7 pt-4 border-t border-white/20">
-              {stats.map((stat, i) => (
-                <div key={i}>
-                  <div className="text-xl font-bold text-white">{stat.number}</div>
-                  <div className="text-xs text-white/60 mt-0.5">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className={`flex flex-col sm:flex-row gap-3 ${TEXT_ALIGN_CTAS[textAlign]}`}>
-              <Button
-                size="lg"
-                className="bg-green-600 hover:bg-green-700 text-base px-6 py-3 shadow-lg shadow-green-900/30 transition-all hover:shadow-green-500/40 hover:scale-[1.02]"
-                onClick={trackCta("explore_products", "hero_desktop")}
+        <div className="relative z-10 container mx-auto px-4 h-full flex items-end pb-12 pt-16">
+          <div className={`flex flex-col sm:flex-row gap-3 ${TEXT_ALIGN_CTAS[textAlign]}`}>
+            <Button
+              size="lg"
+              className="bg-green-600 hover:bg-green-700 text-base px-6 py-3 shadow-lg shadow-green-900/30 transition-all hover:shadow-green-500/40 hover:scale-[1.02]"
+              onClick={trackCta("explore_products", "hero_desktop")}
+            >
+              <Link href="#products" className="flex items-center">
+                Explore Products <ArrowRight className="ml-2" size={18} />
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-2 border-white/60 text-white hover:bg-white/10 hover:border-white text-base px-6 py-3 bg-transparent transition-all"
+              onClick={() => {
+                trackCta("watch_demo", "hero_desktop")()
+                window.open("https://www.youtube.com/@100Xcircle", "_blank")
+              }}
+            >
+              <Play className="mr-2" size={18} />
+              Watch Demo
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 text-base px-6 py-3 bg-transparent transition-all"
+            >
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-gtm="cta_whatsapp"
+                data-gtm-location="hero_desktop"
+                className="flex items-center"
+                onClick={trackCta("whatsapp", "hero_desktop")}
               >
-                <Link href="#products" className="flex items-center">
-                  Explore Products <ArrowRight className="ml-2" size={18} />
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-white/50 text-white hover:bg-white/10 hover:border-white text-base px-6 py-3 bg-transparent transition-all"
-                onClick={() => {
-                  trackCta("watch_demo", "hero_desktop")()
-                  window.open("https://www.youtube.com/@100Xcircle", "_blank")
-                }}
-              >
-                <Play className="mr-2" size={18} />
-                Watch Demo
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 text-base px-6 py-3 bg-transparent transition-all"
-              >
-                <a
-                  href={waHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-gtm="cta_whatsapp"
-                  data-gtm-location="hero_desktop"
-                  className="flex items-center"
-                  onClick={trackCta("whatsapp", "hero_desktop")}
-                >
-                  <MessageCircle className="mr-2" size={18} />
-                  WhatsApp
-                </a>
-              </Button>
-            </div>
+                <MessageCircle className="mr-2" size={18} />
+                WhatsApp
+              </a>
+            </Button>
           </div>
         </div>
       </div>
@@ -405,10 +364,7 @@ export default function HeroBlock({
 
         {/* Content Below Banner - Tablet (same content set as mobile) */}
         <HeroContentBelow
-          changingPhrases={changingPhrases}
-          phraseIndex={phraseIndex}
           waHref={waHref}
-          stats={stats}
           trackCta={trackCta}
           location="hero_tablet"
         />
@@ -496,10 +452,7 @@ export default function HeroBlock({
         )}
 
         <HeroContentBelow
-          changingPhrases={changingPhrases}
-          phraseIndex={phraseIndex}
           waHref={waHref}
-          stats={stats}
           trackCta={trackCta}
           location="hero_mobile"
         />
@@ -554,92 +507,58 @@ export default function HeroBlock({
 
 // Tablet + mobile share the same "content below the banner" treatment.
 function HeroContentBelow({
-  changingPhrases,
-  phraseIndex,
   waHref,
-  stats,
   trackCta,
   location,
 }: {
-  changingPhrases: string[]
-  phraseIndex: number
   waHref: string
-  stats: Stat[]
   trackCta: (cta: string, location: string) => () => void
   location: string
 }) {
   return (
-    <div className="bg-white py-10">
+    <div className="bg-white py-6">
       <div className="container mx-auto px-4">
-        <div className="text-center">
-          <Badge className="mb-4 bg-green-600 hover:bg-green-700 text-base px-5 py-1.5 tracking-wide uppercase">
-            Certified Professional Products
-          </Badge>
-          <h2 className="text-3xl font-bold text-gray-800 mb-3 leading-tight">
-            100X – <span className="text-green-600">Thermal</span> Fogging Machine Manufacturer
-          </h2>
-          <div className="text-lg font-semibold text-green-600 mb-4 min-h-[2rem] transition-all duration-500">
-            {changingPhrases[phraseIndex]}
-          </div>
-
-          <p className="text-sm text-gray-500 mb-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 max-w-md mx-auto">
-            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />GeM-approved OEM</span>
-            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />Made in India</span>
-            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />10,000+ Buyers</span>
-            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />ISO Certified</span>
-          </p>
-
-          <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto mb-7 pt-4 border-t border-gray-100">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-xl font-bold text-green-600">{stat.number}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-3 justify-center">
-            <Button
-              size="lg"
-              className="bg-green-600 hover:bg-green-700 text-lg px-8 py-5 shadow-lg shadow-green-900/20"
-              onClick={trackCta("explore_products", location)}
+        <div className="flex flex-col gap-3 max-w-sm mx-auto">
+          <Button
+            size="lg"
+            className="bg-green-600 hover:bg-green-700 text-base px-6 py-4 shadow-lg shadow-green-900/20 w-full"
+            onClick={trackCta("explore_products", location)}
+          >
+            <Link href="#products" className="flex items-center justify-center w-full">
+              Explore Products <ArrowRight className="ml-2" size={18} />
+            </Link>
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-base px-6 py-4 bg-transparent w-full"
+            onClick={() => {
+              trackCta("watch_demo", location)()
+              window.open("https://www.youtube.com/@100Xcircle", "_blank")
+            }}
+          >
+            <Play className="mr-2" size={18} />
+            Watch Demo
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-base px-6 py-4 bg-transparent w-full"
+          >
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-gtm="cta_whatsapp"
+              data-gtm-location={location}
+              className="flex items-center justify-center"
+              onClick={trackCta("whatsapp", location)}
             >
-              <Link href="#products" className="flex items-center justify-center">
-                Explore Products <ArrowRight className="ml-2" size={20} />
-              </Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-lg px-8 py-4 bg-transparent"
-              onClick={() => {
-                trackCta("watch_demo", location)()
-                window.open("https://www.youtube.com/@100Xcircle", "_blank")
-              }}
-            >
-              <Play className="mr-2" size={20} />
-              Watch Demo
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-lg px-8 py-4 bg-transparent"
-            >
-              <a
-                href={waHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-gtm="cta_whatsapp"
-                data-gtm-location={location}
-                className="flex items-center justify-center"
-                onClick={trackCta("whatsapp", location)}
-              >
-                <MessageCircle className="mr-2" size={20} />
-                WhatsApp
-              </a>
-            </Button>
-          </div>
+              <MessageCircle className="mr-2" size={18} />
+              WhatsApp
+            </a>
+          </Button>
         </div>
       </div>
     </div>

@@ -34,6 +34,7 @@ export default function VideoPopup() {
   const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
+    setLoading(true)
     fetch("/api/video-popup")
       .then((r) => r.json())
       .then((data) => {
@@ -63,7 +64,7 @@ export default function VideoPopup() {
         })
       })
       .finally(() => setLoading(false))
-  }, [])
+  }, [pathname])
 
   useEffect(() => {
     if (!config || loading || visible) return
