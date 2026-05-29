@@ -114,12 +114,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const author = blogStr(blog.author, "100x Circle")
   const category = blogStr(blog.category)
   const publishedAtStr = blogOptStr(blog.publishedAt)
+  const updatedAtStr = blogOptStr((blog as { updatedAt?: unknown }).updatedAt)
   const readTime = blogOptStr((blog as { readTime?: unknown }).readTime) ?? "5 min read"
   const slug = blogPostSlug(blog) || rawSlug
   const pageUrl = `${SITE_URL}/blog/${slug}`
   const inlineImages = blogStrArr(blog.inlineImages)
   const coverSrc = blogImageSrc(blog.topImage)
   const topImgForJsonLd = blogOptStr(blog.topImage)
+  const plainContent = plainTextFromHtml(content)
+  const wordCount = plainContent.trim() ? plainContent.trim().split(/\s+/).length : undefined
 
   return (
     <div className="pt-20 min-h-screen bg-gray-50">
@@ -129,7 +132,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         url={pageUrl}
         image={topImgForJsonLd}
         datePublished={publishedAtStr}
+        dateModified={updatedAtStr || publishedAtStr}
         authorName={author}
+        category={category || undefined}
+        wordCount={wordCount}
       />
       <BreadcrumbJsonLd
         items={[
