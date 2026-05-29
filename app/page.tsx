@@ -46,7 +46,7 @@ import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
-import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContent"
+import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContentTypes"
 
 // Dynamic imports for below-fold components (code-split JS bundles)
 const BlogBlock = dynamic(() => import("@/components/home/BlogBlock"))

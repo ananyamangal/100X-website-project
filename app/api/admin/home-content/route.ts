@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
-import { DEFAULT_HOME_CONTENT } from '@/lib/homeContent'
+import { DEFAULT_HOME_CONTENT } from '@/lib/homeContentTypes'
 
 const KEY = 'main'
 

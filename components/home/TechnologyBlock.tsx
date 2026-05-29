@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContent"
+import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContentTypes"
 
 const STEP_ICONS = [Flame, Droplets, Wind, Target]
 const BENEFIT_ICONS = [Leaf, ShieldCheck, Building2, Sprout]

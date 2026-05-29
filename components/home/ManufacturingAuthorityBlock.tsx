@@ -2,7 +2,7 @@
 
 import React from "react"
 import { Factory, MapPin, Award, Wrench } from "lucide-react"
-import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContent"
+import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContentTypes"
 
 const STAT_ICONS = [Factory, Award, Wrench, MapPin]
 

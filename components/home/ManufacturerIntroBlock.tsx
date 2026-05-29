@@ -3,7 +3,7 @@
 import React from "react"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle } from "lucide-react"
-import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContent"
+import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContentTypes"
 
 type Props = {
   content?: HomeContent["manufacturerIntro"]

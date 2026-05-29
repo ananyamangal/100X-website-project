@@ -5,7 +5,7 @@ import { Save, Loader2, Check, Plus, Trash2, ChevronDown, ChevronUp } from "luci
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { DEFAULT_HOME_CONTENT, type HomeContent, type HomeContentFaq, type HomeContentStep, type HomeContentStat } from "@/lib/homeContent"
+import { DEFAULT_HOME_CONTENT, type HomeContent, type HomeContentFaq, type HomeContentStep, type HomeContentStat } from "@/lib/homeContentTypes"
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
