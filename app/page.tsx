@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import clientPromise from "@/lib/mongodb"
 import { getHomeContent } from "@/lib/homeContent"
 import { serializeBlogs } from "@/lib/blogSerialize"

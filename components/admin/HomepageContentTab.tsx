@@ -1,11 +1,26 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Save, Loader2, Check, Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react"
+import { Save, Loader2, Check, Plus, Trash2, ChevronDown, ChevronUp, Upload, Video } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { DEFAULT_HOME_CONTENT, type HomeContent, type HomeContentFaq, type HomeContentStep, type HomeContentStat } from "@/lib/homeContentTypes"
+
+const CLOUDINARY_IMAGE_URL = "https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload"
+const CLOUDINARY_VIDEO_URL = "https://api.cloudinary.com/v1_1/dhbvzugv6/video/upload"
+const UPLOAD_PRESET = "product_uploads"
+
+async function uploadToCloudinary(file: File, type: "image" | "video"): Promise<string> {
+  const fd = new FormData()
+  fd.append("file", file)
+  fd.append("upload_preset", UPLOAD_PRESET)
+  const endpoint = type === "video" ? CLOUDINARY_VIDEO_URL : CLOUDINARY_IMAGE_URL
+  const res = await fetch(endpoint, { method: "POST", body: fd })
+  if (!res.ok) throw new Error("Upload failed")
+  const data = await res.json()
+  return data.secure_url as string
+}
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -174,6 +189,176 @@ function StepsEditor({
   )
 }
 
+function TechStepsEditor({
+  steps,
+  onChange,
+}: {
+  steps: HomeContentStep[]
+  onChange: (steps: HomeContentStep[]) => void
+}) {
+  const [uploading, setUploading] = useState<number | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+
+  function updateStep(i: number, fields: Partial<HomeContentStep>) {
+    const next = [...steps]
+    next[i] = { ...next[i], ...fields }
+    onChange(next)
+  }
+
+  async function handleMediaUpload(i: number, file: File, mediaType: HomeContentStep["mediaType"]) {
+    setUploading(i)
+    setUploadError(null)
+    try {
+      const type = mediaType === "video" ? "video" : "image"
+      const url = await uploadToCloudinary(file, type)
+      updateStep(i, { mediaUrl: url })
+    } catch {
+      setUploadError(`Upload failed for step ${i + 1}. Check your file type and try again.`)
+    } finally {
+      setUploading(null)
+    }
+  }
+
+  return (
+    <div>
+      <label className="block text-xs font-medium text-gray-600 mb-2">Process Steps</label>
+      {uploadError && (
+        <p className="text-xs text-red-600 mb-2">{uploadError}</p>
+      )}
+      <div className="space-y-4">
+        {steps.map((step, i) => (
+          <div key={i} className="border rounded-lg p-4 bg-gray-50/60 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-gray-500">Step {i + 1}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => onChange(steps.filter((_, idx) => idx !== i))}
+                className="text-red-500 hover:text-red-700 px-2 h-7"
+              >
+                <Trash2 size={13} />
+              </Button>
+            </div>
+
+            <Input
+              placeholder="Title (e.g. Pulse-Jet Combustion)"
+              value={step.title}
+              onChange={(e) => updateStep(i, { title: e.target.value })}
+              className="text-sm"
+            />
+            <Textarea
+              placeholder="Short description (shown in collapsed view)"
+              rows={2}
+              value={step.body}
+              onChange={(e) => updateStep(i, { body: e.target.value })}
+              className="text-sm"
+            />
+            <Textarea
+              placeholder="Expandable details (optional — shown when step is tapped)"
+              rows={2}
+              value={step.details || ""}
+              onChange={(e) => updateStep(i, { details: e.target.value })}
+              className="text-sm"
+            />
+
+            {/* Media type */}
+            <div className="space-y-2">
+              <label className="block text-xs font-medium text-gray-600">Step media (optional)</label>
+              <select
+                value={step.mediaType || "none"}
+                onChange={(e) =>
+                  updateStep(i, {
+                    mediaType: e.target.value as HomeContentStep["mediaType"],
+                    mediaUrl: e.target.value === "none" ? undefined : step.mediaUrl,
+                  })
+                }
+                className="w-full text-sm border border-gray-200 rounded-md px-3 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-green-500"
+              >
+                <option value="none">None</option>
+                <option value="image">Image</option>
+                <option value="gif">GIF (animated image)</option>
+                <option value="video">Video clip</option>
+              </select>
+
+              {step.mediaType && step.mediaType !== "none" && (
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center gap-3">
+                    <label className="cursor-pointer">
+                      <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium hover:bg-gray-50 transition-colors">
+                        {uploading === i ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <Upload size={13} />
+                        )}
+                        {uploading === i ? "Uploading…" : `Upload ${step.mediaType === "video" ? "video" : "image"}`}
+                      </span>
+                      <input
+                        type="file"
+                        accept={step.mediaType === "video" ? "video/*" : "image/*,.gif"}
+                        className="sr-only"
+                        disabled={uploading === i}
+                        onChange={(e) => {
+                          const f = e.target.files?.[0]
+                          if (f) handleMediaUpload(i, f, step.mediaType)
+                        }}
+                      />
+                    </label>
+                    <span className="text-xs text-gray-400">or paste URL below</span>
+                  </div>
+
+                  <Input
+                    placeholder={`${step.mediaType === "video" ? "Video" : "Image"} URL`}
+                    value={step.mediaUrl || ""}
+                    onChange={(e) => updateStep(i, { mediaUrl: e.target.value })}
+                    className="text-sm"
+                  />
+
+                  {step.mediaUrl && (
+                    <div className="rounded-lg overflow-hidden ring-1 ring-gray-200 max-h-32 bg-gray-100 flex items-center justify-center">
+                      {step.mediaType === "video" ? (
+                        // eslint-disable-next-line jsx-a11y/media-has-caption
+                        <video
+                          src={step.mediaUrl}
+                          className="max-h-32 max-w-full"
+                          muted
+                          preload="metadata"
+                        />
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={step.mediaUrl}
+                          alt=""
+                          className="max-h-32 max-w-full object-contain"
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  <Input
+                    placeholder="Alt text / caption (for SEO and accessibility)"
+                    value={step.mediaAlt || ""}
+                    onChange={(e) => updateStep(i, { mediaAlt: e.target.value })}
+                    className="text-sm"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => onChange([...steps, { title: "", body: "" }])}
+        >
+          <Plus size={14} className="mr-1" /> Add step
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 function StatsEditor({
   stats,
   onChange,
@@ -289,6 +474,8 @@ export function HomepageContentTab() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [openSection, setOpenSection] = useState<string | null>("manufacturerIntro")
+  const [videoUploading, setVideoUploading] = useState(false)
+  const [videoUploadError, setVideoUploadError] = useState<string | null>(null)
 
   useEffect(() => {
     fetch("/api/admin/home-content")
@@ -409,16 +596,98 @@ export function HomepageContentTab() {
         )}
       </div>
 
-      {/* Technology */}
+      {/* Technology / How It Works */}
       <div className="border rounded-lg overflow-hidden">
         <SectionHeader title="Technology / How It Works Section" open={openSection === "technology"} onToggle={() => toggle("technology")} />
         {openSection === "technology" && (
           <div className="p-4 space-y-4">
             <Field label="Badge" value={content.technology.badge} onChange={(v) => patchTech("badge", v)} />
             <Field label="Headline" value={content.technology.headline} onChange={(v) => patchTech("headline", v)} />
-            <Field label="Body" value={content.technology.body} onChange={(v) => patchTech("body", v)} multiline rows={3} />
-            <StepsEditor label="Process Steps" steps={content.technology.steps} onChange={(v) => patchTech("steps", v)} />
-            <Field label="Benefits Section Title" value={content.technology.benefitsTitle} onChange={(v) => patchTech("benefitsTitle", v)} />
+            <Field label="Body text" value={content.technology.body} onChange={(v) => patchTech("body", v)} multiline rows={3} />
+
+            {/* Section demo video */}
+            <div className="border rounded-lg p-4 bg-blue-50/40 space-y-3">
+              <div className="flex items-center gap-2">
+                <Video size={16} className="text-blue-600" />
+                <p className="text-sm font-semibold text-gray-800">Section demo video (appears on the left side)</p>
+              </div>
+              <p className="text-xs text-gray-500">
+                Upload an MP4 showing the fogging machine in operation. This is the primary visual — it plays on loop
+                next to the process steps.
+              </p>
+
+              {videoUploadError && (
+                <p className="text-xs text-red-600">{videoUploadError}</p>
+              )}
+
+              <div className="flex items-center gap-3">
+                <label className="cursor-pointer">
+                  <span className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm">
+                    {videoUploading ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Upload size={14} />
+                    )}
+                    {videoUploading ? "Uploading video…" : "Upload video (MP4)"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/*"
+                    className="sr-only"
+                    disabled={videoUploading}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      setVideoUploading(true)
+                      setVideoUploadError(null)
+                      try {
+                        const url = await uploadToCloudinary(file, "video")
+                        patchTech("videoUrl", url)
+                      } catch {
+                        setVideoUploadError("Upload failed. File may be too large or in an unsupported format.")
+                      } finally {
+                        setVideoUploading(false)
+                        e.target.value = ""
+                      }
+                    }}
+                  />
+                </label>
+                <span className="text-xs text-gray-400">or paste a direct URL below</span>
+              </div>
+
+              <Field
+                label="Video URL (Cloudinary or direct MP4 link)"
+                value={content.technology.videoUrl || ""}
+                onChange={(v) => patchTech("videoUrl", v)}
+              />
+              <Field
+                label="Poster / thumbnail URL (shown before video loads)"
+                value={content.technology.videoPoster || ""}
+                onChange={(v) => patchTech("videoPoster", v)}
+              />
+              <Field
+                label="Video alt text / caption (SEO — describes what the video shows)"
+                value={content.technology.videoAlt || ""}
+                onChange={(v) => patchTech("videoAlt", v)}
+              />
+
+              {content.technology.videoUrl && (
+                <div className="mt-2 rounded-lg overflow-hidden ring-1 ring-gray-200 bg-black max-h-40 flex items-center justify-center">
+                  {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+                  <video
+                    key={content.technology.videoUrl}
+                    src={content.technology.videoUrl}
+                    className="max-h-40 max-w-full"
+                    controls
+                    muted
+                    preload="metadata"
+                  />
+                </div>
+              )}
+            </div>
+
+            <TechStepsEditor steps={content.technology.steps} onChange={(v) => patchTech("steps", v)} />
+            <Field label="Benefits section title" value={content.technology.benefitsTitle} onChange={(v) => patchTech("benefitsTitle", v)} />
             <StepsEditor label="Benefits" steps={content.technology.benefits} onChange={(v) => patchTech("benefits", v)} />
           </div>
         )}

@@ -8,6 +8,10 @@ export interface HomeContentFaq {
 export interface HomeContentStep {
   title: string
   body: string
+  details?: string
+  mediaType?: 'none' | 'image' | 'gif' | 'video'
+  mediaUrl?: string
+  mediaAlt?: string
 }
 
 export interface HomeContentStat {
@@ -39,6 +43,9 @@ export interface HomeContent {
     badge: string
     headline: string
     body: string
+    videoUrl?: string
+    videoPoster?: string
+    videoAlt?: string
     steps: HomeContentStep[]
     benefitsTitle: string
     benefits: HomeContentStep[]
