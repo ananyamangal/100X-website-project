@@ -121,6 +121,7 @@ interface BlogPost {
   _id?: string;
   id?: string;
   order?: number; // Display order (lower numbers appear first)
+  slug?: string; // SEO-friendly URL slug (overrides auto-generated title+id slug)
   title: string;
   excerpt: string;
   content: string;
@@ -147,13 +148,23 @@ function AdminAuthGate({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === 'dtu@ananya') {
-      Cookies.set('admin-token', 'authenticated', { path: '/admin' });
-      setIsAuthed(true);
-    } else {
-      setError('Invalid password');
+    setError('');
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: passwordInput }),
+      });
+      if (res.ok) {
+        Cookies.set('admin-token', 'authenticated', { path: '/admin' });
+        setIsAuthed(true);
+      } else {
+        setError('Invalid password');
+      }
+    } catch {
+      setError('Login failed. Please try again.');
     }
   };
 
@@ -1054,6 +1065,28 @@ function AdminDashboardContent() {
                 <Download className="mr-3" size={20} />
                 Brochure
               </button>
+              <button
+                onClick={() => setActiveTab("rfqPopup")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "rfqPopup"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <FileText className="mr-3" size={20} />
+                RFQ Popup
+              </button>
+              <button
+                onClick={() => setActiveTab("settings")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "settings"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Settings className="mr-3" size={20} />
+                Settings
+              </button>
             </nav>
           </div>
 
@@ -1146,6 +1179,8 @@ function AdminDashboardContent() {
             {activeTab === "aboutUs" && <AboutUsTab />}
             {activeTab === "videoPopup" && <VideoPopupTab />}
             {activeTab === "brochure" && <BrochureTab />}
+            {activeTab === "rfqPopup" && <RFQPopupAdminTab />}
+            {activeTab === "settings" && <SettingsTab />}
           </div>
         </div>
       </div>
@@ -2956,6 +2991,7 @@ function BlogForm({
 }) {
   const [formData, setFormData] = useState({
     order: blog?.order ?? undefined,
+    slug: blog?.slug || "",
     title: blog?.title || "",
     excerpt: blog?.excerpt || "",
     content: blog?.content || "",
@@ -3010,7 +3046,11 @@ function BlogForm({
               <label className="block text-sm font-medium text-gray-700 mb-2">Blog Title</label>
               <Input
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) => {
+                  const title = e.target.value
+                  const autoSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+                  setFormData({ ...formData, title, slug: formData.slug || autoSlug })
+                }}
                 placeholder="Enter blog title"
                 required
               />
@@ -3024,6 +3064,16 @@ function BlogForm({
                 required
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">SEO Slug (URL)</label>
+            <Input
+              value={formData.slug}
+              onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-") })}
+              placeholder="e.g., thermal-fogging-machine-guide"
+            />
+            <p className="text-xs text-gray-500 mt-1">URL: /blog/{formData.slug || "auto-generated"}. Leave blank to auto-generate from title+ID.</p>
           </div>
 
           <div>
@@ -4846,6 +4896,13 @@ function BrochureTab() {
 function VideoPopupTab() {
   const [youtubeUrl, setYoutubeUrl] = useState("")
   const [portrait, setPortrait] = useState(true)
+  const [enabled, setEnabled] = useState(true)
+  const [delayMs, setDelayMs] = useState(5000)
+  const [sessionOnce, setSessionOnce] = useState(true)
+  const [showOnMobile, setShowOnMobile] = useState(true)
+  const [showOnDesktop, setShowOnDesktop] = useState(true)
+  const [autoCloseMs, setAutoCloseMs] = useState(0)
+  const [hideOnPaths, setHideOnPaths] = useState("")
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
@@ -4856,11 +4913,15 @@ function VideoPopupTab() {
       .then((data) => {
         setYoutubeUrl(data?.youtubeUrl || "")
         setPortrait(data?.orientation !== "landscape")
+        setEnabled(data?.enabled !== false)
+        setDelayMs(typeof data?.delayMs === "number" ? data.delayMs : 5000)
+        setSessionOnce(data?.sessionOnce !== false)
+        setShowOnMobile(data?.showOnMobile !== false)
+        setShowOnDesktop(data?.showOnDesktop !== false)
+        setAutoCloseMs(typeof data?.autoCloseMs === "number" ? data.autoCloseMs : 0)
+        setHideOnPaths(Array.isArray(data?.hideOnPaths) ? data.hideOnPaths.join(", ") : "")
       })
-      .catch(() => {
-        setYoutubeUrl("")
-        setPortrait(true)
-      })
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 
@@ -4868,6 +4929,7 @@ function VideoPopupTab() {
     e.preventDefault()
     setSaving(true)
     setMessage(null)
+    const paths = hideOnPaths.split(",").map((p: string) => p.trim()).filter(Boolean)
     try {
       const res = await fetch("/api/admin/video-popup", {
         method: "PUT",
@@ -4876,10 +4938,17 @@ function VideoPopupTab() {
         body: JSON.stringify({
           youtubeUrl: youtubeUrl.trim(),
           orientation: portrait ? "portrait" : "landscape",
+          enabled,
+          delayMs,
+          sessionOnce,
+          showOnMobile,
+          showOnDesktop,
+          autoCloseMs,
+          hideOnPaths: paths,
         }),
       })
       if (res.ok) {
-        setMessage({ type: "success", text: "Video popup saved. It will appear in the bottom-right (above WhatsApp) for visitors." })
+        setMessage({ type: "success", text: "Video popup settings saved." })
       } else {
         setMessage({ type: "error", text: "Failed to save" })
       }
@@ -4890,48 +4959,81 @@ function VideoPopupTab() {
     }
   }
 
-  if (loading) {
-    return <div className="text-gray-500">Loading…</div>
-  }
+  if (loading) return <div className="text-gray-500">Loading…</div>
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Video Popup</h2>
-        <p className="text-gray-600">
-          Set a YouTube link for the small video that plays muted in the bottom-right corner when visitors land on the site (above the WhatsApp button). Leave empty to hide it.
-        </p>
+        <p className="text-gray-600">Control the muted video that appears in the bottom-right corner for site visitors.</p>
       </div>
       <Card>
         <CardContent className="p-6">
-          <form onSubmit={handleSave} className="space-y-4">
+          <form onSubmit={handleSave} className="space-y-6">
+            {/* Enable/disable */}
+            <div className="flex items-center gap-3">
+              <input type="checkbox" id="vp-enabled" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} className="rounded border-gray-300 text-green-600 focus:ring-green-500 w-4 h-4" />
+              <label htmlFor="vp-enabled" className="text-sm font-semibold text-gray-800">Enable video popup</label>
+            </div>
+
+            {/* YouTube URL */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">YouTube link</label>
-              <Input
-                type="url"
-                placeholder="e.g. https://www.youtube.com/watch?v=... or https://youtu.be/..."
-                value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
-                className="w-full max-w-xl"
-              />
+              <Input type="url" placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..." value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} className="w-full max-w-xl" />
             </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="video-popup-portrait"
-                checked={portrait}
-                onChange={(e) => setPortrait(e.target.checked)}
-                className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-              />
-              <label htmlFor="video-popup-portrait" className="text-sm font-medium text-gray-700">
-                Portrait (vertical video, e.g. Shorts). Uncheck for landscape.
-              </label>
+
+            {/* Orientation */}
+            <div className="flex items-center gap-2">
+              <input type="checkbox" id="vp-portrait" checked={portrait} onChange={(e) => setPortrait(e.target.checked)} className="rounded border-gray-300 text-green-600 focus:ring-green-500 w-4 h-4" />
+              <label htmlFor="vp-portrait" className="text-sm font-medium text-gray-700">Portrait / vertical (e.g. Shorts). Uncheck for landscape.</label>
             </div>
-            {message && (
-              <p className={message.type === "success" ? "text-green-600" : "text-red-600"}>{message.text}</p>
-            )}
+
+            {/* Timing */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Delay before showing (ms)</label>
+                <Input type="number" min={0} max={60000} step={500} value={delayMs} onChange={(e) => setDelayMs(Number(e.target.value))} />
+                <p className="text-xs text-gray-500 mt-1">5000 = 5 seconds after page load</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Auto-close after (ms, 0 = never)</label>
+                <Input type="number" min={0} step={1000} value={autoCloseMs} onChange={(e) => setAutoCloseMs(Number(e.target.value))} />
+                <p className="text-xs text-gray-500 mt-1">30000 = auto-close after 30 seconds</p>
+              </div>
+            </div>
+
+            {/* Frequency & targeting */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-gray-700">Frequency</p>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={sessionOnce} onChange={(e) => setSessionOnce(e.target.checked)} className="rounded border-gray-300 text-green-600 focus:ring-green-500 w-4 h-4" />
+                  <span className="text-sm text-gray-700">Show once per browser session</span>
+                </label>
+              </div>
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-gray-700">Device targeting</p>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={showOnMobile} onChange={(e) => setShowOnMobile(e.target.checked)} className="rounded border-gray-300 text-green-600 focus:ring-green-500 w-4 h-4" />
+                  <span className="text-sm text-gray-700">Show on mobile</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={showOnDesktop} onChange={(e) => setShowOnDesktop(e.target.checked)} className="rounded border-gray-300 text-green-600 focus:ring-green-500 w-4 h-4" />
+                  <span className="text-sm text-gray-700">Show on desktop</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Hidden paths */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Hide on these paths (comma-separated)</label>
+              <Input value={hideOnPaths} onChange={(e) => setHideOnPaths(e.target.value)} placeholder="/admin, /thank-you, /checkout" />
+              <p className="text-xs text-gray-500 mt-1">/admin and /thank-you are always hidden regardless.</p>
+            </div>
+
+            {message && <p className={message.type === "success" ? "text-green-600" : "text-red-600"}>{message.text}</p>}
             <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={saving}>
-              {saving ? "Saving…" : "Save"}
+              {saving ? "Saving…" : "Save Settings"}
             </Button>
           </form>
         </CardContent>
@@ -5046,5 +5148,400 @@ function CustomerForm({
         </form>
       </CardContent>
     </Card>
+  )
+}
+
+// ─── RFQ Popup Admin Tab ───────────────────────────────────────────────────
+
+interface RFQQuestion {
+  id: string
+  type: "text" | "email" | "phone" | "textarea" | "select" | "radio" | "checkbox"
+  label: string
+  required: boolean
+  placeholder: string
+  options: string[]
+}
+
+function RFQPopupAdminTab() {
+  const [cfg, setCfg] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null)
+  const [leads, setLeads] = useState<any[]>([])
+  const [leadsLoading, setLeadsLoading] = useState(true)
+  const [activeSection, setActiveSection] = useState<"config" | "questions" | "leads">("config")
+
+  useEffect(() => {
+    fetch("/api/admin/rfq-popup")
+      .then((r) => r.json())
+      .then((d) => setCfg(d))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+    fetch("/api/admin/rfq-popup/leads")
+      .then((r) => r.json())
+      .then((d) => setLeads(Array.isArray(d) ? d : []))
+      .catch(() => {})
+      .finally(() => setLeadsLoading(false))
+  }, [])
+
+  const save = async () => {
+    setSaving(true)
+    setMsg(null)
+    try {
+      const res = await fetch("/api/admin/rfq-popup", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(cfg),
+      })
+      if (res.ok) setMsg({ type: "success", text: "Settings saved." })
+      else setMsg({ type: "error", text: "Failed to save." })
+    } catch {
+      setMsg({ type: "error", text: "Failed to save." })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const updateCfg = (patch: Partial<any>) => setCfg((prev: any) => ({ ...prev, ...patch }))
+
+  const addQuestion = () => {
+    const q: RFQQuestion = { id: `q${Date.now()}`, type: "text", label: "New Question", required: false, placeholder: "", options: [] }
+    updateCfg({ questions: [...(cfg?.questions || []), q] })
+  }
+
+  const updateQuestion = (idx: number, patch: Partial<RFQQuestion>) => {
+    const qs = [...(cfg?.questions || [])]
+    qs[idx] = { ...qs[idx], ...patch }
+    updateCfg({ questions: qs })
+  }
+
+  const removeQuestion = (idx: number) => {
+    const qs = [...(cfg?.questions || [])]
+    qs.splice(idx, 1)
+    updateCfg({ questions: qs })
+  }
+
+  const moveQuestion = (idx: number, dir: -1 | 1) => {
+    const qs = [...(cfg?.questions || [])]
+    const to = idx + dir
+    if (to < 0 || to >= qs.length) return
+    const tmp = qs[idx]; qs[idx] = qs[to]; qs[to] = tmp
+    updateCfg({ questions: qs })
+  }
+
+  const exportLeads = () => {
+    if (!leads.length) return
+    const allKeys = Array.from(new Set(leads.flatMap((l) => Object.keys(l.answers || {}))))
+    const headers = ["Date", "Page", "UTM Source", "UTM Campaign", ...allKeys]
+    const rows = leads.map((l) => [
+      l.createdAt,
+      l.pagePath,
+      l.utm?.utm_source || "",
+      l.utm?.utm_campaign || "",
+      ...allKeys.map((k) => { const v = l.answers?.[k]; return Array.isArray(v) ? v.join("; ") : (v ?? "") }),
+    ])
+    const csv = [headers, ...rows]
+      .map((r) => r.map((c: any) => `"${String(c).replace(/"/g, '""')}"`).join(","))
+      .join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `rfq-popup-leads-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  if (loading) return <div className="text-gray-500">Loading…</div>
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">RFQ Popup</h2>
+        <p className="text-gray-600">Manage the lead-capture popup shown to visitors.</p>
+      </div>
+
+      <div className="flex gap-2 border-b">
+        {(["config", "questions", "leads"] as const).map((s) => (
+          <button key={s} onClick={() => setActiveSection(s)}
+            className={`px-4 py-2 text-sm font-medium capitalize border-b-2 transition-colors ${activeSection === s ? "border-green-600 text-green-700" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
+            {s === "leads" ? `Leads (${leads.length})` : s.charAt(0).toUpperCase() + s.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {activeSection === "config" && cfg && (
+        <Card>
+          <CardContent className="p-6 space-y-5">
+            <div className="flex items-center gap-3">
+              <input type="checkbox" id="rfqp-enabled" checked={cfg.enabled || false} onChange={(e) => updateCfg({ enabled: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+              <label htmlFor="rfqp-enabled" className="text-sm font-semibold text-gray-800">Enable RFQ popup</label>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Delay before showing (ms)</label>
+                <Input type="number" min={0} step={500} value={cfg.delayMs || 8000} onChange={(e) => updateCfg({ delayMs: Number(e.target.value) })} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Auto-close (ms, 0 = never)</label>
+                <Input type="number" min={0} step={1000} value={cfg.autoCloseMs || 0} onChange={(e) => updateCfg({ autoCloseMs: Number(e.target.value) })} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-700">Frequency</p>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={cfg.sessionOnce !== false} onChange={(e) => updateCfg({ sessionOnce: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                  <span className="text-sm text-gray-700">Show once per session</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={cfg.exitIntent || false} onChange={(e) => updateCfg({ exitIntent: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                  <span className="text-sm text-gray-700">Exit intent trigger (desktop)</span>
+                </label>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-700">Device targeting</p>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={cfg.showOnMobile !== false} onChange={(e) => updateCfg({ showOnMobile: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                  <span className="text-sm text-gray-700">Show on mobile</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={cfg.showOnDesktop !== false} onChange={(e) => updateCfg({ showOnDesktop: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                  <span className="text-sm text-gray-700">Show on desktop</span>
+                </label>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Trigger on these pages only (one per line, empty = all pages)</label>
+              <textarea rows={3} value={(cfg.triggerPages || []).join("\n")}
+                onChange={(e) => updateCfg({ triggerPages: e.target.value.split("\n").map((s: string) => s.trim()).filter(Boolean) })}
+                placeholder="/products&#10;/blog"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Hide on these pages (one per line)</label>
+              <textarea rows={3} value={(cfg.hiddenPages || []).join("\n")}
+                onChange={(e) => updateCfg({ hiddenPages: e.target.value.split("\n").map((s: string) => s.trim()).filter(Boolean) })}
+                placeholder="/admin&#10;/thank-you&#10;/brochure-thank-you"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Lead notification email</label>
+              <Input type="email" value={cfg.recipientEmail || ""} onChange={(e) => updateCfg({ recipientEmail: e.target.value })} placeholder="admin@yoursite.com" className="max-w-sm" />
+              <p className="text-xs text-gray-500 mt-1">Leave blank to use the system EMAIL_TO env var.</p>
+            </div>
+            {msg && <p className={`text-sm ${msg.type === "success" ? "text-green-600" : "text-red-600"}`}>{msg.text}</p>}
+            <Button onClick={save} className="bg-green-600 hover:bg-green-700" disabled={saving}>
+              {saving ? "Saving…" : "Save Config"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeSection === "questions" && cfg && (
+        <div className="space-y-4">
+          {(cfg.questions || []).map((q: RFQQuestion, idx: number) => (
+            <Card key={q.id}>
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-semibold text-gray-700">Question {idx + 1}</span>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => moveQuestion(idx, -1)} disabled={idx === 0} className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30"><ArrowUp size={14} /></button>
+                    <button onClick={() => moveQuestion(idx, 1)} disabled={idx === (cfg.questions || []).length - 1} className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30"><ArrowDown size={14} /></button>
+                    <button onClick={() => removeQuestion(idx)} className="p-1 text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Label</label>
+                    <Input value={q.label} onChange={(e) => updateQuestion(idx, { label: e.target.value })} placeholder="Question label" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Type</label>
+                    <select value={q.type} onChange={(e) => updateQuestion(idx, { type: e.target.value as RFQQuestion["type"] })}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none">
+                      <option value="text">Text</option>
+                      <option value="email">Email</option>
+                      <option value="phone">Phone</option>
+                      <option value="textarea">Textarea</option>
+                      <option value="select">Dropdown</option>
+                      <option value="radio">Radio</option>
+                      <option value="checkbox">Checkbox</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Placeholder</label>
+                    <Input value={q.placeholder || ""} onChange={(e) => updateQuestion(idx, { placeholder: e.target.value })} placeholder="Hint text" />
+                  </div>
+                  <div className="flex items-center gap-2 pt-5">
+                    <input type="checkbox" id={`req-${q.id}`} checked={q.required} onChange={(e) => updateQuestion(idx, { required: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                    <label htmlFor={`req-${q.id}`} className="text-sm text-gray-700">Required</label>
+                  </div>
+                </div>
+                {["select", "radio", "checkbox"].includes(q.type) && (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Options (one per line)</label>
+                    <textarea rows={3} value={(q.options || []).join("\n")}
+                      onChange={(e) => updateQuestion(idx, { options: e.target.value.split("\n").map((s: string) => s.trim()).filter(Boolean) })}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Option 1&#10;Option 2&#10;Option 3" />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+          <Button onClick={addQuestion} variant="outline" className="w-full border-dashed border-green-400 text-green-700 hover:bg-green-50">
+            <Plus className="mr-2" size={16} /> Add Question
+          </Button>
+          {msg && <p className={`text-sm ${msg.type === "success" ? "text-green-600" : "text-red-600"}`}>{msg.text}</p>}
+          <Button onClick={save} className="bg-green-600 hover:bg-green-700" disabled={saving}>
+            {saving ? "Saving…" : "Save Questions"}
+          </Button>
+        </div>
+      )}
+
+      {activeSection === "leads" && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-600">{leads.length} lead{leads.length !== 1 ? "s" : ""} captured</p>
+            <Button variant="outline" onClick={exportLeads} disabled={!leads.length} className="bg-transparent">
+              <Download className="mr-2" size={16} /> Export CSV
+            </Button>
+          </div>
+          {leadsLoading ? (
+            <p className="text-gray-500 text-sm">Loading…</p>
+          ) : leads.length === 0 ? (
+            <p className="text-gray-500 text-sm">No leads yet. Enable the popup and wait for submissions.</p>
+          ) : (
+            <div className="overflow-x-auto rounded-xl border">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">Date</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">Page</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">Answers</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">UTM</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {leads.map((lead) => (
+                    <tr key={lead._id} className="hover:bg-gray-50">
+                      <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{new Date(lead.createdAt).toLocaleDateString("en-IN")}</td>
+                      <td className="px-3 py-2 text-gray-600 max-w-[120px] truncate">{lead.pagePath}</td>
+                      <td className="px-3 py-2">
+                        <div className="space-y-0.5">
+                          {Object.entries(lead.answers || {}).map(([k, v]) => (
+                            <div key={k} className="text-xs"><span className="text-gray-500">{k}:</span> <span className="text-gray-900">{Array.isArray(v) ? v.join(", ") : String(v)}</span></div>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 text-xs text-gray-500">{lead.utm?.utm_source || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Settings Tab (Password Change) ──────────────────────────────────────────
+
+function SettingsTab() {
+  const [currentPw, setCurrentPw] = useState("")
+  const [newPw, setNewPw] = useState("")
+  const [confirmPw, setConfirmPw] = useState("")
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null)
+
+  const strength = (pw: string) => {
+    if (!pw) return 0
+    let s = 0
+    if (pw.length >= 8) s++
+    if (pw.length >= 12) s++
+    if (/[A-Z]/.test(pw)) s++
+    if (/[0-9]/.test(pw)) s++
+    if (/[^A-Za-z0-9]/.test(pw)) s++
+    return s
+  }
+  const s = strength(newPw)
+  const strengthLabel = ["", "Weak", "Fair", "Good", "Strong", "Very strong"][s] || ""
+  const strengthColor = ["", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-green-500", "bg-green-600"][s] || ""
+
+  const handleChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMsg(null)
+    if (newPw !== confirmPw) { setMsg({ type: "error", text: "New passwords do not match." }); return }
+    if (newPw.length < 8) { setMsg({ type: "error", text: "Password must be at least 8 characters." }); return }
+    setSaving(true)
+    try {
+      const res = await fetch("/api/admin/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ currentPassword: currentPw, newPassword: newPw }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setMsg({ type: "success", text: "Password changed successfully." })
+        setCurrentPw(""); setNewPw(""); setConfirmPw("")
+      } else {
+        setMsg({ type: "error", text: data.error || "Failed to change password." })
+      }
+    } catch {
+      setMsg({ type: "error", text: "Failed to change password." })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Settings</h2>
+        <p className="text-gray-600">Manage admin account settings.</p>
+      </div>
+      <Card className="max-w-md">
+        <CardHeader>
+          <CardTitle className="text-lg">Change Password</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleChange} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+              <Input type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} required autoComplete="current-password" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+              <Input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} required autoComplete="new-password" />
+              {newPw && (
+                <div className="mt-1.5 space-y-1">
+                  <div className="flex gap-1">
+                    {[1,2,3,4,5].map((i) => (
+                      <div key={i} className={`h-1.5 flex-1 rounded-full ${i <= s ? strengthColor : "bg-gray-200"}`} />
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500">{strengthLabel}</p>
+                </div>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+              <Input type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} required autoComplete="new-password" />
+              {confirmPw && newPw !== confirmPw && <p className="text-xs text-red-500 mt-1">Passwords do not match</p>}
+            </div>
+            {msg && <p className={`text-sm ${msg.type === "success" ? "text-green-600" : "text-red-600"}`}>{msg.text}</p>}
+            <Button type="submit" className="bg-green-600 hover:bg-green-700 w-full" disabled={saving || newPw !== confirmPw || !currentPw || !newPw}>
+              {saving ? "Saving…" : "Change Password"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

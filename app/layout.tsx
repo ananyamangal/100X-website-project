@@ -15,6 +15,7 @@ const inter = Inter({
 })
 import GemPopup from '@/components/GemPopup'
 import VideoPopup from '@/components/VideoPopup'
+import RFQPopup from '@/components/RFQPopup'
 import RFQFloatingRibbon from '@/components/forms/RFQFloatingRibbon'
 import SiteFooter from '@/components/SiteFooter'
 import GlobalJsonLd from '@/components/seo/GlobalJsonLd'
@@ -150,6 +151,7 @@ export default function RootLayout({
         </a>
         <GemPopup />
         <VideoPopup />
+        <RFQPopup />
         <RFQFloatingRibbon />
         <Script id="data-layer-events" strategy="afterInteractive">
           {`

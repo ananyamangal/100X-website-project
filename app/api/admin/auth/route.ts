@@ -1,30 +1,52 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { createHash } from "crypto"
+import clientPromise from "@/lib/mongodb"
+
+function hashPw(password: string): string {
+  return createHash("sha256").update(`100x-admin-v1:${password}`).digest("hex")
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { username, password } = await request.json()
+    const body = await request.json()
+    // Accept either { username, password } (legacy) or { password } only
+    const password = body.password || ""
 
-    // In production, verify against secure database
-    // This is just for demo - NEVER hardcode credentials!
-    const validCredentials = username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD
+    // Check MongoDB override hash first
+    try {
+      const client = await clientPromise
+      const db = client.db()
+      const settings = await db.collection("admin_settings").findOne({ key: "password" })
+      if (settings?.hash && hashPw(password) === String(settings.hash)) {
+        const response = NextResponse.json({ success: true })
+        response.cookies.set("admin-token", "authenticated", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 60 * 60 * 24,
+          path: "/admin",
+        })
+        return response
+      }
+    } catch {
+      // MongoDB unavailable — fall through to env/hardcoded check
+    }
 
-    if (validCredentials) {
-      // In production, generate JWT token
+    // Fall back to env var or hardcoded default
+    const envPassword = process.env.ADMIN_PASSWORD || "dtu@ananya"
+    if (password === envPassword) {
       const response = NextResponse.json({ success: true })
-
-      // Set secure HTTP-only cookie
       response.cookies.set("admin-token", "authenticated", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 60 * 60 * 24, // 24 hours
+        maxAge: 60 * 60 * 24,
         path: "/admin",
       })
-
       return response
-    } else {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
+
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
   } catch (error) {
     return NextResponse.json({ error: "Authentication failed" }, { status: 500 })
   }

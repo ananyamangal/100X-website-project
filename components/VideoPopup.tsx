@@ -1,14 +1,11 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import { X } from "lucide-react"
 
-// Fallback when admin hasn't configured /api/video-popup — uses the hero
-// demo so the floating video popup is visible by default. Replaces the
-// in-page HeroVideoBlock that used to render this video full-width.
-const FALLBACK_HERO_VIDEO_URL = "https://www.youtube.com/shorts/ZiVGNkvAI9g"
-const FALLBACK_HERO_ORIENTATION: "portrait" | "landscape" = "portrait"
+const FALLBACK_VIDEO_URL = "https://www.youtube.com/shorts/ZiVGNkvAI9g"
+const SESSION_KEY = "video-popup-seen-v1"
 
 function getYouTubeId(url: string): string | null {
   if (!url || typeof url !== "string") return null
@@ -16,66 +13,104 @@ function getYouTubeId(url: string): string | null {
   return m ? m[1] : null
 }
 
-export default function VideoPopup() {
-  // Hide on admin + transactional routes — the popup overlaps edit forms and
-  // confirmation screens.
-  const pathname = usePathname() || ""
-  const hideOnRoute =
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/thank-you") ||
-    pathname.startsWith("/brochure-thank-you")
+interface VideoConfig {
+  youtubeUrl: string
+  orientation: "portrait" | "landscape"
+  enabled: boolean
+  delayMs: number
+  sessionOnce: boolean
+  showOnMobile: boolean
+  showOnDesktop: boolean
+  autoCloseMs: number
+  hideOnPaths: string[]
+}
 
-  // Important: keep both pieces of "what to render" in one state so we
-  // commit URL + orientation atomically. Initialising to null + loading
-  // true means the iframe is NOT rendered until we know which video to
-  // play — eliminates the fallback → admin-config flash that looked
-  // like "the video keeps changing".
-  const [config, setConfig] = useState<{
-    url: string;
-    orientation: "portrait" | "landscape";
-  } | null>(null)
-  const [closed, setClosed] = useState(false)
+export default function VideoPopup() {
+  const pathname = usePathname() || ""
+  const [config, setConfig] = useState<VideoConfig | null>(null)
+  const [visible, setVisible] = useState(false)
   const [loading, setLoading] = useState(true)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     fetch("/api/video-popup")
-      .then((res) => res.json())
+      .then((r) => r.json())
       .then((data) => {
-        const u = data?.youtubeUrl
-        if (u && String(u).trim()) {
-          setConfig({
-            url: String(u).trim(),
-            orientation: data?.orientation === "landscape" ? "landscape" : "portrait",
-          })
-        } else {
-          setConfig({ url: FALLBACK_HERO_VIDEO_URL, orientation: FALLBACK_HERO_ORIENTATION })
-        }
+        setConfig({
+          youtubeUrl: data?.youtubeUrl?.trim() || FALLBACK_VIDEO_URL,
+          orientation: data?.orientation === "landscape" ? "landscape" : "portrait",
+          enabled: data?.enabled !== false,
+          delayMs: typeof data?.delayMs === "number" ? data.delayMs : 5000,
+          sessionOnce: data?.sessionOnce !== false,
+          showOnMobile: data?.showOnMobile !== false,
+          showOnDesktop: data?.showOnDesktop !== false,
+          autoCloseMs: typeof data?.autoCloseMs === "number" ? data.autoCloseMs : 0,
+          hideOnPaths: Array.isArray(data?.hideOnPaths) ? data.hideOnPaths : [],
+        })
       })
       .catch(() => {
-        setConfig({ url: FALLBACK_HERO_VIDEO_URL, orientation: FALLBACK_HERO_ORIENTATION })
+        setConfig({
+          youtubeUrl: FALLBACK_VIDEO_URL,
+          orientation: "portrait",
+          enabled: true,
+          delayMs: 5000,
+          sessionOnce: true,
+          showOnMobile: true,
+          showOnDesktop: true,
+          autoCloseMs: 0,
+          hideOnPaths: [],
+        })
       })
       .finally(() => setLoading(false))
   }, [])
 
-  if (hideOnRoute || loading || !config || closed) return null
-  const videoId = getYouTubeId(config.url)
-  if (!videoId) return null
-  const orientation = config.orientation
+  useEffect(() => {
+    if (!config || loading || visible) return
+    if (!config.enabled) return
 
-  // Lock the player down: loop the same video, hide YouTube branding/related,
-  // disable keyboard controls, kill annotations. Prevents the player from
-  // advancing into "up next" suggestions which looked like the video
-  // randomly changing.
+    // Path check
+    const defaultHide = ["/admin", "/thank-you", "/brochure-thank-you"]
+    const hidePaths = [...defaultHide, ...config.hideOnPaths]
+    if (hidePaths.some((p) => pathname.startsWith(p))) return
+
+    // Mobile/desktop check
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    if (isMobile && !config.showOnMobile) return
+    if (!isMobile && !config.showOnDesktop) return
+
+    // Session once check
+    if (config.sessionOnce && sessionStorage.getItem(SESSION_KEY)) return
+
+    timerRef.current = setTimeout(() => {
+      setVisible(true)
+      if (config.sessionOnce) sessionStorage.setItem(SESSION_KEY, "1")
+      if (config.autoCloseMs > 0) {
+        autoCloseRef.current = setTimeout(() => setVisible(false), config.autoCloseMs)
+      }
+    }, config.delayMs)
+
+    return () => {
+      clearTimeout(timerRef.current!)
+      clearTimeout(autoCloseRef.current!)
+    }
+  }, [config, loading, pathname, visible])
+
+  if (loading || !config || !visible) return null
+
+  const videoId = getYouTubeId(config.youtubeUrl)
+  if (!videoId) return null
+
+  const isPortrait = config.orientation === "portrait"
   const embed = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}&rel=0&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0`
-  const isPortrait = orientation === "portrait"
 
   return (
     <div
-      className="fixed right-6 bottom-24 z-[51] flex flex-col items-end gap-1"
+      className="fixed right-6 z-[51] flex flex-col items-end gap-1"
       style={{ bottom: "7rem" }}
     >
       <button
-        onClick={() => setClosed(true)}
+        onClick={() => setVisible(false)}
         className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors -mb-1 z-10"
         aria-label="Close video"
       >
@@ -89,7 +124,7 @@ export default function VideoPopup() {
         <div className={`w-full relative ${isPortrait ? "aspect-[9/16]" : "aspect-video"}`}>
           <iframe
             src={embed}
-            title="Video"
+            title="Product video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             className="absolute inset-0 w-full h-full"
