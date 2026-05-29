@@ -93,11 +93,12 @@ const FAQS: Faq[] = [
   },
 ]
 
-export default function FAQSection() {
+export default function FAQSection({ faqs: faqsProp }: { faqs?: Faq[] }) {
+  const faqs = faqsProp && faqsProp.length > 0 ? faqsProp : FAQS
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQS.map((f) => ({
+    mainEntity: faqs.map((f) => ({
       "@type": "Question",
       name: f.q,
       acceptedAnswer: {
@@ -127,7 +128,7 @@ export default function FAQSection() {
           collapsible
           className="divide-y divide-gray-200 rounded-2xl border border-gray-200 bg-white shadow-sm"
         >
-          {FAQS.map((f, i) => (
+          {faqs.map((f, i) => (
             <Accordion.Item key={i} value={`faq-${i}`}>
               <Accordion.Header className="flex">
                 <Accordion.Trigger className="group flex w-full items-start justify-between gap-4 px-5 md:px-6 py-4 md:py-5 text-left font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 focus-visible:ring-inset rounded-2xl [&[data-state=open]]:text-green-700">

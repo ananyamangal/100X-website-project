@@ -2,15 +2,17 @@
 
 import React from "react"
 import { Factory, MapPin, Award, Wrench } from "lucide-react"
+import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContent"
 
-const STATS = [
-  { icon: Factory, value: "Gurugram", label: "Manufacturing facility" },
-  { icon: Award, value: "10+ years", label: "Of OEM production" },
-  { icon: Wrench, value: "In-house", label: "Engineering & assembly" },
-  { icon: MapPin, value: "50+", label: "Distribution points" },
-]
+const STAT_ICONS = [Factory, Award, Wrench, MapPin]
 
-export default function ManufacturingAuthorityBlock() {
+type Props = {
+  content?: HomeContent["manufacturingAuthority"]
+}
+
+export default function ManufacturingAuthorityBlock({ content }: Props) {
+  const c = content ?? DEFAULT_HOME_CONTENT.manufacturingAuthority
+
   return (
     <section
       className="bg-gradient-to-b from-gray-950 to-gray-900 py-16 md:py-24"
@@ -19,22 +21,22 @@ export default function ManufacturingAuthorityBlock() {
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-12 md:mb-16">
           <p className="text-xs md:text-sm uppercase tracking-widest text-green-400 font-semibold mb-3">
-            Manufacturing Authority
+            {c.eyebrow}
           </p>
           <h2
             id="manufacturing-heading"
             className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight"
           >
-            Designed, Built, and Tested in India
+            {c.headline}
           </h2>
           <p className="text-base md:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Pulse-jet thermal foggers engineered and assembled at our Gurugram facility. Every machine field-tested for Indian conditions before it ships — from monsoon humidity to high-vegetation municipal terrain.
+            {c.body}
           </p>
         </div>
 
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 list-none">
-          {STATS.map((s) => {
-            const Icon = s.icon
+          {c.stats.map((s, index) => {
+            const Icon = STAT_ICONS[index % STAT_ICONS.length]
             return (
               <li
                 key={s.label}

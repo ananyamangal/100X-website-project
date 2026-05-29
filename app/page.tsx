@@ -46,6 +46,7 @@ import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
+import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContent"
 
 // Dynamic imports for below-fold components (code-split JS bundles)
 const BlogBlock = dynamic(() => import("@/components/home/BlogBlock"))
@@ -237,6 +238,7 @@ export default function HomePage() {
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [bannersLoading, setBannersLoading] = useState(true)
   const [mainBrochureUrl, setMainBrochureUrl] = useState<string | null>(null)
+  const [homeContent, setHomeContent] = useState<HomeContent>(DEFAULT_HOME_CONTENT)
   const bannerTouchStartX = useRef<number | null>(null)
 
   const changingPhrases = [
@@ -357,6 +359,14 @@ export default function HomePage() {
       .then((res) => res.json())
       .then((data) => setMainBrochureUrl(data?.mainBrochureUrl ?? null))
       .catch(() => setMainBrochureUrl(null))
+  }, [])
+
+  // Fetch homepage section content
+  useEffect(() => {
+    fetch("/api/admin/home-content")
+      .then((res) => res.json())
+      .then((data) => setHomeContent({ ...DEFAULT_HOME_CONTENT, ...data }))
+      .catch(() => {})
   }, [])
 
   // Fetch customers from API
@@ -617,24 +627,24 @@ export default function HomePage() {
           phraseIndex={phraseIndex}
         />
 
-        <SectionConnector eyebrow="Built for India" text="A decade of manufacturing for the field." />
+        <SectionConnector eyebrow={homeContent.connectors.c1.eyebrow} text={homeContent.connectors.c1.text} />
 
         {/* Accreditations Autoscroll Bar - just above Our Products */}
         <AccreditationsStrip accreditations={accreditations} />
 
-        <SectionConnector eyebrow="The Range" text="From handheld to vehicle-mounted." />
+        <SectionConnector eyebrow={homeContent.connectors.c2.eyebrow} text={homeContent.connectors.c2.text} />
 
         <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
 
-        <ManufacturerIntroBlock />
+        <ManufacturerIntroBlock content={homeContent.manufacturerIntro} />
 
-        <SectionConnector eyebrow="The Technology" text="Inside every 100X fogger." />
+        <SectionConnector eyebrow={homeContent.connectors.c3.eyebrow} text={homeContent.connectors.c3.text} />
 
-        <TechnologyBlock />
+        <TechnologyBlock content={homeContent.technology} />
 
         <RFQMidPageBlock />
 
-        <ManufacturingAuthorityBlock />
+        <ManufacturingAuthorityBlock content={homeContent.manufacturingAuthority} />
 
         <InlineInquiryCTA
           text="Compare models or request a tailored quote for your tender."
@@ -647,7 +657,7 @@ export default function HomePage() {
         {/* Our Customers bar - above Customer Reviews */}
         <OurCustomersScroll customers={customers} />
 
-        <SectionConnector eyebrow="In Their Words" text="Reviews from the field." />
+        <SectionConnector eyebrow={homeContent.connectors.c4.eyebrow} text={homeContent.connectors.c4.text} />
 
         <TrustBlock />
 
@@ -657,7 +667,7 @@ export default function HomePage() {
 
         <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />
 
-        <FAQSection />
+        <FAQSection faqs={homeContent.faqs} />
 
         <ContactSection products={products} />
 

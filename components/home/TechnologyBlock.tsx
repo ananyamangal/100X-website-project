@@ -15,54 +15,18 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContent"
 
-const PROCESS_STEPS = [
-  {
-    icon: Flame,
-    title: "Pulse-Jet Combustion",
-    body: "A pulse-jet engine ignites a controlled fuel-air mix at high frequency — no moving compressor parts, low maintenance, consistent output.",
-  },
-  {
-    icon: Droplets,
-    title: "Chemical Vaporization",
-    body: "Heat from the combustion chamber vaporizes the chemical or water-based solution as it passes through the resonator tube.",
-  },
-  {
-    icon: Wind,
-    title: "Ultra-Fine Fog Ejection",
-    body: "The vapor cools instantly at the nozzle, forming sub-50-micron droplets — small enough to drift, large enough to deposit on target surfaces.",
-  },
-  {
-    icon: Target,
-    title: "Deep Penetration",
-    body: "The dense fog penetrates foliage, open drains, voids, and construction sites that conventional sprayers cannot reach.",
-  },
-]
+const STEP_ICONS = [Flame, Droplets, Wind, Target]
+const BENEFIT_ICONS = [Leaf, ShieldCheck, Building2, Sprout]
 
-const BENEFITS = [
-  {
-    icon: Leaf,
-    title: "Lower Chemical Consumption",
-    body: "Up to 10× less pesticide per acre compared to manual spraying — ultra-fine droplets cover more surface area per litre.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Effective Vector Control",
-    body: "Field-proven against dengue, malaria, and chikungunya vectors. Deployed by municipal bodies during outbreaks.",
-  },
-  {
-    icon: Building2,
-    title: "Municipal-Grade",
-    body: "GeM-listed OEM equipment trusted by Nagar Nigams, Nagar Palikas, and Panchayats for public-health fogging drives.",
-  },
-  {
-    icon: Sprout,
-    title: "Agricultural Applications",
-    body: "Pesticides, fungicides, and plant-growth regulators for orchards, paddy fields, and vegetable farms — single-operator friendly.",
-  },
-]
+type Props = {
+  content?: HomeContent["technology"]
+}
 
-export default function TechnologyBlock() {
+export default function TechnologyBlock({ content }: Props) {
+  const c = content ?? DEFAULT_HOME_CONTENT.technology
+
   return (
     <section
       className="bg-white py-16 md:py-24"
@@ -71,22 +35,22 @@ export default function TechnologyBlock() {
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-12 md:mb-16">
           <Badge className="mb-5 bg-green-100 text-green-800 hover:bg-green-200 text-base px-5 py-1.5">
-            How It Works
+            {c.badge}
           </Badge>
           <h2
             id="technology-heading"
             className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-5 leading-tight"
           >
-            Pulse-Jet Thermal Fogging Technology
+            {c.headline}
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Four engineered stages that turn a fuel-air spark into a dense, deep-penetrating fog — built for both municipal vector control and agricultural crop protection.
+            {c.body}
           </p>
         </div>
 
         <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-16 md:mb-20 list-none">
-          {PROCESS_STEPS.map((step, index) => {
-            const Icon = step.icon
+          {c.steps.map((step, index) => {
+            const Icon = STEP_ICONS[index % STEP_ICONS.length]
             return (
               <li
                 key={step.title}
@@ -111,11 +75,11 @@ export default function TechnologyBlock() {
 
         <div className="rounded-3xl bg-gradient-to-b from-gray-950 to-gray-900 p-8 md:p-10">
           <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-8 md:mb-10">
-            Why pulse-jet beats conventional spraying
+            {c.benefitsTitle}
           </h3>
           <ul className="grid sm:grid-cols-2 gap-6 md:gap-8 list-none">
-            {BENEFITS.map((b) => {
-              const Icon = b.icon
+            {c.benefits.map((b, index) => {
+              const Icon = BENEFIT_ICONS[index % BENEFIT_ICONS.length]
               return (
                 <li
                   key={b.title}
