@@ -2,15 +2,20 @@ import { BUSINESS, SITE_NAME, SITE_NAME_LEGAL, SITE_URL, defaultOgImage } from "
 
 const organization = {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": ["Organization", "Manufacturer"],
   "@id": `${SITE_URL}/#organization`,
   name: SITE_NAME_LEGAL,
-  alternateName: SITE_NAME,
+  alternateName: [SITE_NAME, "100X", "Instafog", "100 X Circle"],
+  legalName: "100X Circle Private Limited",
   url: SITE_URL,
   logo: {
     "@type": "ImageObject",
+    "@id": `${SITE_URL}/#logo`,
     url: defaultOgImage,
+    contentUrl: defaultOgImage,
+    caption: "100X Circle — Indian Thermal Fogging Machine Manufacturer",
   },
+  image: defaultOgImage,
   email: BUSINESS.email,
   telephone: [BUSINESS.phonePrimary, BUSINESS.phoneSecondary],
   contactPoint: [
@@ -21,6 +26,7 @@ const organization = {
       email: BUSINESS.email,
       areaServed: "IN",
       availableLanguage: ["en", "hi"],
+      contactOption: "TollFree",
     },
     {
       "@type": "ContactPoint",
@@ -30,31 +36,73 @@ const organization = {
       availableLanguage: ["en", "hi"],
     },
   ],
-  sameAs: [BUSINESS.youtube],
+  sameAs: [
+    BUSINESS.youtube,
+    "https://gem.gov.in",
+  ],
   foundingDate: "2014",
   foundingLocation: {
     "@type": "Place",
     name: "Gurugram, Haryana, India",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Gurugram",
+      addressRegion: "Haryana",
+      addressCountry: "IN",
+    },
   },
   description:
-    "100X Circle is an Indian OEM manufacturer of pulse-jet thermal fogging machines for municipal vector control and agricultural use. GeM-listed, ISO-grade build, distributed across 50+ Indian locations and exported across South Asia, Africa, and the Middle East.",
-  keywords: [
-    "thermal fogging machine manufacturer",
-    "pulse jet fogging machine",
-    "GeM approved OEM",
-    "vector control equipment",
-    "agricultural fogging machine",
-  ].join(", "),
+    "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines for municipal vector control and agricultural use. GeM-listed, ISO 9001 certified, MSME/UDYAM registered. Factory at IMT Manesar, Gurgaon. Brands: 100X, Instafog. Distributed across 50+ Indian locations. Export to South Asia, Africa, and the Middle East.",
   knowsAbout: [
-    "Pulse-jet thermal fogging",
-    "Vector-borne disease control",
-    "Municipal mosquito control",
-    "Agricultural crop protection",
-    "Government e-Marketplace procurement",
+    "Pulse-jet thermal fogging technology",
+    "Vector-borne disease control — dengue, malaria, chikungunya",
+    "Municipal mosquito control operations",
+    "Agricultural crop protection fogging",
+    "Government e-Marketplace (GeM) procurement",
+    "WHO mosquito control protocols",
+    "Vehicle-mounted fogging systems",
+    "Indian agricultural machinery manufacturing",
+  ],
+  hasCredential: [
+    {
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "certification",
+      name: "ISO 9001:2015",
+      description: "Quality Management System certification for manufacturing and supply of fogging equipment",
+      recognizedBy: { "@type": "Organization", name: "ISO — International Organization for Standardization" },
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "certification",
+      name: "CE Marking",
+      description: "European conformity certification for export models",
+      recognizedBy: { "@type": "Organization", name: "European Union Standards Body" },
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "certification",
+      name: "ISI Mark — Bureau of Indian Standards",
+      description: "BIS product standard certification",
+      recognizedBy: { "@type": "Organization", name: "Bureau of Indian Standards, Government of India" },
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "registration",
+      name: "MSME / UDYAM Registration",
+      description: "Micro, Small and Medium Enterprise registration enabling GeM preference",
+      recognizedBy: { "@type": "Organization", name: "Ministry of MSME, Government of India" },
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "registration",
+      name: "GeM Seller Registration",
+      description: "Government e-Marketplace approved seller for direct government procurement",
+      recognizedBy: { "@type": "Organization", name: "Government e-Marketplace (GeM), Government of India" },
+    },
   ],
   makesOffer: {
     "@type": "OfferCatalog",
-    name: "100X Circle Fogging Equipment",
+    name: "100X Circle Fogging Equipment Catalog",
     itemListElement: [
       {
         "@type": "OfferCatalog",
@@ -63,35 +111,39 @@ const organization = {
           {
             "@type": "Offer",
             itemOffered: {
-              "@type": "Service",
-              name: "Vehicle-Mounted Thermal Fogging Machines",
+              "@type": "Product",
+              name: "Vehicle-Mounted Thermal Fogging Machine",
+              description: "High-capacity pulse-jet fogger mounted on vehicles for city-wide mosquito control",
             },
           },
           {
             "@type": "Offer",
             itemOffered: {
-              "@type": "Service",
-              name: "Double-Barrel Thermal Foggers",
+              "@type": "Product",
+              name: "Double-Barrel Thermal Fogger",
+              description: "Dual-output thermal fogger for maximum coverage in municipal operations",
             },
           },
         ],
       },
       {
         "@type": "OfferCatalog",
-        name: "Agricultural Foggers",
+        name: "Agricultural and Portable Foggers",
         itemListElement: [
           {
             "@type": "Offer",
             itemOffered: {
-              "@type": "Service",
-              name: "Portable Pulse-Jet Foggers",
+              "@type": "Product",
+              name: "Portable Pulse-Jet Thermal Fogger",
+              description: "Single-operator handheld fogger for farm and small-area use",
             },
           },
           {
             "@type": "Offer",
             itemOffered: {
-              "@type": "Service",
-              name: "Power Tillers and Sprayers",
+              "@type": "Product",
+              name: "Agricultural Sprayer and Power Tiller",
+              description: "Farm equipment for crop protection and soil preparation",
             },
           },
         ],
@@ -99,28 +151,20 @@ const organization = {
     ],
   },
   areaServed: [
-    {
-      "@type": "Country",
-      name: "India",
-    },
-    {
-      "@type": "AdministrativeArea",
-      name: "South Asia",
-    },
-    {
-      "@type": "AdministrativeArea",
-      name: "Middle East",
-    },
-    {
-      "@type": "AdministrativeArea",
-      name: "Africa",
-    },
+    { "@type": "Country", name: "India" },
+    { "@type": "AdministrativeArea", name: "South Asia" },
+    { "@type": "AdministrativeArea", name: "Middle East" },
+    { "@type": "AdministrativeArea", name: "Africa" },
   ],
+  numberOfEmployees: { "@type": "QuantitativeValue", minValue: 25, maxValue: 100 },
+  naics: "333999",
+  isicV4: "2819",
+  slogan: "100X your productivity with Indian-made fogging technology",
 }
 
 const localBusiness = {
   "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "Store"],
+  "@type": ["LocalBusiness", "Store", "Manufacturer"],
   "@id": `${SITE_URL}/#localbusiness`,
   name: SITE_NAME_LEGAL,
   image: defaultOgImage,
@@ -149,6 +193,9 @@ const localBusiness = {
     },
   ],
   priceRange: "$$",
+  currenciesAccepted: "INR",
+  paymentAccepted: "Bank Transfer, UPI, Cheque, GeM",
+  hasMap: `https://maps.google.com/?q=${BUSINESS.geo.latitude},${BUSINESS.geo.longitude}`,
 }
 
 const website = {
@@ -157,16 +204,36 @@ const website = {
   "@id": `${SITE_URL}/#website`,
   url: SITE_URL,
   name: SITE_NAME,
+  alternateName: "100X Circle — Thermal Fogging Machine Manufacturer India",
   publisher: { "@id": `${SITE_URL}/#organization` },
   inLanguage: "en-IN",
-  // SearchAction is intentionally omitted — there is no server-side
-  // search endpoint that resolves `?q={search_term_string}` today.
-  // Adding the action without an implementation would mislead crawlers
-  // and isn't a sitelinks-search prerequisite that GSC would honour.
+  description:
+    "Official website of 100X Circle Pvt Ltd — Indian OEM manufacturer of thermal fogging machines for municipal vector control, agricultural use, and government procurement.",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${SITE_URL}/products?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
+}
+
+const breadcrumbSitewide = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: SITE_URL,
+    },
+  ],
 }
 
 export default function GlobalJsonLd() {
-  const payload = [organization, localBusiness, website]
+  const payload = [organization, localBusiness, website, breadcrumbSitewide]
   return (
     <script
       type="application/ld+json"
