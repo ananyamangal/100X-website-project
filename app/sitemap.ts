@@ -29,6 +29,19 @@ const STATIC_ROUTES: Array<{
   { path: "/shipping-policy", changeFrequency: "yearly", priority: 0.2 },
   { path: "/power-tiller", changeFrequency: "monthly", priority: 0.8 },
   { path: "/vehicle-mounted-fogging-machine", changeFrequency: "monthly", priority: 0.8 },
+  // AI landing pages
+  { path: "/ai/about-100x", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/ai/factory", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/ai/certifications", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/ai/product-catalog", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/ai/government-supplies", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/ai/manufacturing-capabilities", changeFrequency: "monthly", priority: 0.6 },
+  // Knowledge base
+  { path: "/knowledge", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/knowledge/how-thermal-fogging-works", changeFrequency: "yearly", priority: 0.7 },
+  { path: "/knowledge/thermal-vs-ulv-fogging", changeFrequency: "yearly", priority: 0.7 },
+  { path: "/knowledge/government-procurement-guide", changeFrequency: "yearly", priority: 0.7 },
+  { path: "/knowledge/mosquito-control-india", changeFrequency: "yearly", priority: 0.7 },
 ]
 
 function toDate(value: string | undefined): Date | undefined {

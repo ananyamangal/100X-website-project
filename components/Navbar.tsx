@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { href: '/about', label: 'About' },
   { href: '/contact-us', label: 'Contact' },
   { href: '/blog', label: 'Blog' },
+  { href: '/knowledge', label: 'Knowledge' },
 ] as const
 
 // Pre-computed so we don't re-encode on every render.
