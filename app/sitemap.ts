@@ -36,12 +36,38 @@ const STATIC_ROUTES: Array<{
   { path: "/ai/product-catalog", changeFrequency: "weekly", priority: 0.7 },
   { path: "/ai/government-supplies", changeFrequency: "monthly", priority: 0.6 },
   { path: "/ai/manufacturing-capabilities", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/ai/scorecard", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/ai/entity-graph", changeFrequency: "monthly", priority: 0.5 },
   // Knowledge base
   { path: "/knowledge", changeFrequency: "monthly", priority: 0.7 },
   { path: "/knowledge/how-thermal-fogging-works", changeFrequency: "yearly", priority: 0.7 },
   { path: "/knowledge/thermal-vs-ulv-fogging", changeFrequency: "yearly", priority: 0.7 },
   { path: "/knowledge/government-procurement-guide", changeFrequency: "yearly", priority: 0.7 },
   { path: "/knowledge/mosquito-control-india", changeFrequency: "yearly", priority: 0.7 },
+  // Phase C pages
+  { path: "/factory", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/case-studies", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/compare", changeFrequency: "monthly", priority: 0.7 },
+  // Comparison pages (20)
+  { path: "/compare/100x-circle-vs-korean-fogging-machines", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/compare/100x-circle-vs-german-fogging-machines", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/compare/vehicle-mounted-vs-portable-thermal-fogger", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/compare/best-thermal-fogging-machine-for-municipal-use", changeFrequency: "yearly", priority: 0.8 },
+  { path: "/compare/best-thermal-fogger-for-agriculture-india", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/compare/fogging-machine-for-dengue-control-india", changeFrequency: "yearly", priority: 0.8 },
+  { path: "/compare/fogging-machine-for-malaria-control-india", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/compare/gem-fogging-machines-india", changeFrequency: "yearly", priority: 0.8 },
+  { path: "/compare/fogging-machine-for-pest-control-companies", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/compare/double-barrel-vs-single-barrel-thermal-fogger", changeFrequency: "yearly", priority: 0.7 },
+  { path: "/compare/fogging-machine-price-guide-india-2026", changeFrequency: "yearly", priority: 0.8 },
+  { path: "/compare/msme-fogging-machine-manufacturers-india", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/compare/iso-certified-fogging-machines-india", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/compare/fogging-machine-for-hospitals-healthcare", changeFrequency: "yearly", priority: 0.7 },
+  { path: "/compare/fogging-machine-for-agricultural-cooperatives", changeFrequency: "yearly", priority: 0.7 },
+  { path: "/compare/fogging-machine-for-small-municipalities-nagar-panchayat", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/compare/fogging-machine-export-india", changeFrequency: "yearly", priority: 0.7 },
+  { path: "/compare/make-in-india-fogging-machines", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/compare/fogging-machine-buyer-guide-india", changeFrequency: "yearly", priority: 0.8 },
 ]
 
 function toDate(value: string | undefined): Date | undefined {

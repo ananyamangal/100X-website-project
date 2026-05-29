@@ -4,6 +4,7 @@ import clientPromise from "@/lib/mongodb"
 import { getHomeContent } from "@/lib/homeContent"
 import { serializeBlogs } from "@/lib/blogSerialize"
 import HomePageClient from "@/components/home/HomePageClient"
+import HomepageAiSummary from "@/components/seo/HomepageAiSummary"
 
 export default async function HomePage() {
   const client = await clientPromise
@@ -47,14 +48,17 @@ export default async function HomePage() {
   const mainBrochureUrl: string | null = brochureDoc ? (brochureDoc as any).mainBrochureUrl ?? null : null
 
   return (
-    <HomePageClient
-      products={products}
-      banners={banners}
-      blogPosts={blogPosts}
-      accreditations={accreditations}
-      customers={customers}
-      mainBrochureUrl={mainBrochureUrl}
-      homeContent={homeContent}
-    />
+    <>
+      <HomepageAiSummary />
+      <HomePageClient
+        products={products}
+        banners={banners}
+        blogPosts={blogPosts}
+        accreditations={accreditations}
+        customers={customers}
+        mainBrochureUrl={mainBrochureUrl}
+        homeContent={homeContent}
+      />
+    </>
   )
 }

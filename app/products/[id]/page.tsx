@@ -6,6 +6,7 @@ import RelatedProductsSection from "@/components/RelatedProductsSection"
 import { getProductById } from "@/lib/productsQuery"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
+import ProductAiSummary from "@/components/seo/ProductAiSummary"
 
 function absolutizeImages(urls: string[]): string[] {
   return urls
@@ -57,6 +58,14 @@ export async function generateMetadata({
   }
 }
 
+function getYouTubeId(url: string): string | null {
+  if (!url || typeof url !== "string") return null
+  const match = url.match(
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/
+  )
+  return match ? match[1] : null
+}
+
 export default async function ProductRoutePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const product = await getProductById(id)
@@ -69,23 +78,60 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
     product && typeof product.reviewsCount === "number" ? product.reviewsCount : undefined
   const priceRange =
     product && typeof product.priceRange === "string" ? product.priceRange : undefined
+  const inStock = product ? product.inStock !== false : true
+  const features = product && Array.isArray(product.features) ? (product.features as string[]) : []
+  const badges = product && Array.isArray(product.badges) ? (product.badges as string[]) : []
+  const shortDescription = String(product?.shortDescription || product?.detailedDescription || "")
+
+  // VideoObject schema when product has a YouTube link
+  const youtubeLink = product && typeof product.youtubeLink === "string" ? product.youtubeLink : null
+  const videoId = youtubeLink ? getYouTubeId(youtubeLink) : null
+  const videoJsonLd = videoId
+    ? {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: `${productName} — Product Video`,
+        description: shortDescription || `Product video for ${productName} by 100X Circle`,
+        thumbnailUrl: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+        embedUrl: `https://www.youtube.com/embed/${videoId}`,
+        contentUrl: `https://www.youtube.com/watch?v=${videoId}`,
+        uploadDate: "2024-01-01",
+        publisher: { "@id": `${SITE_URL}/#organization` },
+      }
+    : null
 
   return (
     <>
       {product ? (
         <>
+          <ProductAiSummary
+            id={id}
+            name={productName}
+            category={category ?? ""}
+            shortDescription={shortDescription}
+            priceRange={priceRange}
+            inStock={inStock}
+            features={features}
+            badges={badges}
+          />
           <ProductJsonLd
             name={productName}
-            description={String(product.shortDescription || product.detailedDescription || "")}
+            description={shortDescription}
             images={imgs.length ? imgs : [`${SITE_URL}/logo-main.png`]}
             url={url}
             sku={String(product._id ?? id)}
-            inStock={product.inStock !== false}
+            inStock={inStock}
             rating={rating}
             reviewsCount={reviewsCount}
             priceRange={priceRange}
             category={category}
           />
+          {videoJsonLd && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }}
+            />
+          )}
           <BreadcrumbJsonLd
             items={[
               { name: "Home", url: "/" },
