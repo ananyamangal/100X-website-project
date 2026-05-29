@@ -37,7 +37,6 @@ import SpecialisedBuyersBlock from "@/components/home/SpecialisedBuyersBlock"
 import ProductsBlock from "@/components/home/ProductsBlock"
 import ManufacturingAuthorityBlock from "@/components/home/ManufacturingAuthorityBlock"
 import HeroBlock from "@/components/home/HeroBlock"
-import RFQHeroPanel from "@/components/forms/RFQHeroPanel"
 import RFQMidPageBlock from "@/components/forms/RFQMidPageBlock"
 import SectionConnector from "@/components/home/SectionConnector"
 import StatesServedBlock from "@/components/home/StatesServedBlock"
@@ -616,7 +615,6 @@ export default function HomePage() {
           stats={stats}
           changingPhrases={changingPhrases}
           phraseIndex={phraseIndex}
-          rfqSlot={<RFQHeroPanel />}
         />
 
         <SectionConnector eyebrow="Built for India" text="A decade of manufacturing for the field." />

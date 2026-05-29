@@ -31,6 +31,8 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+  const isHeroPage = pathname === '/'
+  const transparent = isHeroPage && !scrolled
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
@@ -51,29 +53,21 @@ export default function Navbar() {
   // Call + WhatsApp buttons with text labels on desktop (md+), icon-only on mobile.
   // Wrapped with data-gtm-location="navbar" so the global click listener auto-fires
   // phone_click / whatsapp_click with the right location field.
+  const iconClass = transparent
+    ? 'inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-white/90 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2'
+    : 'inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-gray-700 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2'
+
   const contactIcons = (
     <div
       data-gtm-location="navbar"
       className="flex items-center gap-1 md:gap-2"
       aria-label="Quick contact"
     >
-      <a
-        href={TEL_HREF}
-        aria-label={`Call ${BUSINESS.phonePrimary}`}
-        data-gtm="nav_call"
-        className="inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-gray-700 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
-      >
+      <a href={TEL_HREF} aria-label={`Call ${BUSINESS.phonePrimary}`} data-gtm="nav_call" className={iconClass}>
         <Phone size={18} aria-hidden="true" />
         <span className="hidden md:inline text-sm font-semibold">Call Now</span>
       </a>
-      <a
-        href={WA_HREF}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Chat on WhatsApp"
-        data-gtm="nav_whatsapp"
-        className="inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-gray-700 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
-      >
+      <a href={WA_HREF} target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" data-gtm="nav_whatsapp" className={iconClass}>
         <MessageCircle size={18} aria-hidden="true" />
         <span className="hidden md:inline text-sm font-semibold">WhatsApp Us</span>
       </a>
@@ -83,10 +77,12 @@ export default function Navbar() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 w-full z-50 transition-[background-color,backdrop-filter,box-shadow,border-color] duration-200',
-        scrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200'
-          : 'bg-white border-b border-gray-100',
+        'fixed top-0 left-0 w-full z-50 transition-[background-color,backdrop-filter,box-shadow,border-color] duration-300',
+        transparent
+          ? 'bg-transparent border-b border-white/10'
+          : scrolled
+            ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200'
+            : 'bg-white border-b border-gray-100',
       )}
     >
       <nav className="container mx-auto px-4 py-3.5 md:py-4 flex items-center justify-between gap-3">
@@ -108,9 +104,10 @@ export default function Navbar() {
                 href={l.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'text-sm font-medium transition-colors',
-                  'focus-visible:outline-none focus-visible:text-green-700',
-                  active ? 'text-green-700' : 'text-gray-700 hover:text-green-600',
+                  'text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 rounded-sm',
+                  active
+                    ? transparent ? 'text-green-400' : 'text-green-700'
+                    : transparent ? 'text-white/85 hover:text-white' : 'text-gray-700 hover:text-green-600',
                 )}
               >
                 {l.label}
@@ -128,7 +125,10 @@ export default function Navbar() {
           </Button>
           <button
             type="button"
-            className="lg:hidden p-2 -mr-2 ml-1 text-gray-700 hover:text-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 rounded-md transition-colors"
+            className={cn(
+              'lg:hidden p-2 -mr-2 ml-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 rounded-md transition-colors',
+              transparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-green-600',
+            )}
             aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={isMenuOpen}
             aria-controls="navbar-mobile-menu"

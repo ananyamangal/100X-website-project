@@ -93,7 +93,6 @@ interface Props {
   stats: Stat[];
   changingPhrases: string[];
   phraseIndex: number;
-  rfqSlot?: React.ReactNode;
 }
 
 export default function HeroBlock({
@@ -106,7 +105,6 @@ export default function HeroBlock({
   stats,
   changingPhrases,
   phraseIndex,
-  rfqSlot,
 }: Props) {
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -160,7 +158,6 @@ export default function HeroBlock({
   // Per-slide content layer settings, with defaults.
   const overlayOpacity = Math.max(0, Math.min(1, currentSlideData?.overlayOpacity ?? 0.4))
   const textAlign: NonNullable<HeroSlide["textAlign"]> = currentSlideData?.textAlign ?? "left"
-  const contentWidth: NonNullable<HeroSlide["contentWidth"]> = currentSlideData?.contentWidth ?? "medium"
 
   // Optimized image URLs (Cloudinary f_auto,q_auto + width hint; no-op on
   // /public fallbacks).
@@ -187,7 +184,7 @@ export default function HeroBlock({
       aria-label="Hero banner carousel"
       aria-roledescription="carousel"
       tabIndex={-1}
-      className="pt-16 relative overflow-hidden focus:outline-none"
+      className="relative overflow-hidden focus:outline-none"
     >
       {/* CSS-only Ken-Burns slow zoom on hero images. Respects reduced-motion.
           GPU-accelerated transform; no library, no main-thread cost. */}
@@ -208,7 +205,7 @@ export default function HeroBlock({
       {/* DESKTOP (lg+) — banner with overlaid content on the LEFT column.
           Aspect locked to 1920/850. */}
       <div
-        className="hidden lg:block relative aspect-[1920/850] max-h-[80vh] min-h-[520px] overflow-hidden"
+        className="hidden lg:block relative w-full h-screen min-h-[600px] overflow-hidden"
         aria-roledescription="slide"
         aria-label={`Slide ${currentSlide + 1} of ${heroSlides.length || 1}: ${desktopAlt}`}
       >
@@ -251,58 +248,76 @@ export default function HeroBlock({
           />
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 flex items-center h-full">
-          <div className="grid md:grid-cols-2 gap-8 items-center w-full">
-            <div className={`text-white ${TEXT_ALIGN_CONTENT[textAlign]} ${CONTENT_WIDTH_CLASS[contentWidth]}`}>
-              <Badge className="mb-4 bg-green-600 hover:bg-green-700 text-base px-5 py-1.5">
-                Certified Professional Products
-              </Badge>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-                100X – <span className="text-green-400">Thermal</span> Fogging Machine Manufacturer
-              </h1>
-              <div className="text-base md:text-lg font-semibold text-green-400 mb-4 min-h-[1.75rem] transition-all duration-500">
-                {changingPhrases[phraseIndex]}
-              </div>
-
-              {rfqSlot ? (
-                <div className="mb-4 md:max-w-md">
-                  {rfqSlot}
-                </div>
-              ) : null}
-
-              <div className={`flex flex-col sm:flex-row gap-3 ${TEXT_ALIGN_CTAS[textAlign]}`}>
-                <Button
-                  size="lg"
-                  className="bg-green-600 hover:bg-green-700 text-base px-6 py-3 shadow-lg shadow-green-900/20 transition-shadow hover:shadow-green-500/40"
-                  onClick={trackCta("explore_products", "hero_desktop")}
-                >
-                  <Link href="#products" className="flex items-center">
-                    Explore Products <ArrowRight className="ml-2" size={18} />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 text-base px-6 py-3 bg-transparent transition-shadow hover:shadow-lg hover:shadow-green-400/30"
-                >
-                  <a
-                    href={waHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-gtm="cta_whatsapp"
-                    data-gtm-location="hero_desktop"
-                    className="flex items-center"
-                    onClick={trackCta("whatsapp", "hero_desktop")}
-                  >
-                    <MessageCircle className="mr-2" size={18} />
-                    WhatsApp
-                  </a>
-                </Button>
-              </div>
+        <div className="relative z-10 container mx-auto px-4 flex items-center h-full pt-16">
+          <div className={`text-white max-w-2xl ${TEXT_ALIGN_CONTENT[textAlign]}`}>
+            <Badge className="mb-5 bg-green-600 hover:bg-green-700 text-sm px-5 py-1.5 tracking-wide uppercase">
+              Certified Professional Products
+            </Badge>
+            <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 leading-tight drop-shadow-sm">
+              100X – <span className="text-green-400">Thermal</span> Fogging Machine Manufacturer
+            </h1>
+            <div className="text-lg font-semibold text-green-400 mb-5 min-h-[1.75rem] transition-all duration-500">
+              {changingPhrases[phraseIndex]}
             </div>
 
-            <div className="hidden md:block" aria-hidden="true" />
+            <div className="flex flex-wrap gap-x-5 gap-y-2 mb-6 text-sm text-white/80">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400" aria-hidden="true" />GeM-approved OEM</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400" aria-hidden="true" />Made in India</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400" aria-hidden="true" />10,000+ Buyers</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400" aria-hidden="true" />ISO Certified</span>
+            </div>
+
+            <div className="grid grid-cols-4 gap-3 mb-7 pt-4 border-t border-white/20">
+              {stats.map((stat, i) => (
+                <div key={i}>
+                  <div className="text-xl font-bold text-white">{stat.number}</div>
+                  <div className="text-xs text-white/60 mt-0.5">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className={`flex flex-col sm:flex-row gap-3 ${TEXT_ALIGN_CTAS[textAlign]}`}>
+              <Button
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-base px-6 py-3 shadow-lg shadow-green-900/30 transition-all hover:shadow-green-500/40 hover:scale-[1.02]"
+                onClick={trackCta("explore_products", "hero_desktop")}
+              >
+                <Link href="#products" className="flex items-center">
+                  Explore Products <ArrowRight className="ml-2" size={18} />
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-white/50 text-white hover:bg-white/10 hover:border-white text-base px-6 py-3 bg-transparent transition-all"
+                onClick={() => {
+                  trackCta("watch_demo", "hero_desktop")()
+                  window.open("https://www.youtube.com/@100Xcircle", "_blank")
+                }}
+              >
+                <Play className="mr-2" size={18} />
+                Watch Demo
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 text-base px-6 py-3 bg-transparent transition-all"
+              >
+                <a
+                  href={waHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-gtm="cta_whatsapp"
+                  data-gtm-location="hero_desktop"
+                  className="flex items-center"
+                  onClick={trackCta("whatsapp", "hero_desktop")}
+                >
+                  <MessageCircle className="mr-2" size={18} />
+                  WhatsApp
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -392,7 +407,6 @@ export default function HeroBlock({
         <HeroContentBelow
           changingPhrases={changingPhrases}
           phraseIndex={phraseIndex}
-          rfqSlot={rfqSlot}
           waHref={waHref}
           stats={stats}
           trackCta={trackCta}
@@ -484,7 +498,6 @@ export default function HeroBlock({
         <HeroContentBelow
           changingPhrases={changingPhrases}
           phraseIndex={phraseIndex}
-          rfqSlot={rfqSlot}
           waHref={waHref}
           stats={stats}
           trackCta={trackCta}
@@ -543,7 +556,6 @@ export default function HeroBlock({
 function HeroContentBelow({
   changingPhrases,
   phraseIndex,
-  rfqSlot,
   waHref,
   stats,
   trackCta,
@@ -551,33 +563,42 @@ function HeroContentBelow({
 }: {
   changingPhrases: string[]
   phraseIndex: number
-  rfqSlot?: React.ReactNode
   waHref: string
   stats: Stat[]
   trackCta: (cta: string, location: string) => () => void
   location: string
 }) {
   return (
-    <div className="bg-white py-12">
+    <div className="bg-white py-10">
       <div className="container mx-auto px-4">
         <div className="text-center">
-          <Badge className="mb-4 bg-green-600 hover:bg-green-700 text-lg px-6 py-2">
+          <Badge className="mb-4 bg-green-600 hover:bg-green-700 text-base px-5 py-1.5 tracking-wide uppercase">
             Certified Professional Products
           </Badge>
-          <h2 className="text-3xl font-bold text-gray-800 mb-4 leading-tight">
+          <h2 className="text-3xl font-bold text-gray-800 mb-3 leading-tight">
             100X – <span className="text-green-600">Thermal</span> Fogging Machine Manufacturer
           </h2>
           <div className="text-lg font-semibold text-green-600 mb-4 min-h-[2rem] transition-all duration-500">
             {changingPhrases[phraseIndex]}
           </div>
 
-          {rfqSlot ? (
-            <div className="mb-5">
-              {rfqSlot}
-            </div>
-          ) : null}
+          <p className="text-sm text-gray-500 mb-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 max-w-md mx-auto">
+            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />GeM-approved OEM</span>
+            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />Made in India</span>
+            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />10,000+ Buyers</span>
+            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />ISO Certified</span>
+          </p>
 
-          <div className="flex flex-col gap-3 justify-center mb-6">
+          <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto mb-7 pt-4 border-t border-gray-100">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-xl font-bold text-green-600">{stat.number}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-3 justify-center">
             <Button
               size="lg"
               className="bg-green-600 hover:bg-green-700 text-lg px-8 py-5 shadow-lg shadow-green-900/20"
@@ -618,30 +639,6 @@ function HeroContentBelow({
                 WhatsApp
               </a>
             </Button>
-          </div>
-
-          <p className="text-xs text-gray-600 mb-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 max-w-md mx-auto">
-            <span className="inline-flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
-              GeM-approved OEM
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
-              Made in India
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
-              10,000+ buyers
-            </span>
-          </p>
-
-          <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">{stat.number}</div>
-                <div className="text-sm text-gray-600">{stat.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
