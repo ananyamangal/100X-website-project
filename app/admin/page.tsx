@@ -1101,6 +1101,17 @@ function AdminDashboardContent() {
                 Website Settings
               </button>
               <button
+                onClick={() => setActiveTab("legalPages")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "legalPages"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <FileText className="mr-3" size={20} />
+                Legal Pages
+              </button>
+              <button
                 onClick={() => setActiveTab("settings")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "settings"
@@ -1206,6 +1217,7 @@ function AdminDashboardContent() {
             {activeTab === "rfqPopup" && <RFQPopupAdminTab />}
             {activeTab === "homepageContent" && <HomepageContentTab />}
             {activeTab === "websiteSettings" && <BrandAssetsTab />}
+            {activeTab === "legalPages" && <LegalPagesTab />}
             {activeTab === "settings" && <SettingsTab />}
           </div>
         </div>
@@ -5357,6 +5369,37 @@ function RFQPopupAdminTab() {
               <Input type="email" value={cfg.recipientEmail || ""} onChange={(e) => updateCfg({ recipientEmail: e.target.value })} placeholder="admin@yoursite.com" className="max-w-sm" />
               <p className="text-xs text-gray-500 mt-1">Leave blank to use the system EMAIL_TO env var.</p>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp notification number</label>
+              <Input type="tel" value={cfg.notificationWhatsapp || ""} onChange={(e) => updateCfg({ notificationWhatsapp: e.target.value })} placeholder="+917827229116" className="max-w-sm" />
+              <p className="text-xs text-gray-500 mt-1">Include country code (e.g. +91...). A quick-reply WhatsApp link will be included in email alerts.</p>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-4 space-y-3">
+              <p className="text-sm font-semibold text-gray-800">Frequency control</p>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={cfg.neverAfterSubmission !== false} onChange={(e) => updateCfg({ neverAfterSubmission: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                <span className="text-sm text-gray-700">Never show again after visitor submits (stored in browser)</span>
+              </label>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-4 space-y-3">
+              <p className="text-sm font-semibold text-gray-800">Document upload</p>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={cfg.allowFileUpload || false} onChange={(e) => updateCfg({ allowFileUpload: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                <span className="text-sm text-gray-700">Allow visitors to attach a document</span>
+              </label>
+              {cfg.allowFileUpload && (
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Max file size (MB)</label>
+                    <Input type="number" min={1} max={50} value={cfg.maxFileSizeMb || 5} onChange={(e) => updateCfg({ maxFileSizeMb: Number(e.target.value) })} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Allowed types (comma-separated)</label>
+                    <Input value={(cfg.allowedFileTypes || []).join(",")} onChange={(e) => updateCfg({ allowedFileTypes: e.target.value.split(",").map((s: string) => s.trim()).filter(Boolean) })} placeholder=".pdf,.doc,.jpg" />
+                  </div>
+                </div>
+              )}
+            </div>
             {msg && <p className={`text-sm ${msg.type === "success" ? "text-green-600" : "text-red-600"}`}>{msg.text}</p>}
             <Button onClick={save} className="bg-green-600 hover:bg-green-700" disabled={saving}>
               {saving ? "Saving…" : "Save Config"}
@@ -5448,6 +5491,7 @@ function RFQPopupAdminTab() {
                     <th className="px-3 py-2 text-left font-medium text-gray-600">Date</th>
                     <th className="px-3 py-2 text-left font-medium text-gray-600">Page</th>
                     <th className="px-3 py-2 text-left font-medium text-gray-600">Answers</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">Attachment</th>
                     <th className="px-3 py-2 text-left font-medium text-gray-600">UTM</th>
                   </tr>
                 </thead>
@@ -5463,6 +5507,11 @@ function RFQPopupAdminTab() {
                           ))}
                         </div>
                       </td>
+                      <td className="px-3 py-2 text-xs">
+                        {lead.attachmentUrl ? (
+                          <a href={lead.attachmentUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">View file</a>
+                        ) : "—"}
+                      </td>
                       <td className="px-3 py-2 text-xs text-gray-500">{lead.utm?.utm_source || "—"}</td>
                     </tr>
                   ))}
@@ -5472,6 +5521,106 @@ function RFQPopupAdminTab() {
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+// ─── Legal Pages Tab ─────────────────────────────────────────────────────────
+
+const LEGAL_PAGE_LABELS: Record<string, string> = {
+  "privacy-policy": "Privacy Policy",
+  "terms-and-conditions": "Terms & Conditions",
+  "return-policy": "Return Policy",
+  "refund-policy": "Refund Policy",
+  "shipping-policy": "Shipping Policy",
+  "warranty-policy": "Warranty Policy",
+  "disclaimer": "Disclaimer",
+  "cookie-policy": "Cookie Policy",
+}
+
+function LegalPagesTab() {
+  const [selected, setSelected] = useState("privacy-policy")
+  const [content, setContent] = useState<Record<string, string>>({})
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null)
+
+  useEffect(() => {
+    fetch("/api/admin/legal-pages")
+      .then((r) => r.json())
+      .then((data) => {
+        const c: Record<string, string> = {}
+        for (const k of Object.keys(LEGAL_PAGE_LABELS)) {
+          c[k] = data[k]?.content || ""
+        }
+        setContent(c)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  const save = async () => {
+    setSaving(true)
+    setMsg(null)
+    try {
+      const res = await fetch("/api/admin/legal-pages", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ key: selected, content: content[selected] || "" }),
+      })
+      if (res.ok) setMsg({ type: "success", text: "Page saved." })
+      else setMsg({ type: "error", text: "Failed to save." })
+    } catch {
+      setMsg({ type: "error", text: "Failed to save." })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) return <div className="text-gray-500">Loading…</div>
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Legal Pages</h2>
+        <p className="text-gray-600">Edit the content of your legal / policy pages. Leave blank to use the default built-in content.</p>
+      </div>
+      <div className="flex gap-2 flex-wrap border-b pb-2">
+        {Object.entries(LEGAL_PAGE_LABELS).map(([k, label]) => (
+          <button
+            key={k}
+            onClick={() => { setSelected(k); setMsg(null); }}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${selected === k ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>{LEGAL_PAGE_LABELS[selected]}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-xs text-gray-500">
+            Custom content saved here will appear on <code className="bg-gray-100 px-1 rounded">/{selected}</code>. Leave blank to show the default hardcoded content.
+          </p>
+          <AdminRichTextEditor
+            value={content[selected] || ""}
+            onChange={(v) => setContent((prev) => ({ ...prev, [selected]: v }))}
+            placeholder="Enter legal page content here…"
+          />
+          {msg && <p className={`text-sm ${msg.type === "success" ? "text-green-600" : "text-red-600"}`}>{msg.text}</p>}
+          <div className="flex gap-3">
+            <Button onClick={save} className="bg-green-600 hover:bg-green-700" disabled={saving}>
+              {saving ? "Saving…" : "Save"}
+            </Button>
+            <Button variant="outline" onClick={() => window.open(`/${selected}`, "_blank")} className="bg-transparent">
+              Preview page
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

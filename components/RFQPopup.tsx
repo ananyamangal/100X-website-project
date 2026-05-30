@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
-import { X } from "lucide-react"
+import { X, Paperclip } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Question {
@@ -18,6 +18,7 @@ interface PopupConfig {
   enabled: boolean
   delayMs: number
   sessionOnce: boolean
+  neverAfterSubmission: boolean
   showOnMobile: boolean
   showOnDesktop: boolean
   exitIntent: boolean
@@ -25,9 +26,15 @@ interface PopupConfig {
   triggerPages: string[]
   hiddenPages: string[]
   questions: Question[]
+  allowFileUpload: boolean
+  maxFileSizeMb: number
+  allowedFileTypes: string[]
 }
 
 const SESSION_KEY = "rfq-popup-seen-v1"
+const SUBMITTED_KEY = "rfq-popup-submitted-v1"
+const CLOUDINARY_CLOUD = "dhbvzugv6"
+const CLOUDINARY_PRESET = "product_uploads"
 
 function getUtm(): Record<string, string> {
   if (typeof window === "undefined") return {}
@@ -39,6 +46,19 @@ function getUtm(): Record<string, string> {
   }
 }
 
+async function uploadFileToCloudinary(file: File): Promise<string> {
+  const fd = new FormData()
+  fd.append("file", file)
+  fd.append("upload_preset", CLOUDINARY_PRESET)
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/auto/upload`, {
+    method: "POST",
+    body: fd,
+  })
+  const data = await res.json()
+  if (!data.secure_url) throw new Error(data.error?.message || "Upload failed")
+  return data.secure_url as string
+}
+
 export default function RFQPopup() {
   const pathname = usePathname() || ""
   const [config, setConfig] = useState<PopupConfig | null>(null)
@@ -47,6 +67,8 @@ export default function RFQPopup() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({})
+  const [attachedFile, setAttachedFile] = useState<File | null>(null)
+  const [uploadingFile, setUploadingFile] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -75,6 +97,9 @@ export default function RFQPopup() {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
     if (isMobile && !config.showOnMobile) return
     if (!isMobile && !config.showOnDesktop) return
+
+    // Never show after successful submission (localStorage)
+    if (config.neverAfterSubmission && typeof window !== "undefined" && localStorage.getItem(SUBMITTED_KEY)) return
 
     // Session once
     if (config.sessionOnce && sessionStorage.getItem(SESSION_KEY)) return
@@ -133,6 +158,20 @@ export default function RFQPopup() {
 
     setSubmitting(true)
     try {
+      let attachmentUrl: string | undefined
+      if (attachedFile) {
+        setUploadingFile(true)
+        try {
+          attachmentUrl = await uploadFileToCloudinary(attachedFile)
+        } catch {
+          setError("File upload failed. Please try again or submit without attachment.")
+          setSubmitting(false)
+          setUploadingFile(false)
+          return
+        }
+        setUploadingFile(false)
+      }
+
       const utm = getUtm()
       await fetch("/api/rfq-popup/submit", {
         method: "POST",
@@ -144,8 +183,16 @@ export default function RFQPopup() {
           utm,
           userAgent: navigator.userAgent,
           referrer: document.referrer,
+          attachmentUrl,
         }),
       })
+
+      // Persist submission so popup never shows again (if configured)
+      if (config?.neverAfterSubmission && typeof window !== "undefined") {
+        localStorage.setItem(SUBMITTED_KEY, "1")
+      }
+      sessionStorage.setItem(SESSION_KEY, "1")
+
       setSubmitted(true)
     } catch {
       setError("Submission failed. Please try again.")
@@ -165,6 +212,12 @@ export default function RFQPopup() {
       : [...current, option]
     setAnswer(label, updated)
   }
+
+  const allowedTypes = config?.allowedFileTypes?.length
+    ? config.allowedFileTypes.join(",")
+    : ".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+
+  const maxSizeBytes = (config?.maxFileSizeMb || 5) * 1024 * 1024
 
   if (!visible || !config) return null
 
@@ -286,21 +339,58 @@ export default function RFQPopup() {
                 </div>
               ))}
 
+              {/* File upload */}
+              {config.allowFileUpload && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Attach Document <span className="text-gray-400 font-normal">(optional)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border border-dashed border-gray-300 hover:border-green-500 transition-colors text-sm text-gray-600">
+                    <Paperclip size={16} className="shrink-0" />
+                    <span>{attachedFile ? attachedFile.name : "Choose file (PDF, DOC, XLS, JPG, PNG)"}</span>
+                    <input
+                      type="file"
+                      accept={allowedTypes}
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        if (file.size > maxSizeBytes) {
+                          setError(`File too large. Max size: ${config.maxFileSizeMb || 5} MB`)
+                          return
+                        }
+                        setAttachedFile(file)
+                        setError("")
+                      }}
+                    />
+                  </label>
+                  {attachedFile && (
+                    <button
+                      type="button"
+                      onClick={() => setAttachedFile(null)}
+                      className="mt-1 text-xs text-gray-400 hover:text-red-500"
+                    >
+                      Remove file
+                    </button>
+                  )}
+                </div>
+              )}
+
               {error && (
                 <p className="text-red-600 text-sm">{error}</p>
               )}
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || uploadingFile}
                 className={cn(
                   "w-full py-2.5 rounded-lg text-white font-semibold text-sm transition-colors",
-                  submitting
+                  submitting || uploadingFile
                     ? "bg-green-400 cursor-not-allowed"
                     : "bg-green-600 hover:bg-green-700"
                 )}
               >
-                {submitting ? "Submitting…" : "Submit Request"}
+                {uploadingFile ? "Uploading file…" : submitting ? "Submitting…" : "Submit Request"}
               </button>
 
               <p className="text-center text-xs text-gray-400">

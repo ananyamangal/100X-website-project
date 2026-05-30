@@ -121,26 +121,18 @@ export default function SiteFooter({ logoUrl = '/logo-main.png', logoAlt = '100X
           </div>
         </div>
         <div className="text-center text-gray-500 text-sm border-t border-gray-800 pt-8">
-          <div className="flex justify-center items-center space-x-4 flex-wrap gap-2 mb-4">
-            <span>&copy; 2026 100X Circle Pvt Ltd. All rights reserved.</span>
-            <a href="/sitemap.xml" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">
-              Sitemap
-            </a>
-            <Link href="/privacy-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/terms-and-conditions" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">
-              Terms &amp; Conditions
-            </Link>
-            <Link href="/return-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">
-              Return Policy
-            </Link>
-            <Link href="/shipping-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">
-              Shipping Policy
-            </Link>
-            <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">
-              Admin
-            </a>
+          <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-1 mb-4">
+            <span className="text-xs">&copy; 2026 100X Circle Pvt Ltd. All rights reserved.</span>
+            <Link href="/privacy-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Privacy Policy</Link>
+            <Link href="/terms-and-conditions" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Terms &amp; Conditions</Link>
+            <Link href="/return-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Return Policy</Link>
+            <Link href="/refund-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Refund Policy</Link>
+            <Link href="/shipping-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Shipping Policy</Link>
+            <Link href="/warranty-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Warranty</Link>
+            <Link href="/disclaimer" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Disclaimer</Link>
+            <Link href="/cookie-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Cookie Policy</Link>
+            <a href="/sitemap.xml" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Sitemap</a>
+            <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
           </div>
           <p className="text-gray-600 text-[10px] leading-relaxed">
             fogging machine, fogging machine price, fogger, fogger machine price, thermal fogging machine, Double barrel

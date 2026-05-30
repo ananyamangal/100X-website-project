@@ -1,13 +1,11 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import Head from 'next/head';
 import { useParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Download, MessageCircle, Star, CheckCircle, Menu, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, MessageCircle, Star, CheckCircle, Play } from 'lucide-react';
 import Link from 'next/link';
 import { RichContent } from '@/components/RichContent';
-import { X as CloseIcon } from 'lucide-react';
 import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
 import { getLandingPage, type LandingPageDef } from '@/lib/seo/landing-pages';
 import RFQForm from '@/components/forms/RFQForm';
@@ -19,12 +17,11 @@ const badgeLogoMap: Record<string, string> = {
     'GeM': '/Logos clipart 2/GeM logo.png',
     'GeM logo': '/Logos clipart 2/GeM logo.png',
     'Heavy Duty': '/Logos clipart 2/Heavy Duty.png',
-    'Heavy duty': '/Logos clipart 2/Heavy Duty.png', // Case variation
+    'Heavy duty': '/Logos clipart 2/Heavy Duty.png',
     'Eco Friendly': '/Logos clipart 2/Ecofreidly.png',
     'Ecofreidly': '/Logos clipart 2/Ecofreidly.png',
     'BIS Approved': '/Logos clipart 2/BIS approved.png',
 };
-
 
 function getYouTubeId(url: string): string | null {
     if (!url || typeof url !== 'string') return null;
@@ -32,73 +29,6 @@ function getYouTubeId(url: string): string | null {
         /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/
     );
     return match ? match[1] : null;
-}
-
-function Header() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    return (
-        <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-lg z-50 border-b">
-            {/* Green utility bar removed — phone + WhatsApp now live in the
-                global Navbar as compact icon buttons. */}
-
-            <nav className="container mx-auto px-4 py-4">
-                <div className="flex justify-between items-center">
-                    <Link href="/" className="flex items-center space-x-3">
-                        <img src="/logo-main.png" alt="100X Logo" className="w-24 h-auto" />
-                        <div className="flex flex-col">
-                            <span className="text-base md:text-lg text-black font-bold">Circle Pvt Ltd.</span>
-                        </div>
-                    </Link>
-
-                    <div className="hidden lg:flex items-center space-x-8">
-                        <Link href="/" className="font-semibold text-gray-700 hover:text-green-600 transition-colors">
-                            Home
-                        </Link>
-                        <Link href="/products" className="text-gray-700 hover:text-green-600 transition-colors">
-                            Products
-                        </Link>
-                        <Link href="/contact-us" className="text-gray-700 hover:text-green-600 transition-colors" onClick={() => { if (typeof window !== 'undefined' && (window as any).gtag_report_conversion) { (window as any).gtag_report_conversion(); } }}>
-                            Contact
-                        </Link>
-                        <Button
-                            className="bg-green-600 hover:bg-green-700"
-                            onClick={() => {
-                                // Could link to a catalog or trigger a download; placeholder for now
-                                window.open('/', '_self');
-                            }}
-                        >
-                            <Download size={16} className="mr-2" />
-                            Brochure
-                        </Button>
-                    </div>
-
-                    <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
-                </div>
-
-                {isMenuOpen && (
-                    <div className="lg:hidden mt-4 pb-4 border-t">
-                        <div className="flex flex-col space-y-4 pt-4">
-                            <Link href="/" className="text-left text-green-600 font-semibold" onClick={() => setIsMenuOpen(false)}>
-                                Home
-                            </Link>
-                            <Link href="/products" className="text-gray-700" onClick={() => setIsMenuOpen(false)}>
-                                Products
-                            </Link>
-                            <Link
-                                href="/contact-us"
-                                className="text-gray-700"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Contact
-                            </Link>
-                        </div>
-                    </div>
-                )}
-            </nav>
-        </header>
-    );
 }
 
 // Landing-page narrative content is sourced from the single registry at
@@ -114,17 +44,21 @@ export default function ProductDetailPage() {
     const [loading, setLoading] = useState(true);
     const [isZoomed, setIsZoomed] = useState(false);
     const [transformOrigin, setTransformOrigin] = useState('center center');
-    const [videoClosed, setVideoClosed] = useState(false);
+    const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
     const pageMeta: ProductMeta | undefined = slug ? getLandingPage(slug) : undefined;
 
-    // Carousel auto-scroll
     useEffect(() => {
-        if (!product?.imageUrls?.length) return;
-        // Use product's slideshow interval or default to 3000ms (3 seconds)
+        if (!product) return;
+        const imgs: string[] = product.imageUrls && product.imageUrls.length > 0
+            ? product.imageUrls
+            : product.imageUrl ? [product.imageUrl] : product.image ? [product.image] : [];
+        const hasVideo = Boolean(product.youtubeLink);
+        const total = imgs.length + (hasVideo ? 1 : 0);
+        if (total <= 1) return;
         const intervalTime = product.slideshowInterval || 3000;
         const interval = setInterval(() => {
-            setCurrentImageIndex((prev) => (prev + 1) % product.imageUrls.length);
+            setCurrentImageIndex((prev) => (prev + 1) % total);
         }, intervalTime);
         return () => clearInterval(interval);
     }, [product]);
@@ -163,16 +97,21 @@ export default function ProductDetailPage() {
                 ? [product.image]
                 : [];
 
-    // Helper for thumbnails: show up to 3, centered on current image if possible
+    const videoId = product.youtubeLink ? getYouTubeId(product.youtubeLink) : null;
+    const ytThumb = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
+    type MediaItem = { kind: 'image'; url: string } | { kind: 'youtube'; videoId: string; thumb: string };
+    const mediaItems: MediaItem[] = [
+        ...images.map((url: string): MediaItem => ({ kind: 'image', url })),
+        ...(videoId && ytThumb ? [{ kind: 'youtube' as const, videoId, thumb: ytThumb }] : []),
+    ];
+
     const getThumbnails = () => {
-        if (images.length <= 3) return images;
-        if (currentImageIndex === 0) return images.slice(0, 3);
-        if (currentImageIndex === images.length - 1) return images.slice(-3);
-        return images.slice(currentImageIndex - 1, currentImageIndex + 2);
+        if (mediaItems.length <= 3) return mediaItems;
+        if (currentImageIndex === 0) return mediaItems.slice(0, 3);
+        if (currentImageIndex === mediaItems.length - 1) return mediaItems.slice(-3);
+        return mediaItems.slice(currentImageIndex - 1, currentImageIndex + 2);
     };
     const thumbnails = getThumbnails();
-
-    const videoId = product.youtubeLink ? getYouTubeId(product.youtubeLink) : null;
 
     return (
 
@@ -182,7 +121,6 @@ export default function ProductDetailPage() {
                 productName={product?.name}
                 whatsappMessage={product?.whatsappMessageText}
             />
-            <Header />
             <div className="container mx-auto px-4 py-12">
                 <div className="mb-8">
                     <Link href="/products">
@@ -195,46 +133,76 @@ export default function ProductDetailPage() {
                 <div className="grid lg:grid-cols-2 gap-12 mb-16">
                     <div>
                         <div className="relative w-full flex flex-col items-center">
-                            {/* Main Image */}
+                            {/* Main Media Viewer */}
                             <div
-                                className="relative w-full flex items-center justify-center overflow-hidden rounded-2xl"
+                                className="relative w-full flex items-center justify-center overflow-hidden rounded-2xl bg-gray-100"
+                                style={{ minHeight: 280 }}
                                 onMouseMove={(e) => {
+                                    if (mediaItems[currentImageIndex]?.kind !== 'image') return;
                                     const rect = e.currentTarget.getBoundingClientRect();
                                     const x = ((e.clientX - rect.left) / rect.width) * 100;
                                     const y = ((e.clientY - rect.top) / rect.height) * 100;
-                                    const clampedX = Math.min(100, Math.max(0, x));
-                                    const clampedY = Math.min(100, Math.max(0, y));
-                                    setTransformOrigin(`${clampedX}% ${clampedY}%`);
+                                    setTransformOrigin(`${Math.min(100, Math.max(0, x))}% ${Math.min(100, Math.max(0, y))}%`);
                                     setIsZoomed(true);
                                 }}
                                 onMouseLeave={() => setIsZoomed(false)}
                             >
-                                <img
-                                    src={images[currentImageIndex] || '/placeholder.svg'}
-                                    alt={product.name}
-                                    className="max-h-[400px] w-auto h-auto object-contain transition-transform duration-200 ease-out"
-                                    style={{
-                                        width: '100%',
-                                        transform: isZoomed ? 'scale(2)' : 'scale(1)',
-                                        transformOrigin,
-                                    }}
-                                />
-                                {/* Left/Right Arrows */}
-                                {images.length > 1 && (
+                                {mediaItems[currentImageIndex]?.kind === 'youtube' ? (
+                                    activeVideoId === (mediaItems[currentImageIndex] as any).videoId ? (
+                                        <iframe
+                                            src={`https://www.youtube.com/embed/${(mediaItems[currentImageIndex] as any).videoId}?autoplay=1&playsinline=1`}
+                                            title="Product video"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowFullScreen
+                                            className="w-full aspect-video rounded-2xl"
+                                        />
+                                    ) : (
+                                        <button
+                                            className="relative w-full aspect-video flex items-center justify-center group"
+                                            onClick={() => setActiveVideoId((mediaItems[currentImageIndex] as any).videoId)}
+                                            aria-label="Play video"
+                                        >
+                                            <img
+                                                src={(mediaItems[currentImageIndex] as any).thumb}
+                                                alt="Video thumbnail"
+                                                className="w-full h-full object-cover rounded-2xl"
+                                                draggable="false"
+                                                onContextMenu={(e) => e.preventDefault()}
+                                            />
+                                            <div className="absolute inset-0 bg-black/30 rounded-2xl group-hover:bg-black/40 transition-colors" />
+                                            <div className="absolute w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                                <Play size={28} className="text-white ml-1" fill="white" />
+                                            </div>
+                                        </button>
+                                    )
+                                ) : (
+                                    <div className="relative w-full">
+                                        <img
+                                            src={(mediaItems[currentImageIndex] as any)?.url || '/placeholder.svg'}
+                                            alt={product.name}
+                                            className="max-h-[400px] w-auto h-auto object-contain transition-transform duration-200 ease-out mx-auto block"
+                                            style={{ width: '100%', transform: isZoomed ? 'scale(2)' : 'scale(1)', transformOrigin }}
+                                            draggable="false"
+                                            onContextMenu={(e) => e.preventDefault()}
+                                        />
+                                        <div className="absolute inset-0 select-none" style={{ zIndex: 1 }} onContextMenu={(e) => e.preventDefault()} />
+                                    </div>
+                                )}
+                                {mediaItems.length > 1 && (
                                     <>
                                         <button
                                             className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-1 shadow border border-gray-300"
                                             style={{ zIndex: 2 }}
-                                            onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
-                                            aria-label="Previous image"
+                                            onClick={() => { setCurrentImageIndex((prev) => (prev - 1 + mediaItems.length) % mediaItems.length); setActiveVideoId(null); }}
+                                            aria-label="Previous"
                                         >
                                             <ChevronLeft size={32} />
                                         </button>
                                         <button
                                             className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-1 shadow border border-gray-300"
                                             style={{ zIndex: 2 }}
-                                            onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
-                                            aria-label="Next image"
+                                            onClick={() => { setCurrentImageIndex((prev) => (prev + 1) % mediaItems.length); setActiveVideoId(null); }}
+                                            aria-label="Next"
                                         >
                                             <ChevronRight size={32} />
                                         </button>
@@ -243,15 +211,28 @@ export default function ProductDetailPage() {
                             </div>
                             {/* Thumbnails */}
                             <div className="flex gap-2 mt-4 justify-center">
-                                {thumbnails.slice(0, 3).map((url: string, idx: number) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setCurrentImageIndex(images.indexOf(url))}
-                                        className={`w-20 h-20 rounded-lg border-2 ${currentImageIndex === images.indexOf(url) ? 'border-green-600' : 'border-gray-200'}`}
-                                    >
-                                        <img src={url} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover rounded-lg" />
-                                    </button>
-                                ))}
+                                {thumbnails.slice(0, 4).map((item, idx) => {
+                                    const globalIdx = mediaItems.indexOf(item);
+                                    const isActive = currentImageIndex === globalIdx;
+                                    return (
+                                        <button
+                                            key={idx}
+                                            onClick={() => { setCurrentImageIndex(globalIdx); setActiveVideoId(null); }}
+                                            className={`relative w-20 h-20 rounded-lg border-2 overflow-hidden ${isActive ? 'border-green-600' : 'border-gray-200'}`}
+                                        >
+                                            {item.kind === 'youtube' ? (
+                                                <>
+                                                    <img src={item.thumb} alt="Video" className="w-full h-full object-cover" draggable="false" />
+                                                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                                        <Play size={18} className="text-white" fill="white" />
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <img src={item.url} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" draggable="false" onContextMenu={(e) => e.preventDefault()} />
+                                            )}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
@@ -448,33 +429,6 @@ export default function ProductDetailPage() {
                     </div>
                 )}
             </div>
-            {
-                videoId && !videoClosed && (
-                    <div
-                        className="fixed right-6 bottom-24 z-[51] flex flex-col items-end gap-1"
-                        style={{ bottom: '7rem' }}
-                    >
-                        <button
-                            onClick={() => setVideoClosed(true)}
-                            className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors -mb-1 z-10"
-                            aria-label="Close video"
-                        >
-                            <CloseIcon size={18} />
-                        </button>
-                        <div className="w-[280px] sm:w-[320px] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black">
-                            <div className="aspect-video w-full relative">
-                                <iframe
-                                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}`}
-                                    title="Product video"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                    className="absolute inset-0 w-full h-full"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
-        </div >
+        </div>
     );
 } 

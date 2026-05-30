@@ -40,6 +40,20 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
   const isHeroPage = pathname === '/'
   const transparent = isHeroPage && !scrolled
 
+  const handleBrochureClick = async () => {
+    try {
+      const res = await fetch('/api/brochure')
+      const data = await res.json()
+      if (data?.mainBrochureUrl) {
+        window.open(data.mainBrochureUrl, '_blank', 'noopener,noreferrer')
+      } else {
+        window.open('/contact-us', '_self')
+      }
+    } catch {
+      window.open('/contact-us', '_self')
+    }
+  }
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
     onScroll()
@@ -125,7 +139,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
         {/* Right cluster: contact icons (always visible) + Brochure (desktop) + hamburger (mobile) */}
         <div className="flex items-center gap-1 md:gap-2">
           {contactIcons}
-          <Button className="hidden lg:inline-flex bg-green-600 hover:bg-green-700 ml-1">
+          <Button onClick={handleBrochureClick} className="hidden lg:inline-flex bg-green-600 hover:bg-green-700 ml-1" data-download aria-label="Download company brochure">
             <Download size={16} className="mr-2" aria-hidden="true" />
             Brochure
           </Button>
@@ -168,7 +182,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
                 </Link>
               )
             })}
-            <Button className="mt-3 bg-green-600 hover:bg-green-700" onClick={() => setIsMenuOpen(false)}>
+            <Button className="mt-3 bg-green-600 hover:bg-green-700" onClick={() => { setIsMenuOpen(false); handleBrochureClick(); }} data-download aria-label="Download company brochure">
               <Download size={16} className="mr-2" aria-hidden="true" />
               Brochure
             </Button>
