@@ -71,6 +71,8 @@ export default function RFQPopup() {
   const [uploadingFile, setUploadingFile] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Tracks explicit user dismissal — popup never reopens once dismissed
+  const userDismissedRef = useRef(false)
 
   // Fetch config
   useEffect(() => {
@@ -84,7 +86,10 @@ export default function RFQPopup() {
 
   // Determine whether to show the popup
   useEffect(() => {
-    if (!config || visible) return
+    if (!config) return
+    // Never reopen once user explicitly dismissed
+    if (userDismissedRef.current) return
+    if (visible) return
 
     // Path checks
     const hidden = config.hiddenPages || []
@@ -105,6 +110,7 @@ export default function RFQPopup() {
     if (config.sessionOnce && sessionStorage.getItem(SESSION_KEY)) return
 
     function show() {
+      if (userDismissedRef.current) return
       setVisible(true)
       if (config!.sessionOnce) sessionStorage.setItem(SESSION_KEY, "1")
       if (config!.autoCloseMs > 0) {
@@ -133,10 +139,23 @@ export default function RFQPopup() {
       clearTimeout(timerRef.current!)
       clearTimeout(autoCloseRef.current!)
     }
-  }, [config, pathname, visible])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config, pathname])
+
+  // ESC key closes the popup
+  useEffect(() => {
+    if (!visible) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close()
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [visible])
 
   function close() {
+    userDismissedRef.current = true
     setVisible(false)
+    clearTimeout(timerRef.current!)
     clearTimeout(autoCloseRef.current!)
   }
 

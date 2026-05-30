@@ -24,6 +24,10 @@ const DEFAULT_CONFIG = {
 }
 
 export async function GET() {
+  // TEST_MODE: bypass MongoDB for local popup behavior testing
+  if (process.env.POPUP_TEST_MODE === "1") {
+    return NextResponse.json({ ...DEFAULT_CONFIG, enabled: true, delayMs: 300, sessionOnce: false, neverAfterSubmission: false })
+  }
   try {
     const client = await clientPromise
     const db = client.db()

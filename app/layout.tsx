@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
@@ -25,6 +27,7 @@ import { MobileCtaProvider } from '@/components/cta/MobileCtaContext'
 import MobileCtaBar from '@/components/cta/MobileCtaBar'
 import { SITE_URL, SITE_NAME } from '@/lib/seo/site-config'
 import { getBrandAssets } from '@/lib/brandAssets'
+import MediaProtection from '@/components/MediaProtection'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -326,6 +329,7 @@ export default async function RootLayout({
             };
           `}
         </Script>
+        <MediaProtection />
         <MobileCtaProvider>
           <Navbar logoUrl={brandAssets.logoUrl} logoAlt={brandAssets.logoAlt} />
           <main id="main-content" tabIndex={-1}>

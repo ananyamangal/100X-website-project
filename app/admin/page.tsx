@@ -5381,6 +5381,11 @@ function RFQPopupAdminTab() {
               <Input type="tel" value={cfg.notificationWhatsapp || ""} onChange={(e) => updateCfg({ notificationWhatsapp: e.target.value })} placeholder="+917827229116" className="max-w-sm" />
               <p className="text-xs text-gray-500 mt-1">Include country code (e.g. +91...). A quick-reply WhatsApp link will be included in email alerts.</p>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Webhook URL (n8n / Zapier / Make)</label>
+              <Input type="url" value={cfg.notificationWebhook || ""} onChange={(e) => updateCfg({ notificationWebhook: e.target.value })} placeholder="https://your-n8n.com/webhook/rfq" className="max-w-xl" />
+              <p className="text-xs text-gray-500 mt-1">When set, every new lead POSTs the full lead JSON here. Use n8n to send WhatsApp via WhatsApp Business API. Leave blank to disable.</p>
+            </div>
             <div className="rounded-lg border border-gray-200 p-4 space-y-3">
               <p className="text-sm font-semibold text-gray-800">Frequency control</p>
               <label className="flex items-center gap-2 cursor-pointer">

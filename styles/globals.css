@@ -92,3 +92,46 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* ── Content protection ────────────────────────────────────────────────────── */
+
+/* Prevent drag on all images sitewide */
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+/* Product and gallery images: block right-click save + selection */
+.protected-media {
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Wrapper div that sits over an image and blocks casual right-click */
+.media-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Headings and key marketing copy: prevent trivial copy-paste */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Animate logo-marquee for customer strip */
+@keyframes logoMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-logo-marquee {
+  animation: logoMarquee 30s linear infinite;
+  width: max-content;
+}
+.animate-logo-marquee:hover {
+  animation-play-state: paused;
+}

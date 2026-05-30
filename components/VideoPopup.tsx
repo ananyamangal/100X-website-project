@@ -32,6 +32,8 @@ export default function VideoPopup() {
   const [loading, setLoading] = useState(true)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Track explicit user dismissal — once dismissed, never reopen until page reload
+  const userDismissedRef = useRef(false)
 
   useEffect(() => {
     setLoading(true)
@@ -67,8 +69,11 @@ export default function VideoPopup() {
   }, [pathname])
 
   useEffect(() => {
-    if (!config || loading || visible) return
+    if (!config || loading) return
     if (!config.enabled) return
+    // Never reopen if user explicitly dismissed
+    if (userDismissedRef.current) return
+    if (visible) return
 
     // Path check — normalize stored values: strip any leading domain so
     // full URLs pasted by the admin ("https://site.com/path") still match.
@@ -88,6 +93,7 @@ export default function VideoPopup() {
     if (config.sessionOnce && sessionStorage.getItem(SESSION_KEY)) return
 
     timerRef.current = setTimeout(() => {
+      if (userDismissedRef.current) return
       setVisible(true)
       if (config.sessionOnce) sessionStorage.setItem(SESSION_KEY, "1")
       if (config.autoCloseMs > 0) {
@@ -99,9 +105,31 @@ export default function VideoPopup() {
       clearTimeout(timerRef.current!)
       clearTimeout(autoCloseRef.current!)
     }
-  }, [config, loading, pathname, visible])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config, loading, pathname])
+
+  // ESC key closes the popup
+  useEffect(() => {
+    if (!visible) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        userDismissedRef.current = true
+        setVisible(false)
+        clearTimeout(autoCloseRef.current!)
+      }
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [visible])
 
   if (loading || !config || !visible) return null
+
+  const dismiss = () => {
+    userDismissedRef.current = true
+    setVisible(false)
+    clearTimeout(timerRef.current!)
+    clearTimeout(autoCloseRef.current!)
+  }
 
   const videoId = getYouTubeId(config.youtubeUrl)
   if (!videoId) return null
@@ -115,9 +143,9 @@ export default function VideoPopup() {
       style={{ bottom: "7rem" }}
     >
       <button
-        onClick={() => setVisible(false)}
-        className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors -mb-1 z-10"
-        aria-label="Close video"
+        onClick={dismiss}
+        className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors -mb-1 z-10 min-w-[32px] min-h-[32px] flex items-center justify-center"
+        aria-label="Close video — will not reopen"
       >
         <X size={18} />
       </button>

@@ -4,6 +4,10 @@ import clientPromise from '@/lib/mongodb';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  // TEST_MODE: bypass MongoDB for local popup behavior testing
+  if (process.env.POPUP_TEST_MODE === "1") {
+    return NextResponse.json({ youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', orientation: 'landscape', enabled: true, delayMs: 300, sessionOnce: false, showOnMobile: true, showOnDesktop: true, autoCloseMs: 0, hideOnPaths: [] });
+  }
   try {
     const client = await clientPromise;
     const db = client.db();

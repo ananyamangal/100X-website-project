@@ -43,12 +43,13 @@ export async function sendAdminEmail(args: {
   text: string;
   html?: string;
   replyTo?: string;
+  to?: string;
 }): Promise<SendResult> {
   const transporter = getTransporter()
   if (!transporter) return { ok: false, reason: "not_configured" }
 
   const from = process.env.EMAIL_USER!
-  const to = process.env.EMAIL_TO || from
+  const to = args.to || process.env.EMAIL_TO || from
 
   try {
     const info = await transporter.sendMail({
