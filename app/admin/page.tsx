@@ -4967,7 +4967,11 @@ function VideoPopupTab() {
     e.preventDefault()
     setSaving(true)
     setMessage(null)
-    const paths = hideOnPaths.split(",").map((p: string) => p.trim()).filter(Boolean)
+    const normalizePath = (raw: string) => {
+      const t = raw.trim()
+      try { return new URL(t).pathname } catch { return t }
+    }
+    const paths = hideOnPaths.split(",").map(normalizePath).filter(Boolean)
     try {
       const res = await fetch("/api/admin/video-popup", {
         method: "PUT",
@@ -5066,7 +5070,10 @@ function VideoPopupTab() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Hide on these paths (comma-separated)</label>
               <Input value={hideOnPaths} onChange={(e) => setHideOnPaths(e.target.value)} placeholder="/admin, /thank-you, /checkout" />
-              <p className="text-xs text-gray-500 mt-1">/admin and /thank-you are always hidden regardless.</p>
+              <p className="text-xs text-gray-500 mt-1">/admin and /thank-you are always hidden regardless. Use paths only — e.g. <code>/product-page</code>, not full URLs.</p>
+              {hideOnPaths && hideOnPaths.split(",").some((p) => p.trim().startsWith("http")) && (
+                <p className="text-xs text-amber-600 mt-1 font-medium">⚠ Full URLs detected — they will be automatically converted to paths on save.</p>
+              )}
             </div>
 
             {message && <p className={message.type === "success" ? "text-green-600" : "text-red-600"}>{message.text}</p>}

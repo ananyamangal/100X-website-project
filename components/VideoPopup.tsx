@@ -70,10 +70,14 @@ export default function VideoPopup() {
     if (!config || loading || visible) return
     if (!config.enabled) return
 
-    // Path check
+    // Path check — normalize stored values: strip any leading domain so
+    // full URLs pasted by the admin ("https://site.com/path") still match.
+    const toPath = (raw: string) => {
+      try { return new URL(raw).pathname } catch { return raw }
+    }
     const defaultHide = ["/admin", "/thank-you", "/brochure-thank-you"]
-    const hidePaths = [...defaultHide, ...config.hideOnPaths]
-    if (hidePaths.some((p) => pathname.startsWith(p))) return
+    const hidePaths = [...defaultHide, ...config.hideOnPaths.map(toPath)]
+    if (hidePaths.some((p) => p && pathname.startsWith(p))) return
 
     // Mobile/desktop check
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768
