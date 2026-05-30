@@ -14,8 +14,8 @@ const CASE_STUDIES = [
     id: "municipal-nagar-nigam-haryana-up-bihar",
     title: "Vehicle-Mounted Foggers for Nagar Nigams — Haryana, UP, Bihar",
     type: "Municipal Vector Control",
-    scale: "Multiple municipal corporations across 3 states",
-    product: "Vehicle-mounted thermal fogging machines",
+    scale: "Multiple Nagar Nigams and municipal corporations across Haryana, Uttar Pradesh, and Bihar",
+    product: "100XDB400 Double Barrel Vehicle-Mounted Thermal Fogging Machine (50–100L tank)",
     problem:
       "Nagar Nigams in Haryana, Uttar Pradesh, and Bihar needed to upgrade ageing fogging equipment for monsoon-season dengue and malaria control drives. Previous imported machines had long spare parts lead times and high maintenance costs.",
     solution:
@@ -30,8 +30,8 @@ const CASE_STUDIES = [
     id: "district-health-gem-dengue-outbreak",
     title: "Emergency GeM Procurement — District Health Departments for Dengue Outbreaks",
     type: "Emergency Vector Control",
-    scale: "Multiple district health departments",
-    product: "Portable thermal fogging machines",
+    scale: "District health departments across multiple states via GeM direct procurement",
+    product: "100XTFS50 Portable Thermal Fogging Machine and ISI-marked HDPE tank models",
     problem:
       "District health departments needed rapid procurement of portable thermal foggers for emergency dengue outbreak response. Standard tender processes took 6–12 weeks — too slow for epidemic response.",
     solution:
@@ -46,8 +46,8 @@ const CASE_STUDIES = [
     id: "agricultural-cooperatives-punjab-haryana",
     title: "Agricultural Fogger Deployment — Punjab and Haryana Cooperatives",
     type: "Agricultural Sector",
-    scale: "Farm cooperative societies across 2 states",
-    product: "Portable thermal fogging machines",
+    scale: "Farm cooperative societies in Punjab and Haryana (shared-use procurement model)",
+    product: "100XKB200 Mini Portable Thermal Fogging Machine (5–10L tank, single-operator)",
     problem:
       "Paddy and vegetable farmers in Punjab and Haryana faced increasing crop loss from whitefly, aphid, and fungal infestations. Conventional compression sprayers failed to penetrate dense paddy canopy, leaving undersides of leaves unprotected.",
     solution:
@@ -95,17 +95,31 @@ const CASE_STUDIES = [
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  name: "100X Circle Case Studies",
+  name: "100X Circle Case Studies — Government & Commercial Supply Track Record",
   description:
-    "Government supply and commercial deployment case studies for 100X Circle thermal fogging machines.",
+    "Government supply and commercial deployment case studies for 100X Circle thermal fogging machines. Covers Nagar Nigams in Haryana/UP/Bihar, district health department emergency GeM procurement, Punjab/Haryana agricultural cooperatives, pan-India PCO fleet expansion, and international export.",
   url: `${SITE_URL}/case-studies`,
   publisher: { "@id": `${SITE_URL}/#organization` },
+  about: { "@id": `${SITE_URL}/#organization` },
+  mentions: [
+    { "@type": "Organization", name: "Government e-Marketplace (GeM)", url: "https://gem.gov.in" },
+    { "@type": "AdministrativeArea", name: "Haryana, India" },
+    { "@type": "AdministrativeArea", name: "Uttar Pradesh, India" },
+    { "@type": "AdministrativeArea", name: "Bihar, India" },
+    { "@type": "AdministrativeArea", name: "Punjab, India" },
+    { "@type": "Product", name: "100XDB400 Double Barrel Thermal Fogging Machine", manufacturer: { "@id": `${SITE_URL}/#organization` } },
+    { "@type": "Product", name: "100XTFS50 Thermal and Cold Fogging Machine", manufacturer: { "@id": `${SITE_URL}/#organization` } },
+    { "@type": "Product", name: "100XKB200 Mini Portable Fogging Machine", manufacturer: { "@id": `${SITE_URL}/#organization` } },
+  ],
   hasPart: CASE_STUDIES.map((cs) => ({
     "@type": "Article",
     name: cs.title,
-    description: cs.outcome,
+    description: `${cs.problem} ${cs.outcome}`,
     url: `${SITE_URL}/case-studies#${cs.id}`,
     about: { "@type": "Thing", name: cs.type },
+    mentions: [{ "@id": `${SITE_URL}/#organization` }],
+    keywords: [cs.type, "thermal fogging machine", "100X Circle", cs.procurement].join(", "),
+    datePublished: cs.timeline.split("–")[0].trim() + "-01-01",
   })),
 }
 

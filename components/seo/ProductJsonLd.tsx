@@ -129,6 +129,14 @@ export function ProductJsonLd({
     brand: {
       "@type": "Brand",
       name: SITE_NAME,
+      "@id": `${SITE_URL}/#brand`,
+    },
+    manufacturer: {
+      "@id": `${SITE_URL}/#organization`,
+    },
+    countryOfOrigin: {
+      "@type": "Country",
+      name: "India",
     },
     offers: buildOffers(url, inStock, priceRange),
     aggregateRating,

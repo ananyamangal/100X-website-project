@@ -196,43 +196,122 @@ export default async function RootLayout({
                   var link_location = (locWrap && locWrap.getAttribute('data-gtm-location')) || '';
                   var href = (el.getAttribute && el.getAttribute('href')) || '';
                   var h = String(href).toLowerCase();
+
+                  // Phone / call click
                   if (h.indexOf('tel:') === 0) {
-                    var telPayload = Object.assign(gtmContextFromStorage(), { event: 'phone_click', link_url: href });
+                    var telPayload = Object.assign(gtmContextFromStorage(), {
+                      event: 'phone_click',
+                      // GA4 standard: 'call_click'
+                      ga4_event: 'call_click',
+                      link_url: href,
+                      phone_number: href.replace('tel:', ''),
+                      value: 500,
+                      currency: 'INR',
+                    });
                     if (link_location) telPayload.link_location = link_location;
                     window.dataLayer.push(telPayload);
                     return;
                   }
+
+                  // Email click
                   if (h.indexOf('mailto:') === 0) {
                     var mailPayload = Object.assign(gtmContextFromStorage(), { event: 'email_click', link_url: href });
                     if (link_location) mailPayload.link_location = link_location;
                     window.dataLayer.push(mailPayload);
                     return;
                   }
+
+                  // WhatsApp click — conversion event
                   if (h.indexOf('wa.me') !== -1 || h.indexOf('whatsapp') !== -1) {
-                    var waPayload = Object.assign(gtmContextFromStorage(), { event: 'whatsapp_click', whatsapp_url: href });
+                    var waPayload = Object.assign(gtmContextFromStorage(), {
+                      event: 'whatsapp_click',
+                      ga4_event: 'contact',
+                      whatsapp_url: href,
+                      value: 500,
+                      currency: 'INR',
+                    });
                     if (link_location) waPayload.link_location = link_location;
                     window.dataLayer.push(waPayload);
                     return;
+                  }
+
+                  // Brochure / PDF download
+                  if (h.indexOf('.pdf') !== -1 || (el.getAttribute && el.getAttribute('data-download'))) {
+                    window.dataLayer.push(Object.assign(gtmContextFromStorage(), {
+                      event: 'file_download',
+                      ga4_event: 'file_download',
+                      file_name: href.split('/').pop() || 'brochure',
+                      file_extension: 'pdf',
+                      link_url: href,
+                    }));
+                    return;
+                  }
+
+                  // GeM link click
+                  if (h.indexOf('gem.gov.in') !== -1) {
+                    window.dataLayer.push(Object.assign(gtmContextFromStorage(), {
+                      event: 'gem_click',
+                      link_url: href,
+                    }));
                   }
                 },
                 true
               );
 
+              // Contact form submit
               document.addEventListener(
                 'submit',
                 function (e) {
                   var form = e.target;
                   if (!form || form.tagName !== 'FORM') return;
+                  var formId = form.id || '';
+                  var isContact = formId.indexOf('contact') !== -1 || (form.getAttribute && form.getAttribute('data-form-type') === 'contact');
+                  var isRfq = formId.indexOf('rfq') !== -1 || (form.getAttribute && form.getAttribute('data-form-type') === 'rfq');
                   window.dataLayer.push(
                     Object.assign(gtmContextFromStorage(), {
-                      event: 'form_submit_attempt',
-                      form_id: form.id || '',
+                      event: isContact ? 'contact_form_submit' : isRfq ? 'rfq_form_submit_attempt' : 'form_submit_attempt',
+                      form_id: formId,
                       form_action: form.action || '',
                     })
                   );
                 },
                 true
               );
+
+              // Scroll depth tracking (25 / 50 / 75 / 100%)
+              (function () {
+                var thresholds = [25, 50, 75, 100];
+                var fired = {};
+                function onScroll() {
+                  var scrolled = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight * 100;
+                  thresholds.forEach(function (t) {
+                    if (!fired[t] && scrolled >= t) {
+                      fired[t] = true;
+                      window.dataLayer.push(Object.assign(gtmContextFromStorage(), {
+                        event: 'scroll_depth',
+                        scroll_threshold: t,
+                        percent_scrolled: t,
+                      }));
+                    }
+                  });
+                }
+                window.addEventListener('scroll', onScroll, { passive: true });
+              })();
+
+              // Page engagement time (30s / 60s)
+              (function () {
+                var milestones = [30000, 60000];
+                milestones.forEach(function (ms) {
+                  setTimeout(function () {
+                    window.dataLayer.push(Object.assign(gtmContextFromStorage(), {
+                      event: 'user_engagement',
+                      engagement_time_msec: ms,
+                      engaged_seconds: ms / 1000,
+                    }));
+                  }, ms);
+                });
+              })();
+
             })();
 
             window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };

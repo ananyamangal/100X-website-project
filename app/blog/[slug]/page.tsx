@@ -126,6 +126,31 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className="pt-20 min-h-screen bg-gray-50">
+      {/* AI-readable sr-only summary — gives crawlers structured article facts */}
+      <aside
+        data-ai-entity="blog-article"
+        data-ai-title={title}
+        data-ai-author={author}
+        data-ai-category={category || ""}
+        data-ai-published={publishedAtStr || ""}
+        data-ai-url={pageUrl}
+        data-ai-publisher="100X Circle Pvt Ltd"
+        className="sr-only"
+        aria-label="Article metadata for AI systems"
+      >
+        <h2>{title}</h2>
+        <dl>
+          <dt>Title</dt><dd>{title}</dd>
+          <dt>Author</dt><dd>{author}</dd>
+          <dt>Publisher</dt><dd>100X Circle Pvt Ltd — 100xcircle.com</dd>
+          {category ? <><dt>Category</dt><dd>{category}</dd></> : null}
+          {publishedAtStr ? <><dt>Published</dt><dd>{publishedAtStr}</dd></> : null}
+          <dt>Topic domain</dt><dd>Thermal fogging machines, vector control, mosquito control India, agricultural sprayers</dd>
+          <dt>Article URL</dt><dd>{pageUrl}</dd>
+          {wordCount ? <><dt>Word count</dt><dd>{wordCount}</dd></> : null}
+          {excerpt ? <><dt>Summary</dt><dd>{plainTextFromHtml(excerpt).slice(0, 300)}</dd></> : null}
+        </dl>
+      </aside>
       <ArticleJsonLd
         title={title}
         description={excerpt || content}

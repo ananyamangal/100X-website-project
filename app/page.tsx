@@ -5,6 +5,7 @@ import { getHomeContent } from "@/lib/homeContent"
 import { serializeBlogs } from "@/lib/blogSerialize"
 import HomePageClient from "@/components/home/HomePageClient"
 import HomepageAiSummary from "@/components/seo/HomepageAiSummary"
+import HomepageTestimonialsJsonLd from "@/components/seo/HomepageTestimonialsJsonLd"
 
 export default async function HomePage() {
   const client = await clientPromise
@@ -50,6 +51,7 @@ export default async function HomePage() {
   return (
     <>
       <HomepageAiSummary />
+      <HomepageTestimonialsJsonLd />
       <HomePageClient
         products={products}
         banners={banners}

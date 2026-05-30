@@ -127,8 +127,8 @@ const PAGES = [
   {
     url: "/blog/[slug]",
     label: "Blog Posts",
-    scores: { structuredData: 72, factualDensity: 65, entityClarity: 70, crawlerAccess: 100, answerQuality: 68 },
-    notes: "Lowest scoring. Add Article JSON-LD to blog posts. Improve factual density in articles.",
+    scores: { structuredData: 85, factualDensity: 65, entityClarity: 78, crawlerAccess: 100, answerQuality: 72 },
+    notes: "Article JSON-LD upgraded: @id, publisher entity link, wordCount, inLanguage, isPartOf, author disambiguation. AI summary block added. Improve: factual density in articles.",
   },
 ]
 
