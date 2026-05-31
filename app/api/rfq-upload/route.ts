@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
+import clientPromise from "@/lib/mongodb"
+import { GridFSBucket } from "mongodb"
+
+export const dynamic = "force-dynamic"
 
 const MAX_BYTES = 10 * 1024 * 1024 // 10MB
 
@@ -15,12 +19,13 @@ const ALLOWED_MIME = new Set([
 
 const ALLOWED_EXT = new Set([".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png"])
 
-const CLOUDINARY_CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dhbvzugv6"
-const CLOUDINARY_PRESET = "product_uploads"
-
 function extOf(name: string): string {
   const i = name.lastIndexOf(".")
   return i >= 0 ? name.slice(i).toLowerCase() : ""
+}
+
+function safeName(name: string): string {
+  return name.replace(/[^a-zA-Z0-9._-]+/g, "-").slice(0, 120)
 }
 
 export async function POST(request: NextRequest) {
@@ -43,29 +48,35 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Upload to Cloudinary (server-side) — raw for documents, image for photos
-    const resourceType = file.type.startsWith("image/") ? "image" : "raw"
-    const fd = new FormData()
-    fd.append("file", file)
-    fd.append("upload_preset", CLOUDINARY_PRESET)
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const client = await clientPromise
+    const db = client.db()
+    const bucket = new GridFSBucket(db, { bucketName: "rfq_attachments" })
 
-    const cloudRes = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/${resourceType}/upload`,
-      { method: "POST", body: fd },
-    )
-    const cloudData = await cloudRes.json()
-    if (!cloudData.secure_url) {
-      console.error("Cloudinary upload failed:", cloudData.error)
-      return NextResponse.json({ error: cloudData.error?.message || "Upload failed" }, { status: 500 })
-    }
-
-    return NextResponse.json({
-      url: cloudData.secure_url as string,
-      name: file.name,
-      size: file.size,
+    const filename = `${Date.now()}-${safeName(file.name)}`
+    const uploadStream = bucket.openUploadStream(filename, {
+      contentType: file.type || "application/octet-stream",
+      metadata: {
+        originalName: file.name,
+        size: file.size,
+        uploadedAt: new Date().toISOString(),
+      },
     })
+    uploadStream.end(buffer)
+
+    await new Promise<void>((resolve, reject) => {
+      uploadStream.on("finish", resolve)
+      uploadStream.on("error", reject)
+    })
+
+    const fileId = String(uploadStream.id)
+    // Public URL served by our own endpoint — no Cloudinary dependency
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://100-x-website-project.vercel.app"
+    const url = `${baseUrl}/api/rfq-attachments/${fileId}`
+
+    return NextResponse.json({ url, name: file.name, size: file.size })
   } catch (err) {
     console.error("RFQ upload failed:", err)
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 })
+    return NextResponse.json({ error: "Upload failed", detail: String(err) }, { status: 500 })
   }
 }

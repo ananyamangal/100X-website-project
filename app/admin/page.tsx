@@ -4879,19 +4879,16 @@ function BrochureTab() {
     setUploading(true)
     setMessage(null)
     try {
-      const formDataCloud = new FormData()
-      formDataCloud.append("file", file)
-      formDataCloud.append("upload_preset", "product_uploads")
-      const res = await fetch("https://api.cloudinary.com/v1_1/dhbvzugv6/raw/upload", {
-        method: "POST",
-        body: formDataCloud,
-      })
+      // Upload via our own server route (stores in MongoDB GridFS — avoids Cloudinary ACL issues)
+      const fd = new FormData()
+      fd.append("file", file)
+      const res = await fetch("/api/admin/brochure/upload", { method: "POST", body: fd })
       const data = await res.json()
-      if (data.secure_url) {
-        setMainBrochureUrl(data.secure_url)
-        setMessage({ type: "success", text: "PDF uploaded. Click Save to use it as the main website brochure." })
+      if (res.ok && data.ok) {
+        setMainBrochureUrl("/api/brochure/download")
+        setMessage({ type: "success", text: `PDF uploaded (${(file.size / 1024).toFixed(0)} KB). Brochure is now live — test it at /api/brochure/download` })
       } else {
-        setMessage({ type: "error", text: "Upload failed. Check Cloudinary preset allows raw/PDF uploads." })
+        setMessage({ type: "error", text: data.error || "Upload failed." })
       }
     } catch {
       setMessage({ type: "error", text: "Upload failed." })
@@ -4901,6 +4898,8 @@ function BrochureTab() {
     }
   }
 
+  // Save is now automatic after upload — the upload route sets the brochure URL in MongoDB.
+  // The handleSave form is kept for manual URL override if needed.
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
@@ -4912,7 +4911,7 @@ function BrochureTab() {
         body: JSON.stringify({ mainBrochureUrl: mainBrochureUrl.trim() }),
       })
       if (res.ok) {
-        setMessage({ type: "success", text: "Main website brochure saved. It will be used when visitors click the header \"Brochure\" (Complete Product Catalog)." })
+        setMessage({ type: "success", text: "Brochure URL saved." })
       } else {
         setMessage({ type: "error", text: "Failed to save." })
       }
@@ -4955,8 +4954,8 @@ function BrochureTab() {
                 </label>
                 {mainBrochureUrl && (
                   <>
-                    <a href={mainBrochureUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline text-sm">
-                      View current brochure
+                    <a href="/api/brochure/download" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline text-sm">
+                      Test brochure download ↗
                     </a>
                     <button
                       type="button"
@@ -5573,7 +5572,9 @@ function RFQPopupAdminTab() {
                       </td>
                       <td className="px-3 py-2 text-xs">
                         {lead.attachmentUrl ? (
-                          <a href={lead.attachmentUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">View file</a>
+                          <a href={lead.attachmentUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">
+                            View file
+                          </a>
                         ) : "—"}
                       </td>
                       <td className="px-3 py-2 text-xs text-gray-500">{lead.utm?.utm_source || "—"}</td>

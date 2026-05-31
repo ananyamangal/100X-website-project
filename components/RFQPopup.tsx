@@ -35,8 +35,6 @@ interface PopupConfig {
 
 const SESSION_KEY = "rfq-popup-seen-v1"
 const SUBMITTED_KEY = "rfq-popup-submitted-v1"
-const CLOUDINARY_CLOUD = "dhbvzugv6"
-const CLOUDINARY_PRESET = "product_uploads"
 
 function getUtm(): Record<string, string> {
   if (typeof window === "undefined") return {}
@@ -58,19 +56,18 @@ function buildWaMessage(answers: Record<string, string | string[]>, attachmentUr
   return lines.join("\n")
 }
 
-async function uploadFileToCloudinary(file: File): Promise<string> {
+// Upload via our own server route (MongoDB GridFS) — avoids Cloudinary ACL issues on raw files
+async function uploadFileViaServer(file: File): Promise<string> {
   const fd = new FormData()
   fd.append("file", file)
-  fd.append("upload_preset", CLOUDINARY_PRESET)
-  // Use raw/upload for documents; image/upload for images — auto/upload can fail on raw presets
-  const resourceType = file.type.startsWith("image/") ? "image" : "raw"
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/${resourceType}/upload`, {
-    method: "POST",
-    body: fd,
-  })
+  const res = await fetch("/api/rfq-upload", { method: "POST", body: fd })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Upload failed" }))
+    throw new Error(err.error || "Upload failed")
+  }
   const data = await res.json()
-  if (!data.secure_url) throw new Error(data.error?.message || "Upload failed")
-  return data.secure_url as string
+  if (!data.url) throw new Error("No URL returned from upload")
+  return data.url as string
 }
 
 export default function RFQPopup() {
@@ -205,7 +202,7 @@ export default function RFQPopup() {
       if (attachedFile) {
         setUploadingFile(true)
         try {
-          attachmentUrl = await uploadFileToCloudinary(attachedFile)
+          attachmentUrl = await uploadFileViaServer(attachedFile)
         } catch {
           setError("File upload failed. Please try again or submit without attachment.")
           setSubmitting(false)
