@@ -1915,15 +1915,13 @@ function ProductForm({
                     if (e.target.files && e.target.files[0]) {
                       setUploadingBrochure(true);
                       const file = e.target.files[0];
-                      const formDataCloud = new FormData();
-                      formDataCloud.append("file", file);
-                      formDataCloud.append("upload_preset", "product_uploads");
-                      const res = await fetch(
-                        "https://api.cloudinary.com/v1_1/dhbvzugv6/raw/upload",
-                        { method: "POST", body: formDataCloud }
-                      );
+                      const fd = new FormData();
+                      fd.append("file", file);
+                      const res = await fetch("/api/admin/upload-file", { method: "POST", body: fd });
                       const data = await res.json();
-                      setFormData(prev => ({ ...prev, brochureUrl: data.secure_url || prev.brochureUrl }));
+                      if (res.ok && data.url) {
+                        setFormData(prev => ({ ...prev, brochureUrl: data.url }));
+                      }
                       setUploadingBrochure(false);
                     }
                   }}

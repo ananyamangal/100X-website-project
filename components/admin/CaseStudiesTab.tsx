@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 
+// Images still use Cloudinary (image/upload — no ACL issues). PDFs use /api/admin/upload-file.
 const CLOUDINARY_CLOUD = "dhbvzugv6"
 const CLOUDINARY_PRESET = "product_uploads"
 
@@ -124,10 +125,9 @@ export function CaseStudiesTab() {
     setUploading(true)
     const fd = new FormData()
     fd.append("file", file)
-    fd.append("upload_preset", CLOUDINARY_PRESET)
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/raw/upload`, { method: "POST", body: fd })
+    const res = await fetch("/api/admin/upload-file", { method: "POST", body: fd })
     const data = await res.json()
-    if (data.secure_url) set("pdfUrl", data.secure_url as string)
+    if (res.ok && data.url) set("pdfUrl", data.url as string)
     setUploading(false)
   }
 

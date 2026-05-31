@@ -41,11 +41,11 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
   const isHeroPage = pathname === '/'
   const transparent = isHeroPage && !scrolled
 
-  // Check if a brochure is configured so we know where to send on click
+  // Check if a brochure is uploaded so we know where to send on click
   useEffect(() => {
     fetch('/api/brochure')
       .then((r) => r.json())
-      .then((data) => { if (data?.mainBrochureUrl) setHasBrochure(true) })
+      .then((data) => { if (data?.hasBrochure) setHasBrochure(true) })
       .catch(() => {})
   }, [])
 

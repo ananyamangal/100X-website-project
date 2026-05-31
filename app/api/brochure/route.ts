@@ -1,18 +1,23 @@
-import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
+import { NextResponse } from "next/server"
+import clientPromise from "@/lib/mongodb"
 
-const KEY = 'main';
+export const dynamic = "force-dynamic"
 
-// GET - Public: fetch main website brochure URL
+// Returns whether a brochure file exists in GridFS.
+// Navbar and other consumers use this to decide whether to show the button.
 export async function GET() {
   try {
-    const client = await clientPromise;
-    const db = client.db();
-    const doc = await db.collection('brochure').findOne({ key: KEY });
-    const mainBrochureUrl = doc?.mainBrochureUrl ?? null;
-    return NextResponse.json({ mainBrochureUrl });
-  } catch (error) {
-    console.error('Error fetching brochure:', error);
-    return NextResponse.json({ mainBrochureUrl: null });
+    const client = await clientPromise
+    const db = client.db()
+    const count = await db
+      .collection("brochures.files")
+      .countDocuments({ filename: "main-brochure.pdf" })
+    return NextResponse.json({
+      hasBrochure: count > 0,
+      // Keep mainBrochureUrl for backwards compat — always points to our proxy
+      mainBrochureUrl: count > 0 ? "/api/brochure/download" : null,
+    })
+  } catch {
+    return NextResponse.json({ hasBrochure: false, mainBrochureUrl: null })
   }
 }
