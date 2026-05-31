@@ -26,6 +26,179 @@ const PLACEMENTS = [
 
 const IMAGE_POSITIONS = ["left", "right", "center", "background"]
 const THEMES = ["light", "dark", "green", "orange"]
+const LAYOUTS = [
+  { value: "split", label: "Split (image + text side by side)" },
+  { value: "comparison", label: "Comparison Table (Trading Co. vs Manufacturer)" },
+  { value: "pillars", label: "Trust Pillars (checkmarks grid)" },
+  { value: "grid-cards", label: "Grid Cards (icon + label)" },
+  { value: "centered", label: "Centered (full-width)" },
+]
+
+// The 4 campaign sections for the OEM Manufacturer trust story
+const CAMPAIGN_SECTIONS = [
+  {
+    sectionKey: "buyers-dilemma",
+    type: "before",
+    layout: "comparison",
+    enabled: false,
+    order: 10,
+    placement: "after-hero",
+    badge: "The Buyer's Dilemma",
+    headline: "Everyone Claims To Be A Manufacturer. How Do You Know Who Really Is?",
+    subheadline: "Buyers often discover the difference only after quality issues, spare-part shortages, or tender compliance failures.",
+    bodyText: "Many suppliers market imported products as their own. Without verified manufacturing credentials, buyers risk procurement failures that cost far more than the machine itself.",
+    ctaText: "View Manufacturing Facility",
+    ctaUrl: "/about",
+    ctaSecondaryText: "See Certifications",
+    ctaSecondaryUrl: "/about#certifications",
+    imageUrl: "https://res.cloudinary.com/dhbvzugv6/image/upload/v1780214929/npfovt85oy1y1rfm2siu.png",
+    imageAlt: "Buyer confused about which fogging machine supplier to trust",
+    imagePosition: "right",
+    theme: "light",
+    comparisonBadTitle: "Trading Company",
+    comparisonGoodTitle: "100x Circle — Genuine Manufacturer",
+    comparisonBad: [
+      "Imported Chinese products with Indian branding",
+      "No testing infrastructure",
+      "Cannot modify specifications",
+      "Limited or no spare parts support",
+      "No original technical documentation",
+      "Cannot support tenders requiring Indian OEM certification",
+    ],
+    comparisonGood: [
+      "Designed and manufactured in India",
+      "In-house testing facility",
+      "Custom specification manufacturing",
+      "Full spare parts availability from Gurugram",
+      "Complete technical documentation",
+      "GeM and tender compliance documentation",
+    ],
+    stats: [],
+    bullets: [],
+    showOnMobile: true,
+    showOnDesktop: true,
+  },
+  {
+    sectionKey: "100x-difference",
+    type: "after",
+    layout: "pillars",
+    enabled: false,
+    order: 11,
+    placement: "after-products",
+    badge: "The 100x Difference",
+    headline: "Choose A Genuine OEM Manufacturer",
+    subheadline: "100x Circle designs, manufactures and supports fogging equipment from India.",
+    bodyText: "",
+    ctaText: "Explore Products",
+    ctaUrl: "/products",
+    ctaSecondaryText: "",
+    ctaSecondaryUrl: "",
+    imageUrl: "https://res.cloudinary.com/dhbvzugv6/image/upload/v1780214888/tc0ezlvaku38ypw5ajet.png",
+    imageAlt: "Satisfied buyer approving 100x Circle genuine OEM fogging machines",
+    imagePosition: "left",
+    theme: "green",
+    bullets: [
+      "Genuine OEM Manufacturer",
+      "Made In India",
+      "GeM Qualified Supplier",
+      "Lab Tested Products",
+      "Indian & International Certifications",
+      "OEM Branding Available",
+      "Custom Manufacturing",
+      "Tender Qualified Products",
+      "Government Supply Experience",
+      "Spare Parts Support",
+    ],
+    stats: [
+      { label: "Years of Manufacturing", value: "10+" },
+      { label: "Government Orders", value: "1000+" },
+    ],
+    comparisonBad: [],
+    comparisonGood: [],
+    comparisonBadTitle: "",
+    comparisonGoodTitle: "",
+    showOnMobile: true,
+    showOnDesktop: true,
+  },
+  {
+    sectionKey: "public-health-authority",
+    type: "government",
+    layout: "grid-cards",
+    enabled: false,
+    order: 12,
+    placement: "before-trust",
+    badge: "Government & Institutional",
+    headline: "Trusted For Public Health & Municipal Fogging Programs",
+    subheadline: "Supporting municipalities, government departments, public health agencies, institutional buyers, pest-control operators and distributors across India.",
+    bodyText: "",
+    ctaText: "View Deployments",
+    ctaUrl: "/deployments",
+    ctaSecondaryText: "Read Case Studies",
+    ctaSecondaryUrl: "/case-studies",
+    imageUrl: "",
+    imageAlt: "",
+    imagePosition: "right",
+    theme: "dark",
+    bullets: [
+      "Government Procurement Support",
+      "GeM Procurement Ready",
+      "Tender Documentation Support",
+      "Technical Compliance Support",
+      "After Sales Service",
+      "Custom Manufacturing",
+      "OEM Branding",
+      "Deployment Support",
+    ],
+    stats: [
+      { label: "States Covered", value: "22" },
+      { label: "Nagar Nigams Served", value: "50+" },
+    ],
+    comparisonBad: [],
+    comparisonGood: [],
+    comparisonBadTitle: "",
+    comparisonGoodTitle: "",
+    showOnMobile: true,
+    showOnDesktop: true,
+  },
+  {
+    sectionKey: "manufacturing-authority",
+    type: "custom",
+    layout: "grid-cards",
+    enabled: false,
+    order: 13,
+    placement: "before-faq",
+    badge: "Why Genuine Manufacturers Win",
+    headline: "Why Buyers Choose Genuine Manufacturers",
+    subheadline: "The difference between a trading company and a real OEM manufacturer becomes clear when it matters most — in tenders, service, and long-term performance.",
+    bodyText: "",
+    ctaText: "Request a Quote",
+    ctaUrl: "/contact-us",
+    ctaSecondaryText: "View Products",
+    ctaSecondaryUrl: "/products",
+    imageUrl: "",
+    imageAlt: "",
+    imagePosition: "right",
+    theme: "light",
+    bullets: [
+      "Factory & Manufacturing Plant",
+      "In-house Testing & QC",
+      "ISO 9001:2015 & CE Certification",
+      "Engineering & R&D Capability",
+      "Custom Specification Manufacturing",
+      "OEM Branding for Distributors",
+      "GeM & Tender Qualification",
+      "Government Supply Track Record",
+      "Domestic Spare Parts & Service",
+    ],
+    stats: [],
+    comparisonBad: [],
+    comparisonGood: [],
+    comparisonBadTitle: "",
+    comparisonGoodTitle: "",
+    showOnMobile: true,
+    showOnDesktop: true,
+  },
+]
 
 const SEED_SECTIONS = [
   {
@@ -150,7 +323,17 @@ const SEED_SECTIONS = [
   },
 ]
 
-const EMPTY = { ...SEED_SECTIONS[0], sectionKey: "", headline: "", subheadline: "", bodyText: "", ctaText: "", ctaUrl: "", imageUrl: "", imageAlt: "", badge: "", stats: [] as { label: string; value: string }[] }
+const EMPTY: Record<string, any> = {
+  sectionKey: "", type: "custom", layout: "split", enabled: false, order: 0, placement: "after-hero",
+  headline: "", subheadline: "", bodyText: "",
+  ctaText: "", ctaUrl: "", ctaSecondaryText: "", ctaSecondaryUrl: "",
+  imageUrl: "", imageAlt: "", imagePosition: "right", badge: "", theme: "light",
+  stats: [] as { label: string; value: string }[],
+  bullets: [] as string[],
+  comparisonBadTitle: "Trading Company", comparisonGoodTitle: "Genuine Manufacturer",
+  comparisonBad: [] as string[], comparisonGood: [] as string[],
+  showOnMobile: true, showOnDesktop: true,
+}
 
 export function HomepageSectionsTab() {
   const [sections, setSections] = useState<any[]>([])
@@ -177,7 +360,7 @@ export function HomepageSectionsTab() {
   const reset = () => { setForm({ ...EMPTY }); setEditing(null); setShowForm(false); setMsg(null) }
 
   const startEdit = (s: any) => {
-    setForm({ ...EMPTY, ...s, stats: s.stats || [] })
+    setForm({ ...EMPTY, ...s, stats: s.stats || [], bullets: s.bullets || [], comparisonBad: s.comparisonBad || [], comparisonGood: s.comparisonGood || [] })
     setEditing(s._id)
     setShowForm(true)
     setMsg(null)
@@ -268,6 +451,34 @@ export function HomepageSectionsTab() {
   }
   const removeStat = (i: number) => set("stats", form.stats.filter((_: any, j: number) => j !== i))
 
+  // Bullet list helpers
+  const addBullet = () => set("bullets", [...(form.bullets || []), ""])
+  const updateBullet = (i: number, v: string) => { const b = [...(form.bullets || [])]; b[i] = v; set("bullets", b) }
+  const removeBullet = (i: number) => set("bullets", form.bullets.filter((_: any, j: number) => j !== i))
+
+  // Comparison list helpers
+  const addCompRow = (side: "comparisonBad" | "comparisonGood") => set(side, [...(form[side] || []), ""])
+  const updateCompRow = (side: "comparisonBad" | "comparisonGood", i: number, v: string) => {
+    const a = [...(form[side] || [])]; a[i] = v; set(side, a)
+  }
+  const removeCompRow = (side: "comparisonBad" | "comparisonGood", i: number) =>
+    set(side, form[side].filter((_: any, j: number) => j !== i))
+
+  const seedCampaign = async () => {
+    if (!confirm(`Seed 4 OEM Trust Campaign sections? They start disabled — enable them after adding content.`)) return
+    setSeeding(true)
+    for (const s of CAMPAIGN_SECTIONS) {
+      await fetch("/api/admin/homepage-sections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(s),
+      })
+    }
+    load()
+    setSeeding(false)
+    setMsg({ type: "success", text: `4 OEM Trust Campaign sections created. Enable each to activate on homepage.` })
+  }
+
   return (
     <div className="space-y-6">
       <AssetPicker open={pickerOpen} onClose={() => setPickerOpen(false)} onSelect={handleAssetSelect} title="Pick Celebrity Image" />
@@ -275,12 +486,15 @@ export function HomepageSectionsTab() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-3xl font-bold text-gray-900 mb-1">Homepage Sections</h2>
-          <p className="text-gray-600 text-sm">Celebrity-powered sections for homepage. Enable and order as needed. Inject at 4 placement slots.</p>
+          <p className="text-gray-600 text-sm">Admin-managed sections — enable and order each. 4 placement slots on homepage.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button variant="outline" onClick={seedCampaign} disabled={seeding} className="bg-transparent border-green-300 text-green-700 hover:bg-green-50">
+            {seeding ? "Seeding…" : "⭐ Seed OEM Trust Campaign (4 sections)"}
+          </Button>
           {sections.length === 0 && (
             <Button variant="outline" onClick={seedAll} disabled={seeding} className="bg-transparent">
-              {seeding ? "Seeding…" : "Seed 6 Pre-built Sections"}
+              {seeding ? "Seeding…" : "Seed 6 Generic Sections"}
             </Button>
           )}
           <Button onClick={() => { reset(); setShowForm(true) }} className="bg-green-600 hover:bg-green-700">
@@ -296,12 +510,18 @@ export function HomepageSectionsTab() {
           <CardContent className="p-6">
             <h3 className="font-semibold text-gray-900 mb-5">{editing ? "Edit Section" : "New Homepage Section"}</h3>
             <form onSubmit={handleSave} className="space-y-5">
-              {/* Type + Placement row */}
-              <div className="grid sm:grid-cols-3 gap-4">
+              {/* Type + Layout + Placement + Order */}
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Section Type</label>
                   <select value={form.type} onChange={(e) => set("type", e.target.value)} className="w-full h-10 rounded-md border border-gray-300 px-3 text-sm">
                     {SECTION_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Layout</label>
+                  <select value={form.layout || "split"} onChange={(e) => set("layout", e.target.value)} className="w-full h-10 rounded-md border border-gray-300 px-3 text-sm">
+                    {LAYOUTS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
                   </select>
                 </div>
                 <div>
@@ -396,6 +616,67 @@ export function HomepageSectionsTab() {
                     <Button type="button" variant="outline" size="sm" onClick={() => removeStat(i)} className="bg-transparent text-red-500 border-red-200">×</Button>
                   </div>
                 ))}
+              </div>
+
+              {/* Secondary CTA */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Secondary CTA Text</label>
+                  <Input value={form.ctaSecondaryText || ""} onChange={(e) => set("ctaSecondaryText", e.target.value)} placeholder="e.g. See Certifications" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Secondary CTA URL</label>
+                  <Input value={form.ctaSecondaryUrl || ""} onChange={(e) => set("ctaSecondaryUrl", e.target.value)} placeholder="/about#certifications" />
+                </div>
+              </div>
+
+              {/* Bullet Checklist (for pillars / grid-cards layout) */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Trust Pillars / Checklist Items</label>
+                  <Button type="button" variant="outline" size="sm" onClick={addBullet} className="bg-transparent text-xs">+ Add Item</Button>
+                </div>
+                <p className="text-xs text-gray-400 mb-2">Used by Pillars and Grid-Cards layouts. Each item gets a ✔ or card treatment.</p>
+                {(form.bullets || []).map((b: string, i: number) => (
+                  <div key={i} className="flex gap-2 mb-2">
+                    <Input value={b} onChange={(e) => updateBullet(i, e.target.value)} placeholder="e.g. Genuine OEM Manufacturer" className="flex-1" />
+                    <Button type="button" variant="outline" size="sm" onClick={() => removeBullet(i)} className="bg-transparent text-red-500 border-red-200">×</Button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Comparison columns (for comparison layout) */}
+              <div className="grid sm:grid-cols-2 gap-6 border-t pt-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">❌ Bad Column Title</label>
+                      <Input value={form.comparisonBadTitle || ""} onChange={(e) => set("comparisonBadTitle", e.target.value)} placeholder="Trading Company" className="mb-2" />
+                    </div>
+                    <Button type="button" variant="outline" size="sm" onClick={() => addCompRow("comparisonBad")} className="bg-transparent text-xs ml-2 shrink-0 self-end mb-2">+ Add</Button>
+                  </div>
+                  {(form.comparisonBad || []).map((item: string, i: number) => (
+                    <div key={i} className="flex gap-2 mb-2">
+                      <Input value={item} onChange={(e) => updateCompRow("comparisonBad", i, e.target.value)} placeholder="e.g. Imported products" className="flex-1 text-xs" />
+                      <Button type="button" variant="outline" size="sm" onClick={() => removeCompRow("comparisonBad", i)} className="bg-transparent text-red-500 border-red-200">×</Button>
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">✅ Good Column Title</label>
+                      <Input value={form.comparisonGoodTitle || ""} onChange={(e) => set("comparisonGoodTitle", e.target.value)} placeholder="Genuine Manufacturer" className="mb-2" />
+                    </div>
+                    <Button type="button" variant="outline" size="sm" onClick={() => addCompRow("comparisonGood")} className="bg-transparent text-xs ml-2 shrink-0 self-end mb-2">+ Add</Button>
+                  </div>
+                  {(form.comparisonGood || []).map((item: string, i: number) => (
+                    <div key={i} className="flex gap-2 mb-2">
+                      <Input value={item} onChange={(e) => updateCompRow("comparisonGood", i, e.target.value)} placeholder="e.g. Made in India" className="flex-1 text-xs" />
+                      <Button type="button" variant="outline" size="sm" onClick={() => removeCompRow("comparisonGood", i)} className="bg-transparent text-red-500 border-red-200">×</Button>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Toggles */}
