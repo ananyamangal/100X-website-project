@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { RichContent } from '@/components/RichContent';
 import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
 import RFQForm from '@/components/forms/RFQForm';
+import BrochureLeadModal from '@/components/BrochureLeadModal';
 
 // Menu and X were only used by the removed local Header component.
 
@@ -40,6 +41,7 @@ export default function ProductDetailClient({ productId }: { productId: string }
   const [isZoomed, setIsZoomed] = useState(false);
   const [transformOrigin, setTransformOrigin] = useState('center center');
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const [brochureModalOpen, setBrochureModalOpen] = useState(false);
 
   // Carousel auto-scroll — runs after mediaItems is derived (inside render)
   // We use a ref-based approach by moving this after component builds mediaItems.
@@ -285,17 +287,18 @@ export default function ProductDetailClient({ productId }: { productId: string }
                 size="lg"
                 variant="outline"
                 className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent flex-1"
-                onClick={() => {
-                  if (product.brochureUrl) {
-                    window.open(product.brochureUrl, '_blank');
-                  } else {
-                    alert('Brochure download coming soon!');
-                  }
-                }}
+                onClick={() => setBrochureModalOpen(true)}
               >
                 <Download className="mr-2" size={20} />
                 Download Brochure
               </Button>
+              <BrochureLeadModal
+                open={brochureModalOpen}
+                onClose={() => setBrochureModalOpen(false)}
+                source="product-detail"
+                brochureUrl={product?.brochureUrl || undefined}
+                productName={product?.name}
+              />
             </div>
           </div>
         </div>

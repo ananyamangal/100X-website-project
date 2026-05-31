@@ -34,6 +34,7 @@ import StatesServedBlock from "@/components/home/StatesServedBlock"
 import InlineInquiryCTA from "@/components/home/InlineInquiryCTA"
 import HomepageJsonLd from "@/components/seo/HomepageJsonLd"
 import CelebritySectionsBlock from "@/components/home/CelebritySectionsBlock"
+import BrochureLeadModal from "@/components/BrochureLeadModal"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
 import { type HomeContent } from "@/lib/homeContentTypes"
@@ -269,15 +270,10 @@ export default function HomePageClient({
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState("home")
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null)
-  const [showBrochureForm, setShowBrochureForm] = useState(false)
-  const [brochureFormData, setBrochureFormData] = useState<{
-    name: string
-    phone: string
-    productName: string
-    brochureUrl?: string
-  }>({ name: "", phone: "", productName: "" })
-  const [brochureSubmitting, setBrochureSubmitting] = useState(false)
-  const [brochureFormError, setBrochureFormError] = useState<string | null>(null)
+  const [brochureModalOpen, setBrochureModalOpen] = useState(false)
+  const [brochureModalData, setBrochureModalData] = useState<{ productName?: string; brochureUrl?: string }>({})
+  // Legacy state kept to avoid breaking downstream refs — no longer drives the old form
+  const [showBrochureForm] = useState(false)
 
   const heroSlides = banners
     .filter((b) => b.isActive && (b.desktopBannerImage || b.image))
@@ -299,88 +295,9 @@ export default function HomePageClient({
     return () => window.removeEventListener("hashchange", handleHashNavigation)
   }, [router])
 
-  // Escape key closes brochure modal
-  useEffect(() => {
-    if (!showBrochureForm) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return
-      if (!brochureSubmitting) {
-        setBrochureFormError(null)
-        setShowBrochureForm(false)
-      }
-    }
-    document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
-  }, [showBrochureForm, brochureSubmitting])
-
   const handleBrochureDownload = (productName: string, brochureUrl?: string) => {
-    setBrochureFormError(null)
-    setBrochureFormData((prev) => ({ ...prev, productName, brochureUrl }))
-    setShowBrochureForm(true)
-  }
-
-  const handleBrochureFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setBrochureFormError(null)
-    const form = e.currentTarget
-    const formData = new FormData(form)
-    const name = String(formData.get("name") ?? "").trim()
-    const phone = String(formData.get("phone") ?? "").trim()
-    const hp = String(formData.get("company_website") ?? "").trim()
-
-    if (!name || !phone) {
-      setBrochureFormError("Please enter your name and phone number.")
-      return
-    }
-    const digits = phone.replace(/\D/g, "")
-    if (digits.length < 10 || digits.length > 15) {
-      setBrochureFormError("Please enter a valid phone number (10–15 digits).")
-      return
-    }
-    if (hp) {
-      setBrochureFormError("Something went wrong. Please try again.")
-      return
-    }
-
-    setBrochureSubmitting(true)
-    pushDataLayer({ event: "brochure_form_submit_attempt", product: brochureFormData.productName })
-
-    try {
-      const attribution = getPersistedAttribution()
-      const res = await fetch("/api/submissions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          phone,
-          productName: brochureFormData.productName,
-          type: "brochure",
-          attribution,
-          form_page_url: window.location.href,
-          form_page_path: window.location.pathname,
-          company_website: hp,
-        }),
-      })
-      if (!res.ok) throw new Error("Failed to save")
-
-      setBrochureLeadContext({
-        productName: brochureFormData.productName,
-        brochureUrl: brochureFormData.brochureUrl || "",
-        product: brochureFormData.productName,
-        has_brochure_file: Boolean(brochureFormData.brochureUrl),
-      })
-
-      pushDataLayer({ event: "brochure_form_success", product: brochureFormData.productName })
-
-      form.reset()
-      setShowBrochureForm(false)
-      setBrochureFormData({ name: "", phone: "", productName: "", brochureUrl: undefined })
-      router.push("/brochure-thank-you")
-    } catch {
-      setBrochureFormError("We could not save your request. Please try again or contact us by phone.")
-    } finally {
-      setBrochureSubmitting(false)
-    }
+    setBrochureModalData({ productName, brochureUrl })
+    setBrochureModalOpen(true)
   }
 
   const renderHomePage = () => (
@@ -441,71 +358,15 @@ export default function HomePageClient({
 
   return (
     <>
-      <div className="min-h-screen bg-white">
-        {showBrochureForm && (
-          <div
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="brochure-modal-title"
-            onClick={() => {
-              if (brochureSubmitting) return
-              setBrochureFormError(null)
-              setShowBrochureForm(false)
-            }}
-          >
-            <Card className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-              <CardContent className="p-6">
-                <h3 id="brochure-modal-title" className="text-xl font-bold text-gray-800 mb-4">
-                  Download brochure
-                </h3>
-                <p className="text-gray-600 mb-6">Please provide your details to download the brochure for:</p>
-                <p className="font-semibold text-green-600 mb-6">{brochureFormData.productName}</p>
-                <form onSubmit={handleBrochureFormSubmit} className="relative space-y-4">
-                  <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-                    <label htmlFor="brochure-hp-website">Company website</label>
-                    <input id="brochure-hp-website" name="company_website" type="text" tabIndex={-1} autoComplete="off" />
-                  </div>
-                  <Input name="name" placeholder="Your full name" required className="p-3 min-h-[48px]" disabled={brochureSubmitting} />
-                  <Input name="phone" type="tel" placeholder="Phone number" required className="p-3 min-h-[48px]" disabled={brochureSubmitting} />
-                  {brochureFormError ? (
-                    <p className="text-sm text-red-600" role="alert">
-                      {brochureFormError}
-                    </p>
-                  ) : null}
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700 min-h-[48px]" disabled={brochureSubmitting}>
-                      {brochureSubmitting ? (
-                        <>
-                          <Loader2 className="mr-2 animate-spin" size={16} aria-hidden />
-                          Submitting…
-                        </>
-                      ) : (
-                        <>
-                          <Download className="mr-2" size={16} aria-hidden />
-                          Continue
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setBrochureFormError(null)
-                        setShowBrochureForm(false)
-                      }}
-                      className="bg-transparent min-h-[48px]"
-                      disabled={brochureSubmitting}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+      <BrochureLeadModal
+        open={brochureModalOpen}
+        onClose={() => setBrochureModalOpen(false)}
+        source="product-card"
+        brochureUrl={brochureModalData.brochureUrl}
+        productName={brochureModalData.productName}
+      />
 
+      <div className="min-h-screen bg-white">
         <div>{renderPage()}</div>
 
         <WhatsAppFloatingButton

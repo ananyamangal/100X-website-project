@@ -42,6 +42,7 @@ import { VideosTab } from "@/components/admin/VideosTab"
 import { LeadAnalyticsTab } from "@/components/admin/LeadAnalyticsTab"
 import { CelebrityAssetsTab } from "@/components/admin/CelebrityAssetsTab"
 import { HomepageSectionsTab } from "@/components/admin/HomepageSectionsTab"
+import { BrochureLeadsTab } from "@/components/admin/BrochureLeadsTab"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
@@ -1074,6 +1075,17 @@ function AdminDashboardContent() {
                 Brochure
               </button>
               <button
+                onClick={() => setActiveTab("brochureLeads")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "brochureLeads"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Download className="mr-3" size={20} />
+                Brochure Leads
+              </button>
+              <button
                 onClick={() => setActiveTab("rfqPopup")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "rfqPopup"
@@ -1286,6 +1298,7 @@ function AdminDashboardContent() {
             {activeTab === "aboutUs" && <AboutUsTab />}
             {activeTab === "videoPopup" && <VideoPopupTab />}
             {activeTab === "brochure" && <BrochureTab />}
+            {activeTab === "brochureLeads" && <BrochureLeadsTab />}
             {activeTab === "rfqPopup" && <RFQPopupAdminTab />}
             {activeTab === "homepageContent" && <HomepageContentTab />}
             {activeTab === "websiteSettings" && <BrandAssetsTab />}
