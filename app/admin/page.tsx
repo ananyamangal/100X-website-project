@@ -40,6 +40,8 @@ import { CaseStudiesTab } from "@/components/admin/CaseStudiesTab"
 import { DeploymentsTab } from "@/components/admin/DeploymentsTab"
 import { VideosTab } from "@/components/admin/VideosTab"
 import { LeadAnalyticsTab } from "@/components/admin/LeadAnalyticsTab"
+import { CelebrityAssetsTab } from "@/components/admin/CelebrityAssetsTab"
+import { HomepageSectionsTab } from "@/components/admin/HomepageSectionsTab"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
@@ -1160,6 +1162,28 @@ function AdminDashboardContent() {
                 Lead Analytics
               </button>
               <button
+                onClick={() => setActiveTab("celebrityAssets")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "celebrityAssets"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Star className="mr-3" size={20} />
+                Celebrity Assets
+              </button>
+              <button
+                onClick={() => setActiveTab("homepageSections")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "homepageSections"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <ImageIcon className="mr-3" size={20} />
+                Homepage Sections
+              </button>
+              <button
                 onClick={() => setActiveTab("settings")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "settings"
@@ -1270,6 +1294,8 @@ function AdminDashboardContent() {
             {activeTab === "deployments" && <DeploymentsTab />}
             {activeTab === "videos" && <VideosTab />}
             {activeTab === "leadAnalytics" && <LeadAnalyticsTab />}
+            {activeTab === "celebrityAssets" && <CelebrityAssetsTab />}
+            {activeTab === "homepageSections" && <HomepageSectionsTab />}
             {activeTab === "settings" && <SettingsTab />}
           </div>
         </div>

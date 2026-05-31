@@ -33,6 +33,7 @@ import SectionConnector from "@/components/home/SectionConnector"
 import StatesServedBlock from "@/components/home/StatesServedBlock"
 import InlineInquiryCTA from "@/components/home/InlineInquiryCTA"
 import HomepageJsonLd from "@/components/seo/HomepageJsonLd"
+import CelebritySectionsBlock from "@/components/home/CelebritySectionsBlock"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
 import { type HomeContent } from "@/lib/homeContentTypes"
@@ -72,6 +73,7 @@ interface HomePageClientProps {
   customers: any[]
   mainBrochureUrl: string | null
   homeContent: HomeContent
+  homepageSections?: any[]
 }
 
 const getYouTubeId = (url: string): string | null => {
@@ -262,6 +264,7 @@ export default function HomePageClient({
   accreditations,
   customers,
   homeContent,
+  homepageSections = [],
 }: HomePageClientProps) {
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState("home")
@@ -384,10 +387,14 @@ export default function HomePageClient({
     <>
       <HomepageJsonLd />
       <HeroBlock heroSlides={heroSlides} />
+      {/* PLACEMENT: after-hero — awareness/problem sections */}
+      <CelebritySectionsBlock sections={homepageSections} placement="after-hero" />
       <SectionConnector eyebrow={homeContent.connectors.c1.eyebrow} text={homeContent.connectors.c1.text} />
       <AccreditationsStrip accreditations={accreditations} />
       <SectionConnector eyebrow={homeContent.connectors.c2.eyebrow} text={homeContent.connectors.c2.text} />
       <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
+      {/* PLACEMENT: after-products — solution/after sections */}
+      <CelebritySectionsBlock sections={homepageSections} placement="after-products" />
       <ManufacturerIntroBlock content={homeContent.manufacturerIntro} />
       <SectionConnector eyebrow={homeContent.connectors.c3.eyebrow} text={homeContent.connectors.c3.text} />
       <TechnologyBlock content={homeContent.technology} />
@@ -398,12 +405,16 @@ export default function HomePageClient({
         whatsappMessage="Hi, I'd like a quote tailored to my use case (please mention: municipal / agricultural / industrial / export)."
         tone="dark"
       />
+      {/* PLACEMENT: before-trust — government/awareness sections */}
+      <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
       <YoutubeShortsCarousel />
       <OurCustomersScroll customers={customers} />
       <SectionConnector eyebrow={homeContent.connectors.c4.eyebrow} text={homeContent.connectors.c4.text} />
       <TrustBlock />
       <SpecialisedBuyersBlock />
       <StatesServedBlock />
+      {/* PLACEMENT: before-faq — agriculture/municipal story sections */}
+      <CelebritySectionsBlock sections={homepageSections} placement="before-faq" />
       <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />
       <FAQSection faqs={homeContent.faqs} />
       <ContactSection products={products} />

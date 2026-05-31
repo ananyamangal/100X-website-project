@@ -11,7 +11,7 @@ export default async function HomePage() {
   const client = await clientPromise
   const db = client.db()
 
-  const [productsRaw, bannersRaw, blogsRaw, accreditationsRaw, customersRaw, brochureDoc, homeContent] =
+  const [productsRaw, bannersRaw, blogsRaw, accreditationsRaw, customersRaw, brochureDoc, homeContent, homepageSectionsRaw] =
     await Promise.all([
       db.collection("products").find({}).toArray(),
       db.collection("banners").find({}).toArray(),
@@ -27,6 +27,7 @@ export default async function HomePage() {
       db.collection("customers").find({}).sort({ order: 1 }).toArray(),
       db.collection("brochure").findOne({ key: "main" }),
       getHomeContent(),
+      db.collection("homepage_sections").find({ enabled: true }).sort({ order: 1 }).toArray(),
     ])
 
   // Serialize MongoDB docs (ObjectId → hex string, Date → ISO string)
@@ -47,6 +48,7 @@ export default async function HomePage() {
   const accreditations = JSON.parse(JSON.stringify(accreditationsRaw))
   const customers = JSON.parse(JSON.stringify(customersRaw))
   const mainBrochureUrl: string | null = brochureDoc ? (brochureDoc as any).mainBrochureUrl ?? null : null
+  const homepageSections = JSON.parse(JSON.stringify(homepageSectionsRaw))
 
   return (
     <>
@@ -60,6 +62,7 @@ export default async function HomePage() {
         customers={customers}
         mainBrochureUrl={mainBrochureUrl}
         homeContent={homeContent}
+        homepageSections={homepageSections}
       />
     </>
   )
