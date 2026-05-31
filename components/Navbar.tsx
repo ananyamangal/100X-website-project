@@ -36,21 +36,24 @@ interface NavbarProps {
 export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Circle' }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [brochureUrl, setBrochureUrl] = useState<string | null>(null)
   const pathname = usePathname()
   const isHeroPage = pathname === '/'
   const transparent = isHeroPage && !scrolled
 
-  const handleBrochureClick = async () => {
-    try {
-      const res = await fetch('/api/brochure')
-      const data = await res.json()
-      if (data?.mainBrochureUrl) {
-        window.open(data.mainBrochureUrl, '_blank', 'noopener,noreferrer')
-      } else {
-        window.open('/contact-us', '_self')
-      }
-    } catch {
-      window.open('/contact-us', '_self')
+  // Pre-fetch so window.open runs synchronously on click (avoids popup blockers)
+  useEffect(() => {
+    fetch('/api/brochure')
+      .then((r) => r.json())
+      .then((data) => { if (data?.mainBrochureUrl) setBrochureUrl(data.mainBrochureUrl) })
+      .catch(() => {})
+  }, [])
+
+  const handleBrochureClick = () => {
+    if (brochureUrl) {
+      window.open(brochureUrl, '_blank', 'noopener,noreferrer')
+    } else {
+      window.location.href = '/contact-us'
     }
   }
 

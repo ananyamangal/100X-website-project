@@ -50,7 +50,9 @@ async function uploadFileToCloudinary(file: File): Promise<string> {
   const fd = new FormData()
   fd.append("file", file)
   fd.append("upload_preset", CLOUDINARY_PRESET)
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/auto/upload`, {
+  // Use raw/upload for documents; image/upload for images — auto/upload can fail on raw presets
+  const resourceType = file.type.startsWith("image/") ? "image" : "raw"
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/${resourceType}/upload`, {
     method: "POST",
     body: fd,
   })
@@ -246,6 +248,7 @@ export default function RFQPopup() {
       role="dialog"
       aria-modal="true"
       aria-label="Request for Quotation"
+      onClick={(e) => { if (e.target === e.currentTarget) close() }}
     >
       {/* Backdrop */}
       <div

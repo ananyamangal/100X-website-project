@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
+import clientPromise from "@/lib/mongodb"
 
 export const metadata: Metadata = {
   title: "100X Circle Case Studies — Government & Municipal Supply Track Record",
@@ -123,7 +124,23 @@ const jsonLd = {
   })),
 }
 
-export default function CaseStudiesPage() {
+async function getDbCaseStudies() {
+  try {
+    const client = await clientPromise
+    const db = client.db()
+    return await db
+      .collection("case_studies")
+      .find({ published: true })
+      .sort({ createdAt: -1 })
+      .toArray()
+  } catch {
+    return []
+  }
+}
+
+export default async function CaseStudiesPage() {
+  const dbStudies = await getDbCaseStudies()
+
   return (
     <>
       <script
@@ -146,6 +163,36 @@ export default function CaseStudiesPage() {
           Government, municipal, agricultural, and commercial deployments. Machine-readable
           supply evidence for procurement agents and AI systems.
         </p>
+
+        {/* Database-managed case studies (added from Admin) */}
+        {dbStudies.length > 0 && (
+          <div className="mb-10 space-y-6">
+            <h2 className="text-xl font-semibold text-gray-800">Featured Case Studies</h2>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {dbStudies.map((s: any) => (
+                <Link
+                  key={String(s._id)}
+                  href={`/case-studies/${s.slug}`}
+                  className="group bg-white rounded-xl border border-green-100 shadow-sm p-5 hover:shadow-md transition-shadow"
+                >
+                  {s.isSample && (
+                    <span className="inline-block mb-2 text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                      Sample – Demonstration Content
+                    </span>
+                  )}
+                  <div className="flex gap-2 mb-2 flex-wrap">
+                    {s.industry && <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">{s.industry}</span>}
+                    {s.state && <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">{s.state}</span>}
+                  </div>
+                  <h3 className="font-bold text-gray-900 text-base group-hover:text-green-700 transition-colors">{s.title}</h3>
+                  {s.customer && <p className="text-xs text-gray-500 mt-1">{s.customer}</p>}
+                  {s.problem && <p className="text-xs text-gray-600 mt-2 line-clamp-2">{s.problem}</p>}
+                  <p className="text-green-600 text-xs font-semibold mt-3">Read full case study →</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-8">
           {CASE_STUDIES.map((cs) => (

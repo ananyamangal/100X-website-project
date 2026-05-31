@@ -36,6 +36,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { AdminRichTextEditor } from "@/components/admin/AdminRichTextEditor"
 import { BrandAssetsTab } from "@/components/admin/BrandAssetsTab"
 import { HomepageContentTab } from "@/components/admin/HomepageContentTab"
+import { CaseStudiesTab } from "@/components/admin/CaseStudiesTab"
+import { DeploymentsTab } from "@/components/admin/DeploymentsTab"
+import { VideosTab } from "@/components/admin/VideosTab"
+import { LeadAnalyticsTab } from "@/components/admin/LeadAnalyticsTab"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
@@ -1112,6 +1116,50 @@ function AdminDashboardContent() {
                 Legal Pages
               </button>
               <button
+                onClick={() => setActiveTab("caseStudies")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "caseStudies"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Star className="mr-3" size={20} />
+                Case Studies
+              </button>
+              <button
+                onClick={() => setActiveTab("deployments")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "deployments"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Package className="mr-3" size={20} />
+                Deployments
+              </button>
+              <button
+                onClick={() => setActiveTab("videos")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "videos"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Video className="mr-3" size={20} />
+                Videos
+              </button>
+              <button
+                onClick={() => setActiveTab("leadAnalytics")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "leadAnalytics"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <BarChart3 className="mr-3" size={20} />
+                Lead Analytics
+              </button>
+              <button
                 onClick={() => setActiveTab("settings")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "settings"
@@ -1218,6 +1266,10 @@ function AdminDashboardContent() {
             {activeTab === "homepageContent" && <HomepageContentTab />}
             {activeTab === "websiteSettings" && <BrandAssetsTab />}
             {activeTab === "legalPages" && <LegalPagesTab />}
+            {activeTab === "caseStudies" && <CaseStudiesTab />}
+            {activeTab === "deployments" && <DeploymentsTab />}
+            {activeTab === "videos" && <VideosTab />}
+            {activeTab === "leadAnalytics" && <LeadAnalyticsTab />}
             {activeTab === "settings" && <SettingsTab />}
           </div>
         </div>

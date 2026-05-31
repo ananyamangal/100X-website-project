@@ -15,7 +15,6 @@ const inter = Inter({
   display: 'swap',
   variable: '--font-sans',
 })
-import GemPopup from '@/components/GemPopup'
 import VideoPopup from '@/components/VideoPopup'
 import RFQPopup from '@/components/RFQPopup'
 import RFQFloatingRibbon from '@/components/forms/RFQFloatingRibbon'
@@ -166,7 +165,6 @@ export default async function RootLayout({
         >
           Skip to main content
         </a>
-        <GemPopup />
         <VideoPopup />
         <RFQPopup />
         <RFQFloatingRibbon />
