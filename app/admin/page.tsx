@@ -5697,6 +5697,8 @@ function SettingsTab() {
   const [confirmPw, setConfirmPw] = useState("")
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null)
+  const [emailTesting, setEmailTesting] = useState(false)
+  const [emailTestResult, setEmailTestResult] = useState<any>(null)
 
   const strength = (pw: string) => {
     if (!pw) return 0
@@ -5779,6 +5781,73 @@ function SettingsTab() {
               {saving ? "Saving…" : "Change Password"}
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Email Diagnostics */}
+      <Card className="max-w-md">
+        <CardHeader>
+          <CardTitle className="text-lg">Email Diagnostics</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-gray-600">
+            Send a test email to verify your email configuration is working.
+          </p>
+          <p className="text-xs text-gray-500">
+            Set in Vercel: <code className="bg-gray-100 px-1 rounded">EMAIL_USER</code> and <code className="bg-gray-100 px-1 rounded">EMAIL_APP_PASSWORD</code>
+          </p>
+          <Button
+            onClick={async () => {
+              setEmailTesting(true)
+              setEmailTestResult(null)
+              try {
+                const res = await fetch("/api/admin/test-email", { method: "POST" })
+                const data = await res.json()
+                setEmailTestResult(data)
+              } catch (e) {
+                setEmailTestResult({ ok: false, error: String(e) })
+              } finally {
+                setEmailTesting(false)
+              }
+            }}
+            disabled={emailTesting}
+            variant="outline"
+            className="bg-transparent"
+          >
+            {emailTesting ? "Sending…" : "Send Test Email"}
+          </Button>
+          {emailTestResult && (
+            <div className={`rounded-lg p-3 text-sm ${emailTestResult.ok ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}>
+              {emailTestResult.ok ? (
+                <p>✓ Email sent! Check inbox for <strong>{emailTestResult.EMAIL_USER}</strong></p>
+              ) : (
+                <div className="space-y-1">
+                  <p>✗ Failed: <strong>{emailTestResult.reason || "unknown"}</strong></p>
+                  {emailTestResult.error && <p className="text-xs opacity-80">{emailTestResult.error}</p>}
+                  <p className="text-xs">EMAIL_USER in Vercel: {emailTestResult.EMAIL_USER || "MISSING"}</p>
+                  <p className="text-xs">EMAIL_APP_PASSWORD: {emailTestResult.EMAIL_APP_PASSWORD || "MISSING"}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* System Health */}
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle className="text-lg">System Health</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-gray-600">Check MongoDB lead counts, email config, and brochure status.</p>
+          <a
+            href="/api/admin/health"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block text-sm text-green-700 underline font-medium"
+          >
+            Open health report →
+          </a>
         </CardContent>
       </Card>
     </div>

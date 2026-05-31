@@ -38,11 +38,14 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     }
 
-    // Save to MongoDB
+    // Save to MongoDB — return 500 if this fails so the client knows
+    let savedId: string | null = null
     try {
-      await db.collection("rfq_popup_leads").insertOne(lead)
+      const result = await db.collection("rfq_popup_leads").insertOne(lead)
+      savedId = String(result.insertedId)
     } catch (dbErr) {
       console.error("RFQ popup lead DB save failed:", dbErr)
+      return NextResponse.json({ error: "Failed to save lead to database", detail: String(dbErr) }, { status: 500 })
     }
 
     // Build answer summary for notifications
@@ -114,7 +117,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, savedId })
   } catch (err) {
     console.error("RFQ popup submit error:", err)
     return NextResponse.json({ error: "Failed to process submission" }, { status: 500 })

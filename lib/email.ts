@@ -25,8 +25,11 @@ let cachedTransporter: nodemailer.Transporter | null = null
 function getTransporter(): nodemailer.Transporter | null {
   if (cachedTransporter) return cachedTransporter
   const user = process.env.EMAIL_USER
-  const pass = process.env.EMAIL_APP_PASSWORD
-  if (!user || !pass) return null
+  const rawPass = process.env.EMAIL_APP_PASSWORD
+  if (!user || !rawPass) return null
+  // Google App Passwords are displayed with spaces (e.g. "lnve jcpe pqrb iqag")
+  // but must be sent without spaces to the SMTP server.
+  const pass = rawPass.replace(/\s+/g, "")
   cachedTransporter = nodemailer.createTransport({
     service: "gmail",
     auth: { user, pass },

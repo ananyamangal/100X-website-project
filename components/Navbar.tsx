@@ -36,22 +36,23 @@ interface NavbarProps {
 export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Circle' }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [brochureUrl, setBrochureUrl] = useState<string | null>(null)
+  const [hasBrochure, setHasBrochure] = useState(false)
   const pathname = usePathname()
   const isHeroPage = pathname === '/'
   const transparent = isHeroPage && !scrolled
 
-  // Pre-fetch so window.open runs synchronously on click (avoids popup blockers)
+  // Check if a brochure is configured so we know where to send on click
   useEffect(() => {
     fetch('/api/brochure')
       .then((r) => r.json())
-      .then((data) => { if (data?.mainBrochureUrl) setBrochureUrl(data.mainBrochureUrl) })
+      .then((data) => { if (data?.mainBrochureUrl) setHasBrochure(true) })
       .catch(() => {})
   }, [])
 
   const handleBrochureClick = () => {
-    if (brochureUrl) {
-      window.open(brochureUrl, '_blank', 'noopener,noreferrer')
+    if (hasBrochure) {
+      // Use proxy route — forces proper PDF download across all browsers
+      window.open('/api/brochure/download', '_blank', 'noopener,noreferrer')
     } else {
       window.location.href = '/contact-us'
     }

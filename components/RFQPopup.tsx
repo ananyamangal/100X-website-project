@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import { X, Paperclip } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { BUSINESS } from "@/lib/seo/site-config"
 
 interface Question {
   id: string
@@ -29,6 +30,7 @@ interface PopupConfig {
   allowFileUpload: boolean
   maxFileSizeMb: number
   allowedFileTypes: string[]
+  notificationWhatsapp?: string
 }
 
 const SESSION_KEY = "rfq-popup-seen-v1"
@@ -44,6 +46,16 @@ function getUtm(): Record<string, string> {
   } catch {
     return {}
   }
+}
+
+function buildWaMessage(answers: Record<string, string | string[]>, attachmentUrl?: string): string {
+  const lines = ["*New RFQ — 100x Circle*", ""]
+  for (const [q, a] of Object.entries(answers)) {
+    const val = Array.isArray(a) ? a.join(", ") : String(a)
+    if (val) lines.push(`${q}: ${val}`)
+  }
+  if (attachmentUrl) lines.push(`Attachment: ${attachmentUrl}`)
+  return lines.join("\n")
 }
 
 async function uploadFileToCloudinary(file: File): Promise<string> {
@@ -177,6 +189,16 @@ export default function RFQPopup() {
       }
     }
 
+    // Open WhatsApp synchronously inside the user gesture (before any await)
+    // so popup blockers don't interfere.
+    const waNumber = (config?.notificationWhatsapp || "").replace(/[^0-9]/g, "") || BUSINESS.whatsappE164
+    const waMessage = buildWaMessage(answers)
+    window.open(
+      `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`,
+      "_blank",
+      "noopener,noreferrer",
+    )
+
     setSubmitting(true)
     try {
       let attachmentUrl: string | undefined
@@ -194,7 +216,7 @@ export default function RFQPopup() {
       }
 
       const utm = getUtm()
-      await fetch("/api/rfq-popup/submit", {
+      const res = await fetch("/api/rfq-popup/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -207,6 +229,9 @@ export default function RFQPopup() {
           attachmentUrl,
         }),
       })
+      if (!res.ok) {
+        console.error("RFQ popup submit failed:", await res.text())
+      }
 
       // Persist submission so popup never shows again (if configured)
       if (config?.neverAfterSubmission && typeof window !== "undefined") {
