@@ -3,18 +3,18 @@
 import React from "react"
 
 const LOGO_PLACEHOLDER =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect fill='%23e5e7eb' width='80' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='10'%3ELogo%3C/text%3E%3C/svg%3E";
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect fill='%23e5e7eb' width='80' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='10'%3ELogo%3C/text%3E%3C/svg%3E"
 
 interface Props {
-  accreditations: any[];
+  accreditations: any[]
 }
 
 export default function AccreditationsStrip({ accreditations }: Props) {
-  if (accreditations.length === 0) return null;
+  if (accreditations.length === 0) return null
 
-  const n = accreditations.length;
-  const extendedAccreditations = [...accreditations, ...accreditations];
-  const itemWidthPercent = 100 / n;
+  const n = accreditations.length
+  const extendedAccreditations = [...accreditations, ...accreditations]
+  const itemWidthPercent = 100 / n
 
   return (
     <section className="py-10 md:py-14 bg-gray-50 overflow-hidden">
@@ -46,8 +46,7 @@ export default function AccreditationsStrip({ accreditations }: Props) {
             ))}
           </div>
         </div>
-        </div>
       </div>
     </section>
-  );
+  )
 }
