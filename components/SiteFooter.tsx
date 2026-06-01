@@ -1,149 +1,264 @@
 import Link from "next/link"
-import { Mail, MapPin, Phone, Youtube } from "lucide-react"
+import { Mail, MapPin, Phone } from "lucide-react"
 import { getAllLandingPages, getLandingDisplayName } from "@/lib/seo/landing-pages"
+import { BUSINESS } from "@/lib/seo/site-config"
 
-const YOUTUBE_CHANNEL = "https://www.youtube.com/@100Xcircle"
+const SOCIAL = [
+  {
+    key: "youtube",
+    href: BUSINESS.youtube,
+    label: "100X Circle on YouTube",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+      </svg>
+    ),
+    hoverClass: "hover:bg-red-600",
+  },
+  {
+    key: "facebook",
+    href: BUSINESS.facebook,
+    label: "100X Circle on Facebook",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+      </svg>
+    ),
+    hoverClass: "hover:bg-blue-700",
+  },
+  {
+    key: "instagram",
+    href: BUSINESS.instagram,
+    label: "100X Circle on Instagram",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+      </svg>
+    ),
+    hoverClass: "hover:bg-gradient-to-br hover:from-purple-600 hover:via-pink-600 hover:to-orange-400",
+  },
+  {
+    key: "linkedin",
+    href: BUSINESS.linkedin,
+    label: "100X Circle on LinkedIn",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+      </svg>
+    ),
+    hoverClass: "hover:bg-blue-600",
+  },
+]
+
+const WA_HREF = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(
+  "Hi 100X Circle, I'd like to know more about your fogging machines."
+)}`
 
 interface SiteFooterProps {
   logoUrl?: string
   logoAlt?: string
 }
 
-export default function SiteFooter({ logoUrl = '/logo-main.png', logoAlt = '100X Circle home' }: SiteFooterProps) {
+export default function SiteFooter({
+  logoUrl = "/logo-main.png",
+  logoAlt = "100X Circle — Thermal Fogging Machine Manufacturer",
+}: SiteFooterProps) {
+  const landingPages = getAllLandingPages().slice(0, 7)
+
   return (
-    <footer className="bg-gray-900 text-white py-16 mt-24">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          <div>
-            <Link href="/" className="flex items-center space-x-3 mb-6">
-              <img src={logoUrl} alt={logoAlt} className="w-24 h-auto" />
-              <div>
-                <h3 className="text-xl font-bold">100X</h3>
-                <p className="text-green-400 text-sm">Certified professional products</p>
+    <footer className="bg-cinema-900 text-white">
+      {/* ── Trust Strip ────────────────────────────────────── */}
+      <div className="border-b border-white/8 bg-cinema-800">
+        <div className="container mx-auto px-4 md:px-6 py-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
+            {[
+              "OEM Manufacturer",
+              "Made in India",
+              "GeM Registered",
+              "Government Supplier",
+              "ISO Certified",
+              "Pan-India Delivery",
+            ].map((trust) => (
+              <div key={trust} className="flex items-center gap-1.5">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <circle cx="6" cy="6" r="6" fill="#16a34a" />
+                  <path d="M3.5 6l1.5 1.5 3.5-3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="text-xs text-cinema-300 font-500 tracking-wide">{trust}</span>
               </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Main footer grid ───────────────────────────────── */}
+      <div className="container mx-auto px-4 md:px-6 py-16 md:py-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+          {/* Column 1: Brand */}
+          <div className="lg:col-span-1">
+            <Link href="/" className="inline-block mb-6" aria-label="100X Circle home">
+              <img src={logoUrl} alt={logoAlt} className="h-10 w-auto" draggable={false} />
             </Link>
-            <p className="text-gray-400 mb-6">Leading manufacturer of premium products across India.</p>
-            <div className="flex space-x-4">
+            <p className="text-cinema-400 text-sm leading-relaxed mb-6 max-w-xs">
+              India's trusted manufacturer of thermal fogging machines for public health, municipalities, agriculture, and industrial pest control.
+            </p>
+
+            {/* Social icons */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {SOCIAL.map((s) => (
+                <a
+                  key={s.key}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  className={`w-9 h-9 rounded-full bg-white/8 flex items-center justify-center text-cinema-300 transition-all duration-200 ${s.hoverClass} hover:text-white hover:scale-110`}
+                >
+                  {s.icon}
+                </a>
+              ))}
+              {/* WhatsApp */}
               <a
-                href={YOUTUBE_CHANNEL}
+                href={WA_HREF}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-                aria-label="100X Circle on YouTube"
+                aria-label="Chat with 100X Circle on WhatsApp"
+                className="w-9 h-9 rounded-full bg-white/8 flex items-center justify-center text-cinema-300 transition-all duration-200 hover:bg-[#25D366] hover:text-white hover:scale-110"
               >
-                <Youtube size={20} />
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
               </a>
             </div>
           </div>
+
+          {/* Column 2: Products */}
           <div>
-            <h4 className="font-semibold mb-6 text-lg">Popular Products</h4>
-            <ul className="space-y-3 text-gray-400">
-              {getAllLandingPages().map((def) => (
+            <h4 className="text-sm font-600 text-white uppercase tracking-widest mb-6">Products</h4>
+            <ul className="space-y-3">
+              {landingPages.map((def) => (
                 <li key={def.slug}>
                   <Link
                     href={`/${def.slug}`}
-                    className="hover:text-green-400 transition-colors line-clamp-2"
+                    className="text-cinema-400 hover:text-brand-400 text-sm transition-colors leading-snug"
                   >
                     {getLandingDisplayName(def.slug) ?? def.slug}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link
-                  href="/products"
-                  className="hover:text-green-400 transition-colors font-semibold text-green-400"
-                >
+                <Link href="/spare-parts" className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
+                  Spare Parts
+                </Link>
+              </li>
+              <li className="pt-1">
+                <Link href="/products" className="text-brand-400 hover:text-brand-300 text-sm font-600 transition-colors">
                   View all products →
                 </Link>
               </li>
             </ul>
           </div>
+
+          {/* Column 3: Company */}
           <div>
-            <h4 className="font-semibold mb-6 text-lg">Quick Links</h4>
-            <ul className="space-y-3 text-gray-400">
-              <li>
-                <Link href="/" className="hover:text-green-400 transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/products" className="hover:text-green-400 transition-colors">
-                  Products
-                </Link>
-              </li>
-              <li>
-                <Link href="/spare-parts" className="hover:text-green-400 transition-colors">
-                  Spare Parts
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-green-400 transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact-us" className="hover:text-green-400 transition-colors">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="hover:text-green-400 transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <a href="/sitemap.xml" className="hover:text-green-400 transition-colors">
-                  Sitemap
-                </a>
-              </li>
+            <h4 className="text-sm font-600 text-white uppercase tracking-widest mb-6">Company</h4>
+            <ul className="space-y-3">
+              {[
+                { href: "/about", label: "About 100X Circle" },
+                { href: "/products", label: "Product Catalogue" },
+                { href: "/spare-parts", label: "Spare Parts" },
+                { href: "/case-studies", label: "Case Studies" },
+                { href: "/deployments", label: "Government Deployments" },
+                { href: "/knowledge", label: "Knowledge Centre" },
+                { href: "/blog", label: "Blog" },
+                { href: "/contact-us", label: "Contact Us" },
+              ].map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
+
+          {/* Column 4: Contact */}
           <div>
-            <h4 className="font-semibold mb-6 text-lg">Contact</h4>
-            <ul className="space-y-3 text-gray-400">
-              <li className="flex items-start gap-2">
-                <Mail className="mt-1 shrink-0" size={16} aria-hidden="true" />
+            <h4 className="text-sm font-600 text-white uppercase tracking-widest mb-6">Get in Touch</h4>
+            <ul className="space-y-4 mb-8">
+              <li>
                 <a
-                  href="mailto:100xcircle@gmail.com"
-                  className="hover:text-green-400 transition-colors break-all"
+                  href={`tel:${BUSINESS.phonePrimary.replace(/[\s-]/g, "")}`}
+                  className="flex items-start gap-3 text-cinema-400 hover:text-brand-400 transition-colors group"
                 >
-                  100xcircle@gmail.com
+                  <Phone size={15} className="mt-0.5 shrink-0 group-hover:text-brand-400" aria-hidden="true" />
+                  <span className="text-sm">{BUSINESS.phonePrimary}</span>
                 </a>
               </li>
-              <li className="flex items-start gap-2">
-                <Phone className="mt-1 shrink-0" size={16} aria-hidden="true" />
-                <a href="tel:+917827229116" className="hover:text-green-400 transition-colors">
-                  +91 7827229116
+              <li>
+                <a
+                  href={`mailto:${BUSINESS.email}`}
+                  className="flex items-start gap-3 text-cinema-400 hover:text-brand-400 transition-colors group"
+                >
+                  <Mail size={15} className="mt-0.5 shrink-0 group-hover:text-brand-400" aria-hidden="true" />
+                  <span className="text-sm break-all">{BUSINESS.email}</span>
                 </a>
               </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="mt-1 shrink-0" size={16} aria-hidden="true" />
-                <address className="not-italic">
-                  UG, 398, Sector 7, IMT Manesar, Gurugram
-                </address>
+              <li>
+                <div className="flex items-start gap-3 text-cinema-400">
+                  <MapPin size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
+                  <address className="not-italic text-sm leading-relaxed">
+                    UG, 398, Sector 7, IMT Manesar,<br />Gurugram, Haryana 122050
+                  </address>
+                </div>
               </li>
             </ul>
+
+            {/* WhatsApp CTA */}
+            <a
+              href={WA_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#25D366] hover:bg-[#1ebe5a] text-white font-600 rounded-full text-sm transition-all hover:shadow-lg hover:shadow-[#25D366]/20 hover:-translate-y-0.5"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+              WhatsApp Us
+            </a>
           </div>
         </div>
-        <div className="text-center text-gray-500 text-sm border-t border-gray-800 pt-8">
-          <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-1 mb-4">
-            <span className="text-xs">&copy; 2026 100X Circle Pvt Ltd. All rights reserved.</span>
-            <Link href="/privacy-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Privacy Policy</Link>
-            <Link href="/terms-and-conditions" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Terms &amp; Conditions</Link>
-            <Link href="/return-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Return Policy</Link>
-            <Link href="/refund-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Refund Policy</Link>
-            <Link href="/shipping-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Shipping Policy</Link>
-            <Link href="/warranty-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Warranty</Link>
-            <Link href="/disclaimer" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Disclaimer</Link>
-            <Link href="/cookie-policy" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Cookie Policy</Link>
-            <a href="/sitemap.xml" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Sitemap</a>
-            <a href="/admin" className="text-xs text-gray-400 hover:text-green-400 underline transition-colors">Admin</a>
+      </div>
+
+      {/* ── Bottom bar ─────────────────────────────────────── */}
+      <div className="border-t border-white/8">
+        <div className="container mx-auto px-4 md:px-6 py-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-cinema-500 text-xs">
+              &copy; 2026 100X Circle Pvt Ltd. All rights reserved. Manufactured in India.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+              {[
+                { href: "/privacy-policy", label: "Privacy Policy" },
+                { href: "/terms-and-conditions", label: "Terms" },
+                { href: "/return-policy", label: "Returns" },
+                { href: "/warranty-policy", label: "Warranty" },
+                { href: "/disclaimer", label: "Disclaimer" },
+              ].map((l) => (
+                <Link key={l.href} href={l.href} className="text-cinema-600 hover:text-cinema-400 text-xs transition-colors">
+                  {l.label}
+                </Link>
+              ))}
+              <a href="/admin" className="text-cinema-700 hover:text-cinema-500 text-xs transition-colors">
+                Admin
+              </a>
+            </div>
           </div>
-          <p className="text-gray-600 text-[10px] leading-relaxed">
-            fogging machine, fogging machine price, fogger, fogger machine price, thermal fogging machine, Double barrel
-            fogging machine, best thermal fogging machine, fogging machine in bihar, fogging machine in delhi, fogging
-            machine in india, fogging machine in mumbai, fogging machine pune, thermal fogging machine manufacturer in
-            india, fogging machine in uttar pradesh, Best foggers, Foggers india, giant fogging machine, Mosquito fogger
+          {/* Hidden SEO keywords - visually hidden but accessible */}
+          <p className="sr-only">
+            Fogging machine manufacturer India, thermal fogging machine, mosquito fogger, vehicle mounted fogging machine,
+            industrial fogging machine, pest control equipment, fogging machine Delhi, fogging machine UP, fogging machine Bihar,
+            fogging machine Mumbai, fogging machine Pune, 100X Circle
           </p>
         </div>
       </div>

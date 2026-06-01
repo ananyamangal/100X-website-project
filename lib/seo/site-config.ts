@@ -22,6 +22,10 @@ export const BUSINESS = {
     longitude: 76.9318,
   },
   youtube: "https://www.youtube.com/@100Xcircle",
+  facebook: "https://www.facebook.com/100xcircle",
+  instagram: "https://www.instagram.com/100xcircle",
+  linkedin: "https://www.linkedin.com/company/100xcircle",
+  twitter: "https://x.com/100xcircle",
 } as const
 
 export const defaultOgImage = `${SITE_URL}/logo-main.png`

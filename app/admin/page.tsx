@@ -44,6 +44,7 @@ import { CelebrityAssetsTab } from "@/components/admin/CelebrityAssetsTab"
 import { HomepageSectionsTab } from "@/components/admin/HomepageSectionsTab"
 import { BrochureLeadsTab } from "@/components/admin/BrochureLeadsTab"
 import { SparePartsTab } from "@/components/admin/SparePartsTab"
+import { ReviewsTab } from "@/components/admin/ReviewsTab"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
@@ -1159,6 +1160,17 @@ function AdminDashboardContent() {
                 Spare Parts
               </button>
               <button
+                onClick={() => setActiveTab("reviews")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "reviews"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Star className="mr-3" size={20} />
+                Reviews
+              </button>
+              <button
                 onClick={() => setActiveTab("deployments")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "deployments"
@@ -1328,6 +1340,7 @@ function AdminDashboardContent() {
             {activeTab === "celebrityAssets" && <CelebrityAssetsTab />}
             {activeTab === "homepageSections" && <HomepageSectionsTab />}
             {activeTab === "spareParts" && <SparePartsTab />}
+            {activeTab === "reviews" && <ReviewsTab />}
             {activeTab === "settings" && <SettingsTab />}
           </div>
         </div>

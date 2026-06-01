@@ -40,6 +40,7 @@ import CinematicManufacturingSection from "@/components/home/CinematicManufactur
 import CinematicTrustSection from "@/components/home/CinematicTrustSection"
 import CinematicCTASection from "@/components/home/CinematicCTASection"
 import CinematicProductsSection from "@/components/home/CinematicProductsSection"
+import ReviewsSection from "@/components/home/ReviewsSection"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
 import { type HomeContent } from "@/lib/homeContentTypes"
@@ -365,6 +366,9 @@ export default function HomePageClient({
 
       {/* ── 10. OUR CUSTOMERS ─────────────────────────────────────── */}
       <OurCustomersScroll customers={customers} />
+
+      {/* ── 10b. REVIEWS ──────────────────────────────────────────── */}
+      <ReviewsSection limit={6} />
 
       {/* ── 11. TRUST SECTION — certifications + pillars ─────────── */}
       <SectionConnector eyebrow={homeContent.connectors.c4.eyebrow} text={homeContent.connectors.c4.text} />
