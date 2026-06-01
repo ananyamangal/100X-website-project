@@ -73,17 +73,17 @@ export default function MobileCtaBar() {
         role="region"
         aria-label="Quick contact"
         data-gtm-location="sticky_mobile_bar"
-        className="md:hidden fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur shadow-[0_-2px_8px_rgba(15,23,42,0.08)]"
+        className="md:hidden fixed inset-x-0 bottom-0 z-50 bg-gray-950/98 backdrop-blur-md border-t border-white/8"
         style={{ paddingBottom: "calc(0.5rem + env(safe-area-inset-bottom))" }}
       >
-        <div className="grid grid-cols-[5fr_3fr_4fr] gap-2 px-2 pt-2">
+        <div className="grid grid-cols-3 gap-2 px-3 pt-2.5">
           <a
             href={telHref}
             aria-label={`Call ${BUSINESS.phonePrimary}`}
             data-gtm="cta_call"
-            className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-md bg-green-600 px-3 text-white font-semibold text-base shadow-sm transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
+            className="inline-flex min-h-[50px] flex-col items-center justify-center gap-0.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-600 text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
           >
-            <Phone size={20} aria-hidden="true" />
+            <Phone size={18} aria-hidden="true" />
             <span>{copy.call}</span>
           </a>
 
@@ -93,7 +93,7 @@ export default function MobileCtaBar() {
             rel="noopener noreferrer"
             aria-label="Chat on WhatsApp"
             data-gtm="cta_whatsapp"
-            className="inline-flex min-h-[52px] items-center justify-center gap-1.5 rounded-md border border-green-600 bg-white px-2 text-green-700 font-semibold text-[15px] transition-colors hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="inline-flex min-h-[50px] flex-col items-center justify-center gap-0.5 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-600 text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
           >
             <MessageCircle size={18} aria-hidden="true" />
             <span>{copy.whatsapp}</span>
@@ -105,13 +105,10 @@ export default function MobileCtaBar() {
             aria-haspopup={isContactPage ? undefined : "dialog"}
             aria-expanded={isContactPage ? undefined : quoteOpen}
             data-gtm="cta_quote"
-            className="inline-flex min-h-[52px] items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white px-2 text-slate-900 font-semibold transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
+            className="inline-flex min-h-[50px] flex-col items-center justify-center gap-0.5 rounded-xl border border-white/15 bg-white/6 text-white font-600 text-[11px] transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
           >
-            <FileText size={16} aria-hidden="true" className="shrink-0" />
-            {/* Smaller text for the long "Request Tender Quote" label so it
-                doesn't truncate on 360-375px phones. Other labels (Get Quote /
-                Get Price / Become Distributor) stay at the standard size. */}
-            <span className={copy.quote.length > 12 ? "truncate text-[12px]" : "truncate text-[15px]"}>
+            <FileText size={17} aria-hidden="true" className="shrink-0" />
+            <span className={copy.quote.length > 12 ? "truncate text-[10px]" : "truncate text-[11px]"}>
               {copy.quote}
             </span>
           </button>

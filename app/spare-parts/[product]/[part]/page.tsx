@@ -5,6 +5,7 @@ import clientPromise from "@/lib/mongodb"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import ScrollReveal from "@/components/cinematic/ScrollReveal"
+import ShareButtons from "@/components/cinematic/ShareButtons"
 import { Download, MessageCircle, CheckCircle2, Wrench, ArrowRight } from "lucide-react"
 
 export const dynamic = "force-dynamic"
@@ -152,7 +153,7 @@ export default async function SparePartDetailPage({
 
               {/* Downloads */}
               {part.downloads?.length > 0 && (
-                <div className="space-y-2">
+                <div className="space-y-2 mb-6">
                   {part.downloads.map((d: any, i: number) => (
                     <a key={i} href={d.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-cinema-400 hover:text-brand-400 transition-colors text-sm">
                       <Download size={14} /> {d.label}
@@ -160,6 +161,15 @@ export default async function SparePartDetailPage({
                   ))}
                 </div>
               )}
+
+              {/* Share */}
+              <div className="pt-5 border-t border-white/8">
+                <ShareButtons
+                  url={`${SITE_URL}/spare-parts/${productSlug}/${partSlug}`}
+                  title={`${part.name} spare part for ${productName} — 100X Circle`}
+                  variant="dark"
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -17,7 +17,11 @@ export default function AccreditationsStrip({ accreditations }: Props) {
   const itemWidthPercent = 100 / n;
 
   return (
-    <section className="py-6 md:py-12 bg-gray-50 overflow-hidden">
+    <section className="py-10 md:py-14 bg-gray-50 overflow-hidden">
+      <div className="container mx-auto px-4 mb-6 md:mb-8">
+        <p className="eyebrow text-brand-600 text-center mb-2">Verified Quality</p>
+        <p className="text-xl font-700 text-gray-900 text-center">Certified. Tested. Trusted.</p>
+      </div>
       <div className="container mx-auto px-2 md:px-4">
         <div className="relative overflow-hidden">
           <div className="flex animate-logo-marquee">
@@ -41,6 +45,7 @@ export default function AccreditationsStrip({ accreditations }: Props) {
               </div>
             ))}
           </div>
+        </div>
         </div>
       </div>
     </section>

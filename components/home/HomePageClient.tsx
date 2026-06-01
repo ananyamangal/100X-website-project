@@ -154,9 +154,10 @@ function OurCustomersScroll({ customers }: { customers: any[] }) {
   const extendedCustomers = [...customers, ...customers]
   const itemWidthPercent = 100 / n
   return (
-    <section className="py-6 md:py-12 bg-gray-50 overflow-hidden">
+    <section className="py-12 md:py-16 bg-gray-50 overflow-hidden">
       <div className="container mx-auto px-2 md:px-4">
-        <p className="text-xl md:text-3xl font-bold text-gray-800 text-center mb-4 md:mb-8">OUR CUSTOMERS</p>
+        <p className="eyebrow text-brand-600 text-center mb-2">Trusted by</p>
+        <p className="text-2xl md:text-3xl font-700 text-gray-900 text-center mb-8 md:mb-10">Our customers across India</p>
         <div className="relative overflow-hidden">
           <div className="flex animate-logo-marquee">
             {extendedCustomers.map((c, i) => (
@@ -202,21 +203,13 @@ function YoutubeShortsCarousel() {
   return (
     <section className="py-16 md:py-20 bg-gray-50 relative">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <Badge className="mb-6 bg-red-100 text-red-800 hover:bg-red-200 text-lg px-6 py-2">YouTube Shorts</Badge>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-            Fogging Machine Supplier - Watch Real Product Demos
+        <div className="text-center mb-12">
+          <p className="eyebrow text-red-600 mb-3">YouTube</p>
+          <h2 className="text-3xl md:text-4xl font-700 text-gray-800 mb-4">
+            See our machines in action.
           </h2>
-          <p className="text-xl text-gray-600 max-w-5xl mx-auto">
-            100X Circle shares real product demo videos to help you understand machine performance before buying.
-          </p>
-          <p className="text-xl text-gray-600 max-w-5xl mx-auto">
-            Watch our latest demos, working guides, and quick tips to see fog output, coverage area, and ease of use in
-            real conditions. Our videos showcase thermal and pulse jet fogging machines used for mosquito control, public
-            health, and commercial pest management across India.
-          </p>
-          <p className="text-xl text-gray-600 max-w-5xl mx-auto">
-            Explore our YouTube Shorts to stay updated and choose the right fogging machine with confidence.
+          <p className="text-gray-500 max-w-xl mx-auto text-base">
+            Real demos, field tests, and operating guides — watch before you buy.
           </p>
         </div>
         <div className="relative">
