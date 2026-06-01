@@ -3,7 +3,7 @@
 import React from "react"
 import Link from "next/link"
 import { MessageCircle, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
+
 import { BUSINESS } from "@/lib/seo/site-config"
 
 interface Props {
@@ -32,37 +32,23 @@ export default function InlineInquiryCTA({
           {text}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button
-            asChild
-            size="lg"
-            className="bg-green-600 hover:bg-green-700 text-base md:text-lg px-7 py-5 shadow-lg shadow-green-900/20"
+          <Link
+            href="/contact-us"
+            className={`inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-600 text-sm transition-all hover:-translate-y-0.5 shadow-lg ${isDark ? 'bg-brand-600 hover:bg-brand-700 text-white shadow-brand-900/30' : 'bg-brand-600 hover:bg-brand-700 text-white shadow-brand-900/20'}`}
           >
-            <Link href="/contact-us" className="flex items-center">
-              Get a Quote <ArrowRight className="ml-2" size={20} />
-            </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            size="lg"
-            className={
-              isDark
-                ? "border-2 border-white text-white hover:bg-white hover:text-gray-900 bg-transparent text-base md:text-lg px-7 py-5"
-                : "border-2 border-green-700 text-green-700 hover:bg-green-50 text-base md:text-lg px-7 py-5"
-            }
+            Get a Quote <ArrowRight size={16} />
+          </Link>
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm="cta_whatsapp"
+            data-gtm-location="inline_inquiry"
+            className={`inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-600 text-sm border-2 transition-all hover:-translate-y-0.5 ${isDark ? 'border-white/50 text-white hover:border-white hover:bg-white/10' : 'border-brand-600 text-brand-700 hover:bg-brand-50'}`}
           >
-            <a
-              href={waHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center"
-              data-gtm="cta_whatsapp"
-              data-gtm-location="inline_inquiry"
-            >
-              <MessageCircle className="mr-2" size={20} />
-              WhatsApp
-            </a>
-          </Button>
+            <MessageCircle size={16} />
+            WhatsApp
+          </a>
         </div>
       </div>
     </section>

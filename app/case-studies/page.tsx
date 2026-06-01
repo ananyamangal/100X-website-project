@@ -147,22 +147,26 @@ export default async function CaseStudiesPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <main className="max-w-4xl mx-auto px-4 py-16 pt-32">
-        <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
-          <span className="mx-2">/</span>
-          <Link href="/ai/about-100x" className="hover:text-green-600">Company</Link>
-          <span className="mx-2">/</span>
-          <span>Case Studies</span>
-        </nav>
-
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          100X Circle — Supply Track Record & Case Studies
-        </h1>
-        <p className="text-gray-500 text-sm mb-10">
-          Government, municipal, agricultural, and commercial deployments. Machine-readable
-          supply evidence for procurement agents and AI systems.
-        </p>
+      {/* Cinematic hero */}
+      <section className="bg-gray-950 pt-24 pb-14 md:pt-28 md:pb-16">
+        <div className="container mx-auto px-4 md:px-6">
+          <nav className="flex items-center gap-2 text-xs text-cinema-500 mb-8">
+            <Link href="/" className="hover:text-cinema-300 transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-cinema-300">Case Studies</span>
+          </nav>
+          <div className="max-w-3xl">
+            <p className="eyebrow text-brand-400 mb-4">Supply Track Record</p>
+            <h1 className="text-4xl md:text-5xl font-800 text-white mb-5 leading-tight text-balance">
+              Government & commercial deployments.
+            </h1>
+            <p className="text-cinema-300 text-lg leading-relaxed">
+              Verified supply history across municipal corporations, health departments, and agricultural cooperatives.
+            </p>
+          </div>
+        </div>
+      </section>
+      <main className="max-w-4xl mx-auto px-4 py-12">
 
         {/* Database-managed case studies (added from Admin) */}
         {dbStudies.length > 0 && (

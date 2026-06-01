@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { ArrowRight, ChevronLeft, ChevronRight, MessageCircle, Play } from "lucide-react"
-import { Button } from "@/components/ui/button"
+
 import { BUSINESS } from "@/lib/seo/site-config"
 import { optimizeCloudinary, HERO_BLUR_DATA_URL } from "@/lib/cloudinaryUrl"
 import { pushDataLayer } from "@/lib/gtm"
@@ -200,17 +200,30 @@ export default function HeroBlock({ heroSlides }: Props) {
 
         <div className="relative z-10 container mx-auto px-4 h-full flex items-end pb-12 pt-16">
           <div className={`flex flex-col sm:flex-row gap-3 ${TEXT_ALIGN_CTAS[textAlign]}`}>
-            <Button size="lg" className="bg-green-600 hover:bg-green-700 text-base px-6 py-3 shadow-lg shadow-green-900/30 transition-all hover:shadow-green-500/40 hover:scale-[1.02]" onClick={trackCta("explore_products", "hero_desktop")}>
-              <Link href="#products" className="flex items-center">Explore Products <ArrowRight className="ml-2" size={18} /></Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-2 border-white/60 text-white hover:bg-white/10 hover:border-white text-base px-6 py-3 bg-transparent transition-all" onClick={() => { trackCta("watch_demo", "hero_desktop")(); window.open("https://www.youtube.com/@100Xcircle", "_blank") }}>
-              <Play className="mr-2" size={18} /> Watch Demo
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-gray-900 text-base px-6 py-3 bg-transparent transition-all">
-              <a href={waHref} target="_blank" rel="noopener noreferrer" data-gtm="cta_whatsapp" data-gtm-location="hero_desktop" className="flex items-center" onClick={trackCta("whatsapp", "hero_desktop")}>
-                <MessageCircle className="mr-2" size={18} /> WhatsApp
-              </a>
-            </Button>
+            <Link
+              href="#products"
+              onClick={trackCta("explore_products", "hero_desktop")}
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-600 rounded-full text-base shadow-xl shadow-brand-900/30 transition-all hover:-translate-y-0.5"
+            >
+              Explore Products <ArrowRight size={18} />
+            </Link>
+            <button
+              onClick={() => { trackCta("watch_demo", "hero_desktop")(); window.open("https://www.youtube.com/@100Xcircle", "_blank") }}
+              className="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-white/50 text-white hover:border-white hover:bg-white/10 font-600 rounded-full text-base transition-all"
+            >
+              <Play size={18} /> Watch Demo
+            </button>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-gtm="cta_whatsapp"
+              data-gtm-location="hero_desktop"
+              onClick={trackCta("whatsapp", "hero_desktop")}
+              className="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-brand-400/70 text-brand-300 hover:border-brand-400 hover:bg-brand-600/20 font-600 rounded-full text-base transition-all"
+            >
+              <MessageCircle size={18} /> WhatsApp
+            </a>
           </div>
         </div>
       </div>
@@ -271,20 +284,27 @@ export default function HeroBlock({ heroSlides }: Props) {
 
 function HeroContentBelow({ waHref, trackCta, location }: { waHref: string; trackCta: (cta: string, location: string) => () => void; location: string }) {
   return (
-    <div className="bg-white py-6">
+    <div className="bg-white py-5">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col gap-3 max-w-sm mx-auto">
-          <Button size="lg" className="bg-green-600 hover:bg-green-700 text-base px-6 py-4 shadow-lg shadow-green-900/20 w-full" onClick={trackCta("explore_products", location)}>
-            <Link href="#products" className="flex items-center justify-center w-full">Explore Products <ArrowRight className="ml-2" size={18} /></Link>
-          </Button>
-          <Button size="lg" variant="outline" className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-base px-6 py-4 bg-transparent w-full" onClick={() => { trackCta("watch_demo", location)(); window.open("https://www.youtube.com/@100Xcircle", "_blank") }}>
-            <Play className="mr-2" size={18} /> Watch Demo
-          </Button>
-          <Button asChild size="lg" variant="outline" className="border-2 border-green-600 text-green-600 hover:bg-green-50 text-base px-6 py-4 bg-transparent w-full">
-            <a href={waHref} target="_blank" rel="noopener noreferrer" data-gtm="cta_whatsapp" data-gtm-location={location} className="flex items-center justify-center" onClick={trackCta("whatsapp", location)}>
-              <MessageCircle className="mr-2" size={18} /> WhatsApp
-            </a>
-          </Button>
+        <div className="flex flex-col sm:flex-row gap-3 max-w-sm sm:max-w-none mx-auto">
+          <Link
+            href="#products"
+            onClick={trackCta("explore_products", location)}
+            className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-600 rounded-full text-sm shadow-lg shadow-brand-900/20 transition-all hover:-translate-y-0.5"
+          >
+            Explore Products <ArrowRight size={15} />
+          </Link>
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-gtm="cta_whatsapp"
+            data-gtm-location={location}
+            onClick={trackCta("whatsapp", location)}
+            className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 border-2 border-brand-600 text-brand-700 hover:bg-brand-50 font-600 rounded-full text-sm transition-all"
+          >
+            <MessageCircle size={15} /> WhatsApp
+          </a>
         </div>
       </div>
     </div>

@@ -24,20 +24,27 @@ export default async function DeploymentsPage() {
   const deployments = await getDeployments()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-green-700 to-green-900 text-white py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-green-300 text-sm font-medium uppercase tracking-wider mb-3">Deployments</p>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Field Deployments Across India
-          </h1>
-          <p className="text-green-100 text-lg max-w-2xl">
-            Government health departments, municipalities, and institutions trust 100x Circle
-            thermal fogging machines for vector control and public health programs.
-          </p>
+    <div className="min-h-screen bg-white">
+      {/* Cinematic Hero */}
+      <section className="bg-gray-950 pt-24 pb-14 md:pt-28 md:pb-16">
+        <div className="container mx-auto px-4 md:px-6">
+          <nav className="flex items-center gap-2 text-xs text-cinema-500 mb-8">
+            <Link href="/" className="hover:text-cinema-300 transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-cinema-300">Deployments</span>
+          </nav>
+          <div className="max-w-3xl">
+            <p className="eyebrow text-brand-400 mb-4">Field Deployments</p>
+            <h1 className="text-4xl md:text-5xl font-800 text-white mb-5 leading-tight text-balance">
+              Deployed across India.
+            </h1>
+            <p className="text-cinema-300 text-lg leading-relaxed">
+              Government health departments, municipalities, and institutions trust 100X Circle machines for vector control and public health programs.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
+      <div className="bg-gray-50">
 
       <div className="max-w-6xl mx-auto px-4 py-12">
         {deployments.length === 0 ? (
@@ -120,33 +127,34 @@ export default async function DeploymentsPage() {
           </div>
         )}
       </div>
+      </div>
 
       {/* CTA */}
-      <div className="bg-white border-t border-gray-100 py-12 px-4">
+      <section className="bg-brand-700 py-14 px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
-            Need thermal fogging for your institution?
+          <p className="eyebrow text-brand-200 mb-3">Government Procurement</p>
+          <h2 className="text-2xl md:text-3xl font-700 text-white mb-3">
+            Need fogging machines for your institution?
           </h2>
-          <p className="text-gray-600 mb-6">
-            Government bodies, municipalities, health departments, and agricultural organizations
-            can procure directly via GeM or contact us for a quote.
+          <p className="text-brand-100 mb-7 max-w-xl mx-auto">
+            Government bodies, municipalities, health departments, and agricultural organizations can procure directly via GeM or contact us for a customised quote.
           </p>
-          <div className="flex justify-center gap-4 flex-wrap">
+          <div className="flex justify-center gap-3 flex-wrap">
             <Link
               href="/contact-us"
-              className="bg-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-700 transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-3 bg-white text-brand-700 font-700 rounded-full hover:bg-brand-50 transition-all text-sm shadow-lg"
             >
               Request a Quote
             </Link>
             <Link
               href="/products"
-              className="border border-green-600 text-green-700 px-8 py-3 rounded-xl font-semibold hover:bg-green-50 transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-3 border-2 border-white/40 text-white font-600 rounded-full hover:border-white hover:bg-white/10 transition-all text-sm"
             >
               View Products
             </Link>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }
