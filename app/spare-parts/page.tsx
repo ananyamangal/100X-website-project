@@ -5,6 +5,22 @@ import { SITE_URL } from "@/lib/seo/site-config"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import { ArrowRight, Wrench } from "lucide-react"
 
+function buildPartUrl(part: any): string {
+  // Parts live at /spare-parts/[product-slug]/[part-slug]
+  // Derive product slug from the first compatible product name
+  const productName = part.compatibleProductNames?.[0]
+  if (productName) {
+    const productSlug = productName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
+    return `/spare-parts/${productSlug}/${part.slug}`
+  }
+  // Fallback: try to use the part category as a grouping key
+  const cat = (part.category || "parts").toLowerCase().replace(/[^a-z0-9]+/g, "-")
+  return `/spare-parts/${cat}/${part.slug}`
+}
+
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
@@ -95,7 +111,7 @@ export default async function SparePartsPage() {
                     {byCategory[cat].map((part: any) => (
                       <Link
                         key={part._id}
-                        href={`/spare-parts/${part.slug}`}
+                        href={buildPartUrl(part)}
                         className="group block bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-brand-200 hover:shadow-md transition-all"
                       >
                         {part.images?.[0] ? (

@@ -223,7 +223,14 @@ function CompatibleSpareParts({ productId, productName }: { productId: string; p
           {parts.slice(0, 8).map((part, i) => (
             <ScrollReveal key={part._id} animation="fade-up" delay={i * 60}>
               <Link
-                href={`/spare-parts/${part.slug}`}
+                href={(() => {
+                  const pName = part.compatibleProductNames?.[0];
+                  if (pName) {
+                    const pSlug = pName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                    return `/spare-parts/${pSlug}/${part.slug}`;
+                  }
+                  return `/spare-parts/${part.category?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'parts'}/${part.slug}`;
+                })()}
                 className="group block bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-brand-200 hover:shadow-md transition-all duration-300"
               >
                 {part.images?.[0] ? (
