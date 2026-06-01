@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Badge } from "@/components/ui/badge"
+
 import { CheckCircle } from "lucide-react"
 import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContentTypes"
 
@@ -17,12 +17,10 @@ export default function ManufacturerIntroBlock({ content }: Props) {
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center mb-14 md:mb-16">
           <div className="order-2 md:order-1 text-center md:text-left">
-            <Badge className="mb-5 bg-green-600 hover:bg-green-700 text-base md:text-lg px-5 md:px-6 py-1.5 md:py-2">
-              {c.badge}
-            </Badge>
+            <p className="eyebrow text-brand-600 mb-3">{c.badge}</p>
             <h2
               id="manufacturer-intro-heading"
-              className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-5 leading-tight"
+              className="text-display-xs text-gray-900 mb-4 text-balance"
             >
               {c.headline}
             </h2>

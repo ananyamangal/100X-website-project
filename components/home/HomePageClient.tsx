@@ -4,16 +4,7 @@ import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import dynamic from "next/dynamic"
-import {
-  X,
-  Download,
-  MessageCircle,
-  Star,
-  ChevronRight,
-  ChevronLeft,
-  CheckCircle,
-  Loader2,
-} from "lucide-react"
+import { Download, MessageCircle, Star, ChevronRight, ChevronLeft, X, CheckCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -267,20 +258,14 @@ export default function HomePageClient({
   homepageSections = [],
 }: HomePageClientProps) {
   const router = useRouter()
-  const [currentPage, setCurrentPage] = useState("home")
-  const [selectedProduct, setSelectedProduct] = useState<string | null>(null)
   const [brochureModalOpen, setBrochureModalOpen] = useState(false)
   const [brochureModalData, setBrochureModalData] = useState<{ productName?: string; brochureUrl?: string }>({})
-  // Legacy state kept to avoid breaking downstream refs — no longer drives the old form
-  const [showBrochureForm] = useState(false)
 
   const heroSlides = banners
     .filter((b) => b.isActive && (b.desktopBannerImage || b.image))
     .sort((a, b) => (a.order || 0) - (b.order || 0))
 
   const displayBlogPosts = blogPosts.length > 0 ? blogPosts : defaultBlogPosts
-
-  const whatsappNumber = BUSINESS.whatsappE164
 
   // Handle legacy hash links (e.g., /#about, /#contact)
   useEffect(() => {
@@ -387,24 +372,6 @@ export default function HomePageClient({
     </>
   )
 
-  const renderPage = () => {
-    if (currentPage === "product" && selectedProduct) {
-      const product = products.find((p) => (p.id || p._id) === selectedProduct)
-      if (product) {
-        return (
-          <ProductDetailPage
-            product={product}
-            setCurrentPage={setCurrentPage}
-            setSelectedProduct={setSelectedProduct}
-            onBrochureDownload={handleBrochureDownload}
-            whatsappNumber={whatsappNumber}
-          />
-        )
-      }
-    }
-    return renderHomePage()
-  }
-
   return (
     <>
       <BrochureLeadModal
@@ -416,7 +383,7 @@ export default function HomePageClient({
       />
 
       <div className="min-h-screen bg-white">
-        <div>{renderPage()}</div>
+        <div>{renderHomePage()}</div>
 
         <WhatsAppFloatingButton
           waNumber={BUSINESS.whatsappE164}
@@ -428,7 +395,9 @@ export default function HomePageClient({
   )
 }
 
-function ProductDetailPage({
+// Legacy component removed — product detail pages use app/products/[id]/ProductDetailClient.tsx
+// Kept as type-only placeholder to avoid import errors during removal
+function _unused_ProductDetailPage({
   product,
   setCurrentPage,
   setSelectedProduct,
