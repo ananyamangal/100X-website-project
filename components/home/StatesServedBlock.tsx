@@ -3,7 +3,6 @@
 import React from "react"
 import Link from "next/link"
 import { MapPin, ArrowRight } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 
 // Curated list of major states/regions served. Each entry can optionally link
 // to a state-specific landing page; entries without `href` render as a plain
@@ -35,16 +34,14 @@ export default function StatesServedBlock() {
     >
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-10 md:mb-14">
-          <Badge className="mb-5 bg-green-100 text-green-800 hover:bg-green-200 text-base px-5 py-1.5">
-            Pan-India Coverage
-          </Badge>
+          <p className="eyebrow text-brand-600 mb-3">Pan-India Coverage</p>
           <h2
             id="states-served-heading"
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight"
+            className="text-display-xs text-gray-900 mb-4 text-balance"
           >
-            States We Serve
+            Serving India, state by state.
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
             Active distributors and direct supply across major Indian states — for municipal corporations, Nagar Nigams, Nagar Palikas, Panchayats, and private buyers.
           </p>
         </div>

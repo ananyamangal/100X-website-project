@@ -3,8 +3,6 @@
 import React from "react"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import ProductCard from "@/components/ProductCard"
 
 // Local Product interface — matches the one declared in app/page.tsx.
@@ -42,13 +40,11 @@ export default function ProductsBlock({ products, onBrochureDownload }: Props) {
   return (
     <section id="products" className="py-16 md:py-20">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-14 md:mb-16">
-          <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">
-            Our Products
-          </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Buy GeM Approved OEM of Fogging Machines at Best Prices</h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            GeM-approved fogging machines built for municipal vector control, agricultural spraying, and industrial pest management. Manufactured in India with full after-sales support — <a className="text-green-700 underline-offset-2 hover:underline" href="https://www.100xcircle.com/">buy industrial fogging machines online</a>.
+        <div className="text-center mb-12">
+          <p className="eyebrow text-brand-600 mb-3">Product Catalogue</p>
+          <h2 className="text-display-xs text-gray-900 mb-4 text-balance">Machines for every application.</h2>
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            GeM-approved, OEM-manufactured fogging machines for municipal vector control, agricultural spraying, and industrial pest management.
           </p>
         </div>
 

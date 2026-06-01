@@ -17,7 +17,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+
 import { Button } from "@/components/ui/button"
 import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContentTypes"
 
@@ -55,16 +55,14 @@ export default function TechnologyBlock({ content }: Props) {
 
         {/* Section header */}
         <div className="text-center mb-12 md:mb-16">
-          <Badge className="mb-5 bg-green-100 text-green-800 hover:bg-green-200 text-base px-5 py-1.5">
-            {c.badge}
-          </Badge>
+          <p className="eyebrow text-brand-600 mb-3">{c.badge}</p>
           <h2
             id="technology-heading"
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-5 leading-tight"
+            className="text-display-xs text-gray-900 mb-4 text-balance"
           >
             {c.headline}
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">{c.body}</p>
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">{c.body}</p>
         </div>
 
         {/* Video + Steps — desktop side-by-side, mobile stacked */}

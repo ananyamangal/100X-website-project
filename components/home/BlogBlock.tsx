@@ -3,8 +3,6 @@
 import React from "react"
 import Link from "next/link"
 import { ArrowRight, Calendar, User } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { blogPostSlug } from "@/lib/blogSlug"
@@ -31,16 +29,11 @@ export default function BlogBlock({ posts, hasApiPosts }: Props) {
   return (
     <section className="py-16 md:py-20 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-20">
-          <Badge className="mb-6 bg-purple-100 text-purple-800 hover:bg-purple-200 text-lg px-6 py-2">
-            Latest Blog Posts
-          </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Mosquito Fogging Machine Manufacturer – Industry Insights & Tips</h2>
-          <p className="text-xl text-gray-600 max-w-5xl mx-auto mb-4">
-            As a leading <a className="text-blue-500" href="https://www.100xcircle.com/">mosquito fogging machine manufacturer</a>, 100x Circle shares practical industry insights, usage techniques, and expert guidance to help you get the best performance from your equipment.
-          </p>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Stay updated with the latest fogging methods, maintenance tips, safety practices, and application guides for effective disinfection and pest control. Our insights are designed to help industries, Municipalities, Nagar Nigam, Nagar Palika & Panchayats to improve efficiency, coverage, and long-term machine performance.
+        <div className="text-center mb-12">
+          <p className="eyebrow text-brand-600 mb-3">Knowledge Centre</p>
+          <h2 className="text-display-xs text-gray-900 mb-4 text-balance">Industry insights &amp; guides.</h2>
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto">
+            Practical articles on thermal fogging, pest control, agricultural equipment, and government procurement — written by our technical team.
           </p>
         </div>
 
@@ -53,52 +46,41 @@ export default function BlogBlock({ posts, hasApiPosts }: Props) {
               <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
 
 
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <Badge variant="secondary">{post.category}</Badge>
-                  <span className="text-sm text-gray-500">{post.readTime}</span>
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-2">
+                  {post.category && <p className="eyebrow text-brand-600">{post.category}</p>}
+                  <span className="text-xs text-gray-400 ml-auto">{post.readTime}</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">{post.title}</h3>
-                <p className="text-gray-600 mb-4 line-clamp-3">{plainTextFromHtml(post.excerpt || "")}</p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <User size={16} className="text-gray-400" />
-                    <span className="text-sm text-gray-600">{post.author}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Calendar size={16} className="text-gray-400" />
-                    <span className="text-sm text-gray-600">{formatDate(post.date)}</span>
-                  </div>
+                <h3 className="font-700 text-gray-900 text-base mb-2 line-clamp-2">{post.title}</h3>
+                <p className="text-gray-500 text-sm mb-4 line-clamp-3">{plainTextFromHtml(post.excerpt || "")}</p>
+                <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
+                  <span className="flex items-center gap-1">
+                    <User size={12} aria-hidden />
+                    {post.author || "100x Circle"}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar size={12} aria-hidden />
+                    {formatDate(post.date)}
+                  </span>
                 </div>
                 {hasApiPosts ? (
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700" asChild>
-                    <Link href={`/blog/${blogPostSlug(post)}`}>
-                      Read Full Article <ArrowRight className="ml-2" size={16} />
-                    </Link>
-                  </Button>
+                  <Link href={`/blog/${blogPostSlug(post)}`} className="inline-flex items-center gap-1.5 text-brand-600 hover:text-brand-700 font-600 text-sm transition-colors">
+                    Read article <ArrowRight size={13} />
+                  </Link>
                 ) : (
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700" asChild>
-                    <Link href="/blog">
-                      View Blog <ArrowRight className="ml-2" size={16} />
-                    </Link>
-                  </Button>
+                  <Link href="/blog" className="inline-flex items-center gap-1.5 text-brand-600 hover:text-brand-700 font-600 text-sm transition-colors">
+                    View blog <ArrowRight size={13} />
+                  </Link>
                 )}
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="text-center">
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-purple-600 text-purple-600 hover:bg-purple-50 bg-transparent"
-            asChild
-          >
-            <Link href="/blog">
-              View All Blog Posts <ArrowRight className="ml-2" size={20} />
-            </Link>
-          </Button>
+        <div className="text-center mt-10">
+          <Link href="/blog" className="inline-flex items-center gap-2 px-6 py-3 border border-brand-200 text-brand-600 hover:bg-brand-50 font-600 rounded-full text-sm transition-colors">
+            View all articles <ArrowRight size={14} />
+          </Link>
         </div>
       </div>
     </section>

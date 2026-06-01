@@ -9,7 +9,6 @@ import {
   Factory,
   ArrowRight,
 } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { BUSINESS } from "@/lib/seo/site-config"
 
 const PROGRAMS = [
@@ -55,16 +54,14 @@ export default function SpecialisedBuyersBlock() {
     >
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-12 md:mb-14">
-          <Badge className="mb-5 bg-green-100 text-green-800 hover:bg-green-200 text-base px-5 py-1.5">
-            Specialised Programs
-          </Badge>
+          <p className="eyebrow text-brand-600 mb-3">Specialised Programs</p>
           <h2
             id="specialised-buyers-heading"
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight"
+            className="text-display-xs text-gray-900 mb-4 text-balance"
           >
-            Built for Every Kind of Buyer
+            Built for every kind of buyer.
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
             Government procurement, distributor partnerships, export, and industrial supply — each with a dedicated lane and a dedicated team.
           </p>
         </div>
@@ -76,23 +73,23 @@ export default function SpecialisedBuyersBlock() {
             return (
               <div
                 key={p.title}
-                className="rounded-2xl border border-gray-200 bg-gray-50/60 p-6 md:p-7 hover:shadow-md transition-shadow flex flex-col"
+                className="group rounded-2xl border border-gray-100 bg-white p-6 md:p-7 hover:shadow-lg hover:border-brand-200 hover:-translate-y-0.5 transition-all duration-300 flex flex-col"
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="grid place-items-center w-11 h-11 rounded-xl bg-green-600/10 ring-1 ring-green-600/20">
-                    <Icon className="text-green-700" size={22} aria-hidden="true" />
+                  <span className="grid place-items-center w-10 h-10 rounded-xl bg-brand-50 group-hover:bg-brand-100 transition-colors">
+                    <Icon className="text-brand-700" size={20} aria-hidden="true" />
                   </span>
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900">{p.title}</h3>
+                  <h3 className="font-700 text-gray-900 text-lg">{p.title}</h3>
                 </div>
-                <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-6 flex-1">
+                <p className="text-sm text-gray-500 leading-relaxed mb-6 flex-1">
                   {p.body}
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href="/contact-us"
-                    className="inline-flex items-center text-sm md:text-base font-semibold text-white bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-md transition-colors"
+                    className="inline-flex items-center gap-1.5 text-sm font-600 text-white bg-brand-600 hover:bg-brand-700 px-4 py-2.5 rounded-full transition-colors"
                   >
-                    {p.cta} <ArrowRight className="ml-2" size={16} />
+                    {p.cta} <ArrowRight size={13} />
                   </Link>
                   <a
                     href={waHref}
@@ -100,7 +97,7 @@ export default function SpecialisedBuyersBlock() {
                     rel="noopener noreferrer"
                     data-gtm="cta_whatsapp"
                     data-gtm-location={`specialised_${p.title.toLowerCase().replace(/\s+/g, "_")}`}
-                    className="inline-flex items-center text-sm md:text-base font-semibold text-green-700 hover:text-green-800 underline-offset-2 hover:underline"
+                    className="inline-flex items-center gap-1 text-sm font-500 text-gray-500 hover:text-brand-600 transition-colors"
                   >
                     WhatsApp →
                   </a>

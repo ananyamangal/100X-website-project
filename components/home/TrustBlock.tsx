@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import useEmblaCarousel from "embla-carousel-react"
 import { ChevronLeft, ChevronRight, Quote, ShieldCheck, MapPin, Building2, Globe2, Factory, BadgeCheck } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+
 import { Card } from "@/components/ui/card"
 
 function ReviewsCarousel() {
@@ -159,12 +159,10 @@ export default function TrustBlock() {
               Verified deployments
             </span>
           </div>
-          <Badge className="mb-6 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-lg px-6 py-2">
-            Customer Reviews
-          </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Trusted Fogging Machine Supplier – What Our Customers Say</h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Trusted by 10,000+ customers — including municipal bodies, Nagar Nigams, and farm cooperatives across Bihar, UP, Gujarat, and beyond. Field reviews from the people running our machines every day.
+          <p className="eyebrow text-brand-600 mb-3">Customer Reviews</p>
+          <h2 className="text-display-xs text-gray-900 mb-4 text-balance">What our customers say.</h2>
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            Trusted by 10,000+ customers — municipal bodies, Nagar Nigams, and farm cooperatives across India. Field reviews from the people running our machines every day.
           </p>
         </div>
         <div className="grid sm:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto mb-12 md:mb-16">
