@@ -2,7 +2,7 @@
 
 import * as Accordion from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+
 
 type Faq = {
   q: string
@@ -112,13 +112,11 @@ export default function FAQSection({ faqs: faqsProp }: { faqs?: Faq[] }) {
     <section className="py-16 md:py-24 bg-white" aria-labelledby="faq-heading">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-10 md:mb-14">
-          <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-200 text-base px-5 py-1.5">
-            Frequently Asked Questions
-          </Badge>
-          <h2 id="faq-heading" className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-            Procurement, Operations & After-Sales — Answered
+          <p className="eyebrow text-brand-600 mb-3">FAQ</p>
+          <h2 id="faq-heading" className="text-display-xs text-gray-900 mb-4 text-balance">
+            Questions, answered.
           </h2>
-          <p className="mt-4 text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
             Practical answers for government buyers, municipal teams, dealers, and field operators evaluating 100X Circle equipment.
           </p>
         </div>
@@ -126,22 +124,24 @@ export default function FAQSection({ faqs: faqsProp }: { faqs?: Faq[] }) {
         <Accordion.Root
           type="single"
           collapsible
-          className="divide-y divide-gray-200 rounded-2xl border border-gray-200 bg-white shadow-sm"
+          className="divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden"
         >
           {faqs.map((f, i) => (
             <Accordion.Item key={i} value={`faq-${i}`}>
               <Accordion.Header className="flex">
-                <Accordion.Trigger className="group flex w-full items-start justify-between gap-4 px-5 md:px-6 py-4 md:py-5 text-left font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 focus-visible:ring-inset rounded-2xl [&[data-state=open]]:text-green-700">
-                  <span className="text-base md:text-[17px] leading-snug">{f.q}</span>
-                  <ChevronDown
-                    size={20}
-                    aria-hidden="true"
-                    className="mt-1 shrink-0 text-green-700 transition-transform duration-200 group-data-[state=open]:rotate-180"
-                  />
+                <Accordion.Trigger className="group flex w-full items-start justify-between gap-4 px-5 md:px-6 py-4 md:py-5 text-left font-600 text-gray-900 transition-colors hover:bg-brand-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-inset [&[data-state=open]]:text-brand-700 [&[data-state=open]]:bg-brand-50/40">
+                  <span className="text-sm md:text-base leading-snug">{f.q}</span>
+                  <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full border border-gray-200 group-data-[state=open]:border-brand-300 flex items-center justify-center transition-all">
+                    <ChevronDown
+                      size={12}
+                      aria-hidden="true"
+                      className="text-gray-400 group-data-[state=open]:text-brand-600 transition-transform duration-200 group-data-[state=open]:rotate-180"
+                    />
+                  </div>
                 </Accordion.Trigger>
               </Accordion.Header>
-              <Accordion.Content className="overflow-hidden text-gray-700 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
-                <p className="px-5 md:px-6 pb-5 md:pb-6 text-sm md:text-base text-gray-700 leading-relaxed">{f.a}</p>
+              <Accordion.Content className="overflow-hidden text-gray-600 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+                <p className="px-5 md:px-6 pb-5 md:pb-6 text-sm md:text-base text-gray-600 leading-relaxed">{f.a}</p>
               </Accordion.Content>
             </Accordion.Item>
           ))}
