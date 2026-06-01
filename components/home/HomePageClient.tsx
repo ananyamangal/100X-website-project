@@ -35,6 +35,11 @@ import InlineInquiryCTA from "@/components/home/InlineInquiryCTA"
 import HomepageJsonLd from "@/components/seo/HomepageJsonLd"
 import CelebritySectionsBlock from "@/components/home/CelebritySectionsBlock"
 import BrochureLeadModal from "@/components/BrochureLeadModal"
+import IndustryApplicationsSection from "@/components/home/IndustryApplicationsSection"
+import CinematicManufacturingSection from "@/components/home/CinematicManufacturingSection"
+import CinematicTrustSection from "@/components/home/CinematicTrustSection"
+import CinematicCTASection from "@/components/home/CinematicCTASection"
+import CinematicProductsSection from "@/components/home/CinematicProductsSection"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
 import { type HomeContent } from "@/lib/homeContentTypes"
@@ -303,37 +308,84 @@ export default function HomePageClient({
   const renderHomePage = () => (
     <>
       <HomepageJsonLd />
+
+      {/* ── 1. CINEMATIC HERO ──────────────────────────────────────── */}
       <HeroBlock heroSlides={heroSlides} />
+
       {/* PLACEMENT: after-hero — awareness/problem sections */}
       <CelebritySectionsBlock sections={homepageSections} placement="after-hero" />
+
+      {/* ── 2. TRUST SIGNAL STRIP ─────────────────────────────────── */}
       <SectionConnector eyebrow={homeContent.connectors.c1.eyebrow} text={homeContent.connectors.c1.text} />
       <AccreditationsStrip accreditations={accreditations} />
+
+      {/* ── 3. PRODUCTS — cinematic card grid ─────────────────────── */}
       <SectionConnector eyebrow={homeContent.connectors.c2.eyebrow} text={homeContent.connectors.c2.text} />
-      <ProductsBlock products={products} onBrochureDownload={handleBrochureDownload} />
+      <CinematicProductsSection products={products} onBrochureDownload={handleBrochureDownload} />
+
       {/* PLACEMENT: after-products — solution/after sections */}
       <CelebritySectionsBlock sections={homepageSections} placement="after-products" />
+
+      {/* ── 4. INDUSTRY APPLICATIONS — dark cinematic section ─────── */}
+      <IndustryApplicationsSection />
+
+      {/* ── 5. BRAND STORY — manufacturer intro + technology ──────── */}
       <ManufacturerIntroBlock content={homeContent.manufacturerIntro} />
       <SectionConnector eyebrow={homeContent.connectors.c3.eyebrow} text={homeContent.connectors.c3.text} />
       <TechnologyBlock content={homeContent.technology} />
+
+      {/* ── 6. MID-PAGE RFQ ───────────────────────────────────────── */}
       <RFQMidPageBlock />
-      <ManufacturingAuthorityBlock content={homeContent.manufacturingAuthority} />
+
+      {/* ── 7. MANUFACTURING EXCELLENCE — cinematic dark section ───── */}
+      <CinematicManufacturingSection
+        content={{
+          eyebrow: homeContent.manufacturingAuthority?.eyebrow,
+          headline: homeContent.manufacturingAuthority?.headline,
+          body: homeContent.manufacturingAuthority?.body,
+          stats: homeContent.manufacturingAuthority?.stats?.map((s) => ({
+            value: Number(s.value) || 0,
+            label: s.label,
+          })),
+        }}
+      />
+
+      {/* ── 8. GOVERNMENT + INQUIRY CTA ───────────────────────────── */}
       <InlineInquiryCTA
         text="Compare models or request a tailored quote for your tender."
         whatsappMessage="Hi, I'd like a quote tailored to my use case (please mention: municipal / agricultural / industrial / export)."
         tone="dark"
       />
+
       {/* PLACEMENT: before-trust — government/awareness sections */}
       <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
+
+      {/* ── 9. YOUTUBE SHORTS ─────────────────────────────────────── */}
       <YoutubeShortsCarousel />
+
+      {/* ── 10. OUR CUSTOMERS ─────────────────────────────────────── */}
       <OurCustomersScroll customers={customers} />
+
+      {/* ── 11. TRUST SECTION — certifications + pillars ─────────── */}
       <SectionConnector eyebrow={homeContent.connectors.c4.eyebrow} text={homeContent.connectors.c4.text} />
+      <CinematicTrustSection accreditations={accreditations} />
       <TrustBlock />
       <SpecialisedBuyersBlock />
       <StatesServedBlock />
+
       {/* PLACEMENT: before-faq — agriculture/municipal story sections */}
       <CelebritySectionsBlock sections={homepageSections} placement="before-faq" />
+
+      {/* ── 12. BLOG ──────────────────────────────────────────────── */}
       <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />
+
+      {/* ── 13. FAQ ───────────────────────────────────────────────── */}
       <FAQSection faqs={homeContent.faqs} />
+
+      {/* ── 14. CINEMATIC CTA BAND ────────────────────────────────── */}
+      <CinematicCTASection />
+
+      {/* ── 15. CONTACT FORM ──────────────────────────────────────── */}
       <ContactSection products={products} />
     </>
   )

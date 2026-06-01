@@ -72,6 +72,11 @@ export default function SiteFooter({ logoUrl = '/logo-main.png', logoAlt = '100X
                 </Link>
               </li>
               <li>
+                <Link href="/spare-parts" className="hover:text-green-400 transition-colors">
+                  Spare Parts
+                </Link>
+              </li>
+              <li>
                 <Link href="/about" className="hover:text-green-400 transition-colors">
                   About Us
                 </Link>

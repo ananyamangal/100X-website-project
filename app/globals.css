@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Mobile CTA bar height token ─────────────────────────────── */
 :root {
   --mobile-cta-bar-h: 64px;
 }
@@ -16,31 +17,7 @@ body {
   }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  .animate-logo-marquee {
-    /* Calmer, "rolling carousel" pace. Was 9s desktop / 5s mobile — felt
-       dizzying at small viewports. Pauses on hover so users can read a logo. */
-    animation: logo-marquee 36s linear infinite;
-  }
-  .animate-logo-marquee:hover {
-    animation-play-state: paused;
-  }
-  @media (max-width: 768px) {
-    .animate-logo-marquee {
-      animation-duration: 32s;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .animate-logo-marquee {
-      animation: none;
-    }
-  }
-}
-
+/* ── Radix/shadcn design tokens ───────────────────────────────── */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -114,19 +91,240 @@ body {
 }
 
 @layer base {
-  * {
-    @apply border-border;
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+}
+
+/* ── Marquee animation ────────────────────────────────────────── */
+@keyframes logo-marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+
+  /* Logo marquee */
+  .animate-logo-marquee {
+    animation: logo-marquee 36s linear infinite;
   }
-  body {
-    @apply bg-background text-foreground;
+  .animate-logo-marquee:hover { animation-play-state: paused; }
+  @media (max-width: 768px) {
+    .animate-logo-marquee { animation-duration: 32s; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-logo-marquee { animation: none; }
   }
 }
 
-@keyframes logo-marquee {
-  0% {
-    transform: translateX(0);
+/* ── Scroll-reveal system ─────────────────────────────────────── */
+/*
+  Usage: add class "reveal" + one of the variant classes.
+  JS (ScrollReveal component) adds "is-visible" when in viewport.
+  prefers-reduced-motion collapses everything to a simple fade.
+*/
+
+.reveal {
+  opacity: 0;
+  transition-property: opacity, transform;
+  transition-duration: 0.75s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+/* Delay helpers — apply alongside .reveal */
+.reveal-delay-100 { transition-delay: 100ms; }
+.reveal-delay-150 { transition-delay: 150ms; }
+.reveal-delay-200 { transition-delay: 200ms; }
+.reveal-delay-300 { transition-delay: 300ms; }
+.reveal-delay-400 { transition-delay: 400ms; }
+.reveal-delay-500 { transition-delay: 500ms; }
+.reveal-delay-600 { transition-delay: 600ms; }
+.reveal-delay-700 { transition-delay: 700ms; }
+.reveal-delay-800 { transition-delay: 800ms; }
+
+.reveal-fade-up    { transform: translateY(36px); }
+.reveal-fade-down  { transform: translateY(-36px); }
+.reveal-fade-left  { transform: translateX(48px); }
+.reveal-fade-right { transform: translateX(-48px); }
+.reveal-scale      { transform: scale(0.93); }
+.reveal-fade       { transform: none; }
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
-  100% {
-    transform: translateX(-50%);
+}
+
+/* ── Cinematic section primitives ────────────────────────────── */
+
+/* Full-viewport section base */
+.section-cinema {
+  position: relative;
+  overflow: hidden;
+  background-color: #0a0a0a;
+  color: #f5f5f5;
+}
+
+/* Subtle noise texture for dark sections */
+.section-cinema::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.section-cinema > * { position: relative; z-index: 1; }
+
+/* Horizontal rule in dark sections */
+.cinema-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent);
+  border: none;
+  margin: 0;
+}
+
+/* ── Display typography helpers ──────────────────────────────── */
+
+.text-display {
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+/* Product-cinema-card hover lift */
+.product-cinema-card {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.product-cinema-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.18);
+}
+
+/* ── Glass card effect ───────────────────────────────────────── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Brand accent line ───────────────────────────────────────── */
+.brand-line {
+  display: inline-block;
+  width: 40px;
+  height: 3px;
+  background: #16a34a;
+  border-radius: 2px;
+}
+
+/* ── Metric counter style ────────────────────────────────────── */
+.metric-value {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+/* ── Parallax image container ────────────────────────────────── */
+.parallax-container {
+  overflow: hidden;
+}
+.parallax-img {
+  transform: scale(1.12);
+  transition: transform 0.1s linear;
+  will-change: transform;
+}
+
+/* ── Feature spotlight tab ───────────────────────────────────── */
+.feature-tab {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-left: 2px solid transparent;
+}
+.feature-tab.active,
+.feature-tab:hover {
+  border-left-color: #16a34a;
+  background: rgba(22, 163, 74, 0.06);
+}
+
+/* ── Smooth scroll ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* ── Ken Burns for hero images ───────────────────────────────── */
+.hero-ken-burns {
+  animation: ken-burns 20s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes ken-burns {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-ken-burns { animation: none; }
+}
+
+/* ── Shimmer skeleton ────────────────────────────────────────── */
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ── Floating product image ──────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-14px); }
+  }
+}
+
+/* ── Section eyebrow label ───────────────────────────────────── */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ── Gradient text utility ───────────────────────────────────── */
+.text-gradient-brand {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Horizontal scroll snap for mobile carousels ─────────────── */
+.snap-x-mandatory {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.snap-start { scroll-snap-align: start; }
+
+/* ── Clip path for diagonal section dividers ─────────────────── */
+.clip-diagonal-bottom {
+  clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%);
+}
+.clip-diagonal-top {
+  clip-path: polygon(0 12%, 100% 0, 100% 100%, 0 100%);
 }
