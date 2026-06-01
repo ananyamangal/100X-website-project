@@ -115,19 +115,29 @@ export default function ProductDetailPage() {
 
     return (
 
-        <div className="pt-32 min-h-screen bg-gray-50 relative">
+        <div className="min-h-screen bg-white">
             <MobileCtaOverride
                 audience="product"
                 productName={product?.name}
                 whatsappMessage={product?.whatsappMessageText}
             />
-            <div className="container mx-auto px-4 py-12">
-                <div className="mb-8">
-                    <Link href="/products">
-                        <Button variant="outline" className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent">
-                            <ChevronLeft className="mr-2" size={20} />
-                            Back to Products
-                        </Button>
+            {/* Breadcrumb nav */}
+            <div className="bg-gray-950 pt-20 pb-4">
+              <div className="container mx-auto px-4">
+                <nav className="flex items-center gap-2 text-xs text-cinema-500">
+                  <Link href="/" className="hover:text-cinema-300 transition-colors">Home</Link>
+                  <span>/</span>
+                  <Link href="/products" className="hover:text-cinema-300 transition-colors">Products</Link>
+                  <span>/</span>
+                  <span className="text-cinema-300 truncate">{product?.name}</span>
+                </nav>
+              </div>
+            </div>
+            <div className="container mx-auto px-4 py-8">
+                <div className="mb-6">
+                    <Link href="/products" className="inline-flex items-center gap-1.5 text-brand-600 hover:text-brand-700 font-500 text-sm transition-colors">
+                        <ChevronLeft size={16} />
+                        Back to Products
                     </Link>
                 </div>
                 <div className="grid lg:grid-cols-2 gap-12 mb-16">
@@ -257,7 +267,7 @@ export default function ProductDetailPage() {
                                 </Badge>
                             ))}
                         </div>
-                        <h1 className="text-4xl font-bold text-gray-800 mb-4">{product.name}</h1>
+                        <h1 className="text-3xl md:text-4xl font-800 text-gray-900 mb-4 text-balance">{product.name}</h1>
                         <div className="flex items-center space-x-4 mb-6">
                             <div className="flex items-center space-x-1">
                                 {[...Array(5)].map((_, i) => (
@@ -271,34 +281,26 @@ export default function ProductDetailPage() {
                                 <span className="text-gray-600">({product.reviewsCount} reviews)</span>
                             </div>
                         </div>
-                        <div className="text-3xl font-bold text-green-600 mb-6">{product.priceRange}</div>
-                        <div className="text-lg text-gray-600 mb-8 leading-relaxed">
+                        {product.priceRange && (
+                          <div className="text-2xl font-800 text-brand-600 mb-5">{product.priceRange}</div>
+                        )}
+                        <div className="text-base text-gray-600 mb-7 leading-relaxed">
                             <RichContent html={product.detailedDescription || ''} />
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                            <Button
-                                size="lg"
-                                className="bg-green-600 hover:bg-green-700 flex-1"
-                                onClick={() => window.open(`https://wa.me/91${product.whatsappNumber || '7827229116'}?text=${encodeURIComponent('Hi, I am interested in this product: ' + product.name)}`, '_blank')}
+                        <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                            <button
+                                className="inline-flex items-center justify-center gap-2 flex-1 px-6 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-600 rounded-full transition-all hover:-translate-y-0.5 shadow-lg shadow-brand-900/20 text-sm"
+                                onClick={() => window.open(`https://wa.me/917827229116?text=${encodeURIComponent('Hi, I am interested in: ' + product.name + '. Please share pricing.')}`, '_blank')}
                             >
-                                <MessageCircle className="mr-2" size={20} />
+                                <MessageCircle size={16} />
                                 Get Quote on WhatsApp
-                            </Button>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent flex-1"
-                                onClick={() => {
-                                    if (product.brochureUrl) {
-                                        window.open(product.brochureUrl, '_blank');
-                                    } else {
-                                        alert('Brochure download coming soon!');
-                                    }
-                                }}
+                            </button>
+                            <Link
+                                href={`/products/${product._id || product.id}`}
+                                className="inline-flex items-center justify-center gap-2 flex-1 px-6 py-3.5 border border-brand-200 text-brand-700 hover:bg-brand-50 font-500 rounded-full transition-all text-sm"
                             >
-                                <Download className="mr-2" size={20} />
-                                Download Brochure
-                            </Button>
+                                View Full Details
+                            </Link>
                         </div>
                     </div>
                 </div>
