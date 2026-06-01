@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { Badge } from "@/components/ui/badge"
 import RFQForm from "./RFQForm"
 
 export default function RFQMidPageBlock() {
@@ -12,17 +11,15 @@ export default function RFQMidPageBlock() {
     >
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="text-center mb-10 md:mb-12">
-          <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-200 text-base px-5 py-1.5">
-            Procurement & Bulk Inquiry
-          </Badge>
+          <p className="eyebrow text-brand-600 mb-3">Procurement & Bulk Inquiry</p>
           <h2
             id="rfq-mid-heading"
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 leading-tight"
+            className="text-display-xs text-gray-900 mb-4 text-balance"
           >
-            Request a Quote for Government, Municipal & Bulk Orders
+            Get a quote in 24 hours.
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            GeM-ready documentation, GST invoices, and compliance certificates included. Upload your tender or specifications and our procurement desk will respond within 48 hours.
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            GeM-ready documentation, GST invoices, and compliance certificates included. Our procurement desk responds within 48 hours.
           </p>
         </div>
 

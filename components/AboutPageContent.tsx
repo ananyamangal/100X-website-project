@@ -15,7 +15,6 @@ import {
   Users,
   Wrench,
 } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { RichContent } from "@/components/RichContent"
@@ -62,12 +61,38 @@ export default function AboutPageContent({
   ]
 
   return (
-    <div className="pt-32 min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-20">
-          <Badge className="mb-6 bg-green-100 text-green-800 hover:bg-green-200 text-lg px-6 py-2">{heroBadge}</Badge>
-          <h1 className="text-5xl font-bold text-gray-800 mb-6">{heroTitle}</h1>
+    <div className="min-h-screen bg-white">
+      {/* Cinematic hero */}
+      <section className="bg-gray-950 pt-24 pb-14 md:pt-28 md:pb-16">
+        <div className="container mx-auto px-4 md:px-6">
+          <nav className="flex items-center gap-2 text-xs text-cinema-500 mb-8">
+            <a href="/" className="hover:text-cinema-300 transition-colors">Home</a>
+            <span>/</span>
+            <span className="text-cinema-300">About Us</span>
+          </nav>
+          <div className="max-w-3xl">
+            <p className="eyebrow text-brand-400 mb-4">{heroBadge}</p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-800 text-white leading-tight mb-5 text-balance">
+              {heroTitle}
+            </h1>
+            <div className="flex flex-wrap gap-x-8 gap-y-3 mt-8">
+              {[
+                { value: "15+", label: "Years Manufacturing" },
+                { value: "10,000+", label: "Machines Deployed" },
+                { value: "GeM", label: "OEM Registered" },
+                { value: "ISO", label: "9001:2015 Certified" },
+              ].map((s) => (
+                <div key={s.label}>
+                  <p className="text-2xl font-800 text-white">{s.value}</p>
+                  <p className="text-cinema-500 text-xs font-500 uppercase tracking-widest">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+      </section>
+      <div className="bg-gray-50">
+      <div className="container mx-auto px-4 py-12 md:py-16">
 
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
           <div>
@@ -306,14 +331,13 @@ export default function AboutPageContent({
           </p>
         </section>
 
-        <div className="text-center">
-          <Button size="lg" variant="outline" asChild className="border-gray-600 text-gray-600 hover:bg-gray-50 bg-transparent">
-            <Link href="/">
-              <ChevronLeft className="mr-2" size={20} />
-              Back to Home
-            </Link>
-          </Button>
+        <div className="text-center pb-4">
+          <Link href="/" className="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-500 text-sm transition-colors">
+            <ChevronLeft size={16} />
+            Back to Home
+          </Link>
         </div>
+      </div>
       </div>
     </div>
   )

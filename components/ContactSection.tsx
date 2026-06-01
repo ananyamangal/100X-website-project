@@ -130,81 +130,63 @@ export default function ContactSection({
   return (
     <section id={id} className="py-24 md:py-32 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16 md:mb-20">
-          <span className="inline-block mb-6 rounded-full bg-green-100 px-4 py-2 text-lg font-medium text-green-800">
-            Get In Touch
-          </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Contact Us</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Ready to transform your work? Get in touch with our experts today!
+        <div className="text-center mb-12 md:mb-16">
+          <p className="eyebrow text-brand-600 mb-3">Contact Us</p>
+          <h2 className="text-display-xs text-gray-900 mb-4 text-balance">Talk to our team.</h2>
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            Government, municipal, dealer, and export inquiries welcome. Our team responds within one business day.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-14">
           <div>
             <h3 className="text-2xl font-bold text-gray-800 mb-8">Contact Information</h3>
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4 p-6 bg-gray-50 rounded-xl shadow-lg">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <Phone className="text-green-600" size={24} />
+            <div className="space-y-4">
+              <a
+                href="tel:+917827229116"
+                data-gtm-location="contact_section"
+                className="flex items-start gap-4 p-5 bg-gray-50 rounded-xl hover:bg-brand-50 hover:border-brand-100 border border-transparent transition-all group"
+              >
+                <div className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center shrink-0 group-hover:border-brand-200 transition-colors">
+                  <Phone className="text-brand-600" size={18} />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-800">Phone</div>
-                  <div className="text-gray-600">
-                    <a
-                      href="tel:+917827229116"
-                      className="underline hover:text-green-600"
-                      data-gtm-location="contact_section"
-                    >
-                      +91 7827229116
-                    </a>
-                  </div>
-                  <div className="text-gray-600">
-                    <a
-                      href="tel:+918178567520"
-                      className="underline hover:text-green-600"
-                      data-gtm-location="contact_section"
-                    >
-                      +91 8178567520
-                    </a>
-                  </div>
-                  <div className="text-sm text-gray-500">Mon-Sat: 9:00 AM - 6:00 PM</div>
+                  <p className="text-xs font-600 text-gray-400 uppercase tracking-wide mb-0.5">Phone</p>
+                  <p className="font-600 text-gray-900">+91 7827229116</p>
+                  <p className="font-500 text-gray-500 text-sm">+91 8178567520</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Mon–Sat, 9 AM – 6 PM IST</p>
                 </div>
-              </div>
+              </a>
 
-              <div className="flex items-center space-x-4 p-6 bg-gray-50 rounded-xl shadow-lg">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <Mail className="text-green-600" size={24} />
+              <a
+                href="mailto:100xcircle@gmail.com"
+                data-gtm-location="contact_section"
+                className="flex items-start gap-4 p-5 bg-gray-50 rounded-xl hover:bg-brand-50 hover:border-brand-100 border border-transparent transition-all group"
+              >
+                <div className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center shrink-0 group-hover:border-brand-200 transition-colors">
+                  <Mail className="text-brand-600" size={18} />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-800">Business Email</div>
-                  <div className="text-gray-600">
-                    <a
-                      href="mailto:100xcircle@gmail.com"
-                      className="underline hover:text-green-600 break-all"
-                      data-gtm-location="contact_section"
-                    >
-                      100xcircle@gmail.com
-                    </a>
-                  </div>
+                  <p className="text-xs font-600 text-gray-400 uppercase tracking-wide mb-0.5">Email</p>
+                  <p className="font-600 text-gray-900 break-all">100xcircle@gmail.com</p>
                 </div>
-              </div>
+              </a>
 
-              <div className="flex items-center space-x-4 p-6 bg-gray-50 rounded-xl shadow-lg">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <MapPin className="text-green-600" size={24} />
+              <div className="flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-transparent">
+                <div className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center shrink-0">
+                  <MapPin className="text-brand-600" size={18} />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-800">Address</div>
-                  <div className="text-gray-600">UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana</div>
+                  <p className="text-xs font-600 text-gray-400 uppercase tracking-wide mb-0.5">Address</p>
+                  <p className="font-500 text-gray-700 text-sm leading-relaxed">UG, 398, Sector 7, IMT Manesar,<br />Gurugram, Haryana 122050</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <Card className="border-0 shadow-xl">
-            <CardContent className="p-8 md:p-10">
-              <h3 className="text-3xl font-bold text-gray-800 mb-6">Send us a message</h3>
+          <Card className="border border-gray-100 shadow-sm">
+            <CardContent className="p-6 md:p-8">
+              <h3 className="font-700 text-gray-900 text-xl mb-5">Send us a message</h3>
 
               <div className="mb-8 flex items-start gap-3 rounded-xl border border-green-100 bg-green-50/80 px-4 py-3 text-left text-base text-green-900">
                 <Shield className="mt-0.5 h-6 w-6 shrink-0 text-green-600" aria-hidden />
@@ -287,7 +269,7 @@ export default function ContactSection({
                   type="submit"
                   size="lg"
                   disabled={submitting}
-                  className="w-full bg-green-600 hover:bg-green-700 text-xl py-6 min-h-[56px]"
+                  className="w-full bg-brand-600 hover:bg-brand-700 rounded-full font-600 min-h-[52px]"
                 >
                   {submitting ? (
                     <>
