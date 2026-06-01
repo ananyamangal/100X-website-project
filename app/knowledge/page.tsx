@@ -68,18 +68,26 @@ export default function KnowledgeHubPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <main className="max-w-4xl mx-auto px-4 py-16 pt-32">
-        <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
-          <span className="mx-2">/</span>
-          <span>Knowledge Hub</span>
-        </nav>
-
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">Knowledge Hub</h1>
-        <p className="text-gray-600 mb-10 max-w-2xl">
-          Technical articles on thermal fogging technology, vector control operations, and
-          government procurement. Written by 100X Circle — Indian OEM manufacturer since 2014.
-        </p>
+      {/* Cinematic hero */}
+      <section className="bg-gray-950 pt-24 pb-12 md:pt-28 md:pb-14">
+        <div className="container mx-auto px-4 md:px-6">
+          <nav className="flex items-center gap-2 text-xs text-cinema-500 mb-6">
+            <Link href="/" className="hover:text-cinema-300 transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-cinema-300">Knowledge Hub</span>
+          </nav>
+          <div className="max-w-3xl">
+            <p className="eyebrow text-brand-400 mb-3">Technical Knowledge</p>
+            <h1 className="text-3xl md:text-4xl font-800 text-white mb-4 text-balance">
+              Knowledge Hub
+            </h1>
+            <p className="text-cinema-300 leading-relaxed">
+              Technical articles on thermal fogging technology, vector control, and government procurement.
+            </p>
+          </div>
+        </div>
+      </section>
+      <main className="max-w-4xl mx-auto px-4 py-10">
 
         <div className="grid sm:grid-cols-2 gap-6 mb-12">
           {ARTICLES.map((article) => (

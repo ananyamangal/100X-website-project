@@ -58,11 +58,9 @@ export default function ProductsBlock({ products, onBrochureDownload }: Props) {
               Browse our complete catalogue of industrial fogging machines, vehicle-mounted systems, and agricultural equipment.
             </p>
             <div className="mt-7 flex justify-center">
-              <Button asChild size="lg" className="bg-green-600 hover:bg-green-700">
-                <Link href="/products">
-                  View All Products <ArrowRight className="ml-2" size={18} />
-                </Link>
-              </Button>
+              <Link href="/products" className="inline-flex items-center gap-2 px-7 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-600 rounded-full text-sm transition-all">
+                View All Products <ArrowRight size={15} />
+              </Link>
             </div>
           </div>
         ) : products.length <= 6 ? (
@@ -89,11 +87,9 @@ export default function ProductsBlock({ products, onBrochureDownload }: Props) {
               ))}
             </div>
             <div className="flex justify-center mt-10">
-              <Button asChild className="bg-green-600 hover:bg-green-700 text-lg px-8 py-5 shadow-lg shadow-green-900/15">
-                <Link href="/products" className="flex items-center">
-                  View All Products <ArrowRight className="ml-2" size={20} />
-                </Link>
-              </Button>
+              <Link href="/products" className="inline-flex items-center gap-2 px-7 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-600 rounded-full text-sm shadow-lg shadow-brand-900/15 transition-all">
+                View All Products <ArrowRight size={15} />
+              </Link>
             </div>
           </>
         )}

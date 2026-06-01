@@ -118,7 +118,6 @@ export default async function VideosPage() {
           </div>
         )}
       </div>
-      </div>
     </div>
   )
 }
