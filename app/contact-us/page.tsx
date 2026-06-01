@@ -34,22 +34,31 @@ export default function ContactUsPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24">
-      {/* Intro — agency-supplied Tab 7 copy. Real phone / email / address
-          pulled from BUSINESS config; no "available on the website" circular
-          self-references. */}
-      <header className="container mx-auto px-4 pt-12 pb-6 text-center max-w-3xl">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-          Contact 100x Circle
-        </h1>
-        <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
-          Whether you are a municipal health officer planning a dengue prevention campaign, a pest control operator looking for your next machine, or a farmer who needs the right spraying equipment for the season, getting in touch with the right manufacturer matters. Our team is responsive and familiar with the questions that actually come up in the field.
-        </p>
-      </header>
+    <div className="min-h-screen bg-white">
+      {/* Cinematic hero */}
+      <section className="bg-gray-950 pt-24 pb-14 md:pt-28 md:pb-16">
+        <div className="container mx-auto px-4 md:px-6">
+          <nav className="flex items-center gap-2 text-xs text-cinema-500 mb-8">
+            <Link href="/" className="hover:text-cinema-300 transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-cinema-300">Contact</span>
+          </nav>
+          <div className="max-w-3xl">
+            <p className="eyebrow text-brand-400 mb-4">Get in Touch</p>
+            <h1 className="text-4xl md:text-5xl font-800 text-white mb-5 leading-tight text-balance">
+              Talk to our team.
+            </h1>
+            <p className="text-cinema-300 text-lg leading-relaxed">
+              Whether you're a municipality, pest control operator, farmer, or dealer — our team responds within 24 hours with the information you need.
+            </p>
+          </div>
+        </div>
+      </section>
 
+      <div className="bg-gray-50">
       <section
         aria-label="Direct contact channels"
-        className="container mx-auto px-4 mb-8 max-w-5xl"
+        className="container mx-auto px-4 py-12 max-w-5xl"
       >
         <ul className="grid sm:grid-cols-3 gap-4 list-none">
           <li>
@@ -183,6 +192,7 @@ export default function ContactUsPage() {
       </section>
 
       <ContactSection products={products} id="contact-form" />
+      </div>
     </div>
   )
 }
