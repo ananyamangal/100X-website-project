@@ -29,22 +29,28 @@ export default async function VideosPage() {
   const videos = await getVideos()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-green-700 to-green-900 text-white py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-green-300 text-sm font-medium uppercase tracking-wider mb-3">Video Knowledge Center</p>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Learn from Our Video Library
-          </h1>
-          <p className="text-green-100 text-lg max-w-2xl">
-            Product demonstrations, operation tutorials, maintenance guides, and field deployment
-            videos for 100x Circle thermal fogging machines.
-          </p>
+    <div className="min-h-screen bg-white">
+      {/* Cinematic Hero */}
+      <section className="bg-gray-950 pt-24 pb-14 md:pt-28 md:pb-16">
+        <div className="container mx-auto px-4 md:px-6">
+          <nav className="flex items-center gap-2 text-xs text-cinema-500 mb-8">
+            <Link href="/" className="hover:text-cinema-300 transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-cinema-300">Videos</span>
+          </nav>
+          <div className="max-w-3xl">
+            <p className="eyebrow text-brand-400 mb-4">Video Knowledge Centre</p>
+            <h1 className="text-4xl md:text-5xl font-800 text-white mb-5 leading-tight text-balance">
+              See our machines in action.
+            </h1>
+            <p className="text-cinema-300 text-lg leading-relaxed">
+              Product demonstrations, operation tutorials, maintenance guides, and field deployment videos.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 py-12 bg-gray-50">
         {videos.length === 0 ? (
           <div className="text-center py-24 text-gray-500">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -111,6 +117,7 @@ export default async function VideosPage() {
             })}
           </div>
         )}
+      </div>
       </div>
     </div>
   )
