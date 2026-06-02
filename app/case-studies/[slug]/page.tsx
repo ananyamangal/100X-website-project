@@ -21,9 +21,9 @@ async function getLinkedProducts(ids: string[]) {
   try {
     const client = await clientPromise
     const db = client.db()
-    const objectIds = ids.map(id => { try { return new ObjectId(id) } catch { return null } }).filter(Boolean)
+    const objectIds = ids.map(id => { try { return new ObjectId(id) } catch { return null } }).filter((x): x is import("mongodb").ObjectId => x !== null)
     if (!objectIds.length) return []
-    const products = await db.collection("products").find({ _id: { $in: objectIds } }).toArray()
+    const products = await db.collection("products").find({ _id: { $in: objectIds } } as any).toArray()
     return JSON.parse(JSON.stringify(products))
   } catch {
     return []

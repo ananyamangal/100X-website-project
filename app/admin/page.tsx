@@ -84,6 +84,9 @@ interface Product {
   solution?: string;
   certifications?: string[];
   performanceMetrics?: string[];
+  filmChapters?: any[];
+  boxContents?: any[];
+  productFaqs?: string[];
 }
 
 interface Banner {
