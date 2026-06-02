@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { Product } from "@/lib/productModel";
 import { ObjectId } from "mongodb";
+import { normalizeProducts } from "@/lib/normalizeProduct";
 
 // GET all products
 export async function GET(request: NextRequest) {
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
       .find({})
       .sort({ order: 1, createdAt: -1 }) // Sort by order first, then by creation date
       .toArray();
-    return NextResponse.json(products);
+    return NextResponse.json(normalizeProducts(JSON.parse(JSON.stringify(products))));
   } catch (error) {
     console.error("❌ Error in GET /api/admin/products:", error);
     return NextResponse.json({ error: "Failed to fetch products", details: String(error) }, { status: 500 });

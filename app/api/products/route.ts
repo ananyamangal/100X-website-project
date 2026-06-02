@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { normalizeProducts } from "@/lib/normalizeProduct"
 
 export async function GET() {
   const client = await clientPromise
@@ -10,10 +11,5 @@ export async function GET() {
     .sort({ order: 1, createdAt: -1 })
     .toArray()
 
-  const serialized = JSON.parse(JSON.stringify(products)).map((p: any) => ({
-    ...p,
-    imageUrls: Array.isArray(p.imageUrls) ? p.imageUrls : p.imageUrl ? [p.imageUrl] : [],
-  }))
-
-  return NextResponse.json(serialized)
+  return NextResponse.json(normalizeProducts(JSON.parse(JSON.stringify(products))))
 }

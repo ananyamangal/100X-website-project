@@ -46,6 +46,8 @@ export interface Product {
   // New: Product Experience Builder
   filmChapters?: FilmChapter[];
   boxContents?: BoxItem[];
+  // New: product experience builder
+  productFaqs?: string[];
   // New: bidirectional relationships
   linkedCaseStudyIds?: string[];
-} 
+}

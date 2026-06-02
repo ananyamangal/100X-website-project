@@ -191,7 +191,7 @@ export function ProductExperienceTab({ product, onChange }: Props) {
         <label className="block text-xs font-600 text-gray-700 mb-1">Metrics (one per line)</label>
         <Textarea
           rows={5}
-          value={(product.performanceMetrics || []).join("\n")}
+          value={toLines(product.performanceMetrics)}
           onChange={e => onChange("performanceMetrics", e.target.value.split("\n").filter(Boolean))}
           placeholder={"500m² | Coverage Per Minute | At full output\n2hr | Runtime | Per full tank\n50μm | Droplet Size | Sub-micron fog particles\n29 | States Served | Pan-India deployment"}
         />
@@ -206,7 +206,7 @@ export function ProductExperienceTab({ product, onChange }: Props) {
         <label className="block text-xs font-600 text-gray-700 mb-1">Certifications (one per line)</label>
         <Textarea
           rows={4}
-          value={(product.certifications || []).join("\n")}
+          value={toLines(product.certifications)}
           onChange={e => onChange("certifications", e.target.value.split("\n").filter(Boolean))}
           placeholder={"ISO 9001:2015\nCE Marking\nGeM Registered OEM\nBIS Approved\nMSME/UDYAM Registered"}
         />
@@ -220,7 +220,7 @@ export function ProductExperienceTab({ product, onChange }: Props) {
         <label className="block text-xs font-600 text-gray-700 mb-1">Applications (one per line)</label>
         <Textarea
           rows={5}
-          value={(product.applications || []).join("\n")}
+          value={toLines(product.applications)}
           onChange={e => onChange("applications", e.target.value.split("\n").filter(Boolean))}
           placeholder={"Municipal mosquito control\nAgricultural crop protection\nIndustrial pest control\nGovernment health campaigns\nVehicle-mounted area coverage"}
         />
@@ -234,7 +234,7 @@ export function ProductExperienceTab({ product, onChange }: Props) {
         <label className="block text-xs font-600 text-gray-700 mb-1">FAQs (Q: ... | A: ..., one per line)</label>
         <Textarea
           rows={6}
-          value={(product.productFaqs || []).join("\n")}
+          value={toLines(product.productFaqs)}
           onChange={e => onChange("productFaqs", e.target.value.split("\n").filter(Boolean))}
           placeholder={"Q: What fuel does this machine use? | A: Kerosene-based fogging oil.\nQ: Is this GeM approved? | A: Yes, we are GeM-registered OEM."}
         />

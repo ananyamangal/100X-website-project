@@ -47,6 +47,7 @@ import { SparePartsTab } from "@/components/admin/SparePartsTab"
 import { ReviewsTab } from "@/components/admin/ReviewsTab"
 import { SiteSettingsTab } from "@/components/admin/SiteSettingsTab"
 import { ProductExperienceTab } from "@/components/admin/ProductExperienceTab"
+import { toStringArray } from "@/lib/normalizeProduct"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
@@ -1775,10 +1776,10 @@ function ProductForm({
     reviewsCount: product?.reviewsCount || 0,
     shortDescription: product?.shortDescription || "",
     detailedDescription: product?.detailedDescription || "",
-    features: product?.features?.join("\n") || "",
-    specifications: product?.specifications?.join("\n") || "",
-    applications: product?.applications?.join("\n") || "",
-    badges: product?.badges || [],
+    features: toStringArray(product?.features).join("\n"),
+    specifications: toStringArray(product?.specifications).join("\n"),
+    applications: toStringArray(product?.applications).join("\n"),
+    badges: toStringArray(product?.badges),
     youtubeLink: product?.youtubeLink || "",
     whatsappMessageText: product?.whatsappMessageText || "",
     category: product?.category || "",
@@ -1790,11 +1791,11 @@ function ProductForm({
     heroVideoUrl: product?.heroVideoUrl || "",
     problem: product?.problem || "",
     solution: product?.solution || "",
-    certifications: product?.certifications?.join("\n") || "",
-    performanceMetrics: product?.performanceMetrics?.join("\n") || "",
-    filmChapters: product?.filmChapters || [],
-    boxContents: product?.boxContents || [],
-    productFaqs: product?.productFaqs || [],
+    certifications: toStringArray(product?.certifications).join("\n"),
+    performanceMetrics: toStringArray(product?.performanceMetrics).join("\n"),
+    filmChapters: Array.isArray(product?.filmChapters) ? product.filmChapters : [],
+    boxContents: Array.isArray(product?.boxContents) ? product.boxContents : [],
+    productFaqs: toStringArray(product?.productFaqs),
   })
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingBrochure, setUploadingBrochure] = useState(false);
@@ -1809,12 +1810,14 @@ function ProductForm({
     }
     const productData = {
       ...formData,
-      features: formData.features.split("\n").filter((f: string) => f.trim()),
-      specifications: formData.specifications.split("\n").filter((s: string) => s.trim()),
-      applications: formData.applications.split("\n").filter((a: string) => a.trim()),
-      certifications: formData.certifications.split("\n").filter((c: string) => c.trim()),
-      performanceMetrics: formData.performanceMetrics.split("\n").filter((m: string) => m.trim()),
-      badges: Array.isArray(formData.badges) ? formData.badges : [],
+      // toStringArray handles both string (main form textarea) and array (ProductExperienceTab onChange)
+      features: toStringArray(formData.features),
+      specifications: toStringArray(formData.specifications),
+      applications: toStringArray(formData.applications),
+      certifications: toStringArray(formData.certifications),
+      performanceMetrics: toStringArray(formData.performanceMetrics),
+      productFaqs: toStringArray(formData.productFaqs),
+      badges: toStringArray(formData.badges),
       ...(product && { id: product.id, createdAt: product.createdAt }),
     }
     onSave(productData)

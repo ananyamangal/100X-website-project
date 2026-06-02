@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { Product } from "@/lib/productModel";
+import { normalizeProduct } from "@/lib/normalizeProduct";
 
 export async function GET(request: NextRequest, context: { params?: { id?: string } }) {
   try {
@@ -12,23 +13,10 @@ export async function GET(request: NextRequest, context: { params?: { id?: strin
     }
     const client = await clientPromise;
     const db = client.db();
-    const product = await db.collection("products").findOne({ _id: new ObjectId(id) });
-    if (!product) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const raw = await db.collection("products").findOne({ _id: new ObjectId(id) });
+    if (!raw) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    // Ensure imageUrls is always an array
-    let imageUrls = [];
-    if (Array.isArray(product.imageUrls)) {
-      imageUrls = product.imageUrls;
-    } else if (typeof product.imageUrls === 'string') {
-      imageUrls = product.imageUrls.split(/\r?\n/).map((url: string) => url.trim()).filter((url: string) => url);
-    } else if (product.imageUrl) {
-      imageUrls = [product.imageUrl];
-    } else if (product.image) {
-      imageUrls = [product.image];
-    }
-    product.imageUrls = imageUrls;
-
-    return NextResponse.json(product);
+    return NextResponse.json(normalizeProduct(JSON.parse(JSON.stringify(raw))));
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
   }
