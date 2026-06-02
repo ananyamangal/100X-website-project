@@ -1,5 +1,7 @@
+export const dynamic = "force-dynamic"
+
 import type { Metadata } from "next"
-import { redirect } from "next/navigation"
+import { permanentRedirect } from "next/navigation"
 import ProductDetailClient from "./ProductDetailClient"
 import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
@@ -74,12 +76,12 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
   const { id } = await params
   const result = await getProductBySlugOrId(id)
 
-  // Legacy ObjectId URL → 301 to slug URL
+  // Legacy ObjectId URL → 308 permanent redirect to slug URL
   if (result?.resolvedBy === "id") {
     const product = result.product
     const slug = typeof product.slug === "string" ? product.slug : null
     if (slug) {
-      redirect(`/products/${slug}`)
+      permanentRedirect(`/products/${slug}`)
     }
   }
 
