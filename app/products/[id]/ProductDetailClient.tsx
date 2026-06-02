@@ -160,31 +160,31 @@ function FeatureSpotlight({ features }: { features: string[] }) {
   const [active, setActive] = useState(0);
   if (!features?.length) return null;
   return (
-    <div className="grid md:grid-cols-5 gap-6">
+    <div className="grid md:grid-cols-5 gap-6 md:gap-10">
       {/* Tab list */}
-      <div className="md:col-span-2 space-y-1">
+      <div className="md:col-span-2 space-y-0.5">
         {features.map((feat, i) => (
           <button
             key={i}
             onClick={() => setActive(i)}
-            className={`feature-tab w-full text-left px-4 py-3 rounded-lg transition-all ${i === active ? 'active bg-brand-50 border-l-brand-600' : ''}`}
+            className={`feature-tab w-full text-left px-4 py-3.5 rounded-lg transition-all ${i === active ? 'active bg-brand-50 border-l-brand-600' : ''}`}
           >
-            <span className={`text-sm font-500 ${i === active ? 'text-brand-700' : 'text-gray-600'}`}>
+            <span className={`text-sm ${i === active ? 'font-600 text-brand-700' : 'font-400 text-gray-500'}`}>
               {feat.split(':')[0] || feat}
             </span>
           </button>
         ))}
       </div>
       {/* Active content */}
-      <div className="md:col-span-3 bg-brand-50 rounded-2xl p-6 flex flex-col justify-center min-h-[140px]">
-        <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <CheckCircle2 size={16} className="text-white" />
+      <div className="md:col-span-3 bg-gradient-to-br from-brand-50 to-white rounded-2xl p-7 flex flex-col justify-center min-h-[160px] border border-brand-100/60">
+        <div className="flex items-start gap-4">
+          <div className="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm shadow-brand-600/25">
+            <CheckCircle2 size={17} className="text-white" />
           </div>
           <div>
-            <p className="font-600 text-gray-900 mb-1">{features[active].split(':')[0]}</p>
+            <p className="font-700 text-gray-900 mb-2 text-base">{features[active].split(':')[0]}</p>
             {features[active].includes(':') && (
-              <p className="text-gray-600 text-sm leading-relaxed">{features[active].split(':').slice(1).join(':').trim()}</p>
+              <p className="text-gray-500 text-sm leading-relaxed">{features[active].split(':').slice(1).join(':').trim()}</p>
             )}
           </div>
         </div>
@@ -548,11 +548,11 @@ export default function ProductDetailClient({ productId }: { productId: string }
               </ScrollReveal>
 
               <ScrollReveal animation="fade-left" delay={100}>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-800 text-white leading-tight mb-2 text-balance">
+                <h1 className="text-3xl md:text-4xl lg:text-[3.25rem] font-800 text-white leading-[1.05] tracking-tight mb-3 text-balance">
                   {product.name}
                 </h1>
                 {product.tagline && (
-                  <p className="text-brand-400 text-lg font-500 mb-4">{product.tagline}</p>
+                  <p className="text-brand-400 text-base md:text-lg font-500 mb-5 leading-relaxed">{product.tagline}</p>
                 )}
               </ScrollReveal>
 
@@ -761,12 +761,13 @@ export default function ProductDetailClient({ productId }: { productId: string }
               <p className="eyebrow text-brand-400 mb-3">Performance</p>
               <h2 className="text-display-xs text-white">By the numbers.</h2>
             </ScrollReveal>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-12">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-10">
               {parsedMetrics.map((metric, i) => (
                 <ScrollReveal key={i} animation="fade-up" delay={i * 80} className="text-center">
                   <div className="metric-value text-white">{metric.value}</div>
-                  <p className="mt-2 eyebrow text-brand-400">{metric.label}</p>
-                  {metric.description && <p className="text-cinema-500 text-xs mt-1">{metric.description}</p>}
+                  <div className="w-8 h-px bg-brand-600/60 mx-auto mt-3 mb-2" />
+                  <p className="eyebrow text-brand-400">{metric.label}</p>
+                  {metric.description && <p className="text-cinema-600 text-xs mt-1.5 leading-relaxed">{metric.description}</p>}
                 </ScrollReveal>
               ))}
             </div>
@@ -784,14 +785,14 @@ export default function ProductDetailClient({ productId }: { productId: string }
                 Deployed wherever performance matters.
               </h2>
             </ScrollReveal>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {applications.map((app, i) => (
-                <ScrollReveal key={i} animation="fade-up" delay={i * 60}>
-                  <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-100 hover:border-brand-200 hover:shadow-sm transition-all">
-                    <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
-                      <Zap size={14} className="text-brand-700" />
+                <ScrollReveal key={i} animation="fade-up" delay={i * 50}>
+                  <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-100 hover:border-brand-200 hover:shadow-md transition-all duration-300 group">
+                    <div className="w-9 h-9 rounded-full bg-brand-50 group-hover:bg-brand-100 flex items-center justify-center flex-shrink-0 transition-colors">
+                      <Zap size={15} className="text-brand-600" />
                     </div>
-                    <span className="text-gray-700 text-sm font-500">{app}</span>
+                    <span className="text-gray-800 text-sm font-500 leading-snug">{app}</span>
                   </div>
                 </ScrollReveal>
               ))}

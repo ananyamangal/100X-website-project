@@ -105,11 +105,15 @@ export default function CinematicManufacturingSection({ content }: Props) {
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-cinema-900 gap-4 p-8">
+                    <div className="w-16 h-16 rounded-2xl border border-white/10 flex items-center justify-center bg-white/5">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cinema-400">
+                        <path d="M2 20h20M4 20V10l6-6 6 6v10M10 20v-5h4v5"/>
+                      </svg>
+                    </div>
                     <div className="text-center">
-                      <div className="text-6xl mb-4">🏭</div>
-                      <p className="text-cinema-400 text-sm">Gurugram Manufacturing Facility</p>
-                      <p className="text-cinema-500 text-xs mt-1">Sector 7, Industrial Model Township</p>
+                      <p className="text-cinema-300 text-sm font-500">Gurugram Manufacturing Facility</p>
+                      <p className="text-cinema-600 text-xs mt-1">IMT Manesar, Sector 7</p>
                     </div>
                   </div>
                 )}

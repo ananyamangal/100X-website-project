@@ -62,15 +62,15 @@ export default function CinematicProductsSection({ products, onBrochureDownload 
         {/* Category filter tabs */}
         {categories.length > 2 && (
           <ScrollReveal animation="fade-up" delay={200}>
-            <div className="flex flex-wrap gap-2 mb-10">
+            <div className="flex flex-wrap gap-2 mb-12">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActive(cat)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-500 border transition-all ${
+                  className={`px-4 py-2 rounded-full text-xs font-600 tracking-wide transition-all duration-200 ${
                     active === cat
-                      ? "bg-brand-600 text-white border-brand-600"
-                      : "text-gray-600 border-gray-200 hover:border-brand-400 hover:text-brand-600"
+                      ? "bg-brand-600 text-white shadow-sm shadow-brand-600/30"
+                      : "text-gray-500 bg-gray-100 hover:bg-brand-50 hover:text-brand-700"
                   }`}
                 >
                   {cat}

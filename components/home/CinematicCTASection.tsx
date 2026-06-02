@@ -22,14 +22,18 @@ export default function CinematicCTASection({
   const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent("Hi, I'd like a price quote for your fogging machines. Please share details.")}`
 
   return (
-    <section className="relative overflow-hidden py-24 md:py-32 bg-brand-700">
-      {/* Background pattern */}
+    <section className="relative overflow-hidden py-24 md:py-32 bg-brand-800">
+      {/* Gradient depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-700 via-brand-800 to-brand-900 opacity-80" />
+      {/* Subtle noise */}
       <div
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-[0.06]"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
       />
+      {/* Glow orb */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-brand-500/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative container mx-auto px-4 md:px-6 text-center">
         <ScrollReveal animation="fade-up">

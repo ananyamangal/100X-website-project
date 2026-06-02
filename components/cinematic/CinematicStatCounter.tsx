@@ -35,17 +35,18 @@ function StatItem({ stat, dark }: { stat: Stat; dark: boolean }) {
   }, [])
 
   return (
-    <div ref={ref} className="text-center group">
+    <div ref={ref} className="text-center">
       <div className={`metric-value ${dark ? "text-white" : "text-gray-900"}`}>
-        {stat.prefix && <span className={`text-[0.6em] ${dark ? "text-brand-400" : "text-brand-600"}`}>{stat.prefix}</span>}
+        {stat.prefix && <span className={`text-[0.55em] font-700 ${dark ? "text-brand-400" : "text-brand-600"}`}>{stat.prefix}</span>}
         <span>{count.toLocaleString()}</span>
-        {stat.suffix && <span className={`text-[0.55em] font-700 ml-1 ${dark ? "text-brand-400" : "text-brand-600"}`}>{stat.suffix}</span>}
+        {stat.suffix && <span className={`text-[0.45em] font-700 ml-0.5 align-super ${dark ? "text-brand-400" : "text-brand-600"}`}>{stat.suffix}</span>}
       </div>
-      <p className={`mt-2 text-sm font-600 uppercase tracking-widest ${dark ? "text-cinema-300" : "text-gray-500"}`}>
+      <div className={`w-6 h-px mx-auto mt-3 mb-2.5 ${dark ? "bg-brand-600/50" : "bg-brand-400/50"}`} />
+      <p className={`eyebrow ${dark ? "text-cinema-400" : "text-gray-500"}`}>
         {stat.label}
       </p>
       {stat.description && (
-        <p className={`mt-1 text-xs max-w-[160px] mx-auto ${dark ? "text-cinema-400" : "text-gray-400"}`}>
+        <p className={`mt-1.5 text-xs max-w-[140px] mx-auto leading-relaxed ${dark ? "text-cinema-600" : "text-gray-400"}`}>
           {stat.description}
         </p>
       )}

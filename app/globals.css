@@ -175,22 +175,32 @@ body {
 .section-cinema {
   position: relative;
   overflow: hidden;
-  background-color: #0a0a0a;
+  background-color: #080808;
   color: #f5f5f5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle noise texture for dark sections */
+/* Subtle radial glow + noise for depth */
 .section-cinema::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(22,163,74,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(22,163,74,0.04) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
-  opacity: 0.3;
   z-index: 0;
 }
 
 .section-cinema > * { position: relative; z-index: 1; }
+
+/* All bg-gray-950 / bg-cinema-900 dark sections get smoothing */
+.bg-gray-950, .bg-cinema-900, .bg-cinema-800 {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 /* Horizontal rule in dark sections */
 .cinema-divider {
@@ -237,10 +247,11 @@ body {
 
 /* ── Metric counter style ────────────────────────────────────── */
 .metric-value {
-  font-size: clamp(3rem, 8vw, 6rem);
+  font-size: clamp(3.5rem, 9vw, 7rem);
   font-weight: 900;
-  line-height: 1;
-  letter-spacing: -0.04em;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  font-feature-settings: "tnum", "kern";
 }
 
 /* ── Parallax image container ────────────────────────────────── */
@@ -306,10 +317,11 @@ body {
 
 /* ── Section eyebrow label ───────────────────────────────────── */
 .eyebrow {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  font-feature-settings: "ss01", "kern";
 }
 
 /* ── Gradient text utility ───────────────────────────────────── */
