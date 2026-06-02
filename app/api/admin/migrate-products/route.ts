@@ -15,7 +15,7 @@ import { generateProductSlug } from "@/lib/productSlug"
 
 async function isAuthenticated(): Promise<boolean> {
   const cookieStore = await cookies()
-  return cookieStore.get("admin-token")?.value === process.env.ADMIN_PASSWORD
+  return cookieStore.get("admin-token")?.value === "authenticated"
 }
 
 export async function POST(request: NextRequest) {
