@@ -9,6 +9,9 @@ import BrochureLeadModal from '@/components/BrochureLeadModal';
 import ScrollReveal from '@/components/cinematic/ScrollReveal';
 import PremiumAccordion from '@/components/cinematic/PremiumAccordion';
 import ShareButtons from '@/components/cinematic/ShareButtons';
+import WhatsInTheBox from '@/components/cinematic/WhatsInTheBox';
+import RealWorldDeployments from '@/components/cinematic/RealWorldDeployments';
+import SpecificationsTable from '@/components/cinematic/SpecificationsTable';
 import { BUSINESS, SITE_URL } from '@/lib/seo/site-config';
 
 const badgeLogoMap: Record<string, string> = {
@@ -771,8 +774,16 @@ export default function ProductDetailClient({ productId }: { productId: string }
         </section>
       )}
 
-      {/* ── 7. PREMIUM ACCORDION — Specs / Downloads / FAQs / Warranty */}
-      <section className="py-20 md:py-24 bg-white">
+      {/* ── 7. WHAT'S IN THE BOX ─────────────────────────────────── */}
+      {product.boxContents?.length > 0 && (
+        <WhatsInTheBox items={product.boxContents} productName={product.name} />
+      )}
+
+      {/* ── 8. REDESIGNED SPECIFICATIONS ─────────────────────────── */}
+      <SpecificationsTable specs={specs} />
+
+      {/* ── 9. PRODUCT INFO ACCORDION (Downloads / FAQs / Warranty) ─ */}
+      <section className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl">
           <ScrollReveal animation="fade-up" className="mb-10">
             <p className="eyebrow text-brand-600 mb-3">Product Information</p>
@@ -780,17 +791,17 @@ export default function ProductDetailClient({ productId }: { productId: string }
           </ScrollReveal>
           <ScrollReveal animation="fade-up" delay={100}>
             <PremiumAccordion
-              items={accordionItems}
-              defaultOpen={specs.length > 0 ? 'specs' : 'warranty'}
+              items={accordionItems.filter(a => a.id !== 'specs')}
+              defaultOpen="warranty"
               variant="light"
             />
           </ScrollReveal>
         </div>
       </section>
 
-      {/* ── 8. DETAILED DESCRIPTION ──────────────────────────────── */}
+      {/* ── 10. DETAILED DESCRIPTION ─────────────────────────────── */}
       {product.detailedDescription && (
-        <section className="py-16 bg-gray-50">
+        <section className="py-12 bg-gray-50">
           <div className="container mx-auto px-4 md:px-6 max-w-4xl">
             <ScrollReveal animation="fade-up">
               <p className="eyebrow text-brand-600 mb-3">Product Details</p>
@@ -802,10 +813,13 @@ export default function ProductDetailClient({ productId }: { productId: string }
         </section>
       )}
 
-      {/* ── 9. COMPATIBLE SPARE PARTS ────────────────────────────── */}
+      {/* ── 11. COMPATIBLE SPARE PARTS ───────────────────────────── */}
       <CompatibleSpareParts productId={productId} productName={product.name} />
 
-      {/* ── 10. RFQ SECTION ──────────────────────────────────────── */}
+      {/* ── 12. REAL WORLD DEPLOYMENTS (Case Studies) ────────────── */}
+      <RealWorldDeployments productId={productId} productName={product.name} />
+
+      {/* ── 13. RFQ SECTION ──────────────────────────────────────── */}
       <section className="py-20 md:py-28 bg-gray-950" id="rfq">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
@@ -866,10 +880,10 @@ export default function ProductDetailClient({ productId }: { productId: string }
         </div>
       </section>
 
-      {/* ── 11. RELATED PRODUCTS ─────────────────────────────────── */}
+      {/* ── 14. RELATED PRODUCTS ─────────────────────────────────── */}
       <RelatedProducts currentId={productId} category={product.category || ''} />
 
-      {/* ── 12. BACK TO PRODUCTS ─────────────────────────────────── */}
+      {/* ── 15. BACK TO PRODUCTS ─────────────────────────────────── */}
       <div className="py-8 bg-white border-t border-gray-100">
         <div className="container mx-auto px-4 md:px-6">
           <Link href="/products" className="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-500 text-sm transition-colors group">

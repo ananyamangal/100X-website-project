@@ -45,6 +45,8 @@ import { HomepageSectionsTab } from "@/components/admin/HomepageSectionsTab"
 import { BrochureLeadsTab } from "@/components/admin/BrochureLeadsTab"
 import { SparePartsTab } from "@/components/admin/SparePartsTab"
 import { ReviewsTab } from "@/components/admin/ReviewsTab"
+import { SiteSettingsTab } from "@/components/admin/SiteSettingsTab"
+import { ProductExperienceTab } from "@/components/admin/ProductExperienceTab"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
@@ -1171,6 +1173,17 @@ function AdminDashboardContent() {
                 Reviews
               </button>
               <button
+                onClick={() => setActiveTab("siteSettings")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "siteSettings"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Settings className="mr-3" size={20} />
+                Site Settings
+              </button>
+              <button
                 onClick={() => setActiveTab("deployments")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "deployments"
@@ -1341,6 +1354,7 @@ function AdminDashboardContent() {
             {activeTab === "homepageSections" && <HomepageSectionsTab />}
             {activeTab === "spareParts" && <SparePartsTab />}
             {activeTab === "reviews" && <ReviewsTab />}
+            {activeTab === "siteSettings" && <SiteSettingsTab />}
             {activeTab === "settings" && <SettingsTab />}
           </div>
         </div>
@@ -1775,6 +1789,9 @@ function ProductForm({
     solution: product?.solution || "",
     certifications: product?.certifications?.join("\n") || "",
     performanceMetrics: product?.performanceMetrics?.join("\n") || "",
+    filmChapters: product?.filmChapters || [],
+    boxContents: product?.boxContents || [],
+    productFaqs: product?.productFaqs || [],
   })
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingBrochure, setUploadingBrochure] = useState(false);
@@ -2083,76 +2100,17 @@ function ProductForm({
             <p className="text-xs text-gray-500 mt-1">Enter the full YouTube URL for product demo or review videos</p>
           </div>
 
-          {/* ── Cinematic Page Fields ───────────────────────────── */}
+          {/* ── Product Experience Builder ──────────────────────── */}
           <div className="border-t pt-6 mt-2">
-            <h4 className="text-sm font-700 text-gray-800 mb-1">Cinematic Product Page</h4>
-            <p className="text-xs text-gray-500 mb-5">These fields power the premium product page experience. All optional — product still works without them.</p>
-
-            <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Product Tagline</label>
-                <Input
-                  value={formData.tagline}
-                  onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-                  placeholder="e.g. India's most trusted municipal fogger"
-                />
-                <p className="text-xs text-gray-500 mt-1">Short, punchy line shown under the product name in the hero.</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Hero Video URL (optional)</label>
-                <Input
-                  value={formData.heroVideoUrl}
-                  onChange={(e) => setFormData({ ...formData, heroVideoUrl: e.target.value })}
-                  placeholder="https://www.youtube.com/watch?v=... (separate cinematic hero video)"
-                  type="url"
-                />
-                <p className="text-xs text-gray-500 mt-1">If different from the main YouTube demo — used as the cinematic film section.</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Problem This Solves</label>
-                <Textarea
-                  value={formData.problem}
-                  onChange={(e) => setFormData({ ...formData, problem: e.target.value })}
-                  rows={3}
-                  placeholder="Describe the problem, challenge, or pain point this product addresses. Shown in the scroll-storytelling section."
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Solution Narrative</label>
-                <Textarea
-                  value={formData.solution}
-                  onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
-                  rows={3}
-                  placeholder="How does this product solve the problem? What makes it the right choice?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Certifications (one per line)</label>
-                <Textarea
-                  value={formData.certifications}
-                  onChange={(e) => setFormData({ ...formData, certifications: e.target.value })}
-                  rows={3}
-                  placeholder={"ISO 9001:2015\nGeM Registered OEM\nBIS Approved\nCE Certified"}
-                  className="font-mono text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Performance Metrics (one per line, format: Value | Label | Description)</label>
-                <Textarea
-                  value={formData.performanceMetrics}
-                  onChange={(e) => setFormData({ ...formData, performanceMetrics: e.target.value })}
-                  rows={4}
-                  placeholder={"5 km | Coverage | Area covered per tank\n4 hrs | Runtime | On single tank\n98% | Kill Rate | Mosquito elimination"}
-                  className="font-mono text-sm"
-                />
-                <p className="text-xs text-gray-500 mt-1">These appear as large animated numbers on the product page.</p>
-              </div>
+            <div className="flex items-center gap-2 mb-1">
+              <h4 className="text-sm font-700 text-gray-800">Product Experience Builder</h4>
+              <span className="text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-600 uppercase tracking-wide">Cinematic</span>
             </div>
+            <p className="text-xs text-gray-500 mb-5">Build the full cinematic product page without any code. All sections are optional — add only what you have content for.</p>
+            <ProductExperienceTab
+              product={formData}
+              onChange={(key, value) => setFormData((p: any) => ({ ...p, [key]: value }))}
+            />
           </div>
 
           <div>

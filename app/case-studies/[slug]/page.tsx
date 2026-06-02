@@ -2,7 +2,9 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import type { Metadata } from "next"
 import clientPromise from "@/lib/mongodb"
+import { ObjectId } from "mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
+import { ArrowRight } from "lucide-react"
 
 async function getCaseStudy(slug: string) {
   try {
@@ -11,6 +13,20 @@ async function getCaseStudy(slug: string) {
     return await db.collection("case_studies").findOne({ slug, published: true })
   } catch {
     return null
+  }
+}
+
+async function getLinkedProducts(ids: string[]) {
+  if (!ids?.length) return []
+  try {
+    const client = await clientPromise
+    const db = client.db()
+    const objectIds = ids.map(id => { try { return new ObjectId(id) } catch { return null } }).filter(Boolean)
+    if (!objectIds.length) return []
+    const products = await db.collection("products").find({ _id: { $in: objectIds } }).toArray()
+    return JSON.parse(JSON.stringify(products))
+  } catch {
+    return []
   }
 }
 
@@ -27,6 +43,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function CaseStudyDetailPage({ params }: { params: { slug: string } }) {
   const cs = await getCaseStudy(params.slug)
   if (!cs) notFound()
+  const linkedProducts = await getLinkedProducts(cs.linkedProductIds || [])
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-16 pt-28">
@@ -151,8 +168,39 @@ export default async function CaseStudyDetailPage({ params }: { params: { slug: 
         </div>
       )}
 
+      {/* Linked Products */}
+      {linkedProducts.length > 0 && (
+        <section className="mt-10 pt-8 border-t border-gray-100">
+          <h2 className="font-700 text-gray-900 text-lg mb-4">Products Used in This Deployment</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {linkedProducts.map((p: any) => {
+              const img = p.imageUrls?.[0] || p.imageUrl
+              return (
+                <Link
+                  key={p._id}
+                  href={`/products/${p._id}`}
+                  className="group flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-xl hover:border-brand-200 hover:shadow-sm transition-all"
+                >
+                  {img && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={img} alt={p.name} className="w-16 h-16 object-contain bg-gray-50 rounded-lg shrink-0 p-1" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    {p.category && <p className="eyebrow text-brand-600 mb-0.5">{p.category}</p>}
+                    <p className="font-600 text-gray-900 text-sm truncate group-hover:text-brand-700 transition-colors">{p.name}</p>
+                    <span className="inline-flex items-center gap-1 text-brand-600 text-xs font-500 mt-1 group-hover:gap-1.5 transition-all">
+                      View Product <ArrowRight size={11} />
+                    </span>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </section>
+      )}
+
       <div className="mt-10 pt-8 border-t border-gray-100">
-        <Link href="/case-studies" className="text-green-600 hover:underline text-sm font-medium">
+        <Link href="/case-studies" className="text-brand-600 hover:text-brand-700 text-sm font-500 transition-colors">
           ← Back to all case studies
         </Link>
       </div>

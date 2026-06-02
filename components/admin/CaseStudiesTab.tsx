@@ -5,14 +5,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import { Search, CheckSquare, Square } from "lucide-react"
 
-// Images still use Cloudinary (image/upload — no ACL issues). PDFs use /api/admin/upload-file.
 const CLOUDINARY_CLOUD = "dhbvzugv6"
 const CLOUDINARY_PRESET = "product_uploads"
 
 const EMPTY: Record<string, any> = {
   title: "",
   slug: "",
+  linkedProductIds: [],
   customer: "",
   department: "",
   state: "",
@@ -34,8 +35,86 @@ function slugify(t: string) {
   return t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80)
 }
 
+function ProductMultiSelect({
+  selectedIds,
+  onChange,
+  allProducts,
+}: {
+  selectedIds: string[]
+  onChange: (ids: string[]) => void
+  allProducts: any[]
+}) {
+  const [search, setSearch] = useState("")
+  const filtered = allProducts.filter(p =>
+    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    (p.category || "").toLowerCase().includes(search.toLowerCase())
+  )
+  const toggle = (id: string) => {
+    if (selectedIds.includes(id)) onChange(selectedIds.filter(x => x !== id))
+    else onChange([...selectedIds, id])
+  }
+  const selected = allProducts.filter(p => selectedIds.includes(p._id))
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Linked Products <span className="text-xs text-gray-400 font-normal">(These products will show this case study on their page)</span>
+      </label>
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {selected.map(p => (
+            <span key={p._id} className="inline-flex items-center gap-1 bg-brand-100 text-brand-800 text-xs px-2.5 py-1 rounded-full font-500">
+              {p.name.slice(0, 40)}
+              <button type="button" onClick={() => toggle(p._id)} className="ml-0.5 text-brand-500 hover:text-brand-700">×</button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-100 bg-gray-50">
+          <Search size={14} className="text-gray-400 shrink-0" />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search products…"
+            className="flex-1 text-sm bg-transparent outline-none"
+          />
+        </div>
+        <div className="max-h-48 overflow-y-auto">
+          {filtered.length === 0 ? (
+            <p className="text-xs text-gray-400 px-3 py-4 text-center">No products found</p>
+          ) : filtered.map(p => {
+            const checked = selectedIds.includes(p._id)
+            return (
+              <button
+                key={p._id}
+                type="button"
+                onClick={() => toggle(p._id)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 ${checked ? "bg-brand-50/50" : ""}`}
+              >
+                {checked
+                  ? <CheckSquare size={16} className="text-brand-600 shrink-0" />
+                  : <Square size={16} className="text-gray-300 shrink-0" />}
+                {p.imageUrls?.[0] && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.imageUrls[0]} alt="" className="w-8 h-8 object-contain bg-gray-50 rounded shrink-0" />
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-500 text-gray-800 truncate">{p.name}</p>
+                  {p.category && <p className="text-xs text-gray-400">{p.category}</p>}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function CaseStudiesTab() {
   const [studies, setStudies] = useState<any[]>([])
+  const [allProducts, setAllProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState<Record<string, any>>(EMPTY)
   const [editing, setEditing] = useState<string | null>(null)
@@ -46,9 +125,14 @@ export function CaseStudiesTab() {
 
   const load = () => {
     setLoading(true)
-    fetch("/api/admin/case-studies")
-      .then((r) => r.json())
-      .then((data) => setStudies(Array.isArray(data) ? data : []))
+    Promise.all([
+      fetch("/api/admin/case-studies").then(r => r.json()),
+      fetch("/api/products").then(r => r.json()),
+    ])
+      .then(([studies, products]) => {
+        setStudies(Array.isArray(studies) ? studies : [])
+        setAllProducts(Array.isArray(products) ? products : [])
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
   }
@@ -271,6 +355,12 @@ export function CaseStudiesTab() {
                   <input type="file" accept="application/pdf" disabled={uploading} onChange={(e) => e.target.files?.[0] && uploadPdf(e.target.files[0])} className="text-sm" />
                 )}
               </div>
+
+              <ProductMultiSelect
+                selectedIds={form.linkedProductIds || []}
+                onChange={ids => set("linkedProductIds", ids)}
+                allProducts={allProducts}
+              />
 
               <div className="flex gap-4 items-center">
                 <label className="flex items-center gap-2 text-sm">
