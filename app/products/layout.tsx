@@ -45,7 +45,7 @@ export default async function ProductsLayout({ children }: { children: ReactNode
         url="/products"
         items={top.map((p) => ({
           name: p.name ?? "Product",
-          url: `/products/${p.id}`,
+          url: `/products/${p.slug || p.id}`,
         }))}
       />
       {children}
