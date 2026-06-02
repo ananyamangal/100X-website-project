@@ -10,7 +10,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { RichContent } from "@/components/RichContent"
-import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton"
 import AccreditationsStrip from "@/components/home/AccreditationsStrip"
 import ManufacturerIntroBlock from "@/components/home/ManufacturerIntroBlock"
 import TechnologyBlock from "@/components/home/TechnologyBlock"
@@ -322,10 +321,15 @@ export default function HomePageClient({
           eyebrow: homeContent.manufacturingAuthority?.eyebrow,
           headline: homeContent.manufacturingAuthority?.headline,
           body: homeContent.manufacturingAuthority?.body,
-          stats: homeContent.manufacturingAuthority?.stats?.map((s) => ({
-            value: Number(s.value) || 0,
-            label: s.label,
-          })),
+          // Filter out zero/empty values so the hardcoded defaults show until admin fills them in
+          stats: (() => {
+            const raw = homeContent.manufacturingAuthority?.stats
+            if (!Array.isArray(raw)) return undefined
+            const valid = raw
+              .map((s) => ({ value: Number(s.value), suffix: s.suffix, label: s.label, description: s.description }))
+              .filter((s) => s.value > 0 && s.label)
+            return valid.length > 0 ? valid : undefined
+          })(),
         }}
       />
 
@@ -385,11 +389,6 @@ export default function HomePageClient({
       <div className="min-h-screen bg-white">
         <div>{renderHomePage()}</div>
 
-        <WhatsAppFloatingButton
-          waNumber={BUSINESS.whatsappE164}
-          displayPhone="+91 78272 29116"
-          phoneDigitsForEvents="7827229116"
-        />
       </div>
     </>
   )
