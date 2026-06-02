@@ -1,8 +1,16 @@
 "use client"
 import React, { useState } from "react"
-import { Plus, Trash2, GripVertical, Info } from "lucide-react"
+import { Plus, Trash2, Info } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+
+// Admin form stores arrays-as-strings for textarea fields (certifications, performanceMetrics, applications).
+// This helper handles both string and array inputs safely.
+function toLines(val: any): string {
+  if (Array.isArray(val)) return val.join("\n")
+  if (typeof val === "string") return val
+  return ""
+}
 
 function Helper({ text }: { text: string }) {
   return (
