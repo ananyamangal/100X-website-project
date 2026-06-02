@@ -116,8 +116,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const product of products) {
     const lastModified = toDate(product.updatedAt) ?? now
+    // Use SEO slug if available; fall back to ObjectId for products not yet migrated
+    const productPath = product.slug || product.id
     entries.push({
-      url: `${SITE_URL}/products/${product.id}`,
+      url: `${SITE_URL}/products/${productPath}`,
       lastModified,
       changeFrequency: "weekly",
       priority: 0.85,

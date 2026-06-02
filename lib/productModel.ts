@@ -15,6 +15,7 @@ export interface BoxItem {
 
 export interface Product {
   _id?: string;
+  slug?: string;
   name: string;
   category: string;
   priceRange: string;

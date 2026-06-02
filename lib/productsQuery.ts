@@ -1,5 +1,7 @@
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
+import { isObjectId } from "@/lib/productSlug"
+import { normalizeProduct } from "@/lib/normalizeProduct"
 
 function normalizeImageUrls(product: Record<string, unknown>): string[] {
   let imageUrls: string[] = []
@@ -26,9 +28,39 @@ export async function getProductById(id: string): Promise<Record<string, unknown
     const db = client.db()
     const product = await db.collection("products").findOne({ _id: new ObjectId(id) })
     if (!product) return null
-    const p = product as Record<string, unknown>
-    p.imageUrls = normalizeImageUrls(p)
-    return p
+    return normalizeProduct(JSON.parse(JSON.stringify(product)))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Look up a product by either its slug field or its ObjectId.
+ * Returns { product, resolvedBy } where resolvedBy indicates which was used.
+ * Use this in the product page route to detect when a redirect is needed.
+ */
+export async function getProductBySlugOrId(
+  slugOrId: string
+): Promise<{ product: Record<string, unknown>; resolvedBy: "slug" | "id" } | null> {
+  try {
+    const client = await clientPromise
+    const db = client.db()
+
+    // Try slug first (the preferred, SEO-friendly path)
+    const bySlug = await db.collection("products").findOne({ slug: slugOrId })
+    if (bySlug) {
+      return { product: normalizeProduct(JSON.parse(JSON.stringify(bySlug))), resolvedBy: "slug" }
+    }
+
+    // Fall back to ObjectId (legacy URLs)
+    if (isObjectId(slugOrId)) {
+      const byId = await db.collection("products").findOne({ _id: new ObjectId(slugOrId) })
+      if (byId) {
+        return { product: normalizeProduct(JSON.parse(JSON.stringify(byId))), resolvedBy: "id" }
+      }
+    }
+
+    return null
   } catch {
     return null
   }
@@ -92,6 +124,7 @@ export async function getAllProductIds(): Promise<string[]> {
 
 export type ProductSitemapRow = {
   id: string
+  slug?: string
   updatedAt?: string
   name?: string
   category?: string
@@ -109,7 +142,7 @@ export async function getAllProductsForSitemap(): Promise<ProductSitemapRow[]> {
       .collection("products")
       .find(
         {},
-        { projection: { _id: 1, updatedAt: 1, createdAt: 1, name: 1, category: 1 } },
+        { projection: { _id: 1, slug: 1, updatedAt: 1, createdAt: 1, name: 1, category: 1 } },
       )
       .toArray()
     return docs.map((d) => {
@@ -121,6 +154,7 @@ export async function getAllProductsForSitemap(): Promise<ProductSitemapRow[]> {
         undefined
       return {
         id: String(d._id),
+        slug: typeof d.slug === "string" ? d.slug : undefined,
         updatedAt: updatedAt || undefined,
         name: typeof d.name === "string" ? d.name : undefined,
         category: typeof d.category === "string" ? d.category : undefined,
@@ -133,6 +167,7 @@ export async function getAllProductsForSitemap(): Promise<ProductSitemapRow[]> {
 
 export type RelatedProductRow = {
   id: string
+  slug?: string
   name: string
   category?: string
   shortDescription?: string
@@ -161,6 +196,7 @@ export async function getProductsByCategory(
       .find(query, {
         projection: {
           _id: 1,
+          slug: 1,
           name: 1,
           category: 1,
           shortDescription: 1,
@@ -179,6 +215,7 @@ export async function getProductsByCategory(
       raw.imageUrls = normalizeImageUrls(raw)
       return {
         id: String(d._id),
+        slug: typeof d.slug === "string" ? d.slug : undefined,
         name: String(d.name ?? ""),
         category: typeof d.category === "string" ? d.category : undefined,
         shortDescription:
@@ -219,6 +256,7 @@ export async function getRelatedProducts(
         {
           projection: {
             _id: 1,
+            slug: 1,
             name: 1,
             category: 1,
             shortDescription: 1,
@@ -238,6 +276,7 @@ export async function getRelatedProducts(
       raw.imageUrls = normalizeImageUrls(raw)
       return {
         id: String(d._id),
+        slug: typeof d.slug === "string" ? d.slug : undefined,
         name: String(d.name ?? ""),
         category: typeof d.category === "string" ? d.category : undefined,
         shortDescription:

@@ -8,6 +8,7 @@ import { BUSINESS } from "@/lib/seo/site-config"
 interface Product {
   _id?: string
   id?: string
+  slug?: string
   name: string
   imageUrls: string[]
   priceRange?: string
@@ -28,6 +29,7 @@ interface Props {
 
 export default function CinematicProductCard({ product, index = 0, onBrochureDownload }: Props) {
   const id = product._id || product.id || ""
+  const productPath = product.slug || id
   const img = product.imageUrls?.[0] || "/placeholder.svg"
   const waText = product.whatsappMessageText || `Hi, I'm interested in ${product.name}. Please share pricing.`
   const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waText)}`
@@ -65,7 +67,7 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
         {/* Quick-action overlay */}
         <div className="absolute inset-0 bg-cinema-900/0 group-hover:bg-cinema-900/40 transition-colors duration-500 flex items-center justify-center opacity-0 group-hover:opacity-100">
           <Link
-            href={`/products/${id}`}
+            href={`/products/${productPath}`}
             className="bg-white text-cinema-900 font-600 text-sm px-5 py-2.5 rounded-full flex items-center gap-2 shadow-lg hover:bg-brand-600 hover:text-white transition-colors"
           >
             View Product <ArrowRight size={14} />
@@ -82,7 +84,7 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
 
         {/* Name */}
         <h3 className="font-700 text-gray-900 text-lg leading-snug mb-2 group-hover:text-brand-700 transition-colors">
-          <Link href={`/products/${id}`} className="hover:underline underline-offset-2">
+          <Link href={`/products/${productPath}`} className="hover:underline underline-offset-2">
             {product.name}
           </Link>
         </h3>

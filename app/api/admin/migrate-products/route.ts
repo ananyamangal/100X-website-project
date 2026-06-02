@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { cookies } from "next/headers"
 import { toStringArray, toObjectArray } from "@/lib/normalizeProduct"
+import { generateProductSlug } from "@/lib/productSlug"
 
 async function isAuthenticated(): Promise<boolean> {
   const cookieStore = await cookies()
@@ -50,7 +51,10 @@ export async function POST(request: NextRequest) {
           imageUrls = [product.image]
         }
 
+        const productIdStr = String(product._id)
         const patch = {
+          // Auto-generate slug for products that don't have one yet
+          ...(!product.slug && { slug: generateProductSlug(product.name || "product", productIdStr) }),
           features: toStringArray(product.features),
           specifications: toStringArray(product.specifications),
           applications: toStringArray(product.applications),
@@ -101,7 +105,9 @@ export async function GET(request: NextRequest) {
     const report = products.map((p) => ({
       _id: String(p._id),
       name: p.name,
+      currentSlug: p.slug || null,
       issues: [
+        !p.slug && "missing slug",
         !Array.isArray(p.features) && "features is not array",
         !Array.isArray(p.specifications) && "specifications is not array",
         !Array.isArray(p.applications) && "applications is not array",

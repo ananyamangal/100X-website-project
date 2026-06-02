@@ -27,6 +27,7 @@ import MobileCtaBar from '@/components/cta/MobileCtaBar'
 import { SITE_URL, SITE_NAME } from '@/lib/seo/site-config'
 import { getBrandAssets } from '@/lib/brandAssets'
 import MediaProtection from '@/components/MediaProtection'
+import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -336,6 +337,11 @@ export default async function RootLayout({
           <SiteFooter logoUrl={brandAssets.footerLogoUrl} logoAlt={brandAssets.logoAlt} />
           <MobileCtaBar />
         </MobileCtaProvider>
+        <WhatsAppFloatingButton
+          waNumber="917827229116"
+          displayPhone="+91 78272 29116"
+          phoneDigitsForEvents="7827229116"
+        />
         <Toaster richColors position="top-right" closeButton />
       </body>
     </html>

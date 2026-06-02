@@ -3,6 +3,7 @@ import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { Product } from "@/lib/productModel";
 import { normalizeProduct } from "@/lib/normalizeProduct";
+import { generateProductSlug } from "@/lib/productSlug";
 
 export async function GET(request: NextRequest, context: { params?: { id?: string } }) {
   try {
@@ -84,7 +85,12 @@ export async function PUT(request: NextRequest, context: { params?: { id?: strin
     
     const result = await db.collection("products").findOneAndUpdate(
       { _id: new ObjectId(id) },
-      { $set: { ...productData, updatedAt: new Date().toISOString() } },
+      { $set: {
+          ...productData,
+          // Preserve existing slug; only generate if the product has none
+          slug: productData.slug || currentProduct.slug || generateProductSlug(productData.name || currentProduct.name, id),
+          updatedAt: new Date().toISOString(),
+        } },
       { returnDocument: "after" }
     );
     if (!result || !result.value) return NextResponse.json({ error: "Not found" }, { status: 404 });

@@ -3,6 +3,7 @@ import clientPromise from "@/lib/mongodb";
 import { Product } from "@/lib/productModel";
 import { ObjectId } from "mongodb";
 import { normalizeProducts } from "@/lib/normalizeProduct";
+import { generateProductSlug } from "@/lib/productSlug";
 
 // GET all products
 export async function GET(request: NextRequest) {
@@ -52,8 +53,11 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    const newProduct = { ...productData, order, createdAt: now, updatedAt: now };
-    const result = await db.collection("products").insertOne(newProduct);
+    // Generate a placeholder ID to build the slug before insert
+    const tempId = new ObjectId()
+    const slug = productData.slug || generateProductSlug(productData.name, String(tempId))
+    const newProduct = { ...productData, _id: tempId, slug, order, createdAt: now, updatedAt: now };
+    const result = await db.collection("products").insertOne(newProduct as any);
     return NextResponse.json({ ...newProduct, _id: result.insertedId }, { status: 201 });
   } catch (error) {
     console.error("❌ Error in POST /api/admin/products:", error);

@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 import ProductDetailClient from "./ProductDetailClient"
 import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import RelatedProductsSection from "@/components/RelatedProductsSection"
-import { getProductById } from "@/lib/productsQuery"
+import { getProductBySlugOrId } from "@/lib/productsQuery"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import ProductAiSummary from "@/components/seo/ProductAiSummary"
@@ -21,26 +22,29 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const product = await getProductById(id)
-  if (!product) {
+  const result = await getProductBySlugOrId(id)
+  if (!result) {
     return {
       title: "Product | 100x Circle",
       description: "This product could not be found.",
       robots: { index: false, follow: true },
     }
   }
+  const { product } = result
   const name = String(product.name ?? "Product")
+  const productSlug = typeof product.slug === "string" ? product.slug : String(product._id ?? id)
+  const canonicalPath = `/products/${productSlug}`
   const title = `${name} | 100x Circle`
   const rawDesc = String(product.shortDescription || product.detailedDescription || "")
   const description =
     plainTextFromHtml(rawDesc).slice(0, 155) ||
     `Buy ${name} from 100x Circle — thermal fogging and agricultural equipment in India.`
-  const url = `${SITE_URL}/products/${id}`
+  const url = `${SITE_URL}${canonicalPath}`
   const imgs = absolutizeImages((product.imageUrls as string[]) || [])
   return {
     title,
     description,
-    alternates: { canonical: `/products/${id}` },
+    alternates: { canonical: canonicalPath },
     openGraph: {
       title,
       description,
@@ -68,8 +72,21 @@ function getYouTubeId(url: string): string | null {
 
 export default async function ProductRoutePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const product = await getProductById(id)
-  const url = `${SITE_URL}/products/${id}`
+  const result = await getProductBySlugOrId(id)
+
+  // Legacy ObjectId URL → 301 to slug URL
+  if (result?.resolvedBy === "id") {
+    const product = result.product
+    const slug = typeof product.slug === "string" ? product.slug : null
+    if (slug) {
+      redirect(`/products/${slug}`)
+    }
+  }
+
+  const product = result?.product ?? null
+  const rawId = product ? String(product._id ?? id) : id
+  const productSlug = product && typeof product.slug === "string" ? product.slug : rawId
+  const url = `${SITE_URL}/products/${productSlug}`
   const imgs = product ? absolutizeImages((product.imageUrls as string[]) || []) : []
   const productName = product ? String(product.name) : ""
   const category = product && typeof product.category === "string" ? product.category : undefined
@@ -105,7 +122,7 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
       {product ? (
         <>
           <ProductAiSummary
-            id={id}
+            id={rawId}
             name={productName}
             category={category ?? ""}
             shortDescription={shortDescription}
@@ -119,7 +136,7 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
             description={shortDescription}
             images={imgs.length ? imgs : [`${SITE_URL}/logo-main.png`]}
             url={url}
-            sku={String(product._id ?? id)}
+            sku={rawId}
             inStock={inStock}
             rating={rating}
             reviewsCount={reviewsCount}
@@ -136,14 +153,14 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
             items={[
               { name: "Home", url: "/" },
               { name: "Products", url: "/products" },
-              { name: productName, url: `/products/${id}` },
+              { name: productName, url: `/products/${productSlug}` },
             ]}
           />
         </>
       ) : null}
-      <ProductDetailClient productId={id} />
+      <ProductDetailClient productId={rawId} />
       {product ? (
-        <RelatedProductsSection category={category} excludeId={id} limit={4} />
+        <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
       ) : null}
     </>
   )

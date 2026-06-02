@@ -88,7 +88,7 @@ export default async function RecommendedProductsBlock({
             return (
               <li key={p.id}>
                 <Link
-                  href={`/products/${p.id}`}
+                  href={`/products/${p.slug || p.id}`}
                   className="group block rounded-2xl border border-gray-200 bg-white overflow-hidden transition-all hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 [[data-theme=dark-industrial]_&]:bg-white/[0.04] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:hover:border-green-500/40"
                 >
                   <div className="aspect-[4/3] overflow-hidden bg-gray-100 [[data-theme=dark-industrial]_&]:bg-white/5">
