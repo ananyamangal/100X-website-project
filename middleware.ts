@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     // Ask our own API for the slug (runs on same origin)
-    const res = await fetch(`${origin}/api/debug-product?id=${id}`, {
+    const res = await fetch(`${origin}/api/product-slug?id=${id}`, {
       headers: { "x-middleware-internal": "1" },
     })
     if (!res.ok) return NextResponse.next()
