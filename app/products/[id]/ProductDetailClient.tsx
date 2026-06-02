@@ -375,6 +375,23 @@ export default function ProductDetailClient({ productId }: { productId: string }
   const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waText)}`;
   const shareUrl = `${SITE_URL}/products/${productId}`;
 
+  // Parse product-specific FAQs (format: "Q: question | A: answer")
+  const DEFAULT_FAQS = [
+    { q: 'What fuel does this machine use?', a: 'The machine operates on regular petroleum/kerosene-based fogging oil. We recommend using certified fogging chemicals for best results and to maintain warranty validity.' },
+    { q: 'Is this machine suitable for government tenders?', a: 'Yes. 100X Circle is GeM-registered and our machines meet government procurement standards. We have supplied to municipal corporations, health departments, and agriculture boards across India.' },
+    { q: 'What is the delivery timeline?', a: 'Standard delivery is 5–7 working days across India. Bulk orders and government tenders may require 10–15 days. Contact us for urgent requirements.' },
+    { q: 'Do you provide operator training?', a: 'Yes, we provide complimentary operator training on purchase. For large orders, on-site training can be arranged. Video training materials are also available.' },
+    { q: 'Can I get a demo before purchasing?', a: 'Yes. Product demonstrations can be arranged at our Gurugram facility or at your location for bulk inquiries. Contact us to schedule.' },
+  ];
+  const productFaqsParsed = (product.productFaqs || [])
+    .map((line: string) => {
+      const m = line.match(/^Q:\s*(.*?)\s*\|\s*A:\s*([\s\S]*)$/i);
+      if (!m) return null;
+      return { q: m[1].trim(), a: m[2].trim() };
+    })
+    .filter(Boolean) as { q: string; a: string }[];
+  const faqItems = productFaqsParsed.length > 0 ? productFaqsParsed : DEFAULT_FAQS;
+
   /* Build accordion items */
   const accordionItems = [
     specs.length > 0 && {
@@ -462,13 +479,7 @@ export default function ProductDetailClient({ productId }: { productId: string }
       icon: <HelpCircle size={14} />,
       children: (
         <div className="space-y-4">
-          {[
-            { q: 'What fuel does this machine use?', a: 'The machine operates on regular petroleum/kerosene-based fogging oil. We recommend using certified fogging chemicals for best results and to maintain warranty validity.' },
-            { q: 'Is this machine suitable for government tenders?', a: 'Yes. 100X Circle is GeM-registered and our machines meet government procurement standards. We have supplied to municipal corporations, health departments, and agriculture boards across India.' },
-            { q: 'What is the delivery timeline?', a: 'Standard delivery is 5–7 working days across India. Bulk orders and government tenders may require 10–15 days. Contact us for urgent requirements.' },
-            { q: 'Do you provide operator training?', a: 'Yes, we provide complimentary operator training on purchase. For large orders, on-site training can be arranged. Video training materials are also available.' },
-            { q: 'Can I get a demo before purchasing?', a: 'Yes. Product demonstrations can be arranged at our Gurugram facility or at your location for bulk inquiries. Contact us to schedule.' },
-          ].map((item, i) => (
+          {faqItems.map((item, i) => (
             <div key={i} className="border-b border-gray-50 last:border-0 pb-4 last:pb-0">
               <p className="font-600 text-gray-800 text-sm mb-1.5">{item.q}</p>
               <p className="text-gray-500 text-sm leading-relaxed">{item.a}</p>
@@ -641,6 +652,57 @@ export default function ProductDetailClient({ productId }: { productId: string }
             </ScrollReveal>
           </div>
         </section>
+      )}
+
+      {/* ── 2b. FILM CHAPTERS ────────────────────────────────────── */}
+      {Array.isArray(product.filmChapters) && product.filmChapters.length > 0 && (
+        <div>
+          {product.filmChapters.map((ch: any, i: number) => {
+            const chVideoId = ch.videoUrl ? getYouTubeId(ch.videoUrl) : null
+            const isEven = i % 2 === 0
+            return (
+              <section key={i} className={`py-16 md:py-20 ${isEven ? 'bg-white' : 'bg-gray-50'}`}>
+                <div className="container mx-auto px-4 md:px-6">
+                  <div className={`grid md:grid-cols-2 gap-10 md:gap-16 items-center ${!isEven ? 'md:[&>*:first-child]:order-2' : ''}`}>
+                    {/* Media */}
+                    <ScrollReveal animation={isEven ? 'fade-right' : 'fade-left'}>
+                      {chVideoId ? (
+                        <div className="rounded-2xl overflow-hidden shadow-xl aspect-video">
+                          <iframe
+                            src={`https://www.youtube.com/embed/${chVideoId}?rel=0&modestbranding=1`}
+                            title={ch.title || `Chapter ${i + 1}`}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          />
+                        </div>
+                      ) : ch.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={ch.imageUrl}
+                          alt={ch.title || `Chapter ${i + 1}`}
+                          className="rounded-2xl w-full object-cover shadow-xl aspect-[4/3]"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="rounded-2xl bg-gray-100 aspect-[4/3] flex items-center justify-center">
+                          <span className="text-gray-400 text-sm">Chapter {i + 1}</span>
+                        </div>
+                      )}
+                    </ScrollReveal>
+                    {/* Text */}
+                    <ScrollReveal animation={isEven ? 'fade-left' : 'fade-right'} delay={80}>
+                      <p className="eyebrow text-brand-600 mb-3">Chapter {i + 1}</p>
+                      <h2 className="text-2xl md:text-3xl font-700 text-gray-900 mb-3 text-balance">{ch.title}</h2>
+                      {ch.subtitle && <p className="text-brand-600 font-500 mb-4">{ch.subtitle}</p>}
+                      {ch.description && <p className="text-gray-600 leading-relaxed">{ch.description}</p>}
+                    </ScrollReveal>
+                  </div>
+                </div>
+              </section>
+            )
+          })}
+        </div>
       )}
 
       {/* ── 3. FEATURES SPOTLIGHT ────────────────────────────────── */}
