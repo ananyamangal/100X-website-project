@@ -28,28 +28,41 @@ function getIcon(cat: string): React.ReactNode {
 }
 
 function parseSpecs(specs: string[]): SpecGroup[] {
-  // Supports two formats:
-  // 1. "Category | Key: Value"  — grouped
+  // Supports three formats:
+  // 1. "Category | Key: Value"  — grouped with category
   // 2. "Key: Value"             — ungrouped (put in 'General')
+  // 3. "Plain text"             — feature-style, treated as value under 'General'
   const groups: Record<string, SpecRow[]> = {}
 
   for (const spec of specs) {
     if (!spec.trim()) continue
     if (spec.includes('|')) {
-      const [cat, rest] = spec.split('|').map(s => s.trim())
+      const pipeIdx = spec.indexOf('|')
+      const cat = spec.slice(0, pipeIdx).trim()
+      const rest = spec.slice(pipeIdx + 1).trim()
       const colonIdx = rest.indexOf(':')
-      if (colonIdx === -1) continue
-      const key = rest.slice(0, colonIdx).trim()
-      const value = rest.slice(colonIdx + 1).trim()
-      if (!groups[cat]) groups[cat] = []
-      groups[cat].push({ key, value })
+      if (colonIdx === -1) {
+        // "Category | plain text" — treat rest as value with no key
+        if (!groups[cat]) groups[cat] = []
+        groups[cat].push({ key: '', value: rest })
+      } else {
+        const key = rest.slice(0, colonIdx).trim()
+        const value = rest.slice(colonIdx + 1).trim()
+        if (!groups[cat]) groups[cat] = []
+        groups[cat].push({ key, value })
+      }
     } else {
       const colonIdx = spec.indexOf(':')
-      if (colonIdx === -1) continue
-      const key = spec.slice(0, colonIdx).trim()
-      const value = spec.slice(colonIdx + 1).trim()
-      if (!groups['General']) groups['General'] = []
-      groups['General'].push({ key, value })
+      if (colonIdx === -1) {
+        // Plain text — show as checked feature in General
+        if (!groups['General']) groups['General'] = []
+        groups['General'].push({ key: '', value: spec.trim() })
+      } else {
+        const key = spec.slice(0, colonIdx).trim()
+        const value = spec.slice(colonIdx + 1).trim()
+        if (!groups['General']) groups['General'] = []
+        groups['General'].push({ key, value })
+      }
     }
   }
 
@@ -73,10 +86,17 @@ function SpecCard({ group }: { group: SpecGroup }) {
       {/* Rows */}
       <div className="divide-y divide-gray-50">
         {group.rows.map((row, i) => (
-          <div key={i} className="flex items-center justify-between px-5 py-3 gap-4 hover:bg-gray-50/50 transition-colors">
-            <span className="text-gray-500 text-sm">{row.key}</span>
-            <span className="text-gray-900 font-600 text-sm text-right">{row.value}</span>
-          </div>
+          row.key ? (
+            <div key={i} className="flex items-center justify-between px-5 py-3 gap-4 hover:bg-gray-50/50 transition-colors">
+              <span className="text-gray-500 text-sm">{row.key}</span>
+              <span className="text-gray-900 font-600 text-sm text-right">{row.value}</span>
+            </div>
+          ) : (
+            <div key={i} className="flex items-center gap-2.5 px-5 py-3 hover:bg-gray-50/50 transition-colors">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><circle cx="6.5" cy="6.5" r="6.5" fill="#dcfce7"/><path d="M3.5 6.5l2 2 4-4" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <span className="text-gray-700 text-sm">{row.value}</span>
+            </div>
+          )
         ))}
       </div>
     </div>
@@ -105,10 +125,17 @@ function SpecAccordion({ group }: { group: SpecGroup }) {
       {open && (
         <div className="border-t border-gray-50 divide-y divide-gray-50">
           {group.rows.map((row, i) => (
-            <div key={i} className="flex items-center justify-between px-4 py-2.5 gap-3">
-              <span className="text-gray-500 text-xs">{row.key}</span>
-              <span className="text-gray-900 font-600 text-xs text-right">{row.value}</span>
-            </div>
+            row.key ? (
+              <div key={i} className="flex items-center justify-between px-4 py-2.5 gap-3">
+                <span className="text-gray-500 text-xs">{row.key}</span>
+                <span className="text-gray-900 font-600 text-xs text-right">{row.value}</span>
+              </div>
+            ) : (
+              <div key={i} className="flex items-center gap-2 px-4 py-2.5">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="6" fill="#dcfce7"/><path d="M3 6l2 2 4-4" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <span className="text-gray-700 text-xs">{row.value}</span>
+              </div>
+            )
           ))}
         </div>
       )}
