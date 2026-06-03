@@ -49,6 +49,11 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
           loading="lazy"
           decoding="async"
         />
+        {/* 100X brand badge — replaces vendor watermark */}
+        <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full pl-1.5 pr-2.5 py-1 shadow-sm border border-gray-100/60">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-main.png" alt="100X Circle" className="h-4 w-auto object-contain" />
+        </div>
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-cinema-900/0 group-hover:bg-cinema-900/20 transition-colors duration-500 flex items-end justify-center pb-5 opacity-0 group-hover:opacity-100">
           <span className="bg-white text-cinema-900 font-600 text-sm px-5 py-2 rounded-full flex items-center gap-2 shadow-xl translate-y-2 group-hover:translate-y-0 transition-transform duration-400">

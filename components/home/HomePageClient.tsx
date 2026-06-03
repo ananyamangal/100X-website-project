@@ -332,33 +332,42 @@ export default function HomePageClient({
         </section>
       )}
 
-      {/* 6. INDUSTRY APPLICATIONS */}
+      {/* 6. ADMIN SECTIONS — after products (celebrity endorsement, comparison) */}
+      <CelebritySectionsBlock sections={homepageSections} placement="after-products" />
+
+      {/* 7. INDUSTRY APPLICATIONS */}
       <IndustryApplicationsSection />
 
-      {/* 7. BRAND STORY */}
+      {/* 8. BRAND STORY */}
       <ManufacturerIntroBlock content={homeContent.manufacturerIntro} />
 
-      {/* 8. MID-PAGE RFQ */}
+      {/* 9. ADMIN SECTIONS — before trust (authority, technology pillars) */}
+      <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
+
+      {/* 10. MID-PAGE RFQ */}
       <RFQMidPageBlock />
 
-      {/* 9. SOCIAL PROOF — YouTube + customers + reviews */}
+      {/* 11. SOCIAL PROOF — YouTube + customers + reviews */}
       <YoutubeShortsCarousel />
       <OurCustomersScroll customers={customers} />
       <ReviewsSection limit={4} />
 
-      {/* 10. TRUST & CERTIFICATIONS */}
+      {/* 12. TRUST & CERTIFICATIONS */}
       <CinematicTrustSection accreditations={accreditations} />
 
-      {/* 11. SPECIALISED BUYERS — B2B segments */}
+      {/* 13. SPECIALISED BUYERS — B2B segments */}
       <SpecialisedBuyersBlock />
 
-      {/* 12. BLOG */}
+      {/* 14. ADMIN SECTIONS — before FAQ (manufacturing authority) */}
+      <CelebritySectionsBlock sections={homepageSections} placement="before-faq" />
+
+      {/* 15. BLOG */}
       <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />
 
-      {/* 13. FAQ */}
+      {/* 16. FAQ */}
       <FAQSection faqs={homeContent.faqs} />
 
-      {/* 14. FINAL CTA */}
+      {/* 17. FINAL CTA */}
       <CinematicCTASection />
     </>
   )
