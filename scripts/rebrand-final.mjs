@@ -291,7 +291,7 @@ const SPARE_FILES = [
 ];
 
 // numbered images are raw photos — just add subtle corner logo watermark
-const NUMBERED = new Set(['57.jpg','61.jpg','62.jpg','63.jpg','64.jpg','65.jpg','67.jpg','68.jpg']);
+const NUMBERED = new Set([]); // all spare parts use buildSpareCard — none are raw photos
 
 async function watermarkRaw(srcPath, outPath) {
   const { width: W, height: H } = await sharp(srcPath).metadata();
