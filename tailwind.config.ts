@@ -72,19 +72,19 @@ const config: Config = {
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
   			},
-  			// Brand green palette — OEM identity
+  			// Brand red palette — 100X Circle logo identity
   			brand: {
-  				50:  '#f0fdf4',
-  				100: '#dcfce7',
-  				200: '#bbf7d0',
-  				300: '#86efac',
-  				400: '#4ade80',
-  				500: '#22c55e',
-  				600: '#16a34a',
-  				700: '#15803d',
-  				800: '#166534',
-  				900: '#14532d',
-  				950: '#052e16',
+  				50:  '#fef2f2',
+  				100: '#fee2e2',
+  				200: '#fecaca',
+  				300: '#fca5a5',
+  				400: '#f87171',
+  				500: '#ef4444',
+  				600: '#dc2626',
+  				700: '#b91c1c',
+  				800: '#991b1b',
+  				900: '#7f1d1d',
+  				950: '#450a0a',
   			},
   			// Cinematic dark palette — premium sections
   			cinema: {
@@ -198,8 +198,8 @@ const config: Config = {
   			'cinema-radial': 'radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 100%)',
   			'cinema-top':    'linear-gradient(to bottom, #111111 0%, #0a0a0a 100%)',
   			'hero-overlay':  'linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0) 100%)',
-  			'brand-gradient':'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
-  			'brand-subtle':  'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+  			'brand-gradient':'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+  			'brand-subtle':  'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
   		},
   	}
   },
