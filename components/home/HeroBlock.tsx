@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
@@ -236,13 +236,13 @@ export default function HeroBlock({ heroSlides }: Props) {
             <img key={`tablet-${tabletSrc}`} src={tabletSrc} alt={tabletAlt} fetchPriority="high" decoding="async" loading="eager" draggable={false} className="hero-ken-burns w-full h-full object-cover pointer-events-none select-none" style={{ objectPosition: `${tabletFocalX}% ${tabletFocalY}%`, backgroundImage: `url("${HERO_BLUR_DATA_URL}")`, backgroundSize: "cover" }} />
           </div>
           {slideCount > 1 && <>
-            <button type="button" aria-label="Previous banner" onClick={() => setCurrentSlide((p) => (p - 1 + slideCount) % slideCount)} className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 focus-visible:ring-2 focus-visible:ring-green-500 text-gray-900 p-2.5 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronLeft size={20} /></button>
-            <button type="button" aria-label="Next banner" onClick={() => setCurrentSlide((p) => (p + 1) % slideCount)} className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 focus-visible:ring-2 focus-visible:ring-green-500 text-gray-900 p-2.5 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronRight size={20} /></button>
+            <button type="button" aria-label="Previous banner" onClick={() => setCurrentSlide((p) => (p - 1 + slideCount) % slideCount)} className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 focus-visible:ring-2 focus-visible:ring-brand-500 text-gray-900 p-2.5 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronLeft size={20} /></button>
+            <button type="button" aria-label="Next banner" onClick={() => setCurrentSlide((p) => (p + 1) % slideCount)} className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 focus-visible:ring-2 focus-visible:ring-brand-500 text-gray-900 p-2.5 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronRight size={20} /></button>
           </>}
         </div>
         {slideCount > 1 && (
           <div className="flex justify-center items-center gap-2 py-2 bg-gray-100/90" role="tablist" aria-label="Slide selectors">
-            {heroSlides.map((_, i) => <button key={i} type="button" role="tab" aria-label={`Go to slide ${i + 1} of ${slideCount}`} aria-selected={i === currentSlide} onClick={() => setCurrentSlide(i)} className={`rounded-full transition-colors p-2 focus-visible:ring-2 focus-visible:ring-green-500 ${i === currentSlide ? "bg-green-600" : "bg-gray-400/70"}`}><span className="block w-1.5 h-1.5 min-w-[6px] min-h-[6px] rounded-full bg-inherit" /></button>)}
+            {heroSlides.map((_, i) => <button key={i} type="button" role="tab" aria-label={`Go to slide ${i + 1} of ${slideCount}`} aria-selected={i === currentSlide} onClick={() => setCurrentSlide(i)} className={`rounded-full transition-colors p-2 focus-visible:ring-2 focus-visible:ring-brand-500 ${i === currentSlide ? "bg-brand-600" : "bg-gray-400/70"}`}><span className="block w-1.5 h-1.5 min-w-[6px] min-h-[6px] rounded-full bg-inherit" /></button>)}
           </div>
         )}
         <HeroContentBelow waHref={waHref} trackCta={trackCta} location="hero_tablet" />
@@ -256,13 +256,13 @@ export default function HeroBlock({ heroSlides }: Props) {
             <img key={`mobile-${mobileSrc}`} src={mobileSrc} alt={mobileAlt} fetchPriority="high" decoding="async" loading="eager" draggable={false} className="hero-ken-burns w-full h-full object-cover pointer-events-none select-none" style={{ objectPosition: `${mobileFocalX}% ${mobileFocalY}%`, backgroundImage: `url("${HERO_BLUR_DATA_URL}")`, backgroundSize: "cover" }} />
           </div>
           {slideCount > 1 && <>
-            <button type="button" aria-label="Previous banner" onClick={() => setCurrentSlide((p) => (p - 1 + slideCount) % slideCount)} className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 focus-visible:ring-2 focus-visible:ring-green-500 text-gray-800 p-2.5 rounded-full transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"><ChevronLeft size={18} /></button>
-            <button type="button" aria-label="Next banner" onClick={() => setCurrentSlide((p) => (p + 1) % slideCount)} className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 focus-visible:ring-2 focus-visible:ring-green-500 text-gray-800 p-2.5 rounded-full transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"><ChevronRight size={18} /></button>
+            <button type="button" aria-label="Previous banner" onClick={() => setCurrentSlide((p) => (p - 1 + slideCount) % slideCount)} className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 focus-visible:ring-2 focus-visible:ring-brand-500 text-gray-800 p-2.5 rounded-full transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"><ChevronLeft size={18} /></button>
+            <button type="button" aria-label="Next banner" onClick={() => setCurrentSlide((p) => (p + 1) % slideCount)} className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 focus-visible:ring-2 focus-visible:ring-brand-500 text-gray-800 p-2.5 rounded-full transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"><ChevronRight size={18} /></button>
           </>}
         </div>
         {slideCount > 1 && (
           <div className="flex justify-center items-center gap-2 py-2 bg-gray-100/90" role="tablist" aria-label="Slide selectors">
-            {heroSlides.map((_, i) => <button key={i} type="button" role="tab" aria-label={`Go to slide ${i + 1} of ${slideCount}`} aria-selected={i === currentSlide} onClick={() => setCurrentSlide(i)} className={`rounded-full transition-colors p-2 focus-visible:ring-2 focus-visible:ring-green-500 ${i === currentSlide ? "bg-green-600" : "bg-gray-400/70"}`}><span className="block w-1.5 h-1.5 min-w-[6px] min-h-[6px] rounded-full bg-inherit" /></button>)}
+            {heroSlides.map((_, i) => <button key={i} type="button" role="tab" aria-label={`Go to slide ${i + 1} of ${slideCount}`} aria-selected={i === currentSlide} onClick={() => setCurrentSlide(i)} className={`rounded-full transition-colors p-2 focus-visible:ring-2 focus-visible:ring-brand-500 ${i === currentSlide ? "bg-brand-600" : "bg-gray-400/70"}`}><span className="block w-1.5 h-1.5 min-w-[6px] min-h-[6px] rounded-full bg-inherit" /></button>)}
           </div>
         )}
         <HeroContentBelow waHref={waHref} trackCta={trackCta} location="hero_mobile" />
@@ -271,12 +271,12 @@ export default function HeroBlock({ heroSlides }: Props) {
       {/* Desktop indicators + arrows */}
       {slideCount > 1 && (
         <div className="hidden lg:flex absolute bottom-8 left-1/2 transform -translate-x-1/2 space-x-3 z-20" role="tablist" aria-label="Slide selectors">
-          {heroSlides.map((_, i) => <button key={i} type="button" role="tab" aria-label={`Go to slide ${i + 1} of ${slideCount}`} aria-selected={i === currentSlide} onClick={() => setCurrentSlide(i)} className={`w-4 h-4 rounded-full transition-all hover:scale-110 focus-visible:ring-2 focus-visible:ring-green-500 ${i === currentSlide ? "bg-green-400" : "bg-white/50 hover:bg-white/70"}`} />)}
+          {heroSlides.map((_, i) => <button key={i} type="button" role="tab" aria-label={`Go to slide ${i + 1} of ${slideCount}`} aria-selected={i === currentSlide} onClick={() => setCurrentSlide(i)} className={`w-4 h-4 rounded-full transition-all hover:scale-110 focus-visible:ring-2 focus-visible:ring-brand-500 ${i === currentSlide ? "bg-green-400" : "bg-white/50 hover:bg-white/70"}`} />)}
         </div>
       )}
       {slideCount > 1 && <>
-        <button type="button" aria-label="Previous banner" onClick={() => setCurrentSlide((p) => (p - 1 + slideCount) % slideCount)} className="hidden lg:block absolute left-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 focus-visible:ring-2 focus-visible:ring-green-500 text-white p-4 rounded-full transition-all"><ChevronLeft size={24} /></button>
-        <button type="button" aria-label="Next banner" onClick={() => setCurrentSlide((p) => (p + 1) % slideCount)} className="hidden lg:block absolute right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 focus-visible:ring-2 focus-visible:ring-green-500 text-white p-4 rounded-full transition-all"><ChevronRight size={24} /></button>
+        <button type="button" aria-label="Previous banner" onClick={() => setCurrentSlide((p) => (p - 1 + slideCount) % slideCount)} className="hidden lg:block absolute left-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 focus-visible:ring-2 focus-visible:ring-brand-500 text-white p-4 rounded-full transition-all"><ChevronLeft size={24} /></button>
+        <button type="button" aria-label="Next banner" onClick={() => setCurrentSlide((p) => (p + 1) % slideCount)} className="hidden lg:block absolute right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 focus-visible:ring-2 focus-visible:ring-brand-500 text-white p-4 rounded-full transition-all"><ChevronRight size={24} /></button>
       </>}
     </section>
   )

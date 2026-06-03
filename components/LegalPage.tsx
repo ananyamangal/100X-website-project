@@ -1,4 +1,4 @@
-import Link from "next/link"
+﻿import Link from "next/link"
 
 /**
  * Block types for legal-page sections. Constrained on purpose: legal
@@ -124,7 +124,7 @@ export default function LegalPage({
         </div>
 
         <p className="mt-12 pt-8 border-t border-gray-200">
-          <Link href="/" className="text-green-600 font-medium hover:underline">
+          <Link href="/" className="text-brand-600 font-medium hover:underline">
             ← Back to Home
           </Link>
         </p>

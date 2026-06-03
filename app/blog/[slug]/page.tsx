@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Calendar, ChevronLeft, User } from "lucide-react"
@@ -187,9 +187,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <div className="container mx-auto px-4 py-8 md:py-12">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm text-gray-500 mb-6 max-w-3xl mx-auto">
-          <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
+          <Link href="/" className="hover:text-brand-600 transition-colors">Home</Link>
           <span aria-hidden>/</span>
-          <Link href="/blog" className="hover:text-green-600 transition-colors">Blog</Link>
+          <Link href="/blog" className="hover:text-brand-600 transition-colors">Blog</Link>
           <span aria-hidden>/</span>
           <span className="text-gray-700 line-clamp-1">{title}</span>
         </nav>
@@ -199,7 +199,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* Meta row */}
             <div className="flex flex-wrap items-center gap-3 mb-5 text-gray-500 text-sm">
               {category ? (
-                <Badge className="bg-green-600 hover:bg-green-700 text-white text-xs font-medium">
+                <Badge className="bg-brand-600 hover:bg-brand-700 text-white text-xs font-medium">
                   {category}
                 </Badge>
               ) : null}
@@ -228,7 +228,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             {/* Main content */}
             {content ? (
-              <div className="blog-body text-base md:text-[1.0625rem] text-gray-800 leading-[1.8] space-y-5 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-10 [&_h2]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-gray-900 [&_h3]:mt-8 [&_h3]:mb-3 [&_p]:mb-4 [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:pl-6 [&_ol]:space-y-2 [&_li]:leading-relaxed [&_strong]:font-semibold [&_strong]:text-gray-900 [&_a]:text-green-700 [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-green-600 [&_blockquote]:border-l-4 [&_blockquote]:border-green-500 [&_blockquote]:pl-5 [&_blockquote]:text-gray-600 [&_blockquote]:italic [&_blockquote]:my-6">
+              <div className="blog-body text-base md:text-[1.0625rem] text-gray-800 leading-[1.8] space-y-5 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-10 [&_h2]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-gray-900 [&_h3]:mt-8 [&_h3]:mb-3 [&_p]:mb-4 [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:pl-6 [&_ol]:space-y-2 [&_li]:leading-relaxed [&_strong]:font-semibold [&_strong]:text-gray-900 [&_a]:text-brand-700 [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-brand-600 [&_blockquote]:border-l-4 [&_blockquote]:border-green-500 [&_blockquote]:pl-5 [&_blockquote]:text-gray-600 [&_blockquote]:italic [&_blockquote]:my-6">
                 <RichContent html={content} />
               </div>
             ) : null}
@@ -256,8 +256,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* Author footer + back link */}
             <div className="mt-12 pt-8 border-t border-gray-200 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 bg-green-100 rounded-full flex items-center justify-center shrink-0" aria-hidden>
-                  <span className="text-green-700 font-bold text-base">{blogFirstChar(author)}</span>
+                <div className="w-11 h-11 bg-brand-100 rounded-full flex items-center justify-center shrink-0" aria-hidden>
+                  <span className="text-brand-700 font-bold text-base">{blogFirstChar(author)}</span>
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900 text-sm">{author}</p>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import AiSummaryBlock from "@/components/seo/AiSummaryBlock"
@@ -49,7 +49,7 @@ export default function AiAbout100xPage() {
       />
       <main className="max-w-4xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
           <span>AI Company Profile</span>
         </nav>
@@ -217,7 +217,7 @@ export default function AiAbout100xPage() {
               "/api/mcp",
             ].map((path) => (
               <li key={path}>
-                <a href={`${SITE_URL}${path}`} className="text-green-600 hover:underline">
+                <a href={`${SITE_URL}${path}`} className="text-brand-600 hover:underline">
                   {SITE_URL}{path}
                 </a>
               </li>

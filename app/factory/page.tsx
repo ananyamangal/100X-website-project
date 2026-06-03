@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { AI_FACTORY, AI_CERTIFICATIONS } from "@/lib/ai/knowledge"
@@ -72,9 +72,9 @@ export default function FactoryPage() {
       />
       <main className="max-w-4xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/about" className="hover:text-green-600">About</Link>
+          <Link href="/about" className="hover:text-brand-600">About</Link>
           <span className="mx-2">/</span>
           <span>Factory</span>
         </nav>
@@ -112,7 +112,7 @@ export default function FactoryPage() {
                 href={`https://maps.google.com/?q=${AI_FACTORY.location.coordinates.latitude},${AI_FACTORY.location.coordinates.longitude}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col items-center gap-2 text-gray-600 hover:text-green-600"
+                className="flex flex-col items-center gap-2 text-gray-600 hover:text-brand-600"
               >
                 <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -146,7 +146,7 @@ export default function FactoryPage() {
           <ol className="space-y-3">
             {AI_FACTORY.processes.map((p, i) => (
               <li key={p} className="flex gap-4 text-sm">
-                <span className="flex-shrink-0 w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                <span className="flex-shrink-0 w-7 h-7 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
                   {i + 1}
                 </span>
                 <span className="text-gray-700 pt-1">{p}</span>
@@ -200,14 +200,14 @@ export default function FactoryPage() {
         </section>
 
         {/* Visit / Contact */}
-        <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-sm">
-          <h2 className="font-semibold text-green-800 mb-2">Visit the Factory or Request a Demo</h2>
-          <p className="text-green-700 mb-3">
+        <div className="bg-brand-50 border border-brand-200 rounded-xl p-5 text-sm">
+          <h2 className="font-semibold text-brand-800 mb-2">Visit the Factory or Request a Demo</h2>
+          <p className="text-brand-700 mb-3">
             Government procurement officers and institutional buyers are welcome to visit the
             factory at IMT Manesar for product demonstrations. Please call or email in advance
             to schedule.
           </p>
-          <div className="flex flex-wrap gap-4 text-green-800 font-medium">
+          <div className="flex flex-wrap gap-4 text-brand-800 font-medium">
             <span>📞 +91-7827229116</span>
             <span>✉ 100xcircle@gmail.com</span>
             <a

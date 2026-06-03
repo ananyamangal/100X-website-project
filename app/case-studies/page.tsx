@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import clientPromise from "@/lib/mongodb"
@@ -177,7 +177,7 @@ export default async function CaseStudiesPage() {
                 <Link
                   key={String(s._id)}
                   href={`/case-studies/${s.slug}`}
-                  className="group bg-white rounded-xl border border-green-100 shadow-sm p-5 hover:shadow-md transition-shadow"
+                  className="group bg-white rounded-xl border border-brand-100 shadow-sm p-5 hover:shadow-md transition-shadow"
                 >
                   {s.isSample && (
                     <span className="inline-block mb-2 text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
@@ -185,13 +185,13 @@ export default async function CaseStudiesPage() {
                     </span>
                   )}
                   <div className="flex gap-2 mb-2 flex-wrap">
-                    {s.industry && <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">{s.industry}</span>}
+                    {s.industry && <span className="text-xs bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full">{s.industry}</span>}
                     {s.state && <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">{s.state}</span>}
                   </div>
-                  <h3 className="font-bold text-gray-900 text-base group-hover:text-green-700 transition-colors">{s.title}</h3>
+                  <h3 className="font-bold text-gray-900 text-base group-hover:text-brand-700 transition-colors">{s.title}</h3>
                   {s.customer && <p className="text-xs text-gray-500 mt-1">{s.customer}</p>}
                   {s.problem && <p className="text-xs text-gray-600 mt-2 line-clamp-2">{s.problem}</p>}
-                  <p className="text-green-600 text-xs font-semibold mt-3">Read full case study →</p>
+                  <p className="text-brand-600 text-xs font-semibold mt-3">Read full case study →</p>
                 </Link>
               ))}
             </div>
@@ -208,7 +208,7 @@ export default async function CaseStudiesPage() {
             >
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                  <span className="text-xs bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full">
                     {cs.type}
                   </span>
                   <h2 className="text-lg font-bold text-gray-900 mt-2">{cs.title}</h2>

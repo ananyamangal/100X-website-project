@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation"
+﻿import { notFound } from "next/navigation"
 import Link from "next/link"
 import type { Metadata } from "next"
 import clientPromise from "@/lib/mongodb"
@@ -48,9 +48,9 @@ export default async function CaseStudyDetailPage({ params }: { params: { slug: 
   return (
     <main className="max-w-3xl mx-auto px-4 py-16 pt-28">
       <nav className="text-sm text-gray-500 mb-6">
-        <Link href="/" className="hover:text-green-600">Home</Link>
+        <Link href="/" className="hover:text-brand-600">Home</Link>
         <span className="mx-2">/</span>
-        <Link href="/case-studies" className="hover:text-green-600">Case Studies</Link>
+        <Link href="/case-studies" className="hover:text-brand-600">Case Studies</Link>
         <span className="mx-2">/</span>
         <span className="truncate">{cs.title}</span>
       </nav>
@@ -62,14 +62,14 @@ export default async function CaseStudyDetailPage({ params }: { params: { slug: 
       )}
 
       <div className="flex flex-wrap gap-2 mb-4">
-        {cs.industry && <span className="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-full font-medium">{cs.industry}</span>}
+        {cs.industry && <span className="text-xs bg-brand-50 text-brand-700 px-3 py-1 rounded-full font-medium">{cs.industry}</span>}
         {cs.state && <span className="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">{cs.state}</span>}
         {cs.city && <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">{cs.city}</span>}
       </div>
 
       <h1 className="text-3xl font-bold text-gray-900 mb-2">{cs.title}</h1>
       {cs.customer && (
-        <p className="text-green-700 font-medium mb-6">{cs.customer}
+        <p className="text-brand-700 font-medium mb-6">{cs.customer}
           {cs.department ? ` — ${cs.department}` : ""}
         </p>
       )}
@@ -144,7 +144,7 @@ export default async function CaseStudyDetailPage({ params }: { params: { slug: 
                   </div>
                 )
               }
-              return <a key={i} href={url} className="text-green-600 underline text-sm">Video {i + 1}</a>
+              return <a key={i} href={url} className="text-brand-600 underline text-sm">Video {i + 1}</a>
             })}
           </div>
         </section>
@@ -152,7 +152,7 @@ export default async function CaseStudyDetailPage({ params }: { params: { slug: 
 
       {/* Downloadable PDF */}
       {cs.pdfUrl && (
-        <div className="mt-6 p-4 bg-green-50 rounded-xl flex items-center justify-between">
+        <div className="mt-6 p-4 bg-brand-50 rounded-xl flex items-center justify-between">
           <div>
             <p className="font-medium text-gray-900 text-sm">Download Case Study</p>
             <p className="text-xs text-gray-500">Full report available as PDF</p>
@@ -161,7 +161,7 @@ export default async function CaseStudyDetailPage({ params }: { params: { slug: 
             href={cs.pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            className="bg-brand-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors"
           >
             Download PDF
           </a>

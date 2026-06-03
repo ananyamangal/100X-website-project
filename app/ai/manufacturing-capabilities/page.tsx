@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import AiSummaryBlock from "@/components/seo/AiSummaryBlock"
@@ -36,9 +36,9 @@ export default function AiManufacturingCapabilitiesPage() {
       />
       <main className="max-w-4xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/ai/about-100x" className="hover:text-green-600">Company Profile</Link>
+          <Link href="/ai/about-100x" className="hover:text-brand-600">Company Profile</Link>
           <span className="mx-2">/</span>
           <span>Manufacturing Capabilities</span>
         </nav>

@@ -1,4 +1,4 @@
-import Link from "next/link"
+﻿import Link from "next/link"
 
 export default function PolicyPlaceholder({
   title,
@@ -17,7 +17,7 @@ export default function PolicyPlaceholder({
           replace this placeholder when your legal copy is ready.
         </p>
         <p className="mt-8">
-          <Link href="/" className="text-green-600 font-medium hover:underline">
+          <Link href="/" className="text-brand-600 font-medium hover:underline">
             ← Back to Home
           </Link>
         </p>

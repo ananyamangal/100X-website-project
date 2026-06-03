@@ -1,4 +1,4 @@
-import Link from "next/link"
+﻿import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { getRelatedProducts } from "@/lib/productsQuery"
 
@@ -31,7 +31,7 @@ export default async function RelatedProductsSection({
       <div className="container mx-auto px-4">
         <div className="flex items-end justify-between mb-6 md:mb-8">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-green-700">
+            <p className="text-sm font-semibold uppercase tracking-wider text-brand-700">
               {category ?? "More from 100x Circle"}
             </p>
             <h2
@@ -43,7 +43,7 @@ export default async function RelatedProductsSection({
           </div>
           <Link
             href="/products"
-            className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-green-700 hover:text-green-800"
+            className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-800"
           >
             View all products
             <ArrowRight size={16} aria-hidden="true" />
@@ -57,7 +57,7 @@ export default async function RelatedProductsSection({
               <li key={p.id}>
                 <Link
                   href={`/products/${p.slug || p.id}`}
-                  className="group block bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  className="group block bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                 >
                   <div className="aspect-[4/3] bg-gray-100 overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -76,7 +76,7 @@ export default async function RelatedProductsSection({
                     {p.priceRange ? (
                       <p className="mt-1 text-sm text-gray-600">{p.priceRange}</p>
                     ) : null}
-                    <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-green-700">
+                    <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-700">
                       View details
                       <ArrowRight
                         size={14}

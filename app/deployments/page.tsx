@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import clientPromise from "@/lib/mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
@@ -57,7 +57,7 @@ export default async function DeploymentsPage() {
             </div>
             <p className="text-xl mb-2">Deployments coming soon</p>
             <p className="text-sm">We are documenting our field deployments. Check back soon.</p>
-            <Link href="/contact-us" className="mt-6 inline-block bg-green-600 text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-green-700 transition-colors">
+            <Link href="/contact-us" className="mt-6 inline-block bg-brand-600 text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-brand-700 transition-colors">
               Contact Us
             </Link>
           </div>
@@ -85,7 +85,7 @@ export default async function DeploymentsPage() {
                 <div className="p-5">
                   <div className="flex flex-wrap gap-2 mb-3">
                     {d.department && (
-                      <span className="text-xs bg-green-50 text-green-700 px-2.5 py-0.5 rounded-full font-medium">
+                      <span className="text-xs bg-brand-50 text-brand-700 px-2.5 py-0.5 rounded-full font-medium">
                         {d.department}
                       </span>
                     )}

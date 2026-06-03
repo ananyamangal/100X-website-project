@@ -1,4 +1,4 @@
-import type { ComparisonRow } from "@/lib/seo/landing-types"
+﻿import type { ComparisonRow } from "@/lib/seo/landing-types"
 import SectionHeader from "./SectionHeader"
 
 type Props = {
@@ -63,7 +63,7 @@ export default function ComparisonTableBlock({
                         key={ci}
                         className={
                           highlighted
-                            ? "px-5 py-4 align-top font-semibold text-green-700 [[data-theme=dark-industrial]_&]:text-green-400"
+                            ? "px-5 py-4 align-top font-semibold text-brand-700 [[data-theme=dark-industrial]_&]:text-brand-400"
                             : "px-5 py-4 align-top text-gray-700 [[data-theme=dark-industrial]_&]:text-slate-200"
                         }
                       >

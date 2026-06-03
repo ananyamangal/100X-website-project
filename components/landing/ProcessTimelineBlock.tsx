@@ -1,4 +1,4 @@
-import type { ProcessStep } from "@/lib/seo/landing-types"
+﻿import type { ProcessStep } from "@/lib/seo/landing-types"
 import SectionHeader from "./SectionHeader"
 
 type Props = {
@@ -24,7 +24,7 @@ export default function ProcessTimelineBlock({ eyebrow, title, steps }: Props) {
           />
           {steps.map((step, i) => (
             <li key={i} className="relative flex gap-5 py-4">
-              <span className="relative z-[1] grid place-items-center w-[52px] h-[52px] shrink-0 rounded-full border-2 border-green-600 bg-white text-green-700 font-bold text-lg [[data-theme=dark-industrial]_&]:bg-slate-900 [[data-theme=dark-industrial]_&]:text-green-400 [[data-theme=dark-industrial]_&]:border-green-500">
+              <span className="relative z-[1] grid place-items-center w-[52px] h-[52px] shrink-0 rounded-full border-2 border-brand-600 bg-white text-brand-700 font-bold text-lg [[data-theme=dark-industrial]_&]:bg-slate-900 [[data-theme=dark-industrial]_&]:text-brand-400 [[data-theme=dark-industrial]_&]:border-green-500">
                 {i + 1}
               </span>
               <div className="pt-1">

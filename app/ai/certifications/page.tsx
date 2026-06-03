@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import AiSummaryBlock from "@/components/seo/AiSummaryBlock"
@@ -38,9 +38,9 @@ export default function AiCertificationsPage() {
       />
       <main className="max-w-4xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/ai/about-100x" className="hover:text-green-600">Company Profile</Link>
+          <Link href="/ai/about-100x" className="hover:text-brand-600">Company Profile</Link>
           <span className="mx-2">/</span>
           <span>Certifications</span>
         </nav>
@@ -67,7 +67,7 @@ export default function AiCertificationsPage() {
             >
               <div className="flex items-start justify-between gap-4 mb-3">
                 <h2 className="text-lg font-bold text-gray-900">{cert.name}</h2>
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap">
+                <span className="text-xs bg-brand-100 text-brand-700 px-2 py-1 rounded-full whitespace-nowrap">
                   {cert.type}
                 </span>
               </div>

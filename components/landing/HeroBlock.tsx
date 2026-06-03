@@ -1,4 +1,4 @@
-import Link from "next/link"
+﻿import Link from "next/link"
 import { ArrowRight, MessageCircle } from "lucide-react"
 import type {
   HeroAccent,
@@ -15,7 +15,7 @@ type Props = {
 const ACCENT_CLASS: Record<HeroAccent, string> = {
   default: "",
   green:
-    "text-green-700 [[data-theme=dark-industrial]_&]:text-green-400",
+    "text-brand-700 [[data-theme=dark-industrial]_&]:text-brand-400",
   yellow:
     "text-amber-600 [[data-theme=dark-industrial]_&]:text-yellow-300",
 }
@@ -60,8 +60,8 @@ export default function HeroBlock({ hero, theme }: Props) {
           <span
             className={
               isDark
-                ? "inline-flex items-center gap-2 rounded-full border border-green-500/40 bg-green-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-green-300 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500"
-                : "inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-green-700"
+                ? "inline-flex items-center gap-2 rounded-full border border-green-500/40 bg-brand-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-green-300 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500"
+                : "inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-brand-700"
             }
           >
             {isDark ? (
@@ -102,8 +102,8 @@ export default function HeroBlock({ hero, theme }: Props) {
                 data-gtm={hero.primary.track ?? "hero_primary"}
                 className={
                   isDark
-                    ? "inline-flex items-center gap-2 rounded-lg bg-green-500 px-7 py-3.5 text-base font-semibold text-black shadow-[0_4px_24px_rgba(0,200,83,0.3)] transition-all hover:-translate-y-0.5 hover:bg-green-400 hover:shadow-[0_8px_32px_rgba(0,200,83,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
-                    : "inline-flex items-center gap-2 rounded-lg bg-green-600 px-7 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
+                    ? "inline-flex items-center gap-2 rounded-lg bg-brand-500 px-7 py-3.5 text-base font-semibold text-black shadow-[0_4px_24px_rgba(0,200,83,0.3)] transition-all hover:-translate-y-0.5 hover:bg-green-400 hover:shadow-[0_8px_32px_rgba(0,200,83,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
+                    : "inline-flex items-center gap-2 rounded-lg bg-brand-600 px-7 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
                 }
               >
                 {hero.primary.label}
@@ -120,7 +120,7 @@ export default function HeroBlock({ hero, theme }: Props) {
                 className={
                   isDark
                     ? "inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 text-base font-semibold text-white shadow-[0_4px_24px_rgba(37,211,102,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(37,211,102,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
-                    : "inline-flex items-center gap-2 rounded-lg border-2 border-green-600 px-6 py-3.5 text-base font-semibold text-green-700 transition-colors hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                    : "inline-flex items-center gap-2 rounded-lg border-2 border-brand-600 px-6 py-3.5 text-base font-semibold text-brand-700 transition-colors hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                 }
               >
                 <MessageCircle size={18} aria-hidden="true" />

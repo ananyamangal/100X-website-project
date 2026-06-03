@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React from "react"
 
@@ -14,7 +14,7 @@ export default function SectionConnector({ text, eyebrow }: Props) {
     <div className="bg-white py-6 md:py-8" aria-hidden="true">
       <div className="container mx-auto px-4 max-w-3xl text-center">
         {eyebrow && (
-          <p className="text-xs md:text-sm uppercase tracking-widest text-green-700 font-semibold mb-2">
+          <p className="text-xs md:text-sm uppercase tracking-widest text-brand-700 font-semibold mb-2">
             {eyebrow}
           </p>
         )}

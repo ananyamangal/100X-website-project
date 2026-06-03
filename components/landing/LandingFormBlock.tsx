@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
@@ -159,7 +159,7 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
       <div className="container mx-auto px-4 max-w-5xl grid md:grid-cols-2 gap-10 md:gap-14 items-start">
         <div>
           {block.eyebrow ? (
-            <p className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.15em] text-green-700 mb-3 [[data-theme=dark-industrial]_&]:text-green-400">
+            <p className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.15em] text-brand-700 mb-3 [[data-theme=dark-industrial]_&]:text-brand-400">
               {block.eyebrow}
             </p>
           ) : null}
@@ -180,7 +180,7 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
                 >
                   <span
                     aria-hidden="true"
-                    className="mt-0.5 inline-grid h-5 w-5 place-items-center rounded-full bg-green-600 text-white text-xs font-bold [[data-theme=dark-industrial]_&]:bg-green-500 [[data-theme=dark-industrial]_&]:text-black"
+                    className="mt-0.5 inline-grid h-5 w-5 place-items-center rounded-full bg-brand-600 text-white text-xs font-bold [[data-theme=dark-industrial]_&]:bg-brand-500 [[data-theme=dark-industrial]_&]:text-black"
                   >
                     ✓
                   </span>
@@ -208,7 +208,7 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
                   className="text-[11px] font-semibold uppercase tracking-wider text-gray-600 [[data-theme=dark-industrial]_&]:text-slate-400"
                 >
                   {f.label}
-                  {f.required ? <span aria-hidden="true" className="text-green-700"> *</span> : null}
+                  {f.required ? <span aria-hidden="true" className="text-brand-700"> *</span> : null}
                 </label>
                 {f.type === "select" ? (
                   <select
@@ -218,7 +218,7 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
                     value={values[f.name] || ""}
                     onChange={(e) => update(f.name, e.target.value)}
                     disabled={submitting}
-                    className="rounded-md border border-gray-300 bg-white px-3.5 py-3 text-base text-gray-900 outline-none focus:border-green-600 focus:ring-2 focus:ring-green-200 disabled:opacity-60 [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:bg-white/5 [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:focus:border-green-500 [[data-theme=dark-industrial]_&]:focus:ring-green-500/30"
+                    className="rounded-md border border-gray-300 bg-white px-3.5 py-3 text-base text-gray-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-green-200 disabled:opacity-60 [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:bg-white/5 [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:focus:border-green-500 [[data-theme=dark-industrial]_&]:focus:ring-brand-500/30"
                   >
                     <option value="">Select…</option>
                     {f.options?.map((o) => (
@@ -239,7 +239,7 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
                     value={values[f.name] || ""}
                     onChange={(e) => update(f.name, e.target.value)}
                     disabled={submitting}
-                    className="min-h-[48px] rounded-md border border-gray-300 bg-white px-3.5 py-3 text-base text-gray-900 outline-none placeholder:text-gray-400 focus:border-green-600 focus:ring-2 focus:ring-green-200 disabled:opacity-60 [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:bg-white/5 [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:placeholder:text-slate-500 [[data-theme=dark-industrial]_&]:focus:border-green-500 [[data-theme=dark-industrial]_&]:focus:ring-green-500/30"
+                    className="min-h-[48px] rounded-md border border-gray-300 bg-white px-3.5 py-3 text-base text-gray-900 outline-none placeholder:text-gray-400 focus:border-brand-600 focus:ring-2 focus:ring-green-200 disabled:opacity-60 [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:bg-white/5 [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:placeholder:text-slate-500 [[data-theme=dark-industrial]_&]:focus:border-green-500 [[data-theme=dark-industrial]_&]:focus:ring-brand-500/30"
                   />
                 )}
               </div>
@@ -256,7 +256,7 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
             type="submit"
             disabled={submitting}
             data-gtm={`landing_form_submit_${block.variant}`}
-            className="col-span-2 mt-1 inline-flex items-center justify-center gap-2 rounded-md bg-green-600 px-6 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-green-700 disabled:opacity-60 disabled:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2 [[data-theme=dark-industrial]_&]:bg-green-500 [[data-theme=dark-industrial]_&]:text-black [[data-theme=dark-industrial]_&]:hover:bg-green-400 [[data-theme=dark-industrial]_&]:focus-visible:ring-green-300"
+            className="col-span-2 mt-1 inline-flex items-center justify-center gap-2 rounded-md bg-brand-600 px-6 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-brand-700 disabled:opacity-60 disabled:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2 [[data-theme=dark-industrial]_&]:bg-brand-500 [[data-theme=dark-industrial]_&]:text-black [[data-theme=dark-industrial]_&]:hover:bg-green-400 [[data-theme=dark-industrial]_&]:focus-visible:ring-green-300"
           >
             {submitting ? (
               <>

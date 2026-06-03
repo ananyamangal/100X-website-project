@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 
@@ -136,7 +136,7 @@ const ENTITIES = [
     id: "organization",
     label: "100X Circle Pvt Ltd",
     type: "Organization + Manufacturer",
-    color: "bg-green-600",
+    color: "bg-brand-600",
     links: ["factory", "cert-iso9001", "cert-ce", "cert-msme", "cert-gem", "product-thermal", "product-vehicle", "product-portable", "product-agri"],
     facts: ["Founded 2014", "Gurugram, Haryana", "ISO 9001:2015", "GeM MSME OEM"],
   },
@@ -215,9 +215,9 @@ export default function EntityGraphPage() {
       />
       <main className="max-w-5xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/ai/about-100x" className="hover:text-green-600">AI Profile</Link>
+          <Link href="/ai/about-100x" className="hover:text-brand-600">AI Profile</Link>
           <span className="mx-2">/</span>
           <span>Entity Graph</span>
         </nav>
@@ -274,7 +274,7 @@ export default function EntityGraphPage() {
             <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">@id</code> references
             enabling AI knowledge graph systems to resolve and link entities.
           </p>
-          <div className="bg-gray-900 text-green-400 rounded-xl p-4 text-xs font-mono overflow-x-auto">
+          <div className="bg-gray-900 text-brand-400 rounded-xl p-4 text-xs font-mono overflow-x-auto">
             <pre>{JSON.stringify({ "@context": "https://schema.org", "@graph": "... " + ENTITY_GRAPH["@graph"].length + " entities with @id references" }, null, 2)}</pre>
           </div>
         </section>
@@ -326,7 +326,7 @@ export default function EntityGraphPage() {
           <ul className="space-y-1 font-mono text-xs text-gray-600">
             {["/api/ai/company", "/api/ai/products", "/api/ai/certifications", "/api/mcp"].map((path) => (
               <li key={path}>
-                <Link href={path} className="text-green-600 hover:underline">
+                <Link href={path} className="text-brand-600 hover:underline">
                   {SITE_URL}{path}
                 </Link>
               </li>

@@ -1,4 +1,4 @@
-import type { TrustMetric } from "@/lib/seo/landing-types"
+﻿import type { TrustMetric } from "@/lib/seo/landing-types"
 
 type Props = {
   metrics: TrustMetric[]
@@ -20,7 +20,7 @@ export default function TrustStripBlock({ metrics }: Props) {
         <ul className="flex flex-wrap justify-center gap-x-10 gap-y-6 list-none">
           {metrics.map((m, i) => (
             <li key={i} className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-green-700 tracking-tight [[data-theme=dark-industrial]_&]:text-green-400">
+              <div className="text-2xl md:text-3xl font-bold text-brand-700 tracking-tight [[data-theme=dark-industrial]_&]:text-brand-400">
                 {m.value}
               </div>
               <div className="mt-1 text-[11px] md:text-xs font-semibold uppercase tracking-wider text-gray-500 [[data-theme=dark-industrial]_&]:text-slate-400">

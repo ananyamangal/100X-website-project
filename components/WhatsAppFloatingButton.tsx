@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
@@ -108,11 +108,11 @@ export default function WhatsAppFloatingButton({
         )}
         role="tooltip"
       >
-        <div className="font-semibold text-green-700">Chat on WhatsApp</div>
+        <div className="font-semibold text-brand-700">Chat on WhatsApp</div>
         <div className="mt-1 tabular-nums text-gray-700">{displayPhone}</div>
         <a
           href={telHref}
-          className="mt-2 inline-block text-sm font-medium text-green-600 underline decoration-green-600/40 underline-offset-2 hover:text-green-700"
+          className="mt-2 inline-block text-sm font-medium text-brand-600 underline decoration-green-600/40 underline-offset-2 hover:text-brand-700"
           data-gtm="tel_fallback_float_whatsapp"
           data-gtm-location="floating_whatsapp_tooltip"
         >

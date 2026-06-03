@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import { Loader2, X } from "lucide-react"
@@ -160,7 +160,7 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
                 {copy.modalTitle}
               </h3>
               {productName ? (
-                <p className="mt-1 text-sm font-medium text-green-700">{productName}</p>
+                <p className="mt-1 text-sm font-medium text-brand-700">{productName}</p>
               ) : (
                 <p className="mt-1 text-sm text-gray-600">
                   Share your details — we'll call you back.
@@ -170,7 +170,7 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
             <button
               type="button"
               aria-label="Close quote form"
-              className="-mr-2 -mt-2 rounded-md p-2 text-gray-500 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+              className="-mr-2 -mt-2 rounded-md p-2 text-gray-500 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
               onClick={onClose}
               disabled={submitting}
             >
@@ -250,7 +250,7 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
 
             <Button
               type="submit"
-              className="w-full bg-green-600 hover:bg-green-700 min-h-[48px] text-base font-semibold"
+              className="w-full bg-brand-600 hover:bg-brand-700 min-h-[48px] text-base font-semibold"
               disabled={submitting}
             >
               {submitting ? (

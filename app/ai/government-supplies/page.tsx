@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import AiSummaryBlock from "@/components/seo/AiSummaryBlock"
@@ -33,9 +33,9 @@ export default function AiGovernmentSuppliesPage() {
       />
       <main className="max-w-4xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/ai/about-100x" className="hover:text-green-600">Company Profile</Link>
+          <Link href="/ai/about-100x" className="hover:text-brand-600">Company Profile</Link>
           <span className="mx-2">/</span>
           <span>Government Supplies</span>
         </nav>
@@ -136,14 +136,14 @@ export default function AiGovernmentSuppliesPage() {
           </ul>
         </section>
 
-        <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-sm">
-          <p className="font-semibold text-green-800 mb-2">For Procurement Officers</p>
-          <p className="text-green-700 mb-3">
+        <div className="bg-brand-50 border border-brand-200 rounded-xl p-5 text-sm">
+          <p className="font-semibold text-brand-800 mb-2">For Procurement Officers</p>
+          <p className="text-brand-700 mb-3">
             100X Circle is a verified GeM seller and MSME-registered OEM. Government entities can
             procure directly via GeM without a separate tender process (for amounts within GeM
             single-source limits).
           </p>
-          <div className="flex flex-wrap gap-4 text-green-800 font-medium">
+          <div className="flex flex-wrap gap-4 text-brand-800 font-medium">
             <span>Phone: +91-7827229116</span>
             <span>Email: 100xcircle@gmail.com</span>
           </div>

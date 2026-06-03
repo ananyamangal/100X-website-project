@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useCallback, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -335,7 +335,7 @@ export default function RFQForm({
               type="button"
               onClick={() => setShowOptional((v) => !v)}
               aria-expanded={showOptional}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 hover:text-green-800"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 hover:text-brand-800"
             >
               <ChevronDown
                 size={14}
@@ -384,7 +384,7 @@ export default function RFQForm({
                     handleFile(e.dataTransfer.files?.[0])
                   }}
                   onClick={() => fileInputRef.current?.click()}
-                  className="mt-1 cursor-pointer rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/60 px-4 py-4 text-center hover:border-green-600 hover:bg-green-50/40 transition-colors"
+                  className="mt-1 cursor-pointer rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/60 px-4 py-4 text-center hover:border-brand-600 hover:bg-brand-50/40 transition-colors"
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
@@ -402,7 +402,7 @@ export default function RFQForm({
                     </span>
                   ) : uploaded ? (
                     <span className="inline-flex items-center gap-2 text-sm text-gray-800">
-                      <FileText size={16} className="text-green-700" aria-hidden="true" />
+                      <FileText size={16} className="text-brand-700" aria-hidden="true" />
                       <span className="font-medium truncate max-w-[14rem]">{uploaded.name}</span>
                       <button
                         type="button"
@@ -444,7 +444,7 @@ export default function RFQForm({
 
       <Button
         type="submit"
-        className="w-full bg-green-600 hover:bg-green-700 min-h-[48px] text-base font-semibold shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full bg-brand-600 hover:bg-brand-700 min-h-[48px] text-base font-semibold shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
         disabled={submitting || uploading || !product}
       >
         {submitting ? (

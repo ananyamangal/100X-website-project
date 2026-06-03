@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import React, { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Download, MessageCircle, Star } from 'lucide-react'
@@ -111,7 +111,7 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
             href={wa}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 hover:border-[#25D366] hover:bg-green-50 text-gray-500 hover:[color:#25D366] transition-all shrink-0"
+            className="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 hover:border-[#25D366] hover:bg-brand-50 text-gray-500 hover:[color:#25D366] transition-all shrink-0"
             aria-label="Enquire on WhatsApp"
           >
             <MessageCircle size={15} />

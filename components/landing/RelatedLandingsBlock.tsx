@@ -1,4 +1,4 @@
-import Link from "next/link"
+﻿import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import {
   getAllLandingPages,
@@ -67,13 +67,13 @@ export default function RelatedLandingsBlock({
             <li key={item.slug}>
               <Link
                 href={`/${item.slug}`}
-                className="group flex h-full items-start justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 [[data-theme=dark-industrial]_&]:bg-white/[0.04] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:hover:border-green-500/40"
+                className="group flex h-full items-start justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 [[data-theme=dark-industrial]_&]:bg-white/[0.04] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:hover:border-green-500/40"
               >
                 <div>
-                  <span className="inline-block mb-2 text-[11px] font-semibold uppercase tracking-wider text-green-700 [[data-theme=dark-industrial]_&]:text-green-400">
+                  <span className="inline-block mb-2 text-[11px] font-semibold uppercase tracking-wider text-brand-700 [[data-theme=dark-industrial]_&]:text-brand-400">
                     {item.type.replace("-", " ")}
                   </span>
-                  <h3 className="text-base md:text-lg font-bold text-gray-900 group-hover:text-green-700 transition-colors [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:group-hover:text-green-400">
+                  <h3 className="text-base md:text-lg font-bold text-gray-900 group-hover:text-brand-700 transition-colors [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:group-hover:text-brand-400">
                     {item.title}
                   </h3>
                   <p className="mt-1 text-sm text-gray-600 line-clamp-2 [[data-theme=dark-industrial]_&]:text-slate-300">
@@ -83,7 +83,7 @@ export default function RelatedLandingsBlock({
                 <ArrowRight
                   size={20}
                   aria-hidden="true"
-                  className="mt-1 shrink-0 text-green-600 transition-transform group-hover:translate-x-0.5 [[data-theme=dark-industrial]_&]:text-green-400"
+                  className="mt-1 shrink-0 text-brand-600 transition-transform group-hover:translate-x-0.5 [[data-theme=dark-industrial]_&]:text-brand-400"
                 />
               </Link>
             </li>

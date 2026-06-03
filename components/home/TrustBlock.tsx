@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect } from "react"
 import useEmblaCarousel from "embla-carousel-react"
@@ -74,7 +74,7 @@ function ReviewsCarousel() {
               className="basis-full md:basis-1/2 lg:basis-1/3 shrink-0 grow-0 pl-4 md:pl-6"
             >
               <Card className="h-full border border-gray-200 shadow-sm p-7 md:p-8 flex flex-col">
-                <Quote className="text-green-600/70 mb-4" size={24} aria-hidden="true" />
+                <Quote className="text-brand-600/70 mb-4" size={24} aria-hidden="true" />
                 <p className="text-base text-gray-700 leading-relaxed line-clamp-6 italic flex-1">
                   "{review.review}"
                 </p>
@@ -109,7 +109,7 @@ function ReviewsCarousel() {
               onClick={() => embla?.scrollTo(i)}
               className={
                 selected === i
-                  ? "h-1.5 w-6 rounded-full bg-green-600 transition-all"
+                  ? "h-1.5 w-6 rounded-full bg-brand-600 transition-all"
                   : "h-1.5 w-1.5 rounded-full bg-gray-300 transition-all hover:bg-gray-400"
               }
             />
@@ -121,7 +121,7 @@ function ReviewsCarousel() {
             aria-label="Previous review"
             disabled={!canPrev}
             onClick={() => embla?.scrollPrev()}
-            className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white text-gray-700 transition-all hover:border-green-600 hover:text-green-700 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white text-gray-700 transition-all hover:border-brand-600 hover:text-brand-700 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           >
             <ChevronLeft size={18} aria-hidden="true" />
           </button>
@@ -130,7 +130,7 @@ function ReviewsCarousel() {
             aria-label="Next review"
             disabled={!canNext}
             onClick={() => embla?.scrollNext()}
-            className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white text-gray-700 transition-all hover:border-green-600 hover:text-green-700 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white text-gray-700 transition-all hover:border-brand-600 hover:text-brand-700 disabled:opacity-40 disabled:hover:border-gray-300 disabled:hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           >
             <ChevronRight size={18} aria-hidden="true" />
           </button>
@@ -147,15 +147,15 @@ export default function TrustBlock() {
         <div className="text-center mb-12 md:mb-14">
           <div className="flex flex-wrap justify-center items-center gap-3 mb-4 text-xs md:text-sm text-gray-500">
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-600" aria-hidden="true" />
               Field reviews
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-600" aria-hidden="true" />
               Real customers
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-600" aria-hidden="true" />
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-600" aria-hidden="true" />
               Verified deployments
             </span>
           </div>
@@ -184,7 +184,7 @@ export default function TrustBlock() {
         </div>
 
         <div className="rounded-3xl border border-gray-200 bg-gray-50/60 px-5 py-6 md:px-8 md:py-7 max-w-5xl mx-auto mb-12 md:mb-16">
-          <p className="text-center text-xs md:text-sm uppercase tracking-widest text-green-700 font-semibold mb-5">
+          <p className="text-center text-xs md:text-sm uppercase tracking-widest text-brand-700 font-semibold mb-5">
             Manufacturer Authority
           </p>
           <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-5 list-none">
@@ -200,7 +200,7 @@ export default function TrustBlock() {
               return (
                 <li key={c.label} className="flex flex-col items-center text-center gap-2">
                   <span className="grid place-items-center w-10 h-10 rounded-xl bg-white ring-1 ring-gray-200 shadow-sm">
-                    <Icon size={18} className="text-green-700" aria-hidden="true" />
+                    <Icon size={18} className="text-brand-700" aria-hidden="true" />
                   </span>
                   <span className="text-xs md:text-sm font-semibold text-gray-800 leading-tight">
                     {c.label}

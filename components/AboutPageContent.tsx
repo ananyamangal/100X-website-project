@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Link from "next/link"
 import {
@@ -55,7 +55,7 @@ export default function AboutPageContent({
   ]
   const manufacturingStats = [
     { value: c.manufacturingStat1Value ?? "ISO", label: c.manufacturingStat1Label ?? "Certified", bg: "bg-blue-50", text: "text-blue-600" },
-    { value: c.manufacturingStat2Value ?? "99.5%", label: c.manufacturingStat2Label ?? "Quality Rate", bg: "bg-green-50", text: "text-green-600" },
+    { value: c.manufacturingStat2Value ?? "99.5%", label: c.manufacturingStat2Label ?? "Quality Rate", bg: "bg-brand-50", text: "text-brand-600" },
     { value: c.manufacturingStat3Value ?? "24/7", label: c.manufacturingStat3Label ?? "Production", bg: "bg-purple-50", text: "text-purple-600" },
     { value: c.manufacturingStat4Value ?? "50+", label: c.manufacturingStat4Label ?? "Products", bg: "bg-orange-50", text: "text-orange-600" },
   ]
@@ -118,19 +118,19 @@ export default function AboutPageContent({
               </div>
             )}
             <div className="grid grid-cols-2 gap-6">
-              <div className="text-center p-6 bg-green-50 rounded-xl">
-                <div className="text-3xl font-bold text-green-600 mb-2">{journeyStat1Value}</div>
+              <div className="text-center p-6 bg-brand-50 rounded-xl">
+                <div className="text-3xl font-bold text-brand-600 mb-2">{journeyStat1Value}</div>
                 <div className="text-gray-600">{journeyStat1Label}</div>
               </div>
-              <div className="text-center p-6 bg-green-50 rounded-xl">
-                <div className="text-3xl font-bold text-green-600 mb-2">{journeyStat2Value}</div>
+              <div className="text-center p-6 bg-brand-50 rounded-xl">
+                <div className="text-3xl font-bold text-brand-600 mb-2">{journeyStat2Value}</div>
                 <div className="text-gray-600">{journeyStat2Label}</div>
               </div>
             </div>
           </div>
           <div className="relative">
             <img src={journeyImage} alt={heroTitle} className="w-full rounded-2xl shadow-2xl" />
-            <div className="absolute -top-6 -left-6 w-24 h-24 bg-green-600 rounded-2xl flex items-center justify-center">
+            <div className="absolute -top-6 -left-6 w-24 h-24 bg-brand-600 rounded-2xl flex items-center justify-center">
               <Award className="text-white" size={32} />
             </div>
           </div>
@@ -145,8 +145,8 @@ export default function AboutPageContent({
             {values.map((value, index) => (
               <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
                 <CardContent className="p-8">
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <value.icon className="text-green-600" size={36} />
+                  <div className="w-20 h-20 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <value.icon className="text-brand-600" size={36} />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-800 mb-4">{value.title}</h3>
                   <div className="text-gray-600 leading-relaxed">
@@ -204,7 +204,7 @@ export default function AboutPageContent({
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-green-700">
+              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
                 <Target size={22} aria-hidden="true" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Our Mission</h3>
@@ -220,7 +220,7 @@ export default function AboutPageContent({
                   "Long-term performance through strong engineering + quality control",
                 ].map((item) => (
                   <li key={item} className="flex items-start text-sm">
-                    <CheckCircle size={16} aria-hidden="true" className="mt-1 mr-2 shrink-0 text-green-600" />
+                    <CheckCircle size={16} aria-hidden="true" className="mt-1 mr-2 shrink-0 text-brand-600" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -289,7 +289,7 @@ export default function AboutPageContent({
             ].map(({ icon: Icon, text }) => (
               <li key={text}>
                 <div className="h-full rounded-2xl border border-gray-200 bg-white p-6">
-                  <Icon size={22} aria-hidden="true" className="text-green-700 mb-3" />
+                  <Icon size={22} aria-hidden="true" className="text-brand-700 mb-3" />
                   <p className="text-gray-700 leading-relaxed">{text}</p>
                 </div>
               </li>
@@ -299,7 +299,7 @@ export default function AboutPageContent({
 
         <section
           aria-labelledby="about-public-health-heading"
-          className="bg-green-50 rounded-2xl border border-green-100 p-8 md:p-12 mb-12"
+          className="bg-brand-50 rounded-2xl border border-brand-100 p-8 md:p-12 mb-12"
         >
           <h2
             id="about-public-health-heading"
@@ -321,7 +321,7 @@ export default function AboutPageContent({
               "Continuous high-output usage during peak seasons",
             ].map((item) => (
               <li key={item} className="flex items-start text-gray-700">
-                <CheckCircle size={18} aria-hidden="true" className="mt-1 mr-2.5 shrink-0 text-green-600" />
+                <CheckCircle size={18} aria-hidden="true" className="mt-1 mr-2.5 shrink-0 text-brand-600" />
                 <span>{item}</span>
               </li>
             ))}

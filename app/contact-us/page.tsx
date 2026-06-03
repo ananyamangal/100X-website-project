@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
@@ -65,9 +65,9 @@ export default function ContactUsPage() {
             <a
               href={TEL_HREF}
               data-gtm="contact_page_call"
-              className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
             >
-              <Phone size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-green-700" />
+              <Phone size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-brand-700" />
               <span>
                 <span className="block text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                   Phone
@@ -84,9 +84,9 @@ export default function ContactUsPage() {
               target="_blank"
               rel="noopener noreferrer"
               data-gtm="contact_page_whatsapp"
-              className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
             >
-              <MessageCircle size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-green-700" />
+              <MessageCircle size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-brand-700" />
               <span>
                 <span className="block text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                   WhatsApp
@@ -101,9 +101,9 @@ export default function ContactUsPage() {
             <a
               href={`mailto:${BUSINESS.email}`}
               data-gtm="contact_page_email"
-              className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
             >
-              <Mail size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-green-700" />
+              <Mail size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-brand-700" />
               <span>
                 <span className="block text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                   Email
@@ -117,7 +117,7 @@ export default function ContactUsPage() {
         </ul>
 
         <div className="mt-4 flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-5">
-          <MapPin size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-green-700" />
+          <MapPin size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-brand-700" />
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
               Office &amp; manufacturing
@@ -185,7 +185,7 @@ export default function ContactUsPage() {
         <p className="mt-8 text-sm text-gray-600">
           For government procurement, we are listed on the{" "}
           <span className="font-semibold">Government e-Marketplace (GeM)</span> under OEM listings — search for 100X Circle to raise a purchase order through the portal with full GST documentation. Need help locating our GeM listings?{" "}
-          <Link href="/gem-approved-fogging-machine-oem" className="text-green-700 font-semibold hover:underline">
+          <Link href="/gem-approved-fogging-machine-oem" className="text-brand-700 font-semibold hover:underline">
             See our GeM page →
           </Link>
         </p>

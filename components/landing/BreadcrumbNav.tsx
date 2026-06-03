@@ -1,4 +1,4 @@
-import Link from "next/link"
+﻿import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 import type { BreadcrumbItem } from "@/components/seo/BreadcrumbJsonLd"
 
@@ -44,7 +44,7 @@ export default function BreadcrumbNav({ items }: Props) {
               ) : (
                 <Link
                   href={item.url}
-                  className="text-gray-600 hover:text-green-700 transition-colors [[data-theme=dark-industrial]_&]:text-slate-400 [[data-theme=dark-industrial]_&]:hover:text-green-400"
+                  className="text-gray-600 hover:text-brand-700 transition-colors [[data-theme=dark-industrial]_&]:text-slate-400 [[data-theme=dark-industrial]_&]:hover:text-brand-400"
                 >
                   {item.name}
                 </Link>

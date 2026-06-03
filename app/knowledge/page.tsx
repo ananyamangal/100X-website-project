@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { AI_KNOWLEDGE_ARTICLES } from "@/lib/ai/knowledge"
@@ -100,13 +100,13 @@ export default function KnowledgeHubPage() {
                 {article.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full"
+                    className="text-xs bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
-              <h2 className="font-semibold text-gray-900 group-hover:text-green-700 mb-2 text-base">
+              <h2 className="font-semibold text-gray-900 group-hover:text-brand-700 mb-2 text-base">
                 {article.title}
               </h2>
               <p className="text-sm text-gray-500 leading-relaxed mb-3">{article.summary}</p>
@@ -125,7 +125,7 @@ export default function KnowledgeHubPage() {
           </p>
           <p className="text-sm text-gray-600">
             Machine-readable versions of all knowledge articles are available at{" "}
-            <Link href="/api/ai/knowledge" className="text-green-600 hover:underline font-mono text-xs">
+            <Link href="/api/ai/knowledge" className="text-brand-600 hover:underline font-mono text-xs">
               /api/ai/knowledge
             </Link>
             .

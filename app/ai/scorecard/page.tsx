@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 
@@ -138,7 +138,7 @@ function avg(scores: Record<string, number>): number {
 }
 
 function ScoreBar({ value }: { value: number }) {
-  const color = value >= 90 ? "bg-green-500" : value >= 75 ? "bg-yellow-400" : "bg-red-400"
+  const color = value >= 90 ? "bg-brand-500" : value >= 75 ? "bg-yellow-400" : "bg-red-400"
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 bg-gray-100 rounded-full h-1.5">
@@ -155,9 +155,9 @@ export default function AiScorecardPage() {
   return (
     <main className="max-w-5xl mx-auto px-4 py-16 pt-32">
       <nav className="text-sm text-gray-500 mb-6">
-        <Link href="/" className="hover:text-green-600">Home</Link>
+        <Link href="/" className="hover:text-brand-600">Home</Link>
         <span className="mx-2">/</span>
-        <Link href="/ai/about-100x" className="hover:text-green-600">AI Profile</Link>
+        <Link href="/ai/about-100x" className="hover:text-brand-600">AI Profile</Link>
         <span className="mx-2">/</span>
         <span>Citation Scorecard</span>
       </nav>
@@ -166,7 +166,7 @@ export default function AiScorecardPage() {
       <p className="text-gray-500 text-sm mb-2">100xcircle.com — AI readiness audit. Updated May 2026.</p>
 
       <div className="flex items-center gap-4 mb-10">
-        <div className="text-5xl font-bold text-green-600">{overallAvg}</div>
+        <div className="text-5xl font-bold text-brand-600">{overallAvg}</div>
         <div>
           <p className="font-semibold text-gray-800">Overall AI Citation Score</p>
           <p className="text-sm text-gray-500">Average across {PAGES.length} page/endpoint types</p>
@@ -188,13 +188,13 @@ export default function AiScorecardPage() {
               <div>
                 <Link
                   href={page.url.includes("[") ? page.url.replace(/\[.*?\]/g, "...") : page.url}
-                  className="font-medium text-gray-800 hover:text-green-600 text-sm"
+                  className="font-medium text-gray-800 hover:text-brand-600 text-sm"
                 >
                   {page.label}
                 </Link>
                 <p className="text-xs text-gray-400 font-mono">{page.url}</p>
               </div>
-              <span className={`text-lg font-bold shrink-0 ${avg(page.scores) >= 90 ? "text-green-600" : avg(page.scores) >= 75 ? "text-yellow-500" : "text-red-500"}`}>
+              <span className={`text-lg font-bold shrink-0 ${avg(page.scores) >= 90 ? "text-brand-600" : avg(page.scores) >= 75 ? "text-yellow-500" : "text-red-500"}`}>
                 {avg(page.scores)}
               </span>
             </div>

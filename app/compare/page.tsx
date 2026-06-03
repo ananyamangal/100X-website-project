@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { COMPARISONS } from "@/lib/comparisons/data"
@@ -66,12 +66,12 @@ export default function CompareHubPage() {
             >
               <div className="flex flex-wrap gap-1 mb-2">
                 {c.tags.slice(0, 2).map((tag) => (
-                  <span key={tag} className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                  <span key={tag} className="text-xs bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full">
                     {tag}
                   </span>
                 ))}
               </div>
-              <h3 className="font-semibold text-gray-900 group-hover:text-green-700 text-sm leading-snug mb-1">
+              <h3 className="font-semibold text-gray-900 group-hover:text-brand-700 text-sm leading-snug mb-1">
                 {c.h1}
               </h3>
               <p className="text-xs text-gray-400">{c.readTime} read</p>
@@ -90,7 +90,7 @@ export default function CompareHubPage() {
               className="group flex items-center justify-between py-3 hover:bg-gray-50 px-2 rounded-lg transition-colors"
             >
               <div>
-                <span className="font-medium text-gray-800 group-hover:text-green-700 text-sm">
+                <span className="font-medium text-gray-800 group-hover:text-brand-700 text-sm">
                   {c.h1}
                 </span>
                 <div className="flex gap-1 mt-1">
@@ -107,13 +107,13 @@ export default function CompareHubPage() {
         </div>
       </section>
 
-      <div className="mt-12 bg-green-50 border border-green-200 rounded-xl p-5 text-sm">
-        <p className="font-semibold text-green-800 mb-2">Get a Custom Recommendation</p>
-        <p className="text-green-700 mb-3">
+      <div className="mt-12 bg-brand-50 border border-brand-200 rounded-xl p-5 text-sm">
+        <p className="font-semibold text-brand-800 mb-2">Get a Custom Recommendation</p>
+        <p className="text-brand-700 mb-3">
           Not sure which fogging machine fits your specific requirement? Contact 100X Circle
           directly — we help municipal officers, farmers, and PCOs choose the right equipment.
         </p>
-        <div className="flex flex-wrap gap-4 text-green-800 font-medium">
+        <div className="flex flex-wrap gap-4 text-brand-800 font-medium">
           <span>+91-7827229116</span>
           <span>100xcircle@gmail.com</span>
         </div>

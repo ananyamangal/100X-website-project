@@ -1,4 +1,4 @@
-import Link from "next/link"
+﻿import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { getProductsByCategory } from "@/lib/productsQuery"
 import { getLandingDisplayName, getLandingPage } from "@/lib/seo/landing-pages"
@@ -54,7 +54,7 @@ export default async function RecommendedProductsBlock({
               <li key={item.slug}>
                 <Link
                   href={`/${item.slug}`}
-                  className="group block rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 [[data-theme=dark-industrial]_&]:bg-white/[0.04] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:hover:border-green-500/40"
+                  className="group block rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 [[data-theme=dark-industrial]_&]:bg-white/[0.04] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:hover:border-green-500/40"
                 >
                   <h3 className="text-sm md:text-base font-bold text-gray-900 line-clamp-2 [[data-theme=dark-industrial]_&]:text-white">
                     {item.title}
@@ -62,7 +62,7 @@ export default async function RecommendedProductsBlock({
                   <p className="mt-2 text-xs text-gray-600 line-clamp-3 [[data-theme=dark-industrial]_&]:text-slate-400">
                     {item.description}
                   </p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-green-700 [[data-theme=dark-industrial]_&]:text-green-400">
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-700 [[data-theme=dark-industrial]_&]:text-brand-400">
                     View details
                     <ArrowRight size={14} aria-hidden="true" />
                   </span>
@@ -89,7 +89,7 @@ export default async function RecommendedProductsBlock({
               <li key={p.id}>
                 <Link
                   href={`/products/${p.slug || p.id}`}
-                  className="group block rounded-2xl border border-gray-200 bg-white overflow-hidden transition-all hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 [[data-theme=dark-industrial]_&]:bg-white/[0.04] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:hover:border-green-500/40"
+                  className="group block rounded-2xl border border-gray-200 bg-white overflow-hidden transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 [[data-theme=dark-industrial]_&]:bg-white/[0.04] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:hover:border-green-500/40"
                 >
                   <div className="aspect-[4/3] overflow-hidden bg-gray-100 [[data-theme=dark-industrial]_&]:bg-white/5">
                     {/* eslint-disable-next-line @next/next/no-img-element */}

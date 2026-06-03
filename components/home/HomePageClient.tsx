@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -404,13 +404,13 @@ function _unused_ProductDetailPage({
     <div className="pt-32 min-h-screen bg-gray-50 relative">
       <div className="container mx-auto px-4 py-12">
         <div className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
-          <button onClick={() => setCurrentPage("home")} className="hover:text-green-600">
+          <button onClick={() => setCurrentPage("home")} className="hover:text-brand-600">
             Home
           </button>
           <ChevronRight size={16} />
           <span>Products</span>
           <ChevronRight size={16} />
-          <span className="text-green-600">{product.name}</span>
+          <span className="text-brand-600">{product.name}</span>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 mb-16">
@@ -441,7 +441,7 @@ function _unused_ProductDetailPage({
                     badge === "Best Seller"
                       ? "bg-red-500 hover:bg-red-600"
                       : badge === "Eco-Friendly"
-                        ? "bg-green-500 hover:bg-green-600"
+                        ? "bg-brand-500 hover:bg-brand-600"
                         : badge === "New Launch"
                           ? "bg-blue-500 hover:bg-blue-600"
                           : "bg-orange-500 hover:bg-orange-600"
@@ -469,14 +469,14 @@ function _unused_ProductDetailPage({
                 <span className="text-gray-600">({product.reviewsCount} reviews)</span>
               </div>
             </div>
-            <div className="text-3xl font-bold text-green-600 mb-6">{product.priceRange}</div>
+            <div className="text-3xl font-bold text-brand-600 mb-6">{product.priceRange}</div>
             <div className="text-lg text-gray-600 mb-8 leading-relaxed">
               <RichContent html={product.detailedDescription || ""} />
             </div>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <Button
                 size="lg"
-                className="bg-green-600 hover:bg-green-700 flex-1"
+                className="bg-brand-600 hover:bg-brand-700 flex-1"
                 onClick={() =>
                   window.open(
                     `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi, I'm interested in 100x products, please help me out")}`,
@@ -490,7 +490,7 @@ function _unused_ProductDetailPage({
               <Button
                 size="lg"
                 variant="outline"
-                className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent"
+                className="border-brand-600 text-brand-600 hover:bg-brand-50 bg-transparent"
                 onClick={() => onBrochureDownload(product.name, product.brochureUrl)}
               >
                 <Download className="mr-2" size={20} />
@@ -506,8 +506,8 @@ function _unused_ProductDetailPage({
               <h3 className="text-2xl font-bold text-gray-800 mb-6">Key Features</h3>
               <div className="space-y-4">
                 {product.features.map((feature: string, index: number) => (
-                  <div key={index} className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg">
-                    <CheckCircle className="text-green-600" size={20} />
+                  <div key={index} className="flex items-center space-x-3 p-4 bg-brand-50 rounded-lg">
+                    <CheckCircle className="text-brand-600" size={20} />
                     <span className="text-gray-700 font-medium">{feature}</span>
                   </div>
                 ))}
@@ -552,7 +552,7 @@ function _unused_ProductDetailPage({
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 text-white text-center">
+        <div className="bg-gradient-to-r from-brand-600 to-brand-700 rounded-2xl p-8 text-white text-center">
           <h3 className="text-3xl font-bold mb-4">Ready to Purchase?</h3>
           <p className="text-xl mb-8 opacity-90">
             Get in touch with our experts for detailed pricing, customization options, and delivery information.
@@ -561,7 +561,7 @@ function _unused_ProductDetailPage({
             <Button
               size="lg"
               variant="secondary"
-              className="bg-white text-green-600 hover:bg-gray-100"
+              className="bg-white text-brand-600 hover:bg-gray-100"
               onClick={() => {
                 if (typeof window !== "undefined" && (window as any).gtag_report_conversion) {
                   ;(window as any).gtag_report_conversion()
@@ -578,7 +578,7 @@ function _unused_ProductDetailPage({
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
+              className="border-2 border-white text-white hover:bg-white hover:text-brand-600 bg-transparent"
               onClick={() => onBrochureDownload(product.name, product.brochureUrl)}
             >
               <Download className="mr-2" size={20} />

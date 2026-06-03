@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL, SITE_NAME, defaultOgImage } from '@/lib/seo/site-config'
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd'
@@ -51,7 +51,7 @@ export default function PowerTillerPage() {
         <div className="flex flex-wrap gap-3">
           <Link
             href="/products"
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-green-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-brand-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           >
             View All Products
           </Link>
@@ -59,7 +59,7 @@ export default function PowerTillerPage() {
             href="https://wa.me/917827229116?text=I%27m%20interested%20in%20the%20100x%20Circle%20Power%20Tiller.%20Please%20share%20details."
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-md border border-green-600 bg-white px-6 py-3 text-base font-semibold text-green-700 transition-all hover:-translate-y-0.5 hover:bg-green-50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-brand-600 bg-white px-6 py-3 text-base font-semibold text-brand-700 transition-all hover:-translate-y-0.5 hover:bg-brand-50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           >
             Chat on WhatsApp
           </a>

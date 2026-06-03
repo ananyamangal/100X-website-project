@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useRef } from "react"
 import Link from "next/link"
@@ -104,7 +104,7 @@ export default function TechnologyBlock({ content }: Props) {
                 /* Placeholder when no video is configured */
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-gray-500 p-8 text-center">
                   <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
-                    <Play size={30} className="ml-1 text-green-400" />
+                    <Play size={30} className="ml-1 text-brand-400" />
                   </div>
                   <p className="text-sm text-gray-400 leading-snug">
                     Demo video not configured yet.
@@ -144,7 +144,7 @@ export default function TechnologyBlock({ content }: Props) {
                       onClick={() => handleStepClick(index)}
                       className={`w-full text-left flex gap-4 items-start px-4 py-4 rounded-xl transition-all duration-200 ${
                         isActive
-                          ? "bg-green-50 ring-1 ring-green-400/50 shadow-sm"
+                          ? "bg-brand-50 ring-1 ring-green-400/50 shadow-sm"
                           : "hover:bg-gray-50/80"
                       }`}
                     >
@@ -152,7 +152,7 @@ export default function TechnologyBlock({ content }: Props) {
                       <span
                         className={`relative z-10 shrink-0 grid place-items-center w-10 h-10 rounded-full text-sm font-bold ring-2 transition-colors ${
                           isActive
-                            ? "bg-green-600 ring-green-500 text-white shadow-green-200 shadow-md"
+                            ? "bg-brand-600 ring-brand-500 text-white shadow-green-200 shadow-md"
                             : "bg-white ring-gray-200 text-gray-500"
                         }`}
                       >
@@ -163,7 +163,7 @@ export default function TechnologyBlock({ content }: Props) {
                         <div className="flex items-center justify-between gap-2">
                           <h3
                             className={`font-semibold leading-snug text-base ${
-                              isActive ? "text-green-800" : "text-gray-800"
+                              isActive ? "text-brand-800" : "text-gray-800"
                             }`}
                           >
                             {step.title}
@@ -192,7 +192,7 @@ export default function TechnologyBlock({ content }: Props) {
                       <div className="pl-14 pr-4 pb-4 -mt-1">
                         <p className="text-gray-600 text-sm leading-relaxed">{step.body}</p>
                         {step.details && (
-                          <p className="text-gray-500 text-sm leading-relaxed mt-2 pt-2 border-t border-green-100">
+                          <p className="text-gray-500 text-sm leading-relaxed mt-2 pt-2 border-t border-brand-100">
                             {step.details}
                           </p>
                         )}
@@ -250,8 +250,8 @@ export default function TechnologyBlock({ content }: Props) {
               const Icon = BENEFIT_ICONS[index % BENEFIT_ICONS.length]
               return (
                 <li key={b.title} className="flex gap-4 items-start">
-                  <span className="shrink-0 grid place-items-center w-11 h-11 rounded-xl bg-green-600/15 ring-1 ring-green-500/30">
-                    <Icon className="text-green-400" size={22} aria-hidden />
+                  <span className="shrink-0 grid place-items-center w-11 h-11 rounded-xl bg-brand-600/15 ring-1 ring-brand-500/30">
+                    <Icon className="text-brand-400" size={22} aria-hidden />
                   </span>
                   <div>
                     <h4 className="text-base md:text-lg font-semibold text-white mb-1">{b.title}</h4>
@@ -263,7 +263,7 @@ export default function TechnologyBlock({ content }: Props) {
           </ul>
 
           <div className="mt-10 md:mt-12 flex justify-center">
-            <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4">
+            <Button asChild size="lg" className="bg-brand-600 hover:bg-brand-700 text-lg px-8 py-4">
               <Link href="#products" className="flex items-center">
                 Explore Machines <ArrowRight className="ml-2" size={20} />
               </Link>

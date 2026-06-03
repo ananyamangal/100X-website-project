@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
@@ -282,7 +282,7 @@ export default function RFQPopup() {
       {/* Panel */}
       <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-brand-600 to-brand-700 px-6 py-4 flex items-center justify-between">
           <div>
             <h2 className="text-white font-bold text-lg leading-tight">Get a Free Quote</h2>
             <p className="text-green-100 text-sm mt-0.5">Fill the form — we respond within 24 hours</p>
@@ -300,8 +300,8 @@ export default function RFQPopup() {
         <div className="px-6 py-5 max-h-[70vh] overflow-y-auto">
           {submitted ? (
             <div className="text-center py-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
@@ -309,7 +309,7 @@ export default function RFQPopup() {
               <p className="text-gray-600 text-sm mb-4">We've received your request and will be in touch shortly.</p>
               <button
                 onClick={close}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
+                className="px-6 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 text-sm font-medium"
               >
                 Close
               </button>
@@ -328,13 +328,13 @@ export default function RFQPopup() {
                       onChange={(e) => setAnswer(q.label, e.target.value)}
                       placeholder={q.placeholder}
                       rows={3}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
                     />
                   ) : q.type === "select" ? (
                     <select
                       value={(answers[q.label] as string) || ""}
                       onChange={(e) => setAnswer(q.label, e.target.value)}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                     >
                       <option value="">Select an option…</option>
                       {(q.options || []).map((opt) => (
@@ -351,7 +351,7 @@ export default function RFQPopup() {
                             value={opt}
                             checked={(answers[q.label] as string) === opt}
                             onChange={() => setAnswer(q.label, opt)}
-                            className="text-green-600 focus:ring-green-500"
+                            className="text-brand-600 focus:ring-brand-500"
                           />
                           <span className="text-sm text-gray-700">{opt}</span>
                         </label>
@@ -365,7 +365,7 @@ export default function RFQPopup() {
                             type="checkbox"
                             checked={((answers[q.label] as string[]) || []).includes(opt)}
                             onChange={() => toggleCheckbox(q.label, opt)}
-                            className="rounded text-green-600 focus:ring-green-500"
+                            className="rounded text-brand-600 focus:ring-brand-500"
                           />
                           <span className="text-sm text-gray-700">{opt}</span>
                         </label>
@@ -377,7 +377,7 @@ export default function RFQPopup() {
                       value={(answers[q.label] as string) || ""}
                       onChange={(e) => setAnswer(q.label, e.target.value)}
                       placeholder={q.placeholder}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                     />
                   )}
                 </div>
@@ -431,7 +431,7 @@ export default function RFQPopup() {
                   "w-full py-2.5 rounded-lg text-white font-semibold text-sm transition-colors",
                   submitting || uploadingFile
                     ? "bg-green-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
+                    : "bg-brand-600 hover:bg-brand-700"
                 )}
               >
                 {uploadingFile ? "Uploading file…" : submitting ? "Submitting…" : "Submit Request"}

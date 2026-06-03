@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import clientPromise from "@/lib/mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
@@ -60,7 +60,7 @@ export default async function VideosPage() {
             </div>
             <p className="text-xl mb-2">Video library coming soon</p>
             <p className="text-sm">We are adding our product and tutorial videos. Check back soon.</p>
-            <Link href="/products" className="mt-6 inline-block bg-green-600 text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-green-700 transition-colors">
+            <Link href="/products" className="mt-6 inline-block bg-brand-600 text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-brand-700 transition-colors">
               View Products
             </Link>
           </div>
@@ -91,7 +91,7 @@ export default async function VideosPage() {
                   <div className="p-5">
                     <div className="flex flex-wrap gap-2 mb-3">
                       {v.relatedProduct && (
-                        <span className="text-xs bg-green-50 text-green-700 px-2.5 py-0.5 rounded-full font-medium">
+                        <span className="text-xs bg-brand-50 text-brand-700 px-2.5 py-0.5 rounded-full font-medium">
                           {v.relatedProduct}
                         </span>
                       )}
@@ -102,12 +102,12 @@ export default async function VideosPage() {
                     )}
                     {v.transcript && (
                       <details className="mt-3">
-                        <summary className="text-xs text-gray-500 cursor-pointer hover:text-green-600">View transcript</summary>
+                        <summary className="text-xs text-gray-500 cursor-pointer hover:text-brand-600">View transcript</summary>
                         <p className="text-xs text-gray-600 mt-2 whitespace-pre-wrap leading-relaxed max-h-32 overflow-y-auto">{v.transcript}</p>
                       </details>
                     )}
                     {v.relatedBlog && (
-                      <Link href={`/blog/${v.relatedBlog}`} className="mt-3 block text-xs text-green-600 hover:underline">
+                      <Link href={`/blog/${v.relatedBlog}`} className="mt-3 block text-xs text-brand-600 hover:underline">
                         Related article →
                       </Link>
                     )}

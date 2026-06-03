@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
@@ -46,7 +46,7 @@ export default function BrochureThankYouActions({
       <Button
         type="button"
         size="lg"
-        className="bg-green-600 hover:bg-green-700"
+        className="bg-brand-600 hover:bg-brand-700"
         disabled={!brochureUrl}
         onClick={downloadAgain}
       >
@@ -71,7 +71,7 @@ export default function BrochureThankYouActions({
       {relatedProducts.length > 0 && (
         <div className="mt-12 w-full border-t border-gray-100 pt-10">
           <h2 className="mb-4 flex items-center justify-center gap-2 text-lg font-semibold text-gray-800">
-            <Package className="h-5 w-5 text-green-600" aria-hidden />
+            <Package className="h-5 w-5 text-brand-600" aria-hidden />
             Related products
           </h2>
           <ul className="mx-auto flex max-w-lg flex-col gap-2">
@@ -79,7 +79,7 @@ export default function BrochureThankYouActions({
               <li key={p._id}>
                 <Link
                   href={p.href}
-                  className="block rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 text-center font-medium text-green-700 hover:bg-green-50"
+                  className="block rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 text-center font-medium text-brand-700 hover:bg-brand-50"
                 >
                   {p.name}
                 </Link>
@@ -87,7 +87,7 @@ export default function BrochureThankYouActions({
             ))}
           </ul>
           <div className="mt-4 text-center">
-            <Link href="/products" className="text-sm font-semibold text-green-600 underline">
+            <Link href="/products" className="text-sm font-semibold text-brand-600 underline">
               View all products
             </Link>
           </div>

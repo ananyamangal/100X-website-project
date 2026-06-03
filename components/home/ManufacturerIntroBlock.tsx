@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React from "react"
 
@@ -30,7 +30,7 @@ export default function ManufacturerIntroBlock({ content }: Props) {
             <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm md:text-[15px] text-gray-700 list-none max-w-md mx-auto md:mx-0">
               {c.bullets.map((item) => (
                 <li key={item} className="flex items-start">
-                  <span className="mt-1.5 mr-2 inline-block w-1.5 h-1.5 rounded-full bg-green-600 shrink-0" aria-hidden="true" />
+                  <span className="mt-1.5 mr-2 inline-block w-1.5 h-1.5 rounded-full bg-brand-600 shrink-0" aria-hidden="true" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -49,7 +49,7 @@ export default function ManufacturerIntroBlock({ content }: Props) {
               />
             </div>
             <div className="absolute -bottom-4 -left-4 hidden sm:flex flex-col items-start gap-0.5 rounded-xl bg-white shadow-lg ring-1 ring-gray-200 px-4 py-3">
-              <span className="text-xs uppercase tracking-wider text-green-700 font-semibold">Manufactured in</span>
+              <span className="text-xs uppercase tracking-wider text-brand-700 font-semibold">Manufactured in</span>
               <span className="text-base md:text-lg font-bold text-gray-900">Gurugram, India</span>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function ManufacturerIntroBlock({ content }: Props) {
                 <CheckCircle
                   size={18}
                   aria-hidden="true"
-                  className="mt-1 mr-2.5 shrink-0 text-green-600"
+                  className="mt-1 mr-2.5 shrink-0 text-brand-600"
                 />
                 <span>{item}</span>
               </li>

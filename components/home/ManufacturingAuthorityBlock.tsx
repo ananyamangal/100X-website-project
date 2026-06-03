@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React from "react"
 import { Factory, MapPin, Award, Wrench } from "lucide-react"
@@ -20,7 +20,7 @@ export default function ManufacturingAuthorityBlock({ content }: Props) {
     >
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-12 md:mb-16">
-          <p className="text-xs md:text-sm uppercase tracking-widest text-green-400 font-semibold mb-3">
+          <p className="text-xs md:text-sm uppercase tracking-widest text-brand-400 font-semibold mb-3">
             {c.eyebrow}
           </p>
           <h2
@@ -42,7 +42,7 @@ export default function ManufacturingAuthorityBlock({ content }: Props) {
                 key={s.label}
                 className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-7 text-center"
               >
-                <Icon className="text-green-400 mx-auto mb-3" size={28} aria-hidden="true" />
+                <Icon className="text-brand-400 mx-auto mb-3" size={28} aria-hidden="true" />
                 <div className="text-xl md:text-2xl font-bold text-white mb-1">{s.value}</div>
                 <div className="text-xs md:text-sm text-gray-400">{s.label}</div>
               </li>

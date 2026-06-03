@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react"
+﻿import { ChevronDown } from "lucide-react"
 import type { FaqEntry } from "@/lib/seo/landing-types"
 import SectionHeader from "./SectionHeader"
 
@@ -53,7 +53,7 @@ export default function FaqBlock({
                 <ChevronDown
                   size={20}
                   aria-hidden="true"
-                  className="mt-1 shrink-0 text-green-700 transition-transform duration-200 group-open:rotate-180 [[data-theme=dark-industrial]_&]:text-green-400"
+                  className="mt-1 shrink-0 text-brand-700 transition-transform duration-200 group-open:rotate-180 [[data-theme=dark-industrial]_&]:text-brand-400"
                 />
               </summary>
               <p className="mt-3 leading-relaxed text-gray-700 [[data-theme=dark-industrial]_&]:text-slate-300">

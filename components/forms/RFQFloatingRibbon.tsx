@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
@@ -43,7 +43,7 @@ export default function RFQFloatingRibbon() {
         onClick={() => setOpen(true)}
         aria-label="Submit RFQ / Tender inquiry"
         data-gtm="rfq_ribbon_open"
-        className="flex fixed left-0 top-1/2 -translate-y-1/2 z-[60] rotate-180 [writing-mode:vertical-rl] items-center gap-1.5 md:gap-2 px-2 md:px-3 py-3 md:py-4 bg-green-600 hover:bg-green-700 text-white font-semibold tracking-wide shadow-lg rounded-tr-xl rounded-br-xl text-xs md:text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-700"
+        className="flex fixed left-0 top-1/2 -translate-y-1/2 z-[60] rotate-180 [writing-mode:vertical-rl] items-center gap-1.5 md:gap-2 px-2 md:px-3 py-3 md:py-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold tracking-wide shadow-lg rounded-tr-xl rounded-br-xl text-xs md:text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-700"
       >
         <FileText size={14} aria-hidden="true" className="md:hidden" />
         <FileText size={16} aria-hidden="true" className="hidden md:block" />
@@ -75,7 +75,7 @@ export default function RFQFloatingRibbon() {
                 ref={closeButtonRef}
                 type="button"
                 aria-label="Close RFQ form"
-                className="-mr-2 -mt-2 rounded-md p-2 text-gray-500 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+                className="-mr-2 -mt-2 rounded-md p-2 text-gray-500 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
                 onClick={() => setOpen(false)}
               >
                 <X size={20} aria-hidden="true" />

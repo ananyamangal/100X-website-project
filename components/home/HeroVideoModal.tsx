@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useEffect, useRef } from "react"
 import Link from "next/link"
@@ -79,7 +79,7 @@ export default function HeroVideoModal({ open, onClose, youtubeId }: Props) {
           <Button
             asChild
             size="lg"
-            className="bg-green-600 hover:bg-green-700 text-base md:text-lg px-6 py-3 min-h-[44px]"
+            className="bg-brand-600 hover:bg-brand-700 text-base md:text-lg px-6 py-3 min-h-[44px]"
           >
             <Link href="/contact-us" className="flex items-center">
               Request a Demo <ArrowRight className="ml-2" size={18} />

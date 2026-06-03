@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 
@@ -97,16 +97,16 @@ export default function HowThermalFoggingWorksPage() {
       />
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/knowledge" className="hover:text-green-600">Knowledge Hub</Link>
+          <Link href="/knowledge" className="hover:text-brand-600">Knowledge Hub</Link>
           <span className="mx-2">/</span>
           <span>How Thermal Fogging Works</span>
         </nav>
 
         <div className="flex flex-wrap gap-2 mb-4">
           {["Technology", "Pulse-Jet", "Physics"].map((tag) => (
-            <span key={tag} className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+            <span key={tag} className="text-xs bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full">
               {tag}
             </span>
           ))}
@@ -119,7 +119,7 @@ export default function HowThermalFoggingWorksPage() {
           By 100X Circle Pvt Ltd · 6 min read · Updated May 2026
         </p>
 
-        <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-8 text-sm text-gray-700">
+        <div className="bg-brand-50 border border-brand-200 rounded-xl p-5 mb-8 text-sm text-gray-700">
           <strong>Key fact:</strong> Thermal fogging produces droplets of 1–50 microns — so small
           they stay airborne for minutes and penetrate dense vegetation, reaching mosquitoes hiding
           in foliage where sprayers cannot.

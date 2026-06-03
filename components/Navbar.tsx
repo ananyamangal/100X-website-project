@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -87,7 +87,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
 
   const iconClass = transparent
     ? 'inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-white/90 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2'
-    : 'inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-gray-700 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2'
+    : 'inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-gray-700 transition-colors hover:bg-brand-50 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2'
 
   const contactIcons = (
     <div data-gtm-location="navbar" className="flex items-center gap-1 md:gap-2" aria-label="Quick contact">
@@ -124,7 +124,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
           <Link
             href="/"
             aria-label="100x Circle home"
-            className="flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           >
             <img src={logoUrl} alt={logoAlt} className="h-9 md:h-10 w-auto" draggable={false} />
           </Link>
@@ -139,10 +139,10 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
                   href={l.href}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 rounded-sm',
+                    'text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1 rounded-sm',
                     active
-                      ? transparent ? 'text-green-400' : 'text-green-700'
-                      : transparent ? 'text-white/85 hover:text-white' : 'text-gray-700 hover:text-green-600',
+                      ? transparent ? 'text-brand-400' : 'text-brand-700'
+                      : transparent ? 'text-white/85 hover:text-white' : 'text-gray-700 hover:text-brand-600',
                   )}
                 >
                   {l.label}
@@ -189,8 +189,8 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
               data-download
               aria-label="Download company brochure"
               className={cn(
-                "lg:hidden inline-flex items-center justify-center h-10 w-10 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600",
-                transparent ? "text-white/90 hover:bg-white/10" : "text-gray-700 hover:bg-green-50 hover:text-green-700",
+                "lg:hidden inline-flex items-center justify-center h-10 w-10 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600",
+                transparent ? "text-white/90 hover:bg-white/10" : "text-gray-700 hover:bg-brand-50 hover:text-brand-700",
               )}
             >
               <Download size={18} aria-hidden="true" />
@@ -198,7 +198,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
 
             <Button
               onClick={openBrochure}
-              className="hidden lg:inline-flex bg-green-600 hover:bg-green-700 ml-1"
+              className="hidden lg:inline-flex bg-brand-600 hover:bg-brand-700 ml-1"
               data-download
               aria-label="Download company brochure"
             >
@@ -209,8 +209,8 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
             <button
               type="button"
               className={cn(
-                'lg:hidden p-2 -mr-2 ml-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 rounded-md transition-colors',
-                transparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-green-600',
+                'lg:hidden p-2 -mr-2 ml-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 rounded-md transition-colors',
+                transparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-brand-600',
               )}
               aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={isMenuOpen}
@@ -234,7 +234,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
                     aria-current={active ? 'page' : undefined}
                     className={cn(
                       'rounded-md px-3 py-3 text-base font-medium transition-colors',
-                      active ? 'bg-green-50 text-green-700' : 'text-gray-700 hover:bg-gray-50',
+                      active ? 'bg-brand-50 text-brand-700' : 'text-gray-700 hover:bg-gray-50',
                     )}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -243,7 +243,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
                 )
               })}
               <Button
-                className="mt-3 bg-green-600 hover:bg-green-700"
+                className="mt-3 bg-brand-600 hover:bg-brand-700"
                 onClick={openBrochure}
                 data-download
                 aria-label="Download company brochure"

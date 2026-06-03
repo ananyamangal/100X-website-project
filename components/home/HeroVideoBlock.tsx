@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import Link from "next/link"
@@ -68,7 +68,7 @@ export default function HeroVideoBlock({ youtubeId = HERO_VIDEO_ID }: Props) {
               />
               <span className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               <span className="absolute inset-0 grid place-items-center">
-                <span className="grid place-items-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-green-600/95 text-white shadow-2xl ring-4 ring-white/20 group-hover:scale-110 transition-transform">
+                <span className="grid place-items-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-brand-600/95 text-white shadow-2xl ring-4 ring-white/20 group-hover:scale-110 transition-transform">
                   <Play size={28} className="ml-0.5" aria-hidden="true" />
                 </span>
               </span>
@@ -80,7 +80,7 @@ export default function HeroVideoBlock({ youtubeId = HERO_VIDEO_ID }: Props) {
           <Button
             asChild
             size="lg"
-            className="bg-green-600 hover:bg-green-700 text-lg px-8 py-4"
+            className="bg-brand-600 hover:bg-brand-700 text-lg px-8 py-4"
           >
             <Link href="/contact-us" className="flex items-center">
               Talk to Our Team <ArrowRight className="ml-2" size={20} />

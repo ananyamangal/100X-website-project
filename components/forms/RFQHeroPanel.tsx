@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import { ChevronDown, ChevronUp, FileText } from "lucide-react"
@@ -24,7 +24,7 @@ export default function RFQHeroPanel() {
           className="w-full inline-flex items-center justify-between rounded-xl bg-white shadow-md ring-1 ring-gray-200 px-4 py-3 text-sm font-semibold text-gray-900"
         >
           <span className="inline-flex items-center gap-2">
-            <FileText className="text-green-700" size={18} aria-hidden="true" />
+            <FileText className="text-brand-700" size={18} aria-hidden="true" />
             Request a Quote / Tender Inquiry
           </span>
           {mobileOpen ? <ChevronUp size={18} aria-hidden="true" /> : <ChevronDown size={18} aria-hidden="true" />}

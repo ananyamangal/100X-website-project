@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect, useRef } from "react"
 import { X, Download, Loader2 } from "lucide-react"
@@ -119,7 +119,7 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
     >
       <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 flex items-start justify-between">
+        <div className="bg-gradient-to-r from-brand-600 to-brand-700 px-6 py-4 flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-0.5">
               <Download size={18} className="text-white" aria-hidden />
@@ -143,11 +143,11 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
         <div className="px-6 py-5">
           {done ? (
             <div className="text-center py-4">
-              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Download size={24} className="text-green-600" />
+              <div className="w-14 h-14 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Download size={24} className="text-brand-600" />
               </div>
               <h3 className="font-semibold text-gray-900 text-lg mb-1">Download started!</h3>
-              <p className="text-gray-600 text-sm">Your brochure is downloading. If it doesn't start, <a href={brochureUrl || "/api/brochure/download"} className="text-green-600 underline">click here</a>.</p>
+              <p className="text-gray-600 text-sm">Your brochure is downloading. If it doesn't start, <a href={brochureUrl || "/api/brochure/download"} className="text-brand-600 underline">click here</a>.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} noValidate className="space-y-3">
@@ -224,7 +224,7 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
                     value={state}
                     onChange={(e) => setState(e.target.value)}
                     disabled={submitting}
-                    className="w-full h-11 rounded-md border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                    className="w-full h-11 rounded-md border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
                   >
                     <option value="">Select state</option>
                     {INDIAN_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -241,7 +241,7 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
               <Button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-green-600 hover:bg-green-700 h-11 text-sm font-semibold"
+                className="w-full bg-brand-600 hover:bg-brand-700 h-11 text-sm font-semibold"
               >
                 {submitting ? (
                   <><Loader2 size={16} className="mr-2 animate-spin" />Saving…</>

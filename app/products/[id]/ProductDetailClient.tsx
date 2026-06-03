@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useEffect, useState } from 'react';
 import {
   ChevronDown, ChevronLeft, ChevronRight, Download, MessageCircle, Play,
@@ -271,44 +271,181 @@ function SpecsTable({ specs, youtubeLink }: { specs: string[]; youtubeLink?: str
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Product features (filmChapters) — always visible, alternating image+text
+// Featured video — large full-width embed section
+// ─────────────────────────────────────────────────────────────────────────────
+
+function FeaturedVideoSection({ videoId, productName }: { videoId: string; productName: string }) {
+  const [playing, setPlaying] = useState(false);
+  const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+  return (
+    <section className="bg-gray-950 border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
+        <div className="text-center mb-10">
+          <p className="text-xs font-bold text-brand-400 uppercase tracking-widest mb-3">Watch In Action</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white">{productName} — Product Demo</h2>
+        </div>
+        <div className="relative rounded-2xl overflow-hidden aspect-video max-w-4xl mx-auto shadow-2xl">
+          {playing ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
+              title={`${productName} product demo`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full"
+            />
+          ) : (
+            <button
+              className="absolute inset-0 w-full h-full flex items-center justify-center group"
+              onClick={() => setPlaying(true)}
+              aria-label="Play product demo video"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={thumb} alt={`${productName} demo`} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
+              {/* Play button */}
+              <div className="absolute w-20 h-20 bg-brand-600 group-hover:bg-brand-700 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all">
+                <Play size={32} className="text-white ml-2" fill="white" />
+              </div>
+              <div className="absolute bottom-6 left-0 right-0 text-center">
+                <span className="inline-block bg-black/60 text-white text-sm font-semibold px-4 py-1.5 rounded-full backdrop-blur-sm">
+                  Watch full demo on YouTube
+                </span>
+              </div>
+            </button>
+          )}
+        </div>
+        {/* Direct YouTube link */}
+        <div className="text-center mt-6">
+          <a
+            href={`https://www.youtube.com/watch?v=${videoId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm text-brand-400 hover:text-brand-300 transition-colors"
+          >
+            <Play size={13} /> Open on YouTube
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UGC / Social proof image carousel
+// ─────────────────────────────────────────────────────────────────────────────
+
+function UGCCarousel({ images, productName }: { images: string[]; productName: string }) {
+  if (!images.length) return null;
+  return (
+    <section className="py-14 bg-gray-50 border-t border-gray-100 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 mb-6">
+        <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-1">From the Field</p>
+        <h2 className="text-xl font-bold text-gray-900">{productName} — Real-world Deployments</h2>
+      </div>
+      <div className="flex gap-4 overflow-x-auto pb-4 px-4 md:px-6 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
+        {images.map((img, i) => (
+          <div key={i} className="flex-shrink-0 w-72 md:w-80 aspect-[4/3] rounded-xl overflow-hidden bg-gray-200 snap-start">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={img}
+              alt={`${productName} deployment ${i + 1}`}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Product features (filmChapters) — editorial, large images, Nuuk-style
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ProductFeaturesSection({ chapters }: { chapters: any[] }) {
   if (!chapters.length) return null;
   return (
-    <section className="py-16 bg-white border-t border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="mb-10">
-          <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-2">Product Features</p>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Engineered for performance.</h2>
-        </div>
-        <div className="space-y-16">
-          {chapters.map((ch: any, i: number) => {
-            const chVid = s(ch.videoUrl) ? ytId(s(ch.videoUrl)) : null;
-            const chImg = s(ch.imageUrl);
-            const rev = i % 2 !== 0;
-            return (
-              <div key={i} className={`grid md:grid-cols-2 gap-10 items-center ${rev ? 'md:[&>*:first-child]:order-2' : ''}`}>
-                <div className="rounded-2xl overflow-hidden aspect-video bg-gray-50 border border-gray-100 flex items-center justify-center">
-                  {chVid
-                    ? <iframe src={`https://www.youtube.com/embed/${chVid}?rel=0`} title={s(ch.title)} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
-                    : chImg
-                      ? <img src={chImg} alt={s(ch.title)} className="w-full h-full object-cover" loading="lazy" />
-                      : <span className="text-5xl font-black text-gray-100">{String(i + 1).padStart(2, '0')}</span>}
+    <>
+      {chapters.map((ch: any, i: number) => {
+        const chVid = s(ch.videoUrl) ? ytId(s(ch.videoUrl)) : null;
+        const chImg = s(ch.imageUrl);
+        const isDark = i % 2 !== 0;
+        const isReverse = i % 2 !== 0;
+
+        return (
+          <section
+            key={i}
+            className={`border-t ${isDark ? 'bg-gray-950 border-white/5' : 'bg-white border-gray-100'}`}
+          >
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
+              <div className={`flex flex-col ${isReverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-10 lg:gap-16 items-center`}>
+
+                {/* LARGE IMAGE / VIDEO — 60% on desktop */}
+                <div className="w-full lg:w-[60%] shrink-0">
+                  <div className="relative rounded-2xl overflow-hidden aspect-video bg-gray-100 shadow-xl">
+                    {chVid ? (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${chVid}?rel=0`}
+                        title={s(ch.title)}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="absolute inset-0 w-full h-full"
+                      />
+                    ) : chImg ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={chImg}
+                        alt={s(ch.title)}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-7xl font-black text-gray-200 select-none">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-4">
-                  <p className="text-xs font-bold text-brand-600 uppercase tracking-widest">{String(i + 1).padStart(2, '0')}</p>
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 leading-snug">{s(ch.title)}</h3>
-                  {s(ch.subtitle) && <p className="text-base text-brand-600 font-medium">{s(ch.subtitle)}</p>}
-                  {s(ch.description) && <p className="text-gray-600 leading-relaxed">{s(ch.description)}</p>}
+
+                {/* TEXT — 40% on desktop */}
+                <div className="w-full lg:w-[40%] space-y-5">
+                  <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-brand-400' : 'text-brand-600'}`}>
+                    {String(i + 1).padStart(2, '0')}
+                  </p>
+                  <h3 className={`text-2xl md:text-3xl font-bold leading-snug ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    {s(ch.title)}
+                  </h3>
+                  {s(ch.subtitle) && (
+                    <p className={`text-base font-semibold ${isDark ? 'text-brand-400' : 'text-brand-600'}`}>
+                      {s(ch.subtitle)}
+                    </p>
+                  )}
+                  {s(ch.description) && (
+                    <p className={`leading-relaxed text-base ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {s(ch.description)}
+                    </p>
+                  )}
+                  {/* Video link if chapter has video */}
+                  {chVid && (
+                    <a
+                      href={`https://www.youtube.com/watch?v=${chVid}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center gap-2 text-sm font-semibold transition-colors ${isDark ? 'text-brand-400 hover:text-brand-300' : 'text-brand-600 hover:text-brand-700'}`}
+                    >
+                      <Play size={14} fill="currentColor" /> Watch on YouTube
+                    </a>
+                  )}
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
+            </div>
+          </section>
+        );
+      })}
+    </>
   );
 }
 
@@ -588,6 +725,7 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
   const allCerts    = [...new Set([...certs, ...badges])];
   const videoId     = ytId(s(product.heroVideoUrl || product.youtubeLink));
   const chapters    = (Array.isArray(product.filmChapters) ? product.filmChapters as any[] : []).filter(c => c?.title).slice(0, 3);
+  const ugcImages   = arr(product.ugcImages).filter(u => u.startsWith('http') || u.startsWith('/'));
   const warrantyOn  = Boolean(product.warrantyEnabled);
   const warrantyPeriod = s(product.warrantyPeriod);
   const warrantyDesc = s(product.warrantyDescription);
@@ -743,8 +881,8 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
 
             {/* Warranty inline if enabled */}
             {warrantyOn && (
-              <div className="flex items-start gap-3.5 p-4 bg-green-50 rounded-xl border border-green-100">
-                <ShieldCheck size={20} className="text-green-600 mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3.5 p-4 bg-brand-50 rounded-xl border border-brand-100">
+                <ShieldCheck size={20} className="text-brand-600 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-gray-900">{warrantyPeriod ? `${warrantyPeriod} Manufacturer Warranty` : 'Manufacturer Warranty Included'}</p>
                   {warrantyDesc && <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">{warrantyDesc}</p>}
@@ -768,7 +906,10 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
         </section>
       )}
 
-      {/* ══ PRODUCT FEATURES — always visible ══════════════════════════════ */}
+      {/* ══ FEATURED VIDEO — large embed, dark section ══════════════════════ */}
+      {videoId && <FeaturedVideoSection videoId={videoId} productName={name} />}
+
+      {/* ══ PRODUCT FEATURES — editorial, large images, Nuuk-style ══════════ */}
       <ProductFeaturesSection chapters={chapters} />
 
       {/* ══ APPLICATIONS — always visible ══════════════════════════════════ */}
@@ -776,6 +917,9 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
 
       {/* ══ CERTIFICATIONS — always visible ════════════════════════════════ */}
       <CertificationsSection certs={certs} badges={badges} />
+
+      {/* ══ UGC CAROUSEL — deployment images from admin ═════════════════════ */}
+      <UGCCarousel images={ugcImages} productName={name} />
 
       {/* ══ SPARE PARTS — always visible (async loaded) ════════════════════ */}
       <SparePartsSection productId={productId} productName={name} />

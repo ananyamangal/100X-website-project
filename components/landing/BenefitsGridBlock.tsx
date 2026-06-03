@@ -1,4 +1,4 @@
-import type { BenefitItem } from "@/lib/seo/landing-types"
+﻿import type { BenefitItem } from "@/lib/seo/landing-types"
 import SectionHeader from "./SectionHeader"
 
 type Props = {
@@ -21,7 +21,7 @@ export default function BenefitsGridBlock({ eyebrow, title, items }: Props) {
           {items.map((item, i) => (
             <li
               key={i}
-              className="rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md [[data-theme=dark-industrial]_&]:bg-white/[0.04] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:hover:border-green-500/40 [[data-theme=dark-industrial]_&]:hover:bg-white/[0.06]"
+              className="rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md [[data-theme=dark-industrial]_&]:bg-white/[0.04] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:hover:border-green-500/40 [[data-theme=dark-industrial]_&]:hover:bg-white/[0.06]"
             >
               <div
                 aria-hidden="true"

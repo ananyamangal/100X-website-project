@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, MessageCircle, Star, CheckCircle, Play, Shield, Download, Package, Wrench, FileText, HelpCircle, Layers, Award, ChevronDown } from 'lucide-react';
@@ -158,8 +158,8 @@ function CertificationsTabContent({ certifications, badges }: { certifications: 
 
 function WarrantyTabContent({ period, description, icon }: { period?: string; description?: string; icon?: string }) {
     return (
-        <div className="flex items-start gap-5 p-5 bg-green-50 rounded-xl border border-green-100">
-            <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-white shrink-0 shadow-sm">
+        <div className="flex items-start gap-5 p-5 bg-brand-50 rounded-xl border border-brand-100">
+            <div className="w-12 h-12 rounded-full bg-brand-600 flex items-center justify-center text-white shrink-0 shadow-sm">
                 {icon ? <span className="text-xl">{icon}</span> : <Shield size={22} />}
             </div>
             <div>

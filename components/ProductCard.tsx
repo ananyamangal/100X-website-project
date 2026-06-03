@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -61,7 +61,7 @@ export default function ProductCard({
   }
 
   return (
-    <Card className="group overflow-hidden border border-gray-200 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-green-300 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+    <Card className="group overflow-hidden border border-gray-200 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0">
       {/* Whole image area (image + dots + badges + star) is now a single
           clickable link to the product detail page. Badges and the star
           chip render inside the link via pointer-events-none + relative
@@ -70,7 +70,7 @@ export default function ProductCard({
       <Link
         href={`/${slugify(product.name || product.name)}`}
         aria-label={`View details for ${product.name}`}
-        className="block relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 focus-visible:ring-inset"
+        className="block relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-inset"
       >
         <div className="relative w-full aspect-[4/3] overflow-hidden bg-white">
           <img
@@ -89,7 +89,7 @@ export default function ProductCard({
             {images.slice(0, 5).map((_, idx) => (
               <span
                 key={idx}
-                className={`w-2 h-2 rounded-full ${idx === (currentImageIndex % Math.min(images.length, 5)) ? 'bg-green-600' : 'bg-gray-300'}`}
+                className={`w-2 h-2 rounded-full ${idx === (currentImageIndex % Math.min(images.length, 5)) ? 'bg-brand-600' : 'bg-gray-300'}`}
               />
             ))}
           </div>
@@ -101,7 +101,7 @@ export default function ProductCard({
               className={`${badge === 'Best Seller'
                   ? 'bg-red-500 hover:bg-red-600'
                   : badge === 'Eco-Friendly'
-                    ? 'bg-green-500 hover:bg-green-600'
+                    ? 'bg-brand-500 hover:bg-brand-600'
                     : badge === 'New Launch'
                       ? 'bg-blue-500 hover:bg-blue-600'
                       : 'bg-orange-500 hover:bg-orange-600'
@@ -137,13 +137,13 @@ export default function ProductCard({
       <CardContent className="p-6 md:p-7">
         <div className="flex items-start justify-between gap-3 mb-3">
           <Link href={`/${slugify(product.name || product.name)}`} className="min-w-0 flex-1">
-            <h3 className="text-lg md:text-xl font-bold text-gray-900 leading-snug group-hover:text-green-700 transition-colors line-clamp-2">
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 leading-snug group-hover:text-brand-700 transition-colors line-clamp-2">
               {product.name}
             </h3>
           </Link>
           {product.priceRange ? (
             <div className="shrink-0 text-right">
-              <div className="text-base md:text-lg font-bold text-green-700 tabular-nums">{product.priceRange}</div>
+              <div className="text-base md:text-lg font-bold text-brand-700 tabular-nums">{product.priceRange}</div>
             </div>
           ) : null}
         </div>
@@ -151,7 +151,7 @@ export default function ProductCard({
         <ul className="space-y-1.5 mb-6 list-none">
           {product.features?.slice(0, 3).map((feature: string, idx: number) => (
             <li key={idx} className="flex items-start text-sm text-gray-700">
-              <span aria-hidden="true" className="mt-2 mr-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500"></span>
+              <span aria-hidden="true" className="mt-2 mr-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span>
               <span className="line-clamp-1">{feature}</span>
             </li>
           ))}
@@ -159,7 +159,7 @@ export default function ProductCard({
         <div className="flex gap-2.5">
           <Button
             asChild
-            className="flex-1 bg-green-600 hover:bg-green-700 shadow-sm transition-shadow hover:shadow-md"
+            className="flex-1 bg-brand-600 hover:bg-brand-700 shadow-sm transition-shadow hover:shadow-md"
           >
             <Link href={`/${slugify(product.name || product.name)}`}>
               View Details
@@ -167,7 +167,7 @@ export default function ProductCard({
           </Button>
           <Button
             variant="outline"
-            className="border-green-600 text-green-700 hover:bg-green-50 bg-transparent"
+            className="border-brand-600 text-brand-700 hover:bg-brand-50 bg-transparent"
             onClick={onBrochureDownload}
             aria-label={`Download brochure for ${product.name}`}
           >

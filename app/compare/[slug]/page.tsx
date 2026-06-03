@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
@@ -80,16 +80,16 @@ export default async function ComparisonPage({
 
       <main className="max-w-4xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/compare" className="hover:text-green-600">Compare</Link>
+          <Link href="/compare" className="hover:text-brand-600">Compare</Link>
           <span className="mx-2">/</span>
           <span className="truncate max-w-xs inline-block align-bottom">{c.h1}</span>
         </nav>
 
         <div className="flex flex-wrap gap-2 mb-4">
           {c.tags.map((tag) => (
-            <span key={tag} className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+            <span key={tag} className="text-xs bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full">
               {tag}
             </span>
           ))}
@@ -103,8 +103,8 @@ export default async function ComparisonPage({
         <p className="text-gray-700 leading-relaxed mb-8">{c.intro}</p>
 
         {/* Verdict Banner */}
-        <div className={`rounded-xl p-5 mb-8 border ${c.verdictWinner === "depends" ? "bg-blue-50 border-blue-200" : "bg-green-50 border-green-200"}`}>
-          <p className={`text-xs font-semibold uppercase tracking-widest mb-2 ${c.verdictWinner === "depends" ? "text-blue-700" : "text-green-700"}`}>
+        <div className={`rounded-xl p-5 mb-8 border ${c.verdictWinner === "depends" ? "bg-blue-50 border-blue-200" : "bg-brand-50 border-brand-200"}`}>
+          <p className={`text-xs font-semibold uppercase tracking-widest mb-2 ${c.verdictWinner === "depends" ? "text-blue-700" : "text-brand-700"}`}>
             {c.verdictWinner === "depends" ? "Verdict: Depends on Your Use Case" : `Verdict: ${c.verdictWinner === "a" ? c.aLabel : c.bLabel} Wins`}
           </p>
           <p className="text-gray-800 text-sm leading-relaxed">{c.verdict}</p>
@@ -134,10 +134,10 @@ export default async function ComparisonPage({
                     <td className="py-2.5 px-4 font-medium text-gray-700 border-b border-gray-100 align-top">
                       {row.attribute}
                     </td>
-                    <td className={`py-2.5 px-4 text-gray-700 border-b border-gray-100 align-top ${winnerA ? "text-green-800 font-medium" : ""}`}>
+                    <td className={`py-2.5 px-4 text-gray-700 border-b border-gray-100 align-top ${winnerA ? "text-brand-800 font-medium" : ""}`}>
                       {row.a}
                     </td>
-                    <td className={`py-2.5 px-4 text-gray-700 border-b border-gray-100 align-top ${winnerB ? "text-green-800 font-medium" : ""}`}>
+                    <td className={`py-2.5 px-4 text-gray-700 border-b border-gray-100 align-top ${winnerB ? "text-brand-800 font-medium" : ""}`}>
                       {row.b}
                     </td>
                   </tr>
@@ -199,13 +199,13 @@ export default async function ComparisonPage({
         )}
 
         {/* CTA */}
-        <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-10 text-sm">
-          <p className="font-semibold text-green-800 mb-2">Ready to Buy? Get a Quote from 100X Circle</p>
-          <p className="text-green-700 mb-3">
+        <div className="bg-brand-50 border border-brand-200 rounded-xl p-5 mb-10 text-sm">
+          <p className="font-semibold text-brand-800 mb-2">Ready to Buy? Get a Quote from 100X Circle</p>
+          <p className="text-brand-700 mb-3">
             100X Circle is India&apos;s leading OEM manufacturer of thermal fogging machines — ISO
             9001 certified, GeM-listed MSME, supplying to municipalities and farmers since 2014.
           </p>
-          <div className="flex flex-wrap gap-4 text-green-800 font-medium">
+          <div className="flex flex-wrap gap-4 text-brand-800 font-medium">
             <span>📞 +91-7827229116</span>
             <span>✉ 100xcircle@gmail.com</span>
             <Link href="/products" className="underline hover:no-underline">Browse Products →</Link>

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React from "react"
 import Link from "next/link"
@@ -49,11 +49,11 @@ export default function StatesServedBlock() {
         <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4 list-none">
           {STATES.map((s) => {
             const inner = (
-              <span className="flex items-center gap-2 px-4 py-3 rounded-xl border border-gray-200 bg-white hover:border-green-600 hover:shadow-sm transition-all">
-                <MapPin className="text-green-700 shrink-0" size={18} aria-hidden="true" />
+              <span className="flex items-center gap-2 px-4 py-3 rounded-xl border border-gray-200 bg-white hover:border-brand-600 hover:shadow-sm transition-all">
+                <MapPin className="text-brand-700 shrink-0" size={18} aria-hidden="true" />
                 <span className="text-sm md:text-base text-gray-800 font-medium">{s.name}</span>
                 {s.href && (
-                  <ArrowRight className="text-green-700 ml-auto shrink-0" size={16} aria-hidden="true" />
+                  <ArrowRight className="text-brand-700 ml-auto shrink-0" size={16} aria-hidden="true" />
                 )}
               </span>
             )
@@ -66,7 +66,7 @@ export default function StatesServedBlock() {
         </ul>
 
         <p className="text-center mt-8 text-sm text-gray-600">
-          Don't see your state listed? <Link href="/contact-us" className="text-green-700 underline-offset-2 hover:underline font-medium">Get in touch</Link> — we ship nationwide.
+          Don't see your state listed? <Link href="/contact-us" className="text-brand-700 underline-offset-2 hover:underline font-medium">Get in touch</Link> — we ship nationwide.
         </p>
       </div>
     </section>

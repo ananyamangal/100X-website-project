@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic"
+﻿export const dynamic = "force-dynamic"
 
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
@@ -169,7 +169,7 @@ export default async function RootLayout({
         </Suspense>
         <a
           href="#main-content"
-          className="fixed left-4 top-4 z-[100] -translate-y-[200%] rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-lg ring-2 ring-green-600 transition-transform focus:translate-y-0"
+          className="fixed left-4 top-4 z-[100] -translate-y-[200%] rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-lg ring-2 ring-brand-600 transition-transform focus:translate-y-0"
         >
           Skip to main content
         </a>

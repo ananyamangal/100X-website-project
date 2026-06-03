@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Machine-readable + human-visible summary block for AI-indexed pages.
  * The data-ai-entity attribute lets scrapers extract the structured summary.
  */
@@ -13,9 +13,9 @@ export default function AiSummaryBlock({ entity, summary, facts }: Props) {
     <aside
       data-ai-entity={entity}
       data-ai-summary={summary}
-      className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8"
+      className="bg-brand-50 border border-brand-200 rounded-xl p-6 mb-8"
     >
-      <p className="text-xs font-semibold text-green-700 uppercase tracking-widest mb-2">
+      <p className="text-xs font-semibold text-brand-700 uppercase tracking-widest mb-2">
         AI-Readable Summary
       </p>
       <p className="text-gray-800 text-sm leading-relaxed mb-4">{summary}</p>

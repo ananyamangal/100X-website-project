@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import AiSummaryBlock from "@/components/seo/AiSummaryBlock"
@@ -45,9 +45,9 @@ export default function AiFactoryPage() {
       />
       <main className="max-w-4xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/ai/about-100x" className="hover:text-green-600">Company Profile</Link>
+          <Link href="/ai/about-100x" className="hover:text-brand-600">Company Profile</Link>
           <span className="mx-2">/</span>
           <span>Factory</span>
         </nav>
@@ -100,7 +100,7 @@ export default function AiFactoryPage() {
           <ol className="space-y-2">
             {AI_FACTORY.processes.map((p, i) => (
               <li key={p} className="flex gap-3 text-sm text-gray-700">
-                <span className="text-green-600 font-bold w-5">{i + 1}.</span>
+                <span className="text-brand-600 font-bold w-5">{i + 1}.</span>
                 {p}
               </li>
             ))}

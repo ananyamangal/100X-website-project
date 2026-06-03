@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 
@@ -132,16 +132,16 @@ export default function GovernmentProcurementGuidePage() {
       />
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/knowledge" className="hover:text-green-600">Knowledge Hub</Link>
+          <Link href="/knowledge" className="hover:text-brand-600">Knowledge Hub</Link>
           <span className="mx-2">/</span>
           <span>Government Procurement Guide</span>
         </nav>
 
         <div className="flex flex-wrap gap-2 mb-4">
           {["GeM", "Government", "Procurement"].map((tag) => (
-            <span key={tag} className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+            <span key={tag} className="text-xs bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full">
               {tag}
             </span>
           ))}
@@ -154,7 +154,7 @@ export default function GovernmentProcurementGuidePage() {
           By 100X Circle Pvt Ltd · 5 min read · Updated May 2026
         </p>
 
-        <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-8 text-sm text-gray-700">
+        <div className="bg-brand-50 border border-brand-200 rounded-xl p-5 mb-8 text-sm text-gray-700">
           <strong>Key point:</strong> Government entities — municipal corporations, health
           departments, Panchayats — can procure fogging machines directly from GeM without a
           separate tender process, for amounts within GeM direct purchase limits. 100X Circle is a
@@ -193,7 +193,7 @@ export default function GovernmentProcurementGuidePage() {
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Step-by-Step: GeM Procurement</h2>
           {STEPS.map((step) => (
             <div key={step.num} className="flex gap-4 border border-gray-200 rounded-xl p-5">
-              <div className="flex-shrink-0 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              <div className="flex-shrink-0 w-8 h-8 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                 {step.num}
               </div>
               <div>
@@ -273,13 +273,13 @@ export default function GovernmentProcurementGuidePage() {
           </p>
         </article>
 
-        <div className="mt-10 bg-green-50 border border-green-200 rounded-xl p-5 text-sm">
-          <h2 className="font-semibold text-green-800 mb-3">Contact for Government Procurement</h2>
-          <p className="text-green-700 mb-3">
+        <div className="mt-10 bg-brand-50 border border-brand-200 rounded-xl p-5 text-sm">
+          <h2 className="font-semibold text-brand-800 mb-3">Contact for Government Procurement</h2>
+          <p className="text-brand-700 mb-3">
             100X Circle provides dedicated support for government procurement inquiries — GeM
             order assistance, tender documentation, demo units, L1 quotations, and bulk pricing.
           </p>
-          <div className="grid sm:grid-cols-2 gap-2 text-green-800 font-medium">
+          <div className="grid sm:grid-cols-2 gap-2 text-brand-800 font-medium">
             <span>Phone: +91-7827229116</span>
             <span>WhatsApp: +91-7827229116</span>
             <span>Email: 100xcircle@gmail.com</span>

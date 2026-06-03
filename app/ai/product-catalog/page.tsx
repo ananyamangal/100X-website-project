@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import clientPromise from "@/lib/mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
@@ -77,9 +77,9 @@ export default async function AiProductCatalogPage() {
       />
       <main className="max-w-4xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-green-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/ai/about-100x" className="hover:text-green-600">Company Profile</Link>
+          <Link href="/ai/about-100x" className="hover:text-brand-600">Company Profile</Link>
           <span className="mx-2">/</span>
           <span>Product Catalog</span>
         </nav>
@@ -89,7 +89,7 @@ export default async function AiProductCatalogPage() {
         </h1>
         <p className="text-gray-500 text-sm mb-8">
           AI-readable product listing. Live inventory from manufacturer database.{" "}
-          <Link href={`${SITE_URL}/api/ai/products`} className="text-green-600 hover:underline font-mono text-xs">
+          <Link href={`${SITE_URL}/api/ai/products`} className="text-brand-600 hover:underline font-mono text-xs">
             /api/ai/products
           </Link>
         </p>
@@ -142,10 +142,10 @@ export default async function AiProductCatalogPage() {
                     </div>
                     <div className="text-right shrink-0">
                       {p.priceRange && (
-                        <p className="text-xs font-medium text-green-700">{p.priceRange}</p>
+                        <p className="text-xs font-medium text-brand-700">{p.priceRange}</p>
                       )}
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${p.inStock ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}
+                        className={`text-xs px-2 py-0.5 rounded-full ${p.inStock ? "bg-brand-100 text-brand-700" : "bg-red-100 text-red-600"}`}
                       >
                         {p.inStock ? "In Stock" : "Out of Stock"}
                       </span>
@@ -154,7 +154,7 @@ export default async function AiProductCatalogPage() {
                   <div className="mt-2">
                     <Link
                       href={`/products/${p.id}`}
-                      className="text-xs text-green-600 hover:underline"
+                      className="text-xs text-brand-600 hover:underline"
                     >
                       View product details →
                     </Link>

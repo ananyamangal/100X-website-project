@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -188,8 +188,8 @@ export default function ContactSection({
             <CardContent className="p-6 md:p-8">
               <h3 className="font-700 text-gray-900 text-xl mb-5">Send us a message</h3>
 
-              <div className="mb-8 flex items-start gap-3 rounded-xl border border-green-100 bg-green-50/80 px-4 py-3 text-left text-base text-green-900">
-                <Shield className="mt-0.5 h-6 w-6 shrink-0 text-green-600" aria-hidden />
+              <div className="mb-8 flex items-start gap-3 rounded-xl border border-brand-100 bg-brand-50/80 px-4 py-3 text-left text-base text-green-900">
+                <Shield className="mt-0.5 h-6 w-6 shrink-0 text-brand-600" aria-hidden />
                 <p className="leading-snug">
                   Your details are used only to respond to this inquiry. We typically reply within one business day.
                 </p>
@@ -230,7 +230,7 @@ export default function ContactSection({
                   <select
                     id="contact-subject"
                     name="subject"
-                    className="w-full min-h-[52px] p-5 text-lg border border-gray-300 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 focus-visible:border-transparent bg-white"
+                    className="w-full min-h-[52px] p-5 text-lg border border-gray-300 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:border-transparent bg-white"
                     required
                     defaultValue=""
                   >

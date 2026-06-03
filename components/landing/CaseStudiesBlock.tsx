@@ -1,4 +1,4 @@
-import { Quote } from "lucide-react"
+﻿import { Quote } from "lucide-react"
 import type { CaseStudy } from "@/lib/seo/landing-types"
 import SectionHeader from "./SectionHeader"
 
@@ -26,7 +26,7 @@ export default function CaseStudiesBlock({ eyebrow, title, items }: Props) {
               className="rounded-2xl border border-gray-200 bg-white p-6 [[data-theme=dark-industrial]_&]:bg-white/[0.04] [[data-theme=dark-industrial]_&]:border-white/10"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="grid h-10 w-10 place-items-center rounded-md bg-green-100 text-green-700 font-bold text-sm [[data-theme=dark-industrial]_&]:bg-green-500/10 [[data-theme=dark-industrial]_&]:text-green-400">
+                <div className="grid h-10 w-10 place-items-center rounded-md bg-brand-100 text-brand-700 font-bold text-sm [[data-theme=dark-industrial]_&]:bg-brand-500/10 [[data-theme=dark-industrial]_&]:text-brand-400">
                   {(c.client[0] || "C").toUpperCase()}
                 </div>
                 <div>
@@ -40,7 +40,7 @@ export default function CaseStudiesBlock({ eyebrow, title, items }: Props) {
                   ) : null}
                 </div>
               </div>
-              <p className="text-sm font-medium text-green-700 [[data-theme=dark-industrial]_&]:text-green-400">
+              <p className="text-sm font-medium text-brand-700 [[data-theme=dark-industrial]_&]:text-brand-400">
                 {c.result}
               </p>
               {c.quote ? (
@@ -48,7 +48,7 @@ export default function CaseStudiesBlock({ eyebrow, title, items }: Props) {
                   <Quote
                     size={16}
                     aria-hidden="true"
-                    className="mt-1 shrink-0 text-green-600/70 [[data-theme=dark-industrial]_&]:text-green-400/70"
+                    className="mt-1 shrink-0 text-brand-600/70 [[data-theme=dark-industrial]_&]:text-brand-400/70"
                   />
                   <span>{c.quote}</span>
                 </blockquote>

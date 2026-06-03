@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
@@ -123,7 +123,7 @@ export default function GemPopup() {
             Submit
           </Button>
           <div className="flex gap-3">
-            <Button onClick={talkToOem} className="flex-1 bg-green-600 hover:bg-green-700">
+            <Button onClick={talkToOem} className="flex-1 bg-brand-600 hover:bg-brand-700">
               <MessageCircle className="mr-2" size={18} />
               Talk to OEM
             </Button>

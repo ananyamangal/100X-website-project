@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+﻿import { cn } from "@/lib/utils"
 import { isProbablyRichHtml, sanitizeRichHtml } from "@/lib/rich-text"
 
 type RichContentProps = {
@@ -31,7 +31,7 @@ export function RichContent({ html, className }: RichContentProps) {
         "[&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:space-y-1",
         "[&_li]:text-gray-700",
         // Links
-        "[&_a]:text-green-600 [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-green-700",
+        "[&_a]:text-brand-600 [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-brand-700",
         // Images — responsive, no overflow
         "[&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-4",
         // Tables — scrollable on mobile, no overflow
@@ -42,7 +42,7 @@ export function RichContent({ html, className }: RichContentProps) {
         // Blockquotes
         "[&_blockquote]:border-l-4 [&_blockquote]:border-green-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-600 [&_blockquote]:my-4",
         // Code
-        "[&_pre]:bg-gray-900 [&_pre]:text-green-400 [&_pre]:rounded-lg [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre]:my-4 [&_pre]:text-sm",
+        "[&_pre]:bg-gray-900 [&_pre]:text-brand-400 [&_pre]:rounded-lg [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre]:my-4 [&_pre]:text-sm",
         "[&_code]:bg-gray-100 [&_code]:text-gray-800 [&_code]:rounded [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-sm",
         "[&_pre_code]:bg-transparent [&_pre_code]:text-inherit [&_pre_code]:p-0",
         // Quill size classes
