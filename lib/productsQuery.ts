@@ -84,14 +84,17 @@ function tokenSig(text: string): string {
 }
 
 /**
- * Returns true if a product whose name matches the given slug exists in
- * the DB. Matches by full normalised form first, then by token-sorted
- * signature (so admin renames don't break existing SEO slugs).
+ * Returns true if a product whose slug field or name matches the given slug.
+ * Checks the slug field first (fast index hit), then falls back to name matching.
  */
 export async function productExistsBySlug(slug: string): Promise<boolean> {
   try {
     const client = await clientPromise
     const db = client.db()
+    // Fast path: slug field set by admin
+    const bySlugField = await db.collection("products").findOne({ slug }, { projection: { _id: 1 } })
+    if (bySlugField) return true
+    // Fallback: name-based matching (legacy products without slug field)
     const products = await db
       .collection("products")
       .find({}, { projection: { name: 1 } })
@@ -105,6 +108,34 @@ export async function productExistsBySlug(slug: string): Promise<boolean> {
     })
   } catch {
     return false
+  }
+}
+
+/**
+ * Fetch a fully-normalized product by URL slug.
+ * Returns null if not found. Used server-side in app/[slug]/page.tsx.
+ */
+export async function getProductBySlug(slug: string): Promise<Record<string, unknown> | null> {
+  try {
+    const client = await clientPromise
+    const db = client.db()
+    // Fast path: exact slug field match
+    let raw = await db.collection("products").findOne({ slug })
+    if (!raw) {
+      // Fallback: name-based matching
+      const all = await db.collection("products").find({}, { projection: { name: 1, slug: 1 } }).toArray()
+      const slugNorm = normalizeSlugLike(slug)
+      const slugSig = tokenSig(slug)
+      const match = all.find((p) => {
+        const name = typeof p.name === "string" ? p.name : ""
+        return normalizeSlugLike(name) === slugNorm || tokenSig(name) === slugSig
+      })
+      if (match) raw = await db.collection("products").findOne({ _id: match._id }) ?? null
+    }
+    if (!raw) return null
+    return normalizeProduct(JSON.parse(JSON.stringify(raw)))
+  } catch {
+    return null
   }
 }
 
