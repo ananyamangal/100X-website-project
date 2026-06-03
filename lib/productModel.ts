@@ -60,6 +60,8 @@ export interface Product {
   warrantyPeriod?: string;
   warrantyDescription?: string;
   warrantyIcon?: string;
+  // UGC / deployment carousel images
+  ugcImages?: string[];
   // SEO overrides
   seoTitle?: string;
   metaDescription?: string;

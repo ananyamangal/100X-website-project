@@ -1827,6 +1827,7 @@ function ProductForm({
     warrantyPeriod: product?.warrantyPeriod || "",
     warrantyDescription: product?.warrantyDescription || "",
     warrantyIcon: product?.warrantyIcon || "",
+    ugcImages: toStringArray(product?.ugcImages).join("\n"),
     slug: product?.slug || "",
     seoTitle: product?.seoTitle || "",
     metaDescription: product?.metaDescription || "",
@@ -1854,6 +1855,7 @@ function ProductForm({
       certifications: toStringArray(formData.certifications),
       performanceMetrics: toStringArray(formData.performanceMetrics),
       productFaqs: Array.isArray(formData.productFaqs) ? formData.productFaqs : [],
+      ugcImages: toStringArray(formData.ugcImages),
       badges: toStringArray(formData.badges),
       ...(product && { id: product.id, createdAt: product.createdAt }),
     }
@@ -2082,6 +2084,21 @@ function ProductForm({
                 </>
               )}
             </div>
+          </div>
+
+          {/* UGC / Deployment Images carousel */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Deployment / UGC Images <span className="text-xs text-gray-400 font-normal">(one URL per line — shown as scrollable carousel on product page)</span>
+            </label>
+            <Textarea
+              value={formData.ugcImages as any}
+              onChange={(e) => setFormData({ ...formData, ugcImages: e.target.value as any })}
+              placeholder={"https://…/photo1.jpg\nhttps://…/photo2.jpg\nhttps://…/photo3.jpg"}
+              rows={4}
+              className="font-mono text-xs"
+            />
+            <p className="text-xs text-gray-400 mt-1">Add photos of the machine being used in the field — government deployments, farmers, pest control operators. These display as a horizontal scroll carousel.</p>
           </div>
 
           <div>
