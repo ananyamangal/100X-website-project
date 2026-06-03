@@ -1,12 +1,11 @@
 'use client';
-import React, { useEffect, useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Download, MessageCircle, Play, CheckCircle2, ArrowRight, Star, Wrench, ShieldCheck, HelpCircle, Package, FileText, ChevronDown } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight, Download, MessageCircle, Play, CheckCircle2, ArrowRight, Star, Wrench, ShieldCheck, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { RichContent } from '@/components/RichContent';
 import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
 import RFQForm from '@/components/forms/RFQForm';
 import BrochureLeadModal from '@/components/BrochureLeadModal';
-import RealWorldDeployments from '@/components/cinematic/RealWorldDeployments';
 import { BUSINESS, SITE_URL } from '@/lib/seo/site-config';
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
@@ -38,16 +37,16 @@ function safeArr(v: unknown): string[] {
   return [];
 }
 
-// Spec group keywords
 const SPEC_GROUPS: [string, string][] = [
   ['engine', 'Engine'], ['fuel', 'Engine'], ['ignition', 'Engine'], ['cylinder', 'Engine'], ['rpm', 'Engine'], ['power', 'Engine'],
   ['tank', 'Tank'], ['capacity', 'Tank'], ['solution', 'Tank'], ['reservoir', 'Tank'],
   ['output', 'Output'], ['coverage', 'Output'], ['spray', 'Output'], ['droplet', 'Output'], ['fog', 'Output'], ['range', 'Output'],
   ['weight', 'Dimensions'], ['dimension', 'Dimensions'], ['length', 'Dimensions'], ['width', 'Dimensions'], ['height', 'Dimensions'], ['size', 'Dimensions'],
-  ['material', 'Material'], ['steel', 'Material'], ['body', 'Material'], ['body', 'Material'],
+  ['material', 'Material'], ['steel', 'Material'], ['body', 'Material'],
   ['compliance', 'Compliance'], ['certification', 'Compliance'], ['approved', 'Compliance'], ['standard', 'Compliance'], ['bis', 'Compliance'], ['iso', 'Compliance'],
   ['performance', 'Performance'], ['flow', 'Performance'], ['pressure', 'Performance'], ['speed', 'Performance'],
 ];
+
 function groupSpecs(specs: string[]): Record<string, string[]> {
   const out: Record<string, string[]> = {};
   for (const spec of specs) {
@@ -77,7 +76,6 @@ function ProductGallery({ images, videoId, name }: { images: string[]; videoId: 
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Main viewer */}
       <div
         className="relative rounded-2xl overflow-hidden bg-gray-900"
         style={{ aspectRatio: '4/3' }}
@@ -118,7 +116,6 @@ function ProductGallery({ images, videoId, name }: { images: string[]; videoId: 
           </div>
         </>}
       </div>
-      {/* Thumbs */}
       {n > 1 && (
         <div className="flex gap-2 flex-wrap">
           {items.slice(0, 6).map((item, i) => (
@@ -138,54 +135,68 @@ function ProductGallery({ images, videoId, name }: { images: string[]; videoId: 
   );
 }
 
-// ── Horizontal Tab System ─────────────────────────────────────────────────────
+// ── Accordion ─────────────────────────────────────────────────────────────────
 
-interface Tab { id: string; label: string; content: React.ReactNode; hidden?: boolean }
+interface AccordionItem {
+  id: string;
+  label: string;
+  badge?: string;
+  content: React.ReactNode;
+  hidden?: boolean;
+}
 
-function TabPanel({ tabs }: { tabs: Tab[] }) {
-  const visible = tabs.filter(t => !t.hidden);
-  const [active, setActive] = useState(visible[0]?.id ?? '');
-  const barRef = useRef<HTMLDivElement>(null);
-
-  const current = visible.find(t => t.id === active);
+function AccordionPanel({ items, defaultOpen }: { items: AccordionItem[]; defaultOpen?: string }) {
+  const visible = items.filter(i => !i.hidden);
+  const [open, setOpen] = useState<string>(defaultOpen ?? visible[0]?.id ?? '');
 
   return (
-    <div>
-      {/* Tab bar */}
-      <div ref={barRef} className="flex overflow-x-auto scrollbar-hide border-b border-gray-200 bg-white sticky top-0 z-20" style={{ scrollbarWidth: 'none' }}>
-        {visible.map(tab => (
+    <div className="divide-y divide-gray-100">
+      {visible.map(item => (
+        <div key={item.id}>
           <button
-            key={tab.id}
-            onClick={() => setActive(tab.id)}
-            className={`shrink-0 px-5 py-4 text-sm font-600 whitespace-nowrap border-b-2 transition-all ${active === tab.id ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'}`}
+            onClick={() => setOpen(open === item.id ? '' : item.id)}
+            className="w-full flex items-center gap-3 px-4 md:px-6 lg:px-8 py-[18px] text-left hover:bg-gray-50/80 transition-colors group"
+            aria-expanded={open === item.id}
           >
-            {tab.label}
+            <ChevronRight
+              size={15}
+              className={`shrink-0 transition-transform duration-200 ${open === item.id ? 'rotate-90 text-brand-600' : 'text-gray-400 group-hover:text-gray-600'}`}
+            />
+            <span className={`text-sm font-600 flex-1 transition-colors ${open === item.id ? 'text-brand-700' : 'text-gray-800'}`}>
+              {item.label}
+            </span>
+            {item.badge && (
+              <span className="text-xs text-gray-400 shrink-0 font-500 tabular-nums">{item.badge}</span>
+            )}
           </button>
-        ))}
-      </div>
-      {/* Content */}
-      <div className="py-8 px-4 md:px-6 lg:px-8">
-        {current?.content}
-      </div>
+          {open === item.id && (
+            <div className="px-4 md:px-6 lg:px-8 pb-8 pt-2 border-t border-gray-50">
+              {item.content}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
 
-// ── Tab Contents ──────────────────────────────────────────────────────────────
+// ── Accordion Content Components ──────────────────────────────────────────────
 
 function SpecsContent({ specs, youtubeLink }: { specs: string[]; youtubeLink?: string }) {
   const groups = groupSpecs(specs);
   const multiGroup = Object.keys(groups).length > 1;
   return (
-    <div className="max-w-4xl space-y-8">
+    <div className="max-w-4xl space-y-7">
       {Object.entries(groups).map(([grp, items]) => (
         <div key={grp}>
-          {multiGroup && <h4 className="text-[10px] font-700 text-brand-600 uppercase tracking-widest mb-3">{grp}</h4>}
+          {multiGroup && (
+            <h4 className="text-[10px] font-700 text-brand-600 uppercase tracking-widest mb-3">{grp}</h4>
+          )}
           <div className="rounded-xl border border-gray-100 overflow-hidden">
             {items.map((spec, i) => {
               const ci = spec.indexOf(':');
               if (ci === -1) return (
-                <div key={i} className={`flex items-center gap-3 px-5 py-3 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                <div key={i} className={`flex items-center gap-3 px-5 py-3 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'}`}>
                   <CheckCircle2 size={13} className="text-brand-500 shrink-0" />
                   <span className="text-sm text-gray-700">{spec}</span>
                 </div>
@@ -193,7 +204,7 @@ function SpecsContent({ specs, youtubeLink }: { specs: string[]; youtubeLink?: s
               const label = spec.slice(0, ci).trim();
               const value = spec.slice(ci + 1).trim();
               return (
-                <div key={i} className={`flex items-center gap-4 px-5 py-3 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                <div key={i} className={`flex items-center gap-4 px-5 py-3 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'}`}>
                   <span className="text-sm text-gray-500 w-48 shrink-0">{label}</span>
                   <span className="text-sm font-600 text-gray-900">{value}</span>
                 </div>
@@ -212,9 +223,38 @@ function SpecsContent({ specs, youtubeLink }: { specs: string[]; youtubeLink?: s
   );
 }
 
+function ProductFeaturesContent({ chapters }: { chapters: any[] }) {
+  return (
+    <div className="space-y-10 max-w-4xl">
+      {chapters.map((ch: any, i: number) => {
+        const chVid = safeStr(ch.videoUrl) ? getYouTubeId(safeStr(ch.videoUrl)) : null;
+        const chImg = safeStr(ch.imageUrl);
+        const isReverse = i % 2 !== 0;
+        return (
+          <div key={i} className={`grid md:grid-cols-2 gap-8 items-center ${isReverse ? 'md:[&>*:first-child]:order-2' : ''}`}>
+            <div className="rounded-xl overflow-hidden aspect-video bg-gray-100 flex items-center justify-center">
+              {chVid
+                ? <iframe src={`https://www.youtube.com/embed/${chVid}?rel=0`} title={safeStr(ch.title)} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
+                : chImg
+                  ? <img src={chImg} alt={safeStr(ch.title)} className="w-full h-full object-cover" loading="lazy" />
+                  : <span className="text-4xl font-800 text-gray-200">{String(i + 1).padStart(2, '0')}</span>}
+            </div>
+            <div className="space-y-3">
+              <p className="text-[10px] font-700 text-brand-600 uppercase tracking-widest">{String(i + 1).padStart(2, '0')}</p>
+              <h3 className="text-xl font-700 text-gray-900 leading-snug">{safeStr(ch.title)}</h3>
+              {safeStr(ch.subtitle) && <p className="text-brand-600 font-500 text-sm">{safeStr(ch.subtitle)}</p>}
+              {safeStr(ch.description) && <p className="text-gray-600 leading-relaxed text-sm md:text-base">{safeStr(ch.description)}</p>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function ApplicationsContent({ features, applications }: { features: string[]; applications: string[] }) {
   return (
-    <div className="max-w-4xl space-y-8">
+    <div className="max-w-4xl space-y-7">
       {features.length > 0 && (
         <div>
           <h4 className="text-[10px] font-700 text-brand-600 uppercase tracking-widest mb-4">Key Features</h4>
@@ -280,14 +320,14 @@ function SparePartsContent({ productId, productName }: { productId: string; prod
 
   if (!loaded) return <p className="text-sm text-gray-400">Loading spare parts…</p>;
   if (!parts.length) return (
-    <div className="text-center py-8">
+    <div className="py-4">
       <p className="text-gray-500 text-sm mb-3">No spare parts listed for {productName} yet.</p>
       <Link href="/spare-parts" className="text-sm font-600 text-brand-600 hover:underline">Browse all spare parts →</Link>
     </div>
   );
   return (
     <div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-5">
         {parts.slice(0, 8).map(part => (
           <Link key={part._id}
             href={(() => {
@@ -314,6 +354,53 @@ function SparePartsContent({ productId, productName }: { productId: string; prod
   );
 }
 
+function CaseStudiesContent({ productId, productName }: { productId: string; productName: string }) {
+  const [studies, setStudies] = useState<any[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    fetch(`/api/case-studies/by-product?productId=${productId}`)
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setStudies(data); setLoaded(true); })
+      .catch(() => setLoaded(true));
+  }, [productId]);
+
+  if (!loaded) return <p className="text-sm text-gray-400">Loading case studies…</p>;
+  if (!studies.length) return (
+    <div className="py-4">
+      <p className="text-sm text-gray-500 mb-3">No case studies available for {productName} yet.</p>
+      <Link href="/case-studies" className="text-sm font-600 text-brand-600 hover:underline">View all case studies →</Link>
+    </div>
+  );
+  return (
+    <div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
+        {studies.map((cs: any) => (
+          <Link key={cs._id} href={`/case-studies/${cs.slug}`}
+            className="group block bg-gray-50 rounded-xl border border-gray-100 overflow-hidden hover:border-brand-200 hover:shadow-md transition-all">
+            {cs.images?.[0]
+              ? <img src={cs.images[0]} alt={cs.title} className="w-full aspect-video object-cover" loading="lazy" />
+              : <div className="w-full aspect-video bg-gray-100 flex items-center justify-center"><Building2 size={28} className="text-gray-300" /></div>}
+            <div className="p-4">
+              {(cs.industry || cs.state) && (
+                <div className="flex gap-1.5 mb-2 flex-wrap">
+                  {cs.industry && <span className="text-[10px] font-600 uppercase tracking-wide bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full">{cs.industry}</span>}
+                  {cs.state && <span className="text-[10px] font-600 uppercase tracking-wide bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{cs.state}</span>}
+                </div>
+              )}
+              <p className="font-600 text-gray-900 text-sm leading-snug mb-1 group-hover:text-brand-700 transition-colors">{cs.title}</p>
+              {cs.customer && <p className="text-xs text-gray-500">{cs.customer}</p>}
+              <p className="text-brand-600 text-xs font-600 mt-2">Read case study →</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+      <Link href="/case-studies" className="inline-flex items-center gap-1.5 text-sm font-600 text-brand-600 hover:text-brand-700 transition-colors">
+        View all case studies <ArrowRight size={13} />
+      </Link>
+    </div>
+  );
+}
+
 function DownloadsContent({ brochureUrl, productName, onBrochureClick }: { brochureUrl?: string; productName: string; onBrochureClick: () => void }) {
   if (!brochureUrl) return <p className="text-sm text-gray-400">No downloads available for this product.</p>;
   return (
@@ -332,16 +419,20 @@ function DownloadsContent({ brochureUrl, productName, onBrochureClick }: { broch
 function FaqContent({ faqs }: { faqs: Array<{ q: string; a: string }> }) {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <div className="max-w-3xl divide-y divide-gray-100 rounded-xl border border-gray-100 overflow-hidden bg-gray-50">
+    <div className="max-w-3xl divide-y divide-gray-100 rounded-xl border border-gray-100 overflow-hidden">
       {faqs.map((f, i) => (
-        <div key={i}>
+        <div key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}>
           <button onClick={() => setOpen(open === i ? null : i)}
-            className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-gray-100 transition-colors"
+            className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors"
             aria-expanded={open === i}>
             <span className="text-sm font-600 text-gray-800 leading-snug">{f.q}</span>
-            <ChevronDown size={15} className={`shrink-0 text-gray-400 transition-transform duration-200 ${open === i ? 'rotate-180' : ''}`} />
+            <ChevronRight size={14} className={`shrink-0 text-gray-400 transition-transform duration-200 ${open === i ? 'rotate-90 text-brand-600' : ''}`} />
           </button>
-          {open === i && <div className="px-5 pb-5 pt-1"><p className="text-sm text-gray-600 leading-relaxed">{f.a}</p></div>}
+          {open === i && (
+            <div className="px-5 pb-5 pt-1">
+              <p className="text-sm text-gray-600 leading-relaxed">{f.a}</p>
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -406,6 +497,7 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
   const applications = safeArr(product.applications);
   const badges = safeArr(product.badges);
   const certifications = safeArr(product.certifications);
+  const allCerts = [...new Set([...certifications, ...badges])];
 
   const videoId = safeStr(product.heroVideoUrl || product.youtubeLink)
     ? getYouTubeId(safeStr(product.heroVideoUrl || product.youtubeLink))
@@ -415,7 +507,6 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
     ? (product.filmChapters as any[]).filter(c => c?.title).slice(0, 3)
     : [];
 
-  // FAQs: handle both {q,a} objects and legacy "Q:|A:" strings
   const rawFaqs = Array.isArray(product.productFaqs) ? product.productFaqs : [];
   const parsedFaqs: Array<{ q: string; a: string }> = rawFaqs.flatMap((f: any) => {
     if (f && typeof f === 'object' && f.q) return [{ q: safeStr(f.q), a: safeStr(f.a) }];
@@ -427,28 +518,52 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
   });
   const faqItems = parsedFaqs.length > 0 ? parsedFaqs : DEFAULT_FAQS;
 
-  const waText = safeStr(product.whatsappMessageText) || `Hi, I'm interested in ${name}. Please share pricing.`;
-  const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waText)}`;
-  const shareUrl = `${SITE_URL}/products/${productId}`;
-
-  // First 6 specs for the purchase-area panel
-  const heroSpecs = specs.slice(0, 6);
-
-  // Warranty
   const warrantyEnabled = Boolean(product.warrantyEnabled);
   const warrantyPeriod = safeStr(product.warrantyPeriod);
   const warrantyDesc = safeStr(product.warrantyDescription);
   const warrantyIcon = safeStr(product.warrantyIcon);
 
-  // Tabs
-  const tabs: Tab[] = [
-    { id: 'specs', label: 'Specifications', hidden: specs.length === 0, content: <SpecsContent specs={specs} youtubeLink={safeStr(product.youtubeLink) || undefined} /> },
-    { id: 'applications', label: 'Applications', hidden: features.length === 0 && applications.length === 0, content: <ApplicationsContent features={features} applications={applications} /> },
-    { id: 'certifications', label: 'Certifications', hidden: certifications.length === 0 && badges.length === 0, content: <CertificationsContent certs={certifications} badges={badges} /> },
-    { id: 'spareparts', label: 'Spare Parts', content: <SparePartsContent productId={productId} productName={name} /> },
-    { id: 'downloads', label: 'Downloads', hidden: !brochureUrl, content: <DownloadsContent brochureUrl={brochureUrl} productName={name} onBrochureClick={() => setBrochureOpen(true)} /> },
+  const waText = safeStr(product.whatsappMessageText) || `Hi, I'm interested in ${name}. Please share pricing.`;
+  const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waText)}`;
+
+  const heroSpecs = specs.slice(0, 6);
+
+  // Accordion items
+  const accordionItems: AccordionItem[] = [
     {
-      id: 'warranty', label: 'Warranty', hidden: !warrantyEnabled, content: (
+      id: 'specs',
+      label: 'Technical Specifications',
+      badge: specs.length > 0 ? `${specs.length} specs` : undefined,
+      hidden: specs.length === 0,
+      content: <SpecsContent specs={specs} youtubeLink={safeStr(product.youtubeLink) || undefined} />,
+    },
+    {
+      id: 'features',
+      label: 'Product Features',
+      badge: chapters.length > 0 ? `${chapters.length} features` : undefined,
+      hidden: chapters.length === 0,
+      content: <ProductFeaturesContent chapters={chapters} />,
+    },
+    {
+      id: 'applications',
+      label: 'Applications',
+      badge: (features.length + applications.length) > 0 ? `${features.length + applications.length} items` : undefined,
+      hidden: features.length === 0 && applications.length === 0,
+      content: <ApplicationsContent features={features} applications={applications} />,
+    },
+    {
+      id: 'certifications',
+      label: 'Certifications & Approvals',
+      badge: allCerts.length > 0 ? `${allCerts.length}` : undefined,
+      hidden: allCerts.length === 0,
+      content: <CertificationsContent certs={certifications} badges={badges} />,
+    },
+    {
+      id: 'warranty',
+      label: 'Warranty',
+      badge: warrantyPeriod || undefined,
+      hidden: !warrantyEnabled,
+      content: (
         <div className="max-w-xl flex items-start gap-5 p-6 bg-green-50 rounded-xl border border-green-100">
           <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-white shrink-0">
             {warrantyIcon ? <span className="text-xl">{warrantyIcon}</span> : <ShieldCheck size={22} />}
@@ -458,9 +573,30 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
             {warrantyDesc && <p className="text-sm text-gray-600 leading-relaxed">{warrantyDesc}</p>}
           </div>
         </div>
-      )
+      ),
     },
-    { id: 'faq', label: 'FAQ', content: <FaqContent faqs={faqItems} /> },
+    {
+      id: 'spareparts',
+      label: 'Spare Parts',
+      content: <SparePartsContent productId={productId} productName={name} />,
+    },
+    {
+      id: 'casestudies',
+      label: 'Case Studies',
+      content: <CaseStudiesContent productId={productId} productName={name} />,
+    },
+    {
+      id: 'downloads',
+      label: 'Downloads',
+      hidden: !brochureUrl,
+      content: <DownloadsContent brochureUrl={brochureUrl} productName={name} onBrochureClick={() => setBrochureOpen(true)} />,
+    },
+    {
+      id: 'faq',
+      label: 'Frequently Asked Questions',
+      badge: `${faqItems.length} Q&A`,
+      content: <FaqContent faqs={faqItems} />,
+    },
   ];
 
   return (
@@ -470,7 +606,7 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
 
       {/* ══════════════════════════════════════════════════════════════════
           SECTION 1 — PURCHASE AREA
-          Goal: everything visible above the fold on desktop
+          Everything visible above the fold on desktop
       ══════════════════════════════════════════════════════════════════ */}
       <section className="bg-gray-950 pt-20">
         <div className="container mx-auto px-4 md:px-6 pt-6 pb-10">
@@ -507,7 +643,7 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
                 </div>
               )}
 
-              {/* Name & tagline */}
+              {/* Name + tagline */}
               <div>
                 {product.category && <p className="text-[11px] font-700 text-brand-400 uppercase tracking-widest mb-1.5">{product.category}</p>}
                 <h1 className="text-2xl sm:text-3xl lg:text-[2.25rem] font-800 text-white leading-tight">{h1}</h1>
@@ -551,7 +687,7 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
                     })}
                     {specs.length > 6 && (
                       <div className="pt-2">
-                        <span className="text-[11px] text-brand-400">+ {specs.length - 6} more specs in Specifications tab ↓</span>
+                        <span className="text-[11px] text-brand-400">+ {specs.length - 6} more specs below ↓</span>
                       </div>
                     )}
                   </div>
@@ -577,9 +713,9 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
               </div>
 
               {/* Certification trust strip */}
-              {(certifications.length > 0 || badges.length > 0) && (
+              {allCerts.length > 0 && (
                 <div className="pt-2 flex flex-wrap gap-x-5 gap-y-1.5">
-                  {[...new Set([...certifications, ...badges])].slice(0, 4).map((item, i) => (
+                  {allCerts.slice(0, 4).map((item, i) => (
                     <div key={i} className="flex items-center gap-1.5 text-cinema-400 text-xs">
                       <ShieldCheck size={11} className="text-brand-400" />
                       {item}
@@ -593,12 +729,13 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════
-          SECTION 2 — HORIZONTAL TABS
-          All product detail inline. No stacking. Tab = content swap.
+          SECTION 2 — ACCORDION
+          All product information. Immediately below purchase area.
+          Nuuk-style: collapsed by default except first tab.
       ══════════════════════════════════════════════════════════════════ */}
       <section className="bg-white border-t border-gray-100">
         <div className="container mx-auto">
-          <TabPanel tabs={tabs} />
+          <AccordionPanel items={accordionItems} defaultOpen="specs" />
         </div>
         {/* SEO crawlable hidden content */}
         <div className="sr-only" aria-hidden>
@@ -610,50 +747,7 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════
-          SECTION 3 — STORY BLOCKS (max 3)
-          Only visible when filmChapters set in CMS
-      ══════════════════════════════════════════════════════════════════ */}
-      {chapters.length > 0 && (
-        <section className="bg-gray-950 py-16 md:py-20">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="text-center mb-12">
-              <p className="text-[11px] font-700 text-brand-400 uppercase tracking-widest mb-2">Engineering</p>
-              <h2 className="text-2xl md:text-3xl font-700 text-white">The machine behind the numbers</h2>
-            </div>
-            <div className="space-y-16">
-              {chapters.map((ch: any, i: number) => {
-                const chVid = safeStr(ch.videoUrl) ? getYouTubeId(safeStr(ch.videoUrl)) : null;
-                const chImg = safeStr(ch.imageUrl);
-                return (
-                  <div key={i} className={`grid md:grid-cols-2 gap-10 items-center ${i % 2 !== 0 ? 'md:[&>*:first-child]:order-2' : ''}`}>
-                    <div className="rounded-2xl overflow-hidden aspect-video bg-gray-800 flex items-center justify-center">
-                      {chVid
-                        ? <iframe src={`https://www.youtube.com/embed/${chVid}?rel=0`} title={ch.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
-                        : chImg
-                          ? <img src={chImg} alt={ch.title} className="w-full h-full object-cover" loading="lazy" />
-                          : <span className="text-4xl font-800 text-gray-600">{String(i + 1).padStart(2, '0')}</span>}
-                    </div>
-                    <div className="text-white space-y-4">
-                      <p className="text-[11px] font-700 text-brand-400 uppercase tracking-widest">{String(i + 1).padStart(2, '0')}</p>
-                      <h3 className="text-xl md:text-2xl font-700 leading-snug">{safeStr(ch.title)}</h3>
-                      {safeStr(ch.subtitle) && <p className="text-brand-400 font-500">{safeStr(ch.subtitle)}</p>}
-                      {safeStr(ch.description) && <p className="text-cinema-300 leading-relaxed">{safeStr(ch.description)}</p>}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════
-          SECTION 4 — CASE STUDIES / DEPLOYMENTS
-      ══════════════════════════════════════════════════════════════════ */}
-      <RealWorldDeployments productId={productId} productName={name} />
-
-      {/* ══════════════════════════════════════════════════════════════════
-          SECTION 5 — RFQ FORM
+          SECTION 3 — RFQ FORM
       ══════════════════════════════════════════════════════════════════ */}
       <section className="py-16 md:py-20 bg-gray-950" id="rfq">
         <div className="container mx-auto px-4 md:px-6">
