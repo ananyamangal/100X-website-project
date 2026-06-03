@@ -124,6 +124,13 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const brandAssets = await getBrandAssets()
+  let trustBadges: any[] = []
+  try {
+    const { default: clientPromise } = await import('@/lib/mongodb')
+    const client = await clientPromise
+    const raw = await client.db().collection("trust_badges").find({ isActive: true }).sort({ order: 1 }).toArray()
+    trustBadges = JSON.parse(JSON.stringify(raw))
+  } catch { /* trust badges are optional — fall back to defaults in SiteFooter */ }
 
   return (
     <html lang="en-IN" className={inter.variable}>
@@ -334,7 +341,7 @@ export default async function RootLayout({
           <main id="main-content" tabIndex={-1}>
             {children}
           </main>
-          <SiteFooter logoUrl={brandAssets.footerLogoUrl} logoAlt={brandAssets.logoAlt} />
+          <SiteFooter logoUrl={brandAssets.footerLogoUrl} logoAlt={brandAssets.logoAlt} trustBadges={trustBadges} />
           <MobileCtaBar />
         </MobileCtaProvider>
         <WhatsAppFloatingButton

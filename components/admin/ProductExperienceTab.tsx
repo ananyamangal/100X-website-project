@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from "react"
-import { Plus, Trash2, Info } from "lucide-react"
+import { Plus, Trash2, Info, Upload, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -36,7 +36,22 @@ interface Props {
   onChange: (key: string, value: any) => void
 }
 
+async function uploadToCloudinary(file: File): Promise<string | null> {
+  const fd = new FormData()
+  fd.append("file", file)
+  fd.append("upload_preset", "product_uploads")
+  try {
+    const res = await fetch("https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload", { method: "POST", body: fd })
+    const data = await res.json()
+    return data.secure_url ?? null
+  } catch {
+    return null
+  }
+}
+
 export function ProductExperienceTab({ product, onChange }: Props) {
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null)
+
   /* ── Film Chapters ─────────────────────────────── */
   const filmChapters: any[] = product.filmChapters || []
   const addChapter = () => onChange("filmChapters", [...filmChapters, { title: "", subtitle: "", description: "", videoUrl: "", imageUrl: "", sortOrder: filmChapters.length }])
@@ -45,6 +60,12 @@ export function ProductExperienceTab({ product, onChange }: Props) {
     onChange("filmChapters", updated)
   }
   const removeChapter = (i: number) => onChange("filmChapters", filmChapters.filter((_, idx) => idx !== i))
+  const uploadChapterImage = async (i: number, file: File) => {
+    setUploadingIdx(i)
+    const url = await uploadToCloudinary(file)
+    if (url) updateChapter(i, "imageUrl", url)
+    setUploadingIdx(null)
+  }
 
   /* ── Box Contents ──────────────────────────────── */
   const boxContents: any[] = product.boxContents || []
@@ -119,8 +140,16 @@ export function ProductExperienceTab({ product, onChange }: Props) {
                 <Input value={ch.videoUrl || ""} onChange={e => updateChapter(i, "videoUrl", e.target.value)} placeholder="https://www.youtube.com/..." />
               </div>
               <div>
-                <label className="block text-[11px] font-500 text-gray-600 mb-1">Image URL</label>
-                <Input value={ch.imageUrl || ""} onChange={e => updateChapter(i, "imageUrl", e.target.value)} placeholder="https://res.cloudinary.com/..." />
+                <label className="block text-[11px] font-500 text-gray-600 mb-1">Image</label>
+                <div className="flex gap-2 items-center">
+                  <Input value={ch.imageUrl || ""} onChange={e => updateChapter(i, "imageUrl", e.target.value)} placeholder="https://res.cloudinary.com/..." className="flex-1" />
+                  <label className="cursor-pointer shrink-0 flex items-center gap-1 px-2 py-1.5 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 text-[11px] text-gray-600">
+                    {uploadingIdx === i ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                    <input type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) uploadChapterImage(i, e.target.files[0]) }} />
+                    Upload
+                  </label>
+                </div>
+                {ch.imageUrl && <img src={ch.imageUrl} className="mt-2 h-16 rounded-md object-cover border border-gray-100" alt="Chapter preview" />}
               </div>
             </div>
           </div>
@@ -229,16 +258,128 @@ export function ProductExperienceTab({ product, onChange }: Props) {
       {/* ── SECTION 9: FAQs ───────────────────────── */}
       <SectionCard
         title="⑨ Product-Specific FAQs"
-        helper="These FAQs appear in the accordion on the product page. Format: Q: [Question] | A: [Answer]. Leave blank to show the default global FAQ set."
+        helper="These FAQs appear in the accordion on the product page. Leave blank to show the global FAQ set."
       >
-        <label className="block text-xs font-600 text-gray-700 mb-1">FAQs (Q: ... | A: ..., one per line)</label>
-        <Textarea
-          rows={6}
-          value={toLines(product.productFaqs)}
-          onChange={e => onChange("productFaqs", e.target.value.split("\n").filter(Boolean))}
-          placeholder={"Q: What fuel does this machine use? | A: Kerosene-based fogging oil.\nQ: Is this GeM approved? | A: Yes, we are GeM-registered OEM."}
-        />
-        <Helper text="Each line: Q: [Question] | A: [Answer]. If left blank, the global FAQ set is used." />
+        {(() => {
+          const faqs: Array<{ q: string; a: string }> = Array.isArray(product.productFaqs)
+            ? product.productFaqs.map((f: any) => typeof f === "object" ? f : { q: String(f).replace(/^Q:\s*/i, ""), a: "" })
+            : []
+          const addFaq = () => onChange("productFaqs", [...faqs, { q: "", a: "" }])
+          const updateFaq = (i: number, key: "q" | "a", val: string) =>
+            onChange("productFaqs", faqs.map((f, idx) => idx === i ? { ...f, [key]: val } : f))
+          const removeFaq = (i: number) => onChange("productFaqs", faqs.filter((_, idx) => idx !== i))
+          const moveFaq = (i: number, dir: -1 | 1) => {
+            const next = [...faqs]
+            const swap = i + dir
+            if (swap < 0 || swap >= next.length) return
+            ;[next[i], next[swap]] = [next[swap], next[i]]
+            onChange("productFaqs", next)
+          }
+          return (
+            <div className="space-y-3">
+              {faqs.length === 0 && <p className="text-sm text-gray-400 py-1">No FAQs yet. Add questions specific to this product.</p>}
+              {faqs.map((f, i) => (
+                <div key={i} className="border border-gray-100 rounded-xl p-4 space-y-2 bg-gray-50/50">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[11px] font-600 text-brand-600 uppercase tracking-wide">FAQ {i + 1}</span>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => moveFaq(i, -1)} disabled={i === 0} className="text-gray-400 hover:text-gray-600 disabled:opacity-30 text-[10px] px-1">▲</button>
+                      <button onClick={() => moveFaq(i, 1)} disabled={i === faqs.length - 1} className="text-gray-400 hover:text-gray-600 disabled:opacity-30 text-[10px] px-1">▼</button>
+                      <button onClick={() => removeFaq(i)} className="text-red-400 hover:text-red-600 ml-1"><Trash2 size={13} /></button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-500 text-gray-600 mb-1">Question</label>
+                    <Input value={f.q} onChange={e => updateFaq(i, "q", e.target.value)} placeholder="e.g. What fuel does this machine use?" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-500 text-gray-600 mb-1">Answer</label>
+                    <Textarea rows={2} value={f.a} onChange={e => updateFaq(i, "a", e.target.value)} placeholder="e.g. This machine runs on kerosene-based fogging oil..." />
+                  </div>
+                </div>
+              ))}
+              <button onClick={addFaq} className="flex items-center gap-2 text-brand-600 hover:text-brand-700 text-sm font-500 mt-1">
+                <Plus size={14} /> Add FAQ
+              </button>
+              <Helper text="Each FAQ has a Question and an Answer. Reorder with ▲▼. If left blank, the global FAQ set is shown." />
+            </div>
+          )
+        })()}
+      </SectionCard>
+
+      {/* ── SECTION 10: WARRANTY ──────────────────── */}
+      <SectionCard
+        title="⑩ Warranty"
+        helper="Control whether warranty information is displayed on this product page. Not all products include warranty."
+      >
+        <div className="flex items-center gap-3 mb-3">
+          <input
+            type="checkbox"
+            id="warrantyEnabled"
+            checked={Boolean(product.warrantyEnabled)}
+            onChange={e => onChange("warrantyEnabled", e.target.checked)}
+            className="rounded border-gray-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
+          />
+          <label htmlFor="warrantyEnabled" className="text-sm font-500 text-gray-700 cursor-pointer">
+            This product includes a warranty
+          </label>
+        </div>
+        {Boolean(product.warrantyEnabled) && (
+          <div className="space-y-3 pl-1 border-l-2 border-brand-100 ml-2">
+            <div>
+              <label className="block text-[11px] font-500 text-gray-600 mb-1">Warranty Period</label>
+              <Input value={product.warrantyPeriod || ""} onChange={e => onChange("warrantyPeriod", e.target.value)} placeholder="e.g. 1 Year, 6 Months, 2 Years" className="max-w-xs" />
+            </div>
+            <div>
+              <label className="block text-[11px] font-500 text-gray-600 mb-1">Warranty Description</label>
+              <Textarea rows={3} value={product.warrantyDescription || ""} onChange={e => onChange("warrantyDescription", e.target.value)} placeholder="Covers manufacturing defects and material failure. On-site service available within 48 hours in metro areas." />
+            </div>
+            <div>
+              <label className="block text-[11px] font-500 text-gray-600 mb-1">Warranty Icon (emoji or text label)</label>
+              <Input value={product.warrantyIcon || ""} onChange={e => onChange("warrantyIcon", e.target.value)} placeholder="🛡️" className="max-w-xs" />
+              <Helper text="Optional. Enter an emoji or leave blank for the default shield icon." />
+            </div>
+          </div>
+        )}
+      </SectionCard>
+
+      {/* ── SECTION 11: SEO OVERRIDES ─────────────── */}
+      <SectionCard
+        title="⑪ SEO & URL Settings"
+        helper="Override the auto-generated SEO values for this product. The slug controls the URL. Leave fields blank to use auto-generated values."
+      >
+        <div>
+          <label className="block text-[11px] font-500 text-gray-600 mb-1">URL Slug (auto-generated from name if blank)</label>
+          <Input
+            value={product.slug || ""}
+            onChange={e => onChange("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, ""))}
+            placeholder="e.g. double-barrel-thermal-fogging-machine"
+          />
+          <Helper text="The URL will be /[slug]. Use only lowercase letters, numbers, and hyphens. Changing this creates a new URL — ensure a redirect is in place." />
+        </div>
+        <div>
+          <label className="block text-[11px] font-500 text-gray-600 mb-1">H1 Title (overrides product name in the heading)</label>
+          <Input value={product.h1Title || ""} onChange={e => onChange("h1Title", e.target.value)} placeholder="Leave blank to use product name" />
+        </div>
+        <div>
+          <label className="block text-[11px] font-500 text-gray-600 mb-1">SEO Title (browser tab / Google result)</label>
+          <Input value={product.seoTitle || ""} onChange={e => onChange("seoTitle", e.target.value)} placeholder="e.g. Double Barrel Thermal Fogger | 100x Circle" />
+        </div>
+        <div>
+          <label className="block text-[11px] font-500 text-gray-600 mb-1">Meta Description (≤ 155 chars)</label>
+          <Textarea rows={2} value={product.metaDescription || ""} onChange={e => onChange("metaDescription", e.target.value)} placeholder="Buy the 100XDB400 double barrel vehicle-mounted thermal fogging machine..." />
+          {product.metaDescription && <Helper text={`${product.metaDescription.length}/155 characters`} />}
+        </div>
+        <div className="grid md:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-[11px] font-500 text-gray-600 mb-1">OG Title</label>
+            <Input value={product.ogTitle || ""} onChange={e => onChange("ogTitle", e.target.value)} placeholder="Open Graph title (Facebook/LinkedIn share)" />
+          </div>
+          <div>
+            <label className="block text-[11px] font-500 text-gray-600 mb-1">OG Description</label>
+            <Input value={product.ogDescription || ""} onChange={e => onChange("ogDescription", e.target.value)} placeholder="Open Graph description" />
+          </div>
+        </div>
       </SectionCard>
 
     </div>

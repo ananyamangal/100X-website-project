@@ -13,6 +13,11 @@ export interface BoxItem {
   imageUrl?: string
 }
 
+export interface ProductFaq {
+  q: string
+  a: string
+}
+
 export interface Product {
   _id?: string;
   slug?: string;
@@ -44,11 +49,22 @@ export interface Product {
   solution?: string;
   certifications?: string[];
   performanceMetrics?: string[];
-  // New: Product Experience Builder
+  // Product Experience Builder
   filmChapters?: FilmChapter[];
   boxContents?: BoxItem[];
-  // New: product experience builder
-  productFaqs?: string[];
-  // New: bidirectional relationships
+  productFaqs?: ProductFaq[];
+  // Bidirectional relationships
   linkedCaseStudyIds?: string[];
+  // Warranty
+  warrantyEnabled?: boolean;
+  warrantyPeriod?: string;
+  warrantyDescription?: string;
+  warrantyIcon?: string;
+  // SEO overrides
+  seoTitle?: string;
+  metaDescription?: string;
+  h1Title?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  canonicalUrl?: string;
 }

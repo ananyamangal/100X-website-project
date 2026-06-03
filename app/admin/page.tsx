@@ -69,13 +69,13 @@ interface Product {
   features: string[];
   specifications: string[];
   applications: string[];
-  badges: string[]; // Changed from badge: string to badges: string[]
-  youtubeLink?: string; // Added YouTube link field
+  badges: string[];
+  youtubeLink?: string;
   whatsappMessageText: string;
   category: string;
   inStock: boolean;
-  slideshowInterval?: number; // Time in milliseconds between product image slides
-  order?: number; // Display order (lower numbers appear first, 0 is top)
+  slideshowInterval?: number;
+  order?: number;
   createdAt?: string;
   updatedAt?: string;
   brochureUrl?: string;
@@ -87,7 +87,17 @@ interface Product {
   performanceMetrics?: string[];
   filmChapters?: any[];
   boxContents?: any[];
-  productFaqs?: string[];
+  productFaqs?: Array<{ q: string; a: string }>;
+  warrantyEnabled?: boolean;
+  warrantyPeriod?: string;
+  warrantyDescription?: string;
+  warrantyIcon?: string;
+  slug?: string;
+  seoTitle?: string;
+  metaDescription?: string;
+  h1Title?: string;
+  ogTitle?: string;
+  ogDescription?: string;
 }
 
 interface Banner {
@@ -399,6 +409,8 @@ function AdminDashboardContent() {
     }
     
     setIsAddingProduct(false)
+    setNotification({ type: 'success', message: `✅ Product "${newProduct.name}" created. Changes visible on site within ~1 minute.` })
+    setTimeout(() => setNotification(null), 6000)
   }
 
   // Update product
@@ -410,10 +422,10 @@ function AdminDashboardContent() {
       body: JSON.stringify(updatedProduct),
     })
     const updated = await res.json()
-    
+
     // Get the old product to check if category changed
     const oldProduct = products.find(p => p.id === updatedProduct.id)
-    
+
     // Update products state
     const updatedProducts = products.map(p => p.id === updated._id ? {
       ...updated,
@@ -425,12 +437,12 @@ function AdminDashboardContent() {
       whatsappText: updated.whatsappMessageText,
     } : p)
     setProducts(updatedProducts)
-    
+
     // Check if the updated product has a new category that's not in our categories list
     if (updatedProduct.category && !categories.includes(updatedProduct.category)) {
       const updatedCategories = [...categories, updatedProduct.category]
       setCategories(updatedCategories)
-      
+
       // Update localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
@@ -438,11 +450,14 @@ function AdminDashboardContent() {
         window.dispatchEvent(new Event('categoriesUpdated'))
       }
     }
-    
+
     // Clean up empty categories (this will handle the old category if it's no longer used)
     cleanupEmptyCategories(updatedProducts)
-    
+
     setEditingProduct(null)
+    const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+    setNotification({ type: 'success', message: `✅ "${updatedProduct.name}" saved at ${now}. Changes visible on site within ~1 minute.` })
+    setTimeout(() => setNotification(null), 6000)
   }
 
   // Delete product
@@ -1122,6 +1137,17 @@ function AdminDashboardContent() {
                 Homepage Content
               </button>
               <button
+                onClick={() => setActiveTab("trustBadges")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "trustBadges"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <CheckCircle className="mr-3" size={20} />
+                Footer Trust Badges
+              </button>
+              <button
                 onClick={() => setActiveTab("websiteSettings")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "websiteSettings"
@@ -1349,6 +1375,7 @@ function AdminDashboardContent() {
             {activeTab === "rfqPopup" && <RFQPopupAdminTab />}
             {activeTab === "homepageContent" && <HomepageContentTab />}
             {activeTab === "websiteSettings" && <BrandAssetsTab />}
+            {activeTab === "trustBadges" && <TrustBadgesTab />}
             {activeTab === "legalPages" && <LegalPagesTab />}
             {activeTab === "caseStudies" && <CaseStudiesTab />}
             {activeTab === "deployments" && <DeploymentsTab />}
@@ -1795,7 +1822,17 @@ function ProductForm({
     performanceMetrics: toStringArray(product?.performanceMetrics).join("\n"),
     filmChapters: Array.isArray(product?.filmChapters) ? product.filmChapters : [],
     boxContents: Array.isArray(product?.boxContents) ? product.boxContents : [],
-    productFaqs: toStringArray(product?.productFaqs),
+    productFaqs: Array.isArray(product?.productFaqs) ? product.productFaqs : [],
+    warrantyEnabled: product?.warrantyEnabled ?? false,
+    warrantyPeriod: product?.warrantyPeriod || "",
+    warrantyDescription: product?.warrantyDescription || "",
+    warrantyIcon: product?.warrantyIcon || "",
+    slug: product?.slug || "",
+    seoTitle: product?.seoTitle || "",
+    metaDescription: product?.metaDescription || "",
+    h1Title: product?.h1Title || "",
+    ogTitle: product?.ogTitle || "",
+    ogDescription: product?.ogDescription || "",
   })
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingBrochure, setUploadingBrochure] = useState(false);
@@ -1816,7 +1853,7 @@ function ProductForm({
       applications: toStringArray(formData.applications),
       certifications: toStringArray(formData.certifications),
       performanceMetrics: toStringArray(formData.performanceMetrics),
-      productFaqs: toStringArray(formData.productFaqs),
+      productFaqs: Array.isArray(formData.productFaqs) ? formData.productFaqs : [],
       badges: toStringArray(formData.badges),
       ...(product && { id: product.id, createdAt: product.createdAt }),
     }
@@ -5965,6 +6002,100 @@ function SettingsTab() {
           </a>
         </CardContent>
       </Card>
+    </div>
+  )
+}
+
+// ── Trust Badges Tab ──────────────────────────────────────────────────────
+function TrustBadgesTab() {
+  const [badges, setBadges] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [newBadge, setNewBadge] = useState({ label: "", icon: "✓", description: "" })
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null)
+
+  const showMsg = (type: "success" | "error", text: string) => {
+    setMsg({ type, text })
+    setTimeout(() => setMsg(null), 4000)
+  }
+
+  useEffect(() => {
+    fetch("/api/admin/trust-badges")
+      .then(r => r.json())
+      .then(data => { setBadges(Array.isArray(data) ? data : []); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
+
+  const addBadge = async () => {
+    if (!newBadge.label.trim()) return
+    setSaving(true)
+    const res = await fetch("/api/admin/trust-badges", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newBadge) })
+    const created = await res.json()
+    setBadges(prev => [...prev, created])
+    setNewBadge({ label: "", icon: "✓", description: "" })
+    setSaving(false)
+    showMsg("success", `Badge "${created.label}" added. Changes visible in ~1 minute.`)
+  }
+
+  const deleteBadge = async (id: string) => {
+    if (!confirm("Delete this trust badge?")) return
+    await fetch(`/api/admin/trust-badges?id=${id}`, { method: "DELETE" })
+    setBadges(prev => prev.filter((b: any) => b._id !== id))
+    showMsg("success", "Badge deleted.")
+  }
+
+  const toggleActive = async (badge: any) => {
+    const updated = { ...badge, isActive: !badge.isActive }
+    await fetch("/api/admin/trust-badges", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updated) })
+    setBadges(prev => prev.map((b: any) => b._id === badge._id ? { ...b, isActive: !b.isActive } : b))
+  }
+
+  return (
+    <div className="space-y-6 max-w-2xl">
+      <div>
+        <h2 className="text-xl font-bold text-gray-900 mb-1">Footer Trust Badges</h2>
+        <p className="text-sm text-gray-500">These badges appear in the footer trust strip. Leave empty to use built-in defaults.</p>
+      </div>
+      {msg && <div className={`px-4 py-3 rounded-lg text-sm font-medium ${msg.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>{msg.text}</div>}
+      {loading ? <p className="text-gray-500 text-sm">Loading…</p> : (
+        <div className="space-y-2">
+          {badges.length === 0 && <p className="text-sm text-gray-400">No custom badges yet. Add one below, or leave empty to use site defaults.</p>}
+          {badges.map((badge: any) => (
+            <div key={badge._id} className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200">
+              <span className="text-lg w-8 text-center shrink-0">{badge.icon || "✓"}</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-gray-900 text-sm">{badge.label}</p>
+                {badge.description && <p className="text-xs text-gray-500 truncate">{badge.description}</p>}
+              </div>
+              <button onClick={() => toggleActive(badge)} className={`text-xs px-2.5 py-1 rounded-full border ${badge.isActive ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
+                {badge.isActive ? "Active" : "Hidden"}
+              </button>
+              <button onClick={() => deleteBadge(badge._id)} className="text-red-400 hover:text-red-600 shrink-0"><Trash2 size={16} /></button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 space-y-3">
+        <h3 className="text-sm font-600 text-gray-800">Add New Badge</h3>
+        <div className="grid grid-cols-[60px_1fr] gap-3">
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Icon</label>
+            <Input value={newBadge.icon} onChange={e => setNewBadge({ ...newBadge, icon: e.target.value })} placeholder="🇮🇳" className="text-center" maxLength={4} />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Label *</label>
+            <Input value={newBadge.label} onChange={e => setNewBadge({ ...newBadge, label: e.target.value })} placeholder="Made in India" />
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Description (optional)</label>
+          <Input value={newBadge.description} onChange={e => setNewBadge({ ...newBadge, description: e.target.value })} placeholder="Proudly manufactured in Gurugram, India" />
+        </div>
+        <Button onClick={addBadge} disabled={saving || !newBadge.label.trim()} className="bg-green-600 hover:bg-green-700">
+          {saving ? <Loader2 size={16} className="mr-2 animate-spin" /> : <Plus size={16} className="mr-2" />}
+          Add Badge
+        </Button>
+      </div>
     </div>
   )
 }

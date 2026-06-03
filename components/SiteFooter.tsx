@@ -54,16 +54,28 @@ const WA_HREF = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponen
   "Hi 100X Circle, I'd like to know more about your fogging machines."
 )}`
 
+const DEFAULT_TRUST_BADGES = [
+  { label: "OEM Manufacturer", icon: "✓" },
+  { label: "Made in India", icon: "🇮🇳" },
+  { label: "GeM Registered", icon: "✓" },
+  { label: "Government Supplier", icon: "✓" },
+  { label: "ISO Certified", icon: "✓" },
+  { label: "Pan-India Delivery", icon: "✓" },
+]
+
 interface SiteFooterProps {
   logoUrl?: string
   logoAlt?: string
+  trustBadges?: Array<{ label: string; icon?: string; description?: string }>
 }
 
 export default function SiteFooter({
   logoUrl = "/logo-main.png",
   logoAlt = "100X Circle — Thermal Fogging Machine Manufacturer",
+  trustBadges,
 }: SiteFooterProps) {
   const landingPages = getAllLandingPages().slice(0, 7)
+  const badges = trustBadges && trustBadges.length > 0 ? trustBadges : DEFAULT_TRUST_BADGES
 
   return (
     <footer className="bg-cinema-900 text-white">
@@ -71,20 +83,17 @@ export default function SiteFooter({
       <div className="border-b border-white/8 bg-cinema-800">
         <div className="container mx-auto px-4 md:px-6 py-4">
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-            {[
-              "OEM Manufacturer",
-              "Made in India",
-              "GeM Registered",
-              "Government Supplier",
-              "ISO Certified",
-              "Pan-India Delivery",
-            ].map((trust) => (
-              <div key={trust} className="flex items-center gap-1.5">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                  <circle cx="6" cy="6" r="6" fill="#16a34a" />
-                  <path d="M3.5 6l1.5 1.5 3.5-3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                <span className="text-xs text-cinema-300 font-500 tracking-wide">{trust}</span>
+            {badges.map((badge) => (
+              <div key={badge.label} className="flex items-center gap-1.5">
+                {badge.icon && badge.icon !== "✓" ? (
+                  <span className="text-sm leading-none" aria-hidden="true">{badge.icon}</span>
+                ) : (
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                    <circle cx="6" cy="6" r="6" fill="#16a34a" />
+                    <path d="M3.5 6l1.5 1.5 3.5-3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+                <span className="text-xs text-cinema-300 font-500 tracking-wide">{badge.label}</span>
               </div>
             ))}
           </div>

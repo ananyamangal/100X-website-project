@@ -28,6 +28,36 @@ export function toObjectArray(val: unknown): any[] {
   return []
 }
 
+/**
+ * Normalize productFaqs into [{q, a}] format.
+ * Accepts:
+ *   - Array of {q, a} objects (new format)
+ *   - Array of "Q: ... | A: ..." strings (legacy format)
+ *   - Mixed arrays
+ */
+export function toFaqArray(val: unknown): Array<{ q: string; a: string }> {
+  if (!Array.isArray(val)) return []
+  return val
+    .map((item: unknown) => {
+      if (item && typeof item === "object" && "q" in item) {
+        const f = item as { q?: unknown; a?: unknown }
+        return { q: String(f.q ?? "").trim(), a: String(f.a ?? "").trim() }
+      }
+      if (typeof item === "string") {
+        const sep = item.indexOf(" | A:")
+        if (sep !== -1) {
+          const q = item.slice(0, sep).replace(/^Q:\s*/i, "").trim()
+          const a = item.slice(sep + 5).trim()
+          return { q, a }
+        }
+        // Fallback: treat whole string as a question
+        return { q: item.replace(/^Q:\s*/i, "").trim(), a: "" }
+      }
+      return null
+    })
+    .filter((f): f is { q: string; a: string } => f !== null && Boolean(f.q))
+}
+
 /** Normalize a raw MongoDB product document to the canonical Product shape. */
 export function normalizeProduct(raw: any): any {
   if (!raw) return raw
@@ -56,7 +86,7 @@ export function normalizeProduct(raw: any): any {
     badges: toStringArray(raw.badges),
     certifications: toStringArray(raw.certifications),
     performanceMetrics: toStringArray(raw.performanceMetrics),
-    productFaqs: toStringArray(raw.productFaqs),
+    productFaqs: toFaqArray(raw.productFaqs),
     // Object-array fields
     filmChapters: toObjectArray(raw.filmChapters),
     boxContents: toObjectArray(raw.boxContents),

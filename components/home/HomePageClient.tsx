@@ -71,6 +71,8 @@ interface HomePageClientProps {
   mainBrochureUrl: string | null
   homeContent: HomeContent
   homepageSections?: any[]
+  spareParts?: any[]
+  trustBadges?: any[]
 }
 
 const getYouTubeId = (url: string): string | null => {
@@ -255,6 +257,8 @@ export default function HomePageClient({
   customers,
   homeContent,
   homepageSections = [],
+  spareParts = [],
+  trustBadges = [],
 }: HomePageClientProps) {
   const router = useRouter()
   const [brochureModalOpen, setBrochureModalOpen] = useState(false)
@@ -362,10 +366,60 @@ export default function HomePageClient({
       {/* PLACEMENT: before-faq — agriculture/municipal story sections */}
       <CelebritySectionsBlock sections={homepageSections} placement="before-faq" />
 
-      {/* ── 12. BLOG ──────────────────────────────────────────────── */}
+      {/* ── 12. SPARE PARTS ───────────────────────────────────────── */}
+      {spareParts.length > 0 && (
+        <section className="py-16 md:py-20 bg-gray-950" aria-labelledby="spare-parts-heading">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
+              <div>
+                <p className="text-xs font-700 text-brand-400 uppercase tracking-widest mb-2">Genuine Parts</p>
+                <h2 id="spare-parts-heading" className="text-2xl md:text-3xl font-700 text-white leading-snug">Spare Parts &amp; Accessories</h2>
+                <p className="text-sm text-cinema-400 mt-2 max-w-lg">Genuine replacement parts for all 100X Circle machines. Keep your equipment running at peak performance.</p>
+              </div>
+              <a href="/spare-parts" className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 border border-white/20 text-white hover:bg-white/10 rounded-full text-sm font-500 transition-all">
+                View All Parts →
+              </a>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {spareParts.slice(0, 8).map((part: any) => (
+                <a
+                  key={part._id}
+                  href={`/spare-parts/${part.slug || part._id}`}
+                  className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/8 hover:border-brand-500/30 transition-all"
+                >
+                  {part.images?.[0] ? (
+                    <div className="aspect-square overflow-hidden bg-gray-900">
+                      <img src={part.images[0]} alt={part.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    </div>
+                  ) : (
+                    <div className="aspect-square bg-gray-800 flex items-center justify-center">
+                      <span className="text-3xl text-gray-600">⚙️</span>
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <p className="text-xs text-cinema-500 mb-1">{part.category || 'Spare Part'}</p>
+                    <h3 className="text-sm font-600 text-white mb-1 leading-snug group-hover:text-brand-400 transition-colors">{part.name}</h3>
+                    {part.priceRange && <p className="text-xs text-brand-400 font-600">{part.priceRange}</p>}
+                    {part.compatibleProductNames?.length > 0 && (
+                      <p className="text-[10px] text-cinema-600 mt-1 truncate">Fits: {part.compatibleProductNames.slice(0, 2).join(', ')}</p>
+                    )}
+                  </div>
+                </a>
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <a href="/spare-parts" className="inline-flex items-center gap-2 px-7 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-full text-sm font-600 transition-all hover:-translate-y-0.5 shadow-lg shadow-brand-900/20">
+                Browse Full Spare Parts Catalogue →
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── 13. BLOG ──────────────────────────────────────────────── */}
       <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />
 
-      {/* ── 13. FAQ ───────────────────────────────────────────────── */}
+      {/* ── 14. FAQ ───────────────────────────────────────────────── */}
       <FAQSection faqs={homeContent.faqs} />
 
       {/* ── 14. CINEMATIC CTA BAND ────────────────────────────────── */}

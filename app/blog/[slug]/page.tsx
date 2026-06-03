@@ -186,7 +186,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       <div className="container mx-auto px-4 py-8 md:py-12">
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm text-gray-500 mb-6">
+        <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm text-gray-500 mb-6 max-w-3xl mx-auto">
           <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
           <span aria-hidden>/</span>
           <Link href="/blog" className="hover:text-green-600 transition-colors">Blog</Link>
@@ -197,7 +197,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="max-w-3xl mx-auto">
           <article>
             {/* Meta row */}
-            <div className="flex flex-wrap items-center gap-3 mb-4 text-gray-500 text-sm">
+            <div className="flex flex-wrap items-center gap-3 mb-5 text-gray-500 text-sm">
               {category ? (
                 <Badge className="bg-green-600 hover:bg-green-700 text-white text-xs font-medium">
                   {category}
@@ -211,25 +211,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <Calendar size={14} aria-hidden />
                 {formatDate(publishedAtStr)}
               </time>
-              <span>{readTime}</span>
+              <span className="text-gray-400">{readTime}</span>
             </div>
 
             {/* Title */}
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-5 leading-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-[2.25rem] font-bold text-gray-900 mb-6 leading-[1.2] tracking-tight">
               {title}
             </h1>
 
             {/* Excerpt as lead paragraph */}
             {excerpt ? (
-              <RichContent
-                html={excerpt}
-                className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed font-medium border-l-4 border-green-500 pl-4"
-              />
+              <div className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed font-medium border-l-4 border-green-500 pl-5 py-1">
+                <RichContent html={excerpt} />
+              </div>
             ) : null}
 
             {/* Main content */}
             {content ? (
-              <div className="prose-container text-base md:text-lg text-gray-700 leading-relaxed">
+              <div className="blog-body text-base md:text-[1.0625rem] text-gray-800 leading-[1.8] space-y-5 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-10 [&_h2]:mb-4 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-gray-900 [&_h3]:mt-8 [&_h3]:mb-3 [&_p]:mb-4 [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:pl-6 [&_ol]:space-y-2 [&_li]:leading-relaxed [&_strong]:font-semibold [&_strong]:text-gray-900 [&_a]:text-green-700 [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-green-600 [&_blockquote]:border-l-4 [&_blockquote]:border-green-500 [&_blockquote]:pl-5 [&_blockquote]:text-gray-600 [&_blockquote]:italic [&_blockquote]:my-6">
                 <RichContent html={content} />
               </div>
             ) : null}
