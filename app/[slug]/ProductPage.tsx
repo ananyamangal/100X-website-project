@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
+import { useParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, MessageCircle, Star, CheckCircle, Play, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { RichContent } from '@/components/RichContent';
@@ -76,21 +76,75 @@ function SpecRow({ spec }: { spec: string }) {
 type ProductMeta = Pick<LandingPageDef, "content1" | "content2" | "content3">;
 
 interface Props {
-    product: Record<string, unknown>;
-    slug: string;
+    // Props are optional: when passed from page.tsx (fast path), data is server-fetched.
+    // When called from LandingRenderer without props (legacy path), falls back to client fetch.
+    product?: Record<string, unknown>;
+    slug?: string;
 }
 
-export default function ProductDetailPage({ product, slug }: Props) {
+function decodeSlugToName(slug: string): string {
+    return slug.replace(/-/g, ' ').replace(/\band\b/g, '&').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+export default function ProductDetailPage({ product: productProp, slug: slugProp }: Props) {
+    const params = useParams();
+    const slugFromParams = Array.isArray(params?.slug) ? params.slug[0] : params?.slug ?? '';
+    const slug = slugProp ?? slugFromParams;
+
+    // Client-fetch fallback: used only when LandingRenderer calls <ProductPage /> without props
+    const [fetchedProduct, setFetchedProduct] = useState<Record<string, unknown> | null>(null);
+    const [loading, setLoading] = useState(!productProp);
+
+    useEffect(() => {
+        if (productProp) return; // props provided — no fetch needed
+        if (!slug) { setLoading(false); return; }
+        fetch(`/api/admin/${encodeURIComponent(decodeSlugToName(slug))}`)
+            .then(async res => {
+                if (!res.ok) { setLoading(false); return; }
+                const data = await res.json();
+                if (data?.error) { setLoading(false); return; }
+                setFetchedProduct(data);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, [slug, productProp]);
+
+    const product: Record<string, unknown> | null = productProp ?? fetchedProduct;
+
+    // All hooks must be called unconditionally before any early returns
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isZoomed, setIsZoomed] = useState(false);
     const [transformOrigin, setTransformOrigin] = useState('center center');
     const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
-    const pageMeta: ProductMeta | undefined = getLandingPage(slug);
+    const pageMeta: ProductMeta | undefined = slug ? getLandingPage(slug) : undefined;
+
+    // Safe field reads (defined unconditionally, empty when product is null)
+    const images = safeStrArray(product?.imageUrls).filter((u: string) => u.startsWith('http') || u.startsWith('/'));
+    const specs = safeStrArray(product?.specifications);
+    const mediaItemsForEffect = images.length + (product?.youtubeLink ? 1 : 0);
+
+    // Slideshow auto-advance (must be before early returns)
+    useEffect(() => {
+        if (mediaItemsForEffect <= 1) return;
+        const ms = Number(product?.slideshowInterval) || 3500;
+        const id = setInterval(() => setCurrentImageIndex(p => (p + 1) % mediaItemsForEffect), ms);
+        return () => clearInterval(id);
+    }, [mediaItemsForEffect]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Guard: show loading / not-found after all hooks are called
+    if (loading) return (
+        <div className="min-h-screen bg-white flex items-center justify-center pt-20">
+            <div className="text-center">
+                <div className="w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-sm text-gray-500">Loading product…</p>
+            </div>
+        </div>
+    );
+    if (!product) return <div className="pt-40 text-center text-gray-500">Product not found.</div>;
 
     // Safe field reads — all normalized server-side but belt-and-suspenders here too
-    const images = safeStrArray(product.imageUrls).filter(u => u.startsWith('http') || u.startsWith('/'));
-    const specs = safeStrArray(product.specifications);
+    // Note: images and specs are already declared before the early returns above
     const features = safeStrArray(product.features);
     const applications = safeStrArray(product.applications);
     const badges = safeStrArray(product.badges);
@@ -136,14 +190,6 @@ export default function ProductDetailPage({ product, slug }: Props) {
         ...images.map((url): MediaItem => ({ kind: 'image', url })),
         ...(videoId && ytThumb ? [{ kind: 'youtube' as const, videoId, thumb: ytThumb }] : []),
     ];
-
-    // Slideshow auto-advance
-    useEffect(() => {
-        if (mediaItems.length <= 1) return;
-        const ms = Number(product.slideshowInterval) || 3500;
-        const id = setInterval(() => setCurrentImageIndex(p => (p + 1) % mediaItems.length), ms);
-        return () => clearInterval(id);
-    }, [mediaItems.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const waText = encodeURIComponent(`Hi, I am interested in: ${productName}. Please share pricing.`);
     const waHref = `https://wa.me/917827229116?text=${waText}`;
