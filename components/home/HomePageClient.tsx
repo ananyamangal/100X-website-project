@@ -12,20 +12,13 @@ import { Input } from "@/components/ui/input"
 import { RichContent } from "@/components/RichContent"
 import AccreditationsStrip from "@/components/home/AccreditationsStrip"
 import ManufacturerIntroBlock from "@/components/home/ManufacturerIntroBlock"
-import TechnologyBlock from "@/components/home/TechnologyBlock"
-import TrustBlock from "@/components/home/TrustBlock"
 import SpecialisedBuyersBlock from "@/components/home/SpecialisedBuyersBlock"
-import ManufacturingAuthorityBlock from "@/components/home/ManufacturingAuthorityBlock"
 import HeroBlock from "@/components/home/HeroBlock"
 import RFQMidPageBlock from "@/components/forms/RFQMidPageBlock"
-import SectionConnector from "@/components/home/SectionConnector"
-import StatesServedBlock from "@/components/home/StatesServedBlock"
-import InlineInquiryCTA from "@/components/home/InlineInquiryCTA"
 import HomepageJsonLd from "@/components/seo/HomepageJsonLd"
 import CelebritySectionsBlock from "@/components/home/CelebritySectionsBlock"
 import BrochureLeadModal from "@/components/BrochureLeadModal"
 import IndustryApplicationsSection from "@/components/home/IndustryApplicationsSection"
-import CinematicManufacturingSection from "@/components/home/CinematicManufacturingSection"
 import CinematicTrustSection from "@/components/home/CinematicTrustSection"
 import CinematicCTASection from "@/components/home/CinematicCTASection"
 import CinematicProductsSection from "@/components/home/CinematicProductsSection"
@@ -36,7 +29,6 @@ import { type HomeContent } from "@/lib/homeContentTypes"
 
 const BlogBlock = dynamic(() => import("@/components/home/BlogBlock"))
 const FAQSection = dynamic(() => import("@/components/FAQSection"))
-const ContactSection = dynamic(() => import("@/components/ContactSection"))
 
 interface Product {
   _id?: string
@@ -290,36 +282,33 @@ export default function HomePageClient({
     <>
       <HomepageJsonLd />
 
-      {/* ── 1. CINEMATIC HERO ──────────────────────────────────────── */}
+      {/* 1. HERO */}
       <HeroBlock heroSlides={heroSlides} />
 
-      {/* PLACEMENT: after-hero — awareness/problem sections */}
+      {/* 2. ADMIN CUSTOM SECTIONS (after-hero placement only) */}
       <CelebritySectionsBlock sections={homepageSections} placement="after-hero" />
 
-      {/* ── 2. TRUST SIGNAL STRIP ─────────────────────────────────── */}
-      <SectionConnector eyebrow={homeContent.connectors.c1.eyebrow} text={homeContent.connectors.c1.text} />
+      {/* 3. ACCREDITATIONS — compact trust strip */}
       <AccreditationsStrip accreditations={accreditations} />
 
-      {/* ── 3. PRODUCTS — cinematic card grid ─────────────────────── */}
-      <SectionConnector eyebrow={homeContent.connectors.c2.eyebrow} text={homeContent.connectors.c2.text} />
+      {/* 4. PRODUCTS */}
       <CinematicProductsSection products={products} onBrochureDownload={handleBrochureDownload} />
 
-      {/* ── 3b. SPARE PARTS — immediately below products for cross-sell ── */}
+      {/* 5. SPARE PARTS — cross-sell, 4 items max */}
       {spareParts.length > 0 && (
-        <section className="py-16 md:py-20 bg-gray-950" aria-labelledby="spare-parts-heading">
+        <section className="py-12 md:py-16 bg-gray-950" aria-labelledby="spare-parts-heading">
           <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
               <div>
-                <p className="text-xs font-700 text-brand-400 uppercase tracking-widest mb-2">Genuine Parts</p>
-                <h2 id="spare-parts-heading" className="text-2xl md:text-3xl font-700 text-white leading-snug">Spare Parts &amp; Accessories</h2>
-                <p className="text-sm text-cinema-400 mt-2 max-w-lg">Genuine replacement parts for all 100X Circle machines. Keep your equipment running at peak performance.</p>
+                <p className="text-xs font-700 text-brand-400 uppercase tracking-widest mb-1">Genuine Parts</p>
+                <h2 id="spare-parts-heading" className="text-xl md:text-2xl font-700 text-white">Spare Parts &amp; Accessories</h2>
               </div>
-              <a href="/spare-parts" className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 border border-white/20 text-white hover:bg-white/10 rounded-full text-sm font-500 transition-all">
-                View All Parts →
+              <a href="/spare-parts" className="shrink-0 inline-flex items-center gap-2 px-4 py-2 border border-white/20 text-white hover:bg-white/10 rounded-full text-sm font-500 transition-all">
+                View All →
               </a>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {spareParts.slice(0, 8).map((part: any) => (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {spareParts.slice(0, 4).map((part: any) => (
                 <a key={part._id} href={`/spare-parts/${part.slug || part._id}`}
                   className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/8 hover:border-brand-500/30 transition-all">
                   {part.images?.[0] ? (
@@ -335,94 +324,42 @@ export default function HomePageClient({
                     <p className="text-xs text-cinema-500 mb-1">{part.category || 'Spare Part'}</p>
                     <h3 className="text-sm font-600 text-white mb-1 leading-snug group-hover:text-brand-400 transition-colors">{part.name}</h3>
                     {part.priceRange && <p className="text-xs text-brand-400 font-600">{part.priceRange}</p>}
-                    {part.compatibleProductNames?.length > 0 && (
-                      <p className="text-[10px] text-cinema-600 mt-1 truncate">Fits: {part.compatibleProductNames.slice(0, 2).join(', ')}</p>
-                    )}
                   </div>
                 </a>
               ))}
-            </div>
-            <div className="text-center mt-8">
-              <a href="/spare-parts" className="inline-flex items-center gap-2 px-7 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-full text-sm font-600 transition-all hover:-translate-y-0.5 shadow-lg shadow-brand-900/20">
-                Browse Full Spare Parts Catalogue →
-              </a>
             </div>
           </div>
         </section>
       )}
 
-      {/* PLACEMENT: after-products — solution/after sections */}
-      <CelebritySectionsBlock sections={homepageSections} placement="after-products" />
-
-      {/* ── 4. INDUSTRY APPLICATIONS — dark cinematic section ─────── */}
+      {/* 6. INDUSTRY APPLICATIONS */}
       <IndustryApplicationsSection />
 
-      {/* ── 5. BRAND STORY — manufacturer intro + technology ──────── */}
+      {/* 7. BRAND STORY */}
       <ManufacturerIntroBlock content={homeContent.manufacturerIntro} />
-      <SectionConnector eyebrow={homeContent.connectors.c3.eyebrow} text={homeContent.connectors.c3.text} />
-      <TechnologyBlock content={homeContent.technology} />
 
-      {/* ── 6. MID-PAGE RFQ ───────────────────────────────────────── */}
+      {/* 8. MID-PAGE RFQ */}
       <RFQMidPageBlock />
 
-      {/* ── 7. MANUFACTURING EXCELLENCE — cinematic dark section ───── */}
-      <CinematicManufacturingSection
-        content={{
-          eyebrow: homeContent.manufacturingAuthority?.eyebrow,
-          headline: homeContent.manufacturingAuthority?.headline,
-          body: homeContent.manufacturingAuthority?.body,
-          // Filter out zero/empty values so the hardcoded defaults show until admin fills them in
-          stats: (() => {
-            const raw = homeContent.manufacturingAuthority?.stats
-            if (!Array.isArray(raw)) return undefined
-            const valid = raw
-              .map((s) => ({ value: Number(s.value), suffix: s.suffix, label: s.label, description: s.description }))
-              .filter((s) => s.value > 0 && s.label)
-            return valid.length > 0 ? valid : undefined
-          })(),
-        }}
-      />
-
-      {/* ── 8. GOVERNMENT + INQUIRY CTA ───────────────────────────── */}
-      <InlineInquiryCTA
-        text="Compare models or request a tailored quote for your tender."
-        whatsappMessage="Hi, I'd like a quote tailored to my use case (please mention: municipal / agricultural / industrial / export)."
-        tone="dark"
-      />
-
-      {/* PLACEMENT: before-trust — government/awareness sections */}
-      <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
-
-      {/* ── 9. YOUTUBE SHORTS ─────────────────────────────────────── */}
+      {/* 9. SOCIAL PROOF — YouTube + customers + reviews */}
       <YoutubeShortsCarousel />
-
-      {/* ── 10. OUR CUSTOMERS ─────────────────────────────────────── */}
       <OurCustomersScroll customers={customers} />
+      <ReviewsSection limit={4} />
 
-      {/* ── 10b. REVIEWS ──────────────────────────────────────────── */}
-      <ReviewsSection limit={6} />
-
-      {/* ── 11. TRUST SECTION — certifications + pillars ─────────── */}
-      <SectionConnector eyebrow={homeContent.connectors.c4.eyebrow} text={homeContent.connectors.c4.text} />
+      {/* 10. TRUST & CERTIFICATIONS */}
       <CinematicTrustSection accreditations={accreditations} />
-      <TrustBlock />
+
+      {/* 11. SPECIALISED BUYERS — B2B segments */}
       <SpecialisedBuyersBlock />
-      <StatesServedBlock />
 
-      {/* PLACEMENT: before-faq — agriculture/municipal story sections */}
-      <CelebritySectionsBlock sections={homepageSections} placement="before-faq" />
-
-      {/* ── 12. BLOG ──────────────────────────────────────────────── */}
+      {/* 12. BLOG */}
       <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />
 
-      {/* ── 14. FAQ ───────────────────────────────────────────────── */}
+      {/* 13. FAQ */}
       <FAQSection faqs={homeContent.faqs} />
 
-      {/* ── 14. CINEMATIC CTA BAND ────────────────────────────────── */}
+      {/* 14. FINAL CTA */}
       <CinematicCTASection />
-
-      {/* ── 15. CONTACT FORM ──────────────────────────────────────── */}
-      <ContactSection products={products} />
     </>
   )
 
