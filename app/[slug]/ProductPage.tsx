@@ -239,7 +239,13 @@ function SparePartsTabContent({ productId }: { productId: string }) {
         <div>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                 {parts.map((part) => (
-                    <a key={part._id} href={`/spare-parts/${part.slug || part._id}`}
+                    <a key={part._id} href={(() => {
+                            const n = part.compatibleProductNames?.[0];
+                            const seg = n
+                                ? n.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+                                : part.category?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'parts';
+                            return `/spare-parts/${seg}/${part.slug || part._id}`;
+                        })()}
                         className="group flex gap-3 p-3.5 bg-gray-50 rounded-xl border border-gray-100 hover:border-brand-200 hover:bg-brand-50/30 transition-all">
                         {part.images?.[0]
                             ? <img src={part.images[0]} alt={part.name} className="w-14 h-14 object-cover rounded-lg shrink-0" loading="lazy" />
