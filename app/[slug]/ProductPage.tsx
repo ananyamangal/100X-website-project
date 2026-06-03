@@ -42,7 +42,7 @@ function safeStrArray(val: unknown): string[] {
 }
 
 const badgeLogoMap: Record<string, string> = {
-    'Korean Technology': '/Logos clipart 2/Korean Technology.png',
+    'Made in India': '/Logos clipart 2/MadeInIndia.png',
     'German Technology': '/Logos clipart 2/german technology.png',
     'Japnese Technology': '/Logos clipart 2/Japnese technology.png',
     'GeM': '/Logos clipart 2/GeM logo.png',

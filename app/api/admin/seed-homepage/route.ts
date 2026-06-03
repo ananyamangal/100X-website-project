@@ -58,7 +58,7 @@ const SECTIONS = [
     placement: "after-products",
     layout: "split",
     headline: "When Professionals Need To Get It Right, They Call 100X Circle.",
-    subheadline: "Korea-engineered. India-proven. Trusted by 200+ municipalities across 22 states.",
+    subheadline: "Made in India. India-proven. Trusted by 200+ municipalities across 22 states.",
     bodyText: "From Delhi's monsoon dengue drives to Punjab's agricultural pest seasons — the machines that show up, start up, and never let the team down. Not a trading company. Not a grey-market import. The real thing, with the service record to prove it.",
     ctaText: "Request a Quote",
     ctaUrl: "/contact-us",
@@ -117,7 +117,7 @@ const SECTIONS = [
       "No test certificates for tender compliance",
     ],
     comparisonGood: [
-      "Korean OEM manufacturing — ISO 9001:2015 certified",
+      "Genuine OEM manufacturing — ISO 9001:2015 certified",
       "65+ genuine spare parts stocked — ships in 3 days",
       "1-year manufacturer warranty — resolved in 5 days",
       "Continuous-duty rated — engineered for Indian conditions",
@@ -131,15 +131,15 @@ const SECTIONS = [
   // ── PLACEMENT: before-trust ───────────────────────────────────────────────
   // Section 4: Technology Pillars — dark, cinematic
   {
-    sectionKey: "technology-pillars-korean",
+    sectionKey: "technology-pillars-india",
     type: "technology",
     enabled: true,
     order: 9,
     placement: "before-trust",
     layout: "grid-cards",
-    headline: "Korean Engineering. Built for India's Toughest Conditions.",
+    headline: "Made in India. Built for India's Toughest Conditions.",
     subheadline: "Every component specified for tropical heat, monsoon humidity, and professional daily use.",
-    bodyText: "The 100X Circle product range is engineered in South Korea and tested for the demands of India's public health and agricultural pest control market — not modified consumer products, genuine professional-grade equipment.",
+    bodyText: "The 100X Circle product range is engineered in India and tested for the demands of India's public health and agricultural pest control market — not modified consumer products, genuine professional-grade equipment.",
     ctaText: "Explore the Range",
     ctaUrl: "/products",
     ctaSecondaryText: "Spare Parts Catalogue",
@@ -150,7 +150,7 @@ const SECTIONS = [
     badge: "The Technology",
     theme: "dark",
     stats: [
-      { label: "Years Korean OEM", value: "15+" },
+      { label: "Years Genuine OEM", value: "15+" },
       { label: "Models Available", value: "7" },
     ],
     bullets: [
@@ -159,7 +159,7 @@ const SECTIONS = [
       "8–15 Micron Ultra-Fine Fog",
       "Continuous Duty Operation",
       "WHO-Approved Chemical Compatibility",
-      "Korean Technology Origin",
+      "Made in India Origin",
       "ISO 9001:2015 Certified",
       "GeM Registered Supplier",
       "5+ Years Spare Parts Guarantee",

@@ -99,7 +99,7 @@ function buildSpecs(tankLitres: number, outputLhr: number, weightKg: number, ext
     "Droplet Size: 8–15 microns (ultra-fine thermal fog)",
     "Operation Mode: Continuous duty",
     "Certifications: ISO 9001:2015, GeM Registered, MSME/UDYAM",
-    "Origin: South Korea",
+    "Origin: India",
   ];
   return extraSpecs ? [...base, ...extraSpecs] : base;
 }
@@ -121,7 +121,7 @@ function buildFeatures(tankLitres: number, outputLhr: number, weightKg: number) 
 }
 
 // ── Certifications (standard) ────────────────────────────────────────────────
-const STANDARD_CERTS = ["ISO 9001:2015", "GeM Registered", "MSME/UDYAM Certified", "Korean Technology", "Heavy Duty"];
+const STANDARD_CERTS = ["ISO 9001:2015", "GeM Registered", "MSME/UDYAM Certified", "Made in India", "Heavy Duty"];
 
 // ── Warranty (standard) ──────────────────────────────────────────────────────
 const WARRANTY = {

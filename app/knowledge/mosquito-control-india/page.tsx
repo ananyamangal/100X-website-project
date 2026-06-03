@@ -46,7 +46,7 @@ const faqJsonLd = {
       name: "What fogging machines do Indian municipalities use?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Indian municipalities predominantly use vehicle-mounted pulse-jet thermal fogging machines. The vehicle is driven through residential streets while the fogger discharges insecticide fog on both sides. Common Indian suppliers include 100X Circle (domestic OEM) and imported Korean/German brands. GeM procurement has made domestic MSME suppliers like 100X Circle more accessible.",
+        text: "Indian municipalities predominantly use vehicle-mounted pulse-jet thermal fogging machines. The vehicle is driven through residential streets while the fogger discharges insecticide fog on both sides. Indian manufacturers like 100X Circle (Made in India, MSME/UDYAM certified, GeM listed) are the preferred suppliers under the government's Make in India and Atmanirbhar Bharat policy. Domestic manufacturers provide faster spare parts delivery, direct warranty, and MSME procurement preference over imported alternatives.",
       },
     },
     {
@@ -271,7 +271,7 @@ export default function MosquitoControlIndiaPage() {
           <p>
             Vehicle-mounted pulse-jet thermal fogging machines are standard. The vehicle is driven
             slowly through streets while the fogger discharges insecticide fog. Domestic Indian
-            OEM suppliers like 100X Circle (GeM-listed) and imported Korean/German brands are used.
+            Made in India manufacturers like 100X Circle (MSME/UDYAM certified, GeM-listed, Atmanirbhar Bharat eligible) are preferred under government procurement policy for their domestic after-sales support and competitive pricing.
           </p>
 
           <h3>When is thermal fogging done for mosquito control?</h3>

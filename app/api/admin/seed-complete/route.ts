@@ -12,7 +12,7 @@ const V = "https://www.bestfoggerthailand.com/wp-content/uploads/2025/08";
 
 // ─── Shared content ───────────────────────────────────────────────────────────
 
-const CERTS = ["ISO 9001:2015", "GeM Registered", "MSME/UDYAM Certified", "Korean Technology"];
+const CERTS = ["ISO 9001:2015", "GeM Registered", "MSME/UDYAM Certified", "Made in India"];
 const WARRANTY = {
   warrantyEnabled: true,
   warrantyPeriod: "1 Year",
@@ -40,7 +40,7 @@ const NEW_PRODUCTS = [
     category: "ULV Cold Fogging Machines",
     tagline: "Electric cold fogging for indoor disinfection, hospitals, and precision pest control.",
     priceRange: "Price on Request",
-    badges: ["Korean Technology", "GeM Registered"],
+    badges: ["Made in India", "GeM Registered"],
     rating: 4.7,
     reviewsCount: 18,
     inStock: true,
@@ -68,7 +68,7 @@ const NEW_PRODUCTS = [
       "Chemical Compatibility: Water-based and oil-based formulations",
       "Operating Weight: approx. 4 kg",
       "Noise Level: Low — suitable for occupied spaces",
-      "Origin: South Korea",
+      "Origin: India",
       "Certifications: ISO 9001:2015, GeM Registered",
     ],
     applications: [
@@ -124,7 +124,7 @@ const NEW_PRODUCTS = [
     category: "ULV Cold Fogging Machines",
     tagline: "High-capacity electric ULV fogger for large-area indoor disinfection and vector control.",
     priceRange: "Price on Request",
-    badges: ["Korean Technology", "GeM Registered", "Heavy Duty"],
+    badges: ["Made in India", "GeM Registered", "Heavy Duty"],
     rating: 4.8,
     reviewsCount: 24,
     inStock: true,
@@ -152,7 +152,7 @@ const NEW_PRODUCTS = [
       "Chemical Compatibility: Water-based and oil-based formulations",
       "Operating Weight: approx. 6 kg",
       "Continuous Operation: Yes — no rest cycle required",
-      "Origin: South Korea",
+      "Origin: India",
       "Certifications: ISO 9001:2015, GeM Registered, MSME/UDYAM",
     ],
     applications: [
@@ -208,7 +208,7 @@ const NEW_PRODUCTS = [
     category: "Thermal Fogging Machines",
     tagline: "High-output thermal fogging system for large-area municipal and agricultural operations.",
     priceRange: "Price on Request",
-    badges: ["Korean Technology", "GeM Registered", "Heavy Duty", "Best Seller"],
+    badges: ["Made in India", "GeM Registered", "Heavy Duty", "Best Seller"],
     rating: 4.9,
     reviewsCount: 31,
     inStock: true,
@@ -236,7 +236,7 @@ const NEW_PRODUCTS = [
       "Droplet Size: 8–15 microns (ultra-fine thermal fog)",
       "Operation Mode: Continuous duty",
       "Configuration: Portable / Vehicle-Mountable",
-      "Origin: South Korea",
+      "Origin: India",
       "Certifications: ISO 9001:2015, GeM Registered, MSME/UDYAM",
     ],
     applications: [
@@ -292,13 +292,13 @@ const NEW_PRODUCTS = [
     category: "Thermal Fogging Machines",
     tagline: "Compact pulse-jet thermal fogger — the classic Korean design trusted for decades.",
     priceRange: "Price on Request",
-    badges: ["Korean Technology", "GeM Registered"],
+    badges: ["Made in India", "GeM Registered"],
     rating: 4.6,
     reviewsCount: 42,
     inStock: true,
     imageUrls: [`${V}/2000old.jpg`],
     shortDescription: "<p>The 100X Minisuper 2000 Gold Classic Edition is a compact, lightweight portable thermal fogger based on the time-tested Korean pulse-jet design. Favoured by pest control professionals and health departments for its simplicity, reliability, and ease of field maintenance. Available for direct GeM purchase.</p>",
-    detailedDescription: "<p>The Minisuper 2000 Gold Classic Edition embodies the simplicity that made Korean pulse-jet thermal foggers the standard for professional mosquito control operations worldwide. With decades of field-proven performance in demanding tropical environments similar to India's, this design has been refined through thousands of hours of real-world operator feedback.</p><p><strong>Proven Design.</strong> The Minisuper 2000 Classic uses the original pulse-jet resonance chamber geometry proven in field operations across Southeast Asia, South Asia, and Africa. Pest control professionals who have operated these machines for years trust its predictable, consistent performance.</p><p><strong>Field-Serviceable.</strong> All critical components — nozzle, carburetor, fuel lines, valves — are accessible without specialised tools. Field technicians can diagnose and resolve most operational issues without returning the machine to a service centre.</p><p><strong>Operator Familiarity.</strong> For organisations transitioning to Korean OEM equipment or expanding existing fleets, the Classic Edition provides maximum operator familiarity — experienced field staff can operate it without additional training.</p>",
+    detailedDescription: "<p>The Minisuper 2000 Gold Classic Edition embodies the simplicity that made Korean pulse-jet thermal foggers the standard for professional mosquito control operations worldwide. With decades of field-proven performance in demanding tropical environments similar to India's, this design has been refined through thousands of hours of real-world operator feedback.</p><p><strong>Proven Design.</strong> The Minisuper 2000 Classic uses the original pulse-jet resonance chamber geometry proven in field operations across Southeast Asia, South Asia, and Africa. Pest control professionals who have operated these machines for years trust its predictable, consistent performance.</p><p><strong>Field-Serviceable.</strong> All critical components — nozzle, carburetor, fuel lines, valves — are accessible without specialised tools. Field technicians can diagnose and resolve most operational issues without returning the machine to a service centre.</p><p><strong>Operator Familiarity.</strong> For organisations transitioning to Genuine OEM equipment or expanding existing fleets, the Classic Edition provides maximum operator familiarity — experienced field staff can operate it without additional training.</p>",
     features: [
       "Compact classic Korean pulse-jet design",
       "Field-serviceable: all parts accessible without specialist tools",
@@ -318,7 +318,7 @@ const NEW_PRODUCTS = [
       "Droplet Size: 8–15 microns",
       "Operation Mode: Continuous duty",
       "Design: Classic compact portable configuration",
-      "Origin: South Korea",
+      "Origin: India",
       "Certifications: ISO 9001:2015, GeM Registered",
     ],
     applications: [
@@ -364,7 +364,7 @@ const NEW_PRODUCTS = [
     category: "Thermal Fogging Machines",
     tagline: "The professional standard — DC 12V auto-start pulse-jet thermal fogger trusted by municipalities and pest control professionals.",
     priceRange: "Price on Request",
-    badges: ["Korean Technology", "GeM Registered", "Best Seller"],
+    badges: ["Made in India", "GeM Registered", "Best Seller"],
     rating: 4.8,
     reviewsCount: 56,
     inStock: true,
@@ -399,7 +399,7 @@ const NEW_PRODUCTS = [
       "Droplet Size: 8–15 microns (ultra-fine thermal fog)",
       "Operating Weight: 9 kg (empty tanks)",
       "Operation Mode: Continuous duty",
-      "Origin: South Korea",
+      "Origin: India",
       "Certifications: ISO 9001:2015, GeM Registered, MSME/UDYAM",
     ],
     applications: [
@@ -455,7 +455,7 @@ const NEW_PRODUCTS = [
     category: "Thermal Fogging Machines",
     tagline: "Higher output Korean thermal fogger — 50 L/hr for demanding municipal and agricultural operations.",
     priceRange: "Price on Request",
-    badges: ["Korean Technology", "GeM Registered", "Heavy Duty"],
+    badges: ["Made in India", "GeM Registered", "Heavy Duty"],
     rating: 4.9,
     reviewsCount: 38,
     inStock: true,
@@ -490,7 +490,7 @@ const NEW_PRODUCTS = [
       "Droplet Size: 8–15 microns (ultra-fine thermal fog)",
       "Operating Weight: 10 kg (empty tanks)",
       "Operation Mode: Continuous duty",
-      "Origin: South Korea",
+      "Origin: India",
       "Certifications: ISO 9001:2015, GeM Registered, MSME/UDYAM",
     ],
     applications: [
@@ -546,13 +546,13 @@ const NEW_PRODUCTS = [
     category: "Thermal Fogging Machines",
     tagline: "Updated Korean pulse-jet fogger — improved ergonomics, enhanced durability, same trusted core.",
     priceRange: "Price on Request",
-    badges: ["Korean Technology", "GeM Registered", "Heavy Duty"],
+    badges: ["Made in India", "GeM Registered", "Heavy Duty"],
     rating: 4.8,
     reviewsCount: 29,
     inStock: true,
     imageUrls: [`${V}/2000new.jpg`],
     shortDescription: "<p>The 100X Minisuper 2000 Gold New Edition is the updated design incorporating operator feedback and enhanced material specifications. Improved ergonomic carry handle, updated chemical circuit, and reinforced frame construction — built on the same reliable pulse-jet core. Direct GeM purchase available.</p>",
-    detailedDescription: "<p>The Minisuper 2000 Gold New Edition represents the evolution of the proven classic design. Korean OEM engineers incorporated feedback from thousands of field operators to address the most common maintenance points and operational improvement requests — resulting in an updated machine that retains the reliability of the classic while addressing the ergonomic and durability requirements of modern professional use.</p><p><strong>Enhanced Ergonomics.</strong> The redesigned carry handle and improved weight distribution reduce operator fatigue during extended morning fogging operations. For municipal teams running 4–6 hour fogging drives, reduced fatigue directly improves operational safety and coverage consistency.</p><p><strong>Updated Chemical Circuit.</strong> Redesigned chemical flow path with improved valve geometry delivers more consistent output control. Operators report more precise chemical application and easier flow adjustment during operations.</p><p><strong>Reinforced Frame.</strong> Updated frame construction with improved joint specifications provides greater resistance to the mechanical stress of daily loading, transport, and field deployment — extending service life compared to the classic edition.</p>",
+    detailedDescription: "<p>The Minisuper 2000 Gold New Edition represents the evolution of the proven classic design. Genuine OEM engineers incorporated feedback from thousands of field operators to address the most common maintenance points and operational improvement requests — resulting in an updated machine that retains the reliability of the classic while addressing the ergonomic and durability requirements of modern professional use.</p><p><strong>Enhanced Ergonomics.</strong> The redesigned carry handle and improved weight distribution reduce operator fatigue during extended morning fogging operations. For municipal teams running 4–6 hour fogging drives, reduced fatigue directly improves operational safety and coverage consistency.</p><p><strong>Updated Chemical Circuit.</strong> Redesigned chemical flow path with improved valve geometry delivers more consistent output control. Operators report more precise chemical application and easier flow adjustment during operations.</p><p><strong>Reinforced Frame.</strong> Updated frame construction with improved joint specifications provides greater resistance to the mechanical stress of daily loading, transport, and field deployment — extending service life compared to the classic edition.</p>",
     features: [
       "Updated ergonomic carry handle and weight distribution",
       "Improved chemical circuit with enhanced valve geometry",
@@ -573,7 +573,7 @@ const NEW_PRODUCTS = [
       "Droplet Size: 8–15 microns (ultra-fine thermal fog)",
       "Key Improvement: Enhanced ergonomics + reinforced frame",
       "Operation Mode: Continuous duty",
-      "Origin: South Korea (updated design)",
+      "Origin: India (updated design)",
       "Certifications: ISO 9001:2015, GeM Registered, MSME/UDYAM",
     ],
     applications: [
