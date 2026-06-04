@@ -284,6 +284,11 @@ export default function HomePageClient({
     <>
       <HomepageJsonLd />
 
+      {/* Page-level H1 — visually hidden but present for SEO and screen readers.
+          The hero section uses image banners with no text overlay on desktop,
+          so this ensures a primary heading exists in all viewport contexts. */}
+      <h1 className="sr-only">100X Circle — Thermal Fogging Machine Manufacturer in India</h1>
+
       {/* 1. HERO */}
       <HeroBlock heroSlides={heroSlides} />
 
