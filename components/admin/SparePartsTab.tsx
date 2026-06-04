@@ -32,6 +32,7 @@ export function SparePartsTab() {
   const [parts, setParts] = useState<any[]>([])
   const [products, setProducts] = useState<any[]>([]) // for compatible-product picker
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [form, setForm] = useState<typeof EMPTY & { [k: string]: any }>({ ...EMPTY })
   const [editing, setEditing] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -40,18 +41,33 @@ export function SparePartsTab() {
   const [uploading, setUploading] = useState(false)
   const [searchQ, setSearchQ] = useState("")
 
-  const load = useCallback(() => {
+  const load = useCallback(async () => {
     setLoading(true)
-    Promise.all([
-      fetch("/api/admin/spare-parts").then((r) => r.json()),
-      fetch("/api/products").then((r) => r.json()),
-    ])
-      .then(([partsData, prodsData]) => {
-        setParts(Array.isArray(partsData) ? partsData : [])
-        setProducts(Array.isArray(prodsData) ? prodsData : [])
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
+    setLoadError(null)
+    try {
+      const res = await fetch("/api/admin/spare-parts", { credentials: "include" })
+      if (!res.ok) {
+        const body = await res.text()
+        setLoadError(`API returned ${res.status}: ${body.slice(0, 120)}`)
+        setParts([])
+      } else {
+        const data = await res.json()
+        setParts(Array.isArray(data) ? data : [])
+      }
+    } catch (err: any) {
+      setLoadError(`Fetch failed: ${err?.message ?? String(err)}`)
+      setParts([])
+    } finally {
+      setLoading(false)
+    }
+    // Load products separately — don't let it block spare parts
+    try {
+      const r = await fetch("/api/products")
+      if (r.ok) {
+        const d = await r.json()
+        setProducts(Array.isArray(d) ? d : [])
+      }
+    } catch {}
   }, [])
 
   useEffect(() => { load() }, [load])
@@ -268,6 +284,13 @@ export function SparePartsTab() {
             </form>
           </CardContent>
         </Card>
+      )}
+
+      {/* API error banner */}
+      {loadError && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+          <strong>Failed to load spare parts:</strong> {loadError}
+        </div>
       )}
 
       {/* Parts list */}
