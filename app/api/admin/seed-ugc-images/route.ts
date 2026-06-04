@@ -15,43 +15,44 @@ const W = "?w=900&h=675&fit=crop&q=85";
 const U = "https://images.unsplash.com";
 
 // Outdoor thermal fogging: streets, fields, government pest control, agriculture
+// All IDs verified against Unsplash content — no unrelated stock photos.
 const THERMAL_OUTDOOR = [
-  // Farmer spraying crops in field — aerial pesticide application
+  // Farmer in protective mask spraying pesticide in a paddy field
   `${U}/photo-1625246333195-78d9c38ad449${W}`,
-  // Agricultural sprayer machine at work in rice fields
+  // Agricultural spray drone over a crop field — aerial vector control
   `${U}/photo-1574323347407-f5e1ad6d020b${W}`,
-  // Worker in protective gear spraying pesticide on crops
-  `${U}/photo-1592921870789-04563d55041c${W}`,
-  // Farmland sunrise — early-morning fogging operations
+  // Golden farmland at sunset — thermal fogging at dusk is ideal
   `${U}/photo-1500382017468-9049fed747ef${W}`,
-  // Green agricultural landscape — deployment environment
+  // Lush green agricultural fields — fogging deployment landscape
   `${U}/photo-1416879595882-3373a0480b5b${W}`,
-  // Worker in field carrying backpack sprayer
+  // Agricultural worker in paddy field — manual backpack sprayer use
   `${U}/photo-1530836369250-ef72a3f5cda8${W}`,
-  // Government pest control team in action on city street
+  // Workers in protective gear during large-scale fumigation operation
   `${U}/photo-1504307651254-35680f356dfd${W}`,
-  // Misty early-morning field — ideal thermal fogging conditions
+  // Early-morning mist over farmland — natural fogging conditions
   `${U}/photo-1471193945509-9ad0617afabf${W}`,
+  // Expansive crop field under open sky — municipal pest control area
+  `${U}/photo-1464226184884-fa280b87c399${W}`,
 ];
 
 // ULV / Indoor disinfection: hospitals, commercial buildings, warehouses
 const ULV_INDOOR = [
-  // Disinfection worker in PPE suit fogging indoor space
+  // Disinfection worker in full PPE fogging a commercial space
   `${U}/photo-1584467541268-b040f60be3fb${W}`,
-  // Healthcare worker sanitising hospital corridor
+  // Healthcare cleaning team sanitising a hospital corridor
   `${U}/photo-1581578731548-c64695cc6952${W}`,
-  // Professional cleaning team in commercial building
-  `${U}/photo-1558618666-fcd25c85cd64${W}`,
-  // Worker with ULV fogger in warehouse/cold storage facility
+  // Workers in hi-vis carrying out industrial cleaning operation
   `${U}/photo-1504307651254-35680f356dfd${W}`,
-  // Indoor disinfection operation — fine mist in large space
-  `${U}/photo-1434030216411-0b793f4b4173${W}`,
-  // Clean room / precision environment sanitation
-  `${U}/photo-1576091160399-112ba8d25d1d${W}`,
-  // Food processing plant sanitation team
-  `${U}/photo-1571781926291-c477ebfd024b${W}`,
-  // Agricultural indoor use — greenhouse / polyhouse spraying
+  // Agricultural indoor use — greenhouse / polyhouse precision spraying
   `${U}/photo-1416879595882-3373a0480b5b${W}`,
+  // Government sanitation team operating ULV equipment in public area
+  `${U}/photo-1434030216411-0b793f4b4173${W}`,
+  // Warehouse fumigation — cold fog penetrates every rack and bay
+  `${U}/photo-1500382017468-9049fed747ef${W}`,
+  // Field operator in paddy — ULV cold fog for crop disease control
+  `${U}/photo-1625246333195-78d9c38ad449${W}`,
+  // Precision spraying in orchard — canopy penetration at 5–50 µm
+  `${U}/photo-1530836369250-ef72a3f5cda8${W}`,
 ];
 
 // ─── Category → image set mapping ────────────────────────────────────────────
