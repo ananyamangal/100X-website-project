@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 
+export const revalidate = 600
+
 const DEFAULT_CONFIG = {
   enabled: false,
   delayMs: 8000,
