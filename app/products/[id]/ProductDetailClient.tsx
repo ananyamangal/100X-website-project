@@ -34,7 +34,7 @@ const BADGE_LOGOS: Record<string, string> = {
   'German Technology': '/Logos clipart 2/german technology.png',
   'Japnese Technology': '/Logos clipart 2/Japnese technology.png',
   GeM: '/Logos clipart 2/GeM logo.png', 'GeM logo': '/Logos clipart 2/GeM logo.png',
-  'Heavy Duty': '/Logos clipart 2/Heavy Duty.png', 'Heavy duty': '/Logos clipart 2/Heavy Duty.png',
+  'Heavy Duty': '/Logos clipart 2/Heavy duty.png', 'Heavy duty': '/Logos clipart 2/Heavy duty.png',
   'Eco Friendly': '/Logos clipart 2/Ecofreidly.png', Ecofreidly: '/Logos clipart 2/Ecofreidly.png',
   'BIS Approved': '/Logos clipart 2/BIS approved.png',
 };

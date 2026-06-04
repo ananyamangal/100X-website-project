@@ -78,7 +78,6 @@ const getYouTubeId = (url: string): string | null => {
 }
 
 const badgeLogoMap: Record<string, string> = {
-  "Made in India": "/Logos clipart 2/MadeInIndia.png",
   "German Technology": "/Logos clipart 2/german technology.png",
   "Japnese Technology": "/Logos clipart 2/Japnese technology.png",
   GeM: "/Logos clipart 2/GeM logo.png",
