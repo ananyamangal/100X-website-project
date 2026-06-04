@@ -91,6 +91,8 @@ export function normalizeProduct(raw: any): any {
     filmChapters: toObjectArray(raw.filmChapters),
     boxContents: toObjectArray(raw.boxContents),
     linkedCaseStudyIds: toObjectArray(raw.linkedCaseStudyIds),
+    // UGC deployment carousel
+    ugcImages: toStringArray(raw.ugcImages),
     // Image URLs — unified
     imageUrls,
   }

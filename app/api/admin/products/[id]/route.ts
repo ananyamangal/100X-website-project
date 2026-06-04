@@ -93,8 +93,9 @@ export async function PUT(request: NextRequest, context: { params?: { id?: strin
         } },
       { returnDocument: "after" }
     );
-    if (!result || !result.value) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    return NextResponse.json(result.value);
+    // MongoDB driver v6 returns the document directly (not wrapped in {value: ...})
+    if (!result) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
   }
