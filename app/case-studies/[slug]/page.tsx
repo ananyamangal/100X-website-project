@@ -32,8 +32,9 @@ async function getLinkedProducts(ids: string[]) {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const cs = await getCaseStudy(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const cs = await getCaseStudy(slug)
   if (!cs) return { title: "Case Study Not Found" }
   return {
     title: `${cs.title} | 100x Circle Case Study`,
@@ -42,8 +43,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function CaseStudyDetailPage({ params }: { params: { slug: string } }) {
-  const cs = await getCaseStudy(params.slug)
+export default async function CaseStudyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const cs = await getCaseStudy(slug)
   if (!cs) notFound()
   const linkedProducts = await getLinkedProducts(cs.linkedProductIds || [])
 
