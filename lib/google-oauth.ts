@@ -25,12 +25,16 @@ export const SCOPES = {
 
 // ── Env helpers ───────────────────────────────────────────────────────────────
 
+// Trim all OAuth env vars — Vercel can introduce trailing newlines when pasting credentials
+function clientId(): string { return (process.env.GOOGLE_OAUTH_CLIENT_ID || "").trim() }
+function clientSecret(): string { return (process.env.GOOGLE_OAUTH_CLIENT_SECRET || "").trim() }
+
 export function isOAuthAppConfigured(): boolean {
-  return !!(process.env.GOOGLE_OAUTH_CLIENT_ID && process.env.GOOGLE_OAUTH_CLIENT_SECRET)
+  return !!(clientId() && clientSecret())
 }
 
 export function getOAuthRedirectUri(): string {
-  if (process.env.GOOGLE_OAUTH_REDIRECT_URI) return process.env.GOOGLE_OAUTH_REDIRECT_URI
+  if (process.env.GOOGLE_OAUTH_REDIRECT_URI) return process.env.GOOGLE_OAUTH_REDIRECT_URI.trim()
   // Fallback: use brand domain. Set GOOGLE_OAUTH_REDIRECT_URI explicitly in Vercel to override.
   const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.100xcircle.com").replace(/\/$/, "")
   return `${base}/api/admin/gsc/oauth/callback`
@@ -38,8 +42,8 @@ export function getOAuthRedirectUri(): string {
 
 export function getMissingEnvVars(): string[] {
   const missing: string[] = []
-  if (!process.env.GOOGLE_OAUTH_CLIENT_ID) missing.push("GOOGLE_OAUTH_CLIENT_ID")
-  if (!process.env.GOOGLE_OAUTH_CLIENT_SECRET) missing.push("GOOGLE_OAUTH_CLIENT_SECRET")
+  if (!clientId()) missing.push("GOOGLE_OAUTH_CLIENT_ID")
+  if (!clientSecret()) missing.push("GOOGLE_OAUTH_CLIENT_SECRET")
   return missing
 }
 
@@ -47,7 +51,7 @@ export function getMissingEnvVars(): string[] {
 
 export function buildAuthUrl(state: string, scopes: string[] = [SCOPES.gsc]): string {
   const params = new URLSearchParams({
-    client_id: process.env.GOOGLE_OAUTH_CLIENT_ID!,
+    client_id: clientId(),
     redirect_uri: getOAuthRedirectUri(),
     response_type: "code",
     scope: scopes.join(" "),
@@ -74,8 +78,8 @@ export async function exchangeCode(code: string): Promise<RawTokenResponse> {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       code,
-      client_id: process.env.GOOGLE_OAUTH_CLIENT_ID!,
-      client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET!,
+      client_id: clientId(),
+      client_secret: clientSecret(),
       redirect_uri: getOAuthRedirectUri(),
       grant_type: "authorization_code",
     }).toString(),
@@ -97,8 +101,8 @@ export async function refreshAccessToken(refreshToken: string): Promise<RefreshR
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       refresh_token: refreshToken,
-      client_id: process.env.GOOGLE_OAUTH_CLIENT_ID!,
-      client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET!,
+      client_id: clientId(),
+      client_secret: clientSecret(),
       grant_type: "refresh_token",
     }).toString(),
   })
