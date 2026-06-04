@@ -105,7 +105,7 @@ export default function MobileCtaBar() {
             aria-haspopup={isContactPage ? undefined : "dialog"}
             aria-expanded={isContactPage ? undefined : quoteOpen}
             data-gtm="cta_quote"
-            className="inline-flex min-h-[50px] flex-col items-center justify-center gap-0.5 rounded-xl border border-white/15 bg-white/6 text-white font-600 text-[11px] transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+            className="inline-flex min-h-[50px] flex-col items-center justify-center gap-0.5 rounded-xl bg-gray-600 hover:bg-gray-500 text-white font-600 text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
           >
             <FileText size={17} aria-hidden="true" className="shrink-0" />
             <span className={copy.quote.length > 12 ? "truncate text-[10px]" : "truncate text-[11px]"}>
