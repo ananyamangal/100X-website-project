@@ -23,18 +23,6 @@ import CinematicTrustSection from "@/components/home/CinematicTrustSection"
 import CinematicCTASection from "@/components/home/CinematicCTASection"
 import CinematicProductsSection from "@/components/home/CinematicProductsSection"
 import ReviewsSection from "@/components/home/ReviewsSection"
-import S1Hero from "@/components/home/cinematic/S1Hero"
-import S2Problem from "@/components/home/cinematic/S2Problem"
-import S3ProductIntro from "@/components/home/cinematic/S3ProductIntro"
-import S4Engineering from "@/components/home/cinematic/S4Engineering"
-import S5Manufacturing from "@/components/home/cinematic/S5Manufacturing"
-import S6Features from "@/components/home/cinematic/S6Features"
-import S7Performance from "@/components/home/cinematic/S7Performance"
-import S8Applications from "@/components/home/cinematic/S8Applications"
-import S9Trust from "@/components/home/cinematic/S9Trust"
-import S10Range from "@/components/home/cinematic/S10Range"
-import S11Success from "@/components/home/cinematic/S11Success"
-import S12CTA from "@/components/home/cinematic/S12CTA"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
 import { type HomeContent } from "@/lib/homeContentTypes"
@@ -294,52 +282,19 @@ export default function HomePageClient({
     <>
       <HomepageJsonLd />
 
-      {/* ── ACT I: PHYSICS MADE BEAUTIFUL ─────────────────────────── */}
+      {/* 1. HERO */}
+      <HeroBlock heroSlides={heroSlides} />
 
-      {/* S1 — Hero: Fog That Finds Them */}
-      <S1Hero />
-
-      {/* Admin celebrity placement — after hero */}
+      {/* 2. ADMIN CUSTOM SECTIONS (after-hero placement only) */}
       <CelebritySectionsBlock sections={homepageSections} placement="after-hero" />
 
-      {/* Accreditations compact trust strip */}
+      {/* 3. ACCREDITATIONS — compact trust strip */}
       <AccreditationsStrip accreditations={accreditations} />
 
-      {/* S2 — The Problem: Where It Hides */}
-      <S2Problem />
+      {/* 4. PRODUCTS */}
+      <CinematicProductsSection products={products} onBrochureDownload={handleBrochureDownload} />
 
-      {/* S3 — Product Introduction: The Answer */}
-      <S3ProductIntro featuredProduct={products[0]} />
-
-      {/* S4 — Engineering Excellence: No Moving Parts */}
-      <S4Engineering />
-
-      {/* ── ACT II: THE PROTECTOR ──────────────────────────────────── */}
-
-      {/* S5 — Manufacturing Story: Built By Hand */}
-      <S5Manufacturing />
-
-      {/* S6 — Feature Stories: Three Reasons (light section, contrast break) */}
-      <S6Features />
-
-      {/* S7 — Performance: The Drive That Protects */}
-      <S7Performance />
-
-      {/* S8 — Applications: Four Worlds, One Machine */}
-      <S8Applications />
-
-      {/* Admin celebrity placement — after products */}
-      <CelebritySectionsBlock sections={homepageSections} placement="after-products" />
-
-      {/* ── ACT III: MADE HERE ─────────────────────────────────────── */}
-
-      {/* S9 — Trust & Reliability: The Standard. Met. */}
-      <S9Trust accreditations={accreditations} />
-
-      {/* S10 — Product Range: Find Your Machine (light section) */}
-      <S10Range products={products} />
-
-      {/* Spare parts cross-sell */}
+      {/* 5. SPARE PARTS — cross-sell, 4 items max */}
       {spareParts.length > 0 && (
         <section className="py-12 md:py-16 bg-gray-950" aria-labelledby="spare-parts-heading">
           <div className="container mx-auto px-4">
@@ -358,7 +313,6 @@ export default function HomePageClient({
                   className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/8 hover:border-brand-500/30 transition-all">
                   {part.images?.[0] ? (
                     <div className="aspect-square overflow-hidden bg-gray-900">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={part.images[0]} alt={part.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                     </div>
                   ) : (
@@ -378,32 +332,43 @@ export default function HomePageClient({
         </section>
       )}
 
-      {/* S11 — Customer Success: One Decade, Every State */}
-      <S11Success />
+      {/* 6. ADMIN SECTIONS — after products (celebrity endorsement, comparison) */}
+      <CelebritySectionsBlock sections={homepageSections} placement="after-products" />
 
-      {/* Social proof — YouTube shorts */}
-      <YoutubeShortsCarousel />
+      {/* 7. INDUSTRY APPLICATIONS */}
+      <IndustryApplicationsSection />
 
-      {/* Customer logos marquee */}
-      <OurCustomersScroll customers={customers} />
+      {/* 8. BRAND STORY */}
+      <ManufacturerIntroBlock content={homeContent.manufacturerIntro} />
 
-      {/* Live reviews from CMS */}
-      <ReviewsSection limit={4} />
+      {/* 9. ADMIN SECTIONS — before trust (authority, technology pillars) */}
+      <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
 
-      {/* Admin placement — before FAQ */}
-      <CelebritySectionsBlock sections={homepageSections} placement="before-faq" />
-
-      {/* Mid-page RFQ lead capture */}
+      {/* 10. MID-PAGE RFQ */}
       <RFQMidPageBlock />
 
-      {/* Blog */}
+      {/* 11. SOCIAL PROOF — YouTube + customers + reviews */}
+      <YoutubeShortsCarousel />
+      <OurCustomersScroll customers={customers} />
+      <ReviewsSection limit={4} />
+
+      {/* 12. TRUST & CERTIFICATIONS */}
+      <CinematicTrustSection accreditations={accreditations} />
+
+      {/* 13. SPECIALISED BUYERS — B2B segments */}
+      <SpecialisedBuyersBlock />
+
+      {/* 14. ADMIN SECTIONS — before FAQ (manufacturing authority) */}
+      <CelebritySectionsBlock sections={homepageSections} placement="before-faq" />
+
+      {/* 15. BLOG */}
       <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />
 
-      {/* FAQ */}
+      {/* 16. FAQ */}
       <FAQSection faqs={homeContent.faqs} />
 
-      {/* S12 — Final CTA: Built In India. For India. */}
-      <S12CTA />
+      {/* 17. FINAL CTA */}
+      <CinematicCTASection />
     </>
   )
 
