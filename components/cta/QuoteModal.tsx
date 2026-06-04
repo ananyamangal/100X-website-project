@@ -34,11 +34,16 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
 
   useEffect(() => {
     if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !submitting) onClose()
     }
     document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
+    return () => {
+      document.body.style.overflow = prev
+      document.removeEventListener("keydown", onKey)
+    }
   }, [open, submitting, onClose])
 
   // Reset transient state whenever the modal closes so the next open is clean.

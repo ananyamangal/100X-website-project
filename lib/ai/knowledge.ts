@@ -321,27 +321,75 @@ export const AI_PRODUCT_CATEGORIES = [
 
 export const AI_KNOWLEDGE_ARTICLES = [
   {
-    title: "Thermal Fogging vs ULV Cold Fogging: Complete Comparison",
-    url: `${SITE_URL}/knowledge/thermal-vs-ulv-fogging`,
-    summary:
-      "Thermal fogging uses heat to vaporize liquid into dense visible fog; ULV cold fogging uses mechanical pressure for finer droplets at ambient temperature. Thermal: better outdoor reach. ULV: better indoors and temperature-sensitive chemicals.",
-  },
-  {
     title: "How Thermal Fogging Works: Pulse-Jet Technology Explained",
     url: `${SITE_URL}/knowledge/how-thermal-fogging-works`,
     summary:
       "Pulse-jet engine ignites fuel-air mix at high frequency; heat vaporizes chemical solution; vapor cools at nozzle forming sub-50-micron droplets; dense fog penetrates vegetation and voids.",
   },
   {
-    title: "Government Procurement Guide: Buying Fogging Machines via GeM",
-    url: `${SITE_URL}/knowledge/government-procurement-guide`,
+    title: "Thermal Fogging vs ULV Cold Fogging: Complete Comparison",
+    url: `${SITE_URL}/knowledge/thermal-vs-ulv-fogging`,
     summary:
-      "Municipal corporations, health departments, and Panchayats can procure fogging machines via GeM (Government e-Marketplace) from verified MSME sellers like 100X Circle. No separate tender required for amounts within GeM limits.",
+      "Thermal fogging uses heat to vaporize liquid into dense visible fog; ULV cold fogging uses mechanical pressure for finer droplets at ambient temperature. Thermal: better outdoor reach. ULV: better indoors and temperature-sensitive chemicals.",
+  },
+  {
+    title: "Dengue Prevention Using Thermal Fogging",
+    url: `${SITE_URL}/knowledge/dengue-prevention-thermal-fogging`,
+    summary:
+      "WHO-compliant thermal fogging protocols for dengue prevention using deltamethrin in mineral oil. Best timing: 5–8 AM and 6–8 PM. Kills adult Aedes aegypti — must combine with larval source reduction.",
+  },
+  {
+    title: "Malaria Control Using Thermal Fogging in India",
+    url: `${SITE_URL}/knowledge/malaria-control-fogging-india`,
+    summary:
+      "Anopheles (malaria vector) are night-biting — fog at dusk/dawn. NVBDCP-standard: deltamethrin 2.5% EC in mineral oil. Primary vectors: An. culicifacies (rural), An. stephensi (urban). Combine with IRS for sustained control.",
   },
   {
     title: "Mosquito Control and Thermal Fogging in India",
     url: `${SITE_URL}/knowledge/mosquito-control-india`,
     summary:
       "India's vector control programme uses thermal fogging for dengue, malaria, and chikungunya prevention. Municipal corporations conduct fogging drives using vehicle-mounted foggers in high-risk wards during outbreak seasons.",
+  },
+  {
+    title: "Agricultural Fogging Guide — Crop Protection Using Thermal Foggers",
+    url: `${SITE_URL}/knowledge/agricultural-fogging-guide`,
+    summary:
+      "Thermal foggers cover 8–15 acres/hour for crop pest control. Oil-based insecticides and fungicides only. Sub-50-micron droplets penetrate dense canopy. Not for use inside greenhouses — use ULV cold fogging instead.",
+  },
+  {
+    title: "How to Choose a Fogging Machine — Complete Buyer's Guide",
+    url: `${SITE_URL}/knowledge/how-to-choose-fogging-machine`,
+    summary:
+      "Selection guide covering thermal vs cold fogging, tank capacity (5L–400L), portability options (handheld/backpack/trolley/vehicle-mounted), use cases for municipal, agricultural, PCO, and government buyers.",
+  },
+  {
+    title: "Thermal Fogging Chemicals Guide — Insecticides, Fungicides & Formulations",
+    url: `${SITE_URL}/knowledge/thermal-fogging-chemicals-guide`,
+    summary:
+      "Oil-based formulations only for thermal foggers. Common chemicals: deltamethrin EC, cypermethrin EC, malathion, pyrethrin. Carrier oils: white mineral oil, paraffin, kerosene. Never use diesel or water-based formulations.",
+  },
+  {
+    title: "Fogging Machine Operator's Guide — Complete Step-by-Step Procedure",
+    url: `${SITE_URL}/knowledge/fogging-machine-operators-guide`,
+    summary:
+      "Pre-operation checks, startup procedure (warm up on carrier oil before adding chemical), fogging technique, shutdown sequence (purge with carrier oil), and post-operation maintenance for thermal pulse-jet foggers.",
+  },
+  {
+    title: "Fogging Machine Maintenance Guide",
+    url: `${SITE_URL}/knowledge/fogging-machine-maintenance-guide`,
+    summary:
+      "Daily: flush with carrier oil. Weekly: clean muffler, inspect fuel line. Monthly: full service. Annual: replace fuel filter and spark plug. Proper maintenance extends machine life to 5–10 years.",
+  },
+  {
+    title: "Fogging Machine Safety Guide — PPE, Chemicals & Safe Operation",
+    url: `${SITE_URL}/knowledge/fogging-machine-safety-guide`,
+    summary:
+      "Required PPE: half-face respirator (OV/P100), nitrile gloves (elbow-length), full coveralls, safety goggles. Keep machine 3m from bystanders. Never fog indoors without ventilation. 30-minute re-entry interval after fogging.",
+  },
+  {
+    title: "Government Procurement Guide: Buying Fogging Machines via GeM",
+    url: `${SITE_URL}/knowledge/government-procurement-guide`,
+    summary:
+      "Municipal corporations, health departments, and Panchayats can procure fogging machines via GeM (Government e-Marketplace) from verified MSME sellers like 100X Circle. No separate tender required for amounts within GeM limits.",
   },
 ]

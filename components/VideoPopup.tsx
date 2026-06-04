@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
-import { X } from "lucide-react"
+import { Volume2, VolumeX, X } from "lucide-react"
 
 const FALLBACK_VIDEO_URL = "https://www.youtube.com/shorts/ZiVGNkvAI9g"
 const SESSION_KEY = "video-popup-seen-v1"
@@ -30,6 +30,7 @@ export default function VideoPopup() {
   const [config, setConfig] = useState<VideoConfig | null>(null)
   const [visible, setVisible] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [muted, setMuted] = useState(true)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Track explicit user dismissal — once dismissed, never reopen until page reload
@@ -135,20 +136,31 @@ export default function VideoPopup() {
   if (!videoId) return null
 
   const isPortrait = config.orientation === "portrait"
-  const embed = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}&rel=0&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0`
+  const muteParam = muted ? "1" : "0"
+  const embed = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&playsinline=1&loop=1&playlist=${videoId}&rel=0&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0`
 
   return (
     <div
       className="fixed right-6 z-[51] flex flex-col items-end gap-1"
       style={{ bottom: "7rem" }}
     >
-      <button
-        onClick={dismiss}
-        className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors -mb-1 z-10 min-w-[32px] min-h-[32px] flex items-center justify-center"
-        aria-label="Close video — will not reopen"
-      >
-        <X size={18} />
-      </button>
+      {/* Close + mute controls */}
+      <div className="flex items-center gap-1.5 -mb-1 z-10">
+        <button
+          onClick={() => setMuted((m) => !m)}
+          className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
+          aria-label={muted ? "Unmute video" : "Mute video"}
+        >
+          {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+        </button>
+        <button
+          onClick={dismiss}
+          className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
+          aria-label="Close video — will not reopen"
+        >
+          <X size={18} />
+        </button>
+      </div>
       <div
         className={`overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black ${
           isPortrait ? "w-[200px] sm:w-[220px]" : "w-[280px] sm:w-[320px]"
@@ -156,6 +168,7 @@ export default function VideoPopup() {
       >
         <div className={`w-full relative ${isPortrait ? "aspect-[9/16]" : "aspect-video"}`}>
           <iframe
+            key={muteParam}
             src={embed}
             title="Product video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

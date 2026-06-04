@@ -153,14 +153,19 @@ export default function RFQPopup() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config, pathname])
 
-  // ESC key closes the popup
+  // Scroll lock + ESC key when popup is open
   useEffect(() => {
     if (!visible) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close()
     }
     document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
+    return () => {
+      document.body.style.overflow = prev
+      document.removeEventListener("keydown", onKey)
+    }
   }, [visible])
 
   function close() {

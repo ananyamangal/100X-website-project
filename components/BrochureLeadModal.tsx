@@ -44,9 +44,14 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
     setError("")
     setDone(false)
     setTimeout(() => nameRef.current?.focus(), 80)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape" && !submitting) onClose() }
     document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
+    return () => {
+      document.body.style.overflow = prev
+      document.removeEventListener("keydown", onKey)
+    }
   }, [open, submitting, onClose])
 
   if (!open) return null

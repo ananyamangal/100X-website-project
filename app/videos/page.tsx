@@ -78,6 +78,7 @@ export default async function VideosPage() {
                         src={`https://www.youtube.com/embed/${ytId}`}
                         title={v.title}
                         className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                         loading="lazy"
                       />

@@ -74,9 +74,14 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
 
   useEffect(() => {
     if (!isMenuOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsMenuOpen(false) }
     document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      document.removeEventListener('keydown', onKey)
+    }
   }, [isMenuOpen])
 
   const openBrochure = () => {
