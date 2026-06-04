@@ -56,6 +56,24 @@ export async function PATCH(req: NextRequest) {
   return NextResponse.json({ ok: true })
 }
 
+const AGENT_DISPATCH: Record<string, () => Promise<{ summary: string }>> = {}
+
+async function getDispatch() {
+  if (Object.keys(AGENT_DISPATCH).length === 0) {
+    const [{ runDealerLeadAgent }, { runSchemaAuditAgent }, { runInternalLinkAgent }, { runAICitationAgent }] = await Promise.all([
+      import("@/lib/growth-os/agents/dealer-lead"),
+      import("@/lib/growth-os/agents/schema-audit"),
+      import("@/lib/growth-os/agents/internal-link"),
+      import("@/lib/growth-os/agents/ai-citation"),
+    ])
+    AGENT_DISPATCH["dealer-lead-agent"] = runDealerLeadAgent
+    AGENT_DISPATCH["schema-audit"] = runSchemaAuditAgent
+    AGENT_DISPATCH["internal-link-agent"] = runInternalLinkAgent
+    AGENT_DISPATCH["ai-citation-agent"] = runAICitationAgent
+  }
+  return AGENT_DISPATCH
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json()
   const { id } = body
@@ -65,7 +83,20 @@ export async function POST(req: NextRequest) {
   const agent = await db.collection("growth_os_automations").findOne({ _id: new ObjectId(id) })
   if (!agent) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
-  const runResult = `Manual run at ${new Date().toLocaleString("en-IN")} — simulated`
+  let runResult: string
+  try {
+    const dispatch = await getDispatch()
+    const fn = dispatch[agent.id as string]
+    if (fn) {
+      const result = await fn()
+      runResult = result.summary
+    } else {
+      runResult = `${agent.name} ran at ${new Date().toLocaleString("en-IN")} — agent not yet implemented`
+    }
+  } catch (err) {
+    runResult = `Error: ${err instanceof Error ? err.message : String(err)}`
+  }
+
   await db.collection("growth_os_automations").updateOne(
     { _id: new ObjectId(id) },
     { $set: { lastRun: new Date().toISOString(), lastResult: runResult, updatedAt: new Date().toISOString() }, $inc: { runCount: 1 } }
@@ -74,10 +105,10 @@ export async function POST(req: NextRequest) {
   await db.collection("growth_os_logs").insertOne({
     ts: new Date().toISOString(),
     agent: agent.name,
-    action: `Manual run triggered`,
+    action: `Manual run: ${runResult.slice(0, 120)}`,
     reason: "Admin triggered manual run",
     expectedImpact: agent.description,
-    level: "info",
+    level: runResult.startsWith("Error") ? "error" : "info",
     module: agent.module,
   })
 
