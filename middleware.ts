@@ -26,13 +26,10 @@ export async function middleware(request: NextRequest) {
       loginUrl.pathname = "/admin"
       return NextResponse.redirect(loginUrl)
     }
-    // Forward a header so the root layout can detect admin context
-    const res = NextResponse.next({
-      request: {
-        headers: new Headers({ ...Object.fromEntries(request.headers), "x-is-admin": "1" }),
-      },
-    })
-    return res
+    // Forward x-is-admin header so root layout skips public Navbar/Footer
+    const cloned = new Headers(request.headers)
+    cloned.set("x-is-admin", "1")
+    return NextResponse.next({ request: { headers: cloned } })
   }
 
   // ── Protect admin API routes ──────────────────────────────────────────────
