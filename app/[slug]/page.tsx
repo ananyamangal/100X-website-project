@@ -1,3 +1,5 @@
+export const revalidate = 300
+
 import { notFound } from "next/navigation"
 import LandingRenderer from "@/components/landing/LandingRenderer"
 import ProductPage from "./ProductPage"

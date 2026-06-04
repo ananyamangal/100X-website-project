@@ -128,6 +128,7 @@ function Gallery({ images, videoId, name }: { images: string[]; videoId: string 
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={(cur as any).url} alt={name} fetchPriority="high"
+            width={600} height={600}
             className="absolute inset-0 w-full h-full object-contain p-8 transition-transform duration-150"
             style={{ transform: zoomed ? 'scale(2.2)' : 'scale(1)', transformOrigin: origin }}
             draggable={false} onContextMenu={e => e.preventDefault()}

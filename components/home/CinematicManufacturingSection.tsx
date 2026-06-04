@@ -101,8 +101,11 @@ export default function CinematicManufacturingSection({ content }: Props) {
                   <img
                     src={content.imageUrl}
                     alt="100X Circle manufacturing facility"
+                    width={640}
+                    height={480}
                     className="w-full h-full object-cover"
                     loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center bg-cinema-900 gap-4 p-8">
