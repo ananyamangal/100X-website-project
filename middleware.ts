@@ -16,6 +16,18 @@ function isAuthenticated(request: NextRequest): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname, origin } = request.nextUrl
 
+  // ── Protect Growth OS admin pages ─────────────────────────────────────────
+  // Server-side guard so unauthenticated users cannot reach the SSR output.
+  // The client-side cookie check in the layout is belt-and-suspenders on top.
+  if (pathname.startsWith("/admin/growth")) {
+    if (!isAuthenticated(request)) {
+      const loginUrl = request.nextUrl.clone()
+      loginUrl.pathname = "/admin"
+      return NextResponse.redirect(loginUrl)
+    }
+    return NextResponse.next()
+  }
+
   // ── Protect admin API routes ──────────────────────────────────────────────
   // Every /api/admin/* route requires the admin-token cookie except the
   // auth endpoints themselves (login POST and change-password POST).
@@ -67,5 +79,6 @@ export const config = {
     "/products/:path*",
     "/api/admin/:path*",
     "/api/submissions",
+    "/admin/growth/:path*",
   ],
 }

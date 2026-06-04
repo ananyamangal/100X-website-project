@@ -9,7 +9,9 @@ export default function GrowthOSLayout({ children }: { children: React.ReactNode
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    if (Cookies.get("admin-token") !== "authenticated") {
+    // Same cookie name and check as the main admin page
+    const token = Cookies.get("admin-token")
+    if (token !== "authenticated") {
       router.replace("/admin")
     } else {
       setReady(true)
@@ -24,14 +26,15 @@ export default function GrowthOSLayout({ children }: { children: React.ReactNode
     )
   }
 
+  // Do NOT return <html> or <body> — app/admin/layout.tsx already provides those.
+  // Returning nested <html>/<body> causes hydration failure and triggers the auth
+  // redirect incorrectly.
   return (
-    <html lang="en">
-      <body className="bg-gray-100 min-h-screen">
-        <GrowthSidebar />
-        <div className="ml-56 min-h-screen flex flex-col">
-          {children}
-        </div>
-      </body>
-    </html>
+    <div className="flex bg-gray-100" style={{ minHeight: "100vh" }}>
+      <GrowthSidebar />
+      <div style={{ marginLeft: 224, flex: 1, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        {children}
+      </div>
+    </div>
   )
 }

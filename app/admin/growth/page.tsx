@@ -1,9 +1,6 @@
-"use client"
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { redirect } from "next/navigation"
 
+// Server-side redirect — no client JS needed, no race condition with layout auth
 export default function GrowthRoot() {
-  const router = useRouter()
-  useEffect(() => { router.replace("/admin/growth/dashboard") }, [router])
-  return null
+  redirect("/admin/growth/dashboard")
 }
