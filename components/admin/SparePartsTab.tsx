@@ -102,10 +102,14 @@ export function SparePartsTab() {
     try {
       const fd = new FormData()
       fd.append("file", file)
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd })
+      fd.append("upload_preset", "product_uploads")
+      const res = await fetch("https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload", { method: "POST", body: fd })
       const data = await res.json()
-      if (data.url) set("images", [...(form.images || []), data.url])
-    } catch {}
+      if (data.secure_url) set("images", [...(form.images || []), data.secure_url])
+      else if (data.error) setMsg({ type: "error", text: `Upload failed: ${data.error.message}` })
+    } catch {
+      setMsg({ type: "error", text: "Upload failed. Please try again." })
+    }
     setUploading(false)
     e.target.value = ""
   }

@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb"
 
 async function isAuthenticated() {
   const cookieStore = await cookies()
-  return cookieStore.get("admin-token")?.value === process.env.ADMIN_PASSWORD
+  return cookieStore.get("admin-token")?.value === "authenticated"
 }
 
 function toObjectId(id: string) {
