@@ -14,6 +14,8 @@ const DEFAULT_AGENTS: Omit<Automation, "_id">[] = [
   { id: "content-brief-agent", name: "Content Brief Agent", description: "Generates content briefs for approved opportunities and queues them in Content Factory", module: "content", riskLevel: "medium", status: "paused", schedule: "On opportunity approval", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
   { id: "ads-keyword-agent", name: "Ads Keyword Agent", description: "Analyzes Search Console data to surface high-converting terms for Google Ads campaigns", module: "ads", riskLevel: "low", status: "paused", schedule: "Monthly — 1st", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
   { id: "metadata-optimizer", name: "Metadata Optimizer Agent", description: "Reviews title/description CTR in GSC and recommends improvements for low-CTR pages", module: "seo", riskLevel: "low", status: "paused", schedule: "Monthly — 15th", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "gsc-sync", name: "GSC Data Sync", description: "Pulls 28-day query and page data from Google Search Console into MongoDB for analysis", module: "seo", riskLevel: "low", status: "paused", schedule: "Weekly — Monday 08:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "seo-opportunity-agent", name: "SEO Opportunity Agent", description: "Scans GSC data for near-wins, rank drops, CTR gaps, and new keywords — creates actionable opportunities", module: "seo", riskLevel: "low", status: "paused", schedule: "Weekly — Monday 09:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 ]
 
 export async function GET() {
@@ -58,18 +60,31 @@ export async function PATCH(req: NextRequest) {
 
 const AGENT_DISPATCH: Record<string, () => Promise<{ summary: string }>> = {}
 
+async function runGSCSync(): Promise<{ summary: string }> {
+  const res = await fetch(`${process.env.NEXTAUTH_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"}/api/admin/gsc/sync`, {
+    method: "POST",
+    headers: { "Cookie": "admin-token=authenticated" },
+  })
+  const d = await res.json() as { ok?: boolean; queryCount?: number; pageCount?: number; errors?: string[] }
+  if (!d.ok) throw new Error(d.errors?.[0] || "GSC sync failed")
+  return { summary: `GSC sync complete: ${d.queryCount} queries, ${d.pageCount} pages` }
+}
+
 async function getDispatch() {
   if (Object.keys(AGENT_DISPATCH).length === 0) {
-    const [{ runDealerLeadAgent }, { runSchemaAuditAgent }, { runInternalLinkAgent }, { runAICitationAgent }] = await Promise.all([
+    const [{ runDealerLeadAgent }, { runSchemaAuditAgent }, { runInternalLinkAgent }, { runAICitationAgent }, { runSEOOpportunityAgent }] = await Promise.all([
       import("@/lib/growth-os/agents/dealer-lead"),
       import("@/lib/growth-os/agents/schema-audit"),
       import("@/lib/growth-os/agents/internal-link"),
       import("@/lib/growth-os/agents/ai-citation"),
+      import("@/lib/growth-os/agents/seo-opportunity"),
     ])
     AGENT_DISPATCH["dealer-lead-agent"] = runDealerLeadAgent
     AGENT_DISPATCH["schema-audit"] = runSchemaAuditAgent
     AGENT_DISPATCH["internal-link-agent"] = runInternalLinkAgent
     AGENT_DISPATCH["ai-citation-agent"] = runAICitationAgent
+    AGENT_DISPATCH["seo-opportunity-agent"] = runSEOOpportunityAgent
+    AGENT_DISPATCH["gsc-sync"] = runGSCSync
   }
   return AGENT_DISPATCH
 }
