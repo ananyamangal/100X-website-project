@@ -4,7 +4,7 @@ import { Search, Link2, AlertCircle, ExternalLink, CheckCircle2, XCircle, Play, 
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface SyncStatus { configured: boolean; siteUrl: string; lastSync: { syncedAt: string; queryCount: number; pageCount: number; status: string } | null }
+interface SyncStatus { oauthConfigured: boolean; connected: boolean; connectedEmail: string | null; siteUrl: string; lastSync: { syncedAt: string; queryCount: number; pageCount: number; status: string } | null }
 
 interface GSCOverview { syncedAt: string; period: { startDate: string; endDate: string }; totalClicks: number; totalImpressions: number; avgPosition: number; uniqueQueries: number; uniquePages: number; nearWinCount: number }
 
@@ -50,29 +50,20 @@ function Bar({ value, max, color = "bg-brand-500" }: { value: number; max: numbe
 
 // ─── Not-connected panel ──────────────────────────────────────────────────────
 
-function NotConnected({ siteUrl }: { siteUrl: string }) {
+function NotConnected() {
   return (
     <div className="bg-white rounded-xl border border-amber-200 p-6 shadow-sm">
       <div className="flex items-start gap-3">
         <Info size={18} className="text-amber-500 shrink-0 mt-0.5" />
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-gray-800 mb-2">Connect Google Search Console</h3>
-          <p className="text-xs text-gray-500 mb-4">Search Console is not connected. Once connected, Growth OS will pull keyword rankings, impressions, CTR, and trend data automatically.</p>
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs space-y-2.5">
-            <p className="font-semibold text-gray-700 mb-1">Setup (5 minutes):</p>
-            <ol className="space-y-2 text-gray-600 list-decimal list-inside">
-              <li>Go to <strong>Google Cloud Console</strong> → create or open a project</li>
-              <li>Enable the <strong>Google Search Console API</strong></li>
-              <li>Go to <strong>IAM & Admin → Service Accounts</strong> → Create service account → Add role: <em>Viewer</em> → Create JSON key</li>
-              <li>In <strong>Google Search Console</strong> → Settings → Users and permissions → Add user → paste the service account email → set as <em>Owner</em> or <em>Restricted</em></li>
-              <li>In <strong>Vercel</strong> → Settings → Environment Variables:
-                <ul className="list-disc ml-4 mt-1 space-y-1">
-                  <li><code className="bg-gray-200 px-1 rounded">GOOGLE_SC_KEY</code> — paste the full contents of the JSON key file</li>
-                  <li><code className="bg-gray-200 px-1 rounded">GOOGLE_SC_SITE_URL</code> — the exact URL as shown in Search Console (e.g. <code className="bg-gray-200 px-1 rounded">{siteUrl}</code>)</li>
-                </ul>
-              </li>
-              <li>Redeploy → click <strong>Sync now</strong> above</li>
-            </ol>
+          <h3 className="text-sm font-semibold text-gray-800 mb-2">Google Search Console not connected</h3>
+          <p className="text-xs text-gray-500 mb-4">Once connected, Growth OS pulls keyword rankings, impressions, CTR, and trend data automatically. Uses OAuth2 — no service account keys required.</p>
+          <div className="flex gap-3 flex-wrap">
+            <a href="/admin/growth/seo/setup"
+              className="inline-flex items-center gap-1.5 text-xs bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700">
+              Go to Search Console Setup →
+            </a>
+            <p className="text-[11px] text-gray-400 self-center">Set up OAuth credentials, then click &quot;Connect Google Account&quot; to sign in.</p>
           </div>
         </div>
       </div>
@@ -147,7 +138,7 @@ export default function SEOCommandCenter() {
     setRunningLinks(false)
   }
 
-  const configured = syncStatus?.configured ?? false
+  const configured = (syncStatus?.oauthConfigured && syncStatus?.connected) ?? false
   const hasGSCData = !!overview
   const tabs = [
     { id: "keywords", label: "Keywords" },
@@ -189,7 +180,7 @@ export default function SEOCommandCenter() {
 
       <div className="px-8 py-6 max-w-[1400px] space-y-6">
         {/* Not connected */}
-        {!configured && <NotConnected siteUrl={syncStatus?.siteUrl || "https://www.100xcircle.com/"} />}
+        {!configured && <NotConnected />}
 
         {/* GSC Overview stats */}
         {hasGSCData && overview && (

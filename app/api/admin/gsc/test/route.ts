@@ -1,126 +1,107 @@
 /**
  * POST /api/admin/gsc/test
- * Runs a live connection test against the Google Search Console API.
- * Returns a step-by-step result so the UI can show exactly what failed.
+ * Live OAuth connection test — 5 steps from env vars to a real GSC query.
  */
 import { NextResponse } from "next/server"
-import { getGSCCredentials, getGSCSiteUrl, queryGSC, dateRange } from "@/lib/gsc"
+import { isOAuthAppConfigured, getMissingEnvVars, getStoredTokens, getValidAccessToken, getOAuthRedirectUri } from "@/lib/google-oauth"
+import { queryGSC, getGSCSiteUrl, dateRange } from "@/lib/gsc"
 
 export interface GCSTestResult {
   ok: boolean
   steps: Array<{
     id: string
     label: string
-    status: "pass" | "fail" | "skip"
+    status: "pass" | "fail" | "skip" | "warn"
     detail: string
   }>
+  connectedEmail?: string
   siteUrl: string
-  serviceAccountEmail?: string
+  redirectUri: string
   rowsFetched?: number
-  error?: string
 }
 
-export async function POST(): Promise<NextResponse> {
+export async function POST() {
   const steps: GCSTestResult["steps"] = []
   const siteUrl = getGSCSiteUrl()
+  const redirectUri = getOAuthRedirectUri()
 
-  // Step 1: GOOGLE_SC_KEY present
-  const keyRaw = process.env.GOOGLE_SC_KEY
-  if (!keyRaw) {
-    steps.push({ id: "key_present", label: "GOOGLE_SC_KEY env var", status: "fail", detail: "Not set. Add GOOGLE_SC_KEY in Vercel → Settings → Environment Variables." })
-    return NextResponse.json({ ok: false, steps, siteUrl })
-  }
-  steps.push({ id: "key_present", label: "GOOGLE_SC_KEY env var", status: "pass", detail: "Variable is set." })
-
-  // Step 2: GOOGLE_SC_KEY is valid JSON with required fields
-  const creds = getGSCCredentials()
-  if (!creds) {
-    steps.push({ id: "key_parse", label: "Parse service account JSON", status: "fail", detail: "GOOGLE_SC_KEY could not be parsed as JSON. Paste the full contents of the key file, not a file path." })
-    return NextResponse.json({ ok: false, steps, siteUrl })
-  }
-  if (!creds.private_key || !creds.client_email) {
-    steps.push({ id: "key_parse", label: "Parse service account JSON", status: "fail", detail: `Missing fields. Found: ${Object.keys(creds).join(", ")}. Expected: private_key, client_email, token_uri.` })
-    return NextResponse.json({ ok: false, steps, siteUrl })
-  }
-  steps.push({ id: "key_parse", label: "Parse service account JSON", status: "pass", detail: `Parsed OK. Service account: ${creds.client_email}` })
-
-  // Step 3: GOOGLE_SC_SITE_URL — optional, has fallback; warn but don't block the auth test
-  const siteUrlEnv = process.env.GOOGLE_SC_SITE_URL
-  const effectiveSiteUrl = getGSCSiteUrl()
-  if (!siteUrlEnv) {
+  // Step 1: OAuth app env vars
+  const oauthConfigured = isOAuthAppConfigured()
+  const missing = getMissingEnvVars()
+  if (!oauthConfigured) {
     steps.push({
-      id: "site_url",
-      label: "GOOGLE_SC_SITE_URL env var",
-      status: "skip",
-      detail: `Not set — using hardcoded fallback: ${effectiveSiteUrl}. Recommend setting GOOGLE_SC_SITE_URL explicitly in Vercel, especially if your GSC property URL differs (e.g. sc-domain:100xcircle.com or http:// variant).`,
+      id: "env_vars",
+      label: "OAuth app credentials",
+      status: "fail",
+      detail: `Missing env vars: ${missing.join(", ")}. Add these in Vercel → Settings → Environment Variables.`,
+    })
+    return NextResponse.json({ ok: false, steps, siteUrl, redirectUri })
+  }
+  steps.push({ id: "env_vars", label: "OAuth app credentials", status: "pass", detail: `GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET are set.` })
+
+  // Step 2: Redirect URI
+  const redirectUriEnv = process.env.GOOGLE_OAUTH_REDIRECT_URI
+  if (!redirectUriEnv) {
+    steps.push({
+      id: "redirect_uri",
+      label: "GOOGLE_OAUTH_REDIRECT_URI",
+      status: "warn",
+      detail: `Not set — using computed fallback: ${redirectUri}. Recommend setting GOOGLE_OAUTH_REDIRECT_URI explicitly and registering this exact URI in Google Cloud Console → Credentials → OAuth 2.0 Client ID → Authorized redirect URIs.`,
     })
   } else {
-    steps.push({ id: "site_url", label: "GOOGLE_SC_SITE_URL env var", status: "pass", detail: `Set to: ${siteUrlEnv}` })
+    steps.push({ id: "redirect_uri", label: "GOOGLE_OAUTH_REDIRECT_URI", status: "pass", detail: `Set to: ${redirectUri}` })
   }
 
-  // Step 4: private_key format check
-  const keyStr = creds.private_key
-  if (!keyStr.includes("BEGIN") || !keyStr.includes("END")) {
-    steps.push({ id: "key_format", label: "Private key format", status: "fail", detail: `Private key does not look like a PEM key. Check that \\n sequences in the JSON are actual newlines, not escaped. Current value starts with: ${keyStr.slice(0, 40)}` })
-    return NextResponse.json({ ok: false, steps, siteUrl, serviceAccountEmail: creds.client_email })
-  }
-  steps.push({ id: "key_format", label: "Private key format", status: "pass", detail: "PEM format detected." })
-
-  // Step 5: OAuth2 token exchange
-  try {
-    const { startDate, endDate } = dateRange(7)
-    let rowsFetched = 0
-    try {
-      const rows = await queryGSC({ startDate, endDate, dimensions: ["query"], rowLimit: 1 })
-      rowsFetched = rows.length
-      steps.push({ id: "auth", label: "OAuth2 token exchange", status: "pass", detail: "Access token obtained from Google." })
-      // Step 6: GSC query succeeded
-      steps.push({
-        id: "gsc_query",
-        label: `Query Search Console (${siteUrlEnv})`,
-        status: "pass",
-        detail: rowsFetched > 0
-          ? `Success. ${rowsFetched} row(s) returned for the last 7 days.`
-          : `Success. 0 rows returned — GSC access confirmed but no query data in the last 7 days. This is normal for new properties or very low traffic periods.`,
-      })
-      return NextResponse.json({ ok: true, steps, siteUrl, serviceAccountEmail: creds.client_email, rowsFetched })
-    } catch (queryErr) {
-      const msg = String(queryErr)
-      if (msg.includes("403")) {
-        steps.push({ id: "auth", label: "OAuth2 token exchange", status: "pass", detail: "Access token obtained." })
-        steps.push({
-          id: "gsc_query",
-          label: `Query Search Console (${siteUrlEnv})`,
-          status: "fail",
-          detail: `403 Forbidden. The service account (${creds.client_email}) does not have access to ${siteUrlEnv}. In Google Search Console → Settings → Users and permissions → add ${creds.client_email} as Owner.`,
-        })
-      } else if (msg.includes("404")) {
-        steps.push({ id: "auth", label: "OAuth2 token exchange", status: "pass", detail: "Access token obtained." })
-        steps.push({
-          id: "gsc_query",
-          label: `Query Search Console (${siteUrlEnv})`,
-          status: "fail",
-          detail: `404 Not Found. The site URL ${siteUrlEnv} is not a verified property in this Google account. Check GOOGLE_SC_SITE_URL — it must match the property URL exactly as it appears in Search Console (including or excluding www, and trailing slash).`,
-        })
-      } else if (msg.includes("token error") || msg.includes("401")) {
-        steps.push({
-          id: "auth",
-          label: "OAuth2 token exchange",
-          status: "fail",
-          detail: `Token exchange failed: ${msg.slice(0, 200)}. The private_key or client_email in GOOGLE_SC_KEY may be invalid, or the Search Console API is not enabled in your Google Cloud project.`,
-        })
-      } else {
-        steps.push({ id: "auth", label: "OAuth2 token exchange + GSC query", status: "fail", detail: msg.slice(0, 300) })
-      }
-      return NextResponse.json({ ok: false, steps, siteUrl, serviceAccountEmail: creds.client_email, error: msg.slice(0, 200) })
-    }
-  } catch (authErr) {
+  // Step 3: Tokens stored in MongoDB
+  const stored = await getStoredTokens()
+  if (!stored) {
     steps.push({
-      id: "auth",
-      label: "OAuth2 token exchange",
+      id: "tokens",
+      label: "Google account connected",
       status: "fail",
-      detail: `Unexpected error: ${String(authErr).slice(0, 200)}`,
+      detail: "No tokens found in MongoDB. Click 'Connect Google Account' on this page to complete the OAuth flow.",
     })
-    return NextResponse.json({ ok: false, steps, siteUrl, serviceAccountEmail: creds.client_email, error: String(authErr).slice(0, 200) })
+    return NextResponse.json({ ok: false, steps, siteUrl, redirectUri })
+  }
+  steps.push({
+    id: "tokens",
+    label: "Google account connected",
+    status: "pass",
+    detail: `Tokens found. Connected as: ${stored.connectedEmail || "unknown"}`,
+  })
+
+  // Step 4: Get a valid access token (auto-refresh if needed)
+  let accessToken: string
+  try {
+    accessToken = await getValidAccessToken()
+    steps.push({ id: "access_token", label: "Access token valid", status: "pass", detail: `Token obtained (expires: ${new Date(stored.expiresAt).toLocaleString("en-IN")}).` })
+  } catch (err) {
+    steps.push({ id: "access_token", label: "Access token valid", status: "fail", detail: `${String(err)}` })
+    return NextResponse.json({ ok: false, steps, siteUrl, redirectUri, connectedEmail: stored.connectedEmail })
+  }
+
+  // Step 5: Live GSC query
+  const { startDate, endDate } = dateRange(7)
+  try {
+    const rows = await queryGSC({ startDate, endDate, dimensions: ["query"], rowLimit: 1 }, accessToken)
+    steps.push({
+      id: "gsc_query",
+      label: `Query Search Console (${siteUrl})`,
+      status: "pass",
+      detail: rows.length > 0
+        ? `Success. ${rows.length} row returned. Connection fully operational.`
+        : `Success. 0 rows — GSC confirmed accessible but no query data in the last 7 days. This is normal for new properties or low-traffic periods. Run a full sync to see 28-day data.`,
+    })
+    return NextResponse.json({ ok: true, steps, siteUrl, redirectUri, connectedEmail: stored.connectedEmail, rowsFetched: rows.length })
+  } catch (err) {
+    const msg = String(err)
+    let detail = msg.slice(0, 300)
+    if (msg.includes("403")) {
+      detail = `Your Google account (${stored.connectedEmail}) does not have access to ${siteUrl}. In Google Search Console → Settings → Users and permissions → verify this account is listed.`
+    } else if (msg.includes("404")) {
+      detail = `Property not found: ${siteUrl}. Check GOOGLE_SC_SITE_URL matches the URL exactly as shown in Search Console (including or excluding www, and trailing slash).`
+    }
+    steps.push({ id: "gsc_query", label: `Query Search Console (${siteUrl})`, status: "fail", detail })
+    return NextResponse.json({ ok: false, steps, siteUrl, redirectUri, connectedEmail: stored.connectedEmail })
   }
 }

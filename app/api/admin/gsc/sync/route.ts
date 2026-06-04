@@ -1,22 +1,37 @@
 import { NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
-import { isGSCConfigured, getGSCSiteUrl, fetchAllGSCRows, dateRange } from "@/lib/gsc"
+import { getGSCSiteUrl, fetchAllGSCRows, dateRange } from "@/lib/gsc"
+import { getValidAccessToken, getStoredTokens, isOAuthAppConfigured } from "@/lib/google-oauth"
 
 export const maxDuration = 60
 
 export async function GET() {
   const db = (await clientPromise).db()
-  const last = await db.collection("gsc_syncs").findOne({}, { sort: { syncedAt: -1 } })
+  const [last, stored] = await Promise.all([
+    db.collection("gsc_syncs").findOne({}, { sort: { syncedAt: -1 } }),
+    getStoredTokens(),
+  ])
+
   return NextResponse.json({
-    configured: isGSCConfigured(),
+    oauthConfigured: isOAuthAppConfigured(),
+    connected: !!stored,
+    connectedEmail: stored?.connectedEmail || null,
     siteUrl: getGSCSiteUrl(),
     lastSync: last ? JSON.parse(JSON.stringify(last)) : null,
   })
 }
 
 export async function POST() {
-  if (!isGSCConfigured()) {
-    return NextResponse.json({ error: "GOOGLE_SC_KEY not configured. See /admin/growth/seo for setup instructions." }, { status: 400 })
+  // Get a valid access token (refreshes automatically if needed)
+  let accessToken: string
+  try {
+    accessToken = await getValidAccessToken()
+  } catch (err) {
+    const msg = String(err)
+    if (msg.startsWith("NOT_CONNECTED")) {
+      return NextResponse.json({ error: "not_connected", message: "Connect your Google account first in Growth OS → SEO → Search Console Setup." }, { status: 400 })
+    }
+    return NextResponse.json({ error: "auth_failed", message: msg }, { status: 401 })
   }
 
   const db = (await clientPromise).db()
@@ -24,7 +39,6 @@ export async function POST() {
   const syncDate = syncedAt.split("T")[0]
 
   // Current 28-day window + previous 28-day window for trend comparison
-  // previous = the 28 days immediately before current (not 56 days before current.startDate)
   const current = dateRange(28)
   const previous = dateRange(28, new Date(current.startDate))
 
@@ -33,11 +47,9 @@ export async function POST() {
   const errors: string[] = []
 
   try {
-    // 1. Fetch current period queries
-    const currQueries = await fetchAllGSCRows({ dimensions: ["query"], ...current })
+    // 1. Current period queries
+    const currQueries = await fetchAllGSCRows({ dimensions: ["query"], ...current }, accessToken)
     queryCount = currQueries.length
-
-    // Upsert query rows (replace today's data if re-syncing same day)
     if (currQueries.length > 0) {
       await db.collection("gsc_query_rows").deleteMany({ syncDate, period: "current" })
       await db.collection("gsc_query_rows").insertMany(
@@ -45,8 +57,8 @@ export async function POST() {
       )
     }
 
-    // 2. Fetch previous period queries (for trend)
-    const prevQueries = await fetchAllGSCRows({ dimensions: ["query"], ...previous })
+    // 2. Previous period queries (for trend comparison)
+    const prevQueries = await fetchAllGSCRows({ dimensions: ["query"], ...previous }, accessToken)
     if (prevQueries.length > 0) {
       await db.collection("gsc_query_rows").deleteMany({ syncDate, period: "previous" })
       await db.collection("gsc_query_rows").insertMany(
@@ -54,8 +66,8 @@ export async function POST() {
       )
     }
 
-    // 3. Fetch current period pages
-    const currPages = await fetchAllGSCRows({ dimensions: ["page"], ...current })
+    // 3. Current period pages
+    const currPages = await fetchAllGSCRows({ dimensions: ["page"], ...current }, accessToken)
     pageCount = currPages.length
     if (currPages.length > 0) {
       await db.collection("gsc_page_rows").deleteMany({ syncDate, period: "current" })
@@ -64,8 +76,8 @@ export async function POST() {
       )
     }
 
-    // 4. Fetch previous period pages (for trend)
-    const prevPages = await fetchAllGSCRows({ dimensions: ["page"], ...previous })
+    // 4. Previous period pages
+    const prevPages = await fetchAllGSCRows({ dimensions: ["page"], ...previous }, accessToken)
     if (prevPages.length > 0) {
       await db.collection("gsc_page_rows").deleteMany({ syncDate, period: "previous" })
       await db.collection("gsc_page_rows").insertMany(
@@ -75,10 +87,9 @@ export async function POST() {
 
   } catch (err) {
     errors.push(String(err))
-    // Log but don't stop — still record the sync attempt
   }
 
-  // Record sync metadata
+  // Record sync
   const syncDoc = {
     syncedAt,
     syncDate,
@@ -92,7 +103,7 @@ export async function POST() {
   }
   await db.collection("gsc_syncs").insertOne(syncDoc)
 
-  // Keep only the last 30 syncs
+  // Keep only last 30 syncs
   const count = await db.collection("gsc_syncs").countDocuments()
   if (count > 30) {
     const oldest = await db.collection("gsc_syncs").find({}).sort({ syncedAt: 1 }).limit(count - 30).project({ _id: 1 }).toArray()
