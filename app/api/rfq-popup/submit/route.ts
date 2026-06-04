@@ -6,6 +6,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { answers, pagePath, pageUrl, utm, userAgent, referrer, attachmentUrl } = body
+    // Extract attribution fields from the utm object (populated by initSessionAttribution + mergePersistedAttributionFromUrl)
+    const attr = (utm || {}) as Record<string, string>
 
     if (!answers || typeof answers !== "object") {
       return NextResponse.json({ error: "Invalid submission" }, { status: 400 })
@@ -32,6 +34,15 @@ export async function POST(request: NextRequest) {
       pagePath: pagePath || "",
       pageUrl: pageUrl || "",
       utm: utm || {},
+      // Top-level attribution fields for easy MongoDB aggregation
+      landingPage: attr.landingPage || pagePath || "",
+      firstPageVisited: attr.firstPageVisited || attr.landingPage || pagePath || "",
+      sessionPageCount: parseInt(attr.sessionPageCount || "1", 10),
+      entryReferrer: attr.entryReferrer || referrer || "",
+      utmSource: attr.utm_source || "",
+      utmMedium: attr.utm_medium || "",
+      utmCampaign: attr.utm_campaign || "",
+      utmTerm: attr.utm_term || "",
       userAgent: userAgent || "",
       referrer: referrer || "",
       attachmentUrl: attachmentUrl || null,

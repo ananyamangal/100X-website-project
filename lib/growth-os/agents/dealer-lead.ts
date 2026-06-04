@@ -17,31 +17,62 @@ interface LeadWithSource extends Record<string, unknown> {
   _collection: CollectionName
 }
 
+function getAttrField(lead: Record<string, unknown>, field: string): string {
+  // Top-level fields (rfq_popup_leads after attribution update)
+  if (typeof lead[field] === "string") return String(lead[field])
+  // Nested in attribution object (rfq-submit / submissions)
+  const attr = lead.attribution as Record<string, string> | undefined
+  if (attr && typeof attr[field] === "string") return attr[field]
+  return ""
+}
+
 function classify(lead: Record<string, unknown>): { leadType: LeadType; leadValue: LeadValue; score: number; signals: string[] } {
+  // Submission page: where the form was filled out
   const page = String(lead.page || lead.form_page_path || lead.pagePath || "").toLowerCase()
+  // Landing page: where the visitor first arrived this session (more valuable for attribution)
+  const landingPage = getAttrField(lead, "landingPage").toLowerCase()
+  const effectivePage = page || landingPage
+
   const product = String(lead.product || lead.productName || "").toLowerCase()
   const message = String(lead.message || lead.notes || lead.description || "").toLowerCase()
   const answers = (lead.answers || {}) as Record<string, string>
   const answersText = Object.values(answers).join(" ").toLowerCase()
   const allText = `${product} ${message} ${answersText}`
   const source = String(lead.source || lead.type || "")
-  const signals: string[] = []
 
+  const sessionPageCount = parseInt(String(lead.sessionPageCount || getAttrField(lead, "sessionPageCount") || "1"), 10)
+  const utmCampaign = (lead.utmCampaign || getAttrField(lead, "utm_campaign") || "").toString().toLowerCase()
+  const utmSource = (lead.utmSource || getAttrField(lead, "utm_source") || "").toString().toLowerCase()
+
+  const signals: string[] = []
   let score = 3
   let leadType: LeadType = "general"
 
-  if (DEALER_PAGES.some(p => page.includes(p))) {
+  // Score from submission page
+  if (DEALER_PAGES.some(p => effectivePage.includes(p))) {
     score = Math.max(score, 8)
-    leadType = page.includes("oem") ? "oem_authorization" : "dealer_application"
-    signals.push(`Dealer page: ${page.split("/")[1] || "/"}`)
-  } else if (TENDER_PAGES.some(p => page.includes(p))) {
+    leadType = effectivePage.includes("oem") ? "oem_authorization" : "dealer_application"
+    signals.push(`Page: ${(effectivePage.match(/\/[^/?]+/) || [])[0] || "/"}`)
+  } else if (TENDER_PAGES.some(p => effectivePage.includes(p))) {
     score = Math.max(score, 8)
     leadType = "tender_support"
-    signals.push(`Tender page: ${page.split("/")[1] || "/"}`)
-  } else if (GOV_PAGES.some(p => page.includes(p))) {
+    signals.push(`Page: ${(effectivePage.match(/\/[^/?]+/) || [])[0] || "/"}`)
+  } else if (GOV_PAGES.some(p => effectivePage.includes(p))) {
     score = Math.max(score, 7)
     leadType = "government_procurement"
-    signals.push(`Gov page: ${page.split("/")[1] || "/"}`)
+    signals.push(`Page: ${(effectivePage.match(/\/[^/?]+/) || [])[0] || "/"}`)
+  }
+
+  // Landing page differs from submission page → assisted conversion via content
+  if (landingPage && landingPage !== page && landingPage !== "") {
+    if (DEALER_PAGES.some(p => landingPage.includes(p)) || TENDER_PAGES.some(p => landingPage.includes(p))) {
+      score = Math.max(score, 7)
+      if (leadType === "general") leadType = "dealer_application"
+      signals.push(`Landed: ${(landingPage.match(/\/[^/?]+/) || [])[0] || "/"}`)
+    } else if (landingPage.includes("/knowledge/") || landingPage.includes("/compare/")) {
+      signals.push(`Content assist: ${(landingPage.match(/\/[^/?]+\/([^/?]+)/) || [])[1] || landingPage}`)
+      if (score < 5) score = 4 // content-assisted conversions are medium intent
+    }
   }
 
   if (source === "gem_inquiry") {
@@ -50,25 +81,43 @@ function classify(lead: Record<string, unknown>): { leadType: LeadType; leadValu
     signals.push("GeM inquiry form")
   }
 
+  // UTM signals
+  if (utmCampaign.includes("dealer") || utmCampaign.includes("oem") || utmCampaign.includes("gem")) {
+    score = Math.max(score, 7)
+    if (leadType === "general") leadType = "dealer_application"
+    signals.push(`UTM campaign: ${utmCampaign}`)
+  }
+  if (utmSource === "google" && utmCampaign) {
+    score = Math.max(score, Math.min(score + 1, 9))
+    signals.push(`Paid: ${utmSource}/${utmCampaign}`)
+  }
+
+  // Keyword signals from form content
   const oemHits = OEM_KEYWORDS.filter(k => allText.includes(k))
   if (oemHits.length > 0) {
     score = Math.max(score, 7)
     if (leadType === "general") leadType = "oem_authorization"
-    signals.push(`OEM keywords: ${oemHits.slice(0, 2).join(", ")}`)
+    signals.push(`Keywords: ${oemHits.slice(0, 2).join(", ")}`)
   }
 
   const tenderHits = TENDER_KEYWORDS.filter(k => allText.includes(k))
   if (tenderHits.length > 0) {
     score = Math.max(score, 7)
     if (leadType === "general") leadType = "tender_support"
-    signals.push(`Tender keywords: ${tenderHits.slice(0, 2).join(", ")}`)
+    signals.push(`Keywords: ${tenderHits.slice(0, 2).join(", ")}`)
   }
 
   const govHits = GOV_KEYWORDS.filter(k => allText.includes(k))
   if (govHits.length > 0) {
     score = Math.max(score, 6)
     if (leadType === "general") leadType = "government_procurement"
-    signals.push(`Gov keywords: ${govHits.slice(0, 2).join(", ")}`)
+    signals.push(`Keywords: ${govHits.slice(0, 2).join(", ")}`)
+  }
+
+  // Engagement signal: visited 3+ pages before submitting → more intent
+  if (sessionPageCount >= 3) {
+    score = Math.min(score + 1, 10)
+    signals.push(`Engaged: ${sessionPageCount} pages visited`)
   }
 
   const leadValue: LeadValue = score >= 7 ? "high" : score >= 5 ? "medium" : "low"

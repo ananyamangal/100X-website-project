@@ -1,12 +1,26 @@
 "use client"
 import { useEffect, useState, useCallback } from "react"
-import { Users, TrendingUp, Phone, Mail, Play, RotateCw, Star, Briefcase } from "lucide-react"
+import { Users, TrendingUp, Phone, Mail, Play, RotateCw, Star, Briefcase, MapPin, BarChart2, AlertCircle } from "lucide-react"
 
 interface Lead {
   _id: string; source: string; name: string; phone: string; email: string; product: string; page: string; utm_source: string; utm_campaign: string; createdAt: string
 }
 interface Analytics {
   total: number; bySource: { label: string; count: number }[]; byPage: { label: string; count: number }[]; byProduct: { label: string; count: number }[]; recentLeads: Lead[]
+}
+
+interface PageCount { page: string; count: number }
+interface Attribution {
+  totalLeads: number
+  byLandingPage: PageCount[]
+  bySubmissionPage: PageCount[]
+  dealerLeadsByPage: PageCount[]
+  oemLeadsByPage: PageCount[]
+  gemLeadsByPage: PageCount[]
+  contentAssistPages: PageCount[]
+  byUtmSource: PageCount[]
+  sessionDepth: { one: number; two: number; threeOrMore: number }
+  hasAttributionData: boolean
 }
 
 interface ScoredLead {
@@ -44,16 +58,18 @@ function Pill({ c, children }: { c: string; children: React.ReactNode }) {
 export default function DealerIntelligence() {
   const [data, setData] = useState<Analytics | null>(null)
   const [scores, setScores] = useState<LeadScores | null>(null)
+  const [attribution, setAttribution] = useState<Attribution | null>(null)
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
   const [runResult, setRunResult] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"scoring" | "volume">("scoring")
+  const [activeTab, setActiveTab] = useState<"attribution" | "scoring" | "volume">("attribution")
 
   const loadAll = useCallback(async () => {
     setLoading(true)
     await Promise.allSettled([
       fetch("/api/admin/lead-analytics").then(r => r.json()).then(setData),
       fetch("/api/admin/growth/lead-scores").then(r => r.json()).then(setScores),
+      fetch("/api/admin/growth/attribution").then(r => r.json()).then(setAttribution),
     ])
     setLoading(false)
   }, [])
@@ -111,13 +127,150 @@ export default function DealerIntelligence() {
 
             {/* Tabs */}
             <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm w-fit">
-              {(["scoring", "volume"] as const).map(tab => (
+              {(["attribution", "scoring", "volume"] as const).map(tab => (
                 <button key={tab} onClick={() => setActiveTab(tab)}
                   className={`text-xs px-4 py-1.5 rounded-lg font-medium transition-colors ${activeTab === tab ? "bg-brand-600 text-white" : "text-gray-500 hover:text-gray-700"}`}>
-                  {tab === "scoring" ? "Lead Intelligence" : "Volume & Sources"}
+                  {tab === "attribution" ? "Attribution" : tab === "scoring" ? "Lead Intelligence" : "Volume & Sources"}
                 </button>
               ))}
             </div>
+
+            {/* === ATTRIBUTION === */}
+            {activeTab === "attribution" && (
+              <div className="space-y-4">
+                {!attribution?.hasAttributionData && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
+                    <AlertCircle size={14} className="text-amber-500 shrink-0 mt-0.5" />
+                    <div className="text-xs text-amber-700">
+                      <p className="font-semibold mb-1">Attribution data collection is now active</p>
+                      <p>Existing {attribution?.totalLeads || 0} leads were submitted before attribution tracking was deployed — their landing pages are not available. New leads will include full session context: landing page, referrer, UTM params, and page count. Run the Dealer Lead Agent after a week to see attribution-enriched scoring.</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Q1: Which page generates the most leads? */}
+                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                  <h3 className="text-sm font-semibold text-gray-800 mb-1 flex items-center gap-2">
+                    <MapPin size={14} className="text-brand-600" />
+                    Which page generates the most leads?
+                  </h3>
+                  <p className="text-[11px] text-gray-400 mb-4">Ranked by landing page — the first page a visitor hit before submitting any form.</p>
+                  {!attribution?.byLandingPage.length ? (
+                    <p className="text-xs text-gray-400">No attribution data yet. Landing page tracking is now active — data will appear on new submissions.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {attribution.byLandingPage.map(({ page, count }) => {
+                        const max = Math.max(...attribution.byLandingPage.map(p => p.count), 1)
+                        return (
+                          <div key={page}>
+                            <div className="flex justify-between text-xs mb-1">
+                              <code className="text-gray-700 text-[11px]">{page || "(unknown)"}</code>
+                              <span className="font-semibold text-gray-800">{count}</span>
+                            </div>
+                            <div className="w-full bg-gray-100 rounded-full h-1.5">
+                              <div className="h-1.5 rounded-full bg-brand-500" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Q2 + Q3 + Q4 side by side */}
+                <div className="grid sm:grid-cols-3 gap-4">
+                  {[
+                    { title: "Dealer leads by page", data: attribution?.dealerLeadsByPage, color: "text-green-600", q: "Q2" },
+                    { title: "OEM authorization leads by page", data: attribution?.oemLeadsByPage, color: "text-blue-600", q: "Q3" },
+                    { title: "GeM leads by page", data: attribution?.gemLeadsByPage, color: "text-purple-600", q: "Q4" },
+                  ].map(({ title, data: d, color, q }) => (
+                    <div key={q} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                      <h3 className="text-xs font-semibold text-gray-800 mb-3">{title}</h3>
+                      {!d?.length ? (
+                        <p className="text-[11px] text-gray-400">No data yet.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {d.map(({ page, count }) => (
+                            <div key={page} className="flex justify-between text-[11px]">
+                              <code className={`${color} truncate max-w-[140px]`}>{page || "(unknown)"}</code>
+                              <span className="font-semibold text-gray-700 ml-2">{count}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Q5: Content pages assisting conversions */}
+                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                  <h3 className="text-sm font-semibold text-gray-800 mb-1 flex items-center gap-2">
+                    <BarChart2 size={14} className="text-brand-600" />
+                    Which content pages assist conversions?
+                  </h3>
+                  <p className="text-[11px] text-gray-400 mb-4">Pages where the user entered the site, then navigated to a form on a different page. These pages generate intent even though the form submission happened elsewhere.</p>
+                  {!attribution?.contentAssistPages.length ? (
+                    <p className="text-xs text-gray-400">No content-assisted conversions detected yet.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {attribution.contentAssistPages.map(({ page, count }) => {
+                        const max = Math.max(...attribution.contentAssistPages.map(p => p.count), 1)
+                        return (
+                          <div key={page}>
+                            <div className="flex justify-between text-xs mb-1">
+                              <code className="text-gray-700 text-[11px]">{page}</code>
+                              <span className="font-semibold text-gray-800">{count}</span>
+                            </div>
+                            <div className="w-full bg-gray-100 rounded-full h-1.5">
+                              <div className="h-1.5 rounded-full bg-purple-400" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* UTM source + session depth */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                    <h3 className="text-sm font-semibold text-gray-800 mb-4">Lead source (UTM)</h3>
+                    {!attribution?.byUtmSource.length ? (
+                      <p className="text-xs text-gray-400">No UTM data yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {attribution.byUtmSource.map(({ page: src, count }) => (
+                          <div key={src} className="flex justify-between text-xs">
+                            <span className="text-gray-600">{src}</span>
+                            <span className="font-semibold text-gray-800">{count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                    <h3 className="text-sm font-semibold text-gray-800 mb-4">Session depth at submission</h3>
+                    {!attribution ? (
+                      <p className="text-xs text-gray-400">No data yet.</p>
+                    ) : (
+                      <div className="space-y-2 text-xs">
+                        {[
+                          { label: "1 page (direct intent)", value: attribution.sessionDepth.one },
+                          { label: "2 pages", value: attribution.sessionDepth.two },
+                          { label: "3+ pages (high engagement)", value: attribution.sessionDepth.threeOrMore },
+                        ].map(({ label, value }) => (
+                          <div key={label} className="flex justify-between">
+                            <span className="text-gray-600">{label}</span>
+                            <span className="font-semibold text-gray-800">{value}</span>
+                          </div>
+                        ))}
+                        <p className="text-[10px] text-gray-300 pt-1">3+ page sessions score +1 in lead scoring.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* === LEAD INTELLIGENCE === */}
             {activeTab === "scoring" && (

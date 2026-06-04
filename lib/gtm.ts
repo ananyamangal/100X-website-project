@@ -43,6 +43,45 @@ export function mergePersistedAttributionFromUrl(): void {
   }
 }
 
+/**
+ * Called on every page navigation. On the first call of a session, records
+ * landingPage, firstPageVisited, entryReferrer, and sessionStart. On every
+ * subsequent call, increments sessionPageCount. UTM params are merged
+ * separately by mergePersistedAttributionFromUrl().
+ */
+export function initSessionAttribution(): void {
+  if (typeof window === "undefined") return
+  try {
+    const path = window.location.pathname
+    const raw = sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY)
+    if (!raw || !JSON.parse(raw).landingPage) {
+      // First page of this session — record entry context
+      const existing = raw ? (JSON.parse(raw) as PersistedAttribution) : {}
+      sessionStorage.setItem(
+        ATTRIBUTION_STORAGE_KEY,
+        JSON.stringify({
+          ...existing,
+          landingPage: path,
+          firstPageVisited: path,
+          entryReferrer: document.referrer || "",
+          sessionPageCount: "1",
+          sessionStart: new Date().toISOString(),
+        }),
+      )
+    } else {
+      // Subsequent page — increment count
+      const existing = JSON.parse(raw) as PersistedAttribution
+      const count = parseInt(existing.sessionPageCount || "1", 10)
+      sessionStorage.setItem(
+        ATTRIBUTION_STORAGE_KEY,
+        JSON.stringify({ ...existing, sessionPageCount: String(count + 1) }),
+      )
+    }
+  } catch {
+    // sessionStorage unavailable — no-op
+  }
+}
+
 export function getPersistedAttribution(): PersistedAttribution {
   if (typeof window === "undefined") return {}
   try {
