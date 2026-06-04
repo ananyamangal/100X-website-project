@@ -160,7 +160,7 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
           />
         </>
       ) : null}
-      <ProductDetailClient productId={rawId} />
+      <ProductDetailClient productId={rawId} initialProduct={product ? JSON.parse(JSON.stringify(product)) : undefined} />
       {product ? (
         <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
       ) : null}

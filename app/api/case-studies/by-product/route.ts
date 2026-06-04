@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 
+export const revalidate = 300
+
 // GET /api/case-studies/by-product?productId=xxx
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)

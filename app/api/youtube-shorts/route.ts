@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+// YouTube data changes rarely — cache for 30 minutes at the CDN edge.
+export const revalidate = 1800
+
 export async function GET() {
   const apiKey = process.env.YOUTUBE_API_KEY;
   const channelId = process.env.YOUTUBE_CHANNEL_ID;

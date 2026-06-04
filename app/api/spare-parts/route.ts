@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 
+// Cache spare-parts listing for 2 minutes at the CDN edge.
+export const revalidate = 120
+
 // GET /api/spare-parts — public listing
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
