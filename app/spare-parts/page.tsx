@@ -21,7 +21,7 @@ function buildPartUrl(part: any): string {
   return `/spare-parts/${cat}/${part.slug}`
 }
 
-export const dynamic = "force-dynamic"
+export const revalidate = 120
 
 export const metadata: Metadata = {
   title: "Spare Parts for Thermal Fogging Machines | 100X Circle",

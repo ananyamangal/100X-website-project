@@ -8,7 +8,7 @@ import ScrollReveal from "@/components/cinematic/ScrollReveal"
 import ShareButtons from "@/components/cinematic/ShareButtons"
 import { Download, MessageCircle, CheckCircle2, Wrench, ArrowRight } from "lucide-react"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 300
 
 export async function generateMetadata({
   params,

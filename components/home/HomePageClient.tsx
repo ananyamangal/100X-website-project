@@ -10,24 +10,26 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { RichContent } from "@/components/RichContent"
-import AccreditationsStrip from "@/components/home/AccreditationsStrip"
-import ManufacturerIntroBlock from "@/components/home/ManufacturerIntroBlock"
-import TechnologyBlock from "@/components/home/TechnologyBlock"
-import SpecialisedBuyersBlock from "@/components/home/SpecialisedBuyersBlock"
+// Above-the-fold: eagerly loaded — these must be ready for first paint
 import HeroBlock from "@/components/home/HeroBlock"
-import RFQMidPageBlock from "@/components/forms/RFQMidPageBlock"
 import HomepageJsonLd from "@/components/seo/HomepageJsonLd"
-import CelebritySectionsBlock from "@/components/home/CelebritySectionsBlock"
 import BrochureLeadModal from "@/components/BrochureLeadModal"
-import IndustryApplicationsSection from "@/components/home/IndustryApplicationsSection"
-import CinematicTrustSection from "@/components/home/CinematicTrustSection"
-import CinematicCTASection from "@/components/home/CinematicCTASection"
-import CinematicProductsSection from "@/components/home/CinematicProductsSection"
-import ReviewsSection from "@/components/home/ReviewsSection"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
 import { type HomeContent } from "@/lib/homeContentTypes"
 
+// Below-the-fold: lazy-loaded — reduces initial JS bundle by ~40%
+const AccreditationsStrip = dynamic(() => import("@/components/home/AccreditationsStrip"))
+const ManufacturerIntroBlock = dynamic(() => import("@/components/home/ManufacturerIntroBlock"))
+const TechnologyBlock = dynamic(() => import("@/components/home/TechnologyBlock"))
+const SpecialisedBuyersBlock = dynamic(() => import("@/components/home/SpecialisedBuyersBlock"))
+const RFQMidPageBlock = dynamic(() => import("@/components/forms/RFQMidPageBlock"))
+const CelebritySectionsBlock = dynamic(() => import("@/components/home/CelebritySectionsBlock"))
+const IndustryApplicationsSection = dynamic(() => import("@/components/home/IndustryApplicationsSection"))
+const CinematicTrustSection = dynamic(() => import("@/components/home/CinematicTrustSection"))
+const CinematicCTASection = dynamic(() => import("@/components/home/CinematicCTASection"))
+const CinematicProductsSection = dynamic(() => import("@/components/home/CinematicProductsSection"))
+const ReviewsSection = dynamic(() => import("@/components/home/ReviewsSection"))
 const BlogBlock = dynamic(() => import("@/components/home/BlogBlock"))
 const FAQSection = dynamic(() => import("@/components/FAQSection"))
 

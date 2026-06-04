@@ -11,6 +11,7 @@ import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
 import RFQForm from '@/components/forms/RFQForm';
 import BrochureLeadModal from '@/components/BrochureLeadModal';
 import { BUSINESS } from '@/lib/seo/site-config';
+import ProductCinematicHero from '@/components/product/ProductCinematicHero';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Utilities
@@ -749,21 +750,22 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
       <MobileCtaOverride audience="product" productName={name} whatsappMessage={waText} />
       <BrochureLeadModal open={brochureOpen} onClose={() => setBrochureOpen(false)} source="product-detail" brochureUrl={brochureUrl} productName={name} />
 
-      {/* ══ BREADCRUMB ══════════════════════════════════════════════════════ */}
-      <div className="bg-white pt-20">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 border-b border-gray-100">
-          <nav className="flex items-center gap-1.5 text-xs text-gray-400" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-gray-600 transition-colors">Home</Link>
-            <ChevronRight size={12} className="text-gray-300" />
-            <Link href="/products" className="hover:text-gray-600 transition-colors">Products</Link>
-            <ChevronRight size={12} className="text-gray-300" />
-            <span className="text-gray-700 font-medium truncate max-w-[240px]">{name}</span>
-          </nav>
-        </div>
-      </div>
+      {/* ══ CINEMATIC HERO ══════════════════════════════════════════════════ */}
+      <ProductCinematicHero
+        name={name}
+        h1={h1}
+        tagline={tagline}
+        category={s(product.category)}
+        badges={badges}
+        price={price}
+        specs={specs}
+        rating={rating}
+        reviewsCount={reviews}
+        imageUrl={images[0]}
+      />
 
       {/* ══ PURCHASE AREA — TWO COLUMNS, LEFT STICKY ════════════════════════ */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 bg-white">
         <div className="grid lg:grid-cols-[48%_52%] gap-10 xl:gap-16 py-8 md:py-12">
 
           {/* LEFT — sticky gallery */}

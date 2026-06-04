@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 
-export const dynamic = 'force-dynamic';
+// Video popup config rarely changes — cache for 10 minutes at the CDN edge.
+export const revalidate = 600
 
 export async function GET() {
   // TEST_MODE: bypass MongoDB for local popup behavior testing

@@ -43,7 +43,8 @@ export default function BlogBlock({ posts, hasApiPosts }: Props) {
               key={post.id || post._id || post.slug || index}
               className="overflow-hidden hover:shadow-xl transition-all duration-300"
             >
-              <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} width={480} height={192} className="w-full h-48 object-cover" loading="lazy" decoding="async" />
 
 
               <CardContent className="p-5">

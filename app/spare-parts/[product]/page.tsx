@@ -7,7 +7,7 @@ import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import { ArrowRight, Wrench, MessageCircle } from "lucide-react"
 import { BUSINESS } from "@/lib/seo/site-config"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 120
 
 export async function generateMetadata({ params }: { params: Promise<{ product: string }> }): Promise<Metadata> {
   const { product: productSlug } = await params

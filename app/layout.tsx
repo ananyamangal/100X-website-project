@@ -1,4 +1,6 @@
-﻿export const dynamic = "force-dynamic"
+// Revalidate layout data every 5 minutes — brand assets and trust badges
+// change rarely; no need to hit MongoDB on every request.
+export const revalidate = 300
 
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
@@ -6,18 +8,6 @@ import Script from 'next/script'
 import { Suspense } from 'react'
 import './globals.css'
 import Navbar from '../components/Navbar'
-
-// Premium body + display typeface. Single variable-axis file covers
-// 100–900 weights so headings and body copy share one HTTP request.
-// Exposed as `var(--font-sans)` so globals.css inherits via fallback.
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-sans',
-})
-import VideoPopup from '@/components/VideoPopup'
-import RFQPopup from '@/components/RFQPopup'
-import RFQFloatingRibbon from '@/components/forms/RFQFloatingRibbon'
 import SiteFooter from '@/components/SiteFooter'
 import GlobalJsonLd from '@/components/seo/GlobalJsonLd'
 import UtmPersist from '@/components/UtmPersist'
@@ -26,8 +16,15 @@ import { MobileCtaProvider } from '@/components/cta/MobileCtaContext'
 import MobileCtaBar from '@/components/cta/MobileCtaBar'
 import { SITE_URL, SITE_NAME } from '@/lib/seo/site-config'
 import { getBrandAssets } from '@/lib/brandAssets'
-import MediaProtection from '@/components/MediaProtection'
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton'
+import ClientOnlyPopups from '@/components/ClientOnlyPopups'
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+  preload: true,
+})
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -123,32 +120,51 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const brandAssets = await getBrandAssets()
-  let trustBadges: any[] = []
-  try {
-    const { default: clientPromise } = await import('@/lib/mongodb')
-    const client = await clientPromise
-    const raw = await client.db().collection("trust_badges").find({ isActive: true }).sort({ order: 1 }).toArray()
-    trustBadges = JSON.parse(JSON.stringify(raw))
-  } catch { /* trust badges are optional — fall back to defaults in SiteFooter */ }
+  // Run both DB calls in parallel to minimize layout TTFB
+  const [brandAssets, hasBrochure, trustBadges] = await Promise.all([
+    getBrandAssets(),
+    (async () => {
+      try {
+        const { default: clientPromise } = await import('@/lib/mongodb')
+        const client = await clientPromise
+        const count = await client
+          .db()
+          .collection('brochures.files')
+          .countDocuments({ filename: 'main-brochure.pdf' })
+        return count > 0
+      } catch {
+        return false
+      }
+    })(),
+    (async () => {
+      try {
+        const { default: clientPromise } = await import('@/lib/mongodb')
+        const client = await clientPromise
+        const raw = await client
+          .db()
+          .collection('trust_badges')
+          .find({ isActive: true })
+          .sort({ order: 1 })
+          .toArray()
+        return JSON.parse(JSON.stringify(raw))
+      } catch {
+        return []
+      }
+    })(),
+  ])
 
   return (
     <html lang="en-IN" className={inter.variable}>
       <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <Script id="gtm-head" strategy="afterInteractive">
-          {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-5JMGCKRW');
-          `}
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5JMGCKRW');`}
         </Script>
         {/* Hero banner LCP preload — media-scoped so each viewport only
-            preloads the variant it will actually paint. Small bytes, big
-            LCP win on first paint. */}
+            preloads the variant it will actually paint. */}
         <link rel="preload" as="image" href="/banner-mobile.jpg" media="(max-width: 767.98px)" />
         <link rel="preload" as="image" href="/banner-tablet.jpg" media="(min-width: 768px) and (max-width: 1023.98px)" />
         <link rel="preload" as="image" href="/banner-desktop.jpg" media="(min-width: 1024px)" />
@@ -173,171 +189,12 @@ export default async function RootLayout({
         >
           Skip to main content
         </a>
-        <VideoPopup />
-        <RFQPopup />
-        <RFQFloatingRibbon />
+        <ClientOnlyPopups />
         <Script id="data-layer-events" strategy="afterInteractive">
-          {`
-            (function () {
-              window.dataLayer = window.dataLayer || [];
-
-              function gtmContextFromStorage() {
-                var attrs = {};
-                try {
-                  attrs = JSON.parse(sessionStorage.getItem('attribution_v1') || '{}') || {};
-                } catch (e) {}
-                return Object.assign(
-                  {
-                    page_path: location.pathname,
-                    page_url: location.href,
-                    timestamp_iso: new Date().toISOString(),
-                  },
-                  attrs
-                );
-              }
-
-              document.addEventListener(
-                'click',
-                function (event) {
-                  var el = event.target && event.target.closest && event.target.closest('a[href], button[type="submit"]');
-                  if (!el) return;
-                  var locWrap = event.target && event.target.closest && event.target.closest('[data-gtm-location]');
-                  var link_location = (locWrap && locWrap.getAttribute('data-gtm-location')) || '';
-                  var href = (el.getAttribute && el.getAttribute('href')) || '';
-                  var h = String(href).toLowerCase();
-
-                  // Phone / call click
-                  if (h.indexOf('tel:') === 0) {
-                    var telPayload = Object.assign(gtmContextFromStorage(), {
-                      event: 'phone_click',
-                      // GA4 standard: 'call_click'
-                      ga4_event: 'call_click',
-                      link_url: href,
-                      phone_number: href.replace('tel:', ''),
-                      value: 500,
-                      currency: 'INR',
-                    });
-                    if (link_location) telPayload.link_location = link_location;
-                    window.dataLayer.push(telPayload);
-                    return;
-                  }
-
-                  // Email click
-                  if (h.indexOf('mailto:') === 0) {
-                    var mailPayload = Object.assign(gtmContextFromStorage(), { event: 'email_click', link_url: href });
-                    if (link_location) mailPayload.link_location = link_location;
-                    window.dataLayer.push(mailPayload);
-                    return;
-                  }
-
-                  // WhatsApp click — conversion event
-                  if (h.indexOf('wa.me') !== -1 || h.indexOf('whatsapp') !== -1) {
-                    var waPayload = Object.assign(gtmContextFromStorage(), {
-                      event: 'whatsapp_click',
-                      ga4_event: 'contact',
-                      whatsapp_url: href,
-                      value: 500,
-                      currency: 'INR',
-                    });
-                    if (link_location) waPayload.link_location = link_location;
-                    window.dataLayer.push(waPayload);
-                    return;
-                  }
-
-                  // Brochure / PDF download
-                  if (h.indexOf('.pdf') !== -1 || (el.getAttribute && el.getAttribute('data-download'))) {
-                    window.dataLayer.push(Object.assign(gtmContextFromStorage(), {
-                      event: 'file_download',
-                      ga4_event: 'file_download',
-                      file_name: href.split('/').pop() || 'brochure',
-                      file_extension: 'pdf',
-                      link_url: href,
-                    }));
-                    return;
-                  }
-
-                  // GeM link click
-                  if (h.indexOf('gem.gov.in') !== -1) {
-                    window.dataLayer.push(Object.assign(gtmContextFromStorage(), {
-                      event: 'gem_click',
-                      link_url: href,
-                    }));
-                  }
-                },
-                true
-              );
-
-              // Contact form submit
-              document.addEventListener(
-                'submit',
-                function (e) {
-                  var form = e.target;
-                  if (!form || form.tagName !== 'FORM') return;
-                  var formId = form.id || '';
-                  var isContact = formId.indexOf('contact') !== -1 || (form.getAttribute && form.getAttribute('data-form-type') === 'contact');
-                  var isRfq = formId.indexOf('rfq') !== -1 || (form.getAttribute && form.getAttribute('data-form-type') === 'rfq');
-                  window.dataLayer.push(
-                    Object.assign(gtmContextFromStorage(), {
-                      event: isContact ? 'contact_form_submit' : isRfq ? 'rfq_form_submit_attempt' : 'form_submit_attempt',
-                      form_id: formId,
-                      form_action: form.action || '',
-                    })
-                  );
-                },
-                true
-              );
-
-              // Scroll depth tracking (25 / 50 / 75 / 100%)
-              (function () {
-                var thresholds = [25, 50, 75, 100];
-                var fired = {};
-                function onScroll() {
-                  var scrolled = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight * 100;
-                  thresholds.forEach(function (t) {
-                    if (!fired[t] && scrolled >= t) {
-                      fired[t] = true;
-                      window.dataLayer.push(Object.assign(gtmContextFromStorage(), {
-                        event: 'scroll_depth',
-                        scroll_threshold: t,
-                        percent_scrolled: t,
-                      }));
-                    }
-                  });
-                }
-                window.addEventListener('scroll', onScroll, { passive: true });
-              })();
-
-              // Page engagement time (30s / 60s)
-              (function () {
-                var milestones = [30000, 60000];
-                milestones.forEach(function (ms) {
-                  setTimeout(function () {
-                    window.dataLayer.push(Object.assign(gtmContextFromStorage(), {
-                      event: 'user_engagement',
-                      engagement_time_msec: ms,
-                      engaged_seconds: ms / 1000,
-                    }));
-                  }, ms);
-                });
-              })();
-
-            })();
-
-            window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
-            window.gtag_report_conversion = window.gtag_report_conversion || function(url) {
-              window.dataLayer = window.dataLayer || [];
-              window.dataLayer.push({
-                event: 'legacy_conversion_call',
-                conversion_url: url || ''
-              });
-              if (url) window.location = url;
-              return false;
-            };
-          `}
+          {`(function(){window.dataLayer=window.dataLayer||[];function gtmCtx(){var a={};try{a=JSON.parse(sessionStorage.getItem('attribution_v1')||'{}')||{};}catch(e){}return Object.assign({page_path:location.pathname,page_url:location.href,timestamp_iso:new Date().toISOString()},a);}document.addEventListener('click',function(e){var el=e.target&&e.target.closest&&e.target.closest('a[href], button[type="submit"]');if(!el)return;var lw=e.target&&e.target.closest&&e.target.closest('[data-gtm-location]');var ll=(lw&&lw.getAttribute('data-gtm-location'))||'';var href=(el.getAttribute&&el.getAttribute('href'))||'';var h=String(href).toLowerCase();if(h.indexOf('tel:')===0){var tp=Object.assign(gtmCtx(),{event:'phone_click',ga4_event:'call_click',link_url:href,phone_number:href.replace('tel:',''),value:500,currency:'INR'});if(ll)tp.link_location=ll;window.dataLayer.push(tp);return;}if(h.indexOf('mailto:')===0){var mp=Object.assign(gtmCtx(),{event:'email_click',link_url:href});if(ll)mp.link_location=ll;window.dataLayer.push(mp);return;}if(h.indexOf('wa.me')!==-1||h.indexOf('whatsapp')!==-1){var wp=Object.assign(gtmCtx(),{event:'whatsapp_click',ga4_event:'contact',whatsapp_url:href,value:500,currency:'INR'});if(ll)wp.link_location=ll;window.dataLayer.push(wp);return;}if(h.indexOf('.pdf')!==-1||(el.getAttribute&&el.getAttribute('data-download'))){window.dataLayer.push(Object.assign(gtmCtx(),{event:'file_download',ga4_event:'file_download',file_name:href.split('/').pop()||'brochure',file_extension:'pdf',link_url:href}));return;}if(h.indexOf('gem.gov.in')!==-1){window.dataLayer.push(Object.assign(gtmCtx(),{event:'gem_click',link_url:href}));}},true);document.addEventListener('submit',function(e){var f=e.target;if(!f||f.tagName!=='FORM')return;var fi=f.id||'';var ic=fi.indexOf('contact')!==-1||(f.getAttribute&&f.getAttribute('data-form-type')==='contact');var ir=fi.indexOf('rfq')!==-1||(f.getAttribute&&f.getAttribute('data-form-type')==='rfq');window.dataLayer.push(Object.assign(gtmCtx(),{event:ic?'contact_form_submit':ir?'rfq_form_submit_attempt':'form_submit_attempt',form_id:fi,form_action:f.action||''}));},true);(function(){var ts=[25,50,75,100],fired={};function os(){var s=(window.scrollY+window.innerHeight)/document.documentElement.scrollHeight*100;ts.forEach(function(t){if(!fired[t]&&s>=t){fired[t]=true;window.dataLayer.push(Object.assign(gtmCtx(),{event:'scroll_depth',scroll_threshold:t,percent_scrolled:t}));}});}window.addEventListener('scroll',os,{passive:true});})();(function(){[30000,60000].forEach(function(ms){setTimeout(function(){window.dataLayer.push(Object.assign(gtmCtx(),{event:'user_engagement',engagement_time_msec:ms,engaged_seconds:ms/1000}));},ms);});})();window.gtag=window.gtag||function(){window.dataLayer.push(arguments);};window.gtag_report_conversion=window.gtag_report_conversion||function(url){window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:'legacy_conversion_call',conversion_url:url||''});if(url)window.location=url;return false;};})();`}
         </Script>
-        <MediaProtection />
         <MobileCtaProvider>
-          <Navbar logoUrl={brandAssets.logoUrl} logoAlt={brandAssets.logoAlt} />
+          <Navbar logoUrl={brandAssets.logoUrl} logoAlt={brandAssets.logoAlt} hasBrochure={hasBrochure} />
           <main id="main-content" tabIndex={-1}>
             {children}
           </main>

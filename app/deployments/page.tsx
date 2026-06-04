@@ -1,4 +1,6 @@
-﻿import type { Metadata } from "next"
+﻿export const revalidate = 120
+
+import type { Metadata } from "next"
 import Link from "next/link"
 import clientPromise from "@/lib/mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"

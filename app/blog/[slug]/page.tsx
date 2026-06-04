@@ -21,7 +21,7 @@ import {
   blogImageSrc,
 } from "@/lib/blogFieldGuards"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 300
 
 function formatDate(value: unknown) {
   const s = blogOptStr(value)

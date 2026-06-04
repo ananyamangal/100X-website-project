@@ -37,7 +37,10 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
         <img
           src={images[imgIdx]}
           alt={product.name}
+          width={400}
+          height={300}
           loading="lazy"
+          decoding="async"
           className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-[1.03]"
           onContextMenu={(e) => e.preventDefault()}
           draggable="false"

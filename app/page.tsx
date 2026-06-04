@@ -1,4 +1,6 @@
-export const dynamic = "force-dynamic"
+// Revalidate homepage data every 60 seconds via ISR.
+// Content changes (banners, products) go live within 1 minute max.
+export const revalidate = 60
 
 import clientPromise from "@/lib/mongodb"
 import { getHomeContent } from "@/lib/homeContent"
@@ -6,6 +8,31 @@ import { serializeBlogs } from "@/lib/blogSerialize"
 import HomePageClient from "@/components/home/HomePageClient"
 import HomepageAiSummary from "@/components/seo/HomepageAiSummary"
 import HomepageTestimonialsJsonLd from "@/components/seo/HomepageTestimonialsJsonLd"
+import { optimizeCloudinary } from "@/lib/cloudinaryUrl"
+
+// Server-side preload component for the first banner image.
+// This emits <link rel="preload"> tags in <head> for the actual dynamic
+// Cloudinary banner URLs, not just the static fallbacks in layout.tsx.
+function BannerPreloads({ banners }: { banners: any[] }) {
+  const first = banners[0]
+  if (!first) return null
+  const desktop = optimizeCloudinary(first.desktopBannerImage || first.image, 1920)
+  const tablet = optimizeCloudinary(first.tabletBannerImage || first.desktopBannerImage || first.image, 1200)
+  const mobile = optimizeCloudinary(first.mobileBannerImage || first.desktopBannerImage || first.image, 800)
+  return (
+    <>
+      {desktop && desktop.includes("cloudinary.com") && (
+        <link rel="preload" as="image" href={desktop} media="(min-width: 1024px)" />
+      )}
+      {tablet && tablet.includes("cloudinary.com") && (
+        <link rel="preload" as="image" href={tablet} media="(min-width: 768px) and (max-width: 1023.98px)" />
+      )}
+      {mobile && mobile.includes("cloudinary.com") && (
+        <link rel="preload" as="image" href={mobile} media="(max-width: 767.98px)" />
+      )}
+    </>
+  )
+}
 
 export default async function HomePage() {
   const client = await clientPromise
@@ -56,6 +83,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <BannerPreloads banners={banners} />
       <HomepageAiSummary />
       <HomepageTestimonialsJsonLd />
       <HomePageClient

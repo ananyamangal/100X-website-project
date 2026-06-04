@@ -36,6 +36,8 @@ export default function AccreditationsStrip({ accreditations }: Props) {
                   <img
                     src={accreditation.logo || LOGO_PLACEHOLDER}
                     alt={accreditation.name ? `${accreditation.name} certification` : "Industry certification"}
+                    width={120}
+                    height={80}
                     className="object-contain max-w-full max-h-full min-h-0 min-w-0 w-full h-full"
                     loading="lazy"
                     decoding="async"

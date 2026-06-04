@@ -45,6 +45,8 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
         <img
           src={img}
           alt={product.name}
+          width={400}
+          height={300}
           className="w-full h-full object-contain p-5 transition-transform duration-700 group-hover:scale-[1.04]"
           loading="lazy"
           decoding="async"

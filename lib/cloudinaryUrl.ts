@@ -3,25 +3,38 @@
  * the best format (WebP/AVIF) and an automatically-tuned quality. No-ops for
  * non-Cloudinary URLs (e.g. /banner-desktop.jpg fallbacks).
  *
- * Example:
- *   https://res.cloudinary.com/dhbvzugv6/image/upload/v1/banner.jpg
- *   → https://res.cloudinary.com/dhbvzugv6/image/upload/f_auto,q_auto/v1/banner.jpg
- *
- * `width` is optional; passing it lets Cloudinary downscale on the CDN edge
- * before sending bytes, which is the single biggest LCP win for hero images.
+ * Examples:
+ *   optimizeCloudinary(url, 1920)  → f_auto,q_auto:good,w_1920,dpr_auto,c_limit
+ *   optimizeCloudinary(url, 400)   → f_auto,q_auto,w_400,dpr_auto,c_limit
  */
-export function optimizeCloudinary(url: string | undefined | null, width?: number): string {
+export function optimizeCloudinary(
+  url: string | undefined | null,
+  width?: number,
+  quality: 'auto' | 'auto:good' | 'auto:best' | 'auto:eco' = 'auto',
+): string {
   if (!url) return ""
   if (!url.includes("res.cloudinary.com")) return url
+  // Already transformed — don't double-apply
   if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) return url
-  const parts = ["f_auto", "q_auto"]
-  if (width && width > 0) parts.push(`w_${Math.round(width)}`)
-  const transform = parts.join(",")
-  return url.replace("/upload/", `/upload/${transform}/`)
+  const parts = ["f_auto", `q_${quality}`]
+  if (width && width > 0) {
+    parts.push(`w_${Math.round(width)}`, "c_limit", "dpr_auto")
+  }
+  return url.replace("/upload/", `/upload/${parts.join(",")}/`)
 }
 
-// Tiny base64 blur placeholder — a 4px monochrome JPEG. Used as Next/Image
-// blurDataURL when we don't have a per-image LQIP. Smaller than fetching a
-// real low-res variant; still removes the "blank box" flash.
+/**
+ * Generate a tiny LQIP (Low Quality Image Placeholder) Cloudinary URL.
+ * Used as blur placeholders while the full image loads.
+ */
+export function cloudinaryLqip(url: string | undefined | null): string {
+  if (!url || !url.includes("res.cloudinary.com")) return HERO_BLUR_DATA_URL
+  if (url.includes("/upload/")) {
+    return url.replace("/upload/", "/upload/w_32,q_1,f_jpg,e_blur:400/")
+  }
+  return HERO_BLUR_DATA_URL
+}
+
+// Tiny base64 blur placeholder — used as fallback when LQIP isn't available.
 export const HERO_BLUR_DATA_URL =
   "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSI5IiB2aWV3Qm94PSIwIDAgMTYgOSI+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjkiIGZpbGw9IiMzMzMzMzMiLz48L3N2Zz4="

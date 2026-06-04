@@ -13,7 +13,7 @@ import {
 } from "@/lib/blogFieldGuards"
 import { SITE_URL, SITE_NAME, defaultOgImage } from "@/lib/seo/site-config"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 120
 
 export const metadata = {
   title: "Knowledge & Industry Insights | 100x Circle",

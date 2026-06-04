@@ -44,23 +44,26 @@ function isActive(pathname: string | null, href: string) {
 interface NavbarProps {
   logoUrl?: string
   logoAlt?: string
+  hasBrochure?: boolean
 }
 
-export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Circle' }: NavbarProps) {
+export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Circle', hasBrochure: hasBrochureProp }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [hasBrochure, setHasBrochure] = useState(false)
+  const [hasBrochure, setHasBrochure] = useState(hasBrochureProp ?? false)
   const [modalOpen, setModalOpen] = useState(false)
   const pathname = usePathname()
   const isHeroPage = pathname === '/'
   const transparent = isHeroPage && !scrolled
 
   useEffect(() => {
+    // Only fetch if not pre-resolved from server
+    if (hasBrochureProp !== undefined) return
     fetch('/api/brochure')
       .then((r) => r.json())
       .then((data) => { if (data?.hasBrochure) setHasBrochure(true) })
       .catch(() => {})
-  }, [])
+  }, [hasBrochureProp])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
@@ -126,7 +129,8 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
             aria-label="100x Circle home"
             className="flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           >
-            <img src={logoUrl} alt={logoAlt} className="h-9 md:h-10 w-auto" draggable={false} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoUrl} alt={logoAlt} width={160} height={40} className="h-9 md:h-10 w-auto" draggable={false} fetchPriority="high" />
           </Link>
 
           {/* Desktop nav links */}

@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic"
+export const revalidate = 60
 
 import Link from "next/link"
 import clientPromise from "@/lib/mongodb"
