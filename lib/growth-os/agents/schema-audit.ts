@@ -2,28 +2,63 @@ import clientPromise from "@/lib/mongodb"
 
 const SITE_URL = "https://www.100xcircle.com"
 
-// Pages and their expected schema types
-const AUDIT_PAGES: Array<{ path: string; expected: string[]; priority: "high" | "medium" }> = [
-  { path: "/", expected: ["Organization", "WebSite", "LocalBusiness"], priority: "high" },
-  { path: "/gem-oem-authorization", expected: ["HowTo", "FAQPage"], priority: "high" },
-  { path: "/become-a-dealer", expected: ["FAQPage"], priority: "high" },
-  { path: "/gem-tender-support", expected: ["FAQPage"], priority: "high" },
-  { path: "/is-14855-fogging-machine", expected: ["Product", "FAQPage"], priority: "high" },
-  { path: "/municipal-fogging-programme", expected: ["FAQPage"], priority: "high" },
-  { path: "/nhm-fogging-machine", expected: ["Product", "FAQPage"], priority: "medium" },
-  { path: "/nvbdcp-fogging-machine", expected: ["Product", "FAQPage"], priority: "medium" },
-  { path: "/vector-control-equipment", expected: ["Product", "FAQPage"], priority: "medium" },
-  { path: "/fogging-machine-for-nagar-panchayat", expected: ["Product", "FAQPage"], priority: "medium" },
-  { path: "/gem-reverse-auction-fogging", expected: ["Product", "FAQPage"], priority: "medium" },
-  { path: "/make-in-india-fogging-machine", expected: ["Product", "FAQPage"], priority: "medium" },
-  { path: "/dealers-and-government", expected: [], priority: "medium" },
-  { path: "/dealer-application", expected: [], priority: "medium" },
-]
+// URL pattern → expected JSON-LD types + priority
+function getExpected(path: string): { types: string[]; priority: "high" | "medium" | "low" } {
+  if (path === "/") return { types: ["Organization", "WebSite", "LocalBusiness"], priority: "high" }
+
+  const highFAQ = [
+    "/gem-oem-authorization", "/become-a-dealer", "/gem-tender-support",
+    "/dealer-application", "/dealers-and-government", "/is-14855-fogging-machine",
+  ]
+  if (highFAQ.includes(path)) return { types: ["FAQPage"], priority: "high" }
+
+  const highProduct = [
+    "/nhm-fogging-machine", "/nvbdcp-fogging-machine", "/municipal-fogging-programme",
+    "/public-health-equipment", "/vector-control-equipment", "/fogging-machine-for-nagar-panchayat",
+  ]
+  if (highProduct.includes(path)) return { types: ["Product", "FAQPage"], priority: "high" }
+
+  const medProduct = [
+    "/gem-reverse-auction-fogging", "/make-in-india-fogging-machine",
+    "/power-tiller", "/vehicle-mounted-fogging-machine",
+  ]
+  if (medProduct.includes(path)) return { types: ["Product", "FAQPage"], priority: "medium" }
+
+  if (path.startsWith("/products/") && path !== "/products") return { types: ["Product"], priority: "medium" }
+  if (path.startsWith("/blog/") && path !== "/blog") return { types: ["Article"], priority: "low" }
+  if (path.startsWith("/knowledge/") && path !== "/knowledge") return { types: ["Article"], priority: "low" }
+
+  return { types: [], priority: "low" }
+}
+
+async function fetchSitemapPaths(): Promise<string[]> {
+  try {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 10000)
+    const res = await fetch(`${SITE_URL}/sitemap.xml`, {
+      signal: controller.signal,
+      headers: { "User-Agent": "100XCircle-GrowthOS-SchemaAudit/1.0", "Cache-Control": "no-cache" },
+    })
+    clearTimeout(timer)
+    if (!res.ok) return []
+    const xml = await res.text()
+    const matches = [...xml.matchAll(/<loc>([\s\S]*?)<\/loc>/g)]
+    return matches
+      .map(m => m[1].trim())
+      .filter(url => url.startsWith(SITE_URL))
+      .map(url => {
+        const path = url.replace(SITE_URL, "")
+        return path === "" ? "/" : path
+      })
+  } catch {
+    return []
+  }
+}
 
 async function fetchPage(url: string): Promise<string | null> {
   try {
     const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 8000)
+    const timer = setTimeout(() => controller.abort(), 7000)
     const res = await fetch(url, {
       signal: controller.signal,
       headers: { "User-Agent": "100XCircle-GrowthOS-SchemaAudit/1.0", "Cache-Control": "no-cache" },
@@ -36,8 +71,9 @@ async function fetchPage(url: string): Promise<string | null> {
   }
 }
 
-function extractJsonLdTypes(html: string): string[] {
+function parseJsonLd(html: string): { types: string[]; invalid: boolean } {
   const types: string[] = []
+  let invalid = false
   const scriptRegex = /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
   let match
   while ((match = scriptRegex.exec(html)) !== null) {
@@ -45,117 +81,153 @@ function extractJsonLdTypes(html: string): string[] {
       const data = JSON.parse(match[1])
       const items = Array.isArray(data) ? data : [data]
       for (const item of items) {
-        if (item["@type"]) {
-          const t = Array.isArray(item["@type"]) ? item["@type"] : [item["@type"]]
-          types.push(...t)
+        const pushType = (t: unknown) => {
+          if (typeof t === "string") types.push(t)
+          else if (Array.isArray(t)) t.forEach(x => typeof x === "string" && types.push(x))
         }
-        // Check @graph
+        pushType(item["@type"])
         if (item["@graph"]) {
-          for (const g of item["@graph"]) {
-            if (g["@type"]) {
-              const t = Array.isArray(g["@type"]) ? g["@type"] : [g["@type"]]
-              types.push(...t)
-            }
-          }
+          for (const g of item["@graph"]) pushType(g["@type"])
         }
       }
     } catch {
-      // ignore malformed JSON-LD
+      invalid = true
     }
   }
-  return [...new Set(types)]
+  return { types: [...new Set(types)], invalid }
 }
 
 export interface SchemaAuditResult {
   summary: string
+  pagesFromSitemap: number
   pagesAudited: number
-  pagesPassing: number
-  pagesMissingSchema: number
-  findings: Array<{
+  findings: {
+    noSchema: string[]
+    invalidSchema: string[]
+    missingFAQ: string[]
+    missingProduct: string[]
+    passing: string[]
+  }
+  details: Array<{
     path: string
-    priority: "high" | "medium"
+    priority: "high" | "medium" | "low"
     foundTypes: string[]
     missingTypes: string[]
-    status: "pass" | "partial" | "missing" | "error"
+    status: "pass" | "partial" | "no_schema" | "invalid" | "error"
   }>
 }
 
 export async function runSchemaAuditAgent(): Promise<SchemaAuditResult> {
   const db = (await clientPromise).db()
-  const findings: SchemaAuditResult["findings"] = []
 
-  // Run pages in batches of 3 to avoid timeout
-  for (let i = 0; i < AUDIT_PAGES.length; i += 3) {
-    const batch = AUDIT_PAGES.slice(i, i + 3)
-    const results = await Promise.allSettled(
-      batch.map(async page => {
-        const html = await fetchPage(`${SITE_URL}${page.path}`)
-        const found = html ? extractJsonLdTypes(html) : []
-        const missing = page.expected.filter(e => !found.includes(e))
-        const status = !html ? "error"
-          : missing.length === 0 ? "pass"
-          : missing.length < page.expected.length ? "partial"
-          : page.expected.length === 0 ? "pass"
-          : "missing"
-        return { path: page.path, priority: page.priority, foundTypes: found, missingTypes: missing, status }
-      })
-    )
-    results.forEach((r, j) => {
-      if (r.status === "fulfilled") findings.push(r.value as SchemaAuditResult["findings"][0])
-      else findings.push({ path: batch[j].path, priority: batch[j].priority, foundTypes: [], missingTypes: batch[j].expected, status: "error" })
+  // Fetch live sitemap
+  const allPaths = await fetchSitemapPaths()
+
+  // Audit only pages with schema expectations, capped to avoid timeout
+  const toAudit = allPaths
+    .map(path => ({ path, ...getExpected(path) }))
+    .filter(p => p.types.length > 0)
+    .sort((a, b) => {
+      const order = { high: 0, medium: 1, low: 2 }
+      return order[a.priority] - order[b.priority]
     })
-    // Small delay between batches to avoid hammering the server
-    if (i + 3 < AUDIT_PAGES.length) await new Promise(r => setTimeout(r, 200))
+    .slice(0, 30) // 30 pages × ~7s timeout = max ~3.5 min; batched in 5s
+
+  const details: SchemaAuditResult["details"] = []
+  const findings: SchemaAuditResult["findings"] = {
+    noSchema: [], invalidSchema: [], missingFAQ: [], missingProduct: [], passing: [],
   }
 
-  const passing = findings.filter(f => f.status === "pass").length
-  const missing = findings.filter(f => f.status === "missing" || f.status === "error").length
+  // Fetch in batches of 4
+  for (let i = 0; i < toAudit.length; i += 4) {
+    const batch = toAudit.slice(i, i + 4)
+    const results = await Promise.allSettled(
+      batch.map(async ({ path, types, priority }) => {
+        const html = await fetchPage(`${SITE_URL}${path}`)
+        if (!html) return { path, priority, foundTypes: [], missingTypes: types, status: "error" as const }
+        const { types: found, invalid } = parseJsonLd(html)
+        const missing = types.filter(t => !found.includes(t))
+        let status: SchemaAuditResult["details"][0]["status"]
+        if (invalid && found.length === 0) status = "invalid"
+        else if (found.length === 0) status = "no_schema"
+        else if (missing.length === 0) status = "pass"
+        else status = "partial"
+        return { path, priority, foundTypes: found, missingTypes: missing, status }
+      })
+    )
+    for (const r of results) {
+      if (r.status === "fulfilled") details.push(r.value)
+    }
+    if (i + 4 < toAudit.length) await new Promise(r => setTimeout(r, 150))
+  }
 
-  // Create opportunities for pages with missing high-priority schemas
-  const highPriorityMissing = findings.filter(f => f.priority === "high" && f.missingTypes.length > 0)
-  for (const page of highPriorityMissing.slice(0, 3)) {
+  // Categorize findings
+  for (const d of details) {
+    if (d.status === "no_schema" || d.status === "error") findings.noSchema.push(d.path)
+    if (d.status === "invalid") findings.invalidSchema.push(d.path)
+    if (d.missingTypes.includes("FAQPage")) findings.missingFAQ.push(d.path)
+    if (d.missingTypes.includes("Product")) findings.missingProduct.push(d.path)
+    if (d.status === "pass") findings.passing.push(d.path)
+  }
+
+  // Create opportunities for high-priority gaps
+  const criticalGaps = details.filter(d => d.priority === "high" && d.missingTypes.length > 0)
+  for (const gap of criticalGaps.slice(0, 5)) {
     await db.collection("growth_os_opportunities").updateOne(
-      { title: { $regex: `Schema.*${page.path}`, $options: "i" } },
+      { title: { $regex: `Schema.*${gap.path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, $options: "i" } },
       {
         $setOnInsert: {
-          title: `Add missing schema on ${page.path}: ${page.missingTypes.join(", ")}`,
-          description: `Schema audit found ${page.missingTypes.join(", ")} missing. Found: ${page.foundTypes.join(", ") || "none"}. This is a high-priority page.`,
+          title: `Fix schema on ${gap.path}: add ${gap.missingTypes.join(", ")}`,
+          description: `Schema audit found missing schemas. Expected: ${gap.missingTypes.join(", ")}. Found: ${gap.foundTypes.join(", ") || "none"}. High-priority page — fix for AI Overview and rich result eligibility.`,
           module: "seo",
           source: "agent",
           businessValue: "medium",
           seoValue: "high",
-          geoValue: "medium",
+          geoValue: "high",
           dealerImpact: "low",
           effort: "low",
           status: "pending",
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-        }
+        },
       },
       { upsert: true }
     )
   }
 
-  // Store full audit results
+  // Persist full audit results
   await db.collection("growth_os_schema_audit").replaceOne(
     { _type: "latest" },
-    { _type: "latest", findings, auditedAt: new Date().toISOString() },
+    {
+      _type: "latest",
+      findings,
+      details,
+      pagesFromSitemap: allPaths.length,
+      pagesAudited: details.length,
+      auditedAt: new Date().toISOString(),
+    },
     { upsert: true }
   )
 
-  const summary = `Audited ${findings.length} pages — ${passing} passing, ${missing} with missing schema. High-priority gaps: ${highPriorityMissing.map(p => p.path).join(", ") || "none"}.`
+  const totalIssues = findings.noSchema.length + findings.invalidSchema.length + findings.missingFAQ.length + findings.missingProduct.length
+  const summary = `Audited ${details.length} pages (${allPaths.length} in sitemap). ${findings.passing.length} passing, ${totalIssues} total issues — ${findings.missingFAQ.length} missing FAQ schema, ${findings.missingProduct.length} missing Product schema, ${findings.noSchema.length} with no JSON-LD.`
 
   await db.collection("growth_os_logs").insertOne({
     ts: new Date().toISOString(),
     agent: "Schema Audit Agent",
-    action: `Schema audit: ${passing}/${findings.length} pages passing`,
-    reason: "Periodic structured data verification",
-    expectedImpact: "Identify and fix SEO schema gaps",
-    actualImpact: `${missing} pages need schema fixes`,
-    level: missing > 0 ? "warning" : "success",
+    action: summary,
+    reason: "Live sitemap schema verification",
+    expectedImpact: "Fix JSON-LD gaps for rich results and AI Overview eligibility",
+    actualImpact: `${totalIssues} issues across ${details.length} pages`,
+    level: totalIssues > 0 ? "warning" : "success",
     module: "seo",
-    after: JSON.stringify(findings.map(f => ({ path: f.path, status: f.status, missing: f.missingTypes }))),
+    after: JSON.stringify({
+      passing: findings.passing.length,
+      noSchema: findings.noSchema,
+      missingFAQ: findings.missingFAQ,
+      missingProduct: findings.missingProduct,
+    }),
   })
 
-  return { summary, pagesAudited: findings.length, pagesPassing: passing, pagesMissingSchema: missing, findings }
+  return { summary, pagesFromSitemap: allPaths.length, pagesAudited: details.length, findings, details }
 }

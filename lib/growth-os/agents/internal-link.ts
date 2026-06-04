@@ -3,50 +3,39 @@ import clientPromise from "@/lib/mongodb"
 const SITE_URL = "https://www.100xcircle.com"
 const SITE_DOMAIN = "100xcircle.com"
 
-// Authority pages we care about for the link graph
-const TRACKED_PATHS = [
-  "/gem-oem-authorization",
-  "/become-a-dealer",
-  "/dealer-application",
-  "/gem-tender-support",
-  "/is-14855-fogging-machine",
-  "/municipal-fogging-programme",
-  "/nhm-fogging-machine",
-  "/nvbdcp-fogging-machine",
-  "/vector-control-equipment",
-  "/fogging-machine-for-nagar-panchayat",
-  "/gem-reverse-auction-fogging",
-  "/make-in-india-fogging-machine",
-  "/dealers-and-government",
-  "/public-health-equipment",
-  "/knowledge/gem-oem-authorization-process",
-  "/knowledge/gem-reseller-guide",
-  "/knowledge/government-procurement-guide",
-  "/knowledge/fogging-machine-for-pest-control-business",
-]
+async function fetchSitemapEntries(): Promise<Array<{ path: string; priority: number }>> {
+  try {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 10000)
+    const res = await fetch(`${SITE_URL}/sitemap.xml`, {
+      signal: controller.signal,
+      headers: { "User-Agent": "100XCircle-GrowthOS-LinkBot/1.0", "Cache-Control": "no-cache" },
+    })
+    clearTimeout(timer)
+    if (!res.ok) return []
+    const xml = await res.text()
 
-// Pages to crawl FROM (the ones that should contain internal links)
-const SOURCE_PAGES = [
-  "/",
-  "/gem-oem-authorization",
-  "/become-a-dealer",
-  "/dealers-and-government",
-  "/gem-tender-support",
-  "/is-14855-fogging-machine",
-  "/municipal-fogging-programme",
-  "/nhm-fogging-machine",
-  "/nvbdcp-fogging-machine",
-  "/vector-control-equipment",
-  "/fogging-machine-for-nagar-panchayat",
-  "/gem-reverse-auction-fogging",
-  "/make-in-india-fogging-machine",
-  "/public-health-equipment",
-]
+    // Parse <url><loc>...</loc><priority>...</priority></url> blocks
+    const urlBlocks = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)]
+    return urlBlocks.flatMap(block => {
+      const locMatch = block[1].match(/<loc>([\s\S]*?)<\/loc>/)
+      const prioMatch = block[1].match(/<priority>([\s\S]*?)<\/priority>/)
+      if (!locMatch) return []
+      const url = locMatch[1].trim()
+      if (!url.startsWith(SITE_URL)) return []
+      const path = url.replace(SITE_URL, "") || "/"
+      const priority = prioMatch ? parseFloat(prioMatch[1]) : 0.5
+      return [{ path, priority }]
+    })
+  } catch {
+    return []
+  }
+}
 
 async function fetchPage(url: string): Promise<string | null> {
   try {
     const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 8000)
+    const timer = setTimeout(() => controller.abort(), 7000)
     const res = await fetch(url, {
       signal: controller.signal,
       headers: { "User-Agent": "100XCircle-GrowthOS-LinkBot/1.0", "Cache-Control": "no-cache" },
@@ -61,21 +50,19 @@ async function fetchPage(url: string): Promise<string | null> {
 
 function extractInternalLinks(html: string): string[] {
   const links = new Set<string>()
-  // Match href="..." patterns
-  const patterns = [
-    /href=["'](\/[^"'#?]*)[^"']*["']/g,
-    new RegExp(`href=["']https?://(www\\.)?${SITE_DOMAIN}(/[^"'#?]*)[^"']*["']`, 'g'),
-  ]
-  for (const pattern of patterns) {
-    let match
-    const re = new RegExp(pattern.source, pattern.flags)
-    while ((match = re.exec(html)) !== null) {
-      const path = match[1].startsWith("/") ? match[1] : match[2]
+  const absoluteRe = new RegExp(
+    `href=["']https?://(?:www\\.)?${SITE_DOMAIN}(/[^"'#?]*)[^"']*["']`,
+    "gi"
+  )
+  const relativeRe = /href=["'](\/[^"'#?][^"']*)[^"']*["']/gi
+
+  for (const re of [absoluteRe, relativeRe]) {
+    let m
+    while ((m = re.exec(html)) !== null) {
+      const path = m[1]
       if (!path) continue
-      // Filter out non-page paths
       if (path.startsWith("/api/") || path.startsWith("/_next/") || path.startsWith("/admin/")) continue
-      if (path.endsWith(".json") || path.endsWith(".xml") || path.endsWith(".pdf")) continue
-      // Normalize trailing slashes
+      if (/\.(json|xml|pdf|jpg|png|svg|ico|css|js)$/.test(path)) continue
       const clean = path.replace(/\/$/, "") || "/"
       links.add(clean)
     }
@@ -85,20 +72,47 @@ function extractInternalLinks(html: string): string[] {
 
 export interface InternalLinkResult {
   summary: string
-  pagesCrawled: number
-  orphanPages: string[]
-  weakPages: Array<{ path: string; inboundCount: number; linkedBy: string[] }>
-  linkGraph: Record<string, string[]>
-  recommendations: string[]
+  sourcesAnalyzed: number
+  authorityPagesTracked: number
+  orphanPages: Array<{ path: string; priority: number; addLinkFrom: string[] }>
+  weakPages: Array<{ path: string; priority: number; inboundCount: number; linkedBy: string[]; addLinkFrom: string[] }>
+  strongPages: Array<{ path: string; inboundCount: number }>
+  recommendations: Array<{ from: string; to: string; reason: string }>
 }
 
 export async function runInternalLinkAgent(): Promise<InternalLinkResult> {
   const db = (await clientPromise).db()
 
-  // Crawl source pages in batches of 3
-  const crawlResults: Record<string, string[]> = {}
-  for (let i = 0; i < SOURCE_PAGES.length; i += 3) {
-    const batch = SOURCE_PAGES.slice(i, i + 3)
+  // Get all sitemap entries
+  const entries = await fetchSitemapEntries()
+  if (entries.length === 0) {
+    return {
+      summary: "Could not fetch sitemap — audit skipped.",
+      sourcesAnalyzed: 0, authorityPagesTracked: 0,
+      orphanPages: [], weakPages: [], strongPages: [], recommendations: [],
+    }
+  }
+
+  // Authority pages to track inbound links for: priority >= 0.8
+  const authorityPaths = entries
+    .filter(e => e.priority >= 0.8 && !e.path.startsWith("/blog/") && !e.path.startsWith("/knowledge/") && !e.path.startsWith("/compare/") && !e.path.startsWith("/products/"))
+    .map(e => e.path)
+
+  // Source pages to crawl: high-priority hubs (priority >= 0.75), capped at 18
+  const sourcePaths = entries
+    .filter(e => e.priority >= 0.75 && !e.path.startsWith("/blog/") && !e.path.startsWith("/knowledge/") && !e.path.startsWith("/compare/") && !e.path.startsWith("/products/") && !e.path.startsWith("/ai/"))
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, 18)
+    .map(e => e.path)
+
+  // Initialize inbound link map
+  const inboundLinks: Record<string, string[]> = {}
+  for (const p of authorityPaths) inboundLinks[p] = []
+
+  // Crawl source pages in batches of 4
+  const crawledLinks: Record<string, string[]> = {}
+  for (let i = 0; i < sourcePaths.length; i += 4) {
+    const batch = sourcePaths.slice(i, i + 4)
     const results = await Promise.allSettled(
       batch.map(async path => {
         const html = await fetchPage(`${SITE_URL}${path}`)
@@ -107,51 +121,76 @@ export async function runInternalLinkAgent(): Promise<InternalLinkResult> {
     )
     for (const r of results) {
       if (r.status === "fulfilled") {
-        crawlResults[r.value.path] = r.value.links
-      }
-    }
-    if (i + 3 < SOURCE_PAGES.length) await new Promise(r => setTimeout(r, 200))
-  }
-
-  // Build inbound link count for tracked pages
-  const inboundLinks: Record<string, string[]> = {}
-  for (const tracked of TRACKED_PATHS) {
-    inboundLinks[tracked] = []
-  }
-
-  for (const [sourcePath, links] of Object.entries(crawlResults)) {
-    for (const link of links) {
-      if (inboundLinks[link] !== undefined) {
-        if (!inboundLinks[link].includes(sourcePath)) {
-          inboundLinks[link].push(sourcePath)
+        crawledLinks[r.value.path] = r.value.links
+        for (const link of r.value.links) {
+          if (inboundLinks[link] !== undefined && !inboundLinks[link].includes(r.value.path)) {
+            inboundLinks[link].push(r.value.path)
+          }
         }
       }
     }
+    if (i + 4 < sourcePaths.length) await new Promise(r => setTimeout(r, 150))
   }
 
-  // Find orphan pages (0 inbound links from tracked sources)
-  const orphanPages = TRACKED_PATHS.filter(p => inboundLinks[p]?.length === 0)
-  const weakPages = TRACKED_PATHS
-    .filter(p => inboundLinks[p]?.length === 1)
-    .map(p => ({ path: p, inboundCount: 1, linkedBy: inboundLinks[p] }))
+  // Build priority map for authority pages
+  const priorityMap: Record<string, number> = {}
+  for (const e of entries) priorityMap[e.path] = e.priority
 
-  // Build recommendations
-  const recommendations: string[] = []
-  if (orphanPages.length > 0) {
-    recommendations.push(`Orphan pages (0 inbound links): ${orphanPages.join(", ")} — add links from relevant pages`)
-  }
-  if (weakPages.length > 0) {
-    recommendations.push(`Weak pages (1 inbound link): ${weakPages.map(p => p.path).join(", ")} — add 1-2 more inbound links`)
+  // Classify pages
+  const orphanPages: InternalLinkResult["orphanPages"] = []
+  const weakPages: InternalLinkResult["weakPages"] = []
+  const strongPages: InternalLinkResult["strongPages"] = []
+
+  for (const path of authorityPaths) {
+    const inbound = inboundLinks[path] || []
+    const prio = priorityMap[path] || 0.5
+    if (inbound.length === 0) {
+      // Find 2 most relevant source pages to add links from
+      const candidates = sourcePaths.filter(s => s !== path && !inbound.includes(s)).slice(0, 3)
+      orphanPages.push({ path, priority: prio, addLinkFrom: candidates })
+    } else if (inbound.length <= 2) {
+      const candidates = sourcePaths.filter(s => s !== path && !inbound.includes(s)).slice(0, 2)
+      weakPages.push({ path, priority: prio, inboundCount: inbound.length, linkedBy: inbound, addLinkFrom: candidates })
+    } else {
+      strongPages.push({ path, inboundCount: inbound.length })
+    }
   }
 
-  // Create opportunities for orphan pages
-  for (const page of orphanPages.slice(0, 3)) {
+  // Sort by priority descending
+  orphanPages.sort((a, b) => b.priority - a.priority)
+  weakPages.sort((a, b) => b.priority - a.priority)
+  strongPages.sort((a, b) => b.inboundCount - a.inboundCount)
+
+  // Generate specific recommendations
+  const recommendations: InternalLinkResult["recommendations"] = []
+  for (const orphan of orphanPages.slice(0, 5)) {
+    for (const from of orphan.addLinkFrom.slice(0, 2)) {
+      recommendations.push({
+        from,
+        to: orphan.path,
+        reason: `${orphan.path} has 0 inbound links — add from ${from} (high-traffic hub)`,
+      })
+    }
+  }
+  for (const weak of weakPages.slice(0, 3)) {
+    const from = weak.addLinkFrom[0]
+    if (from) {
+      recommendations.push({
+        from,
+        to: weak.path,
+        reason: `${weak.path} has only ${weak.inboundCount} inbound link${weak.inboundCount > 1 ? "s" : ""} — strengthen with link from ${from}`,
+      })
+    }
+  }
+
+  // Create opportunities for orphan authority pages
+  for (const orphan of orphanPages.filter(p => p.priority >= 0.85).slice(0, 4)) {
     await db.collection("growth_os_opportunities").updateOne(
-      { title: { $regex: `Internal link.*${page}`, $options: "i" } },
+      { title: { $regex: `internal.?link.*${orphan.path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, $options: "i" } },
       {
         $setOnInsert: {
-          title: `Add internal links to orphan page: ${page}`,
-          description: `The page ${page} has 0 inbound internal links from other tracked pages. It cannot be discovered by crawlers or users browsing the site. Add at least 2 links from related pages.`,
+          title: `Link orphan page: ${orphan.path}`,
+          description: `${orphan.path} (priority ${orphan.priority}) has 0 inbound internal links from any tracked page. Crawlers cannot discover it. Add links from: ${orphan.addLinkFrom.slice(0, 2).join(", ")}.`,
           module: "seo",
           source: "agent",
           businessValue: "medium",
@@ -162,39 +201,54 @@ export async function runInternalLinkAgent(): Promise<InternalLinkResult> {
           status: "pending",
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-        }
+        },
       },
       { upsert: true }
     )
   }
 
-  // Store results
+  // Persist results
   await db.collection("growth_os_link_graph").replaceOne(
     { _type: "latest" },
-    { _type: "latest", inboundLinks, orphanPages, weakPages, auditedAt: new Date().toISOString() },
+    {
+      _type: "latest",
+      inboundLinks,
+      orphanPages,
+      weakPages,
+      strongPages,
+      recommendations,
+      sourcesAnalyzed: Object.keys(crawledLinks).length,
+      authorityPagesTracked: authorityPaths.length,
+      auditedAt: new Date().toISOString(),
+    },
     { upsert: true }
   )
 
-  const summary = `Crawled ${Object.keys(crawlResults).length} pages. Tracked ${TRACKED_PATHS.length} authority pages. Orphans: ${orphanPages.length}, Weak: ${weakPages.length}.${orphanPages.length > 0 ? ` Fix: ${orphanPages.slice(0, 3).join(", ")}` : " All pages linked."}`
+  const summary = `Crawled ${Object.keys(crawledLinks).length} source pages. Tracked ${authorityPaths.length} authority pages. Orphans: ${orphanPages.length} (0 inbound), Weak: ${weakPages.length} (≤2 inbound), Strong: ${strongPages.length}. ${recommendations.length} specific link recommendations generated.`
 
   await db.collection("growth_os_logs").insertOne({
     ts: new Date().toISOString(),
     agent: "Internal Link Agent",
-    action: `Link audit: ${orphanPages.length} orphan pages, ${weakPages.length} weak pages`,
-    reason: "Internal link authority analysis",
-    expectedImpact: "Improve crawlability and internal PageRank distribution",
-    actualImpact: `${recommendations.length} recommendations generated`,
+    action: summary,
+    reason: "Internal link authority audit from live sitemap",
+    expectedImpact: "Improve crawlability and internal PageRank flow to authority pages",
+    actualImpact: `${orphanPages.length} orphan pages, ${weakPages.length} weak pages, ${recommendations.length} recommendations`,
     level: orphanPages.length > 0 ? "warning" : "success",
     module: "seo",
-    after: JSON.stringify({ orphanPages, weakPages: weakPages.map(p => p.path) }),
+    after: JSON.stringify({
+      orphans: orphanPages.map(p => p.path),
+      weak: weakPages.map(p => p.path),
+      recommendations: recommendations.slice(0, 5),
+    }),
   })
 
   return {
     summary,
-    pagesCrawled: Object.keys(crawlResults).length,
+    sourcesAnalyzed: Object.keys(crawledLinks).length,
+    authorityPagesTracked: authorityPaths.length,
     orphanPages,
     weakPages,
-    linkGraph: inboundLinks,
+    strongPages,
     recommendations,
   }
 }

@@ -1,135 +1,142 @@
 import clientPromise from "@/lib/mongodb"
+import { TARGET_QUERIES, AI_PLATFORMS } from "@/lib/growth-os/citation-constants"
 
-const TARGET_QUERIES = [
-  "OEM authorization letter fogging machine India",
-  "GeM dealer authorization fogging machine",
-  "thermal fogging machine manufacturer India",
-  "IS 14855 fogging machine",
-  "municipal fogging machine GeM India",
-  "NHM fogging machine procurement",
-  "Make in India fogging machine OEM",
-  "fogging machine for Nagar Panchayat",
-  "vector control equipment GeM India",
-  "MSME fogging machine manufacturer GeM",
-]
+export { TARGET_QUERIES, AI_PLATFORMS }
 
-const BRAND_SIGNALS = ["100x circle", "100xcircle", "100x", "instafog"]
+function getWeekStart(): string {
+  const d = new Date()
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1) // Monday
+  const mon = new Date(d.setDate(diff))
+  return mon.toISOString().split("T")[0]
+}
 
-async function queryOpenAI(question: string, apiKey: string): Promise<{ mentioned: boolean; response: string; competitors: string[] }> {
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "user", content: `${question}\n\nPlease mention any specific Indian manufacturers or brands you know about.` }
-      ],
-      max_tokens: 300,
-      temperature: 0.3,
-    }),
-  })
-  if (!res.ok) throw new Error(`OpenAI error: ${res.status}`)
-  const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> }
-  const text = (data.choices?.[0]?.message?.content || "").toLowerCase()
-  const mentioned = BRAND_SIGNALS.some(s => text.includes(s))
-  const knownCompetitors = ["instafog", "foggers india", "glvm", "neptune", "korean", "german", "igeba"]
-  const competitors = knownCompetitors.filter(c => c !== "instafog" && text.includes(c))
-  if (!mentioned && text.includes("instafog")) competitors.push("instafog")
-  return { mentioned, response: data.choices?.[0]?.message?.content || "", competitors }
+function getNextMonday(): string {
+  const d = new Date()
+  const day = d.getDay()
+  const diff = day === 0 ? 1 : 8 - day
+  d.setDate(d.getDate() + diff)
+  return d.toISOString().split("T")[0]
 }
 
 export interface AICitationResult {
   summary: string
-  queriesChecked: number
-  mentionedCount: number
-  missingCount: number
+  totalCombinations: number
+  checked: number
+  unchecked: number
+  stale: number
+  mentioned: number
+  missing: number
+  competitor: number
   visibilityScore: number
-  results: Array<{
-    query: string
-    platform: string
-    status: "mentioned" | "competitor" | "missing" | "manual_needed"
-    competitors: string[]
-    checkedAt: string
-    note: string
-  }>
-  trend: { previous?: number; current: number; change?: number }
+  weeklyQueueCreated: number
+  tasksThisWeek: Array<{ query: string; platform: string; dueDate: string; priority: string; reason: string }>
+  topMisses: Array<{ query: string; platform: string; competitor?: string; lastChecked?: string }>
 }
 
 export async function runAICitationAgent(): Promise<AICitationResult> {
   const db = (await clientPromise).db()
-  const openAiKey = process.env.OPENAI_API_KEY
-  const results: AICitationResult["results"] = []
 
-  if (openAiKey) {
-    // Real mode: actually query OpenAI
-    for (const query of TARGET_QUERIES.slice(0, 5)) { // limit to 5 to avoid timeout + cost
-      try {
-        const { mentioned, response, competitors } = await queryOpenAI(query, openAiKey)
-        results.push({
-          query,
-          platform: "ChatGPT",
-          status: mentioned ? "mentioned" : competitors.length > 0 ? "competitor" : "missing",
-          competitors,
-          checkedAt: new Date().toISOString(),
-          note: mentioned ? "100X Circle mentioned in response" : `Not mentioned${competitors.length > 0 ? ` — competitors: ${competitors.join(", ")}` : ""}`,
-        })
-        // Store in citation DB
-        await db.collection("growth_os_citations").updateOne(
-          { query, platform: "ChatGPT" },
-          { $set: { query, platform: "ChatGPT", status: mentioned ? "mentioned" : "missing", competitors, response: response.slice(0, 500), checkedAt: new Date().toISOString() } },
-          { upsert: true }
-        )
-        await new Promise(r => setTimeout(r, 500)) // rate limit
-      } catch (e) {
-        results.push({ query, platform: "ChatGPT", status: "manual_needed", competitors: [], checkedAt: new Date().toISOString(), note: `API error: ${e instanceof Error ? e.message : "unknown"}` })
-      }
-    }
-    // Remaining queries: mark as manual_needed
-    for (const query of TARGET_QUERIES.slice(5)) {
-      const existing = await db.collection("growth_os_citations").findOne({ query, platform: "ChatGPT" })
-      if (existing) {
-        results.push({ query, platform: "ChatGPT", status: existing.status, competitors: existing.competitors || [], checkedAt: existing.checkedAt, note: "From previous check" })
-      } else {
-        results.push({ query, platform: "ChatGPT", status: "manual_needed", competitors: [], checkedAt: new Date().toISOString(), note: "Not yet checked — use GEO module to log manually" })
-      }
-    }
-  } else {
-    // Manual mode: load existing citations and mark unchecked as needing manual review
-    for (const query of TARGET_QUERIES) {
-      const existing = await db.collection("growth_os_citations").findOne({ query })
-      if (existing) {
-        results.push({ query, platform: existing.platform || "Manual", status: existing.status, competitors: existing.competitors || [], checkedAt: existing.checkedAt, note: existing.notes || "Manual log" })
-      } else {
-        results.push({ query, platform: "Manual needed", status: "manual_needed", competitors: [], checkedAt: new Date().toISOString(), note: "Open GEO Command Center → Log Citation Check to record this query" })
+  const totalCombinations = TARGET_QUERIES.length * AI_PLATFORMS.length
+
+  // 1. Read all existing citation records from MongoDB
+  const existingCitations = await db.collection("growth_os_citations").find({}).toArray()
+
+  // 2. Build lookup map
+  const citationMap = new Map<string, typeof existingCitations[0]>()
+  for (const c of existingCitations) {
+    citationMap.set(`${c.platform}::${c.query}`, c)
+  }
+
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString()
+  const missingRecords: Array<{ query: string; platform: string }> = []
+  const staleRecords: Array<{ query: string; platform: string; lastChecked: string }> = []
+  const tasksToCreate: Array<{ query: string; platform: string; reason: string; priority: string }> = []
+
+  // 3. Audit each query × platform combination
+  for (const query of TARGET_QUERIES) {
+    for (const platform of AI_PLATFORMS) {
+      const key = `${platform}::${query}`
+      const existing = citationMap.get(key)
+
+      if (!existing) {
+        missingRecords.push({ query, platform })
+        tasksToCreate.push({ query, platform, reason: "never_checked", priority: "high" })
+      } else if (existing.checkedAt && existing.checkedAt < sevenDaysAgo) {
+        staleRecords.push({ query, platform, lastChecked: existing.checkedAt })
+        tasksToCreate.push({ query, platform, reason: "stale_7d", priority: "medium" })
       }
     }
   }
 
-  const mentioned = results.filter(r => r.status === "mentioned").length
-  const total = results.filter(r => r.status !== "manual_needed").length || 1
-  const current = Math.round((mentioned / total) * 100)
+  // 4. Write verification tasks to MongoDB (upsert — no duplicate pending tasks per week)
+  const weekStart = getWeekStart()
+  const dueDate = getNextMonday()
+  let weeklyQueueCreated = 0
 
-  // Get previous score
-  const prevRun = await db.collection("growth_os_citation_runs").findOne({}, { sort: { createdAt: -1 } })
-  const previous = prevRun?.visibilityScore
+  // Prioritize: never_checked first, then stale. Cap at 15 tasks/week.
+  const tasksToWrite = [
+    ...tasksToCreate.filter(t => t.priority === "high"),
+    ...tasksToCreate.filter(t => t.priority === "medium"),
+  ].slice(0, 15)
 
-  // Store this run
-  await db.collection("growth_os_citation_runs").insertOne({
-    visibilityScore: current,
-    mentionedCount: mentioned,
-    totalChecked: total,
-    mode: openAiKey ? "api" : "manual",
-    createdAt: new Date().toISOString(),
-  })
-
-  // Create opportunity if score is low
-  if (current < 30 && total > 5) {
-    await db.collection("growth_os_opportunities").updateOne(
-      { title: { $regex: "AI visibility score", $options: "i" } },
+  for (const task of tasksToWrite) {
+    const result = await db.collection("growth_os_citation_tasks").updateOne(
+      { query: task.query, platform: task.platform, weekOf: weekStart, status: "pending" },
       {
         $setOnInsert: {
-          title: `AI Visibility Score is low: ${current}% — improve ChatGPT/Perplexity citations`,
-          description: `100X Circle appears in only ${mentioned}/${total} checked AI queries. Competitors (instafog, foggersindia) are being cited instead. Improve llms.txt coverage and structured data.`,
+          query: task.query,
+          platform: task.platform,
+          weekOf: weekStart,
+          dueDate,
+          reason: task.reason,
+          priority: task.priority,
+          status: "pending",
+          createdAt: new Date().toISOString(),
+        },
+      },
+      { upsert: true }
+    )
+    if (result.upsertedCount > 0) weeklyQueueCreated++
+  }
+
+  // 5. Compute visibility score from all checked citations
+  const checkedCitations = existingCitations.filter(c => c.status && c.status !== "unknown")
+  const mentioned = checkedCitations.filter(c => c.status === "mentioned").length
+  const missingCount = checkedCitations.filter(c => c.status === "missing").length
+  const competitorCount = checkedCitations.filter(c => c.status === "competitor").length
+  const visibilityScore = checkedCitations.length > 0
+    ? Math.round((mentioned / checkedCitations.length) * 100)
+    : 0
+
+  // 6. Get this week's pending tasks for the return value
+  const pendingTasks = await db
+    .collection("growth_os_citation_tasks")
+    .find({ weekOf: weekStart, status: "pending" })
+    .sort({ priority: -1, createdAt: 1 })
+    .limit(15)
+    .toArray()
+
+  // 7. Find top misses (queries where competitor was cited or 100X was missing)
+  const topMisses = existingCitations
+    .filter(c => c.status === "missing" || c.status === "competitor")
+    .sort((a, b) => (b.checkedAt || "").localeCompare(a.checkedAt || ""))
+    .slice(0, 5)
+    .map(c => ({
+      query: c.query as string,
+      platform: c.platform as string,
+      competitor: c.competitor as string | undefined,
+      lastChecked: c.checkedAt as string | undefined,
+    }))
+
+  // 8. Create opportunity if visibility is low and we have enough data
+  if (checkedCitations.length >= 5 && visibilityScore < 30) {
+    await db.collection("growth_os_opportunities").updateOne(
+      { title: { $regex: "AI Visibility Score", $options: "i" } },
+      {
+        $setOnInsert: {
+          title: `AI Visibility Score is ${visibilityScore}% — improve ChatGPT/Gemini citations`,
+          description: `100X Circle appears in only ${mentioned}/${checkedCitations.length} checked AI queries. ${competitorCount} queries show competitors instead. Focus: add more content targeting checked queries, publish llms.txt updates, and verify citations weekly.`,
           module: "geo",
           source: "agent",
           businessValue: "high",
@@ -140,35 +147,44 @@ export async function runAICitationAgent(): Promise<AICitationResult> {
           status: "pending",
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-        }
+        },
       },
       { upsert: true }
     )
   }
 
-  const summary = openAiKey
-    ? `Checked ${results.length} queries via ChatGPT API. Mentioned in: ${mentioned}/${total}. AI Visibility Score: ${current}%.${previous !== undefined ? ` (was ${previous}%)` : ""}`
-    : `Manual mode (no OPENAI_API_KEY). ${mentioned} queries logged as cited, ${results.filter(r => r.status === "manual_needed").length} need manual checking via GEO Command Center.`
+  const summary = `Citation audit: ${checkedCitations.length}/${totalCombinations} combinations checked. Visibility: ${visibilityScore}%. ${missingRecords.length} never checked, ${staleRecords.length} stale (>7 days). Created ${weeklyQueueCreated} new verification tasks for week of ${weekStart}.`
 
   await db.collection("growth_os_logs").insertOne({
     ts: new Date().toISOString(),
     agent: "AI Citation Agent",
-    action: `AI citation check: ${current}% visibility score`,
-    reason: openAiKey ? "Automated ChatGPT API query" : "Manual mode — pending manual checks",
-    expectedImpact: "Track and improve AI search visibility",
-    actualImpact: `${mentioned} mentions found out of ${total} checked`,
-    level: current >= 50 ? "success" : current >= 20 ? "warning" : "info",
+    action: summary,
+    reason: "Weekly citation database audit and task generation",
+    expectedImpact: "Ensure all queries × platforms are verified weekly",
+    actualImpact: `${weeklyQueueCreated} tasks queued, ${checkedCitations.length} records analyzed`,
+    level: visibilityScore >= 50 ? "success" : visibilityScore >= 20 ? "warning" : "info",
     module: "geo",
-    after: JSON.stringify({ score: current, mentioned, total, mode: openAiKey ? "api" : "manual" }),
+    after: JSON.stringify({ visibilityScore, mentioned, missingCount, competitorCount, weeklyQueueCreated }),
   })
 
   return {
     summary,
-    queriesChecked: results.length,
-    mentionedCount: mentioned,
-    missingCount: results.filter(r => r.status === "missing").length,
-    visibilityScore: current,
-    results,
-    trend: { previous, current, change: previous !== undefined ? current - previous : undefined },
+    totalCombinations,
+    checked: checkedCitations.length,
+    unchecked: missingRecords.length,
+    stale: staleRecords.length,
+    mentioned,
+    missing: missingCount,
+    competitor: competitorCount,
+    visibilityScore,
+    weeklyQueueCreated,
+    tasksThisWeek: pendingTasks.map(t => ({
+      query: t.query as string,
+      platform: t.platform as string,
+      dueDate: t.dueDate as string,
+      priority: t.priority as string,
+      reason: t.reason as string,
+    })),
+    topMisses,
   }
 }
