@@ -31,7 +31,8 @@ export function isOAuthAppConfigured(): boolean {
 
 export function getOAuthRedirectUri(): string {
   if (process.env.GOOGLE_OAUTH_REDIRECT_URI) return process.env.GOOGLE_OAUTH_REDIRECT_URI
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://100-x-website-project.vercel.app").replace(/\/$/, "")
+  // Fallback: use brand domain. Set GOOGLE_OAUTH_REDIRECT_URI explicitly in Vercel to override.
+  const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.100xcircle.com").replace(/\/$/, "")
   return `${base}/api/admin/gsc/oauth/callback`
 }
 
