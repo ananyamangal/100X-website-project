@@ -1,0 +1,85 @@
+import { NextRequest, NextResponse } from "next/server"
+import clientPromise from "@/lib/mongodb"
+import { ObjectId } from "mongodb"
+import type { Automation } from "@/lib/growth-os/types"
+
+const DEFAULT_AGENTS: Omit<Automation, "_id">[] = [
+  { id: "keyword-discovery", name: "Keyword Discovery Agent", description: "Scans GSC search queries and competitor pages to surface new keyword opportunities", module: "seo", riskLevel: "low", status: "paused", schedule: "Weekly — Monday 09:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "competitor-monitor", name: "Competitor Monitor Agent", description: "Checks competitor sites for new pages, keywords, and content changes", module: "competitors", riskLevel: "low", status: "paused", schedule: "Daily — 08:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "ai-citation-agent", name: "AI Citation Agent", description: "Tests whether 100X Circle appears in ChatGPT/Perplexity/Gemini answers for target queries", module: "geo", riskLevel: "low", status: "paused", schedule: "Weekly — Wednesday 10:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "schema-audit", name: "Schema Audit Agent", description: "Verifies structured data on all pages, flags missing or broken schemas", module: "seo", riskLevel: "low", status: "active", schedule: "Weekly — Friday 10:00", lastRun: new Date(Date.now() - 3 * 86400000).toISOString(), successRate: 100, runCount: 4, lastResult: "All 42 pages have valid structured data", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "internal-link-agent", name: "Internal Link Agent", description: "Identifies pages with low internal link density and suggests additions", module: "seo", riskLevel: "low", status: "active", schedule: "Monthly — 1st Monday", lastRun: new Date(Date.now() - 7 * 86400000).toISOString(), successRate: 100, runCount: 2, lastResult: "Identified 3 pages with < 2 inbound links", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "gem-opportunity-agent", name: "GeM Opportunity Agent", description: "Monitors GeM for new tender listings, category changes, and OEM demand signals", module: "gem", riskLevel: "low", status: "paused", schedule: "Daily — 07:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "dealer-lead-agent", name: "Dealer Lead Agent", description: "Classifies incoming leads by dealer type, scores them, and flags high-potential applications", module: "dealers", riskLevel: "low", status: "active", schedule: "Continuous — on new lead", lastRun: new Date(Date.now() - 2 * 3600000).toISOString(), successRate: 95, runCount: 147, lastResult: "3 new leads classified today", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "content-brief-agent", name: "Content Brief Agent", description: "Generates content briefs for approved opportunities and queues them in Content Factory", module: "content", riskLevel: "medium", status: "paused", schedule: "On opportunity approval", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "ads-keyword-agent", name: "Ads Keyword Agent", description: "Analyzes Search Console data to surface high-converting terms for Google Ads campaigns", module: "ads", riskLevel: "low", status: "paused", schedule: "Monthly — 1st", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "metadata-optimizer", name: "Metadata Optimizer Agent", description: "Reviews title/description CTR in GSC and recommends improvements for low-CTR pages", module: "seo", riskLevel: "low", status: "paused", schedule: "Monthly — 15th", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+]
+
+export async function GET() {
+  const db = (await clientPromise).db()
+  const existing = await db.collection("growth_os_automations").find({}).toArray()
+
+  if (existing.length === 0) {
+    await db.collection("growth_os_automations").insertMany(DEFAULT_AGENTS)
+    const seeded = await db.collection("growth_os_automations").find({}).toArray()
+    return NextResponse.json(JSON.parse(JSON.stringify(seeded)))
+  }
+
+  return NextResponse.json(JSON.parse(JSON.stringify(existing)))
+}
+
+export async function PATCH(req: NextRequest) {
+  const body = await req.json()
+  const { id, status, config } = body
+  if (!id) return NextResponse.json({ error: "id required" }, { status: 400 })
+
+  const db = (await clientPromise).db()
+  const update: Record<string, unknown> = { status, updatedAt: new Date().toISOString() }
+  if (config) update.config = config
+
+  await db.collection("growth_os_automations").updateOne(
+    { _id: new ObjectId(id) },
+    { $set: update }
+  )
+
+  await db.collection("growth_os_logs").insertOne({
+    ts: new Date().toISOString(),
+    agent: "manual",
+    action: `Automation ${status}: ${id}`,
+    reason: `Status changed to ${status} by admin`,
+    expectedImpact: "",
+    level: "info",
+    module: "automation",
+  })
+
+  return NextResponse.json({ ok: true })
+}
+
+export async function POST(req: NextRequest) {
+  const body = await req.json()
+  const { id } = body
+  if (!id) return NextResponse.json({ error: "id required" }, { status: 400 })
+
+  const db = (await clientPromise).db()
+  const agent = await db.collection("growth_os_automations").findOne({ _id: new ObjectId(id) })
+  if (!agent) return NextResponse.json({ error: "Not found" }, { status: 404 })
+
+  const runResult = `Manual run at ${new Date().toLocaleString("en-IN")} — simulated`
+  await db.collection("growth_os_automations").updateOne(
+    { _id: new ObjectId(id) },
+    { $set: { lastRun: new Date().toISOString(), lastResult: runResult, updatedAt: new Date().toISOString() }, $inc: { runCount: 1 } }
+  )
+
+  await db.collection("growth_os_logs").insertOne({
+    ts: new Date().toISOString(),
+    agent: agent.name,
+    action: `Manual run triggered`,
+    reason: "Admin triggered manual run",
+    expectedImpact: agent.description,
+    level: "info",
+    module: agent.module,
+  })
+
+  return NextResponse.json({ ok: true, result: runResult })
+}

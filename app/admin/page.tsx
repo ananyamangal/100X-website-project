@@ -1279,6 +1279,15 @@ function AdminDashboardContent() {
                 <Settings className="mr-3" size={20} />
                 Settings
               </button>
+              <div className="pt-2 mt-2 border-t border-gray-200">
+                <a
+                  href="/admin/growth"
+                  className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors bg-gray-900 text-green-400 hover:bg-gray-800 font-semibold"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  Growth OS ↗
+                </a>
+              </div>
             </nav>
           </div>
 
