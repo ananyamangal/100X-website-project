@@ -6,21 +6,13 @@ export const metadata: Metadata = {
   robots: {
     index: false,
     follow: false,
-    googleBot: {
-      index: false,
-      follow: false,
-    },
+    googleBot: { index: false, follow: false },
   },
 }
 
-export default function AdminRootLayout({
-  children,
-}: {
-  children: ReactNode
-}) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  )
+// Root layout (app/layout.tsx) detects admin routes via the x-is-admin header
+// set by middleware and renders a clean <html><body> with no public Navbar/Footer.
+// This layout just passes children through — no extra wrapping needed.
+export default function AdminRootLayout({ children }: { children: ReactNode }) {
+  return <>{children}</>
 }

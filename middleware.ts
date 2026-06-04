@@ -16,16 +16,23 @@ function isAuthenticated(request: NextRequest): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname, origin } = request.nextUrl
 
-  // ── Protect Growth OS admin pages ─────────────────────────────────────────
-  // Server-side guard so unauthenticated users cannot reach the SSR output.
-  // The client-side cookie check in the layout is belt-and-suspenders on top.
-  if (pathname.startsWith("/admin/growth")) {
-    if (!isAuthenticated(request)) {
+  // ── Admin routes: inject x-is-admin header + protect Growth OS ──────────
+  // The x-is-admin header lets app/layout.tsx skip the public Navbar/Footer
+  // for all /admin/* routes so the public UI doesn't overlay the admin UI.
+  if (pathname.startsWith("/admin")) {
+    // Redirect unauthenticated users away from Growth OS pages
+    if (pathname.startsWith("/admin/growth") && !isAuthenticated(request)) {
       const loginUrl = request.nextUrl.clone()
       loginUrl.pathname = "/admin"
       return NextResponse.redirect(loginUrl)
     }
-    return NextResponse.next()
+    // Forward a header so the root layout can detect admin context
+    const res = NextResponse.next({
+      request: {
+        headers: new Headers({ ...Object.fromEntries(request.headers), "x-is-admin": "1" }),
+      },
+    })
+    return res
   }
 
   // ── Protect admin API routes ──────────────────────────────────────────────
@@ -79,6 +86,6 @@ export const config = {
     "/products/:path*",
     "/api/admin/:path*",
     "/api/submissions",
-    "/admin/growth/:path*",
+    "/admin/:path*",
   ],
 }

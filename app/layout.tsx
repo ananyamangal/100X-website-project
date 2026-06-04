@@ -6,6 +6,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import { Suspense } from 'react'
+import { headers } from 'next/headers'
 import './globals.css'
 import Navbar from '../components/Navbar'
 import SiteFooter from '@/components/SiteFooter'
@@ -120,6 +121,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Skip public UI entirely for admin routes — the middleware injects
+  // x-is-admin: 1 for all /admin/* requests so we can detect it here.
+  const headersList = await headers()
+  const isAdmin = headersList.get("x-is-admin") === "1"
+
+  if (isAdmin) {
+    return (
+      <html lang="en" className={inter.variable}>
+        <body className="min-h-screen antialiased">{children}</body>
+      </html>
+    )
+  }
+
   // Run both DB calls in parallel to minimize layout TTFB
   const [brandAssets, hasBrochure, trustBadges] = await Promise.all([
     getBrandAssets(),
