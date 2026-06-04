@@ -214,18 +214,16 @@ export default function BecomeADealerPage() {
         <div className="bg-brand-600 rounded-xl p-6 mb-10 text-white">
           <h2 className="font-bold text-xl mb-2">Apply for Dealership</h2>
           <p className="text-brand-100 text-sm mb-4">
-            No franchise fee. No security deposit. Share your state and current business — we
-            respond within 1 working day.
+            Select your dealer type and get a pre-filled application — or call/WhatsApp directly.
+            We respond within 1 working day. No fee.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/dealer-application"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-brand-50 transition-colors"
             >
-              WhatsApp: +91-7827229116
-            </a>
+              Apply — Choose Your Dealer Type →
+            </Link>
             <a
               href={`tel:${BUSINESS.phonePrimary}`}
               className="inline-flex items-center justify-center gap-2 border border-brand-300 text-white font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-brand-700 transition-colors"

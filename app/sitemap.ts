@@ -89,6 +89,10 @@ const STATIC_ROUTES: Array<{
   { path: "/is-14855-fogging-machine", changeFrequency: "monthly", priority: 0.85 },
   // Municipal vector control hub
   { path: "/municipal-fogging-programme", changeFrequency: "monthly", priority: 0.85 },
+  // Public health & dealer funnel
+  { path: "/public-health-equipment", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/dealer-application", changeFrequency: "monthly", priority: 0.9 },
+  { path: "/ai/dealer-authorization", changeFrequency: "monthly", priority: 0.7 },
   // Dealer & GeM knowledge articles
   { path: "/knowledge/gem-oem-authorization-process", changeFrequency: "yearly", priority: 0.8 },
   { path: "/knowledge/gem-reseller-guide", changeFrequency: "yearly", priority: 0.8 },

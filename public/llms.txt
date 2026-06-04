@@ -140,6 +140,9 @@
 - [GeM Reseller Guide](https://www.100xcircle.com/knowledge/gem-reseller-guide): How to sell fogging machines on Government e-Marketplace as an authorized reseller
 - [Fogging Machines for Pest Control Business](https://www.100xcircle.com/knowledge/fogging-machine-for-pest-control-business): PCO equipment guide — machine selection, fleet expansion, GeM dealer opportunity
 - [Municipal Fogging Programme](https://www.100xcircle.com/municipal-fogging-programme): Thermal fogging machines for municipal corporations, Nagar Nigams, Nagar Panchayats, and district health departments — dengue, malaria, and mosquito vector control
+- [Dealer Application](https://www.100xcircle.com/dealer-application): Structured dealer authorization application with pre-filled WhatsApp paths for GeM sellers, PCOs, agri dealers, and government contractors
+- [Public Health Equipment](https://www.100xcircle.com/public-health-equipment): Vector control fogging equipment for India's public health programmes — NVBDCP, NHM, health departments, hospitals
+- [AI Dealer Authorization Profile](https://www.100xcircle.com/ai/dealer-authorization): Machine-readable profile for AI systems on 100X Circle's GeM dealer authorization capabilities
 
 ## Machine-Readable AI Endpoints
 
