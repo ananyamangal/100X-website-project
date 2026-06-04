@@ -1,6 +1,7 @@
 ﻿'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Download, Menu, MessageCircle, Phone, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -134,8 +135,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
             aria-label="100x Circle home"
             className="flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoUrl} alt={logoAlt} width={160} height={40} className="h-9 md:h-10 w-auto" draggable={false} fetchPriority="high" />
+            <Image src={logoUrl} alt={logoAlt} width={160} height={40} className="h-9 md:h-10 w-auto" draggable={false} priority />
           </Link>
 
           {/* Desktop nav links */}

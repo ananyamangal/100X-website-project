@@ -336,16 +336,34 @@ export default function BecomeADealerPage() {
           </div>
         </div>
 
-        {/* Contact box */}
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8">
-          <h2 className="font-semibold text-gray-800 mb-2">Contact for Dealership Inquiry</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Tell us your state, current business, and whether you&apos;re on GeM. We respond
-            within 1 working day.
+        {/* Bottom CTA */}
+        <div className="bg-brand-600 rounded-xl p-6 mb-8 text-white">
+          <h2 className="font-bold text-xl mb-1">Ready to Start Selling?</h2>
+          <p className="text-brand-100 text-sm mb-4">
+            We respond within 1 working day. No fee, no minimum order.
+            Tell us your state and current business — that&apos;s all we need to start.
           </p>
-          <div className="grid sm:grid-cols-2 gap-2 text-sm font-medium text-gray-800">
-            <span>WhatsApp / Phone: <a href={`tel:${BUSINESS.phonePrimary}`} className="text-brand-600">{BUSINESS.phonePrimary}</a></span>
-            <span>Email: <a href={`mailto:${BUSINESS.email}`} className="text-brand-600">{BUSINESS.email}</a></span>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              href="/dealer-application"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-brand-50 transition-colors"
+            >
+              Choose Your Dealer Type →
+            </Link>
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 border border-brand-300 text-white font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-brand-700 transition-colors"
+            >
+              WhatsApp: {BUSINESS.phonePrimary}
+            </a>
+            <a
+              href={`tel:${BUSINESS.phonePrimary}`}
+              className="inline-flex items-center justify-center gap-2 border border-brand-300 text-white font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-brand-700 transition-colors"
+            >
+              Call Us
+            </a>
           </div>
         </div>
 

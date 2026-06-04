@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Mail, MapPin, Phone } from "lucide-react"
 import { getAllLandingPages, getLandingDisplayName } from "@/lib/seo/landing-pages"
 import { BUSINESS } from "@/lib/seo/site-config"
@@ -106,8 +107,7 @@ export default function SiteFooter({
           {/* Column 1: Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="inline-block mb-6" aria-label="100X Circle home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={logoUrl} alt={logoAlt} width={160} height={40} className="h-10 w-auto" draggable={false} loading="lazy" />
+              <Image src={logoUrl} alt={logoAlt} width={160} height={40} className="h-10 w-auto" draggable={false} />
             </Link>
             <p className="text-cinema-400 text-sm leading-relaxed mb-6 max-w-xs">
               India's trusted manufacturer of thermal fogging machines for public health, municipalities, agriculture, and industrial pest control.

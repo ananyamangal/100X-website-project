@@ -328,17 +328,34 @@ export default function GemTenderSupportPage() {
           </div>
         </div>
 
-        {/* Contact */}
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8">
-          <h2 className="font-semibold text-gray-800 mb-2">Contact for Tender Support</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Share your tender details and required documents. We respond within 1 working
-            day — same day for urgent requests via phone/WhatsApp.
+        {/* Bottom CTA */}
+        <div className="bg-brand-600 rounded-xl p-6 mb-8 text-white">
+          <h2 className="font-bold text-xl mb-1">Need Tender Documents Now?</h2>
+          <p className="text-brand-100 text-sm mb-4">
+            Share your tender details. We respond same day for urgent deadlines.
+            Standard requests processed in 1–2 working days.
           </p>
-          <div className="grid sm:grid-cols-2 gap-2 text-sm font-medium text-gray-800">
-            <span>WhatsApp / Phone: <a href={`tel:${BUSINESS.phonePrimary}`} className="text-brand-600">{BUSINESS.phonePrimary}</a></span>
-            <span>Email: <a href={`mailto:${BUSINESS.email}`} className="text-brand-600">{BUSINESS.email}</a></span>
-            <span>Phone 2: <a href={`tel:${BUSINESS.phoneSecondary}`} className="text-brand-600">{BUSINESS.phoneSecondary}</a></span>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-brand-50 transition-colors"
+            >
+              WhatsApp: +91-7827229116
+            </a>
+            <a
+              href={`tel:${BUSINESS.phonePrimary}`}
+              className="inline-flex items-center justify-center gap-2 border border-brand-300 text-white font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-brand-700 transition-colors"
+            >
+              Call: {BUSINESS.phonePrimary}
+            </a>
+            <a
+              href={`mailto:${BUSINESS.email}?subject=Tender Documentation Request`}
+              className="inline-flex items-center justify-center gap-2 border border-brand-300 text-white font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-brand-700 transition-colors"
+            >
+              Email Us
+            </a>
           </div>
         </div>
 

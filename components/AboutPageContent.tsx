@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { RichContent } from "@/components/RichContent"
+import { optimizeCloudinary } from "@/lib/cloudinaryUrl"
 
 export default function AboutPageContent({
   content,
@@ -129,7 +130,7 @@ export default function AboutPageContent({
             </div>
           </div>
           <div className="relative">
-            <img src={journeyImage} alt={heroTitle} className="w-full rounded-2xl shadow-2xl" />
+            <img src={optimizeCloudinary(journeyImage, 1200) || journeyImage} alt={heroTitle} className="w-full rounded-2xl shadow-2xl" loading="lazy" decoding="async" />
             <div className="absolute -top-6 -left-6 w-24 h-24 bg-brand-600 rounded-2xl flex items-center justify-center">
               <Award className="text-white" size={32} />
             </div>
@@ -177,7 +178,7 @@ export default function AboutPageContent({
               </div>
             </div>
             <div>
-              <img src={manufacturingImage} alt="Manufacturing facility" className="w-full rounded-xl shadow-lg" />
+              <img src={optimizeCloudinary(manufacturingImage, 1200) || manufacturingImage} alt="Manufacturing facility" className="w-full rounded-xl shadow-lg" loading="lazy" decoding="async" />
             </div>
           </div>
         </div>
