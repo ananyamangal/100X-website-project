@@ -584,7 +584,7 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
                                             onClick={() => setActiveVideoId((mediaItems[currentIdx] as any).videoId)} aria-label="Play video">
                                             <img src={(mediaItems[currentIdx] as any).thumb} alt="Video thumbnail" className="w-full h-full object-cover rounded-2xl" />
                                             <div className="absolute inset-0 bg-black/40 rounded-2xl group-hover:bg-black/50 transition-colors" />
-                                            <div className="absolute w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                            <div className="absolute w-16 h-16 bg-brand-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                                 <Play size={28} className="text-white ml-1" fill="white" />
                                             </div>
                                         </button>

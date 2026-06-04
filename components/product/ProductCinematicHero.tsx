@@ -56,35 +56,33 @@ export default function ProductCinematicHero({
       className="relative overflow-hidden"
       style={{ background: "#050505" }}
     >
-      {/* ── Blurred product image as atmospheric bg (if available) ── */}
-      {imageUrl && (
-        <div
-          className="absolute inset-0 opacity-8 pointer-events-none"
-          style={{
-            backgroundImage: `url(${imageUrl})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            filter: "blur(40px) saturate(0.4)",
-            transform: "scale(1.1)",
-          }}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* ── Brand red radial glow ── */}
+      {/* ── Consistent brand gradient — identical on every product ── */}
+      {/* No image bleed-through: color accuracy independent of product photo */}
       <div
         className="absolute inset-0 pointer-events-none"
         aria-hidden="true"
         style={{
-          background:
-            "radial-gradient(ellipse 70% 60% at 0% 50%, rgba(220,38,38,0.10) 0%, transparent 60%)",
+          background: [
+            "radial-gradient(ellipse 60% 80% at 0% 50%, rgba(185,28,28,0.12) 0%, transparent 55%)",
+            "radial-gradient(ellipse 40% 60% at 100% 0%, rgba(80,10,10,0.08) 0%, transparent 50%)",
+          ].join(","),
         }}
       />
 
-      {/* ── Bottom fade to white ── */}
+      {/* ── Subtle noise texture for depth ── */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        aria-hidden="true"
+        style={{
+          backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E\")",
+          opacity: 1,
+        }}
+      />
+
+      {/* ── Bottom fade ── */}
       <div
         className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
-        style={{ background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.02))" }}
+        style={{ background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.3))" }}
         aria-hidden="true"
       />
 

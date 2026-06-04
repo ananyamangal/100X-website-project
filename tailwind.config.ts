@@ -198,8 +198,9 @@ const config: Config = {
   			'cinema-radial': 'radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 100%)',
   			'cinema-top':    'linear-gradient(to bottom, #111111 0%, #0a0a0a 100%)',
   			'hero-overlay':  'linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0) 100%)',
-  			'brand-gradient':'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+  			'brand-gradient':'linear-gradient(135deg, #b91c1c 0%, #991b1b 100%)',
   			'brand-subtle':  'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+  			'hero-product':  'linear-gradient(135deg, #050505 0%, #0a0505 100%)',
   		},
   	}
   },
