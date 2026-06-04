@@ -132,6 +132,9 @@
 - [Knowledge Base](https://www.100xcircle.com/knowledge): How fogging works, thermal vs ULV, procurement guides
 - [Case Studies](https://www.100xcircle.com/case-studies): Government and PCO supply references
 - [Comparison Pages](https://www.100xcircle.com/compare): 100X vs Korean/German machines, municipal vs agricultural use
+- [GeM OEM Authorization](https://www.100xcircle.com/gem-oem-authorization): OEM authorization codes and letters for GeM resellers and fogging machine dealers
+- [Become a Dealer](https://www.100xcircle.com/become-a-dealer): Dealer program, authorized distributor onboarding, GeM reseller benefits
+- [GeM OEM Authorization Process Guide](https://www.100xcircle.com/knowledge/gem-oem-authorization-process): Complete guide for fogging machine resellers on GeM OEM authorization
 
 ## Machine-Readable AI Endpoints
 

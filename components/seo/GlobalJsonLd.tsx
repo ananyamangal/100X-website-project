@@ -321,6 +321,22 @@ const homepageFaq = {
         text: "The 100X Circle factory is at UG, 398, Sector 7, IMT Manesar, Gurugram, Haryana 122050 (GPS: 28.3874°N, 76.9318°E). It manufactures pulse-jet thermal fogging machines, cold (ULV) foggers, agricultural sprayers, and power tillers through 7 in-house manufacturing processes under ISO 9001:2015 quality control.",
       },
     },
+    {
+      "@type": "Question",
+      name: "Does 100X Circle provide OEM authorization for GeM dealers and resellers?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. 100X Circle provides GeM OEM authorization codes (via the GeM OEM panel) and signed OEM authorization letters to approved dealers. This allows dealers to sell 100X Circle fogging machines as authorized resellers on GeM and bid on government tenders. To apply: WhatsApp +91-7827229116 or email 100xcircle@gmail.com. Details at https://www.100xcircle.com/gem-oem-authorization",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How can someone become an authorized 100X Circle fogging machine dealer?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "To become an authorized 100X Circle dealer, contact +91-7827229116 or 100xcircle@gmail.com with your state, GST number, and current business details. No franchise fee or security deposit is required. 100X Circle has 50+ active dealers across India and provides GeM OEM authorization, tender documentation support, and competitive pricing. Details at https://www.100xcircle.com/become-a-dealer",
+      },
+    },
   ],
 }
 

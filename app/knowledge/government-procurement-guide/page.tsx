@@ -304,6 +304,20 @@ export default function GovernmentProcurementGuidePage() {
               <p className="font-medium text-gray-800 text-sm">100X Circle Government Supply Profile</p>
               <p className="text-xs text-gray-500 mt-1">States served, buyer types, tender support</p>
             </Link>
+            <Link
+              href="/gem-oem-authorization"
+              className="border border-gray-200 rounded-lg p-4 hover:border-green-400 transition-colors"
+            >
+              <p className="font-medium text-gray-800 text-sm">GeM OEM Authorization for Dealers</p>
+              <p className="text-xs text-gray-500 mt-1">Get authorization code and letter to resell on GeM</p>
+            </Link>
+            <Link
+              href="/become-a-dealer"
+              className="border border-gray-200 rounded-lg p-4 hover:border-green-400 transition-colors"
+            >
+              <p className="font-medium text-gray-800 text-sm">Become an Authorized Dealer</p>
+              <p className="text-xs text-gray-500 mt-1">Dealer program, GeM reseller benefits, and how to apply</p>
+            </Link>
           </div>
         </div>
       </main>

@@ -82,6 +82,10 @@ const STATIC_ROUTES: Array<{
   { path: "/compare/fogging-machine-export-india", changeFrequency: "yearly", priority: 0.7 },
   { path: "/compare/make-in-india-fogging-machines", changeFrequency: "yearly", priority: 0.75 },
   { path: "/compare/fogging-machine-buyer-guide-india", changeFrequency: "yearly", priority: 0.8 },
+  // Dealer & GeM authority pages
+  { path: "/gem-oem-authorization", changeFrequency: "monthly", priority: 0.9 },
+  { path: "/become-a-dealer", changeFrequency: "monthly", priority: 0.9 },
+  { path: "/knowledge/gem-oem-authorization-process", changeFrequency: "yearly", priority: 0.8 },
 ]
 
 function toDate(value: string | undefined): Date | undefined {
