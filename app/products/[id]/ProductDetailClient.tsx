@@ -147,7 +147,7 @@ function Gallery({ images, videoId, name }: { images: string[]; videoId: string 
             {/* Dot indicators */}
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
               {items.map((_, i) => (
-                <button key={i} onClick={() => go(i)} className={`h-1.5 rounded-full transition-all ${i === idx ? 'w-5 bg-brand-600' : 'w-1.5 bg-gray-300 hover:bg-gray-400'}`} />
+                <button key={i} onClick={() => go(i)} aria-label={`View image ${i + 1}`} aria-pressed={i === idx} className={`h-1.5 rounded-full transition-all ${i === idx ? 'w-5 bg-brand-600' : 'w-1.5 bg-gray-300 hover:bg-gray-400'}`} />
               ))}
             </div>
           </>
@@ -158,7 +158,7 @@ function Gallery({ images, videoId, name }: { images: string[]; videoId: string 
       {n > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1">
           {items.slice(0, 8).map((item, i) => (
-            <button key={i} onClick={() => go(i)} className={`relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all ${i === idx ? 'border-brand-600 shadow-sm' : 'border-transparent hover:border-gray-300'} bg-gray-50`}>
+            <button key={i} onClick={() => go(i)} aria-label={item.kind === 'yt' ? 'View product video' : `View image ${i + 1}`} aria-pressed={i === idx} className={`relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all ${i === idx ? 'border-brand-600 shadow-sm' : 'border-transparent hover:border-gray-300'} bg-gray-50`}>
               {item.kind === 'yt'
                 ? <><img src={item.thumb} alt="" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Play size={10} fill="white" className="text-white" /></div></>
                 // eslint-disable-next-line @next/next/no-img-element
