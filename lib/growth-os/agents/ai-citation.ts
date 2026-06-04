@@ -1,5 +1,6 @@
 import clientPromise from "@/lib/mongodb"
 import { TARGET_QUERIES, AI_PLATFORMS } from "@/lib/growth-os/citation-constants"
+import { logAgentRun } from "@/lib/growth-os/log-agent"
 
 export { TARGET_QUERIES, AI_PLATFORMS }
 
@@ -155,8 +156,7 @@ export async function runAICitationAgent(): Promise<AICitationResult> {
 
   const summary = `Citation audit: ${checkedCitations.length}/${totalCombinations} combinations checked. Visibility: ${visibilityScore}%. ${missingRecords.length} never checked, ${staleRecords.length} stale (>7 days). Created ${weeklyQueueCreated} new verification tasks for week of ${weekStart}.`
 
-  await db.collection("growth_os_logs").insertOne({
-    ts: new Date().toISOString(),
+  await logAgentRun(db, {
     agent: "AI Citation Agent",
     action: summary,
     reason: "Weekly citation database audit and task generation",

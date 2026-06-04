@@ -1,4 +1,5 @@
 import clientPromise from "@/lib/mongodb"
+import { logAgentRun } from "@/lib/growth-os/log-agent"
 
 const SITE_URL = "https://www.100xcircle.com"
 const SITE_DOMAIN = "100xcircle.com"
@@ -123,7 +124,8 @@ export async function runInternalLinkAgent(): Promise<InternalLinkResult> {
       if (r.status === "fulfilled") {
         crawledLinks[r.value.path] = r.value.links
         for (const link of r.value.links) {
-          if (inboundLinks[link] !== undefined && !inboundLinks[link].includes(r.value.path)) {
+          // Exclude self-links — a page linking to itself doesn't count as an inbound link
+          if (inboundLinks[link] !== undefined && link !== r.value.path && !inboundLinks[link].includes(r.value.path)) {
             inboundLinks[link].push(r.value.path)
           }
         }
@@ -226,8 +228,7 @@ export async function runInternalLinkAgent(): Promise<InternalLinkResult> {
 
   const summary = `Crawled ${Object.keys(crawledLinks).length} source pages. Tracked ${authorityPaths.length} authority pages. Orphans: ${orphanPages.length} (0 inbound), Weak: ${weakPages.length} (≤2 inbound), Strong: ${strongPages.length}. ${recommendations.length} specific link recommendations generated.`
 
-  await db.collection("growth_os_logs").insertOne({
-    ts: new Date().toISOString(),
+  await logAgentRun(db, {
     agent: "Internal Link Agent",
     action: summary,
     reason: "Internal link authority audit from live sitemap",

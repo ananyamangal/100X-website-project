@@ -1,4 +1,5 @@
 import clientPromise from "@/lib/mongodb"
+import { logAgentRun } from "@/lib/growth-os/log-agent"
 
 const SITE_URL = "https://www.100xcircle.com"
 
@@ -212,8 +213,7 @@ export async function runSchemaAuditAgent(): Promise<SchemaAuditResult> {
   const totalIssues = findings.noSchema.length + findings.invalidSchema.length + findings.missingFAQ.length + findings.missingProduct.length
   const summary = `Audited ${details.length} pages (${allPaths.length} in sitemap). ${findings.passing.length} passing, ${totalIssues} total issues — ${findings.missingFAQ.length} missing FAQ schema, ${findings.missingProduct.length} missing Product schema, ${findings.noSchema.length} with no JSON-LD.`
 
-  await db.collection("growth_os_logs").insertOne({
-    ts: new Date().toISOString(),
+  await logAgentRun(db, {
     agent: "Schema Audit Agent",
     action: summary,
     reason: "Live sitemap schema verification",

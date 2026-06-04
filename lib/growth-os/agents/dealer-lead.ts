@@ -1,4 +1,5 @@
 import clientPromise from "@/lib/mongodb"
+import { logAgentRun } from "@/lib/growth-os/log-agent"
 
 const DEALER_PAGES = ["/become-a-dealer", "/dealer-application", "/gem-oem-authorization", "/gem-reverse-auction-fogging", "/dealers-and-government"]
 const TENDER_PAGES = ["/gem-tender-support", "/is-14855-fogging-machine"]
@@ -196,8 +197,7 @@ export async function runDealerLeadAgent(): Promise<DealerLeadResult> {
   const topType = Object.entries(byType).sort((a, b) => b[1] - a[1])[0]
   const summary = `Processed ${allLeads.length} leads — HIGH: ${byValue.high}, MEDIUM: ${byValue.medium}, LOW: ${byValue.low}. ${newlyClassified} newly classified. Top type: ${topType ? `${topType[0].replace(/_/g, " ")} (${topType[1]})` : "none"}. ${opportunitiesCreated} opportunities created.`
 
-  await db.collection("growth_os_logs").insertOne({
-    ts: new Date().toISOString(),
+  await logAgentRun(db, {
     agent: "Dealer Lead Agent",
     action: summary,
     reason: "Lead scoring and classification run",
