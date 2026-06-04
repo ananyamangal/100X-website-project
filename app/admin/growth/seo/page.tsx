@@ -123,7 +123,7 @@ export default function SEOCommandCenter() {
     try {
       const r = await fetch("/api/admin/gsc/sync", { method: "POST" })
       const d = await r.json()
-      if (!d.ok) { setSyncError(d.errors?.[0] || "Sync failed"); setSyncing(false); return }
+      if (!d.ok) { setSyncError(d.error || d.errors?.[0] || "Sync failed"); setSyncing(false); return }
       await loadGSC()
     } catch (e) { setSyncError(String(e)) }
     setSyncing(false)

@@ -44,13 +44,19 @@ export async function POST(): Promise<NextResponse> {
   }
   steps.push({ id: "key_parse", label: "Parse service account JSON", status: "pass", detail: `Parsed OK. Service account: ${creds.client_email}` })
 
-  // Step 3: GOOGLE_SC_SITE_URL present
+  // Step 3: GOOGLE_SC_SITE_URL — optional, has fallback; warn but don't block the auth test
   const siteUrlEnv = process.env.GOOGLE_SC_SITE_URL
+  const effectiveSiteUrl = getGSCSiteUrl()
   if (!siteUrlEnv) {
-    steps.push({ id: "site_url", label: "GOOGLE_SC_SITE_URL env var", status: "fail", detail: `Not set. Add GOOGLE_SC_SITE_URL=https://www.100xcircle.com/ in Vercel env vars. The trailing slash is required for URL-prefix properties.` })
-    return NextResponse.json({ ok: false, steps, siteUrl, serviceAccountEmail: creds.client_email })
+    steps.push({
+      id: "site_url",
+      label: "GOOGLE_SC_SITE_URL env var",
+      status: "skip",
+      detail: `Not set — using hardcoded fallback: ${effectiveSiteUrl}. Recommend setting GOOGLE_SC_SITE_URL explicitly in Vercel, especially if your GSC property URL differs (e.g. sc-domain:100xcircle.com or http:// variant).`,
+    })
+  } else {
+    steps.push({ id: "site_url", label: "GOOGLE_SC_SITE_URL env var", status: "pass", detail: `Set to: ${siteUrlEnv}` })
   }
-  steps.push({ id: "site_url", label: "GOOGLE_SC_SITE_URL env var", status: "pass", detail: `Set to: ${siteUrlEnv}` })
 
   // Step 4: private_key format check
   const keyStr = creds.private_key

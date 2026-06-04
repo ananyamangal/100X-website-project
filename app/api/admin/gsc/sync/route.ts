@@ -24,8 +24,9 @@ export async function POST() {
   const syncDate = syncedAt.split("T")[0]
 
   // Current 28-day window + previous 28-day window for trend comparison
+  // previous = the 28 days immediately before current (not 56 days before current.startDate)
   const current = dateRange(28)
-  const previous = dateRange(56, new Date(current.startDate))
+  const previous = dateRange(28, new Date(current.startDate))
 
   let queryCount = 0
   let pageCount = 0
