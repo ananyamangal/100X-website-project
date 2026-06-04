@@ -796,9 +796,9 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
               </div>
             )}
 
-            {/* H1 */}
+            {/* Product name — h2 here; h1 is in ProductCinematicHero above */}
             <div>
-              <h1 className="text-2xl md:text-3xl lg:text-[2rem] font-black text-gray-900 leading-tight tracking-tight">{h1}</h1>
+              <h2 className="text-2xl md:text-3xl lg:text-[2rem] font-black text-gray-900 leading-tight tracking-tight">{h1}</h2>
               {tagline && <p className="text-sm text-gray-500 mt-1.5 italic">{tagline}</p>}
             </div>
 
