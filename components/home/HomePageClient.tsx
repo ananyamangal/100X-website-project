@@ -210,7 +210,7 @@ function YoutubeShortsCarousel() {
           </button>
           <div ref={scrollRef} className="flex gap-6 overflow-x-auto pb-4 scroll-smooth" style={{ scrollBehavior: "smooth" }}>
             {shorts.map((id) => (
-              <div key={id} className="flex-shrink-0 rounded-xl overflow-hidden shadow-lg bg-black w-[70vw] max-w-xs sm:w-[320px] sm:min-w-[320px]">
+              <div key={id} className="flex-shrink-0 rounded-xl overflow-hidden shadow-lg bg-black w-[75vw] max-w-[320px] sm:w-[280px] sm:min-w-[280px]">
                 <iframe
                   width="100%"
                   height="100%"
@@ -625,7 +625,7 @@ function _unused_ProductDetailPage({
           >
             <X size={18} />
           </button>
-          <div className="w-[280px] sm:w-[320px] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black">
+          <div className="w-[calc(100vw-3rem)] max-w-[280px] sm:max-w-[320px] overflow-hidden rounded-xl border-2 border-white/20 shadow-2xl bg-black">
             <div className="aspect-video w-full relative">
               <iframe
                 src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${videoId}`}

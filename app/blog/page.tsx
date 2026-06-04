@@ -89,7 +89,7 @@ export default async function BlogIndexPage() {
       </section>
 
       {/* Articles */}
-      <section className="py-14 md:py-20 bg-white">
+      <section className="py-14 md:py-20 bg-white overflow-x-hidden">
         <div className="container mx-auto px-4 md:px-6">
           {posts.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-gray-100 bg-gray-50 py-20 px-6 text-center max-w-2xl mx-auto">

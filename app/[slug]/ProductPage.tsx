@@ -1,8 +1,9 @@
 ﻿'use client';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { ChevronLeft, ChevronRight, MessageCircle, Star, CheckCircle, Play, Shield, Download, Package, Wrench, FileText, HelpCircle, Layers, Award, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MessageCircle, Star, CheckCircle, Play, Shield, Download, Package, Wrench, FileText, HelpCircle, Layers, Award, ChevronDown, Building2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import ProductCinematicHero from '@/components/product/ProductCinematicHero';
 import { RichContent } from '@/components/RichContent';
 import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
 import { getLandingPage } from '@/lib/seo/landing-pages';
@@ -270,6 +271,55 @@ interface Props {
     slug?: string;
 }
 
+function CaseStudiesSection({ productId, productName }: { productId: string; productName: string }) {
+    const [studies, setStudies] = useState<any[]>([]);
+    const [loaded, setLoaded] = useState(false);
+    useEffect(() => {
+        fetch(`/api/case-studies/by-product?productId=${productId}`)
+            .then(r => r.json()).then(d => { if (Array.isArray(d)) setStudies(d); setLoaded(true); })
+            .catch(() => setLoaded(true));
+    }, [productId]);
+    if (!loaded || !studies.length) return null;
+    return (
+        <section className="py-16 bg-white border-t border-gray-100">
+            <div className="container mx-auto px-4 md:px-6">
+                <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
+                    <div>
+                        <p className="text-xs font-700 text-brand-600 uppercase tracking-widest mb-2">Real Deployments</p>
+                        <h2 className="text-2xl font-700 text-gray-900">Case Studies</h2>
+                    </div>
+                    <Link href="/case-studies" className="text-sm text-brand-600 hover:underline inline-flex items-center gap-1 shrink-0">
+                        View all <ArrowRight size={13} />
+                    </Link>
+                </div>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {studies.map((cs: any) => (
+                        <Link key={cs._id} href={`/case-studies/${cs.slug}`}
+                            className="group block bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden hover:border-brand-200 hover:shadow-lg transition-all">
+                            <div className="aspect-video bg-gray-100 overflow-hidden">
+                                {cs.images?.[0]
+                                    ? <img src={cs.images[0]} alt={cs.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" loading="lazy" />
+                                    : <div className="w-full h-full flex items-center justify-center"><Building2 size={32} className="text-gray-200" /></div>}
+                            </div>
+                            <div className="p-5">
+                                {(cs.industry || cs.state) && (
+                                    <div className="flex gap-1.5 mb-3 flex-wrap">
+                                        {cs.industry && <span className="text-[10px] font-700 uppercase tracking-wide bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full">{cs.industry}</span>}
+                                        {cs.state && <span className="text-[10px] font-700 uppercase tracking-wide bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">{cs.state}</span>}
+                                    </div>
+                                )}
+                                <p className="font-600 text-gray-900 leading-snug group-hover:text-brand-700 transition-colors">{cs.title}</p>
+                                {cs.customer && <p className="text-xs text-gray-500 mt-1">{cs.customer}</p>}
+                                <p className="text-brand-600 text-sm font-600 mt-3 inline-flex items-center gap-1">Read study <ArrowRight size={13} /></p>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
+
 function decodeSlugToName(slug: string): string {
     return slug.replace(/-/g, ' ').replace(/\band\b/g, '&').replace(/\b\w/g, c => c.toUpperCase());
 }
@@ -485,26 +535,27 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
                 whatsappMessage={safeStr(product.whatsappMessageText) || undefined}
             />
 
-            {/* ── Breadcrumb ────────────────────────────────────────── */}
-            <div className="bg-gray-950 pt-20 pb-3">
-                <div className="container mx-auto px-4">
-                    <nav className="flex items-center gap-2 text-xs text-cinema-500" aria-label="Breadcrumb">
-                        <Link href="/" className="hover:text-cinema-300 transition-colors">Home</Link>
-                        <span>/</span>
-                        <Link href="/products" className="hover:text-cinema-300 transition-colors">Products</Link>
-                        <span>/</span>
-                        <span className="text-cinema-300 truncate max-w-[180px] sm:max-w-xs">{productName}</span>
-                    </nav>
-                </div>
-            </div>
+            {/* ── Cinematic Hero ────────────────────────────────────── */}
+            <ProductCinematicHero
+                name={productName}
+                h1={h1}
+                tagline={tagline}
+                category={safeStr(product.category)}
+                badges={badges}
+                price={priceRange}
+                specs={specs}
+                rating={rating}
+                reviewsCount={reviewsCount}
+                imageUrl={images[0]}
+            />
 
             {/* ══════════════════════════════════════════════════════════
                 SECTION 1 — PURCHASE AREA
                 Goal: everything a buyer needs to decide, in one screen
             ══════════════════════════════════════════════════════════ */}
             <div className="bg-gray-950">
-                <div className="container mx-auto px-4 pt-5 pb-10">
-                    <Link href="/products" className="inline-flex items-center gap-1.5 text-cinema-400 hover:text-white text-xs mb-5 transition-colors">
+                <div className="container mx-auto px-4 pt-8 pb-10">
+                    <Link href="/products" className="inline-flex items-center gap-1.5 text-cinema-500 hover:text-white text-xs mb-6 transition-colors">
                         <ChevronLeft size={13} /> Back to Products
                     </Link>
 
@@ -745,7 +796,12 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
             )}
 
             {/* ══════════════════════════════════════════════════════════
-                SECTION 4 — RFQ FORM
+                SECTION 4 — CASE STUDIES
+            ══════════════════════════════════════════════════════════ */}
+            <CaseStudiesSection productId={productId} productName={productName} />
+
+            {/* ══════════════════════════════════════════════════════════
+                SECTION 5 — RFQ FORM
             ══════════════════════════════════════════════════════════ */}
             <div className="bg-white py-14" id="rfq">
                 <div className="container mx-auto px-4">

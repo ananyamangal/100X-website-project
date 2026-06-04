@@ -77,7 +77,7 @@ export default async function ProductSparePartsPage({ params }: { params: Promis
       </section>
 
       {/* Parts grid */}
-      <section className="py-16 md:py-20 bg-white">
+      <section className="py-16 md:py-20 bg-white overflow-x-hidden">
         <div className="container mx-auto px-4 md:px-6">
           {serializedParts.length === 0 ? (
             <div className="text-center py-20">

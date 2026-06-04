@@ -15,7 +15,6 @@ export default function RFQFloatingRibbon() {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   const hidden = pathname ? HIDE_ON_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/")) : false
-  if (hidden) return null
 
   useEffect(() => {
     if (!open) return
@@ -32,6 +31,8 @@ export default function RFQFloatingRibbon() {
       document.body.style.overflow = prev
     }
   }, [open])
+
+  if (hidden) return null
 
   return (
     <>
