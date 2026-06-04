@@ -265,6 +265,13 @@ export default function HowToChoosePage() {
               </div>
             ))}
           </div>
+          <p className="text-gray-600 text-sm mt-4">
+            Government tenders — especially from municipal corporations and health departments — increasingly specify{" "}
+            <Link href="/is-14855-fogging-machine" className="text-brand-600 hover:underline font-500">
+              IS 14855 (Part 1)
+            </Link>
+            {" "}as the Bureau of Indian Standards requirement for fogging machines. Verify IS 14855 compliance documentation is available from your supplier before bidding.
+          </p>
         </section>
 
         {/* Step 4 */}
@@ -295,9 +302,10 @@ export default function HowToChoosePage() {
               </ul>
             </div>
           </div>
-          <p className="text-gray-600 text-sm">
+          <div className="flex flex-col gap-1 text-sm">
             <Link href="/knowledge/government-procurement-guide" className="text-brand-600 hover:underline font-500">Read the complete GeM procurement guide →</Link>
-          </p>
+            <Link href="/gem-tender-support" className="text-brand-600 hover:underline font-500">Dealers: access OEM authorization letters and IS 14855 documentation →</Link>
+          </div>
         </section>
 
         {/* Step 5 */}
@@ -361,6 +369,8 @@ export default function HowToChoosePage() {
               { href: "/knowledge/government-procurement-guide", label: "GeM Procurement Guide for Government Buyers" },
               { href: "/knowledge/how-thermal-fogging-works", label: "How Thermal Fogging Works (Technical)" },
               { href: "/knowledge/mosquito-control-india", label: "Mosquito Control in India — Municipal Guide" },
+              { href: "/is-14855-fogging-machine", label: "IS 14855 Certified Fogging Machines" },
+              { href: "/become-a-dealer", label: "Become an Authorized Dealer" },
               { href: "/products", label: "View All 100X Circle Fogging Machines" },
               { href: "/compare/fogging-machine-price-guide-india-2026", label: "Fogging Machine Price Guide India 2026" },
             ].map((link) => (

@@ -230,6 +230,8 @@ export default function DengueFoggingPage() {
               { href: "/knowledge/how-thermal-fogging-works", label: "How Thermal Fogging Works" },
               { href: "/knowledge/government-procurement-guide", label: "GeM Procurement Guide" },
               { href: "/compare/fogging-machine-for-dengue-control-india", label: "Best Foggers for Dengue Control" },
+              { href: "/municipal-fogging-programme", label: "Municipal Vector Control Programme" },
+              { href: "/is-14855-fogging-machine", label: "IS 14855 Compliant Machines for Government Tenders" },
               { href: "/products", label: "View All Fogging Machines" },
               { href: "/contact-us", label: "Government Enquiry / GeM Quote" },
             ].map((link) => (

@@ -258,6 +258,8 @@ export default function MalariaControlFoggingPage() {
               { href: "/knowledge/mosquito-control-india", label: "Mosquito Control in India — Municipal Guide" },
               { href: "/knowledge/government-procurement-guide", label: "GeM Procurement Guide for Government Bodies" },
               { href: "/compare/fogging-machine-for-malaria-control-india", label: "Best Foggers for Malaria Control" },
+              { href: "/municipal-fogging-programme", label: "Municipal Fogging Programme Guide" },
+              { href: "/is-14855-fogging-machine", label: "IS 14855 Machines for Government Tenders" },
               { href: "/products", label: "View All 100X Circle Fogging Machines" },
               { href: "/contact-us", label: "Government / Health Dept Enquiry" },
             ].map((link) => (

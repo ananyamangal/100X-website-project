@@ -254,7 +254,11 @@ export default function MosquitoControlIndiaPage() {
           </ul>
           <p>
             100X Circle is a GeM-listed MSME OEM, meaning municipal corporations can procure
-            directly without the full tender process for eligible amounts.
+            directly without the full tender process for eligible amounts. For dealers and
+            contractors bidding on municipal procurement tenders, see the full{" "}
+            <Link href="/gem-tender-support" className="text-brand-600 hover:underline font-medium">
+              tender documentation support
+            </Link>.
           </p>
 
           <h2>Frequently Asked Questions</h2>
@@ -305,6 +309,20 @@ export default function MosquitoControlIndiaPage() {
             >
               <p className="font-medium text-gray-800 text-sm">Government Procurement via GeM</p>
               <p className="text-xs text-gray-500 mt-1">Step-by-step buying guide</p>
+            </Link>
+            <Link
+              href="/municipal-fogging-programme"
+              className="border border-gray-200 rounded-lg p-4 hover:border-green-400 transition-colors"
+            >
+              <p className="font-medium text-gray-800 text-sm">Municipal Fogging Programme</p>
+              <p className="text-xs text-gray-500 mt-1">Equipment, procurement, and operations for municipalities</p>
+            </Link>
+            <Link
+              href="/gem-tender-support"
+              className="border border-gray-200 rounded-lg p-4 hover:border-green-400 transition-colors"
+            >
+              <p className="font-medium text-gray-800 text-sm">Tender Documentation Support</p>
+              <p className="text-xs text-gray-500 mt-1">OEM authorization letters and IS 14855 docs for dealers</p>
             </Link>
           </div>
         </div>

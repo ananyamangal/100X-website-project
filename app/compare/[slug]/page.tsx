@@ -209,6 +209,8 @@ export default async function ComparisonPage({
             <span>📞 +91-7827229116</span>
             <span>✉ 100xcircle@gmail.com</span>
             <Link href="/products" className="underline hover:no-underline">Browse Products →</Link>
+            <Link href="/become-a-dealer" className="underline hover:no-underline">Become a Dealer →</Link>
+            <Link href="/gem-oem-authorization" className="underline hover:no-underline">GeM OEM Authorization →</Link>
           </div>
         </div>
 
