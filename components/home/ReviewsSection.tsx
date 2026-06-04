@@ -42,14 +42,14 @@ function ReviewCard({ review }: { review: Review }) {
       <div className="flex items-center gap-3 pt-3 border-t border-gray-50">
         {review.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={review.imageUrl} alt={review.customerName} className="w-10 h-10 rounded-full object-cover shrink-0" />
+          <img src={review.imageUrl} alt={review.customerName || 'Customer'} className="w-10 h-10 rounded-full object-cover shrink-0" />
         ) : (
           <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
-            <span className="text-brand-700 font-700 text-sm">{review.customerName.charAt(0).toUpperCase()}</span>
+            <span className="text-brand-700 font-700 text-sm">{(review.customerName || '?').charAt(0).toUpperCase()}</span>
           </div>
         )}
         <div className="min-w-0">
-          <p className="font-600 text-gray-900 text-sm truncate">{review.customerName}</p>
+          <p className="font-600 text-gray-900 text-sm truncate">{review.customerName || 'Anonymous'}</p>
           {(review.organization || review.location) && (
             <p className="text-gray-400 text-xs truncate">
               {[review.organization, review.location].filter(Boolean).join(' · ')}
