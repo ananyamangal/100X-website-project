@@ -1,6 +1,10 @@
+// About page content rarely changes — cache for 5 minutes
+export const revalidate = 300
+
 import type { Metadata } from "next"
 import { SITE_URL, SITE_NAME_LEGAL, defaultOgImage } from "@/lib/seo/site-config"
-import AboutClient from "./AboutClient"
+import AboutPageContent from "@/components/AboutPageContent"
+import clientPromise from "@/lib/mongodb"
 
 export const metadata: Metadata = {
   title: "About 100X Circle — Indian Thermal Fogging Machine Manufacturer",
@@ -16,6 +20,39 @@ export const metadata: Metadata = {
     locale: "en_IN",
     type: "website",
   },
+}
+
+const DEFAULT_CONTENT = {
+  heroBadge: 'About Us',
+  heroTitle: 'About 100X Circle Pvt Ltd',
+  journeyHeading: 'Our Journey',
+  journeyParagraph1: `100X Circle Pvt Ltd is India's fast-growing OEM of advanced fogging machines, agri implements, and airport ground equipment. Located at Sector 7, IMT Manesar, Gurgaon, we proudly uphold the 'Make in India' mission by delivering CE-certified, ISO 9001-compliant, and W.H.O-compliant solutions for both public and private sectors.`,
+  journeyList: 'Thermal Fogging Machines (Portable & Vehicle-Mounted)\nBio-Foggers for sensitive applications\nMini Fogging Machines for compact operations\nComplete Agricultural Machinery line\nHeavy-duty Airport Baggage Trolleys',
+  journeyParagraph2: 'Tested in approved labs, our machines are available and listed on the Government e-Marketplace (GeM) and widely used by defense forces, municipal bodies, and agriculture departments.',
+  journeyStat1Value: '2015',
+  journeyStat1Label: 'Founded',
+  journeyStat2Value: '10K+',
+  journeyStat2Label: 'Happy customers',
+  journeyImage: '/new.png',
+  foundationHeading: 'Our Foundation',
+  foundationSubtext: 'The principles that guide our work and define our commitment to excellence.',
+  missionTitle: 'Mission',
+  missionDescription: 'To empower customers with innovative, reliable, and affordable agricultural equipment that enhances productivity, reduces labor intensity, and contributes to sustainable farming practices.',
+  visionTitle: 'Vision',
+  visionDescription: 'To be the leading provider of agricultural equipment solutions, driving the transformation of farming practices through technology, innovation, and unwavering commitment to farmer success.',
+  valuesTitle: 'Values',
+  valuesDescription: 'Quality, integrity, innovation, and customer-centricity form the foundation of everything we do.',
+  manufacturingHeading: 'Manufacturing Excellence',
+  manufacturingParagraph: 'Our state-of-the-art manufacturing facility combines traditional craftsmanship with modern technology to produce equipment of the highest quality.',
+  manufacturingStat1Value: 'ISO',
+  manufacturingStat1Label: 'Certified',
+  manufacturingStat2Value: '99.5%',
+  manufacturingStat2Label: 'Quality Rate',
+  manufacturingStat3Value: '24/7',
+  manufacturingStat3Label: 'Production',
+  manufacturingStat4Value: '50+',
+  manufacturingStat4Label: 'Products',
+  manufacturingImage: '/production.png',
 }
 
 const aboutJsonLd = {
@@ -72,51 +109,21 @@ const aboutJsonLd = {
   },
 }
 
-const aboutFaqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "When was 100X Circle Pvt Ltd founded?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "100X Circle Pvt Ltd was founded in 2014. It is incorporated as a Private Limited Company in India and operates a manufacturing facility at IMT Manesar, Gurugram, Haryana.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What certifications does 100X Circle hold?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "100X Circle Pvt Ltd holds: ISO 9001:2015 (Quality Management System), CE Marking (European conformity for export), ISI Mark from Bureau of Indian Standards, MSME/UDYAM Registration, and GeM Seller Registration for government e-Marketplace procurement.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Does 100X Circle supply to government agencies?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. 100X Circle is a GeM-registered seller and MSME/UDYAM registered manufacturer. Government agencies — including municipal corporations, Nagar Nigams, district health departments, and state public works departments — can procure directly via the Government e-Marketplace (gem.gov.in) without a tender process.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Where is the 100X Circle factory located?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "The 100X Circle manufacturing facility is located at UG, 398, Sector 7, Industrial Model Township (IMT), Manesar, Gurugram, Haryana 122050, India. GPS: 28.3874°N, 76.9318°E.",
-      },
-    },
-  ],
-}
+export default async function AboutPage() {
+  let content = DEFAULT_CONTENT
+  try {
+    const client = await clientPromise
+    const doc = await client.db().collection('about_page').findOne({ key: 'about_page' })
+    if (doc) {
+      const { _id, key, ...rest } = doc as any
+      content = { ...DEFAULT_CONTENT, ...rest }
+    }
+  } catch { /* fall back to defaults */ }
 
-export default function AboutPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutFaqJsonLd) }} />
-      <AboutClient />
+      <AboutPageContent content={content} />
     </>
   )
 }
