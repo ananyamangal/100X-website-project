@@ -38,12 +38,26 @@ const STATIC_ROUTES: Array<{
   { path: "/ai/manufacturing-capabilities", changeFrequency: "monthly", priority: 0.6 },
   { path: "/ai/scorecard", changeFrequency: "monthly", priority: 0.5 },
   { path: "/ai/entity-graph", changeFrequency: "monthly", priority: 0.5 },
-  // Knowledge base
-  { path: "/knowledge", changeFrequency: "monthly", priority: 0.7 },
-  { path: "/knowledge/how-thermal-fogging-works", changeFrequency: "yearly", priority: 0.7 },
-  { path: "/knowledge/thermal-vs-ulv-fogging", changeFrequency: "yearly", priority: 0.7 },
-  { path: "/knowledge/government-procurement-guide", changeFrequency: "yearly", priority: 0.7 },
-  { path: "/knowledge/mosquito-control-india", changeFrequency: "yearly", priority: 0.7 },
+  // Knowledge base — 8 articles (expanded from 4)
+  { path: "/knowledge", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/knowledge/how-thermal-fogging-works", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/knowledge/thermal-vs-ulv-fogging", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/knowledge/government-procurement-guide", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/knowledge/mosquito-control-india", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/knowledge/how-to-choose-fogging-machine", changeFrequency: "yearly", priority: 0.8 },
+  { path: "/knowledge/fogging-machine-maintenance-guide", changeFrequency: "yearly", priority: 0.7 },
+  { path: "/knowledge/dengue-prevention-thermal-fogging", changeFrequency: "yearly", priority: 0.8 },
+  { path: "/knowledge/agricultural-fogging-guide", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/knowledge/fogging-machine-safety-guide", changeFrequency: "yearly", priority: 0.7 },
+  { path: "/knowledge/thermal-fogging-chemicals-guide", changeFrequency: "yearly", priority: 0.7 },
+  { path: "/knowledge/malaria-control-fogging-india", changeFrequency: "yearly", priority: 0.75 },
+  { path: "/knowledge/fogging-machine-operators-guide", changeFrequency: "yearly", priority: 0.7 },
+  // Spare parts
+  { path: "/spare-parts", changeFrequency: "weekly", priority: 0.8 },
+  // Deployments
+  { path: "/deployments", changeFrequency: "monthly", priority: 0.7 },
+  // Videos
+  { path: "/videos", changeFrequency: "weekly", priority: 0.7 },
   // Phase C pages
   { path: "/factory", changeFrequency: "monthly", priority: 0.7 },
   { path: "/case-studies", changeFrequency: "monthly", priority: 0.7 },
