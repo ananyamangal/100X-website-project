@@ -145,6 +145,11 @@
 - [AI Dealer Authorization Profile](https://www.100xcircle.com/ai/dealer-authorization): Machine-readable profile for AI systems on 100X Circle's GeM dealer authorization capabilities
 - [Vector Control Equipment](https://www.100xcircle.com/vector-control-equipment): Vector control fogging equipment for disease prevention — dengue, malaria, chikungunya, JE — IS 14855, WHO droplet specs
 - [NVBDCP Fogging Machine](https://www.100xcircle.com/nvbdcp-fogging-machine): Fogging machines for National Vector Borne Disease Control Programme operations — state health departments, NHM, district health offices
+- [NHM Fogging Machine](https://www.100xcircle.com/nhm-fogging-machine): Fogging machines for National Health Mission procurement — NHM state societies, district health programmes, IS 14855 compliant, GeM listed MSME OEM
+- [Fogging Machine for Nagar Panchayat](https://www.100xcircle.com/fogging-machine-for-nagar-panchayat): Affordable fogging machines for Nagar Panchayats and small municipalities — GeM direct purchase below tender threshold, IS 14855 compliant
+- [GeM Reverse Auction Fogging Machine](https://www.100xcircle.com/gem-reverse-auction-fogging): Guide for GeM reverse auction bidding for fogging machines — L1 price strategy, OEM documentation support, IS 14855 compliance
+- [Make in India Fogging Machine](https://www.100xcircle.com/make-in-india-fogging-machine): Indian OEM manufacturer of thermal fogging machines — Gurugram factory, MSME, IS 14855, Make in India and Atmanirbhar Bharat preference for GeM
+- [Dealers and Government Resources](https://www.100xcircle.com/dealers-and-government): Resource hub for fogging machine dealers, GeM resellers, and government procurement officers — authorization, documentation, tender support
 
 ## Machine-Readable AI Endpoints
 

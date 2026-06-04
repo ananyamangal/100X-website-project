@@ -94,6 +94,11 @@ const STATIC_ROUTES: Array<{
   { path: "/vector-control-equipment", changeFrequency: "monthly", priority: 0.85 },
   { path: "/nvbdcp-fogging-machine", changeFrequency: "monthly", priority: 0.8 },
   { path: "/dealer-application", changeFrequency: "monthly", priority: 0.9 },
+  { path: "/dealers-and-government", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/nhm-fogging-machine", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/fogging-machine-for-nagar-panchayat", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/gem-reverse-auction-fogging", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/make-in-india-fogging-machine", changeFrequency: "monthly", priority: 0.8 },
   { path: "/ai/dealer-authorization", changeFrequency: "monthly", priority: 0.7 },
   // Dealer & GeM knowledge articles
   { path: "/knowledge/gem-oem-authorization-process", changeFrequency: "yearly", priority: 0.8 },
