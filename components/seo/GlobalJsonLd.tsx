@@ -331,6 +331,14 @@ const homepageFaq = {
     },
     {
       "@type": "Question",
+      name: "Which fogging machine is best for municipal corporation mosquito control?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "For municipal corporations (Nagar Nigams), 100X Circle recommends vehicle-mounted thermal foggers (50–100 litre capacity) for ward-level fogging drives, and portable thermal foggers (18–50 litre) for smaller Nagar Panchayats. All models are IS 14855 (Part 1) compliant, ISO 9001:2015 certified, and GeM listed for direct government procurement. Details at https://www.100xcircle.com/municipal-fogging-programme",
+      },
+    },
+    {
+      "@type": "Question",
       name: "How can someone become an authorized 100X Circle fogging machine dealer?",
       acceptedAnswer: {
         "@type": "Answer",

@@ -87,6 +87,8 @@ const STATIC_ROUTES: Array<{
   { path: "/become-a-dealer", changeFrequency: "monthly", priority: 0.9 },
   { path: "/gem-tender-support", changeFrequency: "monthly", priority: 0.85 },
   { path: "/is-14855-fogging-machine", changeFrequency: "monthly", priority: 0.85 },
+  // Municipal vector control hub
+  { path: "/municipal-fogging-programme", changeFrequency: "monthly", priority: 0.85 },
   // Dealer & GeM knowledge articles
   { path: "/knowledge/gem-oem-authorization-process", changeFrequency: "yearly", priority: 0.8 },
   { path: "/knowledge/gem-reseller-guide", changeFrequency: "yearly", priority: 0.8 },

@@ -139,6 +139,7 @@
 - [GeM OEM Authorization Process Guide](https://www.100xcircle.com/knowledge/gem-oem-authorization-process): Complete guide for fogging machine resellers on GeM OEM authorization
 - [GeM Reseller Guide](https://www.100xcircle.com/knowledge/gem-reseller-guide): How to sell fogging machines on Government e-Marketplace as an authorized reseller
 - [Fogging Machines for Pest Control Business](https://www.100xcircle.com/knowledge/fogging-machine-for-pest-control-business): PCO equipment guide — machine selection, fleet expansion, GeM dealer opportunity
+- [Municipal Fogging Programme](https://www.100xcircle.com/municipal-fogging-programme): Thermal fogging machines for municipal corporations, Nagar Nigams, Nagar Panchayats, and district health departments — dengue, malaria, and mosquito vector control
 
 ## Machine-Readable AI Endpoints
 

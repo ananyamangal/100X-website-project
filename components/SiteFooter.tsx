@@ -169,10 +169,10 @@ export default function SiteFooter({
             </ul>
           </div>
 
-          {/* Column 3: Company */}
+          {/* Column 3: Company + Dealers */}
           <div>
             <h4 className="text-sm font-600 text-white uppercase tracking-widest mb-6">Company</h4>
-            <ul className="space-y-3">
+            <ul className="space-y-3 mb-6">
               {[
                 { href: "/about", label: "About 100X Circle" },
                 { href: "/products", label: "Product Catalogue" },
@@ -182,6 +182,21 @@ export default function SiteFooter({
                 { href: "/knowledge", label: "Knowledge Centre" },
                 { href: "/blog", label: "Blog" },
                 { href: "/contact-us", label: "Contact Us" },
+              ].map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <h4 className="text-xs font-600 text-cinema-500 uppercase tracking-widest mb-3">For Dealers</h4>
+            <ul className="space-y-3">
+              {[
+                { href: "/become-a-dealer", label: "Become a Dealer" },
+                { href: "/gem-oem-authorization", label: "GeM OEM Authorization" },
+                { href: "/gem-tender-support", label: "Tender Support" },
+                { href: "/is-14855-fogging-machine", label: "IS 14855 Machines" },
               ].map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
