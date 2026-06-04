@@ -27,10 +27,43 @@ function getYouTubeId(url: string): string | null {
   return m ? m[1] : null
 }
 
+function buildVideoJsonLd(videos: any[]) {
+  const items = videos
+    .filter((v: any) => v.videoUrl)
+    .map((v: any) => {
+      const ytId = getYouTubeId(v.videoUrl)
+      if (!ytId) return null
+      return {
+        "@type": "VideoObject",
+        name: v.title,
+        description: v.description || v.title,
+        thumbnailUrl: [`https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`],
+        uploadDate: v.createdAt
+          ? new Date(v.createdAt).toISOString()
+          : new Date().toISOString(),
+        embedUrl: `https://www.youtube.com/embed/${ytId}`,
+        url: `https://www.youtube.com/watch?v=${ytId}`,
+        publisher: { "@id": `${SITE_URL}/#organization` },
+      }
+    })
+    .filter(Boolean)
+
+  if (items.length === 0) return null
+  return { "@context": "https://schema.org", "@graph": items }
+}
+
 export default async function VideosPage() {
   const videos = await getVideos()
+  const videoJsonLd = buildVideoJsonLd(videos)
 
   return (
+    <>
+      {videoJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }}
+        />
+      )}
     <div className="min-h-screen bg-white">
       {/* Cinematic Hero */}
       <section className="bg-gray-950 pt-24 pb-14 md:pt-28 md:pb-16">
@@ -122,5 +155,6 @@ export default async function VideosPage() {
         )}
       </div>
     </div>
+    </>
   )
 }

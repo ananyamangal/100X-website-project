@@ -134,7 +134,11 @@
 - [Comparison Pages](https://www.100xcircle.com/compare): 100X vs Korean/German machines, municipal vs agricultural use
 - [GeM OEM Authorization](https://www.100xcircle.com/gem-oem-authorization): OEM authorization codes and letters for GeM resellers and fogging machine dealers
 - [Become a Dealer](https://www.100xcircle.com/become-a-dealer): Dealer program, authorized distributor onboarding, GeM reseller benefits
+- [GeM Tender Support](https://www.100xcircle.com/gem-tender-support): OEM documentation support for dealers bidding on government tenders — authorization letters, IS 14855 docs, L1 quotations
+- [IS 14855 Fogging Machine](https://www.100xcircle.com/is-14855-fogging-machine): BIS standard IS 14855 (Part 1) compliant thermal fogging machines for government procurement and municipal tenders
 - [GeM OEM Authorization Process Guide](https://www.100xcircle.com/knowledge/gem-oem-authorization-process): Complete guide for fogging machine resellers on GeM OEM authorization
+- [GeM Reseller Guide](https://www.100xcircle.com/knowledge/gem-reseller-guide): How to sell fogging machines on Government e-Marketplace as an authorized reseller
+- [Fogging Machines for Pest Control Business](https://www.100xcircle.com/knowledge/fogging-machine-for-pest-control-business): PCO equipment guide — machine selection, fleet expansion, GeM dealer opportunity
 
 ## Machine-Readable AI Endpoints
 
