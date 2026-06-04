@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { RichContent } from "@/components/RichContent"
 import AccreditationsStrip from "@/components/home/AccreditationsStrip"
 import ManufacturerIntroBlock from "@/components/home/ManufacturerIntroBlock"
+import TechnologyBlock from "@/components/home/TechnologyBlock"
 import SpecialisedBuyersBlock from "@/components/home/SpecialisedBuyersBlock"
 import HeroBlock from "@/components/home/HeroBlock"
 import RFQMidPageBlock from "@/components/forms/RFQMidPageBlock"
@@ -340,6 +341,9 @@ export default function HomePageClient({
 
       {/* 8. BRAND STORY */}
       <ManufacturerIntroBlock content={homeContent.manufacturerIntro} />
+
+      {/* PULSE-JET TECHNOLOGY — how it works, video + accordion steps */}
+      <TechnologyBlock content={homeContent.technology} />
 
       {/* 9. ADMIN SECTIONS — before trust (authority, technology pillars) */}
       <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
