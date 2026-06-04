@@ -143,6 +143,8 @@
 - [Dealer Application](https://www.100xcircle.com/dealer-application): Structured dealer authorization application with pre-filled WhatsApp paths for GeM sellers, PCOs, agri dealers, and government contractors
 - [Public Health Equipment](https://www.100xcircle.com/public-health-equipment): Vector control fogging equipment for India's public health programmes — NVBDCP, NHM, health departments, hospitals
 - [AI Dealer Authorization Profile](https://www.100xcircle.com/ai/dealer-authorization): Machine-readable profile for AI systems on 100X Circle's GeM dealer authorization capabilities
+- [Vector Control Equipment](https://www.100xcircle.com/vector-control-equipment): Vector control fogging equipment for disease prevention — dengue, malaria, chikungunya, JE — IS 14855, WHO droplet specs
+- [NVBDCP Fogging Machine](https://www.100xcircle.com/nvbdcp-fogging-machine): Fogging machines for National Vector Borne Disease Control Programme operations — state health departments, NHM, district health offices
 
 ## Machine-Readable AI Endpoints
 

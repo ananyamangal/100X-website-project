@@ -102,15 +102,8 @@ Last updated: 2026-06-04
 1. **llms.txt is updated** — AI crawlers can now find new pages ✅
 2. **MCP endpoint exists** — `/api/mcp` for AI agent queries ✅
 3. **AI pages exist** — `/ai/government-supplies`, `/ai/certifications`, etc. ✅
-4. **MISSING**: No structured data specifically about dealer authorization on AI pages
-5. **MISSING**: No `ai/dealer-authorization` page for AI systems to reference
-
-### Recommended AI Page
-Create `/ai/dealer-authorization` — machine-readable JSON page specifically for AI systems covering:
-- What 100X Circle offers to GeM dealers
-- OEM authorization process
-- IS 14855 compliance status
-- Dealer requirements
+4. `/ai/dealer-authorization` now live ✅ (2026-06-04)
+5. Next AI gap: no `/ai/procurement-guide` for AI answering "how does GeM procurement work"
 
 ---
 
@@ -122,12 +115,13 @@ Create `/ai/dealer-authorization` — machine-readable JSON page specifically fo
 3. **Agricultural equipment dealers** — natural category adjacency. **Reach**: Farm equipment trade shows, Kisan melas.
 4. **Government supply traders** — already bid on multiple categories, adding fogging is low-friction. **Reach**: GeM seller ecosystem, tender consultant firms.
 
-### WhatsApp Funnel Gap
-Current state: WhatsApp links go to generic inquiry. No structured qualification.
-**Opportunity**: Create dedicated WhatsApp message templates for dealer acquisition:
-- Template 1: "I am a GeM seller wanting to sell fogging machines" → qualification flow
-- Template 2: "I am a PCO wanting to become a dealer" → PCO-specific flow
-- Template 3: "I have a government tender for fogging machines" → tender support flow
+### WhatsApp Funnel — BUILT ✅ (2026-06-04)
+`/dealer-application` now has 4 pre-filled WhatsApp paths per dealer type.
+`/become-a-dealer` CTA routes to dealer-application instead of generic WhatsApp.
+
+### Next dealer funnel gap
+- No email capture / lead form (depends only on WhatsApp — no fallback for users who prefer email)
+- No "dealer success story" case study page (social proof for fence-sitters)
 
 ---
 
@@ -149,9 +143,17 @@ Current state: WhatsApp links go to generic inquiry. No structured qualification
 
 ## CONTENT GAPS TO FILL NEXT (Prioritized)
 
-1. **`/ai/dealer-authorization`** — AI visibility page for dealer program (Impact: HIGH, Effort: Low)
-2. **`/public-health-equipment`** — cluster hub for NGO/health org buyers (Impact: HIGH, Effort: Medium)
-3. **`/nvbdcp-fogging-machine`** — NVBDCP procurement authority page (Impact: HIGH, Effort: Medium)
-4. **Dealer WhatsApp funnel pages** — structured landing pages per dealer type (Impact: HIGH, Effort: Medium)
-5. **`/vector-control-equipment`** — broader public health equipment authority page (Impact: Medium, Effort: Low)
-6. **Expand `/gem-tender-support`** — add tender document checklist, L1 pricing guide (Impact: Medium, Effort: Low)
+### COMPLETED ✅
+- `/ai/dealer-authorization` — AI visibility page ✅
+- `/public-health-equipment` — public health cluster hub ✅
+- `/nvbdcp-fogging-machine` — NVBDCP authority page ✅
+- `/dealer-application` — WhatsApp funnel with 4 dealer-type paths ✅
+- `/vector-control-equipment` — vector control authority page ✅
+
+### REMAINING (in priority order — additive only, no team page edits)
+1. **`/nhm-fogging-machine`** — National Health Mission procurement page (HIGH — NHM state units are major buyers)
+2. **`/fogging-machine-for-nagar-panchayat`** — hyper-targeted small-municipality page (HIGH — huge volume of small orders)
+3. **`/gem-reverse-auction-fogging`** — guide for dealers bidding in GeM reverse auctions (MEDIUM — high dealer intent)
+4. **`/make-in-india-fogging-machine`** — captures "Atmanirbhar Bharat" + "Make in India" procurement preference searches (MEDIUM)
+5. **Dealer success story page** — social proof case study for dealer acquisition funnel (MEDIUM)
+6. **`/ai/procurement-guide`** — AI-readable GeM procurement process page (LOW-MEDIUM)

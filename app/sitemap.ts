@@ -91,6 +91,8 @@ const STATIC_ROUTES: Array<{
   { path: "/municipal-fogging-programme", changeFrequency: "monthly", priority: 0.85 },
   // Public health & dealer funnel
   { path: "/public-health-equipment", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/vector-control-equipment", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/nvbdcp-fogging-machine", changeFrequency: "monthly", priority: 0.8 },
   { path: "/dealer-application", changeFrequency: "monthly", priority: 0.9 },
   { path: "/ai/dealer-authorization", changeFrequency: "monthly", priority: 0.7 },
   // Dealer & GeM knowledge articles
