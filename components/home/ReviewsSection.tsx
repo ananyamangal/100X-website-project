@@ -77,7 +77,19 @@ export default function ReviewsSection({ product, limit = 6 }: ReviewsSectionPro
     fetch(`/api/reviews?${params}`)
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) setReviews(data)
+        if (Array.isArray(data)) {
+          // Only render reviews that have all required fields to prevent
+          // a malformed DB record from causing a runtime crash or showing
+          // empty/broken UI.
+          const valid = data.filter(
+            (r) =>
+              r &&
+              typeof r.customerName === 'string' && r.customerName.trim() !== '' &&
+              typeof r.review === 'string' && r.review.trim() !== '' &&
+              typeof r.rating === 'number' && r.rating >= 1 && r.rating <= 5
+          )
+          setReviews(valid)
+        }
         setLoaded(true)
       })
       .catch(() => setLoaded(true))
