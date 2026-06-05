@@ -7,16 +7,23 @@
  * Filters for fogging-related bids and saves them to the database.
  *
  * Usage:
- *   node scripts/gem-harvest.js                       # scan default range (last 30 days)
- *   node scripts/gem-harvest.js --from=8000000        # scan from specific ID
- *   node scripts/gem-harvest.js --from=8000000 --to=9500000
+ *   node scripts/gem-harvest.js                       # scan default range (Jan 2025 → present)
+ *   node scripts/gem-harvest.js --from=7150000        # scan from specific ID
+ *   node scripts/gem-harvest.js --from=7150000 --to=7580000
  *   node scripts/gem-harvest.js --from=9000000 --max-bids=500
  *   node scripts/gem-harvest.js --concurrency=30      # more parallel fetches (faster)
  *   node scripts/gem-harvest.js --dry-run             # scan but don't save
+ *   node scripts/gem-harvest.js --resume              # force-resume from checkpoint
+ *   node scripts/gem-harvest.js --no-resume           # ignore checkpoint, fresh start
+ *
+ * Checkpointing:
+ *   Progress is saved to scripts/gem-harvest-checkpoint.json every 500 IDs and
+ *   on every bid found. If the script is interrupted (Ctrl+C, crash, power loss),
+ *   re-running with the same --from/--to will auto-resume from the checkpoint.
+ *   The checkpoint is deleted automatically on successful completion.
  *
  * Environment:
  *   MONGODB_URI     — from .env.local (auto-loaded if dotenv installed)
- *   SITE_URL        — optional, for API mode instead of direct DB
  *
  * ID range guide (calibrated June 2026):
  *   Rate: ~25,000 IDs/month (confirmed from bid GEM/2026/B/7555803 = May 2026)
@@ -28,11 +35,11 @@
  *   7,580,000 = Jun 2026  (approx. current)
  *
  * NOTE: The previous guide (8.5M-9.5M) was wrong. Those IDs do not exist yet.
- * Vercel-based harvest also does NOT work — GeM blocks datacenter IPs.
+ * Vercel-based harvest does NOT work — GeM blocks datacenter IPs.
  * This script must run locally on a real machine.
  *
  * Recommended backfill (Jan 2025 → present, ~430K IDs):
- *   node scripts/gem-harvest.js --from=7150000 --to=7560000 --concurrency=30
+ *   node scripts/gem-harvest.js --from=7150000 --to=7580000 --concurrency=30
  *
  * Expected time: 2-4 hours at concurrency 30.
  * Expected yield: 200-350 fogging bids.
@@ -41,14 +48,14 @@
 "use strict"
 
 const https = require("https")
-const http = require("http")
+const http  = require("http")
+const fs    = require("fs")
+const path  = require("path")
 
 // ─── Load env ─────────────────────────────────────────────────────────────────
 
 let MONGODB_URI = process.env.MONGODB_URI
 if (!MONGODB_URI) {
-  const fs = require("fs")
-  const path = require("path")
   const envPath = path.join(__dirname, "..", ".env.local")
   if (fs.existsSync(envPath)) {
     const lines = fs.readFileSync(envPath, "utf8").split("\n")
@@ -77,18 +84,55 @@ for (const arg of process.argv.slice(2)) {
   }
 }
 
-// Default range: IDs 7,150,000 to 7,560,000 (Jan 2025 → Jun 2026 backfill)
 const FROM        = parseInt(args.from || "7150000")
-const TO          = parseInt(args.to || "7560000")
+const TO          = parseInt(args.to   || "7580000")
 const CONCURRENCY = Math.min(parseInt(args.concurrency || "20"), 50)
 const MAX_BIDS    = parseInt(args["max-bids"] || "9999999")
 const DRY_RUN     = args["dry-run"] === true
-const BATCH_DELAY = parseInt(args["delay-ms"] || "200") // ms between concurrent batches
+const VERBOSE     = args["verbose"] === true
+const BATCH_DELAY = parseInt(args["delay-ms"] || "200")
+const NO_RESUME   = args["no-resume"] === true
 
-const KEYWORDS = ["fogging", "fogger", "fog machine", "thermal fog", "cold fog"]
+const KEYWORDS   = ["fogging", "fogger", "fog machine", "thermal fog", "cold fog"]
 const DETAIL_BASE = "https://bidplus.gem.gov.in/bidding/bid/getSinglePacketResultView/"
 
-// ─── HTTP fetch (no external deps) ───────────────────────────────────────────
+// ─── Checkpointing ────────────────────────────────────────────────────────────
+
+const CHECKPOINT_FILE     = path.join(__dirname, "gem-harvest-checkpoint.json")
+const CHECKPOINT_INTERVAL = 500 // save every N IDs scanned
+
+function loadCheckpoint() {
+  if (NO_RESUME)             return null
+  if (!fs.existsSync(CHECKPOINT_FILE)) return null
+  try {
+    const cp = JSON.parse(fs.readFileSync(CHECKPOINT_FILE, "utf8"))
+    // Only resume if the range matches
+    if (cp.from !== FROM || cp.to !== TO) {
+      console.log(` [checkpoint] Range mismatch (cp: ${cp.from}→${cp.to}, current: ${FROM}→${TO}) — ignoring checkpoint.`)
+      return null
+    }
+    return cp
+  } catch {
+    return null
+  }
+}
+
+function saveCheckpoint(data) {
+  if (DRY_RUN) return
+  try {
+    fs.writeFileSync(CHECKPOINT_FILE, JSON.stringify({ ...data, savedAt: new Date().toISOString() }, null, 2))
+  } catch (e) {
+    console.error("\n [checkpoint] WARN: failed to save checkpoint:", e.message)
+  }
+}
+
+function deleteCheckpoint() {
+  try {
+    if (fs.existsSync(CHECKPOINT_FILE)) fs.unlinkSync(CHECKPOINT_FILE)
+  } catch { /* ignore */ }
+}
+
+// ─── HTTP fetch ───────────────────────────────────────────────────────────────
 
 function fetchPage(id) {
   return new Promise((resolve) => {
@@ -128,9 +172,12 @@ function htmlToText(html) {
     .replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim()
 }
 
+const SELLER_LINE_RE = /[^\n]*\b(?:PRIVATE\s+LIMITED|PVT\.?\s*LTD\.?|LTD\.?|LLP|ENTERPRISES|INDUSTRIES|TRADERS|AGENCIES|ELECTRICALS?|SOLUTIONS?|SYSTEMS?|CORPORATION|CORP\.?)\b[^\n]*/gi
+
 function isFogging(text) {
-  const l = text.toLowerCase()
-  return KEYWORDS.some(k => l.includes(k))
+  if (!KEYWORDS.some(k => text.toLowerCase().includes(k))) return false
+  const stripped = text.replace(SELLER_LINE_RE, " ")
+  return KEYWORDS.some(k => stripped.toLowerCase().includes(k))
 }
 
 // ─── Bid parser ───────────────────────────────────────────────────────────────
@@ -170,11 +217,20 @@ function parseBid(text, numericId) {
     /(?:Department)\s*[:\-]\s*([^\n]+)/i,
   ) || "").replace(/\s+/g," ").trim()
 
-  const productLine = (first(text,
-    /(Fogging Machine[^\n]{0,80})/i,
-    /(Fogger[^\n]{0,60})/i,
-    /(?:Item|Product)\s*[:\-]?\s*([^\n]+)/i,
-  ) || "").trim()
+  const COMPANY_RE = /\b(?:PRIVATE\s+LIMITED|PVT\.?\s*LTD\.?|LTD\.?|LLP|ENTERPRISES|INDUSTRIES|TRADERS|AGENCIES)\b/i
+  const productLine = (() => {
+    const labeled = first(text,
+      /(?:Item(?:\s+Description)?|Product(?:\s+(?:Description|Name))?)\s*[:\-]\s*([^\n]{3,80})/i,
+      /(?:Item|Product)\s*[:\-]\s*([^\n]{3,80})/i,
+    )
+    if (labeled && !COMPANY_RE.test(labeled)) return labeled.trim()
+    const kw = first(text,
+      /(Fogging Machine[^\n]{0,80})/i,
+      /((?:Thermal\s+)?Fogger[^\n]{0,60})/i,
+    )
+    if (kw && !COMPANY_RE.test(kw)) return kw.trim()
+    return ""
+  })()
 
   const cat = (() => {
     const l = (productLine || text).toLowerCase()
@@ -274,20 +330,71 @@ async function autoDetectDealers(names) {
 
 async function main() {
   const total = TO - FROM
+
+  // ── Load or init checkpoint ──────────────────────────────────────────────────
+  const checkpoint = loadCheckpoint()
+  let resumeFrom = FROM
+  let scanned  = 0
+  let found    = 0
+  let saved    = 0
+  let updated  = 0
+  let errors   = 0
+  const newDealers = []
+  const foundBids  = []
+
+  if (checkpoint) {
+    resumeFrom = checkpoint.nextId
+    scanned    = checkpoint.scanned  || 0
+    found      = checkpoint.found    || 0
+    saved      = checkpoint.saved    || 0
+    updated    = checkpoint.updated  || 0
+    errors     = checkpoint.errors   || 0
+    newDealers.push(...(checkpoint.newDealers || []))
+    foundBids.push(...(checkpoint.foundBids   || []))
+    console.log(`\n RESUMING from checkpoint — last saved at ID ${checkpoint.nextId - 1} (${checkpoint.savedAt})`)
+    console.log(` Progress so far: ${scanned.toLocaleString()} scanned, ${found} bids found`)
+  }
+
   console.log(`\n${"═".repeat(60)}`)
   console.log(` GeM Fogging Bid Harvester`)
-  console.log(` Scanning IDs: ${FROM.toLocaleString()} → ${TO.toLocaleString()} (${total.toLocaleString()} IDs)`)
+  console.log(` Range:       ${FROM.toLocaleString()} → ${TO.toLocaleString()} (${total.toLocaleString()} total IDs)`)
+  if (checkpoint) {
+  console.log(` Resuming at: ${resumeFrom.toLocaleString()} (${(resumeFrom - FROM).toLocaleString()} already done)`)
+  }
   console.log(` Concurrency: ${CONCURRENCY} | Delay: ${BATCH_DELAY}ms | Dry-run: ${DRY_RUN}`)
-  console.log(` Keywords: ${KEYWORDS.join(", ")}`)
-  if (!DRY_RUN) console.log(` Database: ${MONGODB_URI.replace(/:[^:@]+@/, ":***@")}`)
+  console.log(` Keywords:    ${KEYWORDS.join(", ")}`)
+  console.log(` Checkpoint:  ${CHECKPOINT_FILE}`)
+  if (!DRY_RUN) console.log(` Database:    ${MONGODB_URI.replace(/:[^:@]+@/, ":***@")}`)
   console.log(`${"═".repeat(60)}\n`)
 
-  const startTime = Date.now()
-  let scanned = 0, found = 0, saved = 0, updated = 0, errors = 0
-  const newDealers = []
-  const foundBids = []
+  const overallStart = Date.now() - (checkpoint?.elapsedMs || 0)
 
-  for (let i = FROM; i < TO && found < MAX_BIDS; i += CONCURRENCY) {
+  // ── Graceful shutdown handler ─────────────────────────────────────────────────
+  let shuttingDown = false
+  const shutdown = (signal) => {
+    if (shuttingDown) return
+    shuttingDown = true
+    console.log(`\n\n [${signal}] Saving checkpoint before exit...`)
+    saveCheckpoint({ from: FROM, to: TO, nextId: currentId + 1, scanned, found, saved, updated, errors, newDealers, foundBids, elapsedMs: Date.now() - overallStart })
+    console.log(` Checkpoint saved → ${CHECKPOINT_FILE}`)
+    console.log(` Resume with: node scripts/gem-harvest.js --from=${FROM} --to=${TO} --concurrency=${CONCURRENCY}`)
+    if (mongoClient) mongoClient.close().catch(() => {})
+    process.exit(0)
+  }
+  process.on("SIGINT",  () => shutdown("SIGINT"))
+  process.on("SIGTERM", () => shutdown("SIGTERM"))
+  process.on("SIGHUP",  () => shutdown("SIGHUP"))
+  process.on("uncaughtException", (err) => {
+    console.error("\n [uncaughtException]", err.message)
+    shutdown("uncaughtException")
+  })
+
+  // ── Scan loop ─────────────────────────────────────────────────────────────────
+  let currentId = resumeFrom
+  let lastCheckpointAt = scanned
+
+  for (let i = resumeFrom; i < TO && found < MAX_BIDS && !shuttingDown; i += CONCURRENCY) {
+    currentId = i
     const batch = Array.from({ length: Math.min(CONCURRENCY, TO - i) }, (_, j) => i + j)
 
     const results = await Promise.all(batch.map(async (id) => {
@@ -306,11 +413,17 @@ async function main() {
     }))
 
     scanned += batch.length
+    currentId = i + CONCURRENCY - 1
 
     for (const result of results) {
       if (!result) continue
       found++
       foundBids.push(result.bid.bid_number)
+
+      if (VERBOSE) {
+        console.log(`\n ── BID #${found} (ID ${result.id}) ──`)
+        console.log(JSON.stringify(result.bid, null, 2))
+      }
 
       if (!DRY_RUN) {
         const op = await saveBid(result.bid)
@@ -321,26 +434,36 @@ async function main() {
           result.bid.l3_dealer_name,
         ])
         newDealers.push(...dealers)
+
+        // Save checkpoint after every bid found
+        saveCheckpoint({ from: FROM, to: TO, nextId: i + CONCURRENCY, scanned, found, saved, updated, errors, newDealers, foundBids, elapsedMs: Date.now() - overallStart })
+        lastCheckpointAt = scanned
       }
     }
 
-    // Progress log every 1000 IDs
-    if (scanned % 1000 < CONCURRENCY || found > 0 && found % 10 === 0) {
-      const elapsed = ((Date.now() - startTime) / 1000).toFixed(0)
-      const rate = (scanned / ((Date.now() - startTime) / 1000)).toFixed(1)
-      const remaining = TO - (i + CONCURRENCY)
-      const eta = remaining > 0 ? Math.round(remaining / parseFloat(rate)) : 0
-      process.stdout.write(
-        `\r Scanned: ${scanned.toLocaleString()}/${total.toLocaleString()} | ` +
-        `Fogging: ${found} | Saved: ${saved} | ` +
-        `Rate: ${rate}/s | ETA: ${Math.floor(eta/60)}m${eta%60}s  `
-      )
+    // Periodic checkpoint every CHECKPOINT_INTERVAL IDs regardless of bid finds
+    if (!DRY_RUN && scanned - lastCheckpointAt >= CHECKPOINT_INTERVAL) {
+      saveCheckpoint({ from: FROM, to: TO, nextId: i + CONCURRENCY, scanned, found, saved, updated, errors, newDealers, foundBids, elapsedMs: Date.now() - overallStart })
+      lastCheckpointAt = scanned
     }
+
+    // Progress display
+    const elapsed = (Date.now() - overallStart) / 1000
+    const rate    = elapsed > 0 ? scanned / elapsed : 0
+    const remaining = TO - (i + CONCURRENCY)
+    const eta     = rate > 0 && remaining > 0 ? Math.round(remaining / rate) : 0
+    const pct     = ((scanned / total) * 100).toFixed(1)
+    process.stdout.write(
+      `\r [${pct}%] Scanned: ${scanned.toLocaleString()}/${total.toLocaleString()} | ` +
+      `Bids: ${found} | Saved: ${saved} | New dealers: ${newDealers.length} | ` +
+      `Rate: ${rate.toFixed(0)}/s | ETA: ${Math.floor(eta/60)}m${eta%60}s  `
+    )
 
     await new Promise(r => setTimeout(r, BATCH_DELAY))
   }
 
-  const elapsed = ((Date.now() - startTime) / 1000).toFixed(0)
+  // ── Final summary ─────────────────────────────────────────────────────────────
+  const elapsed = ((Date.now() - overallStart) / 1000).toFixed(0)
   console.log(`\n\n${"═".repeat(60)}`)
   console.log(` HARVEST COMPLETE`)
   console.log(`${"═".repeat(60)}`)
@@ -350,7 +473,7 @@ async function main() {
   console.log(` Updated:      ${updated}`)
   console.log(` New dealers:  ${newDealers.length}`)
   console.log(` Errors:       ${errors}`)
-  console.log(` Time:         ${elapsed}s`)
+  console.log(` Time:         ${Math.floor(elapsed/60)}m${elapsed%60}s`)
   if (foundBids.length > 0) {
     console.log(`\n Bids found:`)
     foundBids.forEach(b => console.log(`   ${b}`))
@@ -360,6 +483,9 @@ async function main() {
     newDealers.forEach(d => console.log(`   ${d}`))
   }
   console.log(`${"═".repeat(60)}\n`)
+
+  // Delete checkpoint on clean completion
+  deleteCheckpoint()
 
   if (mongoClient) await mongoClient.close()
 }
