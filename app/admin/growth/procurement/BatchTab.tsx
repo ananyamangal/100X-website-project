@@ -1,8 +1,9 @@
 "use client"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import {
   Link2, ClipboardPaste, Loader2, CheckCircle2, AlertCircle,
   Terminal, ChevronDown, ChevronUp, Zap, Users, Tag,
+  Bot, Play, RefreshCw, Clock, Database,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -394,6 +395,113 @@ function TextPasteMode({ onSaved }: { onSaved: (n: number) => void }) {
   )
 }
 
+// ─── Harvester Status Panel ───────────────────────────────────────────────────
+
+interface HarvesterState {
+  last_scanned_id: number
+  total_scanned: number
+  total_fogging_found: number
+  last_run_at: string | null
+  last_run_scanned: number
+  last_run_found: number
+  new_dealers_last_run: string[]
+  running: boolean
+}
+
+function HarvesterStatus({ onRefreshed }: { onRefreshed: () => void }) {
+  const [state, setState] = useState<HarvesterState | null>(null)
+  const [totalBids, setTotalBids] = useState<number | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [running, setRunning] = useState(false)
+  const [lastResult, setLastResult] = useState<{ found: number; saved: number; range: string } | null>(null)
+
+  const loadStatus = useCallback(async () => {
+    const res = await fetch("/api/admin/procurement/harvest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "status" }),
+    }).then(r => r.json()).catch(() => null)
+    if (res?.state) { setState(res.state); setTotalBids(res.totalBids) }
+    setLoading(false)
+  }, [])
+
+  useEffect(() => { loadStatus() }, [loadStatus])
+
+  const handleRunNow = async () => {
+    setRunning(true); setLastResult(null)
+    const res = await fetch("/api/admin/procurement/harvest").then(r => r.json()).catch(() => null)
+    setRunning(false)
+    if (res) {
+      setLastResult({ found: res.fogging_found || 0, saved: res.saved || 0, range: res.id_range || "" })
+      await loadStatus()
+      onRefreshed()
+    }
+  }
+
+  if (loading) return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center gap-2 text-xs text-gray-400">
+      <Loader2 size={12} className="animate-spin" />Loading harvester status…
+    </div>
+  )
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Bot size={14} className="text-brand-600" />
+          <span className="text-xs font-semibold text-gray-800">Autonomous Harvester</span>
+          <span className="text-[10px] text-gray-400">— daily cron, 06:00 IST</span>
+        </div>
+        <button onClick={handleRunNow} disabled={running || state?.running}
+          className="flex items-center gap-1.5 text-xs bg-brand-600 text-white px-3 py-1.5 rounded-lg hover:bg-brand-700 disabled:opacity-40">
+          {running ? <><Loader2 size={11} className="animate-spin" />Running…</> : <><Play size={11} />Run now</>}
+        </button>
+      </div>
+
+      <div className="px-5 py-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: "Bids in DB", value: totalBids?.toLocaleString() ?? "—", icon: Database, color: "text-brand-600" },
+          { label: "Total IDs Scanned", value: state?.total_scanned?.toLocaleString() ?? "—", icon: RefreshCw, color: "text-gray-600" },
+          { label: "Fogging Found (lifetime)", value: state?.total_fogging_found?.toLocaleString() ?? "—", icon: Zap, color: "text-green-600" },
+          { label: "Last Run", value: state?.last_run_at ? new Date(state.last_run_at).toLocaleDateString("en-IN", { day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" }) : "Never", icon: Clock, color: "text-gray-500" },
+        ].map(({ label, value, icon: Icon, color }) => (
+          <div key={label}>
+            <div className="flex items-center gap-1 mb-1">
+              <Icon size={11} className={color} />
+              <span className="text-[10px] text-gray-400 uppercase tracking-wide">{label}</span>
+            </div>
+            <p className={`text-lg font-bold ${color}`}>{value}</p>
+          </div>
+        ))}
+      </div>
+
+      {state && (
+        <div className="px-5 pb-4 text-[11px] text-gray-500 space-y-1">
+          <p>Current scan position: ID <span className="font-mono text-gray-700">{state.last_scanned_id?.toLocaleString()}</span></p>
+          <p>Last run: {state.last_run_scanned} IDs scanned · {state.last_run_found} fogging bids found</p>
+          {state.new_dealers_last_run?.length > 0 && (
+            <p className="text-blue-600">{state.new_dealers_last_run.length} new dealers: {state.new_dealers_last_run.slice(0,3).join(", ")}{state.new_dealers_last_run.length > 3 ? ` +${state.new_dealers_last_run.length-3} more` : ""}</p>
+          )}
+        </div>
+      )}
+
+      {lastResult && (
+        <div className="mx-5 mb-4 bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-xs text-green-800">
+          Run complete — Scanned: {lastResult.range} · Found: {lastResult.found} fogging bids · Saved: {lastResult.saved}
+        </div>
+      )}
+
+      <div className="px-5 pb-4 pt-2 border-t border-gray-50 text-[10px] text-gray-400 space-y-0.5">
+        <p className="font-medium text-gray-500">For bulk historical backfill (2025-present):</p>
+        <code className="block bg-gray-50 rounded px-2 py-1 text-gray-600 font-mono text-[10px]">
+          node scripts/gem-harvest.js --from=8500000 --to=9500000 --max-bids=500
+        </code>
+        <p>Scans ~1M IDs, finds ~400-700 fogging bids in 3-6 hrs unattended.</p>
+      </div>
+    </div>
+  )
+}
+
 // ─── Main BatchTab component ──────────────────────────────────────────────────
 
 export function BatchTab({ onSaved }: { onSaved: () => void }) {
@@ -407,6 +515,8 @@ export function BatchTab({ onSaved }: { onSaved: () => void }) {
 
   return (
     <div className="space-y-4 max-w-3xl">
+      {/* Harvester status always shown at top */}
+      <HarvesterStatus onRefreshed={onSaved} />
       {/* Session counter */}
       {sessionCount > 0 && (
         <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 flex items-center gap-2">

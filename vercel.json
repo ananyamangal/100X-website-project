@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/admin/procurement/harvest",
+      "schedule": "30 0 * * *"
+    }
+  ]
+}
