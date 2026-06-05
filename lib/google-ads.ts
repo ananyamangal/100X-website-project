@@ -167,7 +167,7 @@ export const QUERIES = {
     SELECT
       campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type,
       metrics.cost_micros, metrics.clicks, metrics.impressions,
-      metrics.ctr, metrics.average_cpc, metrics.conversions, metrics.cost_per_conversion
+      metrics.ctr, metrics.average_cpc
     FROM campaign
     WHERE segments.date DURING LAST_30_DAYS
       AND campaign.status != 'REMOVED'
@@ -180,7 +180,7 @@ export const QUERIES = {
       ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type,
       campaign.name, ad_group.name,
       metrics.cost_micros, metrics.clicks, metrics.impressions,
-      metrics.ctr, metrics.average_cpc, metrics.conversions
+      metrics.ctr, metrics.average_cpc
     FROM keyword_view
     WHERE segments.date DURING LAST_30_DAYS
       AND ad_group_criterion.status != 'REMOVED'
@@ -193,7 +193,7 @@ export const QUERIES = {
       search_term_view.search_term, search_term_view.status,
       campaign.name, ad_group.name,
       metrics.cost_micros, metrics.clicks, metrics.impressions,
-      metrics.ctr, metrics.average_cpc, metrics.conversions
+      metrics.ctr, metrics.average_cpc
     FROM search_term_view
     WHERE segments.date DURING LAST_30_DAYS
     ORDER BY metrics.clicks DESC
@@ -204,7 +204,7 @@ export const QUERIES = {
     SELECT
       segments.device,
       metrics.cost_micros, metrics.clicks, metrics.impressions,
-      metrics.ctr, metrics.average_cpc, metrics.conversions
+      metrics.ctr, metrics.average_cpc
     FROM campaign
     WHERE segments.date DURING LAST_30_DAYS
       AND campaign.status != 'REMOVED'
@@ -214,7 +214,7 @@ export const QUERIES = {
   locations: `
     SELECT
       geographic_view.country_criterion_id, geographic_view.location_type,
-      metrics.cost_micros, metrics.clicks, metrics.impressions, metrics.conversions
+      metrics.cost_micros, metrics.clicks, metrics.impressions
     FROM geographic_view
     WHERE segments.date DURING LAST_30_DAYS
     ORDER BY metrics.cost_micros DESC
