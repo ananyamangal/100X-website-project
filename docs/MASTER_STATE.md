@@ -302,7 +302,7 @@ GET/POST /api/admin/procurement/harvest
 ### Google Search Console
 - OAuth: web flow, tokens in `google_oauth_tokens`
 - Sync: query + page dimensions, 28-day window, paginated (max 5000 rows)
-- **Status: OAuth code complete. 403 error previously encountered (consent screen not configured for production domain). Requires GSC property access + OAuth consent screen in prod.**
+- **Status: Fully connected and functional. GSC diagnostic passes all 5 steps (confirmed 2026-06-05).**
 
 ### Google Analytics 4
 - Property listing via Admin API v1beta
@@ -343,10 +343,12 @@ GET/POST /api/admin/procurement/harvest
 ---
 
 ## Known Bugs / Issues
-1. **GSC 403**: OAuth consent screen not approved for production domain. Symptom: GSC sync returns 403. Fix: add production domain to OAuth consent screen, or add sulabh.mangal@gmail.com as test user.
+1. ~~**GSC 403**~~ **RESOLVED (2026-06-05)**: GSC diagnostic passes completely. OAuth is connected and functional.
 2. **admin/page.tsx (root)**: Legacy file with hardcoded sample data — not the real admin. Real admin is `app/admin/`. The root `admin/` folder appears unused.
 3. **AI Citation Agent**: Paused because manual checking (visiting ChatGPT/Gemini/etc.) can't be automated without external APIs. The agent creates task queues but doesn't auto-verify.
 4. **Growth OS automations seeded with mock data**: Several automations have fake `successRate`, `runCount`, `lastResult` values from the default seed. They reset when the agent is first actually run.
+5. ~~**SEO Opportunity Agent writes to wrong collection**~~ **FIXED (2026-06-05)**: `lib/growth-os/agents/seo-opportunity.ts` was writing to `growth_os_content_drafts`; now writes to `growth_os_drafts` with ContentDraft-compatible schema.
+6. ~~**GSC sync URL construction broken in automation route**~~ **FIXED (2026-06-05)**: `app/api/admin/growth/automation/route.ts` used a broken `NEXTAUTH_URL || VERCEL_URL` ternary; now uses `NEXT_PUBLIC_SITE_URL` canonical pattern consistent with `lib/google-oauth.ts`.
 
 ---
 

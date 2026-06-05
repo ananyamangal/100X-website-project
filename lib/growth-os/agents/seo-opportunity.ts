@@ -150,15 +150,21 @@ export async function runSEOOpportunityAgent(): Promise<SEOOpportunityResult> {
   }
   for (const [cluster, queries] of newClusters.entries()) {
     if (queries.length === 0) continue
-    const existing = await db.collection("growth_os_content_drafts").findOne({ cluster })
+    const existing = await db.collection("growth_os_drafts").findOne({ targetIntent: cluster, opportunitySource: "gsc-agent" })
     if (!existing) {
-      await db.collection("growth_os_content_drafts").insertOne({
-        cluster,
-        queries,
-        status: "pending_approval",
-        recommendation: `Create or update content targeting: ${queries.join("; ")}. These queries appeared in GSC with no prior ranking — an underserved intent cluster.`,
-        source: "gsc-agent",
+      await db.collection("growth_os_drafts").insertOne({
+        title: `Content opportunity: ${queries[0] || cluster}`,
+        targetIntent: cluster,
+        opportunitySource: "gsc-agent",
+        confidenceScore: 60,
+        expectedImpact: `Create or update content targeting: ${queries.join("; ")}. These queries appeared in GSC with no prior ranking — an underserved intent cluster.`,
+        content: `Target queries: ${queries.join(", ")}`,
+        status: "draft",
+        riskLevel: "low",
+        slug: "",
+        targetUrl: "",
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
       contentDraftsCreated++
     }
