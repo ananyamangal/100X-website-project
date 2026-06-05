@@ -17,15 +17,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 
-export const maxDuration = 60
+export const maxDuration = 120
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 // Approximate ID for June 2026. Cron starts scanning forward from here.
 const DEFAULT_START_ID = 9_200_000
 
-// IDs to scan per daily cron run (keeps well within 60s timeout with concurrency 5)
-const SCAN_PER_RUN = 120
+// IDs to scan per daily cron run. At concurrency=5 and 5s/timeout this fits in ~90s.
+const SCAN_PER_RUN = 80
 
 // Number of parallel fetches at once (5 is conservative for Vercel cron)
 const CRON_CONCURRENCY = 5
@@ -282,23 +282,30 @@ export async function GET(req: NextRequest) {
         last_run_found: 0,
         new_dealers_last_run: [],
         running: false,
+        running_since: null,
       })
     }
 
     const state = existingState || await db.collection("harvester_state").findOne({ key: "singleton" })
     if (!state) throw new Error("Failed to init harvester_state")
 
-    // Prevent concurrent runs
+    const now = new Date()
+
+    // Prevent concurrent runs — auto-clear stale locks (Vercel can kill without cleanup)
     if (state.running) {
-      return NextResponse.json({ skipped: true, reason: "Already running" })
+      const since = state.running_since ? new Date(state.running_since as string) : null
+      const ageMs = since ? now.getTime() - since.getTime() : Infinity
+      if (ageMs < 3 * 60 * 1000) {
+        return NextResponse.json({ skipped: true, reason: "Already running" })
+      }
+      // Lock is stale (> 3 min with no completion) — auto-reset and proceed
     }
 
     await db.collection("harvester_state").updateOne(
       { key: "singleton" },
-      { $set: { running: true } }
+      { $set: { running: true, running_since: now } }
     )
 
-    const now = new Date()
     const from = (state.last_scanned_id as number) + 1
 
     const result = await scanRange(from, SCAN_PER_RUN, CRON_CONCURRENCY, db, now)
@@ -314,6 +321,7 @@ export async function GET(req: NextRequest) {
           last_run_found: result.found,
           new_dealers_last_run: result.new_dealers,
           running: false,
+          running_since: null,
         },
         $inc: {
           total_scanned: result.scanned,
@@ -337,7 +345,7 @@ export async function GET(req: NextRequest) {
     // Reset running flag on error
     try {
       const db = (await clientPromise).db()
-      await db.collection("harvester_state").updateOne({ key: "singleton" }, { $set: { running: false } })
+      await db.collection("harvester_state").updateOne({ key: "singleton" }, { $set: { running: false, running_since: null } })
     } catch { /* ignore */ }
     console.error("harvest GET error:", err)
     return NextResponse.json({ error: String(err) }, { status: 500 })
@@ -355,6 +363,15 @@ export async function POST(req: NextRequest) {
       const totalBids = await db.collection("bid_lifecycle").countDocuments()
       const totalDealers = await db.collection("proc_dealers").countDocuments()
       return NextResponse.json(JSON.parse(JSON.stringify({ state, totalBids, totalDealers })))
+    }
+
+    if (body.action === "reset") {
+      await db.collection("harvester_state").updateOne(
+        { key: "singleton" },
+        { $set: { running: false, running_since: null } },
+        { upsert: true }
+      )
+      return NextResponse.json({ ok: true, reset: true })
     }
 
     if (body.action === "reset_position") {
