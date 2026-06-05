@@ -278,8 +278,10 @@ GET  /api/admin/ads/test
 GET  /api/admin/procurement/stats
 GET/POST /api/admin/procurement/bids
 GET/POST /api/admin/procurement/dealers
-GET  /api/admin/procurement/brands
+GET/POST /api/admin/procurement/brands
 GET  /api/admin/procurement/heatmap
+GET  /api/admin/procurement/departments    ← NEW: aggregate by buying dept
+GET  /api/admin/procurement/intelligence   ← NEW: synthesis view (dealers/OEMs/depts/states/auth opps)
 POST /api/admin/procurement/import
 POST /api/admin/procurement/collect
 POST /api/admin/procurement/batch-parse
@@ -310,8 +312,10 @@ GET/POST /api/admin/procurement/harvest
 - **Status: Fully implemented.**
 
 ### GeM Harvester
-- **Status: Live. Daily cron active. ID range advancing from 9,200,000.**
-- Backfill: run `scripts/gem-harvest.js --from=8500000 --to=9500000` for 2025-present data.
+- **Status: Live. Daily cron FIXED (2026-06-05). Previously stuck due to maxDuration=60 being too short.**
+- Fix: maxDuration→120, SCAN_PER_RUN→80, stale lock detection, `running_since` tracking, `reset` POST action.
+- Cron advances from ID 9,200,000 forward (June 2026 range). Covers ~2026 bids only.
+- **Backfill required**: run `scripts/gem-harvest.js --from=8500000 --to=9500000 --concurrency=30` for 2025-present data. Expected: 400-700 bids, 3-6 hours.
 
 ### MCP Server
 - **Status: Live at /api/mcp. No auth required.**
@@ -349,6 +353,8 @@ GET/POST /api/admin/procurement/harvest
 4. **Growth OS automations seeded with mock data**: Several automations have fake `successRate`, `runCount`, `lastResult` values from the default seed. They reset when the agent is first actually run.
 5. ~~**SEO Opportunity Agent writes to wrong collection**~~ **FIXED (2026-06-05)**: `lib/growth-os/agents/seo-opportunity.ts` was writing to `growth_os_content_drafts`; now writes to `growth_os_drafts` with ContentDraft-compatible schema.
 6. ~~**GSC sync URL construction broken in automation route**~~ **FIXED (2026-06-05)**: `app/api/admin/growth/automation/route.ts` used a broken `NEXTAUTH_URL || VERCEL_URL` ternary; now uses `NEXT_PUBLIC_SITE_URL` canonical pattern consistent with `lib/google-oauth.ts`.
+7. ~~**GeM Harvester stuck on first run**~~ **FIXED (2026-06-05)**: `maxDuration=60` too short for 120 IDs × 8s timeout. Vercel killed first run without cleanup → `running: true` permanently. Fixed: maxDuration→120, SCAN_PER_RUN→80, `running_since` stale detection, `reset` POST action.
+8. ~~**Growth OS automations missing gsc-sync and seo-opportunity-agent**~~ **FIXED (2026-06-05)**: GET handler now upserts missing DEFAULT_AGENTS on each call.
 
 ---
 
