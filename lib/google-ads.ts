@@ -108,7 +108,7 @@ export async function searchAds(
   let pageToken: string | undefined
 
   do {
-    const body: Record<string, unknown> = { query, pageSize: 1000 }
+    const body: Record<string, unknown> = { query }
     if (pageToken) body.pageToken = pageToken
 
     const res = await fetch(url, {
@@ -125,7 +125,7 @@ export async function searchAds(
     const data = await res.json() as { results?: Record<string, unknown>[]; nextPageToken?: string }
     all.push(...(data.results || []))
     pageToken = data.nextPageToken
-  } while (pageToken && all.length < 5000)
+  } while (pageToken)
 
   return all
 }
