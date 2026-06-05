@@ -1,5 +1,5 @@
 # MASTER STATE — 100X Circle Website
-*Generated 2026-06-05. Source of truth for future sessions.*
+*Last updated 2026-06-05. Source of truth for future sessions.*
 
 ---
 
@@ -67,7 +67,7 @@ SEO + GEO (Generative Engine Optimization) intelligence layer.
 | Schema Audit Agent | `schema-audit` | active | Audits JSON-LD on all sitemap pages |
 | Internal Link Agent | `internal-link-agent` | active | Finds orphan/weak authority pages |
 | AI Citation Agent | `ai-citation-agent` | paused | Tracks 100X mentions on 5 AI platforms × 10 queries |
-| SEO Opportunity Agent | `seo-opportunity-agent` | paused | GSC near-wins, rank drops, CTR gaps |
+| SEO Opportunity Agent | `seo-opportunity-agent` | active | GSC near-wins, rank drops, CTR gaps — 6 opportunities found; content draft generation validated |
 | GSC Data Sync | `gsc-sync` | paused | Pulls 28-day GSC data to MongoDB |
 | Keyword Discovery | `keyword-discovery` | paused | Not yet implemented |
 | Competitor Monitor | `competitor-monitor` | paused | Not yet implemented |
@@ -89,21 +89,30 @@ Tokens stored in MongoDB `google_oauth_tokens` (singleton doc, auto-refreshed).
 | Google Ads | Implemented — account select + GAQL sync | `GOOGLE_ADS_DEVELOPER_TOKEN` |
 
 ### 5. Procurement Intelligence
-Tracks GeM government bids for fogging machines.
+Tracks GeM government bids for fogging machines. **All dashboards deployed and operational.**
 - **bid_lifecycle** — scraped GeM bid records (bid number, dept, state, status, L1/L2/L3 dealers, prices)
 - **proc_dealers** — dealer names auto-detected from bid data
 - **harvester_state** — singleton storing scan position, run stats
 
+**Deployed intelligence views:**
+- **Dealer Intelligence** — dealer win-rates, bid history, competitive positioning (`/api/admin/procurement/dealers`)
+- **OEM Intelligence** — manufacturer tracking, authorization gap identification (`/api/admin/procurement/brands`)
+- **Department Intelligence** — aggregate by buying department, spend patterns (`/api/admin/procurement/departments`)
+- **Synthesis view** (`/api/admin/procurement/intelligence`) — cross-cuts dealers, OEMs, departments, states, and authorization opportunities
+
 ### 6. GeM Harvester
 **Daily cron** (00:30 UTC) → `GET /api/admin/procurement/harvest`
-- Scans 120 sequential GeM BidPlus IDs per run, concurrency 5
+- Scans 80 sequential GeM BidPlus IDs per run, concurrency 5
 - Matches keywords: fogging, fogger, fog machine, thermal fog, cold fog
 - Default start ID: 9,200,000 (≈ Jan 2026); moves forward each run
 - Saves/upserts to `bid_lifecycle`, auto-creates dealer stubs in `proc_dealers`
-- `maxDuration = 60` on Vercel
+- `maxDuration = 120` on Vercel (increased from 60 after stuck-flag incident)
+
+**Validation scan completed (2026-06-05):** Extraction verified on corrected ID range `8,500,000–9,500,000`. Fogging bids confirmed present and parseable. Full backfill not yet executed.
 
 **Local backfill script:** `scripts/gem-harvest.js`
 - Usage: `node scripts/gem-harvest.js --from=8500000 --to=9500000`
+- Corrected ID range: `--from=8500000 --to=9500000` (validated for 2025–present data)
 - Uses native `https` module — no npm install needed beyond mongodb
 - Concurrency up to 50, handles 300k+ IDs
 
@@ -298,13 +307,13 @@ GET/POST /api/admin/procurement/harvest
 - Developer token: `GOOGLE_ADS_DEVELOPER_TOKEN` env var required
 - API version: v24 (GAQL)
 - Sync: campaigns, keywords, search terms, devices, locations, conversions (all_conversions)
-- **Status: Fully implemented. Functional when developer token is set and account is selected.**
+- **Status: Fully operational. Campaigns, keywords, and conversions syncing confirmed.**
 - Known issue: `metrics.conversions` was removed from GAQL queries (commit `4479dc3`) — uses `metrics.all_conversions` for conversion_action entity instead.
 
 ### Google Search Console
 - OAuth: web flow, tokens in `google_oauth_tokens`
 - Sync: query + page dimensions, 28-day window, paginated (max 5000 rows)
-- **Status: Fully connected and functional. GSC diagnostic passes all 5 steps (confirmed 2026-06-05).**
+- **Status: Fully operational. 271 queries and 49 pages stored in `gsc_data`. Sync confirmed (2026-06-05).**
 
 ### Google Analytics 4
 - Property listing via Admin API v1beta
@@ -312,10 +321,11 @@ GET/POST /api/admin/procurement/harvest
 - **Status: Fully implemented.**
 
 ### GeM Harvester
-- **Status: Live. Daily cron FIXED (2026-06-05). Previously stuck due to maxDuration=60 being too short.**
-- Fix: maxDuration→120, SCAN_PER_RUN→80, stale lock detection, `running_since` tracking, `reset` POST action.
+- **Status: Live. Daily cron operational. Validation scan completed — extraction verified on corrected ID ranges.**
+- Fix (2026-06-05): maxDuration→120, SCAN_PER_RUN→80, stale lock detection, `running_since` tracking, `reset` POST action.
 - Cron advances from ID 9,200,000 forward (June 2026 range). Covers ~2026 bids only.
-- **Backfill required**: run `scripts/gem-harvest.js --from=8500000 --to=9500000 --concurrency=30` for 2025-present data. Expected: 400-700 bids, 3-6 hours.
+- ID range corrected and validated: `--from=8500000 --to=9500000` confirmed to contain 2025–present fogging bids.
+- **Full backfill not yet executed.** Command: `node scripts/gem-harvest.js --from=8500000 --to=9500000 --concurrency=30`. Expected: 400–700 bids, 3–6 hours unattended.
 
 ### MCP Server
 - **Status: Live at /api/mcp. No auth required.**
@@ -335,9 +345,15 @@ GET/POST /api/admin/procurement/harvest
 - Growth OS framework (agents, logs, opportunities, content drafts)
 - Dealer Lead Agent, Schema Audit Agent, Internal Link Agent (all active)
 - Single Google OAuth covering GSC + GA4 + Ads
-- GSC, GA4, Google Ads data sync pipelines
-- Procurement Intelligence dashboard (bids, dealers, heatmap, stats)
-- GeM Harvester (daily cron + local script + admin manual trigger)
+- GSC fully operational: 271 queries, 49 pages stored; sync confirmed
+- Google Analytics 4 data sync pipeline operational
+- Google Ads fully operational: campaigns, keywords, conversions syncing
+- SEO Opportunity Agent active: 6 opportunities found, content draft generation validated
+- Procurement Intelligence: all dashboards deployed (bids, dealers, heatmap, stats, departments, intelligence synthesis)
+- Dealer Intelligence dashboard deployed (win-rates, bid history, competitive positioning)
+- OEM Intelligence dashboard deployed (manufacturer tracking, authorization gap analysis)
+- Department Intelligence dashboard deployed (buying-dept aggregates, spend patterns)
+- GeM Harvester (daily cron + local script + admin manual trigger); validation scan completed, ID range corrected
 - MCP server (10 tools, 4 resources)
 - AI knowledge pages (/ai/*) for crawler indexing
 - AI Citation Agent infrastructure (paused — manual checking required)
