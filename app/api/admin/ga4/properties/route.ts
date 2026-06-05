@@ -14,20 +14,30 @@ export async function GET() {
     return NextResponse.json({ error: "not_connected", message: String(err) }, { status: 400 })
   }
 
+  const settings = await getGA4Settings()
+
   try {
-    const [properties, settings] = await Promise.all([
-      listGA4Properties(accessToken),
-      getGA4Settings(),
-    ])
+    const properties = await listGA4Properties(accessToken)
     return NextResponse.json({
       properties,
       selectedPropertyId: settings?.propertyId ?? null,
       settings,
+      adminApiDisabled: false,
     })
   } catch (err) {
     const msg = String(err)
-    const status = msg.includes("403") ? 403 : 500
-    return NextResponse.json({ error: "api_error", message: msg }, { status })
+    // Admin API (analyticsadmin.googleapis.com) may not be enabled in the Cloud project.
+    // This is independent of the Data API — fall back to manual property entry.
+    if (msg.includes("403") || msg.includes("SERVICE_DISABLED")) {
+      return NextResponse.json({
+        properties: [],
+        selectedPropertyId: settings?.propertyId ?? null,
+        settings,
+        adminApiDisabled: true,
+        adminApiError: msg.slice(0, 300),
+      })
+    }
+    return NextResponse.json({ error: "api_error", message: msg }, { status: 500 })
   }
 }
 

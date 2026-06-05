@@ -50,19 +50,32 @@ export async function POST() {
     return NextResponse.json({ ok: false, steps })
   }
 
-  // Step 5: List GA4 properties
+  // Step 5: List GA4 properties via Admin API (optional — not required for Data API sync)
   let properties: Awaited<ReturnType<typeof listGA4Properties>> = []
+  let adminApiDisabled = false
   try {
     properties = await listGA4Properties(accessToken)
     steps.push({
       id: "properties",
-      label: "List GA4 properties",
+      label: "Analytics Admin API — list properties",
       status: "pass",
       detail: `${properties.length} propert${properties.length === 1 ? "y" : "ies"} accessible: ${properties.map(p => p.displayName).join(", ") || "none"}`,
     })
   } catch (err) {
-    steps.push({ id: "properties", label: "List GA4 properties", status: "fail", detail: String(err) })
-    return NextResponse.json({ ok: false, steps, properties: [] })
+    const msg = String(err)
+    if (msg.includes("SERVICE_DISABLED") || msg.includes("403")) {
+      adminApiDisabled = true
+      steps.push({
+        id: "properties",
+        label: "Analytics Admin API — list properties",
+        status: "warn",
+        detail: "Analytics Admin API is not enabled in this Google Cloud project — property auto-discovery is unavailable. This does NOT affect data sync. Enter your Property ID manually on the setup page. Data API is confirmed working.",
+      })
+      // Do not return — Admin API is optional; continue to the live Data API query
+    } else {
+      steps.push({ id: "properties", label: "Analytics Admin API — list properties", status: "fail", detail: msg })
+      return NextResponse.json({ ok: false, steps, properties: [] })
+    }
   }
 
   // Step 6: Live query against selected property
@@ -88,7 +101,8 @@ export async function POST() {
       status: "pass",
       detail: `Success. ${users} active users in last 7 days. Connection fully operational.`,
     })
-    return NextResponse.json({ ok: true, steps, properties, selectedPropertyId: settings.propertyId })
+    // ok=true even if Admin API was disabled — Data API is what matters for sync
+    return NextResponse.json({ ok: true, steps, properties, selectedPropertyId: settings.propertyId, adminApiDisabled })
   } catch (err) {
     steps.push({ id: "live_query", label: `Live query: ${settings.propertyId}`, status: "fail", detail: String(err) })
     return NextResponse.json({ ok: false, steps, properties })

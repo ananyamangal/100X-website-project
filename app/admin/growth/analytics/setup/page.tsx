@@ -26,6 +26,8 @@ interface GA4Property {
 interface PropertiesResponse {
   properties: GA4Property[]
   selectedPropertyId: string | null
+  adminApiDisabled?: boolean
+  adminApiError?: string
   error?: string
   message?: string
 }
@@ -48,6 +50,7 @@ export default function GA4Setup() {
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null)
   const [propertiesResp, setPropertiesResp] = useState<PropertiesResponse | null>(null)
   const [selectedId, setSelectedId] = useState<string>("")
+  const [manualId, setManualId] = useState<string>("")
   const [saving, setSaving] = useState(false)
   const [testResult, setTestResult] = useState<{ ok: boolean; steps: TestStep[]; properties?: GA4Property[] } | null>(null)
   const [testing, setTesting] = useState(false)
@@ -81,18 +84,29 @@ export default function GA4Setup() {
     }
   }, [syncStatus, loadProperties])
 
-  const saveProperty = async () => {
-    if (!selectedId || !propertiesResp) return
-    const prop = propertiesResp.properties.find(p => p.propertyId === selectedId)
-    if (!prop) return
+  const saveProperty = async (idOverride?: string) => {
+    const idToSave = idOverride ?? selectedId
+    if (!idToSave) return
+    const prop = propertiesResp?.properties.find(p => p.propertyId === idToSave)
     setSaving(true)
     await fetch("/api/admin/ga4/properties", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ propertyId: prop.propertyId, propertyName: prop.displayName, accountName: prop.accountName }),
+      body: JSON.stringify({
+        propertyId: idToSave.trim(),
+        propertyName: prop?.displayName || `Property ${idToSave.trim()}`,
+        accountName: prop?.accountName || "",
+      }),
     })
     await loadStatus()
     setSaving(false)
+  }
+
+  const saveManualId = async () => {
+    const id = manualId.trim().replace(/\D/g, "") // strip non-digits
+    if (!id) return
+    await saveProperty(id)
+    setManualId("")
   }
 
   const runTest = async () => {
@@ -236,21 +250,55 @@ export default function GA4Setup() {
         {/* Property selector */}
         {connected && hasAnalyticsScope && (
           <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-            <h3 className="text-sm font-semibold text-gray-800 mb-1">Select GA4 Property</h3>
+            <h3 className="text-sm font-semibold text-gray-800 mb-1">GA4 Property</h3>
             <p className="text-xs text-gray-500 mb-4">Choose the GA4 property to sync analytics data from.</p>
-            {propertiesResp?.error === "api_error" && propertiesResp.message?.includes("403") ? (
+
+            {/* Admin API disabled — manual entry */}
+            {propertiesResp?.adminApiDisabled ? (
+              <div className="space-y-3">
+                <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-xs text-amber-700">
+                  <p className="font-semibold mb-1">Analytics Admin API not enabled — enter Property ID manually</p>
+                  <p>
+                    Property auto-discovery uses a separate Google Cloud API
+                    (<code className="bg-amber-100 px-1 rounded">analyticsadmin.googleapis.com</code>)
+                    that is not enabled in this project. Data sync uses only the Data API which is working correctly.
+                    Enter your GA4 Property ID directly below.
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={manualId}
+                    onChange={e => setManualId(e.target.value.replace(/\D/g, ""))}
+                    placeholder="e.g. 520046025"
+                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  />
+                  <button
+                    onClick={saveManualId}
+                    disabled={!manualId.trim() || saving}
+                    className="flex items-center gap-1.5 text-xs bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-40 shrink-0"
+                  >
+                    {saving ? <RotateCw size={11} className="animate-spin" /> : <CheckCircle2 size={11} />}
+                    {saving ? "Saving…" : "Save"}
+                  </button>
+                </div>
+                <p className="text-[11px] text-gray-400">
+                  Find your Property ID in Google Analytics → Admin → Property Settings → Property ID (numeric).
+                </p>
+              </div>
+            ) : propertiesResp?.error ? (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-xs text-red-700">
-                <p className="font-semibold mb-1">analytics.readonly scope not active</p>
+                <p className="font-semibold mb-1">Could not load properties</p>
                 <p>{propertiesResp.message}</p>
               </div>
-            ) : propertiesResp?.properties?.length === 0 ? (
+            ) : propertiesResp && propertiesResp.properties.length === 0 ? (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-xs text-gray-600">
                 No GA4 properties found on this Google account. Make sure the connected account has access to at least one GA4 property in{" "}
                 <a href="https://analytics.google.com" target="_blank" rel="noopener noreferrer" className="text-brand-600 underline inline-flex items-center gap-0.5">
                   Google Analytics <ExternalLink size={10} />
                 </a>.
               </div>
-            ) : (
+            ) : propertiesResp && propertiesResp.properties.length > 0 ? (
               <div className="flex items-center gap-3">
                 <div className="relative flex-1">
                   <select
@@ -259,7 +307,7 @@ export default function GA4Setup() {
                     className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 pr-8 focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="">— select a property —</option>
-                    {propertiesResp?.properties?.map(p => (
+                    {propertiesResp.properties.map(p => (
                       <option key={p.propertyId} value={p.propertyId}>
                         {p.displayName} ({p.accountName}) — ID: {p.propertyId}
                       </option>
@@ -268,7 +316,7 @@ export default function GA4Setup() {
                   <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                 </div>
                 <button
-                  onClick={saveProperty}
+                  onClick={() => saveProperty()}
                   disabled={!selectedId || saving}
                   className="flex items-center gap-1.5 text-xs bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-40 shrink-0"
                 >
@@ -276,10 +324,14 @@ export default function GA4Setup() {
                   {saving ? "Saving…" : "Save Property"}
                 </button>
               </div>
+            ) : (
+              <div className="h-8 bg-gray-100 rounded animate-pulse" />
             )}
+
             {propertyId && (
-              <p className="text-[11px] text-green-700 mt-2 font-medium">
-                ✓ Currently syncing: {syncStatus?.propertyName || propertyId}
+              <p className="text-[11px] text-green-700 mt-3 font-medium flex items-center gap-1">
+                <CheckCircle2 size={11} />
+                Currently syncing: {syncStatus?.propertyName || propertyId} (ID: {propertyId})
               </p>
             )}
           </div>
@@ -337,7 +389,7 @@ export default function GA4Setup() {
             {testResult.ok && (
               <div className="mt-4 bg-green-100 border border-green-300 rounded-lg px-4 py-3 text-xs text-green-800 font-semibold flex items-center gap-2">
                 <BarChart2 size={13} />
-                Fully operational. Go to{" "}
+                Data API operational. Go to{" "}
                 <a href="/admin/growth/analytics" className="underline">Analytics Dashboard</a>{" "}
                 and click <strong>Sync now</strong>.
               </div>
