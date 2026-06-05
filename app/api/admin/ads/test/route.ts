@@ -62,7 +62,7 @@ export async function POST() {
     return NextResponse.json({ ok: false, steps })
   }
 
-  // Step 6: List accessible customers
+  // Step 6: List accessible customers — warn and fall through if discovery fails
   let customerIds: string[] = []
   try {
     customerIds = await listAccessibleCustomerIds(accessToken)
@@ -73,8 +73,12 @@ export async function POST() {
       detail: `${customerIds.length} account${customerIds.length !== 1 ? "s" : ""} accessible: ${customerIds.slice(0, 5).join(", ")}${customerIds.length > 5 ? " …" : ""}`,
     })
   } catch (err) {
-    steps.push({ id: "customers", label: "List accessible Ads accounts", status: "fail", detail: String(err) })
-    return NextResponse.json({ ok: false, steps })
+    steps.push({
+      id: "customers",
+      label: "List accessible Ads accounts",
+      status: "warn",
+      detail: `Discovery failed (${String(err).slice(0, 200)}) — bypassing and attempting live query with saved customer ID.`,
+    })
   }
 
   // Step 7: Live GAQL query against selected account

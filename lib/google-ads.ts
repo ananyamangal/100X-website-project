@@ -11,7 +11,7 @@
 
 import clientPromise from "@/lib/mongodb"
 
-const API_VERSION = "v19"
+const API_VERSION = "v24"
 const BASE = `https://googleads.googleapis.com/${API_VERSION}`
 const SETTINGS_DOC_ID = "ads-settings"
 
@@ -55,14 +55,18 @@ export interface AdsSettings {
 // ── Account discovery ─────────────────────────────────────────────────────────
 
 export async function listAccessibleCustomerIds(accessToken: string): Promise<string[]> {
-  const res = await fetch(`${BASE}/customers:listAccessibleCustomers`, {
+  const url = `${BASE}/customers:listAccessibleCustomers`
+  console.log("[Ads] listAccessibleCustomers →", "GET", url)
+  const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "developer-token": getDeveloperToken(),
     },
   })
+  console.log("[Ads] listAccessibleCustomers ←", res.status, res.headers.get("content-type"))
   if (!res.ok) {
     const body = await res.text()
+    console.error("[Ads] listAccessibleCustomers error body:", body.slice(0, 500))
     throw new Error(`Ads listAccessibleCustomers ${res.status}: ${body.slice(0, 500)}`)
   }
   const data = await res.json() as { resourceNames?: string[] }
@@ -99,6 +103,7 @@ export async function searchAds(
   loginCustomerId?: string,
 ): Promise<Record<string, unknown>[]> {
   const url = `${BASE}/customers/${customerId}/googleAds:search`
+  console.log("[Ads] searchAds →", "POST", url, { loginCustomerId: loginCustomerId ?? "(none)" })
   const all: Record<string, unknown>[] = []
   let pageToken: string | undefined
 
@@ -111,8 +116,10 @@ export async function searchAds(
       headers: adsHeaders(accessToken, loginCustomerId),
       body: JSON.stringify(body),
     })
+    console.log("[Ads] searchAds ←", res.status, res.headers.get("content-type"), `(customer ${customerId})`)
     if (!res.ok) {
       const text = await res.text()
+      console.error("[Ads] searchAds error body:", text.slice(0, 500))
       throw new Error(`Ads API ${res.status} (customer ${customerId}): ${text.slice(0, 500)}`)
     }
     const data = await res.json() as { results?: Record<string, unknown>[]; nextPageToken?: string }
