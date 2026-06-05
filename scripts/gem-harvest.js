@@ -18,18 +18,24 @@
  *   MONGODB_URI     — from .env.local (auto-loaded if dotenv installed)
  *   SITE_URL        — optional, for API mode instead of direct DB
  *
- * ID range guide (approximate):
- *   6,000,000 = Feb 2024
+ * ID range guide (calibrated June 2026):
+ *   Rate: ~25,000 IDs/month (confirmed from bid GEM/2026/B/7555803 = May 2026)
  *   7,000,000 = Jul 2024
- *   8,500,000 = Jun 2025
- *   9,000,000 = Feb 2026
- *   9,500,000 = Jun 2026 (current)
+ *   7,150,000 = Jan 2025
+ *   7,275,000 = Jun 2025
+ *   7,480,000 = Feb 2026
+ *   7,555,803 = May 2026  (confirmed)
+ *   7,580,000 = Jun 2026  (approx. current)
  *
- * Recommended first run for 2025-2026 backfill:
- *   node scripts/gem-harvest.js --from=8500000 --to=9500000 --max-bids=500
+ * NOTE: The previous guide (8.5M-9.5M) was wrong. Those IDs do not exist yet.
+ * Vercel-based harvest also does NOT work — GeM blocks datacenter IPs.
+ * This script must run locally on a real machine.
  *
- * Expected time: 3-6 hours depending on connection speed.
- * Expected yield: 400-700 fogging bids from the 2025-present range.
+ * Recommended backfill (Jan 2025 → present, ~430K IDs):
+ *   node scripts/gem-harvest.js --from=7150000 --to=7560000 --concurrency=30
+ *
+ * Expected time: 2-4 hours at concurrency 30.
+ * Expected yield: 200-350 fogging bids.
  */
 
 "use strict"
@@ -71,9 +77,9 @@ for (const arg of process.argv.slice(2)) {
   }
 }
 
-// Default range: IDs 9,200,000 to 9,500,000 (~Jan 2026 to present)
-const FROM        = parseInt(args.from || "9200000")
-const TO          = parseInt(args.to || "9500000")
+// Default range: IDs 7,150,000 to 7,560,000 (Jan 2025 → Jun 2026 backfill)
+const FROM        = parseInt(args.from || "7150000")
+const TO          = parseInt(args.to || "7560000")
 const CONCURRENCY = Math.min(parseInt(args.concurrency || "20"), 50)
 const MAX_BIDS    = parseInt(args["max-bids"] || "9999999")
 const DRY_RUN     = args["dry-run"] === true
