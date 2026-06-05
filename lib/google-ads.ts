@@ -224,10 +224,9 @@ export const QUERIES = {
   conversions: `
     SELECT
       conversion_action.name, conversion_action.category,
-      metrics.conversions, metrics.cost_per_conversion, metrics.all_conversions
+      metrics.all_conversions
     FROM conversion_action
-    WHERE segments.date DURING LAST_30_DAYS
-      AND metrics.conversions > 0
-    ORDER BY metrics.conversions DESC
+    ORDER BY metrics.all_conversions DESC
+    LIMIT 50
   `.trim(),
 }

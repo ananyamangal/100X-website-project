@@ -94,10 +94,10 @@ export async function POST() {
   type SearchTermRow = { searchTermView?: { searchTerm?: unknown; status?: unknown }; campaign?: { name?: unknown }; adGroup?: { name?: unknown }; metrics?: { costMicros?: unknown; clicks?: unknown; impressions?: unknown; ctr?: unknown; averageCpc?: unknown; conversions?: unknown } }
   type DeviceRow = { segments?: { device?: unknown }; metrics?: { costMicros?: unknown; clicks?: unknown; impressions?: unknown; ctr?: unknown; averageCpc?: unknown; conversions?: unknown } }
   type LocationRow = { geographicView?: { countryCriterionId?: unknown; locationType?: unknown }; metrics?: { costMicros?: unknown; clicks?: unknown; impressions?: unknown; conversions?: unknown } }
-  type ConversionRow = { conversionAction?: { name?: unknown; category?: unknown }; metrics?: { conversions?: unknown; costPerConversion?: unknown; allConversions?: unknown } }
+  type ConversionRow = { conversionAction?: { name?: unknown; category?: unknown }; metrics?: { allConversions?: unknown } }
 
+  // 1. Campaigns
   try {
-    // 1. Campaigns
     counts.campaigns = await syncCollection("ads_campaign_rows", QUERIES.campaigns, (r) => {
       const row = r as CampaignRow
       return {
@@ -114,8 +114,10 @@ export async function POST() {
         costPerConversion: fromMicros(row.metrics?.costPerConversion),
       }
     })
+  } catch (err) { errors.push(`campaigns: ${err}`) }
 
-    // 2. Overview — aggregate campaign totals
+  // 2. Overview — aggregate campaign totals
+  try {
     const campaignRows = await db.collection("ads_campaign_rows").find({ syncDate }).toArray()
     const totalSpend = campaignRows.reduce((s, r) => s + ((r.spend as number) || 0), 0)
     const totalClicks = campaignRows.reduce((s, r) => s + ((r.clicks as number) || 0), 0)
@@ -132,8 +134,10 @@ export async function POST() {
       conversions: Math.round(totalConversions * 100) / 100,
       costPerConversion: totalConversions > 0 ? Math.round(totalSpend / totalConversions * 100) / 100 : 0,
     })
+  } catch (err) { errors.push(`overview: ${err}`) }
 
-    // 3. Keywords
+  // 3. Keywords
+  try {
     counts.keywords = await syncCollection("ads_keyword_rows", QUERIES.keywords, (r) => {
       const row = r as KeywordRow
       return {
@@ -149,8 +153,10 @@ export async function POST() {
         conversions: Math.round(Number(row.metrics?.conversions ?? 0) * 100) / 100,
       }
     })
+  } catch (err) { errors.push(`keywords: ${err}`) }
 
-    // 4. Search terms
+  // 4. Search terms
+  try {
     counts.searchTerms = await syncCollection("ads_searchterm_rows", QUERIES.searchTerms, (r) => {
       const row = r as SearchTermRow
       return {
@@ -166,8 +172,10 @@ export async function POST() {
         conversions: Math.round(Number(row.metrics?.conversions ?? 0) * 100) / 100,
       }
     })
+  } catch (err) { errors.push(`searchTerms: ${err}`) }
 
-    // 5. Devices — aggregate across campaigns
+  // 5. Devices — aggregate across campaigns
+  try {
     const deviceRaw = await searchAds(customerId, QUERIES.devices, accessToken, loginCustomerId)
     const deviceAgg = aggregateBy(
       deviceRaw as DeviceRow[],
@@ -180,7 +188,6 @@ export async function POST() {
         acc.conversions = ((acc.conversions as number) || 0) + Number(r.metrics?.conversions ?? 0)
       }
     )
-    // recompute CTR and avgCPC from aggregated totals
     const deviceFinal = deviceAgg.map(r => ({
       ...r,
       spend: Math.round(((r.spend as number) || 0) * 100) / 100,
@@ -192,8 +199,10 @@ export async function POST() {
       await db.collection("ads_device_rows").insertMany(deviceFinal.map(r => ({ ...r, syncDate })))
     }
     counts.devices = deviceFinal.length
+  } catch (err) { errors.push(`devices: ${err}`) }
 
-    // 6. Locations
+  // 6. Locations
+  try {
     counts.locations = await syncCollection("ads_location_rows", QUERIES.locations, (r) => {
       const row = r as LocationRow
       return {
@@ -205,22 +214,19 @@ export async function POST() {
         conversions: Math.round(Number(row.metrics?.conversions ?? 0) * 100) / 100,
       }
     })
+  } catch (err) { errors.push(`locations: ${err}`) }
 
-    // 7. Conversions
+  // 7. Conversions — uses all_conversions (metrics.conversions not valid on conversion_action)
+  try {
     counts.conversions = await syncCollection("ads_conversion_rows", QUERIES.conversions, (r) => {
       const row = r as ConversionRow
       return {
         name: String(row.conversionAction?.name ?? ""),
         category: String(row.conversionAction?.category ?? ""),
-        conversions: Math.round(Number(row.metrics?.conversions ?? 0) * 100) / 100,
-        costPerConversion: fromMicros(row.metrics?.costPerConversion),
         allConversions: Math.round(Number(row.metrics?.allConversions ?? 0) * 100) / 100,
       }
     })
-
-  } catch (err) {
-    errors.push(String(err))
-  }
+  } catch (err) { errors.push(`conversions: ${err}`) }
 
   const syncDoc = {
     syncedAt,
