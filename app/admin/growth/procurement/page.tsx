@@ -3,8 +3,9 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import {
   FileSearch, Users, Map, Upload, RefreshCw, ChevronDown,
   TrendingUp, Building2, Package, Award, AlertCircle, CheckCircle2,
-  Search, X, ExternalLink, Tag,
+  Search, X, ExternalLink, Tag, PlusCircle,
 } from "lucide-react"
+import { CollectTab } from "./CollectTab"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -83,7 +84,7 @@ interface Brand {
   notes: string
 }
 
-type Tab = "bids" | "dealers" | "heatmap" | "brands" | "import"
+type Tab = "bids" | "dealers" | "heatmap" | "brands" | "import" | "collect"
 type ImportType = "bids" | "dealers" | "products" | "brands"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -826,12 +827,17 @@ export default function ProcurementIntelligence() {
       .catch(() => {})
   }, [])
 
-  const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
-    { id: "bids",     label: "Bid Intelligence",    icon: FileSearch },
-    { id: "dealers",  label: "Dealer Intelligence",  icon: Users },
-    { id: "heatmap",  label: "Procurement Heat Map", icon: Map },
-    { id: "brands",   label: "Brand Intelligence",   icon: Tag },
-    { id: "import",   label: "Import Data",          icon: Upload },
+  const reloadStats = () => {
+    fetch("/api/admin/procurement/stats").then(r => r.json()).then(setStats).catch(() => {})
+  }
+
+  const TABS: { id: Tab; label: string; icon: React.ElementType; highlight?: boolean }[] = [
+    { id: "collect",  label: "Collect Bid",          icon: PlusCircle, highlight: true },
+    { id: "bids",     label: "Bid Intelligence",      icon: FileSearch },
+    { id: "dealers",  label: "Dealer Intelligence",   icon: Users },
+    { id: "heatmap",  label: "Procurement Heat Map",  icon: Map },
+    { id: "brands",   label: "Brand Intelligence",    icon: Tag },
+    { id: "import",   label: "Bulk Import",           icon: Upload },
   ]
 
   return (
@@ -868,10 +874,14 @@ export default function ProcurementIntelligence() {
 
         {/* Tabs */}
         <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm w-fit">
-          {TABS.map(({ id, label, icon: Icon }) => (
+          {TABS.map(({ id, label, icon: Icon, highlight }) => (
             <button key={id} onClick={() => setActiveTab(id)}
               className={`flex items-center gap-1.5 text-xs px-4 py-1.5 rounded-lg font-medium transition-colors ${
-                activeTab === id ? "bg-brand-600 text-white" : "text-gray-500 hover:text-gray-700"
+                activeTab === id
+                  ? "bg-brand-600 text-white"
+                  : highlight
+                  ? "text-brand-600 border border-brand-200 hover:bg-brand-50"
+                  : "text-gray-500 hover:text-gray-700"
               }`}>
               <Icon size={12} />
               {label}
@@ -880,11 +890,12 @@ export default function ProcurementIntelligence() {
         </div>
 
         {/* Tab content */}
-        {activeTab === "bids"    && <BidsTab />}
-        {activeTab === "dealers" && <DealersTab />}
-        {activeTab === "heatmap" && <HeatMapTab />}
-        {activeTab === "brands"  && <BrandsTab />}
-        {activeTab === "import"  && <ImportTab />}
+        {activeTab === "collect"  && <CollectTab onSaved={reloadStats} />}
+        {activeTab === "bids"     && <BidsTab />}
+        {activeTab === "dealers"  && <DealersTab />}
+        {activeTab === "heatmap"  && <HeatMapTab />}
+        {activeTab === "brands"   && <BrandsTab />}
+        {activeTab === "import"   && <ImportTab />}
       </div>
     </div>
   )
