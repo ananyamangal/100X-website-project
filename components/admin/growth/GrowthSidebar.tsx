@@ -21,6 +21,8 @@ const MODULES = [
   { href: "/admin/growth/dealers", label: "Dealer Intelligence", icon: Users, badge: null },
   { href: "/admin/growth/gem", label: "GeM Intelligence", icon: ShoppingBag, badge: null },
   { href: "/admin/growth/ads", label: "Google Ads Intel", icon: Megaphone, badge: null },
+  { href: "/admin/growth/ads/setup", label: "↳ Ads Setup", icon: Plug, badge: null, sub: true },
+  { href: "/admin/growth/ads/dashboard", label: "↳ Ads Dashboard", icon: BarChart2, badge: null, sub: true },
   { href: "/admin/growth/automation", label: "Automation Center", icon: Settings2, badge: null },
   { href: "/admin/growth/logs", label: "Activity Logs", icon: ScrollText, badge: null },
   { href: "/admin/growth/reports", label: "Reporting Center", icon: BarChart2, badge: null },
@@ -57,7 +59,7 @@ export function GrowthSidebar() {
           // For sub-items, active only when on the exact path (not when parent is active)
           const active = sub
             ? pathname === href
-            : pathname === href || (pathname.startsWith(href + "/") && href !== "/admin/growth/seo" && href !== "/admin/growth/analytics")
+            : pathname === href || (pathname.startsWith(href + "/") && href !== "/admin/growth/seo" && href !== "/admin/growth/analytics" && href !== "/admin/growth/ads")
           const isSEOSetup = href === "/admin/growth/seo/setup"
           return (
             <Link

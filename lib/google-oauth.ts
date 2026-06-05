@@ -20,7 +20,7 @@ const DOC_ID = "google-oauth-singleton"
 export const SCOPES = {
   gsc: "https://www.googleapis.com/auth/webmasters.readonly",
   ga4: "https://www.googleapis.com/auth/analytics.readonly",
-  // ads: "https://www.googleapis.com/auth/adwords",
+  ads: "https://www.googleapis.com/auth/adwords",
 }
 
 // ── Env helpers ───────────────────────────────────────────────────────────────
