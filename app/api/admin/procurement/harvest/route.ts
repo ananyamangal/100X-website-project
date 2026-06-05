@@ -21,8 +21,11 @@ export const maxDuration = 120
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-// Approximate ID for June 2026. Cron starts scanning forward from here.
-const DEFAULT_START_ID = 9_200_000
+// Calibrated June 2026 (empirically verified — see MASTER_STATE.md GeM Harvester section).
+// Rate: ~4,000 IDs/day ≈ 120,000 IDs/month.
+// BidPlus page ID ≠ GeM bid sequential number (offset ~+1,790,000 as of Jun 2026).
+// 9,420,000 ≈ Jun 2026 live frontier. Cron scans forward from here.
+const DEFAULT_START_ID = 9_420_000
 
 // IDs to scan per daily cron run. At concurrency=5 and 5s/timeout this fits in ~90s.
 const SCAN_PER_RUN = 80

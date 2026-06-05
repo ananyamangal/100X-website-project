@@ -25,24 +25,41 @@
  * Environment:
  *   MONGODB_URI     — from .env.local (auto-loaded if dotenv installed)
  *
- * ID range guide (calibrated June 2026):
- *   Rate: ~25,000 IDs/month (confirmed from bid GEM/2026/B/7555803 = May 2026)
- *   7,000,000 = Jul 2024
- *   7,150,000 = Jan 2025
- *   7,275,000 = Jun 2025
- *   7,480,000 = Feb 2026
- *   7,555,803 = May 2026  (confirmed)
- *   7,580,000 = Jun 2026  (approx. current)
+ * ID range guide (empirically verified 2026-06-05):
+ *   Rate: ~4,000 IDs/day ≈ 120,000 IDs/month (consistent across all probe points)
  *
- * NOTE: The previous guide (8.5M-9.5M) was wrong. Those IDs do not exist yet.
- * Vercel-based harvest does NOT work — GeM blocks datacenter IPs.
+ *   IMPORTANT: BidPlus page IDs are NOT the same as GeM bid sequential numbers.
+ *   The XXXXXXX in GEM/YYYY/B/XXXXXXX is a separate sequence; BidPlus page IDs
+ *   run ~1,790,000 higher than bid seq numbers as of Jun 2026.
+ *
+ *   Confirmed probe points (live-fetched 2026-06-05):
+ *   6,000,000 = Feb 2024   (GEM/2024/B/4578631)
+ *   6,500,000 = Jun 2024   (GEM/2024/B/5032439)
+ *   7,000,000 = Oct 2024   (GEM/2024/B/5484709)
+ *   7,150,000 = Nov 2024   (GEM/2024/B/5618858)
+ *   7,500,000 = Feb 2025   (GEM/2025/B/5930085)
+ *   7,580,000 = Feb 2025   (GEM/2025/B/6000670)
+ *   8,200,000 = Sep 2025   (GEM/2025/B/6550855)
+ *   8,500,000 = Oct 2025   (GEM/2025/R/564557)
+ *   9,000,000 = Feb 2026   (GEM/2026/B/7251453)
+ *   9,200,000 = Apr 2026   (GEM/2026/B/7423722)
+ *   9,400,000 = May-Jun 2026 (GEM/2026/B/7603255)
+ *   9,450,000+= not yet live
+ *
+ *   Year coverage ranges:
+ *   2024 full year : ~5,600,000 → ~7,280,000  (~1.68M IDs)
+ *   2025 full year : ~7,400,000 → ~8,820,000  (~1.42M IDs)
+ *   2026 Jan-Jun   : ~8,860,000 → ~9,420,000  (~560K IDs)
+ *
+ * NOTE: Vercel-based harvest does NOT work — GeM blocks datacenter IPs.
  * This script must run locally on a real machine.
  *
- * Recommended backfill (Jan 2025 → present, ~430K IDs):
- *   node scripts/gem-harvest.js --from=7150000 --to=7580000 --concurrency=30
+ * Recommended phased backfill (Jan 2025 → Jun 2026, ~2M IDs total):
+ *   Phase A: node scripts/gem-harvest.js --from=7400000 --to=8200000 --concurrency=30  (~800K IDs, 7-9 hrs)
+ *   Phase B: node scripts/gem-harvest.js --from=8200000 --to=8900000 --concurrency=30  (~700K IDs, 6-8 hrs)
+ *   Phase C: node scripts/gem-harvest.js --from=8900000 --to=9420000 --concurrency=30  (~520K IDs, 4-6 hrs)
  *
- * Expected time: 2-4 hours at concurrency 30.
- * Expected yield: 200-350 fogging bids.
+ * Expected total yield: 65-175 genuine fogging bids, 20-60 dealer stubs.
  */
 
 "use strict"
@@ -84,8 +101,12 @@ for (const arg of process.argv.slice(2)) {
   }
 }
 
-const FROM        = parseInt(args.from || "7150000")
-const TO          = parseInt(args.to   || "7580000")
+// No safe single default — always pass explicit --from/--to for backfill phases.
+// Phase A: --from=7400000 --to=8200000  (Jan-Sep 2025, ~800K IDs)
+// Phase B: --from=8200000 --to=8900000  (Sep 2025-Jan 2026, ~700K IDs)
+// Phase C: --from=8900000 --to=9420000  (Jan-Jun 2026, ~520K IDs)
+const FROM        = parseInt(args.from || "9420000")
+const TO          = parseInt(args.to   || "9430000")
 const CONCURRENCY = Math.min(parseInt(args.concurrency || "20"), 50)
 const MAX_BIDS    = parseInt(args["max-bids"] || "9999999")
 const DRY_RUN     = args["dry-run"] === true

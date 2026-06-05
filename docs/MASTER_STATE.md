@@ -104,17 +104,17 @@ Tracks GeM government bids for fogging machines. **All dashboards deployed and o
 **Daily cron** (00:30 UTC) → `GET /api/admin/procurement/harvest`
 - Scans 80 sequential GeM BidPlus IDs per run, concurrency 5
 - Matches keywords: fogging, fogger, fog machine, thermal fog, cold fog
-- Default start ID: 9,200,000 (≈ Jan 2026); moves forward each run
+- Default start ID: 9,420,000 (Jun 2026 live frontier — updated after calibration audit)
 - Saves/upserts to `bid_lifecycle`, auto-creates dealer stubs in `proc_dealers`
-- `maxDuration = 120` on Vercel (increased from 60 after stuck-flag incident)
+- `maxDuration = 120` on Vercel
 
-**Validation scan completed (2026-06-05):** Extraction verified on corrected ID range `8,500,000–9,500,000`. Fogging bids confirmed present and parseable. Full backfill not yet executed.
+**IMPORTANT — BidPlus page ID ≠ GeM bid sequential number.** The XXXXXXX in `GEM/YYYY/B/XXXXXXX` is a separate sequence with a growing offset (~+1,790,000 as of Jun 2026). Previous ranges in docs/scripts were wrong because they confused the two. See verified calibration table in Integration Status → GeM Harvester.
 
 **Local backfill script:** `scripts/gem-harvest.js`
-- Usage: `node scripts/gem-harvest.js --from=8500000 --to=9500000`
-- Corrected ID range: `--from=8500000 --to=9500000` (validated for 2025–present data)
+- Requires phased approach: Jan 2025 → Jun 2026 = IDs 7,400,000 → 9,420,000 (~2M IDs, 3 phases)
 - Uses native `https` module — no npm install needed beyond mongodb
-- Concurrency up to 50, handles 300k+ IDs
+- Concurrency up to 50; checkpoints every 500 IDs — resumes automatically on interrupt
+- GeM blocks datacenter IPs — must run locally, not via Vercel
 
 **Manual via admin UI:** POST `/api/admin/procurement/harvest` with `{action:"scan", from, to}`
 
@@ -321,11 +321,38 @@ GET/POST /api/admin/procurement/harvest
 - **Status: Fully implemented.**
 
 ### GeM Harvester
-- **Status: Live. Daily cron operational. Validation scan completed — extraction verified on corrected ID ranges.**
+- **Status: Live. Daily cron operational. Calibration corrected after coverage audit (2026-06-05). Phased backfill pending.**
 - Fix (2026-06-05): maxDuration→120, SCAN_PER_RUN→80, stale lock detection, `running_since` tracking, `reset` POST action.
-- Cron advances from ID 9,200,000 forward (June 2026 range). Covers ~2026 bids only.
-- ID range corrected and validated: `--from=8500000 --to=9500000` confirmed to contain 2025–present fogging bids.
-- **Full backfill not yet executed.** Command: `node scripts/gem-harvest.js --from=8500000 --to=9500000 --concurrency=30`. Expected: 400–700 bids, 3–6 hours unattended.
+- **Calibration error found and fixed:** BidPlus page IDs were confused with GeM bid sequential numbers. All prior ranges (8.5M–9.5M and 7.15M–7.58M) were wrong.
+- **Cron DEFAULT_START_ID corrected to 9,420,000** (Jun 2026 live frontier).
+- **Coverage:** Current run (7.15M–7.58M, now stopped) scanned 35,700 IDs (Nov 2024 range), found 0 genuine fogging bids.
+- **Full backfill pending** — phased plan: 7.4M → 9.42M (~2M IDs, 3 phases, ~21 hrs total).
+
+**BidPlus ID Calibration (empirically verified 2026-06-05):**
+
+| BidPlus Page ID | Bid Number | Date |
+|---|---|---|
+| 6,000,000 | GEM/2024/B/4578631 | Feb 2024 |
+| 6,500,000 | GEM/2024/B/5032439 | Jun 2024 |
+| 7,000,000 | GEM/2024/B/5484709 | Oct 2024 |
+| 7,150,000 | GEM/2024/B/5618858 | Nov 2024 |
+| 7,500,000 | GEM/2025/B/5930085 | Feb 2025 |
+| 7,580,000 | GEM/2025/B/6000670 | Feb 2025 |
+| 8,200,000 | GEM/2025/B/6550855 | Sep 2025 |
+| 8,500,000 | GEM/2025/R/564557 | Oct 2025 |
+| 9,000,000 | GEM/2026/B/7251453 | Feb 2026 |
+| 9,200,000 | GEM/2026/B/7423722 | Apr 2026 |
+| 9,400,000 | GEM/2026/B/7603255 | May–Jun 2026 |
+| 9,450,000+ | *not yet live* | — |
+
+Rate: ~4,000 IDs/day ≈ 120,000 IDs/month (consistent). BidPlus page ID offset above bid seq number ≈ +1,790,000 as of Jun 2026.
+
+**Year coverage ranges:**
+- 2024 (full year): IDs ~5,600,000 → ~7,280,000 (~1.68M IDs)
+- 2025 (full year): IDs ~7,400,000 → ~8,820,000 (~1.42M IDs)
+- 2026 Jan–Jun: IDs ~8,860,000 → ~9,420,000 (~560K IDs)
+
+**Coverage of previous runs:** 7.15M–7.58M = Nov 2024 → Feb 2025 only (~9% of Jan 2025–Jun 2026 target window).
 
 ### MCP Server
 - **Status: Live at /api/mcp. No auth required.**
@@ -353,7 +380,7 @@ GET/POST /api/admin/procurement/harvest
 - Dealer Intelligence dashboard deployed (win-rates, bid history, competitive positioning)
 - OEM Intelligence dashboard deployed (manufacturer tracking, authorization gap analysis)
 - Department Intelligence dashboard deployed (buying-dept aggregates, spend patterns)
-- GeM Harvester (daily cron + local script + admin manual trigger); validation scan completed, ID range corrected
+- GeM Harvester (daily cron + local script + admin manual trigger); BidPlus ID calibration corrected after coverage audit; phased backfill plan ready
 - MCP server (10 tools, 4 resources)
 - AI knowledge pages (/ai/*) for crawler indexing
 - AI Citation Agent infrastructure (paused — manual checking required)
@@ -371,6 +398,8 @@ GET/POST /api/admin/procurement/harvest
 6. ~~**GSC sync URL construction broken in automation route**~~ **FIXED (2026-06-05)**: `app/api/admin/growth/automation/route.ts` used a broken `NEXTAUTH_URL || VERCEL_URL` ternary; now uses `NEXT_PUBLIC_SITE_URL` canonical pattern consistent with `lib/google-oauth.ts`.
 7. ~~**GeM Harvester stuck on first run**~~ **FIXED (2026-06-05)**: `maxDuration=60` too short for 120 IDs × 8s timeout. Vercel killed first run without cleanup → `running: true` permanently. Fixed: maxDuration→120, SCAN_PER_RUN→80, `running_since` stale detection, `reset` POST action.
 8. ~~**Growth OS automations missing gsc-sync and seo-opportunity-agent**~~ **FIXED (2026-06-05)**: GET handler now upserts missing DEFAULT_AGENTS on each call.
+9. **`bid_lifecycle` contains one false-positive**: `GEM/2024/B/5618858` is a "Power sprayer" bid where only the losing bidder company "FOGGERS INDIA PRIVATE LIMITED" contained the keyword. Improved `SELLER_LINE_RE` filter now rejects it on re-harvest. Should be manually deleted from `bid_lifecycle`.
+10. **BidPlus ID calibration was wrong in all prior docs/code**: The number in `GEM/2026/B/7555803` is the GeM sequential bid number, not the BidPlus page ID. All ranges have been corrected. See Integration Status → GeM Harvester for the verified table.
 
 ---
 

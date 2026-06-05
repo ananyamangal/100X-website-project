@@ -5,14 +5,29 @@
 
 ## Immediate Priorities
 
-### P1 — Run GeM Full Backfill (3–6 hours, unattended)
-GeM harvester cron only scans 80 IDs/day forward from ID 9,200,000. Historical 2025 data is missing.
-Validation scan completed — extraction verified on corrected range. Ready to execute.
+### P1 — Run GeM Phased Backfill (~21 hrs total across 3 sessions)
+Coverage audit (2026-06-05) found the previous range (7.15M–7.58M) only covered Nov 2024–Feb 2025.
+The correct Jan 2025 → Jun 2026 range is **7,400,000 → 9,420,000** (~2M IDs). Run as 3 phases.
+Each phase checkpoints every 500 IDs — safe to interrupt and resume.
+
+**Phase A — Jan 2025 → Sep 2025** (~800K IDs, est. 7–9 hrs):
 ```bash
-node scripts/gem-harvest.js --from=8500000 --to=9500000 --concurrency=30
+node scripts/gem-harvest.js --from=7400000 --to=8200000 --concurrency=30
 ```
-Expected yield: 400–700 fogging bids from 2025–present. Run once, leave overnight.
-**Why:** Dealer Intelligence, OEM Intelligence, and Department Intelligence dashboards all have sparse data until this runs.
+
+**Phase B — Sep 2025 → Jan 2026** (~700K IDs, est. 6–8 hrs):
+```bash
+node scripts/gem-harvest.js --from=8200000 --to=8900000 --concurrency=30
+```
+
+**Phase C — Jan 2026 → Jun 2026** (~520K IDs, est. 4–6 hrs):
+```bash
+node scripts/gem-harvest.js --from=8900000 --to=9420000 --concurrency=30
+```
+
+Expected total yield: 65–175 genuine fogging bids, 20–60 dealer stubs.
+Run phases sequentially. After all complete, reset cron position in admin → Procurement → Harvester.
+**Why:** All Procurement Intelligence dashboards have 0 genuine fogging data until this runs.
 
 ### P2 — Dealer Intelligence Population (1–2 hours after P1)
 After backfill, `proc_dealers` will auto-populate from bid data. Then:
@@ -80,7 +95,9 @@ These agents exist in `growth_os_automations` but have no implementation in `AGE
 |---|---|---|---|
 | ~~Fix GSC OAuth 403~~ | ~~30 min~~ | — | **Done** |
 | ~~Activate SEO Opportunity Agent~~ | ~~15 min~~ | — | **Done** |
-| GeM backfill script run | 0 dev, 3–6h unattended | None | **Pending (P1)** |
+| GeM backfill Phase A (7.4M→8.2M) | 0 dev, 7–9h unattended | None | **Pending (P1)** |
+| GeM backfill Phase B (8.2M→8.9M) | 0 dev, 6–8h unattended | Phase A done | **Pending (P1)** |
+| GeM backfill Phase C (8.9M→9.42M) | 0 dev, 4–6h unattended | Phase B done | **Pending (P1)** |
 | Dealer intelligence population | 1–2h review | GeM backfill | **Pending (P2)** |
 | OEM authorization opportunity analysis | 2–3h analysis | GeM backfill | **Pending (P3)** |
 | Delete stale admin/ folder | 15 min | Confirm not used | Pending (P4) |
