@@ -19,7 +19,7 @@ export async function GET() {
   // CSRF state — stored in cookie, validated in callback
   const state = randomBytes(20).toString("hex")
 
-  const authUrl = buildAuthUrl(state, [SCOPES.gsc])
+  const authUrl = buildAuthUrl(state, [SCOPES.gsc, SCOPES.ga4])
 
   const response = NextResponse.redirect(authUrl)
   response.cookies.set("gsc_oauth_state", state, {

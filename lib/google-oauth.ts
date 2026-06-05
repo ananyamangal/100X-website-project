@@ -19,7 +19,7 @@ const DOC_ID = "google-oauth-singleton"
 // ── Scope registry — add GA4, Ads scopes here when those integrations land ──
 export const SCOPES = {
   gsc: "https://www.googleapis.com/auth/webmasters.readonly",
-  // ga4: "https://www.googleapis.com/auth/analytics.readonly",
+  ga4: "https://www.googleapis.com/auth/analytics.readonly",
   // ads: "https://www.googleapis.com/auth/adwords",
 }
 
