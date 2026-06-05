@@ -32,11 +32,9 @@ export async function listGA4Properties(accessToken: string): Promise<GA4Propert
   const res = await fetch("https://analyticsadmin.googleapis.com/v1beta/accountSummaries", {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
-  if (res.status === 401) throw new Error("GA4 401: access token invalid or expired")
-  if (res.status === 403) throw new Error("GA4 403: analytics.readonly scope not granted — reconnect Google account to add Analytics access")
   if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`GA4 Admin API ${res.status}: ${err.slice(0, 300)}`)
+    const body = await res.text()
+    throw new Error(`GA4 Admin API ${res.status}: ${body.slice(0, 500)}`)
   }
   const data = await res.json() as {
     accountSummaries?: Array<{
@@ -112,12 +110,9 @@ export async function runGA4Report(opts: RunReportOptions, accessToken: string):
       orderBys: (opts.orderBy ?? []).map(o => ({ metric: o.metric, desc: o.desc ?? true })),
     }),
   })
-  if (res.status === 401) throw new Error("GA4 401: access token invalid or expired")
-  if (res.status === 403) throw new Error("GA4 403: account does not have access to this property")
-  if (res.status === 404) throw new Error(`GA4 404: property ${opts.propertyId} not found`)
   if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`GA4 API ${res.status}: ${err.slice(0, 300)}`)
+    const body = await res.text()
+    throw new Error(`GA4 Data API ${res.status} (property ${opts.propertyId}): ${body.slice(0, 500)}`)
   }
   const data = await res.json() as {
     rows?: Array<{
