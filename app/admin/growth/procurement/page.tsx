@@ -6,6 +6,7 @@ import {
   Search, X, ExternalLink, Tag, PlusCircle,
 } from "lucide-react"
 import { CollectTab } from "./CollectTab"
+import { BatchTab } from "./BatchTab"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -84,7 +85,7 @@ interface Brand {
   notes: string
 }
 
-type Tab = "bids" | "dealers" | "heatmap" | "brands" | "import" | "collect"
+type Tab = "bids" | "dealers" | "heatmap" | "brands" | "import" | "collect" | "batch"
 type ImportType = "bids" | "dealers" | "products" | "brands"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -832,12 +833,13 @@ export default function ProcurementIntelligence() {
   }
 
   const TABS: { id: Tab; label: string; icon: React.ElementType; highlight?: boolean }[] = [
-    { id: "collect",  label: "Collect Bid",          icon: PlusCircle, highlight: true },
+    { id: "batch",    label: "Batch Collect",         icon: TrendingUp, highlight: true },
+    { id: "collect",  label: "Single Bid",            icon: PlusCircle },
     { id: "bids",     label: "Bid Intelligence",      icon: FileSearch },
     { id: "dealers",  label: "Dealer Intelligence",   icon: Users },
     { id: "heatmap",  label: "Procurement Heat Map",  icon: Map },
     { id: "brands",   label: "Brand Intelligence",    icon: Tag },
-    { id: "import",   label: "Bulk Import",           icon: Upload },
+    { id: "import",   label: "Bulk Import (CSV)",     icon: Upload },
   ]
 
   return (
@@ -890,6 +892,7 @@ export default function ProcurementIntelligence() {
         </div>
 
         {/* Tab content */}
+        {activeTab === "batch"    && <BatchTab   onSaved={reloadStats} />}
         {activeTab === "collect"  && <CollectTab onSaved={reloadStats} />}
         {activeTab === "bids"     && <BidsTab />}
         {activeTab === "dealers"  && <DealersTab />}
