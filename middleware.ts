@@ -7,6 +7,9 @@ const AUTH_WHITELIST = new Set([
   "/api/admin/auth",
   "/api/admin/auth/change-password",
   "/api/admin/health",
+  // OAuth callback: Google redirects here cross-site, so SameSite=Strict blocks
+  // the admin-token cookie. The callback is CSRF-protected by its own state cookie.
+  "/api/admin/gsc/oauth/callback",
 ])
 
 function isAuthenticated(request: NextRequest): boolean {
