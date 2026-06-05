@@ -28,6 +28,15 @@ export async function GET() {
     return NextResponse.json(JSON.parse(JSON.stringify(seeded)))
   }
 
+  // Upsert agents added to DEFAULT_AGENTS after initial seed
+  const existingIds = new Set(existing.map((a: { id: string }) => a.id))
+  const missing = DEFAULT_AGENTS.filter(a => !existingIds.has(a.id))
+  if (missing.length > 0) {
+    await db.collection("growth_os_automations").insertMany(missing)
+    const updated = await db.collection("growth_os_automations").find({}).toArray()
+    return NextResponse.json(JSON.parse(JSON.stringify(updated)))
+  }
+
   return NextResponse.json(JSON.parse(JSON.stringify(existing)))
 }
 
