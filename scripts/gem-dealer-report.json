@@ -1,0 +1,1357 @@
+{
+  "generatedAt": "2026-06-06T07:24:20.792Z",
+  "totalBids": 563,
+  "totalDealers": 1222,
+  "topL1": [
+    {
+      "name": "ESS KAY HOME CARE",
+      "l1_wins": 9,
+      "l2_count": 11,
+      "l3_count": 10,
+      "departments": [
+        "Indian Army",
+        "Indian Coast Guard",
+        "All India Institute Of Medical Sciences (aiims)",
+        "Sports Authority Of India (sai)",
+        "Assam Rifles",
+        "Office Of Dg ( Ns & M)"
+      ],
+      "states": [
+        "Jammu"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "AKAM ENTERPRISES",
+      "l1_wins": 8,
+      "l2_count": 1,
+      "departments": [
+        "Dg Of Defence Estate",
+        "Indian Air Force",
+        "North Eastern Railway",
+        "Urban Development And Housing Department",
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of",
+        "Central Warehousing Corporation (cwc)",
+        "Banaras Hindu University"
+      ],
+      "states": [
+        "Bihar",
+        "Uttar Pradesh"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "A-Z OFFICE SUPPLIERS",
+      "l1_wins": 8,
+      "departments": [
+        "Central Reserve Police Force (crpf)",
+        "Sashastra Seema Bal (ssb)",
+        "Intelligence Bureau",
+        "Indian Army",
+        "Indian Coast Guard"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "AGMATEL INDIA PRIVATE LIMITED",
+      "l1_wins": 6,
+      "l2_count": 3,
+      "departments": [
+        "Bharat Electronics Limited (bel)",
+        "Indian Institute Of Technology (iit)",
+        "Office Of Dg (ecs)",
+        "Ncra Tifr Pune",
+        "Indian Army",
+        "Society For Applied Microwave Electronic Engineering And Research (sameer)"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "CONET TECHNOLOGIES PRIVATE LIMITED",
+      "l1_wins": 6,
+      "l2_count": 2,
+      "departments": [
+        "Bharat Electronics Limited (bel)",
+        "Indian Space Research Organization",
+        "Ncra Tifr Pune",
+        "Society For Applied Microwave Electronic Engineering And Research (sameer)",
+        "Airports Authority Of India"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "FOGGERS INDIA PRIVATE LIMITED",
+      "l1_wins": 6,
+      "l2_count": 8,
+      "l3_count": 5,
+      "departments": [
+        "Government Medical College And Hospital",
+        "Zilla Parishad Satara",
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of",
+        "Indian Air Force",
+        "South Eastern Coalfields Limited",
+        "Zilla Parishad Sangli",
+        "Controller General Of Defence Accounts",
+        "Directorate Of Municipal Administration",
+        "Indian Army",
+        "Central Warehousing Corporation (cwc)",
+        "Troop Comforts Limited"
+      ],
+      "states": [
+        "Chandigarh",
+        "Odisha",
+        "Jammu",
+        "Maharashtra",
+        "Uttar Pradesh",
+        "Karnataka",
+        "Madhya Pradesh"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "APPLIED REALTECH SYSTEMS PRIVATE LIMITED",
+      "l1_wins": 5,
+      "l2_count": 3,
+      "l3_count": 1,
+      "departments": [
+        "Society For Applied Microwave Electronic Engineering And Research (sameer)",
+        "Indian Space Research Organization",
+        "Indian Institute Of Technology (iit)",
+        "Office Of Dg (ecs)",
+        "Aeronautical Development Agency",
+        "Bharat Electronics Limited (bel)",
+        "Indian Army"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "A ONE CARE PEST CONTROL",
+      "l1_wins": 5,
+      "departments": [
+        "Controller General Of Defence Accounts",
+        "Indian Coast Guard",
+        "Power Grid Corporation Of India Limited",
+        "Office Of Dg R & D (r & M)",
+        "Indian Navy"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "BALAJI ENTERPRISES",
+      "l1_wins": 5,
+      "l2_count": 2,
+      "departments": [
+        "Indian Army"
+      ],
+      "states": [
+        "Madhya Pradesh"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "BBDS PEST SERVICES PRIVATE LIMITED",
+      "l1_wins": 4,
+      "l2_count": 1,
+      "l3_count": 2,
+      "departments": [
+        "Security Printing And Minting Corporation Of India Limited (spmcil)",
+        "Indian Coast Guard",
+        "Power Grid Corporation Of India Limited",
+        "Airports Authority Of India",
+        "Housing And Urban Development Corporation Ltd"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "AYUSHI ENTERPRISES",
+      "l1_wins": 4,
+      "departments": [
+        "Indian Army",
+        "Bharat Petroleum Corporation Ltd"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "CLOUD TECH PRIVATE LIMITED",
+      "l1_wins": 4,
+      "l3_count": 2,
+      "departments": [
+        "Eastern Coalfields Limited",
+        "Rourkela Steel Plant",
+        "Ntpc Limited",
+        "New Okhla Industrial Development Authority (noida)",
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of"
+      ],
+      "states": [
+        "West Bengal",
+        "Uttar Pradesh"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "DECKWARE INDIA PRIVATE LIMITED",
+      "l1_wins": 3,
+      "l2_count": 1,
+      "departments": [
+        "South Eastern Coalfields Limited",
+        "Indian Army",
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of"
+      ],
+      "states": [
+        "Uttar Pradesh"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "ALL IN ONE PEST CONTROL INDIA",
+      "l1_wins": 3,
+      "l2_count": 2,
+      "departments": [
+        "All India Institute Of Medical Sciences (aiims)",
+        "Bureau Of Indian Standards (bis)",
+        "Power Grid Corporation Of India Limited",
+        "Airports Authority Of India",
+        "Delhi Metro Rail Corporation"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "CENTRAL WAREHOUSING CORPORATION",
+      "l1_wins": 3,
+      "l2_count": 3,
+      "l3_count": 8,
+      "departments": [
+        "Indian Coast Guard",
+        "Controller General Of Defence Accounts",
+        "Southern Railway",
+        "South East Central Railway",
+        "Iocl- Panipat Refinery",
+        "Bharat Petroleum Corporation Ltd",
+        "Power Grid Corporation Of India Limited",
+        "Office Of Dg R & D (r & M)",
+        "All India Institute Of Medical Sciences (aiims)",
+        "Indian Navy",
+        "Mangalore Refinery & Petrochemicals Limited",
+        "Central Railway",
+        "Dg Of Defence Estate"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "ALERT PEST CONTROL",
+      "l1_wins": 3,
+      "l2_count": 1,
+      "departments": [
+        "Indian Navy",
+        "Council Of Scientific And Industrial Research (csir)",
+        "Dg Of Defence Estate"
+      ],
+      "states": [
+        "Delhi"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "ASCAR E OFFICE SOLUTIONS",
+      "l1_wins": 3,
+      "departments": [
+        "Indian Army",
+        "Sports Authority Of India (sai)"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "AEVITAS PROCUREMENT SERVICE PRIVATE LIMITED",
+      "l1_wins": 3,
+      "l2_count": 1,
+      "departments": [
+        "Government Medical College And Hospital",
+        "Border Security Force (bsf)",
+        "Sashastra Seema Bal (ssb)"
+      ],
+      "states": [
+        "Chandigarh"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "100KEYS TRADECOM PRIVATE LIMITED",
+      "l1_wins": 3,
+      "departments": [
+        "Hqids",
+        "Indian Coast Guard"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "ANALYTICAL TECHNOLOGIES LIMITED",
+      "l1_wins": 3,
+      "departments": [
+        "National Institute Of Technology (nit)",
+        "Odisha University Of Agriculture And Technology (ouat)",
+        "Indian Council Of Agricultural Research (icar)"
+      ],
+      "states": [
+        "Odisha"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "PARTH ENTERPRISE",
+      "l1_wins": 3,
+      "l3_count": 1,
+      "departments": [
+        "Surat District Panchayats",
+        "Indian Coast Guard"
+      ],
+      "states": [
+        "Gujarat"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "CHANDANA ENTERPRISE",
+      "l1_wins": 3,
+      "departments": [
+        "Eastern Coalfields Limited"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "ANAND SALES CORPORATION",
+      "l1_wins": 3,
+      "departments": [
+        "Border Security Force (bsf)"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "VVDN TECHNOLOGIES PRIVATE LIMITED",
+      "l1_wins": 3,
+      "departments": [
+        "Directorate Of Purchase And Stores",
+        "Indian Institute Of Technology (iit)"
+      ],
+      "is_100x_dealer": false
+    },
+    {
+      "name": "BHIMASHANKAR ENTERPRISES",
+      "l1_wins": 3,
+      "l2_count": 1,
+      "departments": [
+        "Power Grid Corporation Of India Limited",
+        "Ali Yavar Jung National Institute For The Hearing Handicapped (ayjnihh)",
+        "Central Railway"
+      ],
+      "is_100x_dealer": false
+    }
+  ],
+  "authTargets": [
+    {
+      "name": "FOGGERS INDIA PRIVATE LIMITED",
+      "score": 47,
+      "l1_wins": 6,
+      "deptCount": 11,
+      "stateCount": 7,
+      "departments": [
+        "Government Medical College And Hospital",
+        "Zilla Parishad Satara",
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of",
+        "Indian Air Force",
+        "South Eastern Coalfields Limited",
+        "Zilla Parishad Sangli",
+        "Controller General Of Defence Accounts",
+        "Directorate Of Municipal Administration",
+        "Indian Army",
+        "Central Warehousing Corporation (cwc)",
+        "Troop Comforts Limited"
+      ],
+      "states": [
+        "Chandigarh",
+        "Odisha",
+        "Jammu",
+        "Maharashtra",
+        "Uttar Pradesh",
+        "Karnataka",
+        "Madhya Pradesh"
+      ],
+      "aliases": [
+        "FOGGERS INDIA PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2024/B/4422507",
+        "GEM/2024/B/4765530",
+        "GEM/2024/B/4845586",
+        "GEM/2024/B/4807378",
+        "GEM/2024/B/4771703",
+        "GEM/2024/B/4923026",
+        "GEM/2024/B/4937606",
+        "GEM/2024/B/4951674",
+        "GEM/2024/B/5064680",
+        "GEM/2024/B/5088972",
+        "GEM/2024/R/351246",
+        "GEM/2024/B/5292086",
+        "GEM/2024/B/5293007",
+        "GEM/2024/R/375380",
+        "GEM/2024/B/5523537",
+        "GEM/2024/B/5521632",
+        "GEM/2024/B/5611933",
+        "GEM/2024/B/5606348",
+        "GEM/2024/R/411469"
+      ]
+    },
+    {
+      "name": "AKAM ENTERPRISES",
+      "score": 40,
+      "l1_wins": 8,
+      "deptCount": 7,
+      "stateCount": 2,
+      "departments": [
+        "Dg Of Defence Estate",
+        "Indian Air Force",
+        "North Eastern Railway",
+        "Urban Development And Housing Department",
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of",
+        "Central Warehousing Corporation (cwc)",
+        "Banaras Hindu University"
+      ],
+      "states": [
+        "Bihar",
+        "Uttar Pradesh"
+      ],
+      "aliases": [
+        "AKAM ENTERPRISES"
+      ],
+      "bids": [
+        "GEM/2024/R/332370",
+        "GEM/2024/B/4923026",
+        "GEM/2024/R/351246",
+        "GEM/2024/B/5172060",
+        "GEM/2024/B/5145053",
+        "GEM/2024/B/5117584",
+        "GEM/2024/B/5497457",
+        "GEM/2024/B/5611933",
+        "GEM/2024/B/5733679"
+      ]
+    },
+    {
+      "name": "ESS KAY HOME CARE",
+      "score": 40,
+      "l1_wins": 9,
+      "deptCount": 6,
+      "stateCount": 1,
+      "departments": [
+        "Indian Army",
+        "Indian Coast Guard",
+        "All India Institute Of Medical Sciences (aiims)",
+        "Sports Authority Of India (sai)",
+        "Assam Rifles",
+        "Office Of Dg ( Ns & M)"
+      ],
+      "states": [
+        "Jammu"
+      ],
+      "aliases": [
+        "ESS KAY HOME CARE"
+      ],
+      "bids": [
+        "GEM/2026/B/7567330",
+        "GEM/2026/B/7555890",
+        "GEM/2024/B/4516115",
+        "GEM/2024/B/4513772",
+        "GEM/2024/B/4513467",
+        "GEM/2024/B/4657556",
+        "GEM/2024/B/4544674",
+        "GEM/2024/B/4657241",
+        "GEM/2024/B/4844348",
+        "GEM/2024/B/4914909",
+        "GEM/2024/B/4918254",
+        "GEM/2024/B/4934296",
+        "GEM/2024/B/4932309",
+        "GEM/2024/B/4838145",
+        "GEM/2024/B/4926393",
+        "GEM/2024/B/5023774",
+        "GEM/2024/B/5022322",
+        "GEM/2024/B/5149384",
+        "GEM/2024/B/5273669",
+        "GEM/2024/B/5273648",
+        "GEM/2024/B/5252547",
+        "GEM/2024/B/5373211",
+        "GEM/2024/B/5373667",
+        "GEM/2024/B/5485915",
+        "GEM/2024/B/5485824",
+        "GEM/2024/R/401777",
+        "GEM/2024/B/5484779",
+        "GEM/2024/B/5572598",
+        "GEM/2024/B/5572547",
+        "GEM/2024/B/5572477"
+      ]
+    },
+    {
+      "name": "CENTRAL WAREHOUSING CORPORATION",
+      "score": 35,
+      "l1_wins": 3,
+      "deptCount": 13,
+      "stateCount": 0,
+      "departments": [
+        "Indian Coast Guard",
+        "Controller General Of Defence Accounts",
+        "Southern Railway",
+        "South East Central Railway",
+        "Iocl- Panipat Refinery",
+        "Bharat Petroleum Corporation Ltd",
+        "Power Grid Corporation Of India Limited",
+        "Office Of Dg R & D (r & M)",
+        "All India Institute Of Medical Sciences (aiims)",
+        "Indian Navy",
+        "Mangalore Refinery & Petrochemicals Limited",
+        "Central Railway",
+        "Dg Of Defence Estate"
+      ],
+      "aliases": [
+        "CENTRAL WAREHOUSING CORPORATION"
+      ],
+      "bids": [
+        "GEM/2024/R/295658",
+        "GEM/2024/B/4487602",
+        "GEM/2023/B/4389446",
+        "GEM/2024/B/4723763",
+        "GEM/2024/B/4853351",
+        "GEM/2024/B/4914472",
+        "GEM/2024/B/4884884",
+        "GEM/2024/B/4902125",
+        "GEM/2024/B/5137868",
+        "GEM/2024/B/5065472",
+        "GEM/2024/B/5204375",
+        "GEM/2024/B/5377992",
+        "GEM/2024/B/5348490",
+        "GEM/2024/B/5543870"
+      ]
+    },
+    {
+      "name": "A-Z OFFICE SUPPLIERS",
+      "score": 34,
+      "l1_wins": 8,
+      "deptCount": 5,
+      "stateCount": 0,
+      "departments": [
+        "Central Reserve Police Force (crpf)",
+        "Sashastra Seema Bal (ssb)",
+        "Intelligence Bureau",
+        "Indian Army",
+        "Indian Coast Guard"
+      ],
+      "aliases": [
+        "A-Z OFFICE SUPPLIERS"
+      ],
+      "bids": [
+        "GEM/2024/B/4842986",
+        "GEM/2024/B/4867407",
+        "GEM/2024/B/4928705",
+        "GEM/2024/B/5023774",
+        "GEM/2024/B/5148324",
+        "GEM/2024/B/5305740",
+        "GEM/2024/B/5266224",
+        "GEM/2024/B/5540359"
+      ]
+    },
+    {
+      "name": "AGMATEL INDIA PRIVATE LIMITED",
+      "score": 30,
+      "l1_wins": 6,
+      "deptCount": 6,
+      "stateCount": 0,
+      "departments": [
+        "Bharat Electronics Limited (bel)",
+        "Indian Institute Of Technology (iit)",
+        "Office Of Dg (ecs)",
+        "Ncra Tifr Pune",
+        "Indian Army",
+        "Society For Applied Microwave Electronic Engineering And Research (sameer)"
+      ],
+      "aliases": [
+        "AGMATEL INDIA PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2024/R/295203",
+        "GEM/2024/B/4656874",
+        "GEM/2024/R/309615",
+        "GEM/2024/B/5020038",
+        "GEM/2024/B/5018595",
+        "GEM/2024/R/372629",
+        "GEM/2024/R/372598",
+        "GEM/2024/B/4949960",
+        "GEM/2024/B/5394934"
+      ]
+    },
+    {
+      "name": "APPLIED REALTECH SYSTEMS PRIVATE LIMITED",
+      "score": 29,
+      "l1_wins": 5,
+      "deptCount": 7,
+      "stateCount": 0,
+      "departments": [
+        "Society For Applied Microwave Electronic Engineering And Research (sameer)",
+        "Indian Space Research Organization",
+        "Indian Institute Of Technology (iit)",
+        "Office Of Dg (ecs)",
+        "Aeronautical Development Agency",
+        "Bharat Electronics Limited (bel)",
+        "Indian Army"
+      ],
+      "aliases": [
+        "APPLIED REALTECH SYSTEMS PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2024/B/4452010",
+        "GEM/2023/B/4347182",
+        "GEM/2024/B/4656874",
+        "GEM/2024/B/4546740",
+        "GEM/2024/R/309615",
+        "GEM/2024/B/4854072",
+        "GEM/2024/R/372629",
+        "GEM/2024/R/372598",
+        "GEM/2024/B/4949960"
+      ]
+    },
+    {
+      "name": "CONET TECHNOLOGIES PRIVATE LIMITED",
+      "score": 28,
+      "l1_wins": 6,
+      "deptCount": 5,
+      "stateCount": 0,
+      "departments": [
+        "Bharat Electronics Limited (bel)",
+        "Indian Space Research Organization",
+        "Ncra Tifr Pune",
+        "Society For Applied Microwave Electronic Engineering And Research (sameer)",
+        "Airports Authority Of India"
+      ],
+      "aliases": [
+        "CONET TECHNOLOGIES PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2024/R/295203",
+        "GEM/2023/B/4404000",
+        "GEM/2024/B/4933447",
+        "GEM/2024/B/5020038",
+        "GEM/2024/B/5018595",
+        "GEM/2024/B/5468531",
+        "GEM/2024/B/5421070",
+        "GEM/2024/B/5501794"
+      ]
+    },
+    {
+      "name": "A ONE CARE PEST CONTROL",
+      "score": 25,
+      "l1_wins": 5,
+      "deptCount": 5,
+      "stateCount": 0,
+      "departments": [
+        "Controller General Of Defence Accounts",
+        "Indian Coast Guard",
+        "Power Grid Corporation Of India Limited",
+        "Office Of Dg R & D (r & M)",
+        "Indian Navy"
+      ],
+      "aliases": [
+        "A ONE CARE PEST CONTROL"
+      ],
+      "bids": [
+        "GEM/2024/B/4487602",
+        "GEM/2023/B/4311034",
+        "GEM/2024/B/4884884",
+        "GEM/2024/B/5137868",
+        "GEM/2024/B/5204375"
+      ]
+    },
+    {
+      "name": "CLOUD TECH PRIVATE LIMITED",
+      "score": 24,
+      "l1_wins": 4,
+      "deptCount": 5,
+      "stateCount": 2,
+      "departments": [
+        "Eastern Coalfields Limited",
+        "Rourkela Steel Plant",
+        "Ntpc Limited",
+        "New Okhla Industrial Development Authority (noida)",
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of"
+      ],
+      "states": [
+        "West Bengal",
+        "Uttar Pradesh"
+      ],
+      "aliases": [
+        "CLOUD TECH PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2024/B/4738461",
+        "GEM/2024/R/341343",
+        "GEM/2024/R/351840",
+        "GEM/2024/B/5395202",
+        "GEM/2024/B/5581727",
+        "GEM/2024/B/5728758"
+      ]
+    },
+    {
+      "name": "BBDS PEST SERVICES PRIVATE LIMITED",
+      "score": 22,
+      "l1_wins": 4,
+      "deptCount": 5,
+      "stateCount": 0,
+      "departments": [
+        "Security Printing And Minting Corporation Of India Limited (spmcil)",
+        "Indian Coast Guard",
+        "Power Grid Corporation Of India Limited",
+        "Airports Authority Of India",
+        "Housing And Urban Development Corporation Ltd"
+      ],
+      "aliases": [
+        "BBDS PEST SERVICES PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2024/B/4875867",
+        "GEM/2024/B/4902125",
+        "GEM/2024/B/4951304",
+        "GEM/2024/B/5154665",
+        "GEM/2024/B/5296487",
+        "GEM/2024/B/5469974",
+        "GEM/2024/B/5553942"
+      ]
+    },
+    {
+      "name": "ALL IN ONE PEST CONTROL INDIA",
+      "score": 19,
+      "l1_wins": 3,
+      "deptCount": 5,
+      "stateCount": 0,
+      "departments": [
+        "All India Institute Of Medical Sciences (aiims)",
+        "Bureau Of Indian Standards (bis)",
+        "Power Grid Corporation Of India Limited",
+        "Airports Authority Of India",
+        "Delhi Metro Rail Corporation"
+      ],
+      "aliases": [
+        "ALL IN ONE PEST CONTROL INDIA"
+      ],
+      "bids": [
+        "GEM/2024/B/4807111",
+        "GEM/2024/B/5310380",
+        "GEM/2024/B/5490022",
+        "GEM/2024/B/5469974",
+        "GEM/2024/B/5472197"
+      ]
+    },
+    {
+      "name": "BALAJI ENTERPRISES",
+      "score": 18,
+      "l1_wins": 5,
+      "deptCount": 1,
+      "stateCount": 1,
+      "departments": [
+        "Indian Army"
+      ],
+      "states": [
+        "Madhya Pradesh"
+      ],
+      "aliases": [
+        "BALAJI ENTERPRISES",
+        "Balaji Enterprises",
+        "Balaji enterprises"
+      ],
+      "bids": [
+        "GEM/2024/B/4516499",
+        "GEM/2024/B/4756562",
+        "GEM/2024/B/5023774",
+        "GEM/2024/B/5188000",
+        "GEM/2024/B/5485915",
+        "GEM/2024/B/5573768",
+        "GEM/2024/B/5683331"
+      ]
+    },
+    {
+      "name": "ANALYTICAL TECHNOLOGIES LIMITED",
+      "score": 16,
+      "l1_wins": 3,
+      "deptCount": 3,
+      "stateCount": 1,
+      "departments": [
+        "National Institute Of Technology (nit)",
+        "Odisha University Of Agriculture And Technology (ouat)",
+        "Indian Council Of Agricultural Research (icar)"
+      ],
+      "states": [
+        "Odisha"
+      ],
+      "aliases": [
+        "ANALYTICAL TECHNOLOGIES LIMITED"
+      ],
+      "bids": [
+        "GEM/2024/B/4658982",
+        "GEM/2024/B/4657348",
+        "GEM/2024/B/5377023"
+      ]
+    },
+    {
+      "name": "ALERT PEST CONTROL",
+      "score": 16,
+      "l1_wins": 3,
+      "deptCount": 3,
+      "stateCount": 1,
+      "departments": [
+        "Indian Navy",
+        "Council Of Scientific And Industrial Research (csir)",
+        "Dg Of Defence Estate"
+      ],
+      "states": [
+        "Delhi"
+      ],
+      "aliases": [
+        "ALERT PEST CONTROL"
+      ],
+      "bids": [
+        "GEM/2024/B/5022255",
+        "GEM/2024/B/5066168",
+        "GEM/2024/B/4999106",
+        "GEM/2024/B/5543870"
+      ]
+    },
+    {
+      "name": "DECKWARE INDIA PRIVATE LIMITED",
+      "score": 16,
+      "l1_wins": 3,
+      "deptCount": 3,
+      "stateCount": 1,
+      "departments": [
+        "South Eastern Coalfields Limited",
+        "Indian Army",
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of"
+      ],
+      "states": [
+        "Uttar Pradesh"
+      ],
+      "aliases": [
+        "DECKWARE INDIA PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2024/B/4937606",
+        "GEM/2024/R/375380",
+        "GEM/2024/B/5288017",
+        "GEM/2024/B/5596606"
+      ]
+    },
+    {
+      "name": "AEVITAS PROCUREMENT SERVICE PRIVATE LIMITED",
+      "score": 16,
+      "l1_wins": 3,
+      "deptCount": 3,
+      "stateCount": 1,
+      "departments": [
+        "Government Medical College And Hospital",
+        "Border Security Force (bsf)",
+        "Sashastra Seema Bal (ssb)"
+      ],
+      "states": [
+        "Chandigarh"
+      ],
+      "aliases": [
+        "AEVITAS PROCUREMENT SERVICE PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2024/B/4422507",
+        "GEM/2024/B/4871730",
+        "GEM/2024/B/4867407",
+        "GEM/2024/B/4968990"
+      ]
+    },
+    {
+      "name": "AYUSHI ENTERPRISES",
+      "score": 16,
+      "l1_wins": 4,
+      "deptCount": 2,
+      "stateCount": 0,
+      "departments": [
+        "Indian Army",
+        "Bharat Petroleum Corporation Ltd"
+      ],
+      "aliases": [
+        "AYUSHI ENTERPRISES"
+      ],
+      "bids": [
+        "GEM/2026/B/7580934",
+        "GEM/2024/B/4660193",
+        "GEM/2024/B/4851592",
+        "GEM/2024/B/5575232"
+      ]
+    },
+    {
+      "name": "BHIMASHANKAR ENTERPRISES",
+      "score": 15,
+      "l1_wins": 3,
+      "deptCount": 3,
+      "stateCount": 0,
+      "departments": [
+        "Power Grid Corporation Of India Limited",
+        "Ali Yavar Jung National Institute For The Hearing Handicapped (ayjnihh)",
+        "Central Railway"
+      ],
+      "aliases": [
+        "BHIMASHANKAR ENTERPRISES"
+      ],
+      "bids": [
+        "GEM/2026/B/7454511",
+        "GEM/2024/B/4808269",
+        "GEM/2024/B/5099296",
+        "GEM/2024/B/5348490"
+      ]
+    },
+    {
+      "name": "CHETAN CHEMICALS",
+      "score": 15,
+      "l1_wins": 2,
+      "deptCount": 4,
+      "stateCount": 1,
+      "departments": [
+        "Border Security Force (bsf)",
+        "Indira Gandhi Rashtriya Uran Academy (igrua)",
+        "Indian Army",
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of"
+      ],
+      "states": [
+        "Uttar Pradesh"
+      ],
+      "aliases": [
+        "CHETAN CHEMICALS"
+      ],
+      "bids": [
+        "GEM/2024/B/4968990",
+        "GEM/2024/B/5147862",
+        "GEM/2024/B/5136194",
+        "GEM/2024/B/5182557"
+      ]
+    },
+    {
+      "name": "PARTH ENTERPRISE",
+      "score": 14,
+      "l1_wins": 3,
+      "deptCount": 2,
+      "stateCount": 1,
+      "departments": [
+        "Surat District Panchayats",
+        "Indian Coast Guard"
+      ],
+      "states": [
+        "Gujarat"
+      ],
+      "aliases": [
+        "PARTH ENTERPRISE"
+      ],
+      "bids": [
+        "GEM/2024/B/5142299",
+        "GEM/2024/R/389450",
+        "GEM/2024/R/384738",
+        "GEM/2024/R/401840"
+      ]
+    },
+    {
+      "name": "ASCAR E OFFICE SOLUTIONS",
+      "score": 13,
+      "l1_wins": 3,
+      "deptCount": 2,
+      "stateCount": 0,
+      "departments": [
+        "Indian Army",
+        "Sports Authority Of India (sai)"
+      ],
+      "aliases": [
+        "ASCAR E OFFICE SOLUTIONS"
+      ],
+      "bids": [
+        "GEM/2024/B/4513772",
+        "GEM/2024/B/4838145",
+        "GEM/2024/B/4926393"
+      ]
+    },
+    {
+      "name": "100KEYS TRADECOM PRIVATE LIMITED",
+      "score": 13,
+      "l1_wins": 3,
+      "deptCount": 2,
+      "stateCount": 0,
+      "departments": [
+        "Hqids",
+        "Indian Coast Guard"
+      ],
+      "aliases": [
+        "100KEYS TRADECOM PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2026/B/7564840",
+        "GEM/2024/B/5011337",
+        "GEM/2024/B/5267880"
+      ]
+    },
+    {
+      "name": "CLEAN & GREEN EQUIPMENTS PRIVATE LIMITED",
+      "score": 13,
+      "l1_wins": 2,
+      "deptCount": 2,
+      "stateCount": 3,
+      "departments": [
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of",
+        "Patna District Panchayats"
+      ],
+      "states": [
+        "Uttar Pradesh",
+        "Jammu",
+        "Bihar"
+      ],
+      "aliases": [
+        "CLEAN & GREEN EQUIPMENTS PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2024/B/4607800",
+        "GEM/2024/B/4845586",
+        "GEM/2024/B/4794311",
+        "GEM/2024/B/4771703"
+      ]
+    },
+    {
+      "name": "VVDN TECHNOLOGIES PRIVATE LIMITED",
+      "score": 13,
+      "l1_wins": 3,
+      "deptCount": 2,
+      "stateCount": 0,
+      "departments": [
+        "Directorate Of Purchase And Stores",
+        "Indian Institute Of Technology (iit)"
+      ],
+      "aliases": [
+        "VVDN TECHNOLOGIES PRIVATE LIMITED"
+      ],
+      "bids": [
+        "GEM/2026/R/663338",
+        "GEM/2024/R/387644",
+        "GEM/2024/R/387635"
+      ]
+    },
+    {
+      "name": "BHARAT ENTERPRISES",
+      "score": 12,
+      "l1_wins": 2,
+      "deptCount": 2,
+      "stateCount": 2,
+      "departments": [
+        "Indian Army",
+        "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of"
+      ],
+      "states": [
+        "Uttar Pradesh",
+        "Odisha"
+      ],
+      "aliases": [
+        "BHARAT ENTERPRISES",
+        "M/S BHARAT ENTERPRISES",
+        "Bharat enterprises"
+      ],
+      "bids": [
+        "GEM/2026/B/7547712",
+        "GEM/2024/B/4497836",
+        "GEM/2024/B/4685691",
+        "GEM/2024/B/5494646",
+        "GEM/2024/B/5568927"
+      ]
+    },
+    {
+      "name": "GLOBAL TRADE SOLUTIONS",
+      "score": 12,
+      "l1_wins": 2,
+      "deptCount": 2,
+      "stateCount": 2,
+      "departments": [
+        "Urban Development Directorate",
+        "Sangli District Panchayats"
+      ],
+      "states": [
+        "Uttarakhand",
+        "Maharashtra"
+      ],
+      "aliases": [
+        "GLOBAL TRADE SOLUTIONS"
+      ],
+      "bids": [
+        "GEM/2024/B/4760252",
+        "GEM/2024/B/4825931"
+      ]
+    },
+    {
+      "name": "VIGHNHARTA CORPORATION",
+      "score": 12,
+      "l1_wins": 2,
+      "deptCount": 3,
+      "stateCount": 0,
+      "departments": [
+        "Indian Air Force",
+        "Central Warehousing Corporation (cwc)",
+        "Troop Comforts Limited"
+      ],
+      "aliases": [
+        "VIGHNHARTA CORPORATION"
+      ],
+      "bids": [
+        "GEM/2026/R/672410",
+        "GEM/2024/R/400882",
+        "GEM/2024/B/5611933",
+        "GEM/2024/R/411469"
+      ]
+    },
+    {
+      "name": "POOJA TRADERS",
+      "score": 11,
+      "l1_wins": 2,
+      "deptCount": 2,
+      "stateCount": 1,
+      "departments": [
+        "Indian Army",
+        "Kollam Corporation"
+      ],
+      "states": [
+        "Kerala"
+      ],
+      "aliases": [
+        "POOJA TRADERS"
+      ],
+      "bids": [
+        "GEM/2024/B/4642994",
+        "GEM/2024/B/4799168",
+        "GEM/2024/B/5378853"
+      ]
+    },
+    {
+      "name": "CHANDANA ENTERPRISE",
+      "score": 11,
+      "l1_wins": 3,
+      "deptCount": 1,
+      "stateCount": 0,
+      "departments": [
+        "Eastern Coalfields Limited"
+      ],
+      "aliases": [
+        "CHANDANA ENTERPRISE"
+      ],
+      "bids": [
+        "GEM/2024/B/5028190",
+        "GEM/2024/B/5139493",
+        "GEM/2024/B/5275626"
+      ]
+    }
+  ],
+  "deptDistribution": [
+    {
+      "dept": "Indian Army",
+      "count": 163
+    },
+    {
+      "dept": "Indian Coast Guard",
+      "count": 35
+    },
+    {
+      "dept": "E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of",
+      "count": 14
+    },
+    {
+      "dept": "Border Security Force (bsf)",
+      "count": 12
+    },
+    {
+      "dept": "Eastern Coalfields Limited",
+      "count": 11
+    },
+    {
+      "dept": "Ntpc Limited",
+      "count": 10
+    },
+    {
+      "dept": "Indian Navy",
+      "count": 10
+    },
+    {
+      "dept": "Urban Development And Housing Department",
+      "count": 9
+    },
+    {
+      "dept": "Power Grid Corporation Of India Limited",
+      "count": 9
+    },
+    {
+      "dept": "Bharat Electronics Limited (bel)",
+      "count": 9
+    },
+    {
+      "dept": "Indian Air Force",
+      "count": 8
+    },
+    {
+      "dept": "Indian Institute Of Technology (iit)",
+      "count": 7
+    },
+    {
+      "dept": "Indian Council Of Agricultural Research (icar)",
+      "count": 7
+    },
+    {
+      "dept": "Airports Authority Of India",
+      "count": 6
+    },
+    {
+      "dept": "Hqids",
+      "count": 6
+    },
+    {
+      "dept": "Bharat Heavy Electricals Limited (bhel)",
+      "count": 6
+    },
+    {
+      "dept": "All India Institute Of Medical Sciences (aiims)",
+      "count": 5
+    },
+    {
+      "dept": "Security Printing And Minting Corporation Of India Limited (spmcil)",
+      "count": 5
+    },
+    {
+      "dept": "Directorate Of Purchase And Stores",
+      "count": 4
+    },
+    {
+      "dept": "Southern Railway",
+      "count": 4
+    }
+  ],
+  "topDefence": [
+    {
+      "name": "ESS KAY HOME CARE",
+      "wins": 8
+    },
+    {
+      "name": "A-Z OFFICE SUPPLIERS",
+      "wins": 5
+    },
+    {
+      "name": "BALAJI ENTERPRISES",
+      "wins": 4
+    },
+    {
+      "name": "AYUSHI ENTERPRISES",
+      "wins": 3
+    },
+    {
+      "name": "A ONE CARE PEST CONTROL",
+      "wins": 3
+    },
+    {
+      "name": "AKAM ENTERPRISES",
+      "wins": 3
+    },
+    {
+      "name": "AAYU ENTERPRISES",
+      "wins": 3
+    },
+    {
+      "name": "PARTH ENTERPRISE",
+      "wins": 3
+    },
+    {
+      "name": "BHARAT ENTERPRISES",
+      "wins": 2
+    },
+    {
+      "name": "SEEMA CREATION",
+      "wins": 2
+    },
+    {
+      "name": "AA ENTERPRISES",
+      "wins": 2
+    },
+    {
+      "name": "ASCAR E OFFICE SOLUTIONS",
+      "wins": 2
+    },
+    {
+      "name": "POOJA TRADERS",
+      "wins": 2
+    },
+    {
+      "name": "AGARWAL GENERAL SUPPLIERS",
+      "wins": 2
+    },
+    {
+      "name": "M/S BALI AND SONS",
+      "wins": 2
+    }
+  ],
+  "topMunicipal": [
+    {
+      "name": "GLOBAL PEST SOLUTIONS",
+      "wins": 2
+    },
+    {
+      "name": "BBDS PEST SERVICES PRIVATE LIMITED",
+      "wins": 2
+    },
+    {
+      "name": "AKAM ENTERPRISES",
+      "wins": 2
+    },
+    {
+      "name": "ANIKA INFRA VENTURES",
+      "wins": 2
+    },
+    {
+      "name": "COLUMBUS CLIMBER INDIA",
+      "wins": 1
+    },
+    {
+      "name": "AVTAR ENTERPRISES",
+      "wins": 1
+    },
+    {
+      "name": "ROYAL TRADELINKS PRIVATE LIMITED",
+      "wins": 1
+    },
+    {
+      "name": "ABHISHEK INFRA ENTERPRISES",
+      "wins": 1
+    },
+    {
+      "name": "MS Pest Control",
+      "wins": 1
+    },
+    {
+      "name": "J K SWASTHYA SHIKSHA & CONSTRUCTION AND GENERAL ORDER SUPPLIER",
+      "wins": 1
+    },
+    {
+      "name": "ADROIT TECHNOSOFT",
+      "wins": 1
+    },
+    {
+      "name": "F K ENTERPRISES",
+      "wins": 1
+    },
+    {
+      "name": "CLEAN & GREEN EQUIPMENTS PRIVATE LIMITED",
+      "wins": 1
+    },
+    {
+      "name": "SWAPNIL ENTERPRISES AND PEST CONTROL SERVICES",
+      "wins": 1
+    },
+    {
+      "name": "SANVIK IND.",
+      "wins": 1
+    }
+  ]
+}
