@@ -1,9 +1,5 @@
 {
-  "build": {
-    "env": {
-      "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
-    }
-  },
+  "installCommand": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install",
   "crons": [
     {
       "path": "/api/admin/procurement/harvest",
