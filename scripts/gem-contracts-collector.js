@@ -1,23 +1,25 @@
 "use strict";
-// GeM View Contracts Collector — v3
+// GeM View Contracts Collector — v4 (fully unattended)
 // Architecture: 30-day date chunks, true resume via chunk checkpoint,
 //               dual-collection storage (structured + raw card HTML)
 //               Card-based extraction — div#pagi_content div.border.block
 //               Infinite-scroll pagination — scroll #load_more into view
+//               Captcha auto-solved via captcha.php POST (plaintext answer in JSON)
+//               Rolling reports + enrichment after every completed chunk
 //
-// Usage:
+// OVERNIGHT COMMAND (fully unattended, 36 chunks × 30 days = 3 years):
+//   node scripts/gem-contracts-collector.js --full --days=1095
+//
+// Other usage:
 //   node scripts/gem-contracts-collector.js                       → 1 chunk (last 30 days)
 //   node scripts/gem-contracts-collector.js --full                → all pending chunks (default 365 days)
-//   node scripts/gem-contracts-collector.js --full --days=730     → 2 years of history (24 chunks)
-//   node scripts/gem-contracts-collector.js --full --days=1095    → 3 years of history (36 chunks)
+//   node scripts/gem-contracts-collector.js --full --days=730     → 2 years (24 chunks)
 //   node scripts/gem-contracts-collector.js --full --reset        → delete checkpoint, start fresh
 //
 // --days=N     Override total history depth in days (default: 365).
-//              If checkpoint exists with fewer days, new chunks are appended automatically.
 //              Existing completed chunks are NOT re-run.
 //
-// --reset      Delete checkpoint and start fresh from today (re-runs all chunks).
-//              Records already in MongoDB will be safely upserted, not duplicated.
+// --reset      Delete checkpoint and start fresh (safe upserts, no duplicates).
 //
 // Collections written:
 //   gem_contracts       — structured, indexed, queryable
@@ -25,10 +27,10 @@
 //
 // Resume: re-run any command — completed chunks are skipped automatically.
 //         An interrupted chunk restarts from page 1 of that chunk only.
+// Reports: GeMArchive/Reports/CUMULATIVE-LATEST.{txt,json} updated after each chunk.
 
 const path     = require("path")
 const fs       = require("fs")
-const readline = require("readline")
 const { chromium } = require("playwright")
 const { MongoClient } = require("mongodb")
 
@@ -56,11 +58,6 @@ function loadEnv() {
 }
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
-function ask(q) {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-  return new Promise(res => rl.question(q, a => { rl.close(); res(a.trim()) }))
-}
-
 function fmtDate(d) {
   return `${String(d.getDate()).padStart(2,"0")}-${String(d.getMonth()+1).padStart(2,"0")}-${d.getFullYear()}`
 }
@@ -442,12 +439,43 @@ async function processChunk(page, chunk, colGC, colRaw, state) {
   }
   await page.waitForTimeout(400)
 
-  // Captcha
-  console.log(`\n  CAPTCHA required for chunk ${chunk.id}`)
-  console.log(`  Date: ${chunk.from} → ${chunk.to}`)
-  console.log("  1. Type captcha in the browser window")
-  console.log("  2. Press Enter here (do NOT click Search in the browser)")
-  await ask("  Press Enter: ")
+  // Auto-solve captcha
+  console.log(`\n  Auto-solving captcha for chunk ${chunk.id} (${chunk.from} → ${chunk.to})…`)
+  let capText = null
+  for (let capTry = 1; capTry <= 6; capTry++) {
+    try {
+      capText = await page.evaluate(async () => {
+        const resp = await fetch(
+          "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=" + Math.random(),
+          { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "" }
+        )
+        if (!resp.ok) throw new Error("captcha.php HTTP " + resp.status)
+        const data = JSON.parse(await resp.text())
+        // Refresh hidden fields so client-side captcha_check uses this captcha
+        const el1 = document.getElementById("h_captcha1")
+        if (el1) el1.value = data.encodeTxt || ""
+        const el2 = document.getElementById("h_captcha2")
+        if (el2) el2.value = data.encodeTxt || ""
+        const img = document.querySelector("#captchaimg1, #captchaimg")
+        if (img && data.im) img.src = "data:image/jpeg;charset=utf8;base64," + data.im
+        return data.text || null
+      })
+      if (capText) break
+    } catch (capErr) {
+      console.log(`  [warn] Captcha attempt ${capTry} failed: ${capErr.message}`)
+      await page.waitForTimeout(2000)
+    }
+  }
+  if (!capText) throw new Error("Auto-captcha: captcha.php returned no text after 6 attempts")
+  const capFieldSel = "#captcha_code1, input[name='captcha_entered1'], input[id*='captcha_code']"
+  await page.fill(capFieldSel, capText).catch(async () => {
+    await page.evaluate(txt => {
+      const el = document.getElementById("captcha_code1") ||
+                 document.querySelector("input[name='captcha_entered1']")
+      if (el) el.value = txt
+    }, capText)
+  })
+  console.log(`  Auto-captcha solved: "${capText}" — submitting search…`)
 
   const clicked = await page.click(
     "#searchlocation1, button#searchlocation1, [id='searchlocation1']"
@@ -568,9 +596,9 @@ async function processChunk(page, chunk, colGC, colRaw, state) {
       console.log(`  Skipped (no GEMC)   : ${skipped}`)
 
       if (page1Sample.length === 0) {
-        console.log("\n  [!] No valid records. Check cards above and HTML dumps in audit/.")
-        const cont = await ask("  Continue anyway? (y/n): ")
-        if (cont.toLowerCase() !== "y") { break }
+        console.log("\n  [!] No valid records in batch 1 — zero GEMCs extracted. Check audit/ HTML dumps.")
+        console.log("  [auto] Stopping batch loop for this chunk — moving to next chunk.")
+        break
       } else {
         console.log(`\n  First ${page1Sample.length} contract(s) from batch 1:\n`)
         page1Sample.forEach((r, i) => {
@@ -634,12 +662,7 @@ async function processChunk(page, chunk, colGC, colRaw, state) {
         }
 
         console.log("\n" + "─".repeat(65))
-        const cont = await ask("  Continue to load all batches? (y/n): ")
-        if (cont.toLowerCase() !== "y") {
-          console.log(`\n  Stopped at user request. ${inserted} record(s) saved.`)
-          break
-        }
-        console.log("  Confirmed — continuing...\n")
+        console.log("  [auto] Unattended — continuing to load all batches…\n")
       }
     }
     // ── End of batch 1 checkpoint ────────────────────────────────────────────
@@ -863,6 +886,260 @@ async function printReport(db) {
   console.log("═".repeat(70))
 }
 
+// ── Post-chunk hooks: checkpoint + enrich + classify + rolling reports ────────
+function getArchiveRoot() {
+  return process.env.GEM_ARCHIVE_ROOT ||
+    path.join("F:", "OneDrive", "Data", "SULABH2018", "E drive", "GeMArchive")
+}
+
+function scanDirBytes(dir, ext) {
+  try {
+    const files = fs.readdirSync(dir).filter(f => f.endsWith(ext))
+    const bytes = files.reduce((s, f) => {
+      try { return s + fs.statSync(path.join(dir, f)).size } catch { return s }
+    }, 0)
+    return { count: files.length, bytes }
+  } catch { return { count: 0, bytes: 0 } }
+}
+
+function fmtCr(n) {
+  if (!n) return "₹0"
+  if (n >= 1e7) return "₹" + (n / 1e7).toFixed(2) + " Cr"
+  if (n >= 1e5) return "₹" + (n / 1e5).toFixed(2) + " L"
+  return "₹" + Math.round(n).toLocaleString("en-IN")
+}
+
+function runPostScript(script, args = []) {
+  const { spawn } = require("child_process")
+  return new Promise(resolve => {
+    const child = spawn("node", [script, ...args], {
+      stdio: "inherit", shell: false,
+      cwd: path.join(__dirname, ".."),
+    })
+    child.on("close", code => {
+      if (code !== 0) console.log(`\n  [post-chunk] ${path.basename(script)} exit ${code}`)
+      resolve()
+    })
+    child.on("error", () => resolve())
+  })
+}
+
+async function postChunkHooks(chunk, state, db) {
+  const ARCHIVE    = getArchiveRoot()
+  const REPORT_DIR = path.join(ARCHIVE, "Reports")
+  const CPDIR      = path.join(ARCHIVE, "Checkpoints")
+  fs.mkdirSync(REPORT_DIR, { recursive: true })
+  fs.mkdirSync(CPDIR,      { recursive: true })
+
+  const now      = new Date()
+  const dateStr  = now.toISOString().slice(0, 10)
+  const chunkTag = String(chunk.id).padStart(3, "0")
+
+  console.log(`\n${"═".repeat(65)}`)
+  console.log(`  POST-CHUNK PIPELINE — chunk ${chunk.id} of ${state.chunks.length}`)
+  console.log("═".repeat(65))
+
+  // 1. Checkpoint → OneDrive
+  const cpPath = path.join(CPDIR, `checkpoint-chunk-${chunkTag}.json`)
+  fs.writeFileSync(cpPath, JSON.stringify(state, null, 2))
+  console.log(`  [1/5] Checkpoint → Checkpoints/checkpoint-chunk-${chunkTag}.json`)
+
+  // 2. Enrich new contracts (sbtCaptcha auto-solved, browser opens + closes)
+  console.log("  [2/5] Enriching new contracts (auto-captcha, no human interaction)…")
+  await runPostScript("scripts/gem-enrich-contracts.js", ["--value-first"])
+
+  // 3. Classify PDFs
+  console.log("  [3/5] Classifying PDFs…")
+  await runPostScript("scripts/gem-classify-pdfs.js")
+
+  // 4. Query MongoDB for cumulative intelligence
+  console.log("  [4/5] Querying cumulative intelligence…")
+
+  const gc = db.collection("gem_contracts")
+  const [total, enriched] = await Promise.all([
+    gc.countDocuments(),
+    gc.countDocuments({ detail_scraped: true }),
+  ])
+  const gmvAgg = await gc.aggregate([
+    { $group: { _id: null, gmv: { $sum: "$contract_value_num" } } }
+  ]).toArray()
+  const gmv = gmvAgg[0] ? gmvAgg[0].gmv : 0
+
+  const [topDepts, topSellers, topProducts, topStates, dealers, topMinistries] = await Promise.all([
+    gc.aggregate([
+      { $match: { dept_name: { $nin: [null, ""] } } },
+      { $group: { _id: "$dept_name", gmv: { $sum: "$contract_value_num" }, count: { $sum: 1 } } },
+      { $sort: { gmv: -1 } }, { $limit: 20 },
+    ]).toArray(),
+    gc.aggregate([
+      { $match: { seller_name_canonical: { $nin: [null, ""] } } },
+      { $group: { _id: "$seller_name_canonical", gmv: { $sum: "$contract_value_num" }, count: { $sum: 1 },
+          state: { $first: "$seller_state" }, phone: { $first: "$seller_phone" },
+          email: { $first: "$seller_email" }, gstin: { $first: "$seller_gst" } } },
+      { $sort: { gmv: -1 } }, { $limit: 30 },
+    ]).toArray(),
+    gc.aggregate([
+      { $match: { product_name: { $nin: [null, ""] } } },
+      { $group: { _id: "$product_name", gmv: { $sum: "$contract_value_num" }, count: { $sum: 1 } } },
+      { $sort: { gmv: -1 } }, { $limit: 20 },
+    ]).toArray(),
+    gc.aggregate([
+      { $match: { state: { $nin: [null, ""] } } },
+      { $group: { _id: "$state", contracts: { $sum: 1 }, gmv: { $sum: "$contract_value_num" } } },
+      { $sort: { contracts: -1 } }, { $limit: 15 },
+    ]).toArray(),
+    gc.aggregate([
+      { $match: { reseller_indicator: true, seller_name_canonical: { $nin: [null, ""] } } },
+      { $group: { _id: "$seller_name_canonical", gmv: { $sum: "$contract_value_num" }, count: { $sum: 1 },
+          state: { $first: "$seller_state" }, phone: { $first: "$seller_phone" },
+          email: { $first: "$seller_email" }, gstin: { $first: "$seller_gst" } } },
+      { $sort: { gmv: -1 } }, { $limit: 50 },
+    ]).toArray(),
+    gc.aggregate([
+      { $match: { ministry: { $nin: [null, ""] } } },
+      { $group: { _id: "$ministry", contracts: { $sum: 1 }, gmv: { $sum: "$contract_value_num" } } },
+      { $sort: { gmv: -1 } }, { $limit: 15 },
+    ]).toArray(),
+  ])
+
+  const pdfScan    = scanDirBytes(path.join(ARCHIVE, "PDFs"),    ".pdf")
+  const txtScan    = scanDirBytes(path.join(ARCHIVE, "RawText"), ".txt")
+  const jsonScan   = scanDirBytes(path.join(ARCHIVE, "JSON"),    ".json")
+  const totalBytes = pdfScan.bytes + txtScan.bytes + jsonScan.bytes
+
+  const completedChunks = state.chunks.filter(c => c.status === "complete").length
+  const totalChunks     = state.chunks.length
+
+  // 5. Build and save reports
+  console.log("  [5/5] Saving reports to OneDrive…")
+
+  const L = []
+  const SEP = () => L.push("─".repeat(70))
+
+  L.push("═".repeat(70))
+  L.push(`  CUMULATIVE REPORT — chunk ${chunkTag} of ${String(totalChunks).padStart(2)}`)
+  L.push(`  Generated : ${now.toISOString()}`)
+  L.push(`  Progress  : ${completedChunks} chunks complete / ${totalChunks - completedChunks} remaining`)
+  L.push("═".repeat(70))
+  L.push("")
+  SEP()
+  L.push("  COLLECTION TIMELINE")
+  SEP()
+  state.chunks.forEach(c => {
+    const sym  = c.status === "complete" ? "✓" : c.status === "error" ? "✗" : c.status === "in_progress" ? "▶" : "·"
+    const recs = c.recordsInserted ? ` +${c.recordsInserted} new` : ""
+    L.push(`  ${sym} Chunk ${String(c.id).padStart(2)} | ${c.from} → ${c.to}${recs}`)
+  })
+  L.push("")
+  SEP()
+  L.push("  CUMULATIVE TOTALS")
+  SEP()
+  L.push(`  Contracts collected : ${total.toLocaleString("en-IN")}`)
+  L.push(`  Enriched            : ${enriched} / ${total}  (${total ? Math.round(enriched / total * 100) : 0}%)`)
+  L.push(`  PDFs archived       : ${pdfScan.count}`)
+  L.push(`  Total GMV           : ${fmtCr(gmv)}`)
+  L.push("")
+  L.push("  STORAGE — ONEDRIVE ARCHIVE")
+  L.push(`  PDFs     ${String(pdfScan.count).padStart(5)} files   ${(pdfScan.bytes / 1048576).toFixed(2)} MB`)
+  L.push(`  RawText  ${String(txtScan.count).padStart(5)} files   ${(txtScan.bytes / 1048576).toFixed(2)} MB`)
+  L.push(`  JSON     ${String(jsonScan.count).padStart(5)} files   ${(jsonScan.bytes / 1048576).toFixed(2)} MB`)
+  L.push(`  Total    ${String(pdfScan.count + txtScan.count + jsonScan.count).padStart(5)} files   ${(totalBytes / 1048576).toFixed(2)} MB`)
+  L.push("")
+  SEP()
+  L.push("  TOP 20 DEPARTMENTS BY GMV")
+  SEP()
+  topDepts.forEach((d, i) => {
+    L.push(`  ${String(i + 1).padStart(2)}. ${(d._id || "").slice(0, 52).padEnd(52)} ${fmtCr(d.gmv).padStart(12)} ×${d.count}`)
+  })
+  L.push("")
+  SEP()
+  L.push(`  TOP 30 SELLERS BY GMV  (${topSellers.length} enriched sellers)`)
+  SEP()
+  topSellers.forEach((s, i) => {
+    const contact = [s.phone, s.email, s.gstin].filter(Boolean).join(" | ") || "—"
+    L.push(`  ${String(i + 1).padStart(2)}. ${(s._id || "").slice(0, 38).padEnd(38)} ${fmtCr(s.gmv).padStart(12)} ×${s.count}  ${s.state || "—"}`)
+    L.push(`      ${contact}`)
+  })
+  L.push("")
+  SEP()
+  L.push("  TOP 20 PRODUCTS BY GMV")
+  SEP()
+  topProducts.forEach((p, i) => {
+    L.push(`  ${String(i + 1).padStart(2)}. ${(p._id || "").slice(0, 60).padEnd(60)} ${fmtCr(p.gmv).padStart(12)} ×${p.count}`)
+  })
+  L.push("")
+  SEP()
+  L.push("  STATES BY CONTRACT COUNT")
+  SEP()
+  topStates.forEach((s, i) => {
+    L.push(`  ${String(i + 1).padStart(2)}. ${(s._id || "").padEnd(30)} ${String(s.contracts).padStart(5)} contracts  ${fmtCr(s.gmv)}`)
+  })
+  L.push("")
+  SEP()
+  L.push("  TOP 15 MINISTRIES BY GMV")
+  SEP()
+  topMinistries.forEach((m, i) => {
+    L.push(`  ${String(i + 1).padStart(2)}. ${(m._id || "").slice(0, 50).padEnd(50)} ${fmtCr(m.gmv).padStart(12)} ×${m.contracts}`)
+  })
+  L.push("")
+  SEP()
+  L.push(`  DEALER ACQUISITION TARGETS — ${dealers.length} reseller-flagged sellers`)
+  SEP()
+  dealers.forEach((d, i) => {
+    const contact = [d.phone, d.email, d.gstin].filter(Boolean).join(" | ") || "no contact"
+    L.push(`  ${String(i + 1).padStart(2)}. ${(d._id || "").slice(0, 40).padEnd(40)} ${fmtCr(d.gmv).padStart(12)} ×${d.count}  ${d.state || "—"}`)
+    L.push(`      ${contact}`)
+  })
+  L.push("")
+  L.push("═".repeat(70))
+  L.push(`  END — chunk ${chunkTag} | ${now.toISOString()}`)
+  L.push("═".repeat(70))
+
+  const reportText = L.join("\n")
+
+  // Chunk-specific archive
+  fs.writeFileSync(path.join(REPORT_DIR, `cumulative-chunk-${chunkTag}-${dateStr}.txt`), reportText)
+  // Overwrite rolling latest
+  fs.writeFileSync(path.join(REPORT_DIR, "CUMULATIVE-LATEST.txt"), reportText)
+
+  // JSON snapshot (for Opportunity Engine API / dashboard)
+  const snap = {
+    generated_at: now.toISOString(),
+    chunk_id: chunk.id, chunks_complete: completedChunks, chunks_total: totalChunks,
+    total_contracts: total, enriched, pdfs_archived: pdfScan.count,
+    total_gmv: gmv,
+    storage: {
+      pdf_count: pdfScan.count, pdf_mb: parseFloat((pdfScan.bytes / 1048576).toFixed(2)),
+      txt_count: txtScan.count, txt_mb: parseFloat((txtScan.bytes / 1048576).toFixed(2)),
+      json_count: jsonScan.count, json_mb: parseFloat((jsonScan.bytes / 1048576).toFixed(2)),
+      total_mb: parseFloat((totalBytes / 1048576).toFixed(2)),
+    },
+    top_depts:     topDepts.slice(0, 15).map(d => ({ name: d._id, gmv: d.gmv, count: d.count })),
+    top_sellers:   topSellers.slice(0, 20).map(s => ({
+      name: s._id, gmv: s.gmv, count: s.count, state: s.state,
+      phone: s.phone, email: s.email, gstin: s.gstin,
+    })),
+    top_products:  topProducts.slice(0, 15).map(p => ({ name: p._id, gmv: p.gmv, count: p.count })),
+    top_states:    topStates.map(s => ({ state: s._id, contracts: s.contracts, gmv: s.gmv })),
+    top_ministries: topMinistries.map(m => ({ name: m._id, gmv: m.gmv, contracts: m.contracts })),
+    dealer_targets: dealers.slice(0, 50).map(d => ({
+      name: d._id, gmv: d.gmv, count: d.count, state: d.state,
+      phone: d.phone, email: d.email, gstin: d.gstin,
+    })),
+  }
+  fs.writeFileSync(path.join(REPORT_DIR, "CUMULATIVE-LATEST.json"),
+    JSON.stringify(snap, null, 2))
+  fs.writeFileSync(path.join(REPORT_DIR, `cumulative-chunk-${chunkTag}-${dateStr}.json`),
+    JSON.stringify(snap, null, 2))
+
+  console.log(`\n  Contracts  : ${total.toLocaleString("en-IN")}  |  Enriched: ${enriched}/${total}  |  GMV: ${fmtCr(gmv)}`)
+  console.log(`  Storage    : ${(totalBytes / 1048576).toFixed(1)} MB  (${pdfScan.count} PDFs / ${txtScan.count} texts / ${jsonScan.count} JSON)`)
+  console.log(`  Dealers    : ${dealers.length} reseller-flagged`)
+  console.log(`  Saved      → Reports/cumulative-chunk-${chunkTag}-${dateStr}.{txt,json}`)
+  console.log(`             → Reports/CUMULATIVE-LATEST.{txt,json}`)
+  console.log(`             → Checkpoints/checkpoint-chunk-${chunkTag}.json`)
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────────
 ;(async () => {
   loadEnv()
@@ -960,6 +1237,16 @@ async function printReport(db) {
       console.log("  Re-run to retry.")
     }
     saveCheckpoint(state)
+
+    // Rolling reports after every completed chunk
+    if (chunk.status === "complete") {
+      try {
+        await postChunkHooks(chunk, state, db)
+      } catch (hookErr) {
+        console.log("  [warn] Post-chunk hooks error: " + hookErr.message)
+        console.log("         Collection continues — hook failure is non-fatal.")
+      }
+    }
   }
 
   await browser.close()
