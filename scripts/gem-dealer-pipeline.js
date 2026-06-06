@@ -100,10 +100,17 @@ function classifyPage(html, finalUrl, bidNum) {
 }
 
 function extractRankedBidders(html) {
+  // D-PMA pages have both Technical Evaluation and Financial Evaluation tables,
+  // both using productDtl class. Technical Evaluation (submission order, includes
+  // disqualified bidders) comes first in HTML. Slicing at FINANCIAL EVALUATION
+  // ensures we only read the post-qualification price-order rankings.
+  const finIdx = html.indexOf("FINANCIAL EVALUATION");
+  const htmlToUse = finIdx > -1 ? html.slice(finIdx) : html;
+
   const rankMap = {};
   const rowPat  = /<tr[^>]*>\s*<td[^>]*class="productDtl"[^>]*>(\d+)<\/td>([\s\S]*?)<\/tr>/gi;
   let m;
-  while ((m = rowPat.exec(html)) !== null) {
+  while ((m = rowPat.exec(htmlToUse)) !== null) {
     const rank = parseInt(m[1]);
     if (rankMap[rank]) continue;
     const cell  = m[2];
