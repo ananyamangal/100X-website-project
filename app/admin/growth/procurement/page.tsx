@@ -5,10 +5,13 @@ import {
   TrendingUp, Building2, Search, X,
   BarChart3, PlusCircle, Download,
 } from "lucide-react"
-import { CollectTab } from "./CollectTab"
-import { BatchTab }   from "./BatchTab"
+import { CollectTab }  from "./CollectTab"
+import { BatchTab }    from "./BatchTab"
 import { DealerPanel } from "./DealerPanel"
 import { BidPanel }    from "./BidPanel"
+import { BuyersTab }   from "./BuyersTab"
+import { TargetsTab }  from "./TargetsTab"
+import { ReportTab }   from "./ReportTab"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -108,7 +111,7 @@ interface IntelData {
   variant_distribution: { variant: string; count: number }[]
 }
 
-type Tab = "intelligence" | "bids" | "dealers" | "heatmap" | "batch" | "collect"
+type Tab = "intelligence" | "bids" | "dealers" | "heatmap" | "buyers" | "targets" | "report" | "batch" | "collect"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -836,13 +839,16 @@ export default function ProcurementIntelligence() {
     setSelectedBid(bidNumber)
   }, [])
 
-  const TABS: { id: Tab; label: string; icon: React.ElementType; highlight?: boolean }[] = [
-    { id: "intelligence", label: "Intelligence",    icon: BarChart3, highlight: true },
-    { id: "bids",         label: "Bid Explorer",   icon: FileSearch },
-    { id: "dealers",      label: "All Dealers",    icon: Users },
-    { id: "heatmap",      label: "Procurement Map",icon: Map },
-    { id: "batch",        label: "Batch Collect",  icon: TrendingUp },
-    { id: "collect",      label: "Single Bid",     icon: PlusCircle },
+  const TABS: { id: Tab; label: string; icon: React.ElementType; highlight?: boolean; group?: string }[] = [
+    { id: "intelligence", label: "Intelligence",    icon: BarChart3,  highlight: true },
+    { id: "buyers",       label: "Buyer Profiles",  icon: Building2,  highlight: true },
+    { id: "targets",      label: "Target Lists",    icon: TrendingUp, highlight: true },
+    { id: "report",       label: "Sales Report",    icon: BarChart3,  highlight: true },
+    { id: "bids",         label: "Bid Explorer",    icon: FileSearch },
+    { id: "dealers",      label: "All Dealers",     icon: Users },
+    { id: "heatmap",      label: "Procurement Map", icon: Map },
+    { id: "batch",        label: "Batch Collect",   icon: TrendingUp },
+    { id: "collect",      label: "Single Bid",      icon: PlusCircle },
   ]
 
   return (
@@ -854,7 +860,7 @@ export default function ProcurementIntelligence() {
             <Building2 size={18} className="text-brand-600" />
             <div>
               <h1 className="text-base font-bold text-gray-900">Procurement Intelligence</h1>
-              <p className="text-gray-400 text-[11px]">563 awarded bids · 1,222 dealers · GeM fogging 2024–2026 · Click dealers and bids to drill in</p>
+              <p className="text-gray-400 text-[11px]">563 awarded bids · 1,222 dealers · 144 departments · GeM fogging 2024–2026 · Dealer acquisition + sales targeting engine</p>
             </div>
           </div>
           <button onClick={loadStats}
@@ -901,6 +907,9 @@ export default function ProcurementIntelligence() {
 
         {/* Tab content */}
         {activeTab === "intelligence" && <IntelligenceTab onDealerClick={handleDealerClick} />}
+        {activeTab === "buyers"       && <BuyersTab onDealerClick={handleDealerClick} />}
+        {activeTab === "targets"      && <TargetsTab onDealerClick={handleDealerClick} />}
+        {activeTab === "report"       && <ReportTab onDealerClick={handleDealerClick} />}
         {activeTab === "bids"         && <BidsTab onBidClick={handleBidClick} onDealerClick={handleDealerClick} />}
         {activeTab === "dealers"      && <DealersTab onDealerClick={handleDealerClick} />}
         {activeTab === "heatmap"      && <HeatMapTab onDealerClick={handleDealerClick} />}

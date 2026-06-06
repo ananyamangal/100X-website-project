@@ -93,6 +93,14 @@ export async function PATCH(req: NextRequest) {
   if (body.crm_notes    !== undefined) update.crm_notes    = String(body.crm_notes)
   if (body.crm_follow_up !== undefined) update.crm_follow_up = String(body.crm_follow_up)
 
+  // Contact enrichment fields
+  if (body.website    !== undefined) update.website    = String(body.website).trim()
+  if (body.phone      !== undefined) update.phone      = String(body.phone).trim()
+  if (body.email      !== undefined) update.email      = String(body.email).trim()
+  if (body.gst_number !== undefined) update.gst_number = String(body.gst_number).trim().toUpperCase()
+  if (body.city       !== undefined) update.city       = String(body.city).trim()
+  if (body.state_hq   !== undefined) update.state_hq   = String(body.state_hq).trim()
+
   const result = await db.collection("gem_dealers").updateOne(
     { canonical_name: body.canonical_name },
     { $set: update }

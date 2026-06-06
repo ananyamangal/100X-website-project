@@ -38,6 +38,18 @@ export interface DealerDetail {
   last_bid_date: string | null
   bid_count: number
   bids: DealerBid[]
+  // Enrichment fields
+  opportunity_score: number | null
+  defence_l1: number | null
+  municipal_l1: number | null
+  health_l1: number | null
+  // Contact enrichment
+  website:    string | null
+  phone:      string | null
+  email:      string | null
+  gst_number: string | null
+  city:       string | null
+  state_hq:   string | null
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -94,10 +106,17 @@ export function DealerPanel({ name, onClose, onBidClick, onRefreshList }: Props)
   const [saveError, setSaveError] = useState("")
 
   // CRM form state (separate from dealer to allow edits without re-fetch)
-  const [is100x,   setIs100x]   = useState(false)
+  const [is100x,    setIs100x]    = useState(false)
   const [contacted, setContacted] = useState(false)
-  const [notes,    setNotes]    = useState("")
-  const [followUp, setFollowUp] = useState("")
+  const [notes,     setNotes]     = useState("")
+  const [followUp,  setFollowUp]  = useState("")
+  // Contact enrichment form state
+  const [website,    setWebsite]    = useState("")
+  const [phone,      setPhone]      = useState("")
+  const [email,      setEmail]      = useState("")
+  const [gstNumber,  setGstNumber]  = useState("")
+  const [city,       setCity]       = useState("")
+  const [stateHq,    setStateHq]    = useState("")
 
   useEffect(() => {
     setLoading(true)
@@ -112,6 +131,12 @@ export function DealerPanel({ name, onClose, onBidClick, onRefreshList }: Props)
         setContacted(d.crm_contacted ?? false)
         setNotes(d.crm_notes ?? "")
         setFollowUp(d.crm_follow_up ?? "")
+        setWebsite(d.website ?? "")
+        setPhone(d.phone ?? "")
+        setEmail(d.email ?? "")
+        setGstNumber(d.gst_number ?? "")
+        setCity(d.city ?? "")
+        setStateHq(d.state_hq ?? "")
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -131,6 +156,12 @@ export function DealerPanel({ name, onClose, onBidClick, onRefreshList }: Props)
           already_contacted: dealer?.crm_contacted,
           crm_notes: notes,
           crm_follow_up: followUp,
+          website:    website,
+          phone:      phone,
+          email:      email,
+          gst_number: gstNumber,
+          city:       city,
+          state_hq:   stateHq,
         }),
       }).then(r => r.json())
 
@@ -165,7 +196,10 @@ export function DealerPanel({ name, onClose, onBidClick, onRefreshList }: Props)
               </div>
               {dealer && (
                 <div className="flex items-center flex-wrap gap-x-3 gap-y-0.5 mt-1 text-[11px] text-gray-400">
-                  <span>Score <strong className="text-brand-600">{dealer.auth_score}</strong></span>
+                  <span>Auth score <strong className="text-brand-600">{dealer.auth_score}</strong></span>
+                  {dealer.opportunity_score != null && (
+                    <span>Opp score <strong className="text-purple-600">{dealer.opportunity_score}</strong></span>
+                  )}
                   <span>{dealer.bid_count} bids</span>
                   {dealer.first_bid_date && <span>Since {fmtDate(dealer.first_bid_date)}</span>}
                   {dealer.last_bid_date  && <span>Last {fmtDate(dealer.last_bid_date)}</span>}
@@ -243,6 +277,59 @@ export function DealerPanel({ name, onClose, onBidClick, onRefreshList }: Props)
                   )}
                 </div>
               )}
+
+              {/* Segment Exposure — shown only when enrichment has run */}
+              {(dealer.defence_l1 != null || dealer.municipal_l1 != null) && (
+                <div className="px-6 py-3 border-b border-gray-100 flex flex-wrap gap-3">
+                  {dealer.defence_l1 != null && dealer.defence_l1 > 0 && (
+                    <div className="flex items-center gap-1.5 bg-red-50 border border-red-100 rounded-xl px-3 py-1.5">
+                      <span className="text-[9px] text-red-500 uppercase tracking-wide font-semibold">Defence L1</span>
+                      <span className="text-sm font-bold text-red-700">{dealer.defence_l1}</span>
+                    </div>
+                  )}
+                  {dealer.municipal_l1 != null && dealer.municipal_l1 > 0 && (
+                    <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 rounded-xl px-3 py-1.5">
+                      <span className="text-[9px] text-blue-500 uppercase tracking-wide font-semibold">Municipal L1</span>
+                      <span className="text-sm font-bold text-blue-700">{dealer.municipal_l1}</span>
+                    </div>
+                  )}
+                  {dealer.health_l1 != null && dealer.health_l1 > 0 && (
+                    <div className="flex items-center gap-1.5 bg-green-50 border border-green-100 rounded-xl px-3 py-1.5">
+                      <span className="text-[9px] text-green-500 uppercase tracking-wide font-semibold">Health L1</span>
+                      <span className="text-sm font-bold text-green-700">{dealer.health_l1}</span>
+                    </div>
+                  )}
+                  {(dealer.defence_l1 === 0 && dealer.municipal_l1 === 0) && (
+                    <p className="text-[11px] text-gray-400">No segment-specific wins (scores computed)</p>
+                  )}
+                </div>
+              )}
+
+              {/* Contact Details */}
+              <div className="px-6 py-4 border-b border-gray-100">
+                <p className="text-[9px] text-gray-500 uppercase tracking-wide font-semibold mb-3">Contact Details</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: "Phone",      value: phone,      setter: setPhone,      type: "tel",    placeholder: "+91 98765 43210" },
+                    { label: "Email",      value: email,      setter: setEmail,      type: "email",  placeholder: "dealer@example.com" },
+                    { label: "Website",    value: website,    setter: setWebsite,    type: "url",    placeholder: "https://…" },
+                    { label: "GST Number", value: gstNumber,  setter: setGstNumber,  type: "text",   placeholder: "07ABCDE1234F1Z5" },
+                    { label: "City",       value: city,       setter: setCity,       type: "text",   placeholder: "New Delhi" },
+                    { label: "HQ State",   value: stateHq,    setter: setStateHq,    type: "text",   placeholder: "Delhi" },
+                  ].map(({ label, value, setter, type, placeholder }) => (
+                    <div key={label}>
+                      <label className="text-[9px] text-gray-400 uppercase tracking-wide block mb-0.5">{label}</label>
+                      <input
+                        type={type} value={value}
+                        onChange={e => setter(e.target.value)}
+                        placeholder={placeholder}
+                        className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 w-full bg-white focus:outline-none focus:ring-1 focus:ring-brand-400"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[9px] text-gray-400 mt-2">Save via the CRM Actions button below. Fields are stored in gem_dealers.</p>
+              </div>
 
               {/* CRM Section */}
               <div className="px-6 py-4 border-b border-gray-100 bg-amber-50/20">
