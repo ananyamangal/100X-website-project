@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react"
 import {
   FileSearch, Users, Map, RefreshCw,
   TrendingUp, Building2, Search, X,
-  BarChart3, PlusCircle, Download,
+  BarChart3, PlusCircle, Download, HardDrive,
 } from "lucide-react"
 import { CollectTab }    from "./CollectTab"
 import { BatchTab }      from "./BatchTab"
@@ -13,6 +13,7 @@ import { BuyersTab }     from "./BuyersTab"
 import { TargetsTab }    from "./TargetsTab"
 import { ReportTab }     from "./ReportTab"
 import { ContractsTab }  from "./ContractsTab"
+import { StorageTab }    from "./StorageTab"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -112,7 +113,7 @@ interface IntelData {
   variant_distribution: { variant: string; count: number }[]
 }
 
-type Tab = "intelligence" | "contracts" | "bids" | "dealers" | "heatmap" | "buyers" | "targets" | "report" | "batch" | "collect"
+type Tab = "intelligence" | "contracts" | "storage" | "bids" | "dealers" | "heatmap" | "buyers" | "targets" | "report" | "batch" | "collect"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -843,6 +844,7 @@ export default function ProcurementIntelligence() {
   const TABS: { id: Tab; label: string; icon: React.ElementType; highlight?: boolean; group?: string }[] = [
     { id: "intelligence", label: "Intelligence",       icon: BarChart3,  highlight: true },
     { id: "contracts",    label: "Contracts Intel",   icon: TrendingUp, highlight: true },
+    { id: "storage",      label: "PDF Storage",        icon: HardDrive },
     { id: "buyers",       label: "Buyer Profiles",    icon: Building2,  highlight: true },
     { id: "targets",      label: "Target Lists",      icon: TrendingUp, highlight: true },
     { id: "report",       label: "Sales Report",      icon: BarChart3,  highlight: true },
@@ -910,6 +912,7 @@ export default function ProcurementIntelligence() {
         {/* Tab content */}
         {activeTab === "intelligence" && <IntelligenceTab onDealerClick={handleDealerClick} />}
         {activeTab === "contracts"    && <ContractsTab />}
+        {activeTab === "storage"      && <StorageTab />}
         {activeTab === "buyers"       && <BuyersTab onDealerClick={handleDealerClick} />}
         {activeTab === "targets"      && <TargetsTab onDealerClick={handleDealerClick} />}
         {activeTab === "report"       && <ReportTab onDealerClick={handleDealerClick} />}
