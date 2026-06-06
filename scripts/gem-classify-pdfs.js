@@ -31,8 +31,10 @@ const crypto = require("crypto")
 const DRY_RUN           = process.argv.includes("--dry-run")
 const FORCE_RECLASSIFY  = process.argv.includes("--force-reclassify")
 
-const PDF_DIR  = path.join(process.cwd(), "audit", "enrichment", "pdfs")
-const TEXT_DIR = path.join(process.cwd(), "audit", "enrichment", "text")
+const ARCHIVE_ROOT = process.env.GEM_ARCHIVE_ROOT ||
+  path.join("F:", "OneDrive", "Data", "SULABH2018", "E drive", "GeMArchive")
+const PDF_DIR  = path.join(ARCHIVE_ROOT, "PDFs")
+const TEXT_DIR = path.join(ARCHIVE_ROOT, "RawText")
 
 // ─── Classification keywords ──────────────────────────────────────────────────
 const FOGGING_KW = [

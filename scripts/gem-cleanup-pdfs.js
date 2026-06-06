@@ -41,60 +41,60 @@ const RAW_RETENTION_DAYS   = 90    // days before raw text deletion
 const B_RETENTION_DAYS     = 180   // days before Class B PDF deletion
 const CONFIDENCE_THRESHOLD = 60    // minimum confidence to allow raw deletion
 
-const PDF_DIR = path.join(process.cwd(), "audit", "enrichment", "pdfs")
+const ARCHIVE_ROOT = process.env.GEM_ARCHIVE_ROOT ||
+  path.join("F:", "OneDrive", "Data", "SULABH2018", "E drive", "GeMArchive")
+const PDF_DIR  = path.join(ARCHIVE_ROOT, "PDFs")
+const TEXT_DIR = path.join(ARCHIVE_ROOT, "RawText")
 
 function daysAgo(days) {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000)
 }
 
 function slug(id) { return id.replace(/[^A-Z0-9]/g, "_") }
-function pdfDiskPath(gemcNo) { return path.join(PDF_DIR, `${slug(gemcNo)}.pdf`) }
+function pdfDiskPath(gemcNo)  { return path.join(PDF_DIR,  `${slug(gemcNo)}.pdf`) }
+function textDiskPath(gemcNo) { return path.join(TEXT_DIR, `${slug(gemcNo)}.txt`) }
 
-async function cleanupRaw(gc, raw, dryRun) {
+// Raw text cleanup: delete .txt files from OneDrive RawText/ for high-confidence
+// contracts older than RAW_RETENTION_DAYS. MongoDB is never written for raw text.
+async function cleanupRaw(gc, dryRun) {
   const cutoff = daysAgo(RAW_RETENTION_DAYS)
 
-  // Find raw entries old enough to delete
-  const candidates = await raw.find({
-    $or: [
-      { enrichment_timestamp: { $lt: cutoff } },
-      { created_at: { $lt: cutoff } },
-    ]
-  }, { projection: { gemc_no: 1 } }).toArray()
-
-  if (!candidates.length) {
-    console.log("  Raw cleanup: no entries past retention window.")
-    return { checked: 0, deleted: 0 }
-  }
-
-  const gemcNos = candidates.map(r => r.gemc_no)
-
-  // Only delete if the contract has sufficient extraction confidence
-  const highConfidence = await gc.find(
+  const candidates = await gc.find(
     {
-      gemc_no: { $in: gemcNos },
+      detail_scraped: true,
       extraction_confidence: { $gte: CONFIDENCE_THRESHOLD },
+      raw_text_deleted_at: { $exists: false },
+      $or: [
+        { enrichment_timestamp: { $lt: cutoff } },
+        { updated_at: { $lt: cutoff } },
+      ],
     },
     { projection: { gemc_no: 1 } }
   ).toArray()
 
-  const safeToDelete = new Set(highConfidence.map(c => c.gemc_no))
-  const toDelete = candidates.filter(r => safeToDelete.has(r.gemc_no))
-
-  console.log(`  Raw cleanup: ${candidates.length} candidates, ${toDelete.length} safe to delete (confidence ≥ ${CONFIDENCE_THRESHOLD}%)`)
-
-  if (!dryRun && toDelete.length) {
-    const deleteNos = toDelete.map(r => r.gemc_no)
-    const result = await raw.deleteMany({ gemc_no: { $in: deleteNos } })
-    // Mark in gem_contracts
-    await gc.updateMany(
-      { gemc_no: { $in: deleteNos } },
-      { $set: { raw_deleted_at: new Date() } }
-    )
-    console.log(`  ✓ Deleted ${result.deletedCount} raw entries.`)
-    return { checked: candidates.length, deleted: result.deletedCount }
+  if (!candidates.length) {
+    console.log("  Raw text cleanup: nothing past retention window.")
+    return { checked: 0, deleted: 0 }
   }
 
-  return { checked: candidates.length, deleted: 0 }
+  console.log(`  Raw text cleanup: ${candidates.length} eligible (confidence ≥ ${CONFIDENCE_THRESHOLD}%, age ≥ ${RAW_RETENTION_DAYS}d)`)
+
+  let deleted = 0, freed = 0
+  for (const c of candidates) {
+    const diskPath = textDiskPath(c.gemc_no)
+    if (fs.existsSync(diskPath)) {
+      const size = fs.statSync(diskPath).size
+      if (!dryRun) {
+        fs.unlinkSync(diskPath)
+        await gc.updateOne({ gemc_no: c.gemc_no }, { $set: { raw_text_deleted_at: new Date() } })
+      }
+      deleted++
+      freed += size
+    }
+  }
+
+  console.log(`  ✓ ${dryRun ? "Would delete" : "Deleted"} ${deleted} raw text files  (${(freed / 1024 / 1024).toFixed(2)} MB freed)`)
+  return { checked: candidates.length, deleted }
 }
 
 async function cleanupPdfs(gc, dryRun) {
@@ -174,20 +174,16 @@ async function cleanupPdfs(gc, dryRun) {
 async function run() {
   const client = new MongoClient(process.env.MONGODB_URI)
   await client.connect()
-  const db  = client.db()
-  const gc  = db.collection("gem_contracts")
-  const raw = db.collection("gem_contracts_raw")
+  const db = client.db()
+  const gc = db.collection("gem_contracts")
 
   console.log(`${"─".repeat(60)}`)
   console.log(`PDF & RAW CLEANUP ${DRY_RUN ? "[DRY RUN]" : "(LIVE)"}`)
   console.log(`${"─".repeat(60)}`)
 
   if (!PDF_ONLY) {
-    console.log("\nTier 2 — Raw text cleanup:")
-    const rawResult = await cleanupRaw(gc, raw, DRY_RUN)
-    if (!rawResult.deleted && !DRY_RUN) {
-      console.log("  Nothing to clean up in gem_contracts_raw.")
-    }
+    console.log("\nTier 2 — Raw text cleanup (OneDrive RawText/):")
+    await cleanupRaw(gc, DRY_RUN)
   }
 
   if (!RAW_ONLY) {

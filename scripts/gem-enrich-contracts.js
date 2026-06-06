@@ -12,14 +12,16 @@
 //   node scripts/gem-enrich-contracts.js --value-first # highest GMV first
 //   node scripts/gem-enrich-contracts.js --retry-failed # retry errored records
 //
-// Output:
-//   audit/enrichment/pdfs/<gemc>.pdf
-//   audit/enrichment/text/<gemc>.txt
-//   gem_contracts   — all Phase 2A fields written
-//   gem_contracts_raw — pdf_text + pdf_path added
+// Storage (OneDrive archive — MongoDB is intelligence layer only):
+//   $GEM_ARCHIVE_ROOT/PDFs/<gemc>.pdf
+//   $GEM_ARCHIVE_ROOT/RawText/<gemc>.txt
+//   $GEM_ARCHIVE_ROOT/JSON/<gemc>.json
+//   gem_contracts — structured intelligence + pdf_path + pdf_hash + metadata only
+//   gem_contracts_raw — NOT written (raw text lives in RawText/ on disk)
 
-const fs   = require("fs")
-const path = require("path")
+const fs     = require("fs")
+const path   = require("path")
+const crypto = require("crypto")
 const { MongoClient } = require("mongodb")
 const { chromium }    = require("playwright")
 const pdfParse        = require("pdf-parse")
@@ -27,14 +29,23 @@ const pdfParse        = require("pdf-parse")
 // ── Config ────────────────────────────────────────────────────────────────────
 const EXTRACTION_VERSION = 1
 const BATCH_DELAY_MS     = 1200   // between contracts
-const PDF_DIR            = path.join("audit", "enrichment", "pdfs")
-const TEXT_DIR           = path.join("audit", "enrichment", "text")
 const MAX_RETRIES        = 3      // skip after this many failed attempts
 const SBT_URL            = "https://gem.gov.in/view_contracts/sbtCaptcha"
 const CAP_URL            = "https://gem.gov.in/assets/phpcaptcha/captcha.php"
 
-// ── Setup ─────────────────────────────────────────────────────────────────────
-for (const d of [PDF_DIR, TEXT_DIR]) fs.mkdirSync(d, { recursive: true })
+// ── Setup (deferred until after loadEnv()) ────────────────────────────────────
+let PDF_DIR, TEXT_DIR, JSON_DIR
+
+function initDirs() {
+  const root = process.env.GEM_ARCHIVE_ROOT ||
+    path.join("F:", "OneDrive", "Data", "SULABH2018", "E drive", "GeMArchive")
+  PDF_DIR  = path.join(root, "PDFs")
+  TEXT_DIR = path.join(root, "RawText")
+  JSON_DIR = path.join(root, "JSON")
+  for (const d of [PDF_DIR, TEXT_DIR, JSON_DIR]) fs.mkdirSync(d, { recursive: true })
+}
+
+function sha256(buf) { return crypto.createHash("sha256").update(buf).digest("hex") }
 
 function loadEnv() {
   const lines = fs.readFileSync(path.join(__dirname, "..", ".env.local"), "utf8").split("\n")
@@ -409,6 +420,7 @@ async function downloadPdf(context, page, url, dest) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 ;(async () => {
   loadEnv()
+  initDirs()
 
   const args       = process.argv.slice(2)
   const limitIdx   = args.indexOf("--limit")
@@ -419,9 +431,10 @@ async function downloadPdf(context, page, url, dest) {
 
   const client = new MongoClient(process.env.MONGODB_URI)
   await client.connect()
-  const db    = client.db()
-  const gc    = db.collection("gem_contracts")
-  const gcRaw = db.collection("gem_contracts_raw")
+  const db = client.db()
+  const gc = db.collection("gem_contracts")
+
+  console.log(`  Archive root : ${PDF_DIR.replace(/[/\\][^/\\]+$/, "")}`)
 
   // Build queue query
   const queueQuery = retryFailed
@@ -494,6 +507,7 @@ async function downloadPdf(context, page, url, dest) {
 
     const pdfPath  = path.join(PDF_DIR,  slug(gemc_no) + ".pdf")
     const textPath = path.join(TEXT_DIR, slug(gemc_no) + ".txt")
+    const jsonPath = path.join(JSON_DIR, slug(gemc_no) + ".json")
     const now      = new Date()
 
     const update = {
@@ -524,17 +538,18 @@ async function downloadPdf(context, page, url, dest) {
         throw new Error(`sbtCaptcha failed: status=${sbt.status} raw=${sbt.raw}`)
       }
 
-      // B: Download PDF
+      // B: Download PDF → OneDrive archive
       console.log("  [B] Downloading PDF ...")
       const dlLayer = await downloadPdf(context, page, sbt.url, pdfPath)
-      const pdfSize = fs.statSync(pdfPath).size
-      console.log(`      ${pdfSize.toLocaleString()} bytes via ${dlLayer} → ${path.basename(pdfPath)}`)
+      const pdfBuf  = fs.readFileSync(pdfPath)
+      const pdfSize = pdfBuf.length
+      const pdfHash = sha256(pdfBuf)
+      console.log(`      ${pdfSize.toLocaleString()} bytes  sha256:${pdfHash.slice(0,16)}…  via ${dlLayer}`)
 
       if (pdfSize < 500) throw new Error(`PDF too small (${pdfSize} bytes) — likely an error page`)
 
-      // C: Parse PDF text
+      // C: Parse PDF text → OneDrive RawText
       console.log("  [C] Parsing PDF ...")
-      const pdfBuf  = fs.readFileSync(pdfPath)
       const pdfData = await pdfParse(pdfBuf, { max: 0 })
       fs.writeFileSync(textPath, pdfData.text, "utf8")
       console.log(`      pages: ${pdfData.numpages}  chars: ${pdfData.text.length}`)
@@ -548,8 +563,17 @@ async function downloadPdf(context, page, url, dest) {
       const show = ["seller_name","seller_gstin","buyer_name","oem_name","contract_value_pdf"]
       show.forEach(k => console.log(`      ${k.padEnd(22)}: ${fields[k] ?? "(not found)"}`))
 
+      // E: Save extracted intelligence as JSON → OneDrive JSON
+      const intelligenceJson = {
+        gemc_no, extracted_at: now.toISOString(), confidence,
+        pdf_path: pdfPath, pdf_hash: pdfHash, pdf_size_bytes: pdfSize,
+        ...fields,
+      }
+      fs.writeFileSync(jsonPath, JSON.stringify(intelligenceJson, null, 2), "utf8")
+      console.log(`      JSON saved → ${path.basename(jsonPath)}`)
+
       if (!dryRun) {
-        // Update gem_contracts
+        // gem_contracts: structured intelligence + paths only — NO raw text
         await gc.updateOne(
           { gemc_no },
           {
@@ -603,30 +627,21 @@ async function downloadPdf(context, page, url, dest) {
               oem_indicator:         fields.oem_indicator,
               reseller_indicator:    fields.reseller_indicator,
               manufacturer_indicator: fields.manufacturer_indicator,
-              // AUDIT
+              // ARCHIVE POINTERS (paths on local machine, not stored content)
               detail_scraped:        true,
               pdf_downloaded:        true,
               pdf_path:              pdfPath,
+              pdf_hash:              pdfHash,
               pdf_size_bytes:        pdfSize,
+              text_path:             textPath,
+              json_path:             jsonPath,
               extraction_confidence: confidence,
               enrichment_error:      null,
               updated_at:            now,
             },
           }
         )
-
-        // Update gem_contracts_raw
-        await gcRaw.updateOne(
-          { gemc_no },
-          {
-            $set: {
-              pdf_text:   pdfData.text,
-              pdf_path:   pdfPath,
-              enriched_at: now,
-            },
-          },
-          { upsert: true }
-        )
+        // gem_contracts_raw: NOT written — raw text is on disk at text_path
       }
 
       enriched++
@@ -666,8 +681,10 @@ async function downloadPdf(context, page, url, dest) {
   console.log(`  Failed     : ${failed}`)
   console.log(`  Duration   : ${Math.floor(totalSec/60)}m ${totalSec%60}s`)
   console.log(`  Rate       : ~${Math.round(enriched / (totalSec / 3600))} contracts/hr`)
-  console.log(`  PDFs saved : ${PDF_DIR}`)
-  console.log(`  Text saved : ${TEXT_DIR}`)
+  console.log(`  Archive    : ${PDF_DIR.replace(/[/\\][^/\\]+$/, "")}`)
+  console.log(`    PDFs     : ${PDF_DIR}`)
+  console.log(`    RawText  : ${TEXT_DIR}`)
+  console.log(`    JSON     : ${JSON_DIR}`)
   console.log("═".repeat(70))
 
   await cursor.close()

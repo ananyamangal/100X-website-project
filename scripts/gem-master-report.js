@@ -352,45 +352,52 @@ async function run() {
   }
 
   // ── L. Storage report ──────────────────────────────────────────────────────
-  const pdfDir  = path.join(process.cwd(), "audit", "enrichment", "pdfs")
-  const textDir = path.join(process.cwd(), "audit", "enrichment", "text")
-  let pdfCount = 0, pdfBytes = 0, textBytes = 0
+  const archiveRoot = process.env.GEM_ARCHIVE_ROOT ||
+    path.join("F:", "OneDrive", "Data", "SULABH2018", "E drive", "GeMArchive")
+  const pdfDir  = path.join(archiveRoot, "PDFs")
+  const textDir = path.join(archiveRoot, "RawText")
+  const jsonDir = path.join(archiveRoot, "JSON")
+  let pdfCount = 0, pdfBytes = 0, textBytes = 0, jsonBytes = 0
 
-  try {
-    const pdfFiles = fs.readdirSync(pdfDir).filter(f => f.endsWith(".pdf"))
-    pdfCount = pdfFiles.length
-    pdfBytes = pdfFiles.reduce((s, f) => {
-      try { return s + fs.statSync(path.join(pdfDir, f)).size } catch { return s }
-    }, 0)
-  } catch { /* pdfDir not found */ }
+  function scanDir(dir, ext) {
+    try {
+      const files = fs.readdirSync(dir).filter(f => f.endsWith(ext))
+      const bytes = files.reduce((s, f) => {
+        try { return s + fs.statSync(path.join(dir, f)).size } catch { return s }
+      }, 0)
+      return { count: files.length, bytes }
+    } catch { return { count: 0, bytes: 0 } }
+  }
 
-  try {
-    const txtFiles = fs.readdirSync(textDir).filter(f => f.endsWith(".txt"))
-    textBytes = txtFiles.reduce((s, f) => {
-      try { return s + fs.statSync(path.join(textDir, f)).size } catch { return s }
-    }, 0)
-  } catch { /* textDir not found */ }
+  const pdfScan  = scanDir(pdfDir,  ".pdf")
+  const textScan = scanDir(textDir, ".txt")
+  const jsonScan = scanDir(jsonDir, ".json")
+  pdfCount = pdfScan.count; pdfBytes = pdfScan.bytes
+  textBytes = textScan.bytes; jsonBytes = jsonScan.bytes
 
   const classDist = await gc.aggregate([
     { $match: { pdf_retention_class: { $exists: true } } },
-    { $group: { _id: "$pdf_retention_class", count: { $sum: 1 }, pdf_bytes: { $sum: { $ifNull: ["$pdf_size", 0] } } } },
+    { $group: { _id: "$pdf_retention_class", count: { $sum: 1 }, pdf_bytes: { $sum: { $ifNull: ["$pdf_size_bytes", 0] } } } },
   ]).toArray()
 
+  const mongoEst = total * 5 * 1024  // ~5KB/doc (structured fields only, no raw text)
   report.storage = {
-    pdf_count: pdfCount,
-    pdf_bytes: pdfBytes,
-    text_bytes: textBytes,
-    est_mongo_bytes: total * 8 * 1024,
+    archive_root: archiveRoot,
+    pdf_count: pdfCount, pdf_bytes: pdfBytes,
+    text_bytes: textBytes, json_bytes: jsonBytes,
+    est_mongo_bytes: mongoEst,
     class_dist: classDist,
   }
 
-  sep("L. STORAGE USAGE")
-  console.log(`  PDFs on disk:      ${pdfCount} files  (${(pdfBytes / 1024 / 1024).toFixed(1)} MB)`)
-  console.log(`  Raw text:          ${(textBytes / 1024 / 1024).toFixed(1)} MB`)
-  console.log(`  MongoDB (est.):    ${Math.round(total * 8 / 1024)} MB`)
-  console.log(`  Total:             ${((pdfBytes + textBytes + total * 8 * 1024) / 1024 / 1024).toFixed(1)} MB`)
+  sep("L. STORAGE — ONEDRIVE ARCHIVE")
+  console.log(`  Archive root:      ${archiveRoot}`)
+  console.log(`  PDFs:              ${pdfCount} files  (${(pdfBytes / 1024 / 1024).toFixed(1)} MB)`)
+  console.log(`  RawText:           ${textScan.count} files  (${(textBytes / 1024 / 1024).toFixed(1)} MB)`)
+  console.log(`  JSON intelligence: ${jsonScan.count} files  (${(jsonBytes / 1024 / 1024).toFixed(1)} MB)`)
+  console.log(`  MongoDB (est.):    ${Math.round(mongoEst / 1024 / 1024)} MB  (structured fields only)`)
+  console.log(`  Total OneDrive:    ${((pdfBytes + textBytes + jsonBytes) / 1024 / 1024).toFixed(1)} MB`)
   for (const c of classDist.sort((a, b) => (a._id || "Z").localeCompare(b._id || "Z"))) {
-    console.log(`  Class ${c._id}:         ${c.count} contracts  (${(c.pdf_bytes / 1024 / 1024).toFixed(1)} MB PDFs)`)
+    console.log(`  Class ${c._id}:         ${c.count} contracts  (${(c.pdf_bytes / 1024 / 1024).toFixed(1)} MB PDFs in MongoDB metadata)`)
   }
 
   // ── Final ──────────────────────────────────────────────────────────────────
@@ -404,8 +411,12 @@ async function run() {
 
   // ── Optional JSON export ───────────────────────────────────────────────────
   if (WRITE_JSON) {
-    const dateStr = new Date().toISOString().slice(0, 10)
-    const outPath = path.join("audit", `master-report-${dateStr}.json`)
+    const dateStr  = new Date().toISOString().slice(0, 10)
+    const archRoot = process.env.GEM_ARCHIVE_ROOT ||
+      path.join("F:", "OneDrive", "Data", "SULABH2018", "E drive", "GeMArchive")
+    const rptDir   = path.join(archRoot, "Reports")
+    fs.mkdirSync(rptDir, { recursive: true })
+    const outPath  = path.join(rptDir, `master-report-${dateStr}.json`)
     fs.writeFileSync(outPath, JSON.stringify(report, null, 2))
     console.log(`\n  Report saved to ${outPath}`)
   }

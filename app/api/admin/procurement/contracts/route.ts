@@ -70,8 +70,12 @@ export async function GET(req: NextRequest) {
       try {
         const { existsSync, readFileSync } = await import("fs")
         const { join } = await import("path")
-        const safeName = gemc.replace(/[^A-Z0-9-]/gi, "_")
-        const p = join(process.cwd(), "audit", "enrichment", "text", `${safeName}.txt`)
+        const safeName = gemc.replace(/[^A-Z0-9]/g, "_")
+        const archiveRoot = process.env.GEM_ARCHIVE_ROOT ||
+          join("F:", "OneDrive", "Data", "SULABH2018", "E drive", "GeMArchive")
+        const archivePath = join(archiveRoot, "RawText", `${safeName}.txt`)
+        const legacyPath  = join(process.cwd(), "audit", "enrichment", "text", `${safeName}.txt`)
+        const p = existsSync(archivePath) ? archivePath : legacyPath
         if (existsSync(p)) raw_text = readFileSync(p, "utf8").slice(0, 10000)
       } catch { /* graceful on Vercel */ }
 
