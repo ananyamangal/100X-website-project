@@ -11,8 +11,21 @@
  * Output: Updates gem_dealers in-place via bulkWrite. Idempotent.
  */
 
-require("dotenv").config({ path: ".env.local" })
 const { MongoClient } = require("mongodb")
+const fs   = require("fs")
+const path = require("path")
+
+let MONGODB_URI = process.env.MONGODB_URI
+if (!MONGODB_URI) {
+  try {
+    const envPath = path.join(__dirname, "..", ".env.local")
+    const lines   = fs.readFileSync(envPath, "utf8").split("\n")
+    for (const line of lines) {
+      const [k, ...vParts] = line.split("=")
+      if (k?.trim() === "MONGODB_URI") { MONGODB_URI = vParts.join("=").trim(); break }
+    }
+  } catch {}
+}
 
 const DEFENCE_RX   = /Army|Air Force|Navy|Coast Guard|DGQA|Defence|DRDO|Border/i
 const MUNICIPAL_RX = /Nagar|Municipal|Palika|Nigam|Corporation|ULB|E-nagar|Panchayat/i
@@ -26,10 +39,8 @@ function canonicalize(name) {
 }
 
 async function main() {
-  const uri = process.env.MONGODB_URI
-  if (!uri) { console.error("MONGODB_URI not set"); process.exit(1) }
-
-  const client = new MongoClient(uri)
+  if (!MONGODB_URI) { console.error("MONGODB_URI not set"); process.exit(1) }
+  const client = new MongoClient(MONGODB_URI)
   await client.connect()
   console.log("Connected to MongoDB")
 
