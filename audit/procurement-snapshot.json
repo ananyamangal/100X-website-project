@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-06-06T14:04:25.117Z",
+  "checkpoint": "procurement-phase2-pilot-validated",
+  "contracts": {
+    "total": 140,
+    "enriched": 10,
+    "pending": 130,
+    "enrichment_pct": 7,
+    "avg_extraction_confidence": 78.6
+  },
+  "dealers": {
+    "total": 1437
+  },
+  "awarded_bids": {
+    "total": 563
+  },
+  "dimensions": {
+    "departments": 31,
+    "states": 9,
+    "products": 130
+  },
+  "recovery": {
+    "backup_dir": "backups/procurement-phase2-pilot-validated/",
+    "collections_exported": [
+      "gem_contracts",
+      "gem_contracts_raw",
+      "gem_dealers",
+      "gem_awarded_bids"
+    ]
+  }
+}

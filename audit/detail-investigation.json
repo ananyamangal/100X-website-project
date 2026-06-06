@@ -1,0 +1,690 @@
+{
+  "captchaPhpEndpoint": {
+    "success": true,
+    "rawResponse": "{\"text\":\"6pcqrw\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4L",
+    "hasImage": true,
+    "imageLen": 4012,
+    "hasText": true,
+    "textValue": "6pcqrw",
+    "hasEncodeTxt": true,
+    "encodeTxt": "b6zYiZZY3XWy3FhYHHgVgg==",
+    "allKeys": [
+      "text",
+      "im",
+      "encodeTxt"
+    ]
+  },
+  "sbtCaptchaEndpoint": {
+    "GEMC-511687724177915": {
+      "httpStatus": 200,
+      "success": true,
+      "rawResponse": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=aGR3ZnAvTXNtbm9raytCWkVhaXh5QT09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}",
+      "status": "1",
+      "hasCode": true,
+      "codeHtml": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=aGR3ZnAvTXNtbm9raytCWkVhaXh5QT09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "allKeys": [
+        "status",
+        "code"
+      ]
+    },
+    "GEMC-511687777108237": {
+      "httpStatus": 200,
+      "success": true,
+      "rawResponse": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=NGpyTWhLM1hYQmlVNTRmeVRhYkFHZz09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}",
+      "status": "1",
+      "hasCode": true,
+      "codeHtml": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=NGpyTWhLM1hYQmlVNTRmeVRhYkFHZz09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "allKeys": [
+        "status",
+        "code"
+      ]
+    },
+    "GEMC-511687711337833": {
+      "httpStatus": 200,
+      "success": true,
+      "rawResponse": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=VUROYmJrU1dGWnhub2VqdlFLRVdBZz09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}",
+      "status": "1",
+      "hasCode": true,
+      "codeHtml": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=VUROYmJrU1dGWnhub2VqdlFLRVdBZz09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "allKeys": [
+        "status",
+        "code"
+      ]
+    },
+    "GEMC-511687713186535": {
+      "httpStatus": 200,
+      "success": true,
+      "rawResponse": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=OTl3WVlBYys3bTlncUgrakhhemF6UT09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}",
+      "status": "1",
+      "hasCode": true,
+      "codeHtml": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=OTl3WVlBYys3bTlncUgrakhhemF6UT09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "allKeys": [
+        "status",
+        "code"
+      ]
+    },
+    "GEMC-511687781726952": {
+      "httpStatus": 200,
+      "success": true,
+      "rawResponse": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=ejk0VXQ5U01uanRxczNUV2pZbERjZz09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}",
+      "status": "1",
+      "hasCode": true,
+      "codeHtml": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=ejk0VXQ5U01uanRxczNUV2pZbERjZz09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "allKeys": [
+        "status",
+        "code"
+      ]
+    }
+  },
+  "detailPageContent": {
+    "GEMC-511687724177915": {
+      "downloadButtonHtml": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=aGR3ZnAvTXNtbm9raytCWkVhaXh5QT09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "urlsInCode": [
+        "https://fulfilment.gem.gov.in/contract/fds?orderId=aGR3ZnAvTXNtbm9raytCWkVhaXh5QT09"
+      ],
+      "hrefsInCode": [
+        "href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=aGR3ZnAvTXNtbm9raytCWkVhaXh5QT09\""
+      ],
+      "onclicksInCode": [],
+      "modalState": {
+        "modalVisible": true,
+        "captchaImgSrc": "data:image/jpeg;charset=utf8;base64,/9j/4AAQSkZJRgABAQEAYABg...",
+        "hCaptchaValue": "hb7q8r",
+        "oidValue": "GEMC-511687724177915"
+      },
+      "dwnbtnAfterSubmit": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=aGR3ZnAvTXNtbm9raytCWkVhaXh5QT09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "dwnbtnUrls": [
+        "https://fulfilment.gem.gov.in/contract/fds?orderId=aGR3ZnAvTXNtbm9raytCWkVhaXh5QT09"
+      ],
+      "dwnbtnHrefs": [
+        "href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=aGR3ZnAvTXNtbm9raytCWkVhaXh5QT09\""
+      ]
+    },
+    "GEMC-511687777108237": {
+      "downloadButtonHtml": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=NGpyTWhLM1hYQmlVNTRmeVRhYkFHZz09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "urlsInCode": [
+        "https://fulfilment.gem.gov.in/contract/fds?orderId=NGpyTWhLM1hYQmlVNTRmeVRhYkFHZz09"
+      ],
+      "hrefsInCode": [
+        "href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=NGpyTWhLM1hYQmlVNTRmeVRhYkFHZz09\""
+      ],
+      "onclicksInCode": [],
+      "modalState": {
+        "modalVisible": true,
+        "captchaImgSrc": "data:image/jpeg;charset=utf8;base64,/9j/4AAQSkZJRgABAQEAYABg...",
+        "hCaptchaValue": "thd5j8",
+        "oidValue": "GEMC-511687777108237"
+      },
+      "dwnbtnAfterSubmit": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=NGpyTWhLM1hYQmlVNTRmeVRhYkFHZz09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "dwnbtnUrls": [
+        "https://fulfilment.gem.gov.in/contract/fds?orderId=NGpyTWhLM1hYQmlVNTRmeVRhYkFHZz09"
+      ],
+      "dwnbtnHrefs": [
+        "href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=NGpyTWhLM1hYQmlVNTRmeVRhYkFHZz09\""
+      ]
+    },
+    "GEMC-511687711337833": {
+      "downloadButtonHtml": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=VUROYmJrU1dGWnhub2VqdlFLRVdBZz09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "urlsInCode": [
+        "https://fulfilment.gem.gov.in/contract/fds?orderId=VUROYmJrU1dGWnhub2VqdlFLRVdBZz09"
+      ],
+      "hrefsInCode": [
+        "href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=VUROYmJrU1dGWnhub2VqdlFLRVdBZz09\""
+      ],
+      "onclicksInCode": [],
+      "modalState": {
+        "modalVisible": true,
+        "captchaImgSrc": "data:image/jpeg;charset=utf8;base64,/9j/4AAQSkZJRgABAQEAYABg...",
+        "hCaptchaValue": "vgv5v8",
+        "oidValue": "GEMC-511687711337833"
+      },
+      "dwnbtnAfterSubmit": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=VUROYmJrU1dGWnhub2VqdlFLRVdBZz09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "dwnbtnUrls": [
+        "https://fulfilment.gem.gov.in/contract/fds?orderId=VUROYmJrU1dGWnhub2VqdlFLRVdBZz09"
+      ],
+      "dwnbtnHrefs": [
+        "href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=VUROYmJrU1dGWnhub2VqdlFLRVdBZz09\""
+      ]
+    },
+    "GEMC-511687713186535": {
+      "downloadButtonHtml": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=OTl3WVlBYys3bTlncUgrakhhemF6UT09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "urlsInCode": [
+        "https://fulfilment.gem.gov.in/contract/fds?orderId=OTl3WVlBYys3bTlncUgrakhhemF6UT09"
+      ],
+      "hrefsInCode": [
+        "href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=OTl3WVlBYys3bTlncUgrakhhemF6UT09\""
+      ],
+      "onclicksInCode": [],
+      "modalState": {
+        "modalVisible": true,
+        "captchaImgSrc": "data:image/jpeg;charset=utf8;base64,/9j/4AAQSkZJRgABAQEAYABg...",
+        "hCaptchaValue": "ksgp8t",
+        "oidValue": "GEMC-511687713186535"
+      },
+      "dwnbtnAfterSubmit": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=OTl3WVlBYys3bTlncUgrakhhemF6UT09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "dwnbtnUrls": [
+        "https://fulfilment.gem.gov.in/contract/fds?orderId=OTl3WVlBYys3bTlncUgrakhhemF6UT09"
+      ],
+      "dwnbtnHrefs": [
+        "href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=OTl3WVlBYys3bTlncUgrakhhemF6UT09\""
+      ]
+    },
+    "GEMC-511687781726952": {
+      "downloadButtonHtml": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=ejk0VXQ5U01uanRxczNUV2pZbERjZz09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "urlsInCode": [
+        "https://fulfilment.gem.gov.in/contract/fds?orderId=ejk0VXQ5U01uanRxczNUV2pZbERjZz09"
+      ],
+      "hrefsInCode": [
+        "href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=ejk0VXQ5U01uanRxczNUV2pZbERjZz09\""
+      ],
+      "onclicksInCode": [],
+      "modalState": {
+        "modalVisible": true,
+        "captchaImgSrc": "data:image/jpeg;charset=utf8;base64,/9j/4AAQSkZJRgABAQEAYABg...",
+        "hCaptchaValue": "xs8x8q",
+        "oidValue": "GEMC-511687781726952"
+      },
+      "dwnbtnAfterSubmit": "<a href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=ejk0VXQ5U01uanRxczNUV2pZbERjZz09\" target=\"_blank\" class=\"btn btn-secondary\" id=\"dwnbtn\" style=\"    background: #F5821F;\">Download</a>",
+      "dwnbtnUrls": [
+        "https://fulfilment.gem.gov.in/contract/fds?orderId=ejk0VXQ5U01uanRxczNUV2pZbERjZz09"
+      ],
+      "dwnbtnHrefs": [
+        "href=\"https://fulfilment.gem.gov.in/contract/fds?orderId=ejk0VXQ5U01uanRxczNUV2pZbERjZz09\""
+      ]
+    }
+  },
+  "pdfEndpoints": [],
+  "networkRequests": [
+    {
+      "method": "GET",
+      "url": "https://gem.gov.in/view_contracts",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "    <!DOCTYPE HTML>\n<html lang=\"en\">\n   <head>\n      <meta charset=\"utf-8\">\n      <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n      <meta name=\"viewport\" content=\"width=device-width\" initial-scale=\"1.00\" maximum-scale=\"1.0\" />\n      <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->\n      <title>GeM | view contract homepage</title>\n      <meta name=\"keywords\" content=\"Government e-Marketplace,GeM,government e market portal,government e procurement,national public procurement portal,eprocurement govt of india,Government Procurement,govt e marketing place,e marketplace,Public Procurement,Digital India,e-bidding,e-bid,central eprocurement,online procurement system,eprocurement govt of india,GEM online,best online marketplace,best online b2b marketplace,b2b online marketplace,gem website,\" />\n      <meta name=\"language\" content=\"English\">\n      <meta name=\"google-site-verification\" content=\"XGn9tihcUeVBwacYxnEF9QGxyfwYDcJ7wLg7qbMQ5yo\" />\n      <meta name=\"description\" content=\"Government e Marketplace (GeM) is a digital platform for procurement of goods & services by Central / State Ministries / Departments, PSUs, Panchayats & Cooperatives.\" />\n      <link rel=\"image_src\" href=\"https://assets-bg.gem.gov.in/resources/images/gem-logo-n2.svg \" />\n      <link rel=\"canonical\" href=\"https://gem.gov.in/\" />\n      <meta property=\"fb:app_id\" content=\"1259130457514654\" />\n      <meta property=\"og:site_name\" content=\"Government e-Marketplace - Procurement Reimagined\" />\n      <meta property=\"og:type\" content=\"article\" /><!--<meta name=\"robots\" content=\"noindex\">-->\n      <meta property=\"og:url\" content=\"https://gem.gov.in/\" />\n      <meta property=\"og:title\" content=\"Government e-Marketplace - Procurement Reimagined\" />\n      <meta property=\"og:description\" content=\"GeM is the National Public Procurement Portal; an end-to-end online Marketplace for Central and State Government Ministries / Departments, Centra"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/ie-emulation-modes-warning.js?version=20260220185347",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/egrum.js?version=20260220185347",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/jquery-3.6.0.min.js",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/menu-v5.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/gem-new-logo-v6.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/login-v4.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/gem-new-logo-v2.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/vcancel-v4.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/new-on.png",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/new-lms-link.png",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/down-arrow-red.png",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://gem.gov.in/resources/css/roboto/Roboto-Regular.ttf",
+      "postData": null,
+      "status": 200,
+      "contentType": "font/ttf"
+    },
+    {
+      "method": "GET",
+      "url": "https://gem.gov.in/resources/images/refresh.png",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/select2.min.js",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/inc-v1.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/youtube_new-gem.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/twitter-new-icon.png",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/facebook-icons.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/upload/shared_doc/instagram_logo_1737435144.jpg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/jpeg"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/launch-menus.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/closes.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/go-to-tops.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/slideshare.svg",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/svg+xml"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/key1.js",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/bootstrap.min.js",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/ie10-viewport-bug-workaround.js",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/slick.js",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/waypoints.min.js",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/jquery.counterup.min.js",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/custom-v3.js?version=20260220185347",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/jquery.colorbox.js",
+      "postData": null
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/js/autocomplete-v1.js",
+      "postData": null
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.5506177927983648",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"6pjqqh\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoA\\/NL4nSTft6\\/tr2Pgqyleb4a+CGcX08THZKqOPtDgjvLIFhUj+Fd4719JS\\/2DCuo\\/il\\/S\\/zOCX76py9Efod4h8V+F\\/hpoVvc67rOk+FdGjKWsM2o3UVnbqdp2RqzlVBwpwo7KfSvn4wnUdoptna2orUr33xR8GaW+kJeeLtCtH1eNJtNWfUoUN6jjKNDlv3gbIwVyDmmqVR3tF6b6BzRXU6esij40\\/bhsPDHxxg8NaHo\\/x18GeCdU8Oaw8moWmo+IYYHRxhSxVX3CaIq2FYDlmyVr2ME50LylSbTXb+tGcta07JSSsfZEI2woN5lwoG84+b34rxzqOb0z4o+DNal1SPTvF2hX8mlI0t+ltqUMhs0X7zShWPlgYOS2MVq6VSNrxevkTzRfUu+FPGvh7x5pjal4Z17TPEWnLIYTd6TeR3UIkABKF42I3AEHGc8j1qZwlTdpqz8xpqWqZS0z4o+DNal1SPTvF2hX8mlI0t+ltqUMhs0X7zShWPlgYOS2MVTpVI2vF6+QuaL6ngn7bnjXw948\\/Yq+I2peGde0zxFpyi1hN3pN5HdQiQXluSheNiNwBBxnPI9a7sFCVPFQU1Z67+jMarUqbaYv7Enjfw54H\\/AGNvhpceI9f0vw\\/bzpdRRS6pex2ySP8AbJ\\/lUuwBPsKMbCU8VNQV\\/wDhgpNKmrs+n45EmjWSNg6MAyspyCD0INeYdA6gAoA8Y\\/bH+J138Iv2bfG\\/iPTpGh1RbRbOzlQ4aOWeRYQ6+6eYXH+7XZg6SrV4xe3+RlVlywbR+XXw8+EPx4+E\\/wACpfjZ4O1+bw54ZmKTz29hqLx3E8SSGNZpYMbJIwzNgMScEnbgk19PUrYarW+rzV2edGNSMedPQ+g\\/2qfi\\/e\\/HX\\/gnN4F8Yaokaavda9DBe+Uu1WmiF1EzgdBu2B8Dgbsdq4MLRVDGygtrf5G9SXPRTZzfi\\/8AYSPiH9kuD4u6p4w1O\\/8AGsPhq31hb"
+    },
+    {
+      "method": "GET",
+      "url": "https://gem.gov.in/right-red.gif",
+      "postData": null,
+      "status": 302,
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "method": "GET",
+      "url": "https://gem.gov.in/down-red.gif",
+      "postData": null,
+      "status": 302,
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "method": "GET",
+      "url": "https://gem.gov.in/error_404",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "method": "GET",
+      "url": "https://gem.gov.in/error_404",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/favicon.png",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/dept-commerce.png?version=20260220185347",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/upload/shared_doc/nssh_1659512061.png?version=20260220185347",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/digital-india.png?version=20260220185347",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/images/gem-india.jpg?version=20260220185347",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/jpeg"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/upload/shared_doc/stqc1_1651680670.png?version=20260220185347",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/upload/shared_doc/betibachao-logo_1706605704.png?version=20260220185347",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "GET",
+      "url": "https://assets-bg.gem.gov.in/resources/upload/shared_doc/ask_gem_ai_1766480650.png",
+      "postData": null,
+      "status": 200,
+      "contentType": "image/png"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/encryptCaptcha",
+      "postData": "str=6pjqqh",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  WYOEfbPv/LOLXgxHuCVwSA=="
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/contract_details",
+      "postData": "fromDate=27-05-2026&toDate=06-06-2026&department=&bno=&buyer_category=&page=0",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "                                  <div class=\"border block\">\n                                    <div class=\"block_header\">\n                                        <a href=\"javascript:void(0);\" onclick=\"openCap('GEMC-511687724177915');\" style=\"outline: none;\"><div class=\"col-md-8\" style=\"padding-left: 0px;\"><p class=\"bid_no pull-left\" style=\"background:#0F5E8B !important;\">Contract NO: <span class=\"ajxtag_order_number\">GEMC-511687724177915</span></p></div></a> \n                                       <div class=\"col-md-4\"> <p class=\" view_corrigendum\"style=\"    margin-left: 5px;\"><strong>Status of the Contract: </strong><span class=\"ajxtag_order_status\">\n                                            Fullfillment in Progress</span></p></div>\n                                        <div class=\"clearfix\"></div>\n                                    </div>\n                                                                        <div class=\"row\" >\n                                        <div class=\"col-md-5\">\n                                            <p><strong>Organization Type: </strong><span class=\"ajxtag_buyer_dept_org\">State Government</span></p>\n                                        </div>\n                                        <div class=\"col-md-3\">\n                                            <p><strong>Ministry: </strong><span class=\"ajxtag_buying_mode\">UTTAR PRADESH</span></p>\n                                        </div>\n                                        <div class=\"col-md-4\">\n                                            <p><strong>Department: </strong><span class=\"ajxtag_buying_mode\">Vocational Education and Skill Development Department Uttar Pradesh</span></p>\n                                        </div>\n                                    </div>\n                                    <div class=\"row\" style=\"border-bottom: 1px solid #f0f0f0;margin-bottom: 10px;\">\n                                        <div class=\"col-md-5\">\n                              "
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.6810662124249294",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"84fqyc\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoA5YfFXwSfE3\\/CODxhoB8Q7\\/L\\/sn+04Pte\\/+75W7fn2xWvsqnLz8rt3sTzRva51NZFBQAUAFABQAUAFABQAUAFABQAUAFAHjP7ZHjPWfh9+zJ4\\/13w\\/LJBq8FisUM8Jw8IllSJ5FI6FUdmB7EZ7V2YOEaleEZbGVVuMG0fncP2HdCH7F\\/8AwugeL73\\/AISf7F\\/a3k7o\\/se3zdvk5xv83tu3ff4296+h+uy+tew5dNvM4fYr2fPfU\\/RL9jrxtrPxD\\/Zm8A694gkkn1e4sWjmnm5ebypXiWRj3LLGrE9y2e9fPYyEadeUY7HdSblBNn5v\\/twatefHLxL47+JkU7N4U8Ma3a+C9H28xzuEnluHB6H503Z7rKnpX0WCSoRjS6tOT\\/Q4a3vty6LQ\\/UzwDrum+Gfgr4W1TWNQtdK0y10Ozknvb6ZYYYV8hPmd2ICj3Jr5ipFyqyUVd3Z6CaUU2flRoXgyb9uT9ovxvF4n+LVj4bjW\\/kTR1vpVuRdK0zJDb2cJmjDAIo+4SeQcEtmvqZT+o0I8lO\\/f\\/gnnJe2m7yP1Z+CXw0\\/4U78KfDPgv+0v7X\\/sW0Fr9u8jyPOwSd2zc23r03Gvlq1T21SVS1rnowjyxUTQ0z4o+DNal1SPTvF2hX8mlI0t+ltqUMhs0X7zShWPlgYOS2MVLpVI2vF6+Q+aL6lVPjL4Ak8Lv4lXxz4bbw4k\\/wBlfWBq9ubNZsA+WZt+wPgj5c55FP2NXm5OV37WDnja9zXXxt4dfwr\\/AMJOuv6W3hryTc\\/2yLyM2flDrJ527Zt\\/2s4qOSXNyW17dR3Vr30H+FvGGg+OdKGqeG9b07xBppdoxeaXdx3MJYdV3oSMjuM0ShKDtNWYJp6oy9Z+LXgfw5ra6Nq3jPw\\/pesMQF0+91SCG4JPTEbOG5+lVGlUkuaMW16Ccop2bOqVgwBBBB5BHesihaACgDyH9rP4l6b8J\\/2e\\/GWv6rpUGu2\\/2T7Eul3QJhunnYRKkmOdnz5bBB2g4IOK68JTdWtG"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.033513065284171084",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"rkggj3\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgAoAKACgAoAKACgAoAKAOWHxV8FN4m\\/wCEcHjDQD4h3+X\\/AGSNTg+17v7vlbt+fbFa+yqcvPyu3exPNG9rnU1kUFABQBm+IfEmkeEdIn1XXdUstF0uDb5t7qFwkEEe5gq7nchRliAMnkkCqjGU3yxV2JtLVmTqXxU8F6Nomn6zf+L9BsdI1D\\/jz1C51OCO3uf+uchYK\\/8AwEmrVKpJuKi7ryFzRSvc8E\\/4KQzx3X7HfiqaGRJoZJ9PdJI2DKym7iIII6gjvXdl2mJj8\\/yMa\\/8ADZt\\/so+NfD3gP9j\\/AOGWpeJte0zw7pzackK3erXkdrCZCzkIHkYDcQCcZzwfSoxUJVMTNQV3foOm1Gmm2e+aPrOn+ItLtdT0q+ttT026jEtveWcyywzIejI6khgfUGuBxcXaSszZO+qMS3+KPgy7vNVtIPF2hTXekxPNqEEepQs9nGnLvMobMarg5LYA71o6VRJNxevkLmXcveFfGfh\\/x3pZ1Pw1rum+IdNEhi+2aVeR3UO8Yyu+MkZGRkZ7ipnCVN2mrPzGmnqijb\\/FHwZd3mq2kHi7QprvSYnm1CCPUoWezjTl3mUNmNVwclsAd6p0qiSbi9fIXMu5e8K+M\\/D\\/AI70s6n4a13TfEOmiQxfbNKvI7qHeMZXfGSMjIyM9xUzhKm7TVn5jTT1R8m\\/tw2Hhj44weGtD0f46+DPBOqeHNYeTULTUfEMMDo4wpYqr7hNEVbCsByzZK16uCc6F5SpNprt\\/WjOatadkpJWPpP4w6F4s8SfCbxDo\\/gfVLXTvFV9ZG2stSvpXjjhLEK8m+NGZWCFypVT823p1HnUZQjUUqiujeSbi1Hc\\/Oz4p\\/8ABNa1+Ev7N+teN9U8YXE3j7RoTfXK2zg6c4Eg+SMtGsu\\/BGHJGW42jOa+gpZk6tdU1H3X95wyocsOZvU+5\\/2O\\/G2s\\/EX9mfwDr\\/iCSSfV7ixaOeebl5vKleJZGPcusasT3LZrxMZCNOvKMdjspNygmz2SuM1CgD5o\\/wCC"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/sbtCaptcha",
+      "postData": "oid=GEMC-511687724177915",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=aGR3ZnAvTXNtbm9raytCWkVhaXh5QT09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.7127677966958809",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"hb7q8r\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgAoAKACgAoAKACgDlh8VfBJ8Tf8I4PGGgHxDv8v+yf7Tg+17\\/7vlbt+fbFa+yqcvPyu3exPNG9rnU1kUFABQAUAFAHzt\\/wUI\\/5M9+In\\/XKz\\/8AS23r0Mv\\/AN5h8\\/yZhW\\/hsx\\/2JPG\\/hzwP+xt8NLjxHr+l+H7edLqKKXVL2O2SR\\/tk\\/wAql2AJ9hV42Ep4qagr\\/wDDCpNKmrs5r\\/gqdIk37LUMkbB0bXbNlZTkEFJcEGtcr\\/3j5MnEfAev\\/Abx\\/wCF\\/CvwD+Dmna34k0jR9QvvCmki0tL++igluD9kiGI0dgX544Brjr05zrVHFNpN\\/mawklGKb6G7+0b8Gv8AhoD4N6\\/4D\\/tj+wf7VNuf7Q+zfafK8q4jm\\/1e9N2fL2\\/eGM55xiow9b6vVVS17DqQ548p+U\\/7Wv7E9t+y7pvhjy\\/HTeLNZ1+7e3ttMj0f7K2xANz7vPkydzxqF287jzxg\\/U4TGvFOXu2S8\\/8AgHnVaPs7a3ufrR8DPhvD8Ifg\\/wCEfB0SqG0nTooJ2To85G6Zx\\/vSM7fjXylep7arKfc9KEeWKRp6Z8UfBmtS6pHp3i7Qr+TSkaW\\/S21KGQ2aL95pQrHywMHJbGKl0qkbXi9fIfNF9Tyb9pz40W8f7KPxB8X\\/AA58RWGtzW1qLSPUtDvY7lYHeSOOQiSNiFdElL9cjg11Yai\\/rEIVVb1M6k\\/cbiz4IH7DuhD9i\\/8A4XQPF97\\/AMJP9i\\/tbyd0f2Pb5u3yc43+b23bvv8AG3vXvfXZfWvYcum3mcXsV7PnvqfoD+y38Wn1b9lDwP4z8e6zbaY5sfKvNU1a5WBG2TtBHJJI5Ay4VDknkv6mvAxVK2IlTpq\\/odtOV6alI9O1L4qeC9G0TT9Zv\\/F+g2Okah\\/x56hc6nBHb3P\\/AFzkLBX\\/AOAk1zKlUk3FRd15GnNFK9zpIJ47qCOaGRJoZFDpJGwZWUjIII6gjvWWxRJQAUAfO3\\/BQj\\/kz34if9crP\\/0tt69D"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/sbtCaptcha",
+      "postData": "oid=GEMC-511687724177915",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=aGR3ZnAvTXNtbm9raytCWkVhaXh5QT09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.06342627234477138",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"s9dcbd\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgDlz8U\\/BY8Tf8ACOHxfoI8Q7\\/L\\/sj+04fte7+75W7fn2xWvsqnLz8rt3sTzRva51FZFBQAUAFABQAUAFABQAUAFABQAUAcqPit4JPif\\/hGx4x0A+It\\/l\\/2QNUg+17\\/AO75O7fn2xWvsqnLz8rt3sTzRva55r+218TtU+En7M\\/jHX9Dne11gxRWVrcxnDQtNKkTSKezKrMQexArpwVJVq8Yy2M60nGDaPzvH7Etg\\/7FbfGw+Jb7\\/hK\\/KOqfZMp9l8jz\\/L25xv8ANx8+7djPy7f4q+g+uv619XtpscPsv3fPfU\\/Q\\/wDYh+Jeq\\/Fj9mXwbruuTvdausUtlcXMhy05hleJZGPdiqqSe7Zr5\\/G0o0q8ox2O6jJygmzoPiZ8RPCni34V\\/EnT9D8TaNrV\\/Z6BqAubXT7+KeWD\\/R5B86IxK88cis6dOcKkHKLSuipSTi7M8I\\/4JR\\/8my3\\/AP2Md1\\/6Jt67s1\\/jr0\\/zMcN8B9Q6z8WvA\\/hzW10bVvGfh\\/S9YYgLp97qkENwSemI2cNz9K8yNKpJc0Ytr0OhyinZs+Zv+CqLBv2XYiCCDr1oQR3+SWvSyv8A3j5M58R8B678BvH\\/AIX8K\\/AP4OadrfiTSNH1C+8KaSLS0v76KCW4P2SIYjR2BfnjgGuSvTnOtUcU2k3+ZrCSUYpvoez1xmp5V8TPiJ4U8W\\/Cv4k6fofibRtav7PQNQFza6ffxTywf6PIPnRGJXnjkV1U6c4VIOUWldGcpJxdmeEf8Eo\\/+TZb\\/wD7GO6\\/9E29d2a\\/x16f5mOG+A+zK8c6goA5j4o2Wuan8M\\/Ftn4ZlMHiS40i7i0yUPsKXTQuISG7Ycrz2rWk4qpFz2urkyvZ23Pyc+A\\/w++Aep6XP4I+NZ8TfDj4oQ6kztrNxM9qCmfkjzIrxxdyWkQc4IfnA+qr1MSn7TD2lC2x5sI037s9Gfpr8Yfgha\\/GH9nzUvhzLrFxci606GC21m9YSzPNDseKeUqAGJeNSxUDOWxjNfN"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/sbtCaptcha",
+      "postData": "oid=GEMC-511687777108237",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=NGpyTWhLM1hYQmlVNTRmeVRhYkFHZz09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.37495566591789786",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"thd5j8\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgAoAKACgAoAKACgAoAKAOWHxV8EnxN\\/wAI4PGGgHxDv8v+yf7Tg+17\\/wC75W7fn2xWvsqnLz8rt3sTzRva51NZFBQAUAVtS1K00bTrrUNQuoLGwtInnuLq5kEcUMagszuzEBVABJJ4AFNJydkGx8hfAP8Abnk+J37SXjjwLrup+D7HwvZXM9t4d1C2uDHLqji7WGBEkedkmZ0bIEajccEccV69fA+yoRqRTv18tPQ5YVuabi9jvf8AgoR\\/yZ78RP8ArlZ\\/+ltvXPl\\/+8w+f5Mut\\/DZj\\/sSeN\\/Dngf9jb4aXHiPX9L8P286XUUUuqXsdskj\\/bJ\\/lUuwBPsKvGwlPFTUFf8A4YVJpU1dn0\\/HIk0ayRsHRgGVlOQQehBrzDoPLPiZ8RPCni34V\\/EnT9D8TaNrV\\/Z6BqAubXT7+KeWD\\/R5B86IxK88ciuqnTnCpByi0rozlJOLsz4a\\/Z8\\/5RcfFr\\/r+vP\\/AEC1r28R\\/wAjCn8v1OOn\\/Akct8Av+CZf\\/C8fhD4c8c\\/8LI\\/sX+2IpJfsH9hfaPJ2yvHjzPtKbs7M\\/dHWta+ZewqOnyXt5\\/8AAJhh+eKlc\\/UT4f8AhX\\/hBfAfhvw39q+3f2Npttp32ry\\/L87yolj37cnbnbnGTjPU18zUnzzc+7uehFWSR8p\\/tw2Hhj44weGtD0f46+DPBOqeHNYeTULTUfEMMDo4wpYqr7hNEVbCsByzZK16mCc6F5SpNprt\\/WjOetadkpJWPYv2wvGWtfD39l7x5rnh+4lTV7fT0ihuojiSMSSxxPKpHRlR2YEdCM9q48HCNTERjLY1qtxg2j88R+w7oQ\\/Yv\\/4XQPF97\\/wk\\/wBi\\/tbyd0f2Pb5u3yc43+b23bvv8be9fQ\\/XZfWvYcum3mcPsV7Pnvqfol+x1421n4h\\/szeAde8QSST6vcWLRzTzcvN5UrxLIx7lljVie5bPevnsZCNOvKMdjupNygmz2WuM1CgDF8beE7Tx54M1\\/wAM6hJPDYa1p9xp1x"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/sbtCaptcha",
+      "postData": "oid=GEMC-511687777108237",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=NGpyTWhLM1hYQmlVNTRmeVRhYkFHZz09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.37984528322202793",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"bybjd4\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgD47\\/4Kpf8mvR\\/9h60\\/wDQJa9fK\\/8AePkzlxHwHrvwG8f+F\\/CvwD+Dmna34k0jR9QvvCmki0tL++igluD9kiGI0dgX544Brkr05zrVHFNpN\\/mawklGKb6HqHinxhoPgbSjqniTW9O8P6aHWM3mqXcdtCGPRd7kDJ7DNc0YSm7QV2aNpasYvjbw6\\/hX\\/hJ11\\/S28NeSbn+2ReRmz8odZPO3bNv+1nFHJLm5La9uoXVr30Pj7\\/gpV4w0Hxz+yTFqnhvW9O8QaafENrGLzS7uO5hLBJcrvQkZHcZr18thKGJtNWdjlrtOndHunwG8f+F\\/CvwD+Dmna34k0jR9QvvCmki0tL++igluD9kiGI0dgX544Brhr05zrVHFNpN\\/mbQklGKb6Hs9cZqfGn7cNh4Y+OMHhrQ9H+OvgzwTqnhzWHk1C01HxDDA6OMKWKq+4TRFWwrAcs2StexgnOheUqTaa7f1ozlrWnZKSVj7IhG2FBvMuFA3nHze\\/FeOdR5b8TPiJ4U8W\\/Cv4k6fofibRtav7PQNQFza6ffxTywf6PIPnRGJXnjkV1U6c4VIOUWldGcpJxdmeEf8Eo\\/+TZb\\/AP7GO6\\/9E29d2a\\/x16f5mOG+A+Rv24NWvPjl4l8d\\/EyKdm8KeGNbtfBej7eY53CTy3Dg9D86bs91lT0r1sElQjGl1acn+hzVvfbl0Wh+rXwl\\/wCSV+DP+wLZf+iEr5ar\\/El6s9GPwo6usigoA+O\\/+CqX\\/Jr0f\\/YetP8A0CWvXyv\\/AHj5M5cR8B81+Lf2HDrn7H9l8X9T8X6nf+MLfw5aajFZzGM2UenRwoIrdRt3hkgC87sFgRt5zXpQx3LiXQUfdu153\\/4cwdG9Pnb1PcvhQ+p\\/tV\\/8E29X0bVWfUdes7K5sYJ5PmkmntGEttk9ckLEhPU8k9TXDVthccpR2\\/z3NY3qUbM+e7L46+X\\/AMEu7vwz9oxqA8Rf8I4i7vn8ln+3E\\/7pX"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/sbtCaptcha",
+      "postData": "oid=GEMC-511687711337833",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=VUROYmJrU1dGWnhub2VqdlFLRVdBZz09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.8981896475073701",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"vgv5v8\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgAoAKACgAoAKACgAoAKAOWHxV8EnxN\\/wAI4PGGgHxDv8v+yf7Tg+17\\/wC75W7fn2xWvsqnLz8rt3sTzRva51NZFBQAUAY\\/inxjoHgbSjqfiTXNN8P6aHWM3mq3cdtCHPRd7kDJwcDNXGEpu0FdibS1Yz\\/hN\\/Dv\\/CK\\/8JP\\/AG\\/pf\\/CNeT9o\\/tn7ZH9j8r\\/np527Zt984o5Jc3JbXt1C6te+g\\/wt4x0DxzpQ1Pw3rem+INNLtGLzSruO5hLjqu9CRkZGRmiUJQdpqzBNPVFC3+KPgy7vNVtIPF2hTXekxPNqEEepQs9nGnLvMobMarg5LYA71TpVEk3F6+QuZdysPjH4BbwsfEw8ceGz4bWf7KdYGr2\\/2MTf88\\/O37N3+znNP2NTm5OV37WDmja99DV\\/4Tfw7\\/wiv\\/CT\\/wBv6X\\/wjXk\\/aP7Z+2R\\/Y\\/K\\/56edu2bffOKjklzclte3Ud1a99DxT9rDxjoHjn9j34lan4b1vTfEGmnTZIxeaVdx3MJcOmV3oSMjIyM124WEoYmCmrO5jUadNtHxF8Av+CZf\\/C8fhD4c8c\\/8LI\\/sX+2IpJfsH9hfaPJ2yvHjzPtKbs7M\\/dHWvar5l7Co6fJe3n\\/wDkhh+eKlc\\/S3SJ9A+Bnwu8Oad4k8S6bpmm6NYWmlHVtVnjsoZXjiWMHLvhS2wkLuP1NfNvmr1G4K7d3bc71aEVdm3\\/wm\\/h3\\/AIRX\\/hJ\\/7f0v\\/hGvJ+0f2z9sj+x+V\\/z087ds2++cVHJLm5La9upV1a99Dxz9p\\/4yRW\\/7J\\/j7xh8O\\/EFlrMkNp9mg1PRLxLhImeWOKRlkjJAZFkZuDkEA12Yaj\\/tEYVVb1Mqkv3bcWfAw\\/Yd0IfsX\\/wDC6B4vvf8AhJ\\/sX9reTuj+x7fN2+TnG\\/ze27d9\\/jb3r3vrsvrXsOXTbzOL2K9nz31P0S\\/Y68baz8Q\\/2ZvAOveIJJJ9XuLFo5p5uXm8qV4lkY9yyxqxPctnvXz2MhGnXlGOx3U"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/sbtCaptcha",
+      "postData": "oid=GEMC-511687711337833",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=VUROYmJrU1dGWnhub2VqdlFLRVdBZz09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.002575812888116369",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"tmq8s7\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgAoAKACgAoA5YfFXwSfE3\\/AAjg8YaAfEO\\/y\\/7J\\/tOD7Xv\\/ALvlbt+fbFa+yqcvPyu3exPNG9rnU1kUFABQAUAFABQAUAVtS1K00bTrrUNQuoLGwtInnuLq5kEcUMagszuzEBVABJJ4AFNJydkGx8hfAP8Abnk+J37SXjjwLrup+D7HwvZXM9t4d1C2uDHLqji7WGBEkedkmZ0bIEajccEccV69fA+yoRqRTv18tPQ5YVuabi9j6p8XeO\\/DXw\\/0+K\\/8UeIdK8N2MsogjudXvYrWN5CCwQNIwBbCscDnAPpXlQpzqO0E36HS2o7sZB8QfC10uqND4l0eZdKjWXUDHfxMLNGXcrTYb92CvILYyOafs5q2j1FzLuaOh69pnifSbbVNG1G01bTLld0F7YzrNDKM4yrqSGGQRwe1TKLi7SVmNNPVGPpnxR8Ga1LqkeneLtCv5NKRpb9LbUoZDZov3mlCsfLAwclsYq3SqRteL18hc0X1PJv2nPjRbx\\/so\\/EHxf8ADnxFYa3NbWotI9S0O9juVgd5I45CJI2IV0SUv1yODXVhqL+sQhVVvUzqT9xuLPggfsO6EP2L\\/wDhdA8X3v8Awk\\/2L+1vJ3R\\/Y9vm7fJzjf5vbdu+\\/wAbe9e99dl9a9hy6beZxexXs+e+p+iX7HXjbWfiH+zN4B17xBJJPq9xYtHNPNy83lSvEsjHuWWNWJ7ls96+exkI068ox2O6k3KCbO7HxW8EnxP\\/AMI2PGOgHxFv8v8AsgapB9r3\\/wB3yd2\\/PtisPZVOXn5XbvYvmje1zn\\/2jfg1\\/wANAfBvX\\/Af9sf2D\\/aptz\\/aH2b7T5XlXEc3+r3puz5e37wxnPOMVph631eqqlr2JqQ548p+U\\/7Wv7E9t+y7pvhjy\\/HTeLNZ1+7e3ttMj0f7K2xANz7vPkydzxqF287jzxg\\/U4TGvFOXu2S8\\/wDgHnVaPs7a3ufrR8DPhvD8Ifg\\/4R8HRKobSdOignZOjzkbpnH+9Izt+NfKV6ntqsp9z"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/sbtCaptcha",
+      "postData": "oid=GEMC-511687713186535",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=OTl3WVlBYys3bTlncUgrakhhemF6UT09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.7624674246041451",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"ksgp8t\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgAoAKACgAoAKACgDlh8VfBJ8Tf8I4PGGgHxDv8v+yf7Tg+17\\/7vlbt+fbFa+yqcvPyu3exPNG9rnU1kUFABQAUAFAHy\\/8A8FKP+TQfF3\\/XzYf+lcVenlv+8x+f5HPX\\/hs2P2UfGvh7wH+x\\/wDDLUvE2vaZ4d05tOSFbvVryO1hMhZyEDyMBuIBOM54PpUYqEqmJmoK7v0HTajTTbPfNH1nT\\/EWl2up6VfW2p6bdRiW3vLOZZYZkPRkdSQwPqDXA4uLtJWZsnfVGCPit4JPif8A4RseMdAPiLf5f9kDVIPte\\/8Au+Tu359sVp7Kpy8\\/K7d7C5o3tc6qsijmLf4o+DLu81W0g8XaFNd6TE82oQR6lCz2cacu8yhsxquDktgDvWrpVEk3F6+RPMu5UPxo+Hy+GB4kPjvw0PDpuPsg1c6xb\\/ZDPjPledv2b8c7c5x2p+xq83Jyu\\/awueNr3Ld98UfBmlvpCXni7QrR9XjSbTVn1KFDeo4yjQ5b94GyMFcg5pKlUd7Rem+g+aK6nAftkeM9Z+H37Mnj\\/XfD8skGrwWKxQzwnDwiWVInkUjoVR2YHsRntW+DhGpXhGWxFVuMG0fncP2HdCH7F\\/8AwugeL73\\/AISf7F\\/a3k7o\\/se3zdvk5xv83tu3ff4296+h+uy+tew5dNvM4fYr2fPfU\\/Qr9kz4kX3ir9lXwX4u8YXywXC6ZI99qN\\/IEXyoJJE8+V2IABjjDsxPck18\\/i6ahiJQgup3U5Xgmzyb4B\\/tzyfE79pLxx4F13U\\/B9j4Xsrme28O6hbXBjl1RxdrDAiSPOyTM6NkCNRuOCOOK66+B9lQjUinfr5aehlCtzTcXsfY1eOdQUAFAHy\\/\\/wAFKP8Ak0Hxd\\/182H\\/pXFXp5b\\/vMfn+Rz1\\/4bPgv4Z6jcfteeNfgn8GLm7Ok+D\\/AA1YZuopJPLe7dVaa4ZB3YoBGnXaNz9Ca92qlhIVK61k\\/wCkccf3rjDoj9ZPiBoOpRfCPxHovgtU03V10O5s9FWA"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/sbtCaptcha",
+      "postData": "oid=GEMC-511687713186535",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=OTl3WVlBYys3bTlncUgrakhhemF6UT09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.3934634170452952",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"6pcqrw\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoA\\/NL4nSTft6\\/tr2Pgqyleb4a+CGcX08THZKqOPtDgjvLIFhUj+Fd4719JS\\/2DCuo\\/il\\/S\\/zOCX76py9Efod4h8V+F\\/hpoVvc67rOk+FdGjKWsM2o3UVnbqdp2RqzlVBwpwo7KfSvn4wnUdoptna2orUr33xR8GaW+kJeeLtCtH1eNJtNWfUoUN6jjKNDlv3gbIwVyDmmqVR3tF6b6BzRXU6esijlNZ+LXgfw5ra6Nq3jPw\\/pesMQF0+91SCG4JPTEbOG5+laxpVJLmjFtehLlFOzZ1SsGAIIIPII71kUczpnxR8Ga1LqkeneLtCv5NKRpb9LbUoZDZov3mlCsfLAwclsYrV0qkbXi9fInmi+pHafFnwPf8AhW58T23jLw\\/ceGraUQT6zFqkDWcUmVARpg+xWy6DBOfmHqKHSqKXI4u\\/a2oc0bXvoP1L4qeC9G0TT9Zv\\/F+g2Okah\\/x56hc6nBHb3P8A1zkLBX\\/4CTQqVSTcVF3XkHNFK9yx4n+IfhXwTpNtqniLxNo+gaZdOscF7ql\\/FbQzMVLBUd2AYlQSAD0BNKNOc3aMW2Dklq2X\\/wDhItJ\\/sf8Atb+07P8Asr7L9u+3faE8j7Pt3edvzt8vbzuzjHOanllfltqO6tcp+EfHfhr4gWEt94X8RaV4ksoZTBJc6RexXUaSAAlC0bEBsMpwecEetOdOdN2mmvUE1LZm7UDCgDxj9sf4nXfwi\\/Zt8b+I9OkaHVFtFs7OVDho5Z5FhDr7p5hcf7tdmDpKtXjF7f5GVWXLBtH5dfDz4Q\\/Hj4T\\/AAKl+Nng7X5vDnhmYpPPb2GovHcTxJIY1mlgxskjDM2AxJwSduCTX09Sthqtb6vNXZ50Y1Ix509D6D\\/ap+L978df+Cc3gXxhqiRpq91r0MF75S7VaaIXUTOB0G7YHwOBux2rgwtFUMbKC2t\\/kb1Jc9FNnN+L\\/wBhI+If2S4Pi7qnjDU7\\/wAaw+GrfWFtZjGbJ"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/sbtCaptcha",
+      "postData": "oid=GEMC-511687781726952",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=ejk0VXQ5U01uanRxczNUV2pZbERjZz09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.48905966974098836",
+      "postData": null,
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "{\"text\":\"xs8x8q\",\"im\":\"\\/9j\\/4AAQSkZJRgABAQEAYABgAAD\\/\\/gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK\\/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU\\/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU\\/8AAEQgAKAB4AwERAAIRAQMRAf\\/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC\\/\\/EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29\\/j5+v\\/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC\\/\\/EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29\\/j5+v\\/aAAwDAQACEQMRAD8A\\/VOgAoAKACgAoAKAOWHxV8EnxN\\/wjg8YaAfEO\\/y\\/7J\\/tOD7Xv\\/u+Vu359sVr7Kpy8\\/K7d7E80b2udTWRQUAFAHLD4q+CT4m\\/4RweMNAPiHf5f9k\\/2nB9r3\\/3fK3b8+2K19lU5efldu9ieaN7XOprIoKACgAoAKAM7xB4i0nwno9zq2uanZ6NpVsAZ77ULhIIIgSFBZ3IVckgcnqRVRjKb5Yq7E2lqzKPxP8ABq+Dh4tPi3Qh4VJ2jXTqUP2Enf5ePP3bPv8Ay9fvcdav2VTm5OV37W1FzRte+hqeHvEmkeLtHt9W0LVLLWtKuQTDfadcJPBLhip2uhKnDAg4PUEVEoyg+WSsxpp6oxx8VvBJ8T\\/8I2PGOgHxFv8AL\\/sgapB9r3\\/3fJ3b8+2Kv2VTl5+V272FzRva5wf7ZHjPWfh9+zJ4\\/wBd8PyyQavBYrFDPCcPCJZUieRSOhVHZgexGe1b4OEaleEZbEVW4wbR+dw\\/Yd0IfsX\\/APC6B4vvf+En+xf2t5O6P7Ht83b5Ocb\\/ADe27d9\\/jb3r6H67L617Dl028zh9ivZ899T9Av2WvixJq\\/7J3gnxp481i301hYbL3VdWuFgjISZoI5ZJHIGXCock8l\\/evAxVK2IlTpq\\/odtOV6alI9PPxP8ABq+Dh4tPi3Qh4VJ2jXTqUP2Enf5ePP3bPv8Ay9fvcda5vZVObk5XftbU05o2vfQ8t\\/am+K76b+yZ438Z+AtZttTJsPLs9V0i5WdAHnWCSSORCRlAznIPBT1FdOFpXxMadRW8n95nUl+7conwAP2HdCH7F\\/8AwugeL73\\/AISf7F\\/a3k7o\\/se3zdvk5xv83tu3ff42969\\/67L617Dl028zi9ivZ899T9Ev2OvG2s\\/EP9mbwDr3iCSSfV7ixaOaebl5vKleJZGPcssasT3LZ7189jIRp15Rjsd1JuUE2d9pnxR8Ga1LqkeneLtCv5NKRpb9LbUoZDZov3mlCsfLAwclsYrB0qkbXi9fIvmi+pd8KeNfD3jzTG1Lw"
+    },
+    {
+      "method": "POST",
+      "url": "https://gem.gov.in/view_contracts/sbtCaptcha",
+      "postData": "oid=GEMC-511687781726952",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "responseBody": "  {\"status\":\"1\",\"code\":\"<a href=\\\"https:\\/\\/fulfilment.gem.gov.in\\/contract\\/fds?orderId=ejk0VXQ5U01uanRxczNUV2pZbERjZz09\\\" target=\\\"_blank\\\" class=\\\"btn btn-secondary\\\" id=\\\"dwnbtn\\\" style=\\\"    background: #F5821F;\\\">Download<\\/a>\"}"
+    }
+  ],
+  "conclusions": {
+    "captchaAnswerInApiResponse": true,
+    "captchaTextInPlaintext": true,
+    "sbtCaptchaServerValidates": false,
+    "sbtCaptchaBypassable": true,
+    "pdfDownloadFound": false,
+    "pdfUrls": [],
+    "estimatedCaptchasPerDetail": 0
+  }
+}
