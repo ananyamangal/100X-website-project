@@ -6,8 +6,18 @@
 //               Infinite-scroll pagination — scroll #load_more into view
 //
 // Usage:
-//   node scripts/gem-contracts-collector.js          → 1 chunk (last 30 days)
-//   node scripts/gem-contracts-collector.js --full   → all pending chunks (12 months)
+//   node scripts/gem-contracts-collector.js                       → 1 chunk (last 30 days)
+//   node scripts/gem-contracts-collector.js --full                → all pending chunks (default 365 days)
+//   node scripts/gem-contracts-collector.js --full --days=730     → 2 years of history (24 chunks)
+//   node scripts/gem-contracts-collector.js --full --days=1095    → 3 years of history (36 chunks)
+//   node scripts/gem-contracts-collector.js --full --reset        → delete checkpoint, start fresh
+//
+// --days=N     Override total history depth in days (default: 365).
+//              If checkpoint exists with fewer days, new chunks are appended automatically.
+//              Existing completed chunks are NOT re-run.
+//
+// --reset      Delete checkpoint and start fresh from today (re-runs all chunks).
+//              Records already in MongoDB will be safely upserted, not duplicated.
 //
 // Collections written:
 //   gem_contracts       — structured, indexed, queryable
@@ -22,9 +32,17 @@ const readline = require("readline")
 const { chromium } = require("playwright")
 const { MongoClient } = require("mongodb")
 
+// ── CLI args ──────────────────────────────────────────────────────────────────
+const CLI = {}
+for (const arg of process.argv.slice(2)) {
+  if (arg.startsWith("--")) { const [k, v] = arg.slice(2).split("="); CLI[k] = v === undefined ? true : v }
+}
+const FULL_MODE   = !!CLI.full
+const RESET_MODE  = !!CLI.reset
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CHUNK_DAYS  = 30
-const TOTAL_DAYS  = 365
+const TOTAL_DAYS  = parseInt(CLI.days || "365")   // override with --days=N
 const PARSER_VER  = 3          // increment when parseCard() logic changes
 const CHECKPOINT  = "audit/contracts-checkpoint.json"
 
@@ -75,12 +93,15 @@ function parseValue(raw) {
 }
 
 // ── Date chunk generation ─────────────────────────────────────────────────────
-function generateChunks() {
+// startOffsetDays: how many days back to start from today (default 0 = today)
+// totalDays: how many days of history to cover from that offset
+// startId: first chunk ID number
+function generateChunks(totalDays = TOTAL_DAYS, startOffsetDays = 0, startId = 1) {
   const today   = new Date()
   const chunks  = []
-  let offset    = 0
-  let remaining = TOTAL_DAYS
-  let id        = 1
+  let offset    = startOffsetDays
+  let remaining = totalDays
+  let id        = startId
   while (remaining > 0) {
     const size   = Math.min(CHUNK_DAYS, remaining)
     const to_d   = new Date(today); to_d.setDate(to_d.getDate() - offset)
@@ -847,8 +868,6 @@ async function printReport(db) {
   loadEnv()
   fs.mkdirSync("audit", { recursive: true })
 
-  const fullMode = process.argv.includes("--full")
-
   const client = new MongoClient(process.env.MONGODB_URI)
   await client.connect()
   const db    = client.db()
@@ -859,26 +878,41 @@ async function printReport(db) {
 
   const existingCount = await colGC.countDocuments()
 
+  // Handle --reset: delete checkpoint and start fresh
+  if (RESET_MODE && fs.existsSync(CHECKPOINT)) {
+    fs.unlinkSync(CHECKPOINT)
+    console.log("  [reset] Checkpoint deleted. Starting fresh.")
+  }
+
   let state = loadCheckpoint()
   if (!state) {
     state = {
       version:   2,
       totalDays: TOTAL_DAYS,
       chunkDays: CHUNK_DAYS,
-      chunks:    generateChunks(),
+      chunks:    generateChunks(TOTAL_DAYS),
       createdAt: new Date().toISOString(),
     }
     saveCheckpoint(state)
-    console.log(`  Checkpoint created: ${state.chunks.length} chunks`)
+    console.log(`  Checkpoint created: ${state.chunks.length} chunks (${TOTAL_DAYS} days)`)
+  } else if (TOTAL_DAYS > state.totalDays) {
+    // Extend existing checkpoint with additional historical chunks
+    const additionalDays = TOTAL_DAYS - state.totalDays
+    const lastId         = Math.max(...state.chunks.map(c => c.id))
+    const newChunks      = generateChunks(additionalDays, state.totalDays, lastId + 1)
+    state.chunks         = [...state.chunks, ...newChunks]
+    state.totalDays      = TOTAL_DAYS
+    saveCheckpoint(state)
+    console.log(`  Checkpoint extended: +${newChunks.length} chunks (${state.totalDays} days total)`)
   }
 
   const pending = state.chunks.filter(c => c.status !== "complete")
-  const toRun   = fullMode ? pending : pending.slice(0, 1)
+  const toRun   = FULL_MODE ? pending : pending.slice(0, 1)
 
   console.log("\n" + "═".repeat(65))
   console.log("  GeM VIEW CONTRACTS COLLECTOR — v3 (card-based, infinite scroll)")
   console.log("═".repeat(65))
-  console.log(`  Mode             : ${fullMode ? "--full (all pending)" : "TEST (1 chunk)"}`)
+  console.log(`  Mode             : ${FULL_MODE ? `--full (all pending, ${TOTAL_DAYS}d)` : "TEST (1 chunk)"}`)
   console.log(`  gem_contracts    : ${existingCount} existing records`)
   console.log(`  Total chunks     : ${state.chunks.length}`)
   console.log(`  Complete         : ${state.chunks.filter(c => c.status === "complete").length}`)
