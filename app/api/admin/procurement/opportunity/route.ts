@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
           }},
           { $match: { inDealers: { $size: 0 } } },
           { $count: "n" },
-        ]).toArray().then((r: Array<{n: number}>) => r[0]?.n || 0),
+        ]).toArray().then((r) => (r as Array<{n: number}>)[0]?.n || 0),
         gc.countDocuments({ contract_value_num: { $gte: 1_000_000 } }),
         gc.countDocuments({
           $or: FOGGING_KW.map(k => ({ product_name: { $regex: k, $options: "i" } })),
