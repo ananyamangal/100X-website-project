@@ -19,13 +19,18 @@ import { OpportunityTab }  from "./OpportunityTab"
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Stats {
+  total_contracts:    number
+  enriched_contracts: number
+  pct_enriched:       number
+  total_gmv:          number
+  total_dealers:      number
+  states_covered:     number
+  dept_coverage:      number
+  last_sync:          string | null
+  // legacy
   total_bids:      number
-  total_dealers:   number
   defence_count:   number
   municipal_count: number
-  states_covered:  number
-  dept_coverage:   number
-  last_sync:       string | null
 }
 
 interface GemBid {
@@ -866,7 +871,12 @@ export default function ProcurementIntelligence() {
             <Building2 size={18} className="text-brand-600" />
             <div>
               <h1 className="text-base font-bold text-gray-900">Procurement Intelligence</h1>
-              <p className="text-gray-400 text-[11px]">563 awarded bids · 1,222 dealers · 144 departments · GeM fogging 2024–2026 · Dealer acquisition + sales targeting engine</p>
+              <p className="text-gray-400 text-[11px]">
+                {stats
+                  ? `${stats.total_contracts.toLocaleString("en-IN")} contracts · ₹${(stats.total_gmv / 1e7).toFixed(1)} Cr GMV · ${stats.total_dealers.toLocaleString("en-IN")} dealers · ${stats.dept_coverage} depts · 3-year historical`
+                  : "GeM contracts intelligence · 3-year historical · dealer acquisition engine"
+                }
+              </p>
             </div>
           </div>
           <button onClick={loadStats}
@@ -880,13 +890,13 @@ export default function ProcurementIntelligence() {
         {/* Summary stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           {[
-            { label: "Awarded Bids",  value: stats?.total_bids?.toLocaleString()      ?? "—", color: "text-gray-800",   border: "border-gray-200" },
-            { label: "Dealers",       value: stats?.total_dealers?.toLocaleString()   ?? "—", color: "text-teal-600",   border: "border-teal-200" },
-            { label: "Defence Bids",  value: stats?.defence_count?.toLocaleString()   ?? "—", color: "text-red-600",    border: "border-red-200"  },
-            { label: "Municipal Bids",value: stats?.municipal_count?.toLocaleString() ?? "—", color: "text-blue-600",   border: "border-blue-200" },
-            { label: "States w/ Data",value: stats?.states_covered?.toString()        ?? "—", color: "text-amber-600",  border: "border-amber-200"},
-            { label: "Depts Covered", value: stats?.dept_coverage?.toString()         ?? "—", color: "text-purple-600", border: "border-purple-200"},
-            { label: "Last Sync",     value: stats?.last_sync ? fmtDate(stats.last_sync) : "—", color: "text-green-600", border: "border-green-200" },
+            { label: "Contracts",     value: stats?.total_contracts?.toLocaleString("en-IN")    ?? "—", color: "text-gray-800",   border: "border-gray-200" },
+            { label: "Total GMV",     value: stats ? `₹${(stats.total_gmv / 1e7).toFixed(1)} Cr` : "—", color: "text-orange-600",  border: "border-orange-200" },
+            { label: "Enriched",      value: stats ? `${stats.enriched_contracts.toLocaleString("en-IN")} (${stats.pct_enriched}%)` : "—", color: "text-green-600",  border: "border-green-200" },
+            { label: "Dealers",       value: stats?.total_dealers?.toLocaleString("en-IN")      ?? "—", color: "text-teal-600",   border: "border-teal-200" },
+            { label: "States",        value: stats?.states_covered?.toString()                  ?? "—", color: "text-amber-600",  border: "border-amber-200"},
+            { label: "Depts Covered", value: stats?.dept_coverage?.toString()                   ?? "—", color: "text-purple-600", border: "border-purple-200"},
+            { label: "Last Seen",     value: stats?.last_sync ? fmtDate(stats.last_sync) : "—", color: "text-blue-600",  border: "border-blue-200" },
           ].map(({ label, value, color, border }) => (
             <div key={label} className={`bg-white rounded-xl border ${border} p-4 shadow-sm`}>
               <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">{label}</p>

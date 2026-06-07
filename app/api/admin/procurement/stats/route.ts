@@ -1,38 +1,51 @@
 import { NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 
+export const maxDuration = 30
+
 export async function GET() {
   try {
     const db = (await clientPromise).db()
-    const bidCol    = db.collection("gem_awarded_bids")
-    const dealerCol = db.collection("gem_dealers")
+    const gc  = db.collection("gem_contracts")
+    const dls = db.collection("gem_dealers")
 
     const [
-      totalBids,
+      totalContracts,
+      enrichedContracts,
       totalDealers,
-      defenceCount,
-      municipalCount,
+      gmvArr,
       statesArr,
       deptArr,
-      lastSync,
+      lastContract,
     ] = await Promise.all([
-      bidCol.countDocuments(),
-      dealerCol.countDocuments(),
-      bidCol.countDocuments({ dept: { $regex: "Army|Air Force|Navy|Coast Guard|DGQA|Defence|DRDO|Border", $options: "i" } }),
-      bidCol.countDocuments({ dept: { $regex: "Nagar|Municipal|Palika|Nigam|Corporation|ULB|E-nagar|Panchayat", $options: "i" } }),
-      bidCol.distinct("state"),
-      bidCol.distinct("dept"),
-      bidCol.find({}).sort({ updated_at: -1 }).limit(1).toArray(),
+      gc.countDocuments(),
+      gc.countDocuments({ detail_scraped: true }),
+      dls.countDocuments(),
+      gc.aggregate([{ $group: { _id: null, t: { $sum: "$contract_value_num" } } }]).toArray(),
+      gc.distinct("seller_state"),
+      gc.distinct("dept_name"),
+      gc.find({}).sort({ first_seen: -1 }).limit(1).toArray(),
     ])
 
+    const totalGmv      = gmvArr[0]?.t || 0
+    const statesCovered = statesArr.filter(Boolean).length
+    const deptCoverage  = deptArr.filter(Boolean).length
+
     return NextResponse.json({
-      total_bids: totalBids,
-      total_dealers: totalDealers,
-      defence_count: defenceCount,
-      municipal_count: municipalCount,
-      states_covered: statesArr.filter(Boolean).length,
-      dept_coverage: deptArr.filter(Boolean).length,
-      last_sync: lastSync[0]?.updated_at?.toISOString() ?? null,
+      // gem_contracts stats (new primary source)
+      total_contracts:  totalContracts,
+      enriched_contracts: enrichedContracts,
+      pct_enriched:     totalContracts ? Math.round((enrichedContracts / totalContracts) * 100) : 0,
+      total_gmv:        totalGmv,
+      total_dealers:    totalDealers,
+      states_covered:   statesCovered,
+      dept_coverage:    deptCoverage,
+      last_sync:        lastContract[0]?.first_seen?.toISOString() ?? null,
+
+      // legacy fields kept for backwards compat with existing page
+      total_bids:       totalContracts,
+      defence_count:    0,
+      municipal_count:  0,
     })
   } catch (err) {
     console.error("procurement/stats error:", err)
