@@ -403,7 +403,16 @@ async function downloadPdf(context, page, url, dest) {
     if (dl) { await dl.saveAs(dest); return "in-page" }
   } catch {}
 
-  // 3. fetch() inside browser context (inherits session cookies)
+  // 3. Playwright APIRequest — inherits session cookies, runs in Node.js (no CORS)
+  try {
+    const apiResp = await context.request.get(url, { timeout: 30000 })
+    if (apiResp.ok()) {
+      fs.writeFileSync(dest, await apiResp.body())
+      return "api-request"
+    }
+  } catch {}
+
+  // 4. fetch() inside browser context — last resort
   const b64 = await page.evaluate(async u => {
     const res  = await fetch(u)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)

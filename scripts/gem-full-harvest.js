@@ -370,6 +370,7 @@ async function generateFinalReports(db) {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
+if (require.main === module) {
 ;(async () => {
   const startTime = Date.now()
 
@@ -566,3 +567,6 @@ async function generateFinalReports(db) {
   console.error(e.stack)
   process.exit(1)
 })
+}
+
+module.exports = { generateFinalReports }

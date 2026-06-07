@@ -1,5 +1,5 @@
 "use strict";
-// GeM View Contracts Collector — v4 (fully unattended)
+// GeM View Contracts Collector — v5 (captcha intercept + datepicker date fix)
 // Architecture: 30-day date chunks, true resume via chunk checkpoint,
 //               dual-collection storage (structured + raw card HTML)
 //               Card-based extraction — div#pagi_content div.border.block
@@ -39,8 +39,9 @@ const CLI = {}
 for (const arg of process.argv.slice(2)) {
   if (arg.startsWith("--")) { const [k, v] = arg.slice(2).split("="); CLI[k] = v === undefined ? true : v }
 }
-const FULL_MODE   = !!CLI.full
-const RESET_MODE  = !!CLI.reset
+const FULL_MODE    = !!CLI.full
+const RESET_MODE   = !!CLI.reset
+const NO_ENRICH    = !!CLI["no-enrich"]  // skip PDF enrichment (use on VPN/slow connections)
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CHUNK_DAYS  = 30
@@ -422,6 +423,11 @@ async function processChunk(page, chunk, colGC, colRaw, state) {
     waitUntil: "networkidle", timeout: 40000,
   })
 
+  // Wait for page's DOMContentLoaded captcha.php callbacks to complete.
+  // The page calls loadCap1('1') and loadCap1('2') on DOMContentLoaded — both AJAX.
+  // networkidle already waited for both to finish. Extra 1s for their JS callbacks.
+  await page.waitForTimeout(1000)
+
   // Blank category = all categories
   const catVal = await page.$eval(
     "select#buyer_category option:checked", o => o.value
@@ -430,52 +436,87 @@ async function processChunk(page, chunk, colGC, colRaw, state) {
     await page.selectOption("select#buyer_category", "").catch(() => {})
   }
 
-  // Fill date range
-  const fromSel = "#from_date_contract_search1, [name='from_date_contract_search1']"
-  const toSel   = "#to_date_contract_search1, [name='to_date_contract_search1']"
-  for (const [sel, val] of [[fromSel, chunk.from], [toSel, chunk.to]]) {
-    await page.click(sel, { clickCount: 3 }).catch(() => {})
-    await page.keyboard.type(val).catch(() => {})
-  }
-  await page.waitForTimeout(400)
-
-  // Auto-solve captcha
-  console.log(`\n  Auto-solving captcha for chunk ${chunk.id} (${chunk.from} → ${chunk.to})…`)
-  let capText = null
-  for (let capTry = 1; capTry <= 6; capTry++) {
+  // Set date range via jQuery datepicker API (fields are readonly — keyboard.type fails).
+  // datepicker('setDate') opens the calendar via a deferred setTimeout render.
+  // We wait 400ms for that render, then remove the widget from DOM entirely
+  // so S2_any_table cannot pick up the calendar table as search results.
+  console.log(`\n  Setting date range: ${chunk.from} → ${chunk.to}`)
+  await page.evaluate(({ from, to }) => {
+    const parseDate = (s) => {
+      const [d, m, y] = s.split('-').map(Number)
+      return new Date(y, m - 1, d)
+    }
     try {
-      capText = await page.evaluate(async () => {
+      $('#from_date_contract_search1').datepicker('setDate', parseDate(from))
+      $('#to_date_contract_search1').datepicker('setDate', parseDate(to))
+    } catch (e) {
+      const fromEl = document.getElementById('from_date_contract_search1')
+      const toEl   = document.getElementById('to_date_contract_search1')
+      if (fromEl) { fromEl.removeAttribute('readonly'); fromEl.value = from }
+      if (toEl)   { toEl.removeAttribute('readonly');   toEl.value = to   }
+    }
+  }, { from: chunk.from, to: chunk.to })
+
+  // Allow deferred datepicker render to complete, then remove the calendar widget
+  await page.waitForTimeout(400)
+  await page.evaluate(() => {
+    if (typeof $ !== 'undefined') $('.ui-datepicker').remove()
+  })
+
+  const fromVal = await page.$eval('#from_date_contract_search1', el => el.value).catch(() => '?')
+  const toVal   = await page.$eval('#to_date_contract_search1',   el => el.value).catch(() => '?')
+  console.log(`  Date fields  : from="${fromVal}" to="${toVal}"`)
+
+  // Make a fresh captcha.php call and override h_captcha1 so captcha_check passes.
+  // Page callbacks have all fired by now — no further writes to h_captcha1 are pending.
+  console.log(`\n  Auto-solving captcha for chunk ${chunk.id}…`)
+  let captchaText = null
+  for (let capTry = 1; capTry <= 10; capTry++) {
+    try {
+      captchaText = await page.evaluate(async () => {
         const resp = await fetch(
           "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=" + Math.random(),
           { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "" }
         )
         if (!resp.ok) throw new Error("captcha.php HTTP " + resp.status)
         const data = JSON.parse(await resp.text())
-        // Refresh hidden fields so client-side captcha_check uses this captcha
-        const el1 = document.getElementById("h_captcha1")
-        if (el1) el1.value = data.encodeTxt || ""
-        const el2 = document.getElementById("h_captcha2")
-        if (el2) el2.value = data.encodeTxt || ""
-        const img = document.querySelector("#captchaimg1, #captchaimg")
-        if (img && data.im) img.src = "data:image/jpeg;charset=utf8;base64," + data.im
+        const h1 = document.getElementById("h_captcha1")
+        if (h1) h1.value = data.encodeTxt || ""
         return data.text || null
       })
-      if (capText) break
+      if (captchaText) break
     } catch (capErr) {
-      console.log(`  [warn] Captcha attempt ${capTry} failed: ${capErr.message}`)
-      await page.waitForTimeout(2000)
+      const msg = capErr.message || ""
+      const is5xx = /HTTP 5\d\d/.test(msg)
+      console.log(`  [warn] Captcha attempt ${capTry}: ${msg}`)
+      if (is5xx && capTry <= 3) {
+        // Server-side error — reload page and wait 90s before retrying
+        console.log(`  [info] Server error — waiting 90s then reloading page…`)
+        await page.waitForTimeout(90000)
+        await page.goto("https://gem.gov.in/view_contracts", {
+          waitUntil: "networkidle", timeout: 40000,
+        }).catch(() => {})
+        await page.waitForTimeout(2000)
+      } else if (is5xx) {
+        // Still 5xx after 3 reloads — wait 3 minutes
+        console.log(`  [info] Server still down — waiting 3 min…`)
+        await page.waitForTimeout(180000)
+      } else {
+        await page.waitForTimeout(2000)
+      }
     }
   }
-  if (!capText) throw new Error("Auto-captcha: captcha.php returned no text after 6 attempts")
+  if (!captchaText) throw new Error("Auto-captcha: could not obtain captcha text after 10 attempts")
+
+  console.log(`  Auto-captcha : "${captchaText}" — submitting search…`)
   const capFieldSel = "#captcha_code1, input[name='captcha_entered1'], input[id*='captcha_code']"
-  await page.fill(capFieldSel, capText).catch(async () => {
+  await page.fill(capFieldSel, captchaText).catch(async () => {
     await page.evaluate(txt => {
       const el = document.getElementById("captcha_code1") ||
                  document.querySelector("input[name='captcha_entered1']")
       if (el) el.value = txt
-    }, capText)
+    }, captchaText)
   })
-  console.log(`  Auto-captcha solved: "${capText}" — submitting search…`)
 
   const clicked = await page.click(
     "#searchlocation1, button#searchlocation1, [id='searchlocation1']"
@@ -487,13 +528,34 @@ async function processChunk(page, chunk, colGC, colRaw, state) {
     throw new Error(`Search button not found — HTML dumped to audit/chunk${chunk.id}-no-button.html`)
   }
 
-  await page.waitForLoadState("networkidle", { timeout: 30000 }).catch(() => {})
-  await page.waitForTimeout(2000)
+  // Wait for results to populate pagi_content or a known terminal state
+  await page.waitForFunction(
+    () => {
+      const pagi   = document.getElementById("pagi_content")
+      const capErr = document.getElementById("pcaptcha_code1")
+      if (!pagi) return false
+      if (capErr && capErr.innerText.trim()) return true   // captcha error shown
+      if (pagi.querySelectorAll(".border.block").length > 0) return true  // got cards
+      if (/no record|no result|no data/i.test(pagi.innerText || "")) return true
+      return false
+    },
+    { timeout: 25000 }
+  ).catch(() => {
+    console.log("  [warn] pagi_content did not populate in 25s — proceeding with current state")
+  })
+
+  const captchaErrTxt = await page.$eval("#pcaptcha_code1", el => el.innerText.trim()).catch(() => "")
+  if (captchaErrTxt) {
+    const html = await page.content()
+    fs.writeFileSync(`audit/chunk${chunk.id}-page1.html`, html)
+    throw new Error(`Captcha check failed ("${captchaErrTxt}") — HTML dumped. Re-run to retry chunk ${chunk.id}`)
+  }
+
+  const pagiCards = await page.$$eval("#pagi_content .border.block", els => els.length).catch(() => 0)
+  const pagiText  = await page.$eval("#pagi_content", el => el.innerText.slice(0, 80)).catch(() => "")
+  console.log(`  pagi_content : ${pagiCards} cards | preview: "${pagiText.replace(/\s+/g," ").trim().slice(0,80)}"`)
 
   const pageText = await page.evaluate(() => document.body.innerText).catch(() => "")
-  if (/invalid captcha/i.test(pageText)) {
-    throw new Error("Invalid captcha — re-run to retry chunk " + chunk.id)
-  }
   if (/no record|no result|no data found/i.test(pageText)) {
     console.log(`  No records found for this date range`)
     return { batches: 0, inserted: 0, updated: 0, skipped: 0, totalCards: 0 }
@@ -945,12 +1007,16 @@ async function postChunkHooks(chunk, state, db) {
   console.log(`  [1/5] Checkpoint → Checkpoints/checkpoint-chunk-${chunkTag}.json`)
 
   // 2. Enrich new contracts (sbtCaptcha auto-solved, browser opens + closes)
-  console.log("  [2/5] Enriching new contracts (auto-captcha, no human interaction)…")
-  await runPostScript("scripts/gem-enrich-contracts.js", ["--value-first"])
-
-  // 3. Classify PDFs
-  console.log("  [3/5] Classifying PDFs…")
-  await runPostScript("scripts/gem-classify-pdfs.js")
+  if (NO_ENRICH) {
+    console.log("  [2/5] Enrichment skipped (--no-enrich)")
+    console.log("  [3/5] PDF classification skipped (--no-enrich)")
+  } else {
+    console.log("  [2/5] Enriching new contracts (auto-captcha, no human interaction)…")
+    await runPostScript("scripts/gem-enrich-contracts.js", ["--value-first"])
+    // 3. Classify PDFs
+    console.log("  [3/5] Classifying PDFs…")
+    await runPostScript("scripts/gem-classify-pdfs.js")
+  }
 
   // 4. Query MongoDB for cumulative intelligence
   console.log("  [4/5] Querying cumulative intelligence…")
