@@ -428,9 +428,9 @@
       "pagesCollected": 0,
       "recordsInserted": 0,
       "recordsSkipped": 0,
-      "startedAt": "2026-06-07T17:44:26.799Z",
+      "startedAt": "2026-06-07T17:46:50.472Z",
       "completedAt": null,
-      "error": "Auto-captcha: could not obtain captcha text after 6 attempts"
+      "error": "page.waitForTimeout: Target page, context or browser has been closed"
     },
     {
       "id": 34,
@@ -441,9 +441,9 @@
       "pagesCollected": 0,
       "recordsInserted": 0,
       "recordsSkipped": 0,
-      "startedAt": "2026-06-07T17:45:11.864Z",
+      "startedAt": "2026-06-07T18:01:53.356Z",
       "completedAt": null,
-      "error": "Auto-captcha: could not obtain captcha text after 6 attempts"
+      "error": "page.goto: Target page, context or browser has been closed"
     },
     {
       "id": 35,
@@ -454,9 +454,9 @@
       "pagesCollected": 0,
       "recordsInserted": 0,
       "recordsSkipped": 0,
-      "startedAt": "2026-06-07T17:45:56.697Z",
+      "startedAt": "2026-06-07T18:01:53.368Z",
       "completedAt": null,
-      "error": "Auto-captcha: could not obtain captcha text after 6 attempts"
+      "error": "page.goto: Target page, context or browser has been closed"
     },
     {
       "id": 36,
@@ -467,9 +467,9 @@
       "pagesCollected": 0,
       "recordsInserted": 0,
       "recordsSkipped": 0,
-      "startedAt": "2026-06-07T17:46:41.317Z",
+      "startedAt": "2026-06-07T18:01:53.371Z",
       "completedAt": null,
-      "error": "Auto-captcha: could not obtain captcha text after 6 attempts"
+      "error": "page.goto: Target page, context or browser has been closed"
     },
     {
       "id": 37,
@@ -480,9 +480,9 @@
       "pagesCollected": 0,
       "recordsInserted": 0,
       "recordsSkipped": 0,
-      "startedAt": "2026-06-07T17:47:26.006Z",
+      "startedAt": "2026-06-07T18:01:53.375Z",
       "completedAt": null,
-      "error": "Auto-captcha: could not obtain captcha text after 6 attempts"
+      "error": "page.goto: Target page, context or browser has been closed"
     }
   ],
   "createdAt": "2026-06-07T05:49:58.473Z"
