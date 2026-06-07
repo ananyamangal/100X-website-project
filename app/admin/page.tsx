@@ -47,6 +47,7 @@ import { SparePartsTab } from "@/components/admin/SparePartsTab"
 import { ReviewsTab } from "@/components/admin/ReviewsTab"
 import { SiteSettingsTab } from "@/components/admin/SiteSettingsTab"
 import { ProductExperienceTab } from "@/components/admin/ProductExperienceTab"
+import { ProcurementTab } from "@/components/admin/ProcurementTab"
 import { toStringArray } from "@/lib/normalizeProduct"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
@@ -1279,6 +1280,17 @@ function AdminDashboardContent() {
                 <Settings className="mr-3" size={20} />
                 Settings
               </button>
+              <button
+                onClick={() => setActiveTab("procurement")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "procurement"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+                GeM Intelligence
+              </button>
               <div className="pt-2 mt-2 border-t border-gray-200">
                 <a
                   href="/admin/growth"
@@ -1396,6 +1408,7 @@ function AdminDashboardContent() {
             {activeTab === "reviews" && <ReviewsTab />}
             {activeTab === "siteSettings" && <SiteSettingsTab />}
             {activeTab === "settings" && <SettingsTab />}
+            {activeTab === "procurement" && <ProcurementTab />}
           </div>
         </div>
       </div>
