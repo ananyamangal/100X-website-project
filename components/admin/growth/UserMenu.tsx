@@ -35,8 +35,10 @@ const MENU_ITEMS = [
 
 export function UserMenu() {
   const [open, setOpen]       = useState(false)
-  const [loginTime]           = useState(() => new Date())
+  const [loginTime, setLoginTime] = useState<Date | null>(null)
   const { user, loading }     = useAuth()
+
+  useEffect(() => { setLoginTime(new Date()) }, [])
   const router                = useRouter()
   const ref                   = useRef<HTMLDivElement>(null)
 
@@ -100,7 +102,7 @@ export function UserMenu() {
           {/* Session info */}
           <div className="px-4 py-2 border-b border-gray-100 flex items-center gap-2 text-[11px] text-gray-400">
             <Clock size={11} />
-            <span>Logged in at {loginTime.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span>
+            <span>Logged in at {loginTime ? loginTime.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "–"}</span>
           </div>
 
           {/* Menu items */}
@@ -153,7 +155,9 @@ export function UserMenu() {
 // Compact security banner — shows in page headers
 export function SecurityBanner() {
   const { user, loading } = useAuth()
-  const [loginTime]       = useState(() => new Date())
+  const [loginTime, setLoginTime] = useState<Date | null>(null)
+
+  useEffect(() => { setLoginTime(new Date()) }, [])
 
   if (loading || !user) return null
 
@@ -169,7 +173,7 @@ export function SecurityBanner() {
         <span className="mx-1 text-gray-300">·</span>
         <span className="capitalize">{roleName}</span>
         <span className="mx-1 text-gray-300">·</span>
-        <span>Since {loginTime.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span>
+        <span>Since {loginTime ? loginTime.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "–"}</span>
       </span>
       <span className="md:hidden text-gray-600 font-medium">{user.name.split(" ")[0]}</span>
     </div>
