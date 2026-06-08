@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { type Db } from "mongodb"
 import clientPromise from "@/lib/mongodb"
+import { requirePermission } from "@/lib/rbac/server"
 
 export const maxDuration = 60
 
@@ -335,6 +336,9 @@ async function logQuery(
 // ─── POST /api/admin/procurement/ai-analyst ────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  const auth = await requirePermission(req, "procurement.ai_analyst.view")
+  if (!("user" in auth)) return auth
+
   let question: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let bodyFilter: any

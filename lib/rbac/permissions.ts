@@ -151,6 +151,32 @@ export const PERMISSION_REGISTRY: PermDef[] = [
   { key: "product_cat.municipal.view",    label: "Municipal — View",     description: "View municipal products",                   group: "Product Categories", subgroup: "Municipal",    module: "products", action: "view", sortOrder: 7200 },
   { key: "product_cat.municipal.edit",    label: "Municipal — Edit",     description: "Edit municipal products",                   group: "Product Categories", subgroup: "Municipal",    module: "products", action: "edit", sortOrder: 7201 },
 
+  // ── PRODUCT MODEL-LEVEL PERMISSIONS ──────────────────────────────────────
+  // Enforce access per SKU — used by products API and future catalog access control.
+  // Grant these per-user to restrict editors to specific models only.
+  { key: "product.bf105.view",   label: "BF-105 — View",   description: "View BF-105 ULV Cold Fogger product",          group: "Product Categories", subgroup: "Model: BF-105", module: "products", action: "view",   sortOrder: 7300 },
+  { key: "product.bf105.edit",   label: "BF-105 — Edit",   description: "Edit BF-105 ULV Cold Fogger product",          group: "Product Categories", subgroup: "Model: BF-105", module: "products", action: "edit",   sortOrder: 7301 },
+  { key: "product.bf105.delete", label: "BF-105 — Delete", description: "Delete BF-105 ULV Cold Fogger product",        group: "Product Categories", subgroup: "Model: BF-105", module: "products", action: "delete", critical: true, sortOrder: 7302 },
+  { key: "product.bf115.view",   label: "BF-115 — View",   description: "View BF-115 ULV Cold Fogger product",          group: "Product Categories", subgroup: "Model: BF-115", module: "products", action: "view",   sortOrder: 7310 },
+  { key: "product.bf115.edit",   label: "BF-115 — Edit",   description: "Edit BF-115 ULV Cold Fogger product",          group: "Product Categories", subgroup: "Model: BF-115", module: "products", action: "edit",   sortOrder: 7311 },
+  { key: "product.bf115.delete", label: "BF-115 — Delete", description: "Delete BF-115 ULV Cold Fogger product",        group: "Product Categories", subgroup: "Model: BF-115", module: "products", action: "delete", critical: true, sortOrder: 7312 },
+  { key: "product.bf150.view",   label: "BF-150 — View",   description: "View BF-150 Thermal Fogger product",           group: "Product Categories", subgroup: "Model: BF-150", module: "products", action: "view",   sortOrder: 7320 },
+  { key: "product.bf150.edit",   label: "BF-150 — Edit",   description: "Edit BF-150 Thermal Fogger product",           group: "Product Categories", subgroup: "Model: BF-150", module: "products", action: "edit",   sortOrder: 7321 },
+  { key: "product.bf150.delete", label: "BF-150 — Delete", description: "Delete BF-150 Thermal Fogger product",         group: "Product Categories", subgroup: "Model: BF-150", module: "products", action: "delete", critical: true, sortOrder: 7322 },
+  { key: "product.bf200.view",   label: "BF-200 — View",   description: "View BF-200 Thermal Fogger product",           group: "Product Categories", subgroup: "Model: BF-200", module: "products", action: "view",   sortOrder: 7330 },
+  { key: "product.bf200.edit",   label: "BF-200 — Edit",   description: "Edit BF-200 Thermal Fogger product",           group: "Product Categories", subgroup: "Model: BF-200", module: "products", action: "edit",   sortOrder: 7331 },
+  { key: "product.bf200.delete", label: "BF-200 — Delete", description: "Delete BF-200 Thermal Fogger product",         group: "Product Categories", subgroup: "Model: BF-200", module: "products", action: "delete", critical: true, sortOrder: 7332 },
+  { key: "product.bf400.view",   label: "BF-400 — View",   description: "View BF-400 Heavy Duty Thermal Fogger",        group: "Product Categories", subgroup: "Model: BF-400", module: "products", action: "view",   sortOrder: 7340 },
+  { key: "product.bf400.edit",   label: "BF-400 — Edit",   description: "Edit BF-400 Heavy Duty Thermal Fogger",        group: "Product Categories", subgroup: "Model: BF-400", module: "products", action: "edit",   sortOrder: 7341 },
+  { key: "product.bf400.delete", label: "BF-400 — Delete", description: "Delete BF-400 Heavy Duty Thermal Fogger",      group: "Product Categories", subgroup: "Model: BF-400", module: "products", action: "delete", critical: true, sortOrder: 7342 },
+
+  // ── EXPORT PERMISSIONS (granular) ─────────────────────────────────────────
+  // export.view = see export button / initiate; export.download = actually receive file;
+  // export.bulk = export >1000 rows or all records (use with data.export_unlimited)
+  { key: "export.view",     label: "Export — Initiate",     description: "Can see and initiate exports",                         group: "Data Access", subgroup: "Exports", module: "export", action: "view",   sortOrder: 6010 },
+  { key: "export.download", label: "Export — Download",     description: "Can download exported files",                          group: "Data Access", subgroup: "Exports", module: "export", action: "export", sortOrder: 6011 },
+  { key: "export.bulk",     label: "Export — Bulk",         description: "Can export all records (>1000 rows); use with caution",group: "Data Access", subgroup: "Exports", module: "export", action: "export", critical: true, sortOrder: 6012 },
+
   // ── ADMINISTRATION ────────────────────────────────────────────────────────
   { key: "users.view",           label: "View Users",            description: "View user list",                                    group: "Administration", subgroup: "Users",       module: "users",       action: "view",   critical: true, sortOrder: 8000 },
   { key: "users.create",         label: "Create Users",          description: "Create new user accounts",                          group: "Administration", subgroup: "Users",       module: "users",       action: "create", critical: true, sortOrder: 8001 },

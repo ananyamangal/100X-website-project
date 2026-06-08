@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { requirePermission } from "@/lib/rbac/server"
 
 export const maxDuration = 60
 
 export async function GET(req: NextRequest) {
+  const auth = await requirePermission(req, "procurement.contracts.view")
+  if (!("user" in auth)) return auth
   try {
     const db = (await clientPromise).db()
     const gc = db.collection("gem_contracts")

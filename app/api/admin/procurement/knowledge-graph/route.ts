@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { requirePermission } from "@/lib/rbac/server"
 
 export const maxDuration = 60
 
@@ -27,6 +28,9 @@ export async function GET() {
 // ─── POST: build / rebuild ────────────────────────────────────────────────────
 
 export async function POST(_req: NextRequest) {
+  const auth = await requirePermission(_req, "procurement.knowledge_graph.view")
+  if (!("user" in auth)) return auth
+
   const db = (await clientPromise).db()
   const gc = db.collection("gem_contracts")
   const log: Record<string, number> = {}

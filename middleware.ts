@@ -46,8 +46,52 @@ export async function middleware(request: NextRequest) {
 
   // ── Protect admin API routes ─────────────────────────────────────────────────
   if (pathname.startsWith("/api/admin/")) {
-    if (!AUTH_WHITELIST.has(pathname) && !(await isAuthenticated(request))) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (!AUTH_WHITELIST.has(pathname)) {
+      const token = request.cookies.get(SESSION_COOKIE)?.value
+
+      // ── 401: no session ────────────────────────────────────────────────────
+      if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+      // Legacy super-admin cookie — full access, skip permission checks
+      if (token === "authenticated") return NextResponse.next()
+
+      // Verify JWT — 401 if invalid/expired
+      const payload = await verifyJWT(token)
+      if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+      // ── 403: permission enforcement for sensitive route groups ─────────────
+      const perms: string[] = payload.permissions ?? []
+
+      // Procurement Intelligence — ALL routes require procurement.view
+      if (pathname.startsWith("/api/admin/procurement/")) {
+        if (!perms.includes("procurement.view")) {
+          return NextResponse.json(
+            { error: "Forbidden", required: "procurement.view", role: payload.role },
+            { status: 403 }
+          )
+        }
+      }
+
+      // Growth AI agents — require at least one growth module permission
+      // (these call external AI APIs and incur cost)
+      if (pathname.startsWith("/api/admin/growth/agents/")) {
+        const agentPerms = ["seo.view","geo.view","dealer.view","content.view","opportunities.view","automation.view"]
+        if (!agentPerms.some(p => perms.includes(p))) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+        }
+      }
+
+      // GSC / GA4 — require seo.view / analytics.view respectively
+      if (pathname.startsWith("/api/admin/gsc/")) {
+        if (!perms.includes("seo.view")) {
+          return NextResponse.json({ error: "Forbidden", required: "seo.view" }, { status: 403 })
+        }
+      }
+      if (pathname.startsWith("/api/admin/ga4/")) {
+        if (!perms.includes("analytics.view")) {
+          return NextResponse.json({ error: "Forbidden", required: "analytics.view" }, { status: 403 })
+        }
+      }
     }
     return NextResponse.next()
   }

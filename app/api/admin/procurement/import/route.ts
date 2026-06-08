@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { requirePermission } from "@/lib/rbac/server"
 
 type ImportType = "bids" | "dealers" | "products" | "brands"
 
@@ -20,6 +21,9 @@ function parseBool(v: unknown): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requirePermission(req, "procurement.batch_collect.run")
+  if (!("user" in auth)) return auth
+
   try {
     const { type, rows }: { type: ImportType; rows: Record<string, unknown>[] } =
       await req.json()

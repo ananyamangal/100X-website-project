@@ -5,7 +5,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { requirePermission } from "@/lib/rbac/server"
-import { PERMISSION_REGISTRY, PERMISSION_GROUPS } from "@/lib/rbac/permissions"
+import { PERMISSION_REGISTRY, PERMISSION_GROUPS, type PermDef } from "@/lib/rbac/permissions"
 import { ROLE_DEFINITIONS } from "@/lib/rbac/roles"
 import type { DBRolePermissions } from "@/lib/rbac/types"
 
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
   // Merge: code registry + DB custom permissions (DB ones take precedence if key collision)
   const codeMap = new Map(PERMISSION_REGISTRY.map(p => [p.key, p]))
-  for (const p of dbPerms) codeMap.set(p.key, p as typeof codeMap extends Map<string, infer V> ? V : never)
+  for (const p of dbPerms) codeMap.set(p.key as string, p as unknown as PermDef)
   const allPerms = Array.from(codeMap.values()).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
 
   if (format !== "matrix") {

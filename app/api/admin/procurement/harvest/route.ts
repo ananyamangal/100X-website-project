@@ -16,6 +16,7 @@
 
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { requirePermission } from "@/lib/rbac/server"
 
 export const maxDuration = 120
 
@@ -357,6 +358,9 @@ export async function GET(req: NextRequest) {
 
 // POST — manual trigger and admin actions
 export async function POST(req: NextRequest) {
+  const auth = await requirePermission(req, "procurement.batch_collect.run")
+  if (!("user" in auth)) return auth
+
   try {
     const body = await req.json()
     const db = (await clientPromise).db()
