@@ -1,0 +1,264 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687762524855
+अनुबंधअनुबंध  !त!थ!त!थ|Generated Date :|Generated Date : 27-May-2026
+बोलीबोली//आरएआरए//पीबीपीपीबीपी  सं2यासं2या|Bid/RA/PBP No.:|Bid/RA/PBP No.:  GEM/2026/B/7550826
+खरीदखरीद  काका  मा<यममा<यम|Procurement Mode: |Procurement Mode: Bid
+अनुसूचीअनुसूची  नामनाम|Schedule Name:|Schedule Name:Schedule 1
+संगठनसंगठन  !ववरण!ववरण|Organisation Details|Organisation Details
+KLप|Type :State Local Bodies
+मंPालय|Ministry :-
+!वभाग|Department :Urban Development Department Uttar Pradesh
+संगठन का नाम|Organisation Name :NAGAR PANCHAYAT BARSANA MATHURA
+कायाWलय XेP|Office Zone:Mathura
+खरीदारखरीदार  !ववरण!ववरण|Buyer Details|Buyer Details
+पद|Designation :CLREK
+संपकW नंबर|Contact No. :-
+ईमेल आईडी|Email ID :con1.np.mathura@gembuyer.in
+जीएसटcआईएन|GSTIN :-
+पता|Address :
+NAGAR PANCHAYAT BARSANA DISTT- MATHURA,
+Mathura, UTTAR PRADESH-281405, India
+ 
+!वeीय!वeीय  fवीकृ !तfवीकृ !त  !ववरण!ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम!त|IFD Concurrence :No
+Kशास!नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+E.O.
+!वeीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+E.O.
+भुगतानभुगतान  Kा!धकरणKा!धकरण  !ववरण!ववरण|Paying Authority Details|Paying Authority Details
+Role:PAO
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :ASSISTANT CLERK
+ईमेल आईडी|Email ID :pao2.np.mathura@gembuyer.in
+जीएसटcआईएन|GSTIN :-
+पता|Address:
+NAGAR PANCHAYAT BARSANA DISTT- MATHURA,
+Mathura, UTTAR PRADESH-281405, India
+ 
+ 
+!वे ता!वे ता  !ववरण!ववरण|Seller Details|Seller Details
+जेम !वे ता आईडी|GeM Seller ID :C9YM240012811372
+कं पनी का नाम|Company Name :Shri Ramya Enterprises
+संपकW नंबर|Contact No. :06395953484
+ईमेल आईडी|Email ID :aryanshg99@gmail.com
+पता| Address :
+0,sadar bazar,Kishni,MAINPURI,
+Mainpuri, UTTAR PRADESH-206303, -
+एमएसएमई पंजीकरण सं2या|MSME Registration number :UDYAM-UP-53-0023654
+जीएसटcआईएन|GSTIN:09BTGPG2894C1ZN (R)
+एमएसई सामा!जक rेणी|MSE Social Category :General
+एमएसई !लंग rेणी|MSE Gender :Male
+*!जसके नाम के पX मt GST/TAX इनवॉइस पेश !कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+!वतरण !नदyश | Delivery Instructions : NA
+उ{पादउ{पाद  !ववरण!ववरण|Product Details|Product Details
+##आइटमआइटम  !ववरण!ववरण|Item Description|Item Description
+आइटमआइटम
+!ववरण!ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मू~यमू~य
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  !वभाजन!वभाजन (INR)| (INR)|
+Tax Bifurcation (INR)Tax Bifurcation (INR)
+मू~यमू~य  
+(INR (INR मtमt  सभीसभी
+शु~कशु~क  औरऔर  करकर
+स!हतस!हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ{पादउ{पाद  काका  नामनाम |Product Name :  |Product Name : Unbranded Octagonal Pole Double Arm 9 m
+ांडांड|Brand : |Brand : NA
+ांडांड  KकारKकार|Brand Type : |Brand Type : Unbranded
+कै टलॉगकै टलॉग  कक  !!त!!त|Catalogue Status: |Catalogue Status: Catalogue not verified by OEM
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : Reseller not verified by OEM
+rेणीrेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Octagonal Pole (V2) (Q3)
+मॉडलमॉडल|Model:|Model: IGNITE_9M_GIP 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+20pieces283,740NA5,674,800
+कु ल ऑडWर मू~य |Total Order Value (in INR)5,674,8005,674,800
+ 
+परे!षतीपरे!षती  !ववरण!ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे!षतीपरे!षती|Consignee|Consigneeवfतुवfतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माPामाPा|Quantity|Quantity
+!दनांक!दनांक  केके  बादबाद
+!डलीवरी!डलीवरी  शुLशुL
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+!वतरण!वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : -
+
+1
+ईमेल आईडी|Email ID : con1.np.mathura@gembuyer.in
+संपकW|Contact : -
+जीएसटcआईएन|GSTIN : -
+पता|Address : NAGAR PANCHAYAT BARSANA DISTT- MATHURA,
+Mathura, UTTAR PRADESH-281405, India
+Unbranded Octagonal
+Pole Double Arm 9 m
+-2027-May-202626-Jul-2026
+Product Specification for Unbranded Octagonal Pole Double Arm 9 mProduct Specification for Unbranded Octagonal Pole Double Arm 9 m
+!व!नदyश!व!नदyश|Specification|Specificationउपउप--!व!नदyश!व!नदyश|Sub-Spec|Sub-Specमू~यमू~य|Value|Value
+GENERIC
+The Octagonal pole Designing, Engineering, Fabrication and testing before
+dispatch with required height and required no of light fittings with luminaire
+carriage etc, for illumination of open areas
+Yes  
+Height of Octagonal pole (in Meters)9  
+Type of bracket for suitable fitment of luminaire on the Octagonal poleDouble Arm  
+Each bracket length (in mm)1000  
+No of LED Luminaires can be fitted in the bracket of each octagonal pole (in Nos)2  
+On site warranty (in Months)12  
+OCTAGONAL POLE
+CONSTRUCTION
+Material of Octagonal poleGrade ISH430LA as per IS:5986:2017 latest  
+No of section (in Nos.)1  
+Cross section of Octagonal pole (no of sides)8 sided polygon  
+Internal distance between parallel faces at the base of pole (in mm)135  
+Internal distance between parallel faces at the top of pole (in mm)70  
+Octagonal pole sheet thickness (in mm)3  
+Type of welding
+Seamless Single longitudinal Saw weld (No circumference weld
+allowed)  
+No of longitudinal welds (in Nos)1  
+No. of stiffners per poleNo  
+Metal protection treatment of fabricated mast sectionHot dip Galvanised, as per IS:4759 latest: 610 g/m2  
+Luminaire carriage / brackets
+Fabricated suitably and hot dip galvanized for fixing and holding
+required no. of light fixtures  
+Door opening on base of the pole (opening permits clear access to equipment
+like MCB, Switches, cables, etc., )
+Door opening: 500 mm height from base plate, Size: 100 mm x 500
+mm with Gasket  
+Type of locking arrangement for doorPad lock with key  
+BASE PLATE
+Base plate materialGrade: E250, Quality:BR (as per IS:2062:2011 latest)  
+Base plate size - ( Length in mm x Width in mm x Thickness in mm)300x300x20  
+Necessary accessories on each pole
+Suitable foundation Bolts - 4 nos.,Nuts per bolt - 3 nos.,Washers - 3
+nos.,Instruction manual,Anchor Plate 300 mm (L) x 300 mm (W) x 3
+mm thick,4 Nos. of terminal block (each 32 A rating)  
+Foundation Bolt typeJ-Type  
+Bolt sizeM20x600  
+Conformity of specification for Bolts and Nutsas per IS:1367 (Part 2) , Grade A  
+Galvanization of foundation bolts and nuts and octagonal pole shall be
+Galvanized
+As per IS:4759 latest  
+Earthing terminals on the base of the pole, for lightning and electrical protectionUsing 12 mm dia SS Bolts of suitable length  
+WIND LOAD
+Compliance to wind velocity test for the pole structureIS 875:1987 part 3 latest  
+Regional wind withstand capacity which the pole structure support is suitable to
+withstand (in m/s)
+33  
+Gust Factor1.15  
+The designed Life of the Pole shall be (in Years)25  
+Galvanized lightning finial for each pole (in Nos)Without Lightning Finial  
+Aviation obstruction lights on top of each pole with vertical stand and with
+LED/GLS (in Nos)
+Without Aviation Light  
+Junction box on the Carriage Assembly as required, from which the
+interconnections for the designed number of the light fixtures on the carriages
+No  
+Material of Junction BoxWithout Junction Box  
+Ingress protection class of Junction BoxIP 65 (as per IS/IEC60529:2001 latest)  
+
+ADD ON ITEMS
+Cable (ISI Marked Cable) connections from the top junction box to the individual
+luminaries of each pole
+Without Cable Connection  
+Cable (ISI Marked Cable) connections from the Bottom of the pole i.e. from pole's
+door opening (Base compartment) to top junction box of each pole
+Without Cable Connection  
+Terminal Box with Circuit breakers and backlite sheet for cable termination at
+door opening (Base compartment) for each pole
+Without MCBs  
+No.of MCB per Junction Box (in Nos.)Without MCBs  
+Suitable winch mechanism (raising and lowering mechanism) according to pole
+height and according to no.of LED luminaires with necessary interlocking , wires
+and ropes for maintenance
+Without Winch Mechanism  
+Additional requirementNA  
+CERTIFICATIONS
+Availability of type test reports for the entire system including for Pole
+construction , wind load (velocity) tests, Winch Mechanism, from Central Govt.,
+Lab/NABL. ILAC accredited lab to prove conformity of the specification
+Yes  
+Test report Number and dateB73563693 10.04.2023  
+Name and address of labBharat Test House  
+Agreed to furnish all the test reports and certificates to buyer on demandYes  
+ 
+!टपणी!टपणी|Note:: |Note:: Seller has given an undertaking that it has made arrangements for getting the stores from an authorized distributor / dealer / channel partner of the OEM of the
+offered product. At the time of delivery of goods, Seller will provide necessary chain documents (in the form of GST Invoice) to prove that the supplied goods are genuine and are
+being sourced from an authorized distributor / dealer / channel partner of the OEM. In case of any complaint about genuineness of the supplied products, Seller shall be
+responsible for providing genuine replacement supplies.
+ 
+खरीदारखरीदार  प!रभा!षतप!रभा!षत  अ!त!रतअ!त!रत  !व!शता!व!शता  केके  !लए!लए  |Buyer Defined Additional Specification for Unbranded Octagonal Pole Double Arm 9 m|Buyer Defined Additional Specification for Unbranded Octagonal Pole Double Arm 9 m
+!व!नदyश!व!नदyश|Specification|Specificationमू~यमू~य|Value|Value
+establishment and Installation of 9 Mt Pole with 6LED Street light 170 to 200westablishment and Installation of 9 Mt Pole with 6LED Street light 170 to 200w
+ 
+ईपीबीजीईपीबीजी  !ववरण!ववरण  | ePBG Detail| ePBG Detail
+!नयम!नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. General Terms and Conditions-1. General Terms and Conditions-
+1.11.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+1.21.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+1.31.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+2. Buyer Added Bid Specific Terms and Conditions-2. Buyer Added Bid Specific Terms and Conditions-
+2.12.1  GenericGeneric: : 
+OPTION CLAUSE: The Purchaser reserves the right to increase or decrease the quantity to be ordered up to 25 percent of bid quantity at the time of placement of contract. TheOPTION CLAUSE: The Purchaser reserves the right to increase or decrease the quantity to be ordered up to 25 percent of bid quantity at the time of placement of contract. The
+purchaser also reserves the right to increase the ordered quantity up to 25% of the contracted quantity during the currency of the contract at the contracted rates. The deliverypurchaser also reserves the right to increase the ordered quantity up to 25% of the contracted quantity during the currency of the contract at the contracted rates. The delivery
+period of quantity shall commence from the last date of original delivery order and in cases where option clause is exercised during the extended delivery period the additionalperiod of quantity shall commence from the last date of original delivery order and in cases where option clause is exercised during the extended delivery period the additional
+time shall commence from the last date of extended delivery period. The additional delivery time shall be (Increased quantity ÷ Original quantity) × Original delivery period (intime shall commence from the last date of extended delivery period. The additional delivery time shall be (Increased quantity ÷ Original quantity) × Original delivery period (in
+days), subject to minimum of 30 days. If the original delivery period is less than 30 days, the additional time equals the original delivery period. The Purchaser may extend thisdays), subject to minimum of 30 days. If the original delivery period is less than 30 days, the additional time equals the original delivery period. The Purchaser may extend this
+calculated delivery duration up to the original delivery period while exercising the option clause. Bidders must comply with these terms.calculated delivery duration up to the original delivery period while exercising the option clause. Bidders must comply with these terms.
+2.22.2  GenericGeneric: : 
+Bidder financial standing:Bidder financial standing: The bidder should not be under liquidation, court receivership or similar proceedings, should not be bankrupt. Bidder to upload undertaking to this The bidder should not be under liquidation, court receivership or similar proceedings, should not be bankrupt. Bidder to upload undertaking to this
+effect with bid.effect with bid.
+2.32.3  CertificatesCertificates: : 
+Bidder's offer is liable to be rejected if they don't upload any of the certificates / documents sought in the Bid document, ATC and Corrigendum if any.Bidder's offer is liable to be rejected if they don't upload any of the certificates / documents sought in the Bid document, ATC and Corrigendum if any.
+2.42.4  CertificatesCertificates: : 
+ISO 9001: The bidder or the OEM of the offered products must have ISO 9001 certification.ISO 9001: The bidder or the OEM of the offered products must have ISO 9001 certification.
+2.52.5  Buyer Added Bid Specific ATCBuyer Added Bid Specific ATC: : 
+Buyer Added text based ATC clausesBuyer Added text based ATC clauses
+Bidders can also submit the EMD Bidders can also submit the EMD in favour of Executive Officer Nagar Barsana, Matura in favour of Executive Officer Nagar Barsana, Matura Bidder has to uplo ad scanned copy / proof of the FDR/EMD along with bid and has to ensuBidder has to uplo ad scanned copy / proof of the FDR/EMD along with bid and has to ensu
+सलाहकारसलाहकार  बकबक |  | Advisory Bank :Advisory Bank :NA
+ईपीबीजीईपीबीजी  K!तशतK!तशत (%)  (%) | ePBG Percentage(%):| ePBG Percentage(%):NA
+ 
+
+re delivery of hard copy to the Buye r within Bid End date. (I). It is mandatory for the service provider to be at least 3 years old from the date of publication of the bid The agency re delivery of hard copy to the Buye r within Bid End date. (I). It is mandatory for the service provider to be at least 3 years old from the date of publication of the bid The agency 
+must have been working in any government institution department for at least 3 years from the date of publication of the release. (II). It Will Be Mandatory For The Firm To Uploamust have been working in any government institution department for at least 3 years from the date of publication of the release. (II). It Will Be Mandatory For The Firm To Uploa
+d d The EMD Copy Any Exemption Not Allowed & Send EMD Before The Bid End Date. (III).All new attached documents should be within the bid duration , The Bid holder will have toThe EMD Copy Any Exemption Not Allowed & Send EMD Before The Bid End Date. (III).All new attached documents should be within the bid duration , The Bid holder will have to
+submit a Three Year Original Scann 8 / 10 ed Experience, Acknowledgements with I.T.R. Forms & Balance Sheet And CA Verified Turnover Certificate submit a Three Year Original Scann 8 / 10 ed Experience, Acknowledgements with I.T.R. Forms & Balance Sheet And CA Verified Turnover Certificate With UDIN No, Labour DepartWith UDIN No, Labour Depart
+ment Certificated , GST Certificated , PAN Card, Bank A/C Details, ,A duly attested self declaration on stamp paper of Rs. 10/- undertaking that the Agency/Firm has not been blacklment Certificated , GST Certificated , PAN Card, Bank A/C Details, ,A duly attested self declaration on stamp paper of Rs. 10/- undertaking that the Agency/Firm has not been blackl
+isted by any Government Department/Autonomous Bodies as on the date of submission of the Bid.,isted by any Government Department/Autonomous Bodies as on the date of submission of the Bid.,
+..
+Note:Note:  
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.and will also contribute to improving their ratings.
+नोटनोट: : यहयह  !सfटम!सfटम  जनरेटेडजनरेटेड  फाइलफाइल  हैहै। । कोईकोई  हfताXरहfताXर  कक  आवयकताआवयकता  नहनह  हैहै। । इसइस  दfतावेज़दfतावेज़  काका  !Kंट!Kंट  आउटआउट  भुगतानभुगतान//लेनदेनलेनदेन  उेयउेय  केके  !लए!लए  मा यमा य  नहनह  हैहै। । 
+Note: This is system generated file. No signature is required. Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.Print out of this document is not valid for payment/ transaction purpose.

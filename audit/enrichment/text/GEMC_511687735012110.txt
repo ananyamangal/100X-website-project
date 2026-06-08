@@ -1,0 +1,265 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687735012110
+अनुबंधअनुबंध  "त"थ"त"थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा-यममा-यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  "ववरण"ववरण|Organisation Details|Organisation Details
+?@प|Type :State Government
+मंFालय|Ministry :-
+"वभाग|Department :
+Medical Health and Family Welfare Department Uttar
+Pradesh
+संगठन का नाम|Organisation
+Name :
+N/A
+कायाPलय QेF|Office Zone:E Hospital Basti
+खरीदारखरीदार  "ववरण"ववरण|Buyer Details|Buyer Details
+पद|Designation :SMO
+संपकP नंबर|Contact No. :-
+ईमेल आईडी|Email ID :smo-disthosp.bs@up.gov.in
+जीएसट`आईएन|GSTIN :-
+पता|Address :
+DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+ 
+"वdीय"वdीय  eवीकृ "तeवीकृ "त  "ववरण"ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम"त|IFD Concurrence :No
+?शास"नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+SIC DH BASTI
+"वdीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+FO DH BASTI
+भुगतानभुगतान  ?ा"धकरण?ा"धकरण  "ववरण"ववरण|Paying Authority Details|Paying Authority Details
+Role:BUYER
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :SMO
+ईमेल आईडी|Email ID :smo-disthosp.bs@up.gov.in
+जीएसट`आईएन|GSTIN :-
+पता|Address:
+DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+ 
+ 
+"वे ता"वे ता  "ववरण"ववरण|Seller Details|Seller Details
+जेम "वे ता आईडी|GeM Seller ID :C61B240011974537
+कं पनी का नाम|Company Name :AHANA ENTERPRISES
+संपकP नंबर|Contact No. :09616070425
+ईमेल आईडी|Email ID :ahanaenterprises20@gmail.com
+पता| Address :
+MUDILA,ORWARA,ORWARA,ORWARA,
+Basti, UTTAR PRADESH-272002, -
+एमएसएमई पंजीकरण संnया|MSME Registration number :UDYAM-UP-16-0043955
+जीएसट`आईएन|GSTIN:09AKMPC5285H1ZV (R)
+एमएसई सामा"जक qेणी|MSE Social Category :OBC
+एमएसई "लंग qेणी|MSE Gender :Male
+*"जसके नाम के पQ मs GST/TAX इनवॉइस पेश "कया जाएगा|GST / Tax invoice to be raised in the name of - Consignee
+"वतरण "नदxश | Delivery Instructions : NA
+उzपादउzपाद  "ववरण"ववरण|Product Details|Product Details
+##आइटमआइटम  "ववरण"ववरण|Item Description|Item Description
+आइटमआइटम
+"ववरण"ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मू~यमू~य
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  "वभाजन"वभाजन (INR)| (INR)|
+Tax Bifurcation (INR)Tax Bifurcation (INR)
+मू~यमू~य  
+(INR (INR मsमs  सभीसभी
+शु~कशु~क  औरऔर  करकर
+स"हतस"हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उzपादउzपाद  काका  नामनाम |Product Name :  |Product Name : Nareena Lifesciences Pulse Oximeter , Finger Tip
+ांडांड|Brand : |Brand : Nareena Lifesciences
+ांडांड  ?कार?कार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  ""त""त|Catalogue Status: |Catalogue Status: OEM verified catalogue
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+qेणीqेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Pulse Oximeter (V2) (Q2)
+मॉडलमॉडल|Model:|Model: NLS 0703 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+12pieces2,154NA25,848
+कु ल ऑडPर मू~य |Total Order Value (in INR)25,84825,848
+ 
+परे"षतीपरे"षती  "ववरण"ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे"षतीपरे"षती|Consignee|Consigneeवeतुवeतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माFामाFा|Quantity|Quantity
+"दनांक"दनांक  केके  बादबाद
+"डलीवरी"डलीवरी  शु@शु@
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+"वतरण"वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : SMO
+ईमेल आईडी|Email ID : smo-disthosp.bs@up.gov.in
+Nareena Lifesciences
+
+1
+संपकP|Contact : -
+जीएसट`आईएन|GSTIN : -
+पता|Address : DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+Pulse Oximeter , Finger
+Tip
+-1227-May-202611-Jun-2026
+Product Specification for Nareena Lifesciences Pulse Oximeter , Finger TipProduct Specification for Nareena Lifesciences Pulse Oximeter , Finger Tip
+"व"नदxश"व"नदxश|Specification|Specificationउपउप--"व"नदxश"व"नदxश|Sub-Spec|Sub-Specमू~यमू~य|Value|Value
+PRODUCT
+INFORMATION
+Type of Pulse OximeterFinger Tip  
+Should work during motion and very low perfusion conditionsYes  
+Special Signal processing Technology (Motion artifact rejection)Nellcor  
+SPO2 probes utilityReusable  
+Oxygen saturation Range0-100%  
+Pulse rate25-240 BPM  
+Display of SPO2 and PRDigital display with plethysmograph with trends  
+Accuracy± 5 %  
+Shock proofNo  
+Display typeLCD/LED/TFT  
+Display should be readable from at least 3 feetNo  
+Saturation displayed on the screenYes  
+Pulse Rate displayed on the screenYes  
+Perfusion Index displayed on the screenYes  
+Status of battery charging displayed on the screenYes  
+Sensor off /on statusYes  
+Audible and visual AlarmsYes  
+Alarm override facility should be presentYes  
+Trends in Hours48  
+Type of trend displayTabular  
+Power sourceBattery operated  
+Automatic switch from mains to battery in case of power failureNA for fingertip  
+RS 232C interface for data communication and transferNA for fingertip  
+Should have provisions for wireless and bluetooth connectivityNA for fingertip  
+Patient extension cableNot provided  
+Protective splash proof case for clean andstrogage and safe transport providedNo  
+Noise level in dB≤50  
+Display must allow easy viewing in all ambient light levelsYes  
+Non Invasive Hemoglobin measurementNo  
+Display of Respiratory Rate (RRP)Yes  
+Pleth Variable Index (PVI)Yes  
+General
+Product DescriptionPulse Oximeter  
+Purpose
+A pulse oximeter is a device used to measure the
+percentage of oxygen saturation in blood (SpO2) and
+heart rate (pulse).  
+PROBES
+Type of probePediatric  
+Probe usageReusable  
+Number of probes provided1 each  
+NIBP PARAMETERS
+Non invasive blood pressure (NIBP) providedNo  
+Type of BP monitoringNA (If NIBP not provided)  
+NIBP range in mmHgNA (If NIBP not provided)  
+Cuff sizeNA (If NIBP not provided)  
+Number of cuff's providedNA(If NIBP not provided)  
+Compliance to Medical Device Rules (MDR) 2017 as amended till dateYes  
+
+CERTIFICATIONS
+Availability of valid Medical Device license for the product issued from the competent
+authority defined under Drugs and Cosmetic Act 1940 and Rules made there under as
+amended till date
+Yes  
+Valid Medical Device License NumberMFG/MD/2024/000150  
+Certification for manufacturing unitISO:13485 (Latest)  
+Availability of Test Report for each supplied batch/product as per Medical Device Rule (MDR)
+2017 as amended till date
+Yes  
+Submission of all necessary certifications, licenses and test reports to the buyer at the time
+of bid submission or along with supplies as per buyer requirement
+Yes  
+WARRANTY
+Warranty in Years (Option of comprehensive warranty is available through bidding only,
+which if opted will supersede normal warranty in the catalogue)
+2  year
+Warranty for probes in yearsNot Provided  
+ADDITIONAL
+REQUIREMENTS
+Additional RequirementsNA  
+ 
+ईपीबीजीईपीबीजी  "ववरण"ववरण  | ePBG Detail| ePBG Detail
+NANA
+"नयम"नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 01-07-2024Version:1 effective from 01-07-2024
+1.11.111. . AAll Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under as amended till date will always be applicable. Thisll Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under as amended till date will always be applicable. This
+will include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW) and Department ofwill include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW) and Department of
+Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers time to time in this regard.Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers time to time in this regard.
+22. . The sellers are registered on GeM based on the self declaration of valid Medical Device License, product certification, test reports etc. However, buyers must checkThe sellers are registered on GeM based on the self declaration of valid Medical Device License, product certification, test reports etc. However, buyers must check
+and validate the details at their end for all applicable licenses and certifications e.g., validity and authenticity/genuineness of Medical Device license, productand validate the details at their end for all applicable licenses and certifications e.g., validity and authenticity/genuineness of Medical Device license, product
+certification, manufacturer certification/licenses, test reports etc.certification, manufacturer certification/licenses, test reports etc.
+33. . In case of authorized resellers/distributors, it will be the legal & regulatory liability of the manufacturer to ensure that their resellers/distributors are operating inIn case of authorized resellers/distributors, it will be the legal & regulatory liability of the manufacturer to ensure that their resellers/distributors are operating in
+compliance with all relevant laws and regulations and are properly licensed to sell the manufacturer's products, including verifying the validity and authenticity ofcompliance with all relevant laws and regulations and are properly licensed to sell the manufacturer's products, including verifying the validity and authenticity of
+Medical Device license held by them.Medical Device license held by them.
+44. . The price offered by the seller/bidder shall not, in any case exceed the DPCO/NPPA controlled price or price fixed by State Government, if any. The seller must reduceThe price offered by the seller/bidder shall not, in any case exceed the DPCO/NPPA controlled price or price fixed by State Government, if any. The seller must reduce
+the prices if there is any reduction in DPCO/NPPA ceiling price or price fixed by State Government, if any.the prices if there is any reduction in DPCO/NPPA ceiling price or price fixed by State Government, if any.
+55. . Any other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional TermsAny other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional Terms
+and Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms andand Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms and
+conditions are in reverse order of precedence i.e. ATC shall supersede specific STC which shall supersede General Terms and Conditions (GTC), whenever there areconditions are in reverse order of precedence i.e. ATC shall supersede specific STC which shall supersede General Terms and Conditions (GTC), whenever there are
+any conflicting provisions.any conflicting provisions.
+66. . Comprehensive warranty:Comprehensive warranty: Comprehensive warranty shall include preventive maintenance including calibration as per technical/ service /operational manual of the Comprehensive warranty shall include preventive maintenance including calibration as per technical/ service /operational manual of the
+manufacturer, service charges and spares. During the warranty period commencing from date of the successful completion of warranty period, Service personnelmanufacturer, service charges and spares. During the warranty period commencing from date of the successful completion of warranty period, Service personnel
+shall visit each consignee site as recommended in the manufacturer's technical/ service /operational manual, at least once in six months. warranty shall not beshall visit each consignee site as recommended in the manufacturer's technical/ service /operational manual, at least once in six months. warranty shall not be
+including the consumables. Further there will be 98% uptime warranty during warranty period on 24 (hrs) X 7 (days) X 365 (days) basis, with penalty, to extendincluding the consumables. Further there will be 98% uptime warranty during warranty period on 24 (hrs) X 7 (days) X 365 (days) basis, with penalty, to extend
+warranty period by double the downtime period.warranty period by double the downtime period.
+77. . Service centres:Service centres: Details of Service outlets in India to render services for equipment to be furnished to buyer/consignees with complete address, telephone numbers, e Details of Service outlets in India to render services for equipment to be furnished to buyer/consignees with complete address, telephone numbers, e
+mails etc at time of making the supplies. It shall be the responsibility of seller to ensure that authorized service centres are available to cater to the areas wheremails etc at time of making the supplies. It shall be the responsibility of seller to ensure that authorized service centres are available to cater to the areas where
+supplies are made within reasonable distance from where the service calls can be handled. Details of toll-free numbers for service call and online registration ofsupplies are made within reasonable distance from where the service calls can be handled. Details of toll-free numbers for service call and online registration of
+service requests also to be provided buyer/consignee at the time of supplies.service requests also to be provided buyer/consignee at the time of supplies.
+88. . Source of supply:Source of supply: It shall be responsibility of seller to provide Documents regarding source of equipments such as copy of Performa invoice or any other documents It shall be responsibility of seller to provide Documents regarding source of equipments such as copy of Performa invoice or any other documents
+to establish that the products supplied are manufactured by OEM indicated and sourced from them.to establish that the products supplied are manufactured by OEM indicated and sourced from them.
+99. . Packing and Marking:Packing and Marking: Medical equipments being very delicate and sensitive packing for the goods should be strong and durable enough to withstand transit Medical equipments being very delicate and sensitive packing for the goods should be strong and durable enough to withstand transit
+including transhipment (if any), rough handling, open storage etc. without any damage, deterioration etc. .The size, weights and volumes of the packing cases,including transhipment (if any), rough handling, open storage etc. without any damage, deterioration etc. .The size, weights and volumes of the packing cases,
+remoteness of the final destination of the goods, availability or otherwise of transport and handling facilities at all points during transit up to final destination,.remoteness of the final destination of the goods, availability or otherwise of transport and handling facilities at all points during transit up to final destination,.
+Quality of packing, the manner of marking within & outside the packages and provision of accompanying documentation shall take into consideration the type ofQuality of packing, the manner of marking within & outside the packages and provision of accompanying documentation shall take into consideration the type of
+medical equipments being supplied. The accessories shall be suitably labelled and packed. Each of the package shall be marked on three sides with indelible paint ofmedical equipments being supplied. The accessories shall be suitably labelled and packed. Each of the package shall be marked on three sides with indelible paint of
+proper quality: indicating contract number and date, brief description of goods including quantity, Packing list reference number, country of origin of goods and anyproper quality: indicating contract number and date, brief description of goods including quantity, Packing list reference number, country of origin of goods and any
+other relevant details.other relevant details.
+1010. . Spare Parts:Spare Parts: Seller shall provide materials, information etc. pertaining to spare parts manufactured and supplied by the OEM. It shall be ensured that the required Seller shall provide materials, information etc. pertaining to spare parts manufactured and supplied by the OEM. It shall be ensured that the required
+spares are available for purchase at least for 10 years from date of supplies. In case due to any reasons the production of the spare parts is discontinued sufficientspares are available for purchase at least for 10 years from date of supplies. In case due to any reasons the production of the spare parts is discontinued sufficient
+advance notice should be given to the buyer/consignee before such discontinuation to provide adequate time to purchase the required spare parts etc. Further, OEMadvance notice should be given to the buyer/consignee before such discontinuation to provide adequate time to purchase the required spare parts etc. Further, OEM
+and their service centres/dealers shall carry sufficient inventories to assure ex-stock supply of consumables and spares for the equipments so that the same areand their service centres/dealers shall carry sufficient inventories to assure ex-stock supply of consumables and spares for the equipments so that the same are
+available. OEM or reseller shall always accord most favoured client status to the buyer/consignee and shall give the most competitive price for spares andavailable. OEM or reseller shall always accord most favoured client status to the buyer/consignee and shall give the most competitive price for spares and
+consumables of its machines/equipments supplied.consumables of its machines/equipments supplied.
+1111. . Installation, Training, Manuals:Installation, Training, Manuals: Seller shall be responsible to carry out Installation & commissioning, Supervision and Demonstration of the goods. They shall provide Seller shall be responsible to carry out Installation & commissioning, Supervision and Demonstration of the goods. They shall provide
+required jigs and tools for assembly, minor civil works for the completion of the installation and Training of Consignee's representatives for operating andrequired jigs and tools for assembly, minor civil works for the completion of the installation and Training of Consignee's representatives for operating and
+maintaining the equipment and supplying required number of operation & maintenance manual for the goods. In case the category parameters are specifying anymaintaining the equipment and supplying required number of operation & maintenance manual for the goods. In case the category parameters are specifying any
+requirements regarding the installations, training and manuals the same shall also be applicable.requirements regarding the installations, training and manuals the same shall also be applicable.
+1212. . Electrical safety checking:Electrical safety checking: Sellers are required to make sure that they furnish the list of equipments for carrying out routine and preventive maintenance to Sellers are required to make sure that they furnish the list of equipments for carrying out routine and preventive maintenance to
+buyer/consignee .They should make sure to periodically check the electrical safety aspects as per BIS Safety Standards or equivalent .In case they do not havebuyer/consignee .They should make sure to periodically check the electrical safety aspects as per BIS Safety Standards or equivalent .In case they do not have
+required equipment for such testing should ensure that the equipments checked for electrical safety compliance through labs with facilities for such checking duringrequired equipment for such testing should ensure that the equipments checked for electrical safety compliance through labs with facilities for such checking during
+every preventive maintenance call.every preventive maintenance call.
+1313. . Software:Software: All software updates should be provided free of cost during warranty period. All software updates should be provided free of cost during warranty period.
+
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह "सeटम जनरेटेड फाइल है। कोई हeताQर क आवयकता नह है। इस दeतावेज़ का "?ंट आउट भुगतान/लेनदेन उेय के "लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

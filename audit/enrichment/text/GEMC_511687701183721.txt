@@ -1,0 +1,175 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687701183721
+अनुबंधअनुबंध  "त"थ"त"थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा-यममा-यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  "ववरण"ववरण|Organisation Details|Organisation Details
+?@प|Type :Central Government
+मंEालय|Ministry :Ministry of External Affairs
+"वभाग|Department :NA
+संगठन का नाम|Organisation
+Name :
+N/A
+कायाLलय MेE|Office Zone:
+Consular, Passport Visa Division, Patiala House Annexe, Tilak
+Marg, New Delhi
+खरीदारखरीदार  "ववरण"ववरण|Buyer Details|Buyer Details
+पद|Designation :Passport Officer
+संपकL नंबर|Contact No. :091-80788411-52
+ईमेल आईडी|Email ID :admn.rpocochin@cpo.gov.in
+जीएसटbआईएन|GSTIN :32CHNR00173F1DA
+पता|Address :
+Passport Office, Cochin, Panampilly Nagar,
+ERNAKULAM CITY, KERALA-682036, India
+ 
+"वjीय"वjीय  kवीकृ "तkवीकृ "त  "ववरण"ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम"त|IFD Concurrence :Yes
+?शास"नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+RPO
+"वjीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+DDO
+भुगतानभुगतान  ?ा"धकरण?ा"धकरण  "ववरण"ववरण|Paying Authority Details|Paying Authority Details
+Role:DDO
+भुगतान का तरीका|
+Payment Mode:
+PFMS
+पद|Designation :Senior Superintendent
+ईमेल आईडी|Email ID :po.ernakulam@passportindia.gov.in
+जीएसटbआईएन|GSTIN :N
+पता|Address:
+Passport Office, Cochin, Panampilly Nagar,
+ERNAKULAM CITY, KERALA-682036, India
+ 
+ 
+"वे ता"वे ता  "ववरण"ववरण|Seller Details|Seller Details
+जेम "वे ता आईडी|GeM Seller ID :P49Q240012327473
+कं पनी का नाम|Company Name :SRISHTI GENERAL STORE
+संपकL नंबर|Contact No. :07427070210
+ईमेल आईडी|Email ID :anjalimahto2903@gmail.com
+पता| Address :
+CHAK 6 Z,R C COLONY,WARD NO 2 NH 911 BOUTIQUE AND BEAUTY PARLOUR WATER WORKS COLONUY,SRI GANGANAGAR,
+Sri Ganganagar, RAJASTHAN-335001, -
+एमएसएमई पंजीकरण संuया|MSME Registration number :UDYAM-RJ-15-0071015
+जीएसटbआईएन|GSTIN:08LLKPK4431M1ZH (R)
+एमएसई सामा"जक wेणी|MSE Social Category :General
+एमएसई "लंग wेणी|MSE Gender :Female
+*"जसके नाम के पM मy GST/TAX इनवॉइस पेश "कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+"वतरण "नद}श | Delivery Instructions : NA
+उपादउपाद  "ववरण"ववरण|Product Details|Product Details
+##आइटमआइटम  "ववरण"ववरण|Item Description|Item Description
+आइटमआइटम
+"ववरण"ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूयमूय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  "वभाजन"वभाजन
+(INR)|(INR)|
+Tax BifurcationTax Bifurcation
+(INR)(INR)
+मूयमूय  
+(INR (INR मyमy  सभीसभी
+शुकशुक  औरऔर  करकर
+स"हतस"हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उपादउपाद  काका  नामनाम |Product Name :  |Product Name : Peace Forever 150 gsm White Pocket shape envelope of
+dimensions ( In mm) 240 x 330
+ांडांड|Brand : |Brand : Peace Forever
+ांडांड  ?कार?कार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  ""त""त|Catalogue Status: |Catalogue Status: Catalogue not verified by OEM
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : Reseller not verified by OEM
+wेणीwेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Correspondence Envelopes (V3) (Q4)
+मॉडलमॉडल|Model:|Model: MACHINE MADE ENVELOPES 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+15,000pieces3.3NA49,500
+कु ल ऑडLर मूय |Total Order Value (in INR)49,50049,500
+ 
+परे"षतीपरे"षती  "ववरण"ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे"षतीपरे"षती|Consignee|Consigneeवkतुवkतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माEामाEा|Quantity|Quantity
+"दनांक"दनांक  केके  बादबाद
+"डलीवरी"डलीवरी  शु@शु@
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+"वतरण"वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : BUYER-CONSIGNEE
+
+1
+ईमेल आईडी|Email ID : admn.rpocochin@cpo.gov.in
+संपकL|Contact : 091-80788411-52
+जीएसटbआईएन|GSTIN : 32CHNR00173F1DA
+पता|Address : Passport Office, Cochin, Panampilly Nagar,
+ERNAKULAM CITY, KERALA-682036, India
+Peace Forever 150 gsm
+White Pocket shape
+envelope of dimensions
+( In mm) 240 x 330
+-15,00027-May-202611-Jun-2026
+Product Specification for Peace Forever 150 gsm White Pocket shape envelope of dimensions ( In mm) 240 x 330Product Specification for Peace Forever 150 gsm White Pocket shape envelope of dimensions ( In mm) 240 x 330
+"व"नद}श"व"नद}श|Specification|Specificationउपउप--"व"नद}श"व"नद}श|Sub-Spec|Sub-Specमूयमूय|Value|Value
+STANDARDS
+Type of EnvelopePocket shape envelope  
+Dimensions of the Envelope (In mm)240 x 330  
+Grammage of the Envelope150 gsm  
+Colour of the EnvelopeWhite  
+Window in EnvelopeWithout Envelope  
+Material of EnvelopeNA ( In case of Without Envelope)  
+Central Seam of the Envelope2 cm  
+Opening of EnvelopeTop Side opening  
+Lining in EnvelopePlain woven Cotton Cloth Lining  
+Side Gate (on three sides)NA  
+Top Flap7 cm  
+Bottom FlapNA  
+Lamination on EnvelopeWithout  
+Sealing FlapGummed  
+ 
+"टपणी"टपणी|Note:: |Note:: Seller has given an undertaking that it has made arrangements for getting the stores from an authorized distributor / dealer / channel partner of the OEM of the
+offered product. At the time of delivery of goods, Seller will provide necessary chain documents (in the form of GST Invoice) to prove that the supplied goods are genuine and are
+being sourced from an authorized distributor / dealer / channel partner of the OEM. In case of any complaint about genuineness of the supplied products, Seller shall be
+responsible for providing genuine replacement supplies.
+ 
+ईपीबीजीईपीबीजी  "ववरण"ववरण  | ePBG Detail| ePBG Detail
+NANA
+"नयम"नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 04-06-2025Version:1 effective from 04-06-2025
+1.11.1Note to Buyers :Note to Buyers :
+For printing on the envelope as per  Buyer's requirement the buyer shall create the BID and mentioned the contents to be printed in the ATC such as Logo or any texts etc.,For printing on the envelope as per  Buyer's requirement the buyer shall create the BID and mentioned the contents to be printed in the ATC such as Logo or any texts etc.,
+  
+Note to Sellers :Note to Sellers :
+1) Sellers must declare their catalog price for 1 Piece of Unprinted Correspondence envelope.1) Sellers must declare their catalog price for 1 Piece of Unprinted Correspondence envelope.
+2) The seller shall quote their price during bidding in accordance to the  buyer's  requirements for printing contents.2) The seller shall quote their price during bidding in accordance to the  buyer's  requirements for printing contents.
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह "सkटम जनरेटेड फाइल है। कोई हkताMर क आवयकता नह है। इस दkतावेज़ का "?ंट आउट भुगतान/लेनदेन उेय के "लए माय नह है। 
+
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

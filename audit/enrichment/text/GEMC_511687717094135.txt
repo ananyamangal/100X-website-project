@@ -1,0 +1,306 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687717094135
+अनुबंधअनुबंध  #त#थ#त#थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा/यममा/यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  #ववरण#ववरण|Organisation Details|Organisation Details
+ABप|Type :State Government
+मंHालय|Ministry :-
+#वभाग|Department :
+Medical Health and Family Welfare Department Uttar
+Pradesh
+संगठन का नाम|Organisation
+Name :
+N/A
+कायाRलय SेH|Office Zone:E Hospital Basti
+खरीदारखरीदार  #ववरण#ववरण|Buyer Details|Buyer Details
+पद|Designation :SMO
+संपकR नंबर|Contact No. :-
+ईमेल आईडी|Email ID :smo-disthosp.bs@up.gov.in
+जीएसटbआईएन|GSTIN :-
+पता|Address :
+DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+ 
+#वfीय#वfीय  gवीकृ #तgवीकृ #त  #ववरण#ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम#त|IFD Concurrence :No
+Aशास#नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+SIC DH BASTI
+#वfीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+FO DH BASTI
+भुगतानभुगतान  Aा#धकरणAा#धकरण  #ववरण#ववरण|Paying Authority Details|Paying Authority Details
+Role:BUYER
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :SMO
+ईमेल आईडी|Email ID :smo-disthosp.bs@up.gov.in
+जीएसटbआईएन|GSTIN :-
+पता|Address:
+DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+ 
+ 
+#वे ता#वे ता  #ववरण#ववरण|Seller Details|Seller Details
+जेम #वे ता आईडी|GeM Seller ID :THBZ250012898506
+कं पनी का नाम|Company Name :M/S K S ENTERPRISES
+संपकR नंबर|Contact No. :06394893261
+ईमेल आईडी|Email ID :ksenterprises528@gmail.com
+पता| Address :
+Arz No 125, 0,Umarpur Neewa Uparha,Prayagraj,
+PRAYAGRAJ, UTTAR PRADESH-211011, -
+एमएसएमई पंजीकरण संtया|MSME Registration number :UDYAM-UP-03-0113773
+जीएसटbआईएन|GSTIN:09DMZPS6365A1ZA (R)
+एमएसई सामा#जक uेणी|MSE Social Category :General
+एमएसई #लंग uेणी|MSE Gender :Male
+*#जसके नाम के पS मw GST/TAX इनवॉइस पेश #कया जाएगा|GST / Tax invoice to be raised in the name of - Consignee
+#वतरण #नद|श | Delivery Instructions : NA
+उ~पादउ~पाद  #ववरण#ववरण|Product Details|Product Details
+##आइटमआइटम  #ववरण#ववरण|Item Description|Item Description
+आइटमआइटम
+#ववरण#ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूयमूय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  #वभाजन#वभाजन (INR)| (INR)|
+Tax BifurcationTax Bifurcation
+(INR)(INR)
+मूयमूय  
+(INR (INR मwमw  सभीसभी
+शुकशुक  औरऔर  करकर
+स#हतस#हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ~पादउ~पाद  काका  नामनाम |Product Name :  |Product Name : S.CURE ECG Machine 6 Channel
+ांडांड|Brand : |Brand : S.CURE
+ांडांड  AकारAकार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  ##त##त|Catalogue Status: |Catalogue Status: OEM verified catalogue
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+uेणीuेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Electrocardiography (ECG) Machine (V2)
+(Q2)
+मॉडलमॉडल|Model:|Model: ECG 600G 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+1pieces49,999NA49,999
+कु ल ऑडRर मूय |Total Order Value (in INR)49,99949,999
+ 
+परे#षतीपरे#षती  #ववरण#ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे#षतीपरे#षती|Consignee|Consigneeवgतुवgतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माHामाHा|Quantity|Quantity
+#दनांक#दनांक  केके  बादबाद
+#डलीवरी#डलीवरी  शुBशुB
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+#वतरण#वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : SMO
+
+1
+ईमेल आईडी|Email ID : smo-disthosp.bs@up.gov.in
+संपकR|Contact : -
+जीएसटbआईएन|GSTIN : -
+पता|Address : DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+S.CURE ECG Machine 6
+Channel
+-127-May-202611-Jun-2026
+Product Specification for S.CURE ECG Machine 6 ChannelProduct Specification for S.CURE ECG Machine 6 Channel
+#व#नद|श#व#नद|श|Specification|Specificationउपउप--#व#नद|श#व#नद|श|Sub-Spec|Sub-Specमूयमूय|Value|Value
+GENERAL FEATURES
+Product DescriptionECG Machine  
+Purpose
+An ECG is a noninvasive routine examination of the electrical activity of
+the heart that is used to reflect underlying heart conditions  
+PRODUCT
+INFORMATION
+Operating modes of ECG MachineAutomatic, Manual and Rhythm  
+ECG machine should have ECG lead annotation facilityYes  
+Leads which is in ECG machine should be able to acquire simultaneously and
+interpret them
+12  
+Number of channels6 Channel  
+ECG machine should acquire lead ECG for both adult and pediatric patientsYes  
+The ECG machine should have facility to show lead fail indicationYes  
+The ECG machine should have facility to show lead reversal indicationYes  
+The ECG machine should have facility to show the impedance to quality check
+of connection
+Yes  
+Acquisition time for ECG Machine in sec10 sec  
+Digital sampling rate for Pacemaker spike detectionNA  
+Recording of digital sampling for pacemakerNA  
+ECG machine should have real time colour backlit display of ECG waveforms
+with signal qualify indication for each lead
+Yes  
+ECG machine should have frequency filtersArtifact, AC and low and high pass frequency filters  
+Number of ECGs which can be store in ECG Machine151 to 200  
+ECG machine should have full screen preview of ECG report for quality
+assessment checks prior to print
+No  
+Type of inbuilt screenLCD  
+Size of screen in inches7  
+Display resolution of ECG machine in pixels640 x 480  
+ECG machine should have interpretation facility of the amplitudes, duration
+and morphologies of ECG waveforms and associated rhythm for adult and
+pediatric patient
+Yes  
+ECG machine should have alphanumeric keyboard for patient data entryHard keys  
+Availability of latest interpretation softwareYes  
+Wireless acquisition module with RF technologyNo  
+System should have the dedicated software to download the ECG form
+machine in PDF format
+Yes  
+PRINTER
+Printer TypeThermal Printer  
+Recorder Paper Size105 mm x 20 Meter  
+Recorder Speed5 mm/sec  
+Resolution of digital array printer200 dpi x 500 dpi  
+Number of Thermal paper500  
+ECG machine report format
+Report formats of 3x4, 6x2, Rhythm for up to selected leads, 12 lead
+extended measurement, 1 minute of continuous waveform data for 1
+selected lead  
+BATTERY
+Provision of BatteryYes  
+Battery TypeBuilt in Rechargeable Battery  
+Battery capacity of continuous rhythm recording on single charge (minutes)30  
+Battery capacity30 ECG or 30 minutes of continous rhythm recording on single charge  
+Connectivity to ECG MachineNA  
+Storage on external portable memoriesNA  
+
+The individual patient lead should be change without replacing the whole
+patient cable assembly
+Yes  
+ENVIRONNMENTS
+PARAMETERS
+Operating temperature and humidity
+Temperature of 10 to 40 degree Celsius and Relative Humidity of 15 to
+90%  
+POWER SUPPLYPower input220-240 V AC, 50 Hz fitted with Indian plug  
+ACCESSORIES
+ECG Machine 12 leads with interpretation1  
+Patient Cable2  
+Chest Electrodes Adult (set of Six)1  
+Chest Electrodes Paediatric (set of Six)Not provided  
+Limb ElectrodesNot provided  
+Power cable for chargingYes  
+Supplied with Clip electrodeYes  
+Compatible trolley providedNo  
+CERTIFICATION &
+REPORTS
+Compliance to Medical Device Rules (MDR) 2017 as amended till dateYes  
+Availability of valid Medical Device license from competent authorityYes  
+Valid Medical Device License NumberMFG/MD/2024/000460  
+Manufacturing unit certificationISO:13485 (Latest)  
+Additional voluntary certification availableIN58128H  
+Availability of Test Report for each supplied batch/product as per Medical
+Device Rules (MDR) 2017 as amended till date
+Yes  
+Compliance to Safety StandardsIS 13450:Part 2:Sec 25 / IEC 60601-2-25  
+Submission of all necessary certifications, licenses and test reports to the
+buyer at the time of bid submission and/or along with supplies as per buyer
+requirement
+Yes  
+WARRANTY
+Warranty (Option of comprehensive warranty is available through bidding
+only, which if opted will supersede normal warranty in the catalogue)
+1  year
+ADDITIONAL
+REQUIREMENTS
+Additional RequirementsNA  
+Miscellaneous
+Parameters
+User/Technical/Maintenance manuals to be supplied in English in hard and
+soft copy
+Yes  
+The Principal Manufacturer must have direct Presence/approved service
+center In India
+Yes  
+Installation and demonstration of equipment and training to be provided after
+completing supplies before acceptance
+Yes  
+ 
+ईपीबीजीईपीबीजी  #ववरण#ववरण  | ePBG Detail| ePBG Detail
+NANA
+#नयम#नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 23-08-2023Version:1 effective from 23-08-2023
+1.11.111. . AAll Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under as amended till date will always be applicable. Thisll Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under as amended till date will always be applicable. This
+will include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW) and Department ofwill include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW) and Department of
+Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers time to time in this regard.Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers time to time in this regard.
+22. . The sellers are registered on GeM based on self-declaration of valid Drug License, product certification, test reports etc. However, buyers must check and validateThe sellers are registered on GeM based on self-declaration of valid Drug License, product certification, test reports etc. However, buyers must check and validate
+the details at their end for all applicable licenses and certifications e.g., validity and authenticity/genuineness of drug license, product certification, manufacturerthe details at their end for all applicable licenses and certifications e.g., validity and authenticity/genuineness of drug license, product certification, manufacturer
+certification/licenses, test reports etc.certification/licenses, test reports etc.
+33. . In case of authorized resellers/distributors, it will be the legal & regulatory liability of the manufacturer to ensure that their resellers/distributors are operating inIn case of authorized resellers/distributors, it will be the legal & regulatory liability of the manufacturer to ensure that their resellers/distributors are operating in
+compliance with all relevant laws and regulations and are properly licensed to sell the manufacturer's products, including verifying the validity and authenticity ofcompliance with all relevant laws and regulations and are properly licensed to sell the manufacturer's products, including verifying the validity and authenticity of
+drug license held by them.drug license held by them.
+44. . The price offered by the seller/bidder shall not, in any case exceed the DPCO/NPPA controlled price or price fixed by State Government, if any. The seller must reduceThe price offered by the seller/bidder shall not, in any case exceed the DPCO/NPPA controlled price or price fixed by State Government, if any. The seller must reduce
+the prices if there is any reduction in DPCO/NPPA ceiling price or price fixed by State Government, if any.the prices if there is any reduction in DPCO/NPPA ceiling price or price fixed by State Government, if any.
+55. . Any other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional TermsAny other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional Terms
+and Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms andand Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms and
+conditions are in reverse order of precedence i.e. ATC shall supersede specific STC which shall supersede General Terms and Conditions (“GTC”), whenever there areconditions are in reverse order of precedence i.e. ATC shall supersede specific STC which shall supersede General Terms and Conditions (“GTC”), whenever there are
+any conflicting provisions.any conflicting provisions.
+66. . Comprehensive warranty:Comprehensive warranty: Comprehensive warranty shall include preventive maintenance including calibration as per technical/ service /operational manual of the Comprehensive warranty shall include preventive maintenance including calibration as per technical/ service /operational manual of the
+manufacturer, service charges and spares. During the warranty period commencing from date of the successful completion of warranty period, Service personnelmanufacturer, service charges and spares. During the warranty period commencing from date of the successful completion of warranty period, Service personnel
+shall visit each consignee site as recommended in the manufacturer's technical/ service /operational manual, at least once in six months. warranty shall not beshall visit each consignee site as recommended in the manufacturer's technical/ service /operational manual, at least once in six months. warranty shall not be
+
+including the consumables. Further there will be 98% uptime warranty during warranty period on 24 (hrs) X 7 (days) X 365 (days) basis, with penalty, to extendincluding the consumables. Further there will be 98% uptime warranty during warranty period on 24 (hrs) X 7 (days) X 365 (days) basis, with penalty, to extend
+warranty period by double the downtime period.warranty period by double the downtime period.
+77. . Service centres:Service centres: Details of Service outlets in India to render services for equipment to be furnished to buyer/consignees with complete address, telephone numbers, e Details of Service outlets in India to render services for equipment to be furnished to buyer/consignees with complete address, telephone numbers, e
+mails etc at time of making the supplies. It shall be the responsibility of seller to ensure that authorized service centres are available to cater to the areas wheremails etc at time of making the supplies. It shall be the responsibility of seller to ensure that authorized service centres are available to cater to the areas where
+supplies are made within reasonable distance from where the service calls can be handled. Details of toll-free numbers for service call and online registration ofsupplies are made within reasonable distance from where the service calls can be handled. Details of toll-free numbers for service call and online registration of
+service requests also to be provided buyer/consignee at the time of supplies.service requests also to be provided buyer/consignee at the time of supplies.
+88. . Source of supply:Source of supply: It shall be responsibility of seller to provide Documents regarding source of equipments such as copy of Performa invoice or any other documents It shall be responsibility of seller to provide Documents regarding source of equipments such as copy of Performa invoice or any other documents
+to establish that the products supplied are manufactured by OEM indicated and sourced from them.to establish that the products supplied are manufactured by OEM indicated and sourced from them.
+99. . Packing and Marking:Packing and Marking: Medical equipments being very delicate and sensitive packing for the goods should be strong and durable enough to withstand transit Medical equipments being very delicate and sensitive packing for the goods should be strong and durable enough to withstand transit
+including transhipment (if any), rough handling, open storage etc. without any damage, deterioration etc. .The size, weights and volumes of the packing cases,including transhipment (if any), rough handling, open storage etc. without any damage, deterioration etc. .The size, weights and volumes of the packing cases,
+remoteness of the final destination of the goods, availability or otherwise of transport and handling facilities at all points during transit up to final destination,.remoteness of the final destination of the goods, availability or otherwise of transport and handling facilities at all points during transit up to final destination,.
+Quality of packing, the manner of marking within & outside the packages and provision of accompanying documentation shall take into consideration the type ofQuality of packing, the manner of marking within & outside the packages and provision of accompanying documentation shall take into consideration the type of
+medical equipments being supplied. The accessories shall be suitably labelled and packed. Each of the package shall be marked on three sides with indelible paint ofmedical equipments being supplied. The accessories shall be suitably labelled and packed. Each of the package shall be marked on three sides with indelible paint of
+proper quality: indicating contract number and date, brief description of goods including quantity, Packing list reference number, country of origin of goods and anyproper quality: indicating contract number and date, brief description of goods including quantity, Packing list reference number, country of origin of goods and any
+other relevant details.other relevant details.
+1010. . Spare Parts:Spare Parts: Seller shall provide materials, information etc. pertaining to spare parts manufactured and supplied by the OEM. It shall be ensured that the required Seller shall provide materials, information etc. pertaining to spare parts manufactured and supplied by the OEM. It shall be ensured that the required
+spares are available for purchase at least for 10 years from date of supplies. In case due to any reasons the production of the spare parts is discontinued sufficientspares are available for purchase at least for 10 years from date of supplies. In case due to any reasons the production of the spare parts is discontinued sufficient
+advance notice should be given to the buyer/consignee before such discontinuation to provide adequate time to purchase the required spare parts etc. Further, OEMadvance notice should be given to the buyer/consignee before such discontinuation to provide adequate time to purchase the required spare parts etc. Further, OEM
+and their service centres/dealers shall carry sufficient inventories to assure ex-stock supply of consumables and spares for the equipments so that the same areand their service centres/dealers shall carry sufficient inventories to assure ex-stock supply of consumables and spares for the equipments so that the same are
+available. OEM or reseller shall always accord most favoured client status to the buyer/consignee and shall give the most competitive price for spares andavailable. OEM or reseller shall always accord most favoured client status to the buyer/consignee and shall give the most competitive price for spares and
+consumables of its machines/equipments supplied.consumables of its machines/equipments supplied.
+1111. . Installation, Training, Manuals:Installation, Training, Manuals: Seller shall be responsible to carry out Installation & commissioning, Supervision and Demonstration of the goods. They shall provide Seller shall be responsible to carry out Installation & commissioning, Supervision and Demonstration of the goods. They shall provide
+required jigs and tools for assembly, minor civil works for the completion of the installation and Training of Consignee's representatives for operating andrequired jigs and tools for assembly, minor civil works for the completion of the installation and Training of Consignee's representatives for operating and
+maintaining the equipment and supplying required number of operation & maintenance manual for the goods. In case the category parameters are specifying anymaintaining the equipment and supplying required number of operation & maintenance manual for the goods. In case the category parameters are specifying any
+requirements regarding the installations, training and manuals the same shall also be applicable.requirements regarding the installations, training and manuals the same shall also be applicable.
+1212. . Electrical safety checking:Electrical safety checking: Sellers are required to make sure that they furnish the list of equipments for carrying out routine and preventive maintenance to Sellers are required to make sure that they furnish the list of equipments for carrying out routine and preventive maintenance to
+buyer/consignee .They should make sure to periodically check the electrical safety aspects as per BIS Safety Standards or equivalent .In case they do not havebuyer/consignee .They should make sure to periodically check the electrical safety aspects as per BIS Safety Standards or equivalent .In case they do not have
+required equipment for such testing should ensure that the equipments checked for electrical safety compliance through labs with facilities for such checking duringrequired equipment for such testing should ensure that the equipments checked for electrical safety compliance through labs with facilities for such checking during
+every preventive maintenance call.every preventive maintenance call.
+1313. . Software:Software: All software updates should be provided free of cost during warranty period. All software updates should be provided free of cost during warranty period.
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह #सgटम जनरेटेड फाइल है। कोई हgताSर क आवयकता नह है। इस दgतावेज़ का #Aंट आउट भुगतान/लेनदेन उेय के #लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

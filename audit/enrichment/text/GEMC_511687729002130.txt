@@ -1,0 +1,184 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687729002130
+अनुबंधअनुबंध  #त#थ#त#थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा.यममा.यम|Procurement Mode: |Procurement Mode: Lowest price by
+comparison(L1)
+संगठनसंगठन  #ववरण#ववरण|Organisation Details|Organisation Details
+CDप|Type :State Government
+मंIालय|Ministry :-
+#वभाग|Department :
+Medical Health and Family Welfare Department
+Uttarakhand
+संगठन का नाम|Organisation Name
+:
+Uttarakhand Health and Family Welfare Society Dehradun
+कायाSलय TेI|Office Zone:North
+खरीदारखरीदार  #ववरण#ववरण|Buyer Details|Buyer Details
+पद|Designation :Pharmacy Officer
+संपकS नंबर|Contact No. :0135-2726256-
+ईमेल आईडी|Email ID :spsrishikesh@gmail.com
+जीएसटbआईएन|GSTIN :05MRTS02828A1D8
+पता|Address :
+SPS Govt. Hospital, Near Kotwali, Dehradun Road, Rishikesh,
+Dehradun (Uttarakhand),
+Dehradun, UTTARAKHAND-249201, India
+ 
+#वhीय#वhीय  iवीकृ #तiवीकृ #त  #ववरण#ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम#त|IFD Concurrence :No
+Cशास#नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+CMS
+#वhीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+CMS
+भुगतानभुगतान  Cा#धकरणCा#धकरण  #ववरण#ववरण|Paying Authority Details|Paying Authority Details
+Role:BUYER
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :Pharmacy Officer
+ईमेल आईडी|Email ID :spsrishikesh@gmail.com
+जीएसटbआईएन|GSTIN :05MRTS02828A1D8
+पता|Address:
+SPS Govt. Hospital, Near Kotwali, Dehradun Road, Rishikesh,
+Dehradun (Uttarakhand),
+Dehradun, UTTARAKHAND-249201, India
+ 
+ 
+#वे ता#वे ता  #ववरण#ववरण|Seller Details|Seller Details
+जेम #वे ता आईडी|GeM Seller ID :0BB3180000678695
+कं पनी का नाम|Company Name :CONCEPT HEALTH CARE
+संपकS नंबर|Contact No. :09719325538
+ईमेल आईडी|Email ID :concepthealthcare.in@gmail.com
+पता| Address :
+I-223,NEHRU COLONY,NEHRU COLONY,FUWARRA CHOWK,
+Dehradun, UTTARAKHAND-248001, -
+एमएसएमई पंजीकरण संpया|MSME Registration number :-
+जीएसटbआईएन|GSTIN:05CIMPS1084G1Z2 (R)
+*#जसके नाम के पT मr GST/TAX इनवॉइस पेश #कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+#वतरण #नदxश | Delivery Instructions : NA
+उzपादउzपाद  #ववरण#ववरण|Product Details|Product Details
+##आइटमआइटम  #ववरण#ववरण|Item Description|Item Description
+आइटमआइटम
+#ववरण#ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मू~यमू~य
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  #वभाजन#वभाजन
+(INR)|(INR)|
+Tax BifurcationTax Bifurcation
+(INR)(INR)
+मू~यमू~य  
+(INR (INR मrमr  सभीसभी
+शु~कशु~क  औरऔर  करकर
+स#हतस#हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उzपादउzपाद  काका  नामनाम |Product Name :  |Product Name : ARMEDIQ Glucometer Test Strips, Glucose Dehydrogenase (GDH)
+Enzyme, Pack of 25
+ांडांड|Brand : |Brand : ARMEDIQ
+ांडांड  CकारCकार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  ##त##त|Catalogue Status: |Catalogue Status: OEM verified catalogue
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+ेणीेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Glucometer Strips (Q2)
+मॉडलमॉडल|Model:|Model: SMD-103 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+200packet325NA65,000
+कु ल ऑडSर मू~य |Total Order Value (in INR)65,00065,000
+ 
+परे#षतीपरे#षती  #ववरण#ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे#षतीपरे#षती|Consignee|Consigneeवiतुवiतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माIामाIा|Quantity|Quantity
+#दनांक#दनांक  केके  बादबाद
+#डलीवरी#डलीवरी  शुDशुD
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+#वतरण#वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : Pharmacy Officer
+
+1
+ईमेल आईडी|Email ID : spsrishikesh@gmail.com
+संपकS|Contact : 0135-2726256-
+जीएसटbआईएन|GSTIN : 05MRTS02828A1D8
+पता|Address : SPS Govt. Hospital, Near Kotwali, Dehradun Road,
+Rishikesh, Dehradun (Uttarakhand),
+Dehradun, UTTARAKHAND-249201, India
+ARMEDIQ Glucometer
+Test Strips, Glucose
+Dehydrogenase (GDH)
+Enzyme, Pack of 25
+-20027-May-202611-Jun-2026
+Product Specification for ARMEDIQ Glucometer Test Strips, Glucose Dehydrogenase (GDH) Enzyme, Pack of 25Product Specification for ARMEDIQ Glucometer Test Strips, Glucose Dehydrogenase (GDH) Enzyme, Pack of 25
+#व#नदxश#व#नदxश|Specification|Specificationउपउप--#व#नदxश#व#नदxश|Sub-Spec|Sub-Specमू~यमू~य|Value|Value
+PRODUCT
+INFORMATION
+Product DescriptionSingle-use , Disposable Test Strips to be used in Glucometer  
+Enzyme used in the StripGlucose Dehydrogenase (GDH)  
+PACKAGINGNumber of strips per Pack25  
+SHELF LIFE
+Shelf life from the date of manufacture (in months)24  
+Residual shelf life of the product
+Agree to provide residual shelf life of atleast 75% of total shelf life at the time
+of delivery to the consignee  
+CERTIFICATIONS
+Compliance to Drugs and Cosmetic Act 1940 and Medical Device Rules
+(MDR) 2017 as amended till date
+Yes  
+Availability of valid Medical Device license for the product issued from the
+competent authority
+Yes  
+Valid CDSCO Medical Device License NumberMFG/IVD/2021/000061  
+Licence issuing authority as per MDRState Licencing Authority  
+ 
+ईपीबीजीईपीबीजी  #ववरण#ववरण  | ePBG Detail| ePBG Detail
+NANA
+#नयम#नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 10-10-2025Version:1 effective from 10-10-2025
+1.11.111. . AAll Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under and all subsequent amendments till date willll Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under and all subsequent amendments till date will
+always be applicable. This will include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW)always be applicable. This will include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW)
+and Department of Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers in this regard.and Department of Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers in this regard.
+22. . The seller’s registration and product upload on GeM is based on their declaration of possessing a valid Medical Device License for the product, certifications, testThe seller’s registration and product upload on GeM is based on their declaration of possessing a valid Medical Device License for the product, certifications, test
+reports as per MDR (2017), latest amended. However, buyers must check, validate and verify the details at their end for all applicable licenses and certifications e.g.,reports as per MDR (2017), latest amended. However, buyers must check, validate and verify the details at their end for all applicable licenses and certifications e.g.,
+validity and authenticity/genuineness of medical device license (or registration), product certifications, manufacturer’s certifications/ licenses, test reports at the timevalidity and authenticity/genuineness of medical device license (or registration), product certifications, manufacturer’s certifications/ licenses, test reports at the time
+of supply.of supply.
+33. . In the case of authorized resellers/distributors, it will be the legal and regulatory liability of the manufacturer to ensure that their resellers/distributors are operatingIn the case of authorized resellers/distributors, it will be the legal and regulatory liability of the manufacturer to ensure that their resellers/distributors are operating
+in compliance with all relevant laws and regulations, and are licensed to sell the manufacturer's products, including verifying the validity and authenticity of licensein compliance with all relevant laws and regulations, and are licensed to sell the manufacturer's products, including verifying the validity and authenticity of license
+held by them.held by them.
+44. . Any other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional TermsAny other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional Terms
+and Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms andand Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms and
+conditions are in reverse order of precedence i.e. BID ATC shall supersede specific STC which shall supersede General Terms and Conditions (GTC), whenever thereconditions are in reverse order of precedence i.e. BID ATC shall supersede specific STC which shall supersede General Terms and Conditions (GTC), whenever there
+are any conflicting provisions.are any conflicting provisions.
+55. . Packing and Marking:Packing and Marking: Should be as per MDR. Should be as per MDR.
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह #सiटम जनरेटेड फाइल है। कोई हiताTर क आवयकता नह है। इस दiतावेज़ का #Cंट आउट भुगतान/लेनदेन उेय के #लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

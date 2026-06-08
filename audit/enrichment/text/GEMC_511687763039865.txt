@@ -1,0 +1,366 @@
+
+
+ 
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687763039865
+अनुबंधअनुबंध  "त"थ"त"थ|Generated Date :|Generated Date : 27-May-2026
+बोलीबोली//आरएआरए//पीबीपीपीबीपी  सं3यासं3या|Bid/RA/PBP No.:|Bid/RA/PBP No.:  GEM/2026/B/7487711
+खरीदखरीद  काका  मा>यममा>यम|Procurement Mode: |Procurement Mode: Bid
+संगठनसंगठन  "ववरण"ववरण|Organisation Details|Organisation Details
+IJप|Type :Central Government
+मंNालय|Ministry :Ministry of Fisheries Animal Husbandry Dairying
+"वभाग|Department :Department of Animal Husbandry and Dairying
+संगठन का नाम|Organisation Name :Administration DAHD
+कायाUलय VेN|Office Zone:Room No 432 A Krishi Bhawan New Delhi 110001
+खरीदारखरीदार  "ववरण"ववरण|Buyer Details|Buyer Details
+पद|Designation :section officer
+संपकU नंबर|Contact No. :011-23385116-
+ईमेल आईडी|Email ID :vk.vikrosy@gov.in
+जीएसटcआईएन|GSTIN :-
+पता|Address :
+Room No. 248-C, Krishi Bhawan.,
+CENTRAL DELHI, DELHI-110001, India
+ 
+"वgीय"वgीय  hवीकृ "तhवीकृ "त  "ववरण"ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम"त|IFD Concurrence :Yes
+Iशास"नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+deputy secretary
+"वgीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+deputy secretary
+भुगतानभुगतान  Iा"धकरणIा"धकरण  "ववरण"ववरण|Paying Authority Details|Paying Authority Details
+Role:DDO
+भुगतान का तरीका|
+Payment Mode:
+PFMS
+पद|Designation :Section Officer
+ईमेल आईडी|Email ID :rawat.ks@nic.in
+जीएसटcआईएन|GSTIN :-
+पता|Address:
+Room No. 432-A, Krishi Bhawan.,
+CENTRAL DELHI, DELHI-110001, India
+ 
+ 
+"वे ता"वे ता  "ववरण"ववरण|Seller Details|Seller Details
+जेम "वे ता आईडी|GeM Seller ID :B319200001502899
+कं पनी का नाम|Company Name :KESHVI ENTERPRISES
+संपकU नंबर|Contact No. :09811580270
+ईमेल आईडी|Email ID :keshvienterprises154@gmail.com
+पता| Address :
+1st Foor, 2/130, Sector-2,Rajender Nagar, Sahibabad,
+Ghaziabad, UTTAR PRADESH-201005, -
+एमएसएमई पंजीकरण सं3या|MSME Registration number :UDYAM-UP-29-0015884
+जीएसटcआईएन|GSTIN:09EEZPS8508L1Z6 (R)
+खरीदार tारा मूvयां"कत एमआईआई "w"त | MII Status as
+evaluated by buyer :
+Verified
+खरीदार tारा सxया"पत एमएसएमई "w"त |MSME Status as
+verified by buyer :
+Not Verified
+एमएसई सामा"जक yेणी|MSE Social Category :General
+एमएसई "लंग yेणी|MSE Gender :Male
+*"जसके नाम के पV म{ GST/TAX इनवॉइस पेश "कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+"वतरण "नदश | Delivery Instructions : NA
+उxपादउxपाद  "ववरण"ववरण|Product Details|Product Details
+##आइटमआइटम  "ववरण"ववरण|Item Description|Item Description
+आइटमआइटम
+"ववरण"ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूvयमूvय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  "वभाजन"वभाजन (INR)| (INR)|
+Tax Bifurcation (INR)Tax Bifurcation (INR)
+मूvयमूvय  
+(INR (INR म{म{  सभीसभी
+शुvकशुvक  औरऔर  करकर
+स"हतस"हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उxपादउxपाद  काका  नामनाम |Product Name :  |Product Name : hp 1024 GB Storage Laptop - Notebook
+ांडांड|Brand : |Brand : hp
+ांडांड  IकारIकार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  "w"त"w"त|Catalogue Status: |Catalogue Status: OEM verified catalogue
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+yेणीyेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : High End Laptop - Notebook (Q2)
+मॉडलमॉडल|Model:|Model: HP 440 G11 U7-155U Win11P 161SSD3 wifi 14" 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+16pieces152,800NA2,444,800
+कु ल ऑडUर मूvय |Total Order Value (in INR)2,444,8002,444,800
+ 
+परे"षतीपरे"षती  "ववरण"ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे"षतीपरे"षती|Consignee|Consigneeवhतुवhतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माNामाNा|Quantity|Quantity
+"दनांक"दनांक  केके  बादबाद
+"डलीवरी"डलीवरी  शुJशुJ
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+"वतरण"वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+
+1
+पद| Designation : -
+ईमेल आईडी|Email ID : vk.vikrosy@gov.in
+संपकU|Contact : 011-23385116-
+जीएसटcआईएन|GSTIN : -
+पता|Address : Room No. 248-C, Krishi Bhawan.,
+CENTRAL DELHI, DELHI-110001, India
+hp 1024 GB Storage
+Laptop - Notebook
+-1627-May-202626-Jun-2026
+Product Specification for hp 1024 GB Storage Laptop - NotebookProduct Specification for hp 1024 GB Storage Laptop - Notebook
+"व"नदश"व"नदश|Specification|Specificationउपउप--"व"नदश"व"नदश|Sub-Spec|Sub-Specमूvयमूvय|Value|Value
+Construction
+Description of Stores
+Laptop with on site 1 year OEM warranty, BIOS Password, 1- inbuilt RJ45 Gigabit Ethernet Port (1-RJ 45 adapter in case not
+inbuilt), minimum 2 number of USB Type A 3.0 Ports (1- Type C to Type A compatible adapter in case only 1 USB Type A 3.0
+port is provided, minimum 1 Type C USB 3.0 Port, 1- HDMI Port, Wi-Fi 5 (802.11ac) or higher, Bluetooth 5.0 or higher, DC
+Adapter Jack, Built-in Stereo Speakers with high definition audio support, built-in microphone, Keyboard with touchpad,
+Minimum Li-ion battery Capacity -36 Watt Hour with minimum 8 hour battery backup and integrated webcam  
+Chassis MaterialAluminium  
+Processor
+Base Processor NumberFor Higher Processor  
+Base Processor Number
+Supplied
+For Higher Processor  
+Higher Processor
+Number
+Intel Core Ultra 7 155U  
+ChipsetCompatible Chipset as per Processor Make  
+MotherboardSecurityDiscrete TPM 2.0  
+Operating System
+Operating System
+(Factory Pre-Loaded)
+Window 11 Professional  
+Recovery Image MediaOn Line/Cloud  
+Agreed to provide OEM
+Website URL Link for
+product verification to
+the buyer at the time of
+bidding or on demand
+Yes, agreed  
+Memory
+Type of RAMDDR5  
+RAM Size (GB)16  
+Total Numbers of DIMM
+Slots Available
+2  
+Number of DIMM Slots
+Populated
+1  
+RAM Expandability up to32  
+Display
+Display Size (in cm) -
+Diagonal
+35.56 to 38.07 (14 In to 14.99 In)  
+Display TechnologyLED  
+Minimum Display
+Resolution (Pixels)
+FHD- 1920x1080  
+Minimum Resolution of
+Webcam
+HD-720p  
+Storage
+Type of Storage DriveNVMe - SSD  
+Capacity of Storage Drive
+(in GB)
+1024  
+DIMENSIONWeight (in gram)1300 to 1599  
+ENVIRONMENTAL
+Minimum Operating
+Temperature (in degree
+Celsius)
+0  
+Maximum Operating
+Temperature (in degree
+Celsius)
+35  
+Operating Humidity (in
+Percentage)
+10 to 90  
+BIS CRS ComplianceYes, as per IS 13252 (Part 1)  
+ROHS ComplianceYes  
+Certification for
+Environmental
+Management System
+Yes. As per IS/ISO:14001  
+
+Certification
+with manufacturer
+Compliance of
+Information Security,
+Cybersecurity and Privacy
+Protection-Information
+Security Management
+Systems Requirements
+Yes. Complies as per IS/ISO/IEC 27001  
+EPR Registration in
+respect of the
+manufacturer as per E
+waste rules as amended
+up to date
+Yes  
+Agreed to Provide a copy
+of EPR Registration
+Certificate to Buyer on
+Demand
+Yes  
+ 
+उxपादउxपाद  काका  बीआईएसबीआईएस  लाइस{सलाइस{स|BIS license of the product:|BIS license of the product: 61001830
+ईपीबीजीईपीबीजी  "ववरण"ववरण  | ePBG Detail| ePBG Detail
+"नयम"नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:5 effective from 28-07-2025Version:5 effective from 28-07-2025
+1.11.1For BuyersFor Buyers  
+  The category has been created in accordance with the Model Technical Specification issued by the Ministry of Electronics and InformationThe category has been created in accordance with the Model Technical Specification issued by the Ministry of Electronics and Information
+Technology (MeitY) vide letter no. W-43/4/2020-IPHW dated 19th August 2024, and is based on the parameters defined therein. TheTechnology (MeitY) vide letter no. W-43/4/2020-IPHW dated 19th August 2024, and is based on the parameters defined therein. The
+specifications applicable to this category are as per the MeitY Model Technical Specification dated 19th August 2024. Accordingly, buyersspecifications applicable to this category are as per the MeitY Model Technical Specification dated 19th August 2024. Accordingly, buyers
+shall not specify or mandate any particular processor, processor brand, or manufacturer in the Additional Terms and Conditions (ATC). Inshall not specify or mandate any particular processor, processor brand, or manufacturer in the Additional Terms and Conditions (ATC). In
+this context, reference may also be made to Clause 2(e) of the GeM General Terms and Conditions (GTC), which inter alia states: "Thethis context, reference may also be made to Clause 2(e) of the GeM General Terms and Conditions (GTC), which inter alia states: "The
+Specifications shall identify the key parameters defining the products with all necessary validations related to configuration, type of data,Specifications shall identify the key parameters defining the products with all necessary validations related to configuration, type of data,
+restrictions, range / allowed values, allowed units etc. Sellers as well as Buyers while offering / buying the Goods / services shall have torestrictions, range / allowed values, allowed units etc. Sellers as well as Buyers while offering / buying the Goods / services shall have to
+comply with the validation rules / restrictions provided for in the Category Specification. Buyers / Sellers cannot add parameters and / orcomply with the validation rules / restrictions provided for in the Category Specification. Buyers / Sellers cannot add parameters and / or
+drop down values not provided for in category Specification." In view of the above, buyers are not permitted to amend or modify anydrop down values not provided for in category Specification." In view of the above, buyers are not permitted to amend or modify any
+technical specification through the Additional Terms and Conditions, and must ensure full compliance with the predefined categorytechnical specification through the Additional Terms and Conditions, and must ensure full compliance with the predefined category
+specificationsspecifications
+Product VerificationProduct VerificationA unique device serial number shall be provided by the seller at the time of supply, which is mentioned on the product. TheA unique device serial number shall be provided by the seller at the time of supply, which is mentioned on the product. The
+buyer/consignee shall be able to verify the complete product details, including configuration, through the OEM website. Thebuyer/consignee shall be able to verify the complete product details, including configuration, through the OEM website. The
+buyer/consignee should be able to perform these verifications without needing to create an account on the OEM website.buyer/consignee should be able to perform these verifications without needing to create an account on the OEM website.
+Operating SystemOperating System11. . There is no requirement that the OEM of the Laptop should be a device partner of Microsoft or hold a valid authorisation fromThere is no requirement that the OEM of the Laptop should be a device partner of Microsoft or hold a valid authorisation from
+Microsoft Microsoft 
+22. . Microsoft OS may be sourced directly from Microsoft by OEMs holding device partner status, and those not holding device partnerMicrosoft OS may be sourced directly from Microsoft by OEMs holding device partner status, and those not holding device partner
+status may source from authorized distributors, i.e., Ingram/Reddington and their authorized channel partners.status may source from authorized distributors, i.e., Ingram/Reddington and their authorized channel partners.
+33. . Buyers may ensure that the authorisation from Microsoft shall not be made a mandatory requirement in bids.Buyers may ensure that the authorisation from Microsoft shall not be made a mandatory requirement in bids.
+44. . If supplies are made as per brands of OEMs who are global device partners, then the serial number of the machine supplied can beIf supplies are made as per brands of OEMs who are global device partners, then the serial number of the machine supplied can be
+used to check the details of the product from the website of the OEM.used to check the details of the product from the website of the OEM.
+55. . In the case of local device partners of Microsoft, OS details such as the digital key number should be produced with supplies, andIn the case of local device partners of Microsoft, OS details such as the digital key number should be produced with supplies, and
+the buyer may verify them from Microsoft.the buyer may verify them from Microsoft.
+66. . In case of other OEMs who are sourcing from authorized distributors of Microsoft, Reddington, or Ingram, a copy of the invoiceIn case of other OEMs who are sourcing from authorized distributors of Microsoft, Reddington, or Ingram, a copy of the invoice
+which contains the relevant serial number of Windows OS shall be submitted with supplies, and the buyer/consignee can verify thewhich contains the relevant serial number of Windows OS shall be submitted with supplies, and the buyer/consignee can verify the
+same from the OS server website or by telephone, or both.same from the OS server website or by telephone, or both.
+77. . In respect of verification of OS, the consignee shall take necessary steps at the time of acceptance. For device partner machines,In respect of verification of OS, the consignee shall take necessary steps at the time of acceptance. For device partner machines,
+buyers can check the Laptop OEM website to verify the OS by entering the PC's serial number and part code number. For entitiesbuyers can check the Laptop OEM website to verify the OS by entering the PC's serial number and part code number. For entities
+that are not device partners and source OS from distributors' networks, they may verify the serial number through the Microsoftthat are not device partners and source OS from distributors' networks, they may verify the serial number through the Microsoft
+website or by telephone, or both.website or by telephone, or both.
+88. . In case the product offered is with a DOS or Linux operating system, such verification of OS shall not be applicable.In case the product offered is with a DOS or Linux operating system, such verification of OS shall not be applicable.
+99. . Buyer shall request for Windows Hardware Compatibility Certificate for window operating system to ensure the supply hardware isBuyer shall request for Windows Hardware Compatibility Certificate for window operating system to ensure the supply hardware is
+compatible with Windows operating systemcompatible with Windows operating system
+Storage RetentionStorage RetentionBuyer may add their requirement of retention of securely store all Hard Disk Drives (HDDs) or Solid-State Drives (SSDs) used in the Laptop-Buyer may add their requirement of retention of securely store all Hard Disk Drives (HDDs) or Solid-State Drives (SSDs) used in the Laptop-
+Notebook under ATC clause.Notebook under ATC clause.
+तकनीकतकनीक--वा"ण"यकवा"ण"यक  ीकरणीकरण|Techno-Commercial Clarification : |Techno-Commercial Clarification : Click here to download
+सलाहकारसलाहकार  बकबक |  | Advisory Bank :Advisory Bank :NA
+ईपीबीजीईपीबीजी  I"तशतI"तशत (%)  (%) | ePBG Percentage(%):| ePBG Percentage(%):NA
+ 
+
+Requirement of OEM logo Requirement of OEM logo Buyers are advised to note that incorporating a condition stipulating an OEM logo on the motherboard is restrictive and may not beBuyers are advised to note that incorporating a condition stipulating an OEM logo on the motherboard is restrictive and may not be
+incorporated into the bids.incorporated into the bids.
+Processors Processors Intel and AMD Processors are added as per Model Technical Specification of Laptop - Notebook issued by Ministry of Electronics andIntel and AMD Processors are added as per Model Technical Specification of Laptop - Notebook issued by Ministry of Electronics and
+Information Technology (MeitY-IPHW Division) W-43/4/2020 dated 19 Aug 2024Information Technology (MeitY-IPHW Division) W-43/4/2020 dated 19 Aug 2024
+WarrantyWarranty11. . The buyer may ensure that as soon as supplies are received, a request for a warranty certificate is made, along with logging intoThe buyer may ensure that as soon as supplies are received, a request for a warranty certificate is made, along with logging into
+the OEM website/call center to verify the certificate.the OEM website/call center to verify the certificate.
+22. . The product in GeM marketplace (Direct Purchase & L1 purchase) comes with a minimum standard on site warranty of one year. InThe product in GeM marketplace (Direct Purchase & L1 purchase) comes with a minimum standard on site warranty of one year. In
+case the seller has standard warranty more than one year, the same may be mentioned in the catalogue (including in the modelcase the seller has standard warranty more than one year, the same may be mentioned in the catalogue (including in the model
+name) and in such case higher warranty offered shall prevail/supersede the minimum one year warranty.name) and in such case higher warranty offered shall prevail/supersede the minimum one year warranty.
+OM related to MII, Local contentOM related to MII, Local content
+and MeitY advice on Modeland MeitY advice on Model
+technical specifications technical specifications 
+Buyers are requested to refer to various OMs pertaining to DPIIT and MeitY, as issued from time to time, while making procurement andBuyers are requested to refer to various OMs pertaining to DPIIT and MeitY, as issued from time to time, while making procurement and
+follow relevant provisions as applicable.follow relevant provisions as applicable.
+Check points during AcceptanceCheck points during Acceptance
+of Supplies of Supplies 
+Before generating the Consignee Receipt and Acceptance Certificate (CRAC), the consignee may inspect the system condition and verifyBefore generating the Consignee Receipt and Acceptance Certificate (CRAC), the consignee may inspect the system condition and verify
+that it complies with the agreed specifications and configurations. In the case of a large number of units to be procured, then the buyerthat it complies with the agreed specifications and configurations. In the case of a large number of units to be procured, then the buyer
+may opt for bidding and accordingly stipulate conditions regarding installation, inspection by consignees/inspection agency. Consigneesmay opt for bidding and accordingly stipulate conditions regarding installation, inspection by consignees/inspection agency. Consignees
+who receive the supplies should be vigilant and should complete checking to ensure that there is no scope for the supply of refurbishedwho receive the supplies should be vigilant and should complete checking to ensure that there is no scope for the supply of refurbished
+products. At the time of receiving supplies, the consignee may adhere to the following to ensure that any discrepancies in supplies can beproducts. At the time of receiving supplies, the consignee may adhere to the following to ensure that any discrepancies in supplies can be
+flagged, taken into account, and reflected while generating the CRAC: flagged, taken into account, and reflected while generating the CRAC: 
+ii. . Packing should be checked properlyPacking should be checked properly
+iiii. . A warranty certificate from the OEM should be insisted upon and checked.A warranty certificate from the OEM should be insisted upon and checked.
+iiiiii. . Instruction manuals and the OS installed should be checked.Instruction manuals and the OS installed should be checked.
+iviv. . The machine serial number should also be checked through settings and can be verified from the OEM website. The above pointsThe machine serial number should also be checked through settings and can be verified from the OEM website. The above points
+are for guidance, and the buyer/consignee may take steps considered suitable by them for checking at the consignee end beforeare for guidance, and the buyer/consignee may take steps considered suitable by them for checking at the consignee end before
+acceptance of systems.acceptance of systems.
+vv. . An escalation matrix for customer grievance redressal shall be insisted upon by the buyer from the seller at the time of delivery.An escalation matrix for customer grievance redressal shall be insisted upon by the buyer from the seller at the time of delivery.
+Battery BackupBattery BackupBuyer may check/validate battery backup time with appropriate benchmark.Buyer may check/validate battery backup time with appropriate benchmark.
+For SellersFor Sellers  
+OEM Website Link/Part No forOEM Website Link/Part No for
+product verification product verification 
+The OEM shall share the OEM website link with the buyer at the time of delivery. The offered model details/configuration should beThe OEM shall share the OEM website link with the buyer at the time of delivery. The offered model details/configuration should be
+available on their website. A unique device serial number shall also be provided at the time of supply, which is also mentioned on theavailable on their website. A unique device serial number shall also be provided at the time of supply, which is also mentioned on the
+product. The buyer/consignee shall be able to verify the complete product details, including configuration, through the shared OEMproduct. The buyer/consignee shall be able to verify the complete product details, including configuration, through the shared OEM
+website link.website link.
+Changing or altering theChanging or altering the
+configurationconfiguration
+Seller must refrain from changing or altering the configuration of the factory pre-loaded machine. The machine should be delivered to theSeller must refrain from changing or altering the configuration of the factory pre-loaded machine. The machine should be delivered to the
+Consignee in its original, factory-approved configuration.Consignee in its original, factory-approved configuration.
+WarrantyWarrantyThe seller shall furnish a valid warranty Certificate/Tag from the OEM to the purchaser, guaranteeing the product's coverage under theThe seller shall furnish a valid warranty Certificate/Tag from the OEM to the purchaser, guaranteeing the product's coverage under the
+specified warranty terms. The warranty certificate should be verifiable through the OEM website/customer care center.specified warranty terms. The warranty certificate should be verifiable through the OEM website/customer care center.
+Compliance of extendedCompliance of extended
+producer’s responsibilityproducer’s responsibility
+With effect from 1.4.23, as per the E-waste rules 2022, EPR registration is mandatory for manufacturing entities. Therefore, all OEMs shallWith effect from 1.4.23, as per the E-waste rules 2022, EPR registration is mandatory for manufacturing entities. Therefore, all OEMs shall
+hold valid EPR registration, and the registration number should be reflected in the catalog parameter. OEMs shall ensure compliance withhold valid EPR registration, and the registration number should be reflected in the catalog parameter. OEMs shall ensure compliance with
+all responsibilities as per EPR registration applicable from time to time.all responsibilities as per EPR registration applicable from time to time.
+Mandatory / StatutoryMandatory / Statutory
+requirements as applicablerequirements as applicable
+OEMs shall have to ensure compliance with the mandatory/statutory requirements as per the Government of India Notifications issuedOEMs shall have to ensure compliance with the mandatory/statutory requirements as per the Government of India Notifications issued
+from time to time for hardware and software components, as applicable.from time to time for hardware and software components, as applicable.
+Operating SystemOperating SystemIt shall be the responsibility of OEMs to ensure that supplies are made with genuine operating systems.It shall be the responsibility of OEMs to ensure that supplies are made with genuine operating systems.
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+3. Buyer Added Bid Specific Terms and Conditions-3. Buyer Added Bid Specific Terms and Conditions-
+3.13.1  GenericGeneric: : 
+OPTION CLAUSE: The Purchaser reserves the right to increase or decrease the quantity to be ordered up to 25 percent of bid quantity at the time of placement of contract. TheOPTION CLAUSE: The Purchaser reserves the right to increase or decrease the quantity to be ordered up to 25 percent of bid quantity at the time of placement of contract. The
+purchaser also reserves the right to increase the ordered quantity up to 25% of the contracted quantity during the currency of the contract at the contracted rates. The deliverypurchaser also reserves the right to increase the ordered quantity up to 25% of the contracted quantity during the currency of the contract at the contracted rates. The delivery
+period of quantity shall commence from the last date of original delivery order and in cases where option clause is exercised during the extended delivery period the additionalperiod of quantity shall commence from the last date of original delivery order and in cases where option clause is exercised during the extended delivery period the additional
+time shall commence from the last date of extended delivery period. The additional delivery time shall be (Increased quantity ÷ Original quantity) × Original delivery period (intime shall commence from the last date of extended delivery period. The additional delivery time shall be (Increased quantity ÷ Original quantity) × Original delivery period (in
+days), subject to minimum of 30 days. If the original delivery period is less than 30 days, the additional time equals the original delivery period. The Purchaser may extend thisdays), subject to minimum of 30 days. If the original delivery period is less than 30 days, the additional time equals the original delivery period. The Purchaser may extend this
+calculated delivery duration up to the original delivery period while exercising the option clause. Bidders must comply with these terms.calculated delivery duration up to the original delivery period while exercising the option clause. Bidders must comply with these terms.
+3.23.2  GenericGeneric: : 
+
+Bidder financial standing:Bidder financial standing: The bidder should not be under liquidation, court receivership or similar proceedings, should not be bankrupt. Bidder to upload undertaking to this The bidder should not be under liquidation, court receivership or similar proceedings, should not be bankrupt. Bidder to upload undertaking to this
+effect with bid.effect with bid.
+3.33.3  CertificatesCertificates: : 
+Bidder's offer is liable to be rejected if they don't upload any of the certificates / documents sought in the Bid document, ATC and Corrigendum if any.Bidder's offer is liable to be rejected if they don't upload any of the certificates / documents sought in the Bid document, ATC and Corrigendum if any.
+3.43.4  CertificatesCertificates: : 
+ISO 9001: The bidder or the OEM of the offered products must have ISO 9001 certification.ISO 9001: The bidder or the OEM of the offered products must have ISO 9001 certification.
+3.53.5  CertificatesCertificates: : 
+Material Test Certificate Should Be Sent Along with The Supply. The Material Will Be Checked by Buyer’s Lab & the Results of the Lab will be the Sole Criteria for Acceptance of theMaterial Test Certificate Should Be Sent Along with The Supply. The Material Will Be Checked by Buyer’s Lab & the Results of the Lab will be the Sole Criteria for Acceptance of the
+Item.Item.
+3.63.6  CertificatesCertificates: : 
+The bidder is required to upload, along with the bid, all relevant certificates such as BIS licence, type test certificate, approval certificates and other certificates as prescribed inThe bidder is required to upload, along with the bid, all relevant certificates such as BIS licence, type test certificate, approval certificates and other certificates as prescribed in
+the Product Specification given in the bid document.the Product Specification given in the bid document.
+3.73.7  Buyer Added Bid Specific ATCBuyer Added Bid Specific ATC: : 
+Buyer uploaded ATC document Buyer uploaded ATC document Click here to view the fileClick here to view the file..
+3.83.8  Service & SupportService & Support: : 
+Availability of Service Centres: Bidder/OEM must have a Functional Service Centre in the State of each Consignee's Location in case of carry-in warranty. (Not applicable in case ofAvailability of Service Centres: Bidder/OEM must have a Functional Service Centre in the State of each Consignee's Location in case of carry-in warranty. (Not applicable in case of
+goods having on-site warranty). goods having on-site warranty). If service center is not already there at the time of bidding, successful bidder / OEM shall have to establish one within 30 days of award ofIf service center is not already there at the time of bidding, successful bidder / OEM shall have to establish one within 30 days of award of
+contract. Payment shall be released only after submission of documentary evidence of having Functional Service Centre.contract. Payment shall be released only after submission of documentary evidence of having Functional Service Centre.
+3.93.9  Service & SupportService & Support: : 
+Dedicated /toll Free Telephone No. for Service Support : BIDDER/OEM  must have  Dedicated/toll Free Telephone No. for Service Support.Dedicated /toll Free Telephone No. for Service Support : BIDDER/OEM  must have  Dedicated/toll Free Telephone No. for Service Support.
+3.103.10  Service & SupportService & Support: : 
+Escalation Matrix For Service Support : Bidder/OEM must provide  Escalation Matrix of Telephone Numbers for Service Support.Escalation Matrix For Service Support : Bidder/OEM must provide  Escalation Matrix of Telephone Numbers for Service Support.
+Note:Note:  
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.and will also contribute to improving their ratings.
+नोटनोट: : यहयह  "सhटम"सhटम  जनरेटेडजनरेटेड  फाइलफाइल  हैहै। । कोईकोई  हhताVरहhताVर  कक  आवयकताआवयकता  नहनह  हैहै। । इसइस  दhतावेज़दhतावेज़  काका  "Iंट"Iंट  आउटआउट  भुगतानभुगतान//लेनदेनलेनदेन  उ¡ेयउ¡ेय  केके  "लए"लए  मा¢यमा¢य  नहनह  हैहै। । 
+Note: This is system generated file. No signature is required. Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.Print out of this document is not valid for payment/ transaction purpose.

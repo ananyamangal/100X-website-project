@@ -33,3 +33,17 @@ next-env.d.ts
 
 # user uploads
 public/rfq-uploads/
+
+# playwright output
+/test-results/
+/playwright-report/
+
+# local tool memory
+.claude/
+
+# temp rebrand working dirs
+.rebrand-out*/
+.rebrand-tmp/
+
+# OneDrive local archive
+OneDriveDataSULABH2018E*/

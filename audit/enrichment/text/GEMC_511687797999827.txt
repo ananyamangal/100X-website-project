@@ -1,0 +1,171 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687797999827
+अनुबंधअनुबंध  !त!थ!त!थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा-यममा-यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  !ववरण!ववरण|Organisation Details|Organisation Details
+?@प|Type :State Government
+मंFालय|Ministry :-
+!वभाग|Department :Agriculture Department Uttar Pradesh
+संगठन का नाम|Organisation Name :N/A
+कायाLलय MेF|Office Zone:Directorate Of Agriculture, U.p.
+खरीदारखरीदार  !ववरण!ववरण|Buyer Details|Buyer Details
+पद|Designation :Fertilizer Analyst
+संपकL नंबर|Contact No. :0121-2526138-
+ईमेल आईडी|Email ID :fertanalyst-agri.me@up.gov.in
+जीएसट`आईएन|GSTIN :-
+पता|Address :
+Opposite Naveen Mandi, Delhi Road,
+Meerut, UTTAR PRADESH-250002, India
+ 
+!वcीय!वcीय  dवीकृ !तdवीकृ !त  !ववरण!ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम!त|IFD Concurrence :No
+?शास!नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+DEPUTY DIRECTOR
+!वcीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+ASST. DIRECTOR
+भुगतानभुगतान  ?ा!धकरण?ा!धकरण  !ववरण!ववरण|Paying Authority Details|Paying Authority Details
+Role:BUYER
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :Fertilizer Analyst
+ईमेल आईडी|Email ID :fertanalyst-agri.me@up.gov.in
+जीएसट`आईएन|GSTIN :-
+पता|Address:
+Opposite Naveen Mandi, Delhi Road,
+Meerut, UTTAR PRADESH-250002, India
+ 
+ 
+!वे ता!वे ता  !ववरण!ववरण|Seller Details|Seller Details
+जेम !वे ता आईडी|GeM Seller ID :854E180000322608
+कं पनी का नाम|Company Name :M/S LAB TRADERS
+संपकL नंबर|Contact No. :09415685828
+ईमेल आईडी|Email ID :labtraders.vns@gmail.com
+पता| Address :
+C-27/180 A,JAGATGANJ,VARANASI,94156,
+VARANASI, Uttar Pradesh-221002, -
+एमएसएमई पंजीकरण संpया|MSME Registration number :UDYAM-UP-75-0004869
+जीएसट`आईएन|GSTIN:09BRZPS6987H1ZC (B) , (R)
+एमएसई सामा!जक qेणी|MSE Social Category :General
+एमएसई !लंग qेणी|MSE Gender :Male
+*!जसके नाम के पM मs GST/TAX इनवॉइस पेश !कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+!वतरण !नदxश | Delivery Instructions : NA
+उzपादउzपाद  !ववरण!ववरण|Product Details|Product Details
+##आइटमआइटम  !ववरण!ववरण|Item Description|Item Description
+आइटमआइटम
+!ववरण!ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई
+||
+UnitUnit
+इकाईइकाई  मू~यमू~य
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  !वभाजन!वभाजन (INR)| (INR)|
+Tax BifurcationTax Bifurcation
+(INR)(INR)
+मू~यमू~य  
+(INR (INR मsमs  सभीसभी
+शु~कशु~क  औरऔर  करकर
+स!हतस!हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उzपादउzपाद  काका  नामनाम |Product Name :  |Product Name : Unbranded Formaldehyde Solution Pack in 0.5 Liter
+ांडांड|Brand : |Brand : NA
+ांडांड  ?कार?कार|Brand Type : |Brand Type : Unbranded
+कै टलॉगकै टलॉग  कक  !!त!!त|Catalogue Status: |Catalogue Status: Catalogue not verified by OEM
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : Reseller not verified by OEM
+qेणीqेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Formaldehyde Solution (V3) Conforming to
+IS 3321 (Q3)
+मॉडलमॉडल|Model:|Model: NA 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+5Unit742NA3,710
+कु ल ऑडLर मू~य |Total Order Value (in INR)3,7103,710
+ 
+परे!षतीपरे!षती  !ववरण!ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे!षतीपरे!षती|Consignee|Consigneeवdतुवdतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माFामाFा|Quantity|Quantity
+!दनांक!दनांक  केके  बादबाद
+!डलीवरी!डलीवरी  शु@शु@
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+!वतरण!वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : Fertilizer Analyst
+ईमेल आईडी|Email ID : fertanalyst-agri.me@up.gov.in
+Unbranded
+
+1
+संपकL|Contact : 0121-2526138-
+जीएसट`आईएन|GSTIN : -
+पता|Address : Opposite Naveen Mandi, Delhi Road,
+Meerut, UTTAR PRADESH-250002, India
+Formaldehyde Solution
+Pack in 0.5 Liter
+-527-May-202611-Jun-2026
+Product Specification for Unbranded Formaldehyde Solution Pack in 0.5 LiterProduct Specification for Unbranded Formaldehyde Solution Pack in 0.5 Liter
+!व!नदxश!व!नदxश|Specification|Specificationउपउप--!व!नदxश!व!नदxश|Sub-Spec|Sub-Specमू~यमू~य|Value|Value
+Generic
+Requirements for Formaldehyde SolutionAs per Table 1 of IS 3321  
+Mode of Supply
+Packaged Shipment (In
+containers)  
+Container Size0.5 Liter  
+UnitContainer  
+Air-tight packing container for Formaldehyde SolutionAluminium Container  
+Packing and MarkingAs per Clause 3 of IS 3321  
+Certification and
+Testing
+Conformity to Indian StandardAs per IS 3321  
+Agreed to furnish all the test reports and certificates to buyer/consignee on demand to prove conformity to
+specifications
+Yes  
+ 
+!टपणी!टपणी|Note:: |Note:: Seller has given an undertaking that it has made arrangements for getting the stores from an authorized distributor / dealer / channel partner of the OEM of the
+offered product. At the time of delivery of goods, Seller will provide necessary chain documents (in the form of GST Invoice) to prove that the supplied goods are genuine and are
+being sourced from an authorized distributor / dealer / channel partner of the OEM. In case of any complaint about genuineness of the supplied products, Seller shall be
+responsible for providing genuine replacement supplies.
+ 
+ईपीबीजीईपीबीजी  !ववरण!ववरण  | ePBG Detail| ePBG Detail
+NANA
+!नयम!नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 13-11-2025Version:1 effective from 13-11-2025
+1.11.1ISI mark : ISI mark : Presently, the products under this category are not covered under mandatory BIS licensing scheme. Hence, both ISI Marked and non-ISI Marked products may bePresently, the products under this category are not covered under mandatory BIS licensing scheme. Hence, both ISI Marked and non-ISI Marked products may be
+available in this category. However, if a buyer intends to procure ISI Marked products, buyer may, at his discretion, opt for the same by indicating the requirement in the bid,available in this category. However, if a buyer intends to procure ISI Marked products, buyer may, at his discretion, opt for the same by indicating the requirement in the bid,
+after taking into account the number of valid licenses issued under the standard. In such cases, buyer shall verify valid BIS License as per the applicable governing standardafter taking into account the number of valid licenses issued under the standard. In such cases, buyer shall verify valid BIS License as per the applicable governing standard
+at the time of evaluation of bid and check the ISI marking on the products at the time of receipt of material before issuing of CRAC. The valid BIS license status of sellers mayat the time of evaluation of bid and check the ISI marking on the products at the time of receipt of material before issuing of CRAC. The valid BIS license status of sellers may
+be viewed by buyer from the below link.be viewed by buyer from the below link.
+https://www.manakonline.in/MANAK/ApplicationLicenceRelatedrpthttps://www.manakonline.in/MANAK/ApplicationLicenceRelatedrpt  
+oror
+https://www.services.bis.gov.in/php/BIS_2.0/bisconnect/knowyourstandards/indian_standards/isdetailshttps://www.services.bis.gov.in/php/BIS_2.0/bisconnect/knowyourstandards/indian_standards/isdetails
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह !सdटम जनरेटेड फाइल है। कोई हdताMर क आवयकता नह है। इस दdतावेज़ का !?ंट आउट भुगतान/लेनदेन उेय के !लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

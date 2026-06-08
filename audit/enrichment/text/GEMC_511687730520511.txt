@@ -1,0 +1,393 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687730520511
+अनुबंधअनुबंध  "त"थ"त"थ|Contract Generated Date :|Contract Generated Date : 27-May-2026
+खरीदखरीद  काका  मा-यममा-यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  "ववरण"ववरण|Organisation Details|Organisation Details
+?@प|Type :State Government
+मंFालय|Ministry :-
+"वभाग|Department :
+Vocational Education and Skill Development Department
+Uttar Pradesh
+संगठन का नाम|Organisation
+Name :
+Directorate of Training And employment, Lucknow
+कायाQलय RेF|Office Zone:Hardoi
+खरीदारखरीदार  "ववरण"ववरण|Buyer Details|Buyer Details
+पद|Designation :STROE KEEPER
+संपकQ नंबर|Contact No. :-
+ईमेल आईडी|Email ID :buycon1.vesd.lmp@gembuyer.in
+जीएसटdआईएन|GSTIN :-
+पता|Address :
+Lucknow Chungi Hardoi,
+Hardoi, UTTAR PRADESH-241001, India
+ 
+"वfीय"वfीय  gवीकृ "तgवीकृ "त  "ववरण"ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम"त|IFD Concurrence :No
+?शास"नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+PRINCIPAL
+"वfीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+Principal
+भुगतानभुगतान  ?ा"धकरण?ा"धकरण  "ववरण"ववरण|Paying Authority Details|Paying Authority Details
+Role:PAO
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :sunil kumar verma
+ईमेल आईडी|Email ID :s.verma85006@gov.in
+जीएसटdआईएन|GSTIN :-
+पता|Address:
+Lucknow Chungi Hardoi,
+Hardoi, UTTAR PRADESH-241001, India
+ 
+परे"षतीपरे"षती  "ववरण"ववरण|Consignee Details|Consignee Details
+.सं..सं.|S.No|S.Noपरे"षतीपरे"षती  नामनाम &  & पतापता|Consignee Name & Address|Consignee Name & Addressसेवासेवा  "ववरण"ववरण|Service Description|Service DescriptionमाFामाFा|Quantity|Quantity
+1
+संपकQ|Contact : -
+ईमेल आईडी|Email ID :
+buycon1.vesd.lmp@gembuyer.in
+जीएसटdआईएन|GSTIN : -
+पता|Address : Lucknow Chungi Hardoi,
+Hardoi, UTTAR PRADESH-241001, India
+Annual Maintenance service-AIR CONDITIONER1
+ 
+सेवासेवा  ?दाता?दाता  "ववरण"ववरण|Service Provider Details|Service Provider Details
+जेम "वे ता आईडी|GeM Seller ID :8331200001517810
+कं पनी का नाम|Company Name :A.M. INFRAPROMOTERS PRIVATE LIMITED
+संपकQ नंबर|Contact No. :07379085637
+ईमेल आईडी|Email ID :aminfrapro26518@gmail.com
+पता| Address :
+124/331,B BLOCK,GOVIND NAGAR,GOVIND NAGAR,
+Kanpur Nagar, UTTAR PRADESH-208008, -
+एमएसएमई पंजीकरण संsया|MSME Registration number :-
+जीएसटdआईएन|GSTIN:09AAJCA7475R1ZN (R)
+*"जसके नाम के पR मv GST/TAX इनवॉइस पेश "कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+सेवासेवा  "ववरण"ववरण|Service Details|Service Details
+सेवासेवा  ?ारंभ?ारंभ  "दनांक"दनांक ( (नवीनतमनवीनतम) |Service Start Date (latest by): ) |Service Start Date (latest by): 30-May-2026सेवासेवा  समा"{तसमा"{त  "त"थ"त"थ|Service End Date : |Service End Date : 29-May-2027
+"ब"लंग"ब"लंग  चच|Billing Cycle: weekly|Billing Cycle: weekly
+Amc CategoryAmc CategoryHot and Cold Air Conditioners
+Type Of AIR CONDITIONERType Of AIR CONDITIONERWindow AC
+Amc BrandAmc BrandONIDA
+Nominal Cooling Capacity in TONNominal Cooling Capacity in TON2.5 Ton/7500 Kcal/hr
+VintageVintage3 to 5 years
+Technology of Air ConditionerTechnology of Air ConditionerInverter (Variable Speed type)
+Number of Routine/ Preventive Maintenance Service PerNumber of Routine/ Preventive Maintenance Service Per
+YearYear
+One Preventive Maintenance (Overhaul) + One Wet (Routine Service) + One
+Dry (Routine Service)
+Condition of Air Conditioners (AT THE TIME OF BIDDING)Condition of Air Conditioners (AT THE TIME OF BIDDING)Under AMC and Functional
+Physical Inspection/ Visit by Service Provider requiredPhysical Inspection/ Visit by Service Provider required
+before Bid Clouserbefore Bid Clouser
+true
+Type of AMCType of AMCNon- Comprehensive
+ेणीेणी  नामनाम|Category Name : Annual Maintenance service-AIR CONDITIONER|Category Name : Annual Maintenance service-AIR CONDITIONER
+"ववरण"ववरण|Description|DescriptionQuantityQuantity
+Cost per AC(AIR CONDITIONER)Cost per AC(AIR CONDITIONER)
+Per Annum Per Annum 
+149990
+कु लकु ल  रा"शरा"श ( (सूFसूF) |Total Amount (Formula) : ) |Total Amount (Formula) : 
+
+(Cost per AC(AIR CONDITIONER) Per Annum*Quantity*Contract Period/365)
+ऐडऑनऐडऑन  केके  "बना"बना  कु लकु ल  मूयमूय  |Total Value without Addons(INR)|Total Value without Addons(INR)49990
+कु लकु ल  एडऑनएडऑन  मूयमूय |Total Addon Value(INR) |Total Addon Value(INR)0
+ऐडऑनऐडऑन  स"हतस"हत  कु लकु ल  मूयमूय |Total Value Including Addons(INR) |Total Value Including Addons(INR)49990.00
+अनुबंधअनुबंध  कक  रा"शरा"श|Amount of Contract|Amount of Contract
+सभीसभी  शुकशुक  औरऔर  करकर  स"हतस"हत  कु लकु ल  अनुबंधअनुबंध  मूयमूय|Total Contract Value Including All Duties and Taxes(INR)|Total Contract Value Including All Duties and Taxes(INR)4999049990
+एसएलएएसएलए  "ववरण"ववरण|SLA Details|SLA Details
+SPECIAL TERMS AND CONDITIONS (STC) FORSPECIAL TERMS AND CONDITIONS (STC) FOR
+ANNUAL MAINTENANCE CONTRACT- AMC SERVICE OF AIR CONDITIONERANNUAL MAINTENANCE CONTRACT- AMC SERVICE OF AIR CONDITIONER
+ 
+PreamblePreamble
+1.1 All Annual Maintenance Contract (AMC) of Air conditioner placed through GeM shall be governed by the following set of Terms and Conditions:
+ 
+The above terms and conditions are in reverse order of precedence i.e. ATC supersedes STC which supersede GTC, , in case of any conflicting provisions.
+ 
+The above set of conditions along with the Scope of supply including price as enumerated in the Contract Document shall be construed to be part and parcel of the
+contract.
+ 
+This document represents a Service Level Agreement (“SLA”) governing the contract between the Buyer and Service Provider (SP). The purpose of this document is to
+outline the scope of work, Stakeholder’s obligation and terms and conditions of all the services covered as mutually understood and agreed by the stakeholders.
+ 
+StakeholdersStakeholders
+The main stakeholders associated with this STC are:
+1. Service Provider
+2. Buyer
+ 
+The responsibilities and obligations of the stakeholders have been outlined in this document. This document also encompasses payment terms and penalties in case of
+non-adherence to the defined terms and conditions by the stakeholders . It is assumed that all the stakeholders have read and understood the same before signing this
+ 
+Annual Maintenance Contract ServiceAnnual Maintenance Contract Service- shall mean and include repair,replacement and upkeep of the Air Conditioners installed at Buyer's premises/office/location, without
+any extra cost and expenses to Buyer.(hereinafter referred as to “AMC”).The scope of AMC for Air Conditioner shall consist of two parts which are General Scope and
+Contract Specific Scope.
+ 
+Scope:Scope: The contract shall be on comprehensive basis, inclusive of repairs and replacement of the spare parts without any extra cost and expenses to the Buyer . The
+Service Provider (SP) shall carry out quarterly routine services , preventive maintenance and breakdown maintenance for the Air Conditioners (ACs) covered under this
+AMC. The scope of Annual Comprehensive Maintenance Service covers upkeep & smooth working of the Air Conditioners  within the premises of Buyer's  department as
+per provision laid down in SLA and other provisions contained in the contract.
+ 
+4.BUYER OBLIGATIONS:4.BUYER OBLIGATIONS:::
+4.1 The Specific Scope shall cover the details regarding the Air Conditioners (such as type of Air Conditioner, Model of Air conditioner, Technology of AC, Nominal cooling capacity,
+Location of ACs, Vintage of AC, Type of Refrigerant etc.) and depending on site/location/building   and other relevant conditions / precaution / requirements/details/information
+essentially considered to be informed to the Service Provider. 
+4.2 Buyer shall nominate a Nodal officer/engineer in-charge from its organization to coordinate with Service Provider to facilitate proper co-ordination..
+4.3 Buyer Department shall ensure that the Service Provider or its authorized personnel gets the required access to location/areas/rooms for providing the services as per contract.
+4.4 The  Scope including specific activities/ work requirements related to the AMC of Air conditioner shall be provided by theBuyer with approval of competent Authority at the time
+of bidding.
+4.5 If needed  complete layout of the site/location/building where Air conditioners are located/installed may be provided by the Buyer to Service Provider after placement of the
+contract to the successful bidder.
+ 
+5.Service Provider Obligations:5.Service Provider Obligations:
+ 
+4.6 Price Variation Clause:4.6 Price Variation Clause:
+"It is advisable to include Price Variation Clause in the long term contracts to take care of the increase/decrease in prices of various ingredients which majorly affect the overall
+price of the service. Buyers are therefore advised to include the Price Variation Clause (PVC) in the bid document through ATC for long term contracts. The additional payment, if
+any, on account of PVC can be done offline till such time online functionality is developed on GeM."
+4.7 Buyer must ensure that the service provider complies with the Rule 144(xi) of General Financial Rules (GFR), 2017 and the product supplied, if any, must also comply with Make
+In India guidelines of DPIIT"
+
+Service provider may depute/engage a suitable team to visit the site before biding if required to fully understand the job and ascertain the difficulties that may be
+encountered during execution of the work . The sites visits shall be entirely at service provider's own cost and expense.
+Service Provider shall depute OEM Authorized Service Engineer/ technically competent service engineer / engineers along with skilled helpers at Buyer's premises to
+ensure proper upkeep of the Air Conditioners and quick resolution of the fault during the AMC period.
+The service Provider shall not demolish, remove, or alter structures or Buyer facilities on the site without prior written approval of Buyer. The Service Provider shall
+clean/dispose of all the debris and other material accumulated due to servicing/ maintenance of the Air Conditioners . The installation/ re-installation of ACs are NOT
+covered under the scope of the AMC.
+As and when required the service provider shall report to representative/nodal officer designated by buyer about performance of the Air Condiotioners .
+The Service Provider shall undertake to arrange genuine spares parts of the Air Conditioners as and when required.
+The Service Provider has to ensure availability of the spare parts in their stock. In case some of the major spare are not available with Service Provider, the same shall be
+arranged within seven days.
+Service Provider shall maintain the confidentiality of any information related to the Air Conditioners under AMC. Service Provider shall be required to take appropriate
+measure  to maintain   confidentiality obligations  by its  personnel engaged .
+The AMC service shall be commenced maximum within 15 days (Two weeks) of award of contract.
+On award of the service order, the Service Provider would prepare a report regarding taking over of the Air Conditioner(s) before commencement of the AMC Service. It
+shall be the responsibility of the Service Provider to make the Air Conditioner work satisfactorily throughout the contract period, also to hand over the Air Conditioners to
+the department in working condition on expiry of the contract. Any damage to the Air Conditionerunits in the contract period due to improper Maintenance practice to be
+rectified/ replaced by the Service Provider without any extra cost and expenses.
+Service provider must provide trained and certified RAC technicians if required by the Buyer.
+ 
+ 
+5.10 Service Provider(SP) shall maintain register indicating details of equipment being maintained and details of rooms/place where they are installed.
+5.11 During AMC the SP shall carry out (___________)number of wet and dry services per year as per contract.
+5.12 During AMC the SP shall also carry out one number of preventive maintenance (overhauling) services per year.
+5.13No work will be undertaken on closed holidays and beyond office hours on any day except by prior approval / direction of the Buyer.
+5.14Service Provider shall have facility to enable user department to register complaints  either through telephone or by E-mail at user premises. Proper record of the complaints
+shall be maintained by the  Service Provider/ Support Engineer/ call center for  each consignee location/ User Premises.
+5.15 Service Provider shall ensure availability of suitable instruments/tools for their service Engineer to examine and repair the Air Conditioners.
+5.16 The preventive maintenance (overhauling) shall cover the details given below:-
+Acid cleaning of condensers and cooling coil fins repair of fins.
+Water cleaning of entire body.
+Tightening of all screws, fasteners.
+Checking all the electrical parts and wiring and repair of such parts. Oiling of all the moving parts.
+Checking the play (gap) of condenser motor and if required, refurbishing/replacing defective worn out parts.
+Checking cooling effect and if it is found that gas is less the same has to be topped up.
+Cleaning/ replacement of filters.
+Servicing of remote control and microprocessor controls.
+Repair of damaged insulation of refrigeration piping of split units, on account of routine service/ repair.
+Any other requirement as per the specific scope of service provided by the Buyer.
+ 
+(Note:Note:Above said jobs are to be carried out at least once a year preferably in the month of May)
+ 
+Apart from the overhauling, timely routine services (dry and wet) are also to be carried out which shall cover the following works.
+ 
+a.Cleaning of filters.
+b.Dust cleaning of entire unit by water/ air blower and cloth.
+c.Checking/ tightening of all the screws/ fasteners.
+d.Checking and tightening of electrical contact points and parts and if required, replacement of the defective parts.
+e.Any other requirement as per the specific scope of service provided by the buyer
+ 
+Service Provider shall maintain the log sheet which will include number of Services provided during the contract period with dates and part of the equipment got repaired
+or replaced, with its proper model number and necessary details.
+ 
+ 
+Service Provider, as per need and requirement of the Department, may ensure appropriate deployment of the manpower.
+ 
+Periodic/ Routine Maintenance shall be as per industry standard/ Maintenance manual of the Air Conditioners. The parts/components/sub-assemblies used for
+repair/replacement by the Service Provider will be of the of same make and functional capability as originally available in the system.
+ 
+ 
+Service Provide shall be responsible for the verification of new part(s) from Buyer/ Buyer's nodal officer before fitting to equipments .The removed part is to be handed
+over to the Buyer/ Buyer's nodal officer. In case service provider notice any part is missing same to be brought to the notice of the Buyer/Buyer's nodal officer or otherwise
+responsibility shall be of service provider.
+
+ 
+All the consumable articles / parts such as material required for cleaning of AC Unit and machinery, repairs and maintenance will be provided by the Service Provider at no
+extra charge to the Buyer.
+In case of delay in attending to problems, breakdown of Air Conditioners due to improper handling by the Service Provider's personnel then penalties for violation of
+Service Level Agreement shall be levied as indicated in the Penalty Clauses
+After carrying out repair when required certificate regarding equipment working condition should be obtained from concerned Buyer/ Nodal Officer.
+Service provider shall provide minimum warranty of 6 months for the replaced part from date of such replacement /repair.
+ 
+Response TimeResponse Time: In case , no part is replaced,then such complaint must be attended within 24 hours of lodging of such complaint .However, in case of requirement of
+change of spare part, then complaint should be resolved within 7 days of lodging. In case the Air Conditioner is not get repaired, or an alternative system not supplied
+within the period of 7 days from the time of failure reported, then the Buyer reserves its right   to get the same repaired by or replaced from any other agency and the cost
+and expenditure incurred therein shall be recovered  from the Service Provider.
+Service Provider shall be responsible for ensuring that the resources employed for carrying out the servicing and repair shall conduct themselves appropriately in the
+premises of the Buyer's department. In case of any misconduct penalties as indicated in the SLA shall be levied and Service Provider may be required to terminate the
+resource with immediate effect
+The Service Provider shall provide proper identity cards, uniform, etc. for the resources to ascertain only authorized service persons are attending to the servicing and
+repairing work.
+In case resources employed by the Service Provider resort to any theft the cost of the article shall be recovered from the Service Provider in addition to any other criminal
+action against such 
+The resources used by Service Provider to carry out maintenance shall be on rolls of the Service Provider and shall have no claim whatsoever for any benefits from the
+Buyer department. Service provider shall be responsible for complying with any and all applicable rules, regulations, bye laws and other statutory compliances.
+ 
+Payment Terms:Payment Terms:
+ 
+The AMC contract is based on Unit rate per AC per Annum (inRs.)
+The payment will be made to AMC Service provider on quarterly basis (if the services are satisfactory) on submission of bill by the vendor on completion of each quarter
+after deducting penalty amount, if any.  
+Enhancement or decrease of taxes, duties or prices of components, etc., will not affect the AMC rates during the entire period of AMC; no difference shall be paid or
+claimed as a result of the above.
+Payment Calculation would be as below :Payment Calculation would be as below :
+Formula = Formula = Cost per AC(AIR CONDITIONER) Per Annum*Quantity*Contract Period/365
+ 
+Penaltiesand Termination:Penaltiesand Termination:
+The Service Provider shall be responsible for faithful   compliance of the terms and conditions of this AMC.In case of noncompliance of Service obligations, penalty per default will
+be imposed as per SLA. Non delivery of service in time, not starting work in time, violation of existing laws and statutory requirements, committing fraud, etc. will be considered as a
+major default and the contract will be liable to be terminated  immediately without giving any further notice.
+Penalty to be imposed if the resolution / maintenance involving part replacement is delayed above 7 days. 
+If the Service Provider is not able to complete or turn up for the calls, then Buyer  can avail the services from any other local service provider / local technician and the
+amount so incurred in such repair or replacement  can be deducted from the bill of Service Provider / from his due amount.
+The cumulative penalty cannot exceed 10% of the contract value for that period. The AMC may be terminated by the Buyer once this limit is breached without any prejudice
+to other contractual remedy, if any.
+ 
+PenaltiesPenalties
+Sl. NoSl. NoService Level AgreementService Level AgreementBase Line PerformanceBase Line PerformanceFirst defaultFirst defaultSecond defaultSecond default
+Third default andThird default and
+subsequentsubsequent
+defaultsdefaults
+1
+Delay in starting the AMC
+Services
+AMC services to start within
+maximum 2 weeks from award of
+the contract
+Termination of
+contract
+  
+2Log sheet Maintenance
+Log sheet to be maintained Per
+Visit / per maintenance arising on
+call 
+Warning to be
+given
+Rs 250Rs500
+33
+Delay in carrying out
+Preventive/ Routine 
+maintenance as per schedule
+To be carried out as per intervals
+applicable
+0.5 % of billed
+amount for every
+day delay 
+  
+44
+Delay in  carrying out repairs
+where no spare part change is
+involved
+ 
+ 
+24 hours of reporting
+1 % of billing
+amount for the
+quarter for every
+one day delay
+2% of billing
+amount for quarter
+for every one day
+delay
+3% of billing
+amount per
+quarter for every
+one day delay
+55
+Delay in carrying out repair in
+where  change of spare part is
+should be resolved within 7 days 
+2  % of billing
+amount for the
+3 % of billing
+amount for quarter
+5 % of billing
+amount per
+
+ 
+ईपीबीजीईपीबीजी  "ववरण"ववरण  | ePBG Detail| ePBG Detail
+NANA
+"नयम"नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. General Terms and Conditions-1. General Terms and Conditions-
+1.11.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+1.21.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+1.31.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Service Providers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment
+processing, and will also contribute to improving their ratings. 
+2. The Excess settlement has been enabled for this contract. The service provider can claim additional charges, if applicable, in the invoice. Any additional charges must be
+supported with documentary evidence.
+नोट: यह "सgटम जनरेटेड फाइल है। कोई हgताRर क आवयकता नह है। 
+Note: This is system generated file. No signature is required.
+involved
+of lodging of complaintquarter for every
+one day delay
+for every one day
+delay
+quarter for every
+one day delay
+66
+Non provision of proper
+identity card to resources
+employed by service provider
+or non display of identity card
+Should be providedRs 500Rs 750
+Rs 1000 for 3
+rd
+and
+subsequent default
+77
+If the  employee of service
+provider is found to have
+misconduct or misbehaved in
+any manner or resort to any
+violent behaviour etc with or
+employees of buyer
+organisation or other
+employees of service provider
+No such occasion should happen
+Rs 1000 and
+resource to be
+terminated in
+addition to any
+other action as
+deemed fit by
+buyer organization 
+Rs2500 and
+resource to be
+terminated in
+addition to any
+other action as
+deemed fit by
+buyer organization 
+Rs5000 and
+resource to be
+terminated in
+addition to any
+other action as
+deemed fit by
+buyer organization 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

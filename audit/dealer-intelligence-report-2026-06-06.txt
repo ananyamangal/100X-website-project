@@ -1,0 +1,674 @@
+
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  GEM DEALER INTELLIGENCE REPORT  —  100X CIRCLE  —  2026-06-06
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  Total bids in corpus  : 563  (563 awarded, D-PMA/C-RA/A-ProductTable)
+  Total dealers tracked : 1437  (486 with ≥1 L1 win)
+  Bids with price data  : 164
+  Date range            : corpus-wide (multi-year, keyword-harvested)
+
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 1 — TOP 100 DEALER TARGETS
+  Ranked by opportunity score: L1×4 + Depts×2 + States + Def_wins×3 + Mun_wins×2 + Health_wins×2
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+Rank Score L1  Depts St  Def Mun Val(L1)    Contact Dealer
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1    48   5    12   0   0   2 ₹0.0L      NONE    CENTRAL WAREHOUSING CORPORATION
+   2    35   6     4   0   1   0 ₹1.72Cr    NONE    VVDN TECHNOLOGIES PRIVATE LIMITED
+   3    34   3     9   4   0   0 ₹0.1L      NONE    FOGGERS INDIA PRIVATE LIMITED
+   4    32   4     2   1   3   1 ₹3.1L      NONE    PARTH ENTERPRISE
+   5    27   3     3   0   3   0 ₹7.0L      NONE    AKAM ENTERPRISES
+   6    26   3     4   2   0   2 ₹24.9L     NONE    ROYAL TRADELINKS PRIVATE LIMITED
+   7    24   3     6   0   0   0 ₹8.59Cr    NONE    APPLIED REALTECH SYSTEMS PRIVATE LIMITED
+   8    24   3     4   0   0   2 ₹5.9L      NONE    GLOBAL PEST SOLUTIONS
+   9    23   3     3   0   1   1 ₹1.0L      NONE    VIGHNHARTA CORPORATION
+  10    23   3     1   0   3   0 —          NONE    MACHINERY SALES CORPORATION
+  11    23   3     1   0   3   0 ₹1.6L      NONE    MATRISH SHIP MANAGEMENT PRIVATE LIMITED
+  12    23   3     1   0   3   0 —          NONE    MAHMUTHA TRADING COMPANY
+  13    22   3     5   0   0   0 ₹2.49Cr    NONE    AGMATEL INDIA PRIVATE LIMITED
+  14    22   3     3   0   0   2 ₹2.5L      NONE    TEMPSENS INSTRUMENTS (INDIA) PRIVATE LIMITED
+  15    20   2     3   0   2   0 ₹0.7L      NONE    ESS KAY HOME CARE
+  16    20   2     3   0   2   0 —          NONE    KRISHNA ENTERPRISES
+  17    20   4     2   0   0   0 —          NONE    ENTUPLE TECHNOLOGIES PRIVATE LIMITED
+  18    18   3     3   0   0   0 —          NONE    CONVERGENT TECHNOLOGIES INDIA PRIVATE LIMITED
+  19    18   2     4   2   0   1 ₹89.7L     NONE    CLOUD TECH PRIVATE LIMITED
+  20    17   2     2   1   0   2 —          NONE    PRITAM SOLAR AND MULTISERVICES
+  21    17   2     2   0   1   1 ₹1.6L      NONE    BIO SOLUTION PEST CONTROL SERVICE PRIVATE LIMITED
+  22    17   2     2   0   1   1 —          NONE    A ONE CARE PEST CONTROL
+  23    17   2     3   0   1   0 —          NONE    SHEORAN ENTERPRISES
+  24    17   2     3   0   1   0 —          NONE    INDIAN PEST CONTROL COMPANY
+  25    16   2     1   0   2   0 —          NONE    VVN ENTERPRISES
+  26    16   2     1   0   2   0 ₹0.6L      NONE    T S ENTERPRISES
+  27    16   2     1   0   2   0 —          NONE    SHRAMAN MACHINERY STORE
+  28    16   2     1   0   2   0 —          NONE    KUNDAN AUTO ELECTRICALS
+  29    16   3     2   0   0   0 ₹1.70Cr    NONE    CONET TECHNOLOGIES PRIVATE LIMITED
+  30    16   2     1   0   2   0 —          NONE    J.S TRADERS
+  31    16   2     1   0   2   0 —          NONE    VIKRANT TRADERS
+  32    16   2     1   0   2   0 ₹1.0L      NONE    EVERGREEN ENTERPRISES
+  33    16   2     3   0   0   1 —          NONE    HINDUSTHAN ASSOCIATES
+  34    16   2     1   0   2   0 —          NONE    SHIMAR STAR GLACIER
+  35    16   2     1   0   2   0 —          NONE    SPR AUTOMOBILES
+  36    16   2     1   0   2   0 ₹0.8L      NONE    AL FALAH INTERNATIONAL
+  37    16   2     1   0   2   0 ₹9.9L      NONE    AAYU ENTERPRISES
+  38    16   2     1   0   2   0 —          NONE    NAV BHARAT ENTERPRISES
+  39    15   1     3   3   0   1 —          NONE    NEPTUNE PACKAGING PRIVATE LIMITED
+  40    15   2     1   1   0   2 —          NONE    ANIKA INFRA VENTURES
+  41    14   2     2   0   0   1 ₹0.1L      NONE    MODERN PEST CONTROL SERVICE(PROP RANJIT SAMANTA)
+  42    14   1     3   1   1   0 —          NONE    M R ENTERPRISES
+  43    14   1     3   1   1   0 ₹0.5L      NONE    DECKWARE INDIA PRIVATE LIMITED
+  44    14   2     1   1   1   0 ₹4.4L      NONE    SEQURE INDIA PEST CONTROL PRIVATE LIMITED
+  45    14   2     3   0   0   0 —          NONE    DYNAMIC PEST AND RODENT CONTROL
+  46    13   3     0   1   0   0 —          NONE    GOURI SALES AGENCIES
+  47    13   1     3   0   1   0 ₹16.33Cr   NONE    TONBO IMAGING INDIA PRIVATE LIMITED
+  48    12   1     3   2   0   0 —          NONE    WHITE CLOUDZ PRIVATE LIMITED
+  49    12   2     2   0   0   0 ₹7.1L      NONE    Q-MAX SERVICES
+  50    12   2     2   0   0   0 —          NONE    ELMACK ENGG SERVICES
+  51    12   2     2   0   0   0 ₹2.5L      NONE    VELA FILAMENTS CO
+  52    12   1     2   1   1   0 ₹41.4L     NONE    KANPUR TENT FACTORY
+  53    12   2     1   0   0   0 ₹9.7L      NONE    VERMA PESTICIDES & PEST CONTROL SERVICES PRIVATE LIMITED
+  54    12   2     2   0   0   0 ₹97.2L     NONE    LLOYD INSULATIONS (INDIA) LIMITED
+  55    12   2     2   0   0   0 —          NONE    ANUBHAV GUPTA
+  56    12   2     1   0   0   1 ₹0.3L      NONE    RFS AGRICO PRIVATE LIMITED
+  57    12   1     4   0   0   0 —          NONE    PCI PEST CONTROL PRIVATE LIMITED
+  58    11   1     2   1   0   1 —          NONE    BHARAT ENTERPRISES
+  59    11   1     2   1   0   0 ₹0.7L      NONE    SHARMA ENTERPRISES
+  60    11   1     2   0   1   0 —          NONE    AXISCAL INSTRUMENTS PRIVATE LIMITED
+  61    11   1     2   0   1   0 —          NONE    SHREE BALAJI TEST HOUSE PRIVATE LIMITED
+  62    11   2     1   1   0   0 —          NONE    S S ENTERPRISES
+  63    11   1     2   0   1   0 —          NONE    AGARWAL GENERAL SUPPLIERS
+  64    11   1     2   0   1   0 —          NONE    ALERT PEST CONTROL
+  65    10   1     3   0   0   0 —          NONE    PEST CURE INCORPORATION
+  66    10   2     1   0   0   0 —          NONE    S.B.S ENTERPRISE
+  67    10   1     1   1   1   0 ₹3.9L      NONE    S K ENTERPRISES
+  68    10   1     3   0   0   0 —          NONE    SONEL INSTRUMENTS INDIA PRIVATE LIMITED
+  69    10   1     2   0   0   1 —          NONE    BHARAT PEST CONTROL SERVICES
+  70     9   1     1   0   1   0 —          NONE    KOCHAR AUTOMOBILES
+  71     9   1     1   0   1   0 —          NONE    VV ENTERPRISES
+  72     9   1     1   0   1   0 —          NONE    GREATWAY SERVICES
+  73     9   1     1   0   1   0 —          NONE    BOTHRA ENTERPRISE
+  74     9   1     1   0   1   0 —          NONE    MAANVIK TRADING
+  75     9   1     1   0   1   0 —          NONE    BRIJ BHOOMI TRADERS
+  76     9   1     1   0   1   0 —          NONE    RS ENTERPRISES
+  77     9   1     1   0   1   0 —          NONE    DURGA MOTOR & TRADING CO
+  78     9   1     1   0   1   0 —          NONE    SHAURYA ENTERPRISES
+  79     9   1     1   1   0   1 ₹19.9L     NONE    COLUMBUS CLIMBER INDIA
+  80     9   1     1   0   1   0 —          NONE    KASHMIR PRINCE
+  81     9   1     1   1   0   1 —          NONE    AVTAR ENTERPRISES
+  82     9   1     1   0   1   0 —          NONE    CENTRAL INDIA ENGINEERING COMPANY
+  83     9   1     1   0   1   0 —          NONE    M G ENTERPRISES
+  84     9   1     1   0   1   0 —          NONE    V.K TRADERS
+  85     9   1     1   1   0   1 —          NONE    RAMASHRAY TRADING CO
+  86     9   1     1   0   1   0 —          NONE    M.V.STATIONERY MART
+  87     9   1     1   0   1   0 —          NONE    TECHNO CRAFT CORP.
+  88     9   1     1   0   1   0 ₹0.9L      NONE    RAINBOW ENTERPRISES
+  89     9   1     1   0   1   0 ₹10.0L     NONE    SARASWAT MEDICOSE
+  90     9   1     1   0   1   0 —          NONE    PRECISION INSTRUMENTATION AND SERVICES PRIVATE LIMITED
+  91     9   1     1   0   1   0 —          NONE    SARASWATI SALES CORPORATION
+  92     9   1     1   0   1   0 ₹1.6L      NONE    RAMADRI ENTERPRISES
+  93     9   1     1   0   1   0 ₹1.8L      NONE    RIDHVI ENTERPRISES
+  94     9   1     1   1   0   0 —          NONE    RAJAN TRADERS
+  95     9   1     1   0   1   0 ₹2.0L      NONE    EKTA ENGINEERING
+  96     9   1     1   0   1   0 —          NONE    PUSHPAK TRADERS
+  97     9   1     1   1   0   0 —          NONE    ELITE ORTHOCARE
+  98     9   1     1   1   0   0 ₹26.4L     NONE    GALAXY ENTERPRISES & SERVICES
+  99     9   1     1   0   1   0 ₹0.3L      NONE    RAJA AUTO WORKS
+ 100     9   1     1   0   1   0 ₹5.0L      NONE    VINAYAK ENGINEERING
+
+  Contact key: NONE=no data  MINIMAL=1 field  PARTIAL=2-3 fields  FULL=4+ fields
+  Immediately reachable (PARTIAL+FULL): 0 of 100
+  Need enrichment (NONE+MINIMAL)      : 100 of 100
+
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 2 — TOP 100 BUYING DEPARTMENTS
+  Ranked by bid count (number of times that department has awarded a fogging bid)
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+Rank Bids Winners Est.Value   L1 Value    Type Department
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1  163     153 —           ₹20.76Cr    DEF  Indian Army
+   2   49      46 —           ₹1.94Cr     GEN  UNKNOWN
+   3   35      25 —           ₹33.8L      DEF  Indian Coast Guard
+   4   14      13 —           —           MUN  E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of
+   5   12      11 —           ₹16.34Cr    DEF  Border Security Force (bsf)
+   6   11      10 —           —           GEN  Eastern Coalfields Limited
+   7   10      10 —           ₹35.7L      DEF  Indian Navy
+   8   10      10 —           —           GEN  Ntpc Limited
+   9    9       8 —           ₹8.0L       MUN  Power Grid Corporation Of India Limited
+  10    9       6 —           ₹10.29Cr    GEN  Bharat Electronics Limited (bel)
+  11    9       9 —           ₹1.09Cr     GEN  Urban Development And Housing Department
+  12    8       7 —           ₹14.1L      DEF  Indian Air Force
+  13    7       6 —           ₹1.23Cr     GEN  Indian Institute Of Technology (iit)
+  14    7       7 —           ₹3.5L       AGR  Indian Council Of Agricultural Research (icar)
+  15    6       6 —           —           GEN  Hqids
+  16    6       5 —           ₹1.59Cr     GEN  Bharat Heavy Electricals Limited (bhel)
+  17    6       4 —           ₹5.7L       GEN  Airports Authority Of India
+  18    5       5 —           ₹5.6L       MUN  Security Printing And Minting Corporation Of India Limited (spmcil)
+  19    5       5 —           —           HLT  All India Institute Of Medical Sciences (aiims)
+  20    4       4 —           —           MUN  E-nagar Palika Government Of Madhya Pradesh
+  21    4       4 —           ₹1.34Cr     GEN  Directorate Of Purchase And Stores
+  22    4       4 —           ₹2.3L       GEN  Director General Of National Cadet Corps (dgncc)
+  23    4       4 —           —           DEF  Controller General Of Defence Accounts
+  24    4       4 —           ₹1.2L       GEN  Southern Railway
+  25    4       4 —           —           GEN  National Institute Of Technology (nit)
+  26    4       4 —           ₹0.3L       MUN  Nuclear Power Corporation Of India Limited
+  27    4       4 —           ₹0.0L       MUN  Bharat Petroleum Corporation Ltd
+  28    3       3 —           —           DEF  Assam Rifles
+  29    3       3 —           ₹1.0L       GEN  Society For Applied Microwave Electronic Engineering And Research (sameer)
+  30    3       3 —           ₹0.0L       GEN  Indian Space Research Organization
+  31    3       3 —           ₹8.24Cr     DEF  Central Reserve Police Force (crpf)
+  32    2       2 —           —           DEF  Directorate General Of Quality Assurance ( Dgqa)
+  33    2       2 —           ₹26.4L      HLT  Health Department,madhya Pradesh
+  34    2       2 —           ₹1.9L       GEN  Western Coalfields Limited
+  35    2       2 —           ₹0.7L       HLT  Government Medical College And Hospital
+  36    2       2 —           —           MUN  Solapur District Panchayats
+  37    2       2 —           ₹2.5L       GEN  South East Central Railway
+  38    2       2 —           ₹6.6L       DEF  Dg Of Defence Estate
+  39    2       2 —           ₹4.7L       GEN  Iocl- Panipat Refinery
+  40    2       2 —           ₹0.6L       GEN  Zilla Parishad Satara
+  41    2       2 —           —           GEN  Centre For Development Of Advanced Computing (c-dac)
+  42    2       2 —           —           GEN  Nlc India Limited
+  43    2       2 —           —           GEN  Nmdc Limited
+  44    2       2 —           ₹35.4L      GEN  Rourkela Steel Plant
+  45    2       2 —           ₹0.9L       GEN  Central Power Research Institute (cpri) Bangalore Karnataka
+  46    2       2 —           —           GEN  Sports Authority Of India (sai)
+  47    2       2 —           ₹3.5L       GEN  North Eastern Railway
+  48    2       2 —           ₹3.3L       GEN  Bhakra Beas Management Board
+  49    2       1 —           —           GEN  Ncra Tifr Pune
+  50    2       2 —           —           GEN  North Central Railway
+  51    2       2 —           ₹22.8L      DEF  Armed Forces Tribunal
+  52    2       2 —           —           MUN  Directorate Of Municipal Administration
+  53    2       2 —           ₹30.5L      GEN  Office Of Dg (mss)
+  54    2       2 —           ₹5.9L       GEN  Troop Comforts Limited
+  55    2       2 —           ₹0.8L       MUN  Food Corporation Of India (fci)
+  56    1       1 —           ₹19.9L      MUN  Nagar Palika Parishad Akbarpur
+  57    1       1 —           ₹24.9L      MUN  Nagar Nigam Dehradun
+  58    1       1 —           —           GEN  State Bank Of India (sbi)
+  59    1       1 —           —           GEN  National Education Society For Tribal Students
+  60    1       1 —           ₹4.1L       HLT  Directorate Of Medical Education And Training
+  61    1       1 —           —           HLT  Haryana State Medical Council
+  62    1       1 —           —           HLT  Directorate Of Health And Family Welfare Services
+  63    1       1 —           ₹40.3L      GEN  Nlc Tamil Nadu Power Limited
+  64    1       1 —           —           GEN  North Western Railway
+  65    1       1 —           ₹1.3L       GEN  Central University Of Odisha
+  66    1       1 —           —           MUN  Nagar Panchayat Ushait Budaun
+  67    1       1 —           ₹26.7L      GEN  South Central Railway
+  68    1       1 —           —           MUN  Ministry Of Panchayati Raj
+  69    1       1 —           —           GEN  Hindustan Aeronautics Limited (hal)
+  70    1       1 —           —           GEN  National Career Service Center For Differently Abl
+  71    1       1 —           —           GEN  Jammu And Kashmir Police
+  72    1       1 —           —           GEN  Indian Association For The Cultivation Of Science (iacs)
+  73    1       1 —           —           GEN  Hll Lifecare Limited
+  74    1       1 —           —           AGR  Odisha University Of Agriculture And Technology (ouat)
+  75    1       1 —           —           GEN  Ans,finance,hr,engineering,tech,ops,commercial,general Store,it
+  76    1       1 —           —           GEN  Andrew Yule  Company Limited
+  77    1       1 —           ₹2.49Cr     GEN  Office Of Dg (ecs)
+  78    1       1 —           ₹2.0L       MUN  Kollam Corporation
+  79    1       1 —           —           MUN  Beed District Panchayats
+  80    1       1 —           —           GEN  Urban Development Directorate
+  81    1       1 —           —           GEN  Advanced Weapons And Equipment India Limited
+  82    1       1 —           —           GEN  The Rajiv Gandhi Institute Of Petroleum Technology (rgipt) Rae Bareli Uttar Prad
+  83    1       1 —           —           GEN  National Aluminium Company Limited, Bhubaneswar
+  84    1       1 —           —           GEN  Central Coalfields Limited
+  85    1       1 —           ₹1.13Cr     MUN  Indian Oil Corporation Limited
+  86    1       1 —           —           GEN  Government Colleges Of Madhya Pradesh
+  87    1       1 —           —           MUN  Sangli District Panchayats
+  88    1       1 —           —           MUN  Patna District Panchayats
+  89    1       1 —           ₹0.9L       GEN  Archaeological Survey Of India (asi)
+  90    1       1 —           ₹4.7L       GEN  Technical Education Department
+  91    1       1 —           ₹0.2L       GEN  Controller General Of Communication Accounts
+  92    1       1 —           —           GEN  Ntpc Green Energy Limited
+  93    1       1 —           —           HLT  Directorate Of Medical Education
+  94    1       1 —           —           DEF  Sashastra Seema Bal (ssb)
+  95    1       1 —           —           GEN  Survey Of India
+  96    1       1 —           —           GEN  Competition Commission Of India
+  97    1       1 —           —           HLT  Indian Council Of Medical Research (icmr)
+  98    1       1 —           —           GEN  South Eastern Coalfields Limited
+  99    1       1 —           —           MUN  Hindustan Petroleum Corporation Ltd
+ 100    1       1 —           —           MUN  Uranium Corporation Of India Limited
+
+  Sector breakdown (all 563 bids):
+    Defence    : 246 bids (44%)
+    Municipal  : 67 bids (12%)
+    Health     : 15 bids (3%)
+    Agriculture: 8 bids (1%)
+    General Gov: 227 bids (40%)
+
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 3 — TOP 50 DEFENCE OPPORTUNITIES
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  3A — Defence Buying Units (sorted by bid volume)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Rank Bids Suppliers Est.Value   Department
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1  163       153 —           Indian Army
+   2   35        25 —           Indian Coast Guard
+   3   12        11 —           Border Security Force (bsf)
+   4   10        10 —           Indian Navy
+   5    8         7 —           Indian Air Force
+   6    4         4 —           Controller General Of Defence Accounts
+   7    3         3 —           Assam Rifles
+   8    3         3 —           Central Reserve Police Force (crpf)
+   9    2         2 —           Directorate General Of Quality Assurance ( Dgqa)
+  10    2         2 —           Dg Of Defence Estate
+  11    2         2 —           Armed Forces Tribunal
+  12    1         1 —           Sashastra Seema Bal (ssb)
+  13    1         1 —           Dg Armed Forces Medical Service
+
+  3B — Dealers with Defence Track Record (top 30)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Rank DefL1 TotalL1 Score  Contact Dealer
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1     3       3     23 NONE    MACHINERY SALES CORPORATION
+   2     3       3     27 NONE    AKAM ENTERPRISES
+   3     3       4     32 NONE    PARTH ENTERPRISE
+   4     3       3     23 NONE    MATRISH SHIP MANAGEMENT PRIVATE LIMITED
+   5     3       3     23 NONE    MAHMUTHA TRADING COMPANY
+   6     2       2     16 NONE    VVN ENTERPRISES
+   7     2       2     20 NONE    ESS KAY HOME CARE
+   8     2       2     16 NONE    T S ENTERPRISES
+   9     2       2     16 NONE    SHRAMAN MACHINERY STORE
+  10     2       2     16 NONE    KUNDAN AUTO ELECTRICALS
+  11     2       2     16 NONE    J.S TRADERS
+  12     2       2     16 NONE    VIKRANT TRADERS
+  13     2       2     16 NONE    EVERGREEN ENTERPRISES
+  14     2       2     16 NONE    SHIMAR STAR GLACIER
+  15     2       2     20 NONE    KRISHNA ENTERPRISES
+  16     2       2     16 NONE    SPR AUTOMOBILES
+  17     2       2     16 NONE    AL FALAH INTERNATIONAL
+  18     2       2     16 NONE    AAYU ENTERPRISES
+  19     2       2     16 NONE    NAV BHARAT ENTERPRISES
+  20     1       1      9 NONE    KOCHAR AUTOMOBILES
+  21     1       1      9 NONE    VV ENTERPRISES
+  22     1       1      9 NONE    GREATWAY SERVICES
+  23     1       1      9 NONE    BOTHRA ENTERPRISE
+  24     1       1      9 NONE    MAANVIK TRADING
+  25     1       1      9 NONE    BRIJ BHOOMI TRADERS
+  26     1       1      9 NONE    RS ENTERPRISES
+  27     1       1      9 NONE    DURGA MOTOR & TRADING CO
+  28     1       1      9 NONE    SHAURYA ENTERPRISES
+  29     1       1      9 NONE    KASHMIR PRINCE
+  30     1       1      9 NONE    CENTRAL INDIA ENGINEERING COMPANY
+
+  Defence insight: Indian Army alone = 163 bids (29%). 153 unique L1 winners → extreme
+  fragmentation. No Army-entrenched incumbent. Avg 1.07 bids/dealer in Army alone.
+  Defence penetration requires: GeM registration, MSME/startup cert preferred, price-aggressiveness.
+
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 4 — TOP 50 MUNICIPAL OPPORTUNITIES
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  4A — Municipal Buying Units (sorted by bid volume)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Rank Bids Suppliers Est.Value   Department
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   14        13 —           E-municipalities - Eservices To Citizens And Employees Of Urban Local Bodies Of
+   2    9         8 —           Power Grid Corporation Of India Limited
+   3    5         5 —           Security Printing And Minting Corporation Of India Limited (spmcil)
+   4    4         4 —           E-nagar Palika Government Of Madhya Pradesh
+   5    4         4 —           Nuclear Power Corporation Of India Limited
+   6    4         4 —           Bharat Petroleum Corporation Ltd
+   7    2         2 —           Solapur District Panchayats
+   8    2         2 —           Directorate Of Municipal Administration
+   9    2         2 —           Food Corporation Of India (fci)
+  10    1         1 —           Nagar Palika Parishad Akbarpur
+  11    1         1 —           Nagar Nigam Dehradun
+  12    1         1 —           Nagar Panchayat Ushait Budaun
+  13    1         1 —           Ministry Of Panchayati Raj
+  14    1         1 —           Kollam Corporation
+  15    1         1 —           Beed District Panchayats
+  16    1         1 —           Indian Oil Corporation Limited
+  17    1         1 —           Sangli District Panchayats
+  18    1         1 —           Patna District Panchayats
+  19    1         1 —           Hindustan Petroleum Corporation Ltd
+  20    1         1 —           Uranium Corporation Of India Limited
+  21    1         1 —           Kerala State Civil Supplies Corporation Limited
+  22    1         1 —           Damodar Valley Corporation
+  23    1         1 —           Chennai Petroleum Corporation Limited
+  24    1         1 —           Surat District Panchayats
+  25    1         1 —           Dhanbad Municipal Corporation Dhanbad
+  26    1         1 —           Marine Products Export Development Authority (mpeda)
+  27    1         1 —           Delhi Metro Rail Corporation
+  28    1         1 —           New Okhla Industrial Development Authority (noida)
+  29    1         1 —           Central Warehousing Corporation (cwc)
+  30    1         1 —           Housing And Urban Development Corporation Ltd
+
+  4B — Dealers with Municipal Track Record (top 25)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Rank MunL1 TotalL1 Score  Contact Dealer
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1     2       3     26 NONE    ROYAL TRADELINKS PRIVATE LIMITED
+   2     2       2     17 NONE    PRITAM SOLAR AND MULTISERVICES
+   3     2       5     48 NONE    CENTRAL WAREHOUSING CORPORATION
+   4     2       3     24 NONE    GLOBAL PEST SOLUTIONS
+   5     2       3     22 NONE    TEMPSENS INSTRUMENTS (INDIA) PRIVATE LIMITED
+   6     2       2     15 NONE    ANIKA INFRA VENTURES
+   7     1       1      9 NONE    COLUMBUS CLIMBER INDIA
+   8     1       1      9 NONE    AVTAR ENTERPRISES
+   9     1       3     23 NONE    VIGHNHARTA CORPORATION
+  10     1       1     11 NONE    BHARAT ENTERPRISES
+  11     1       1      9 NONE    RAMASHRAY TRADING CO
+  12     1       1      8 NONE    PEST CONTROL
+  13     1       1      8 NONE    BHIMASHANKAR ENTERPRISES
+  14     1       1      9 NONE    FURKAN ALI TRADERS
+  15     1       2     17 NONE    BIO SOLUTION PEST CONTROL SERVICE PRIVATE LIMITED
+  16     1       2     17 NONE    A ONE CARE PEST CONTROL
+  17     1       1      9 NONE    CLEAN & GREEN EQUIPMENTS PRIVATE LIMITED
+  18     1       1      9 NONE    DADASHRI ENTERPRISES
+  19     1       1     15 NONE    NEPTUNE PACKAGING PRIVATE LIMITED
+  20     1       1      8 NONE    SWAPNIL ENTERPRISES AND PEST CONTROL SERVICES
+  21     1       2     16 NONE    HINDUSTHAN ASSOCIATES
+  22     1       1      9 NONE    SANVIK IND.
+  23     1       2     18 NONE    CLOUD TECH PRIVATE LIMITED
+  24     1       1      8 NONE    FORBES MARSHALL PRIVATE LIMITED
+  25     1       1      8 NONE    MAAGNUS INFRATECH
+
+  Municipal insight: Corporations run annual vector-control budgets (dengue/malaria season).
+  Repeat-buyer departments are highest-value targets — they have allocated budget lines.
+  NMMC, BBMP, Delhi MCD, BrihanMumbai MC are national-scale buyers worth direct BD.
+
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 5 — DEALER CONTACT ENRICHMENT STRATEGY
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  5A — Current Contact Coverage (486 active dealers)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    Phone     : 0 dealers  (0%)
+    Email     : 0 dealers  (0%)
+    Website   : 0 dealers  (0%)
+    GST No.   : 0 dealers  (0%)
+    100X flag : 0 dealers  (confirmed customers)
+
+  5B — Contact Status Distribution (Top 100 targets)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    FULL     (4+ fields) : 0
+    PARTIAL  (2-3 fields): 0
+    MINIMAL  (1 field)   : 0
+    NONE     (0 fields)  : 100
+
+  5C — Enrichment Playbook (priority order)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  TIER 1 — GST Portal (free, self-serve, instant)
+    Input  : Dealer canonical name → search portal.gst.gov.in
+    Output : GST number, legal name, city, state, registration date
+    Yield  : ~90% hit rate for active government suppliers
+    Time   : 1-2 min per dealer | Tool: manual or scraper
+
+  TIER 2 — IndiaMART / JustDial (free search, 2-3 min per dealer)
+    Input  : Canonical name + city/state from GST lookup
+    Output : Phone number, email, product catalogue, website
+    Yield  : ~60-70% hit rate (IndiaMART higher than JustDial)
+    Time   : 2-3 min per dealer
+
+  TIER 3 — GeM Seller Profile (requires GeM login)
+    URL    : gem.gov.in/seller-profile/{seller-id}
+    Output : Address, phone, product categories, turnover band, certifications
+    Yield  : 100% for any seller who has won a bid (all 486 qualify)
+    Note   : Requires GeM buyer/seller login; Playwright automation feasible
+
+  TIER 4 — LinkedIn + Google Search
+    Input  : Company name + city
+    Output : Owner name, email, LinkedIn profile, press mentions
+    Yield  : ~40% (larger companies, MSME with digital presence)
+    Time   : 5-10 min per dealer
+
+  5D — Top 25 NONE-contact dealers from Top 100 (enrich these first)
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+     1. Score= 48  L1= 5  Def= 0  Mun= 2  CENTRAL WAREHOUSING CORPORATION
+     2. Score= 35  L1= 6  Def= 1  Mun= 0  VVDN TECHNOLOGIES PRIVATE LIMITED
+     3. Score= 34  L1= 3  Def= 0  Mun= 0  FOGGERS INDIA PRIVATE LIMITED
+     4. Score= 32  L1= 4  Def= 3  Mun= 1  PARTH ENTERPRISE
+     5. Score= 27  L1= 3  Def= 3  Mun= 0  AKAM ENTERPRISES
+     6. Score= 26  L1= 3  Def= 0  Mun= 2  ROYAL TRADELINKS PRIVATE LIMITED
+     7. Score= 24  L1= 3  Def= 0  Mun= 0  APPLIED REALTECH SYSTEMS PRIVATE LIMITED
+     8. Score= 24  L1= 3  Def= 0  Mun= 2  GLOBAL PEST SOLUTIONS
+     9. Score= 23  L1= 3  Def= 1  Mun= 1  VIGHNHARTA CORPORATION
+    10. Score= 23  L1= 3  Def= 3  Mun= 0  MACHINERY SALES CORPORATION
+    11. Score= 23  L1= 3  Def= 3  Mun= 0  MATRISH SHIP MANAGEMENT PRIVATE LIMITED
+    12. Score= 23  L1= 3  Def= 3  Mun= 0  MAHMUTHA TRADING COMPANY
+    13. Score= 22  L1= 3  Def= 0  Mun= 0  AGMATEL INDIA PRIVATE LIMITED
+    14. Score= 22  L1= 3  Def= 0  Mun= 2  TEMPSENS INSTRUMENTS (INDIA) PRIVATE LIMITED
+    15. Score= 20  L1= 2  Def= 2  Mun= 0  ESS KAY HOME CARE
+    16. Score= 20  L1= 2  Def= 2  Mun= 0  KRISHNA ENTERPRISES
+    17. Score= 20  L1= 4  Def= 0  Mun= 0  ENTUPLE TECHNOLOGIES PRIVATE LIMITED
+    18. Score= 18  L1= 3  Def= 0  Mun= 0  CONVERGENT TECHNOLOGIES INDIA PRIVATE LIMITED
+    19. Score= 18  L1= 2  Def= 0  Mun= 1  CLOUD TECH PRIVATE LIMITED
+    20. Score= 17  L1= 2  Def= 0  Mun= 2  PRITAM SOLAR AND MULTISERVICES
+    21. Score= 17  L1= 2  Def= 1  Mun= 1  BIO SOLUTION PEST CONTROL SERVICE PRIVATE LIMITED
+    22. Score= 17  L1= 2  Def= 1  Mun= 1  A ONE CARE PEST CONTROL
+    23. Score= 17  L1= 2  Def= 1  Mun= 0  SHEORAN ENTERPRISES
+    24. Score= 17  L1= 2  Def= 1  Mun= 0  INDIAN PEST CONTROL COMPANY
+    25. Score= 16  L1= 2  Def= 2  Mun= 0  VVN ENTERPRISES
+
+  5E — Automation recommendation
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Priority 1: Build GST-lookup batch script → enriches city/state/GST for ~90% of top 100
+  Priority 2: IndiaMART scraper for phone/email → ~60% yield in ~2 hrs automated
+  Priority 3: GeM seller profile scraper (post-login Playwright) → 100% address/category
+  Manual only: Top 25 highest-score dealers — 30 min each, personal research
+  Skip for now: LinkedIn (low yield, high effort, better done during call prep)
+
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 6 — RECOMMENDED DEALER OUTREACH WORKFLOW FOR 100X
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  OBJECTIVE: Convert government-active fogging dealers into 100X machine buyers.
+  These dealers WIN government tenders — they need reliable machines to fulfill orders.
+  100X's pitch: 'We supply the machines you need to win and deliver GeM contracts.'
+
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  PHASE 0 — TARGET SEGMENTATION (Week 1)                            │
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Segment A — Immediate (Top 20, score ≥ 25, contact = PARTIAL/FULL)
+    • Have proven GeM track record + contact info already available
+    • Direct phone/WhatsApp outreach this week
+    • Target: 5 qualified conversations in 7 days
+
+  Segment B — Enrich First (Next 30, score 15-25, contact = NONE)
+    • High value targets missing contact info
+    • Run Tier 1+2 enrichment (GST + IndiaMART) — 2-3 days effort
+    • Begin outreach in Week 2
+
+  Segment C — Defence Track (Top 20 defence dealers)
+    • Won ≥1 Army/BSF/Navy bid — require IS 14855 certified machines
+    • Different pitch: compliance + certification support
+    • Begin in parallel with Segment B
+
+  Segment D — Municipal Track (Top 20 municipal dealers)
+    • Won ≥1 Nagar Nigam/Corporation bid
+    • Pitch angle: seasonal demand (dengue/malaria budgets April-October)
+    • Time outreach before monsoon season (March-May annually)
+
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  PHASE 1 — FIRST CONTACT (Day 1-14)                                │
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Channel priority: WhatsApp > Phone call > Email > LinkedIn
+  (Government dealers are small businesses — WhatsApp is primary channel)
+
+  Opening message template (WhatsApp / Phone):
+  ─────────────────────────────────────────────
+  "Namaste [Name], I am [rep name] from 100X Circle. We supply IS 14855-certified
+  thermal fogging machines used by government contractors across India. We saw your
+  company has successfully won government supply contracts — we supply the equipment
+  many contractors use to fulfill such orders. Can we speak for 10 minutes this week?"
+
+  DO NOT: Pitch price first. DO NOT: Send catalogue PDFs in first message.
+  DO: Reference their government wins (shows you have done homework).
+  DO: Ask one question to qualify (How do you currently source your machines?)
+
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  PHASE 2 — QUALIFICATION CALL (Day 7-21)                           │
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Discovery questions (10-minute call agenda):
+  1. How many government fogging contracts do you typically win per year?
+  2. Where do you currently source your machines — own stock, rent, or subcontract?
+  3. What machine specifications does the tender typically require? (capacity, IS cert)
+  4. Do you have stockist/retailer relationships or do you buy direct?
+  5. What is your typical order size — single machine, or multiple units?
+
+  Qualification pass criteria (move to Demo stage):
+  ✓ Wins ≥2 government contracts per year
+  ✓ Does not already manufacture machines in-house
+  ✓ Is open to a new supplier relationship
+
+  Qualification fail (tag as Monitor / Nurture):
+  ✗ Subcontracts delivery to someone else (paper bidder only)
+  ✗ Has exclusive tie-up with competitor brand
+  ✗ Buying volume too small (single machine every 2-3 years)
+
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  PHASE 3 — DEMO + PROPOSAL (Day 14-30)                             │
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Demo options (in order of preference):
+  A. Physical demo at dealer location / nearest city — highest close rate
+  B. Video demo call with live machine run + certification documents
+  C. Send demo unit on loan for 7 days (for Tier A targets only)
+
+  Proposal must include:
+  • Machine model + IS 14855 certification reference number
+  • GeM catalog listing URL (if listed) — makes their procurement seamless
+  • Volume pricing tiers (1-5 units, 6-20 units, 20+ units)
+  • Credit terms or advance/delivery split for govt-contractor cashflow
+  • After-sales: spare parts availability, warranty, service turnaround SLA
+
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  PHASE 4 — CLOSE + ONBOARD (Day 30-60)                             │
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Close trigger: Dealer has an active or upcoming tender to fulfill
+  Urgency lever: 'If your tender delivery deadline is [date], we need order by [date-2wk]'
+
+  Onboarding checklist:
+  ☐ KYC documents (GST + Aadhaar/PAN of proprietor)
+  ☐ First order placed and payment received
+  ☐ WhatsApp group created (dealer + 100X support)
+  ☐ Marked as is_100x_dealer = true in CRM
+  ☐ Introduced to after-sales point of contact
+  ☐ Follow-up scheduled for next tender season
+
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  PHASE 5 — ACCOUNT EXPANSION (Ongoing)                             │
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Expansion triggers (monitor via GeM bid alerts):
+  • Dealer wins a new tender → proactive call within 24 hrs
+  • Dealer bids on new department → flag for upsell discussion
+  • Tender season begins (typically April + October) → pre-season check-in
+
+  Referral play: Ask every converted dealer for 2 peer dealer intros
+  (Government contractor networks are tight — referrals close 3× faster)
+
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 7 — CRM PIPELINE DESIGN
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  Pipeline stages (linear, left to right):
+
+  [IDENTIFIED] → [ENRICHED] → [CONTACTED] → [QUALIFIED] → [DEMO] → [PROPOSAL]
+       → [NEGOTIATION] → [CLOSED-WON] → [ACTIVE ACCOUNT] → [CHURNED]
+
+  Stage definitions:
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  IDENTIFIED   Record exists in gem_dealers. No outreach yet.
+               Fields: canonical_name, l1_wins, departments[], opportunity_score
+               Count today: 486 active dealers
+
+  ENRICHED     Contact info obtained (phone or email). Ready to reach out.
+               Fields: + phone/email/city/state/gst_number
+               Sub-status: PARTIAL (1-2 contact fields) | FULL (3+ fields)
+               Action: Queue for first contact
+
+  CONTACTED    First outreach attempt made. No response yet, or responded.
+               Fields: + contact_date, contact_channel, contact_rep
+               Sub-status: NO_RESPONSE | CALL_BACK | INTERESTED | NOT_INTERESTED
+               SLA: Follow up in 5 business days if no response (max 3 attempts)
+
+  QUALIFIED    Discovery call completed. Confirmed buyer potential.
+               Fields: + call_notes, annual_tenders, machine_source, order_size_est
+               Disqualification reasons to log: paper_bidder | competitor_locked |
+               volume_too_low | manufacturer_themselves
+
+  DEMO         Demo scheduled or completed.
+               Fields: + demo_date, demo_type (physical/video/loan), demo_notes
+               Win signal: asks for pricing after demo
+
+  PROPOSAL     Formal quote sent.
+               Fields: + proposal_date, proposal_value, machines_quoted, terms_offered
+               SLA: Follow up in 3 business days
+
+  NEGOTIATION  Price/terms discussion active.
+               Fields: + counter_offer, sticking_points, decision_timeline
+
+  CLOSED-WON   Order placed and payment received (or confirmed).
+               Fields: + order_date, order_value, machines_sold, payment_terms_agreed
+               Action: Set is_100x_dealer = true
+
+  ACTIVE ACCT  Repeat buyer. Monitor their GeM wins for upsell triggers.
+               Fields: + lifetime_value, last_order_date, next_followup_date
+               Automation: Alert when dealer wins a new GeM bid
+
+  CHURNED      Was a customer, no longer buying.
+               Fields: + churn_date, churn_reason
+               Action: Re-engage quarterly during tender season
+
+  Key CRM fields per dealer record:
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  From gem_dealers (auto-populated):
+    canonical_name, l1_wins, departments[], states[], opportunity_score,
+    defence_l1, municipal_l1, health_l1, bids[], is_100x_dealer
+
+  Manual enrichment fields:
+    owner_name, phone, whatsapp, email, website, city, state_hq, gst_number,
+    contact_source (GST|IndiaMART|GeM|LinkedIn|Referral)
+
+  Pipeline fields:
+    crm_stage, sub_status, assigned_rep, first_contact_date, last_activity_date,
+    next_followup_date, contact_attempts, call_notes[], disqualified_reason,
+    demo_date, demo_type, proposal_value, machines_quoted, order_date,
+    lifetime_value, churn_reason
+
+  Computed fields (auto from pipeline):
+    days_in_stage, total_contact_attempts, pipeline_value (proposal_value of open deals)
+
+  CRM tool recommendation:
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Option A — Admin panel tab (already built): Add crm_stage + pipeline fields to
+    gem_dealers schema. Add a 'Targets' tab with Kanban or table view, filter by stage.
+    Zero cost. Keeps data co-located with GeM intelligence. Build time: 2-3 days.
+
+  Option B — Notion / Airtable: Easy to set up, good for small team (1-3 reps).
+    Manual sync with GeM DB. No automation. Good for pilot phase (<50 active deals).
+
+  Option C — HubSpot Free: Contacts + deals + email sequences + call logging.
+    Import top 100 from gem_dealers as HubSpot contacts. Use pipeline + sequences.
+    Best when team scales beyond 1 rep or outreach volume exceeds 20 calls/day.
+
+  RECOMMENDATION: Start with Option A (admin panel tab) for first 60 days.
+  Migrate to HubSpot when active pipeline exceeds 30 open deals.
+
+  Priority queue (start here Monday):
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1. [MUN] Score= 48  L1= 5  NONE     CENTRAL WAREHOUSING CORPORATION
+   2. [DEF] Score= 35  L1= 6  NONE     VVDN TECHNOLOGIES PRIVATE LIMITED
+   3.       Score= 34  L1= 3  NONE     FOGGERS INDIA PRIVATE LIMITED
+   4. [DEF] Score= 32  L1= 4  NONE     PARTH ENTERPRISE
+   5. [DEF] Score= 27  L1= 3  NONE     AKAM ENTERPRISES
+   6. [MUN] Score= 26  L1= 3  NONE     ROYAL TRADELINKS PRIVATE LIMITED
+   7.       Score= 24  L1= 3  NONE     APPLIED REALTECH SYSTEMS PRIVATE LIMITED
+   8. [MUN] Score= 24  L1= 3  NONE     GLOBAL PEST SOLUTIONS
+   9. [DEF] Score= 23  L1= 3  NONE     VIGHNHARTA CORPORATION
+  10. [DEF] Score= 23  L1= 3  NONE     MACHINERY SALES CORPORATION
+  11. [DEF] Score= 23  L1= 3  NONE     MATRISH SHIP MANAGEMENT PRIVATE LIMITED
+  12. [DEF] Score= 23  L1= 3  NONE     MAHMUTHA TRADING COMPANY
+  13.       Score= 22  L1= 3  NONE     AGMATEL INDIA PRIVATE LIMITED
+  14. [MUN] Score= 22  L1= 3  NONE     TEMPSENS INSTRUMENTS (INDIA) PRIVATE LIMITED
+  15. [DEF] Score= 20  L1= 2  NONE     ESS KAY HOME CARE
+  16. [DEF] Score= 20  L1= 2  NONE     KRISHNA ENTERPRISES
+  17.       Score= 20  L1= 4  NONE     ENTUPLE TECHNOLOGIES PRIVATE LIMITED
+  18.       Score= 18  L1= 3  NONE     CONVERGENT TECHNOLOGIES INDIA PRIVATE LIMITED
+  19. [MUN] Score= 18  L1= 2  NONE     CLOUD TECH PRIVATE LIMITED
+  20. [MUN] Score= 17  L1= 2  NONE     PRITAM SOLAR AND MULTISERVICES

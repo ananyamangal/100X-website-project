@@ -1,0 +1,172 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687790498798
+अनुबंधअनुबंध  "त"थ"त"थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा.यममा.यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  "ववरण"ववरण|Organisation Details|Organisation Details
+@Aप|Type :Central Government
+मंFालय|Ministry :Ministry of Fisheries Animal Husbandry Dairying
+"वभाग|Department :Department of Animal Husbandry and Dairying
+संगठन का नाम|Organisation Name :Administration DAHD
+कायाNलय OेF|Office Zone:Room No 432 A Krishi Bhawan New Delhi 110001
+खरीदारखरीदार  "ववरण"ववरण|Buyer Details|Buyer Details
+पद|Designation :section officer
+संपकN नंबर|Contact No. :011-23385116-
+ईमेल आईडी|Email ID :vk.vikrosy@gov.in
+जीएसटbआईएन|GSTIN :-
+पता|Address :
+Room No. 248-C, Krishi Bhawan.,
+CENTRAL DELHI, DELHI-110001, India
+ 
+"वfीय"वfीय  gवीकृ "तgवीकृ "त  "ववरण"ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम"त|IFD Concurrence :Yes
+@शास"नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+deputy secretary
+"वfीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+deputy secretary
+भुगतानभुगतान  @ा"धकरण@ा"धकरण  "ववरण"ववरण|Paying Authority Details|Paying Authority Details
+Role:DDO
+भुगतान का तरीका|
+Payment Mode:
+PFMS
+पद|Designation :Section Officer
+ईमेल आईडी|Email ID :rawat.ks@nic.in
+जीएसटbआईएन|GSTIN :-
+पता|Address:
+Room No. 432-A, Krishi Bhawan.,
+CENTRAL DELHI, DELHI-110001, India
+ 
+ 
+"वे ता"वे ता  "ववरण"ववरण|Seller Details|Seller Details
+जेम "वे ता आईडी|GeM Seller ID :U7E1250013489193
+कं पनी का नाम|Company Name :VAIBHAV ENTERPRISES
+संपकN नंबर|Contact No. :09211818536
+ईमेल आईडी|Email ID :vaibhavbhandari4444@gmail.com
+पता| Address :
+B-236,NEW ASHOK NAGAR,NEW ASHOK NAGAR,NEW ASHOK NAGAR,
+East Delhi, DELHI-110096, -
+एमएसएमई पंजीकरण संqया|MSME Registration number :UDYAM-DL-02-0095877
+जीएसटbआईएन|GSTIN:07IERPB6349E1Z7 (R)
+एमएसई सामा"जक rेणी|MSE Social Category :General
+एमएसई "लंग rेणी|MSE Gender :Male
+*"जसके नाम के पO मt GST/TAX इनवॉइस पेश "कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+"वतरण "नदzश | Delivery Instructions : NA
+उ|पादउ|पाद  "ववरण"ववरण|Product Details|Product Details
+##आइटमआइटम  "ववरण"ववरण|Item Description|Item Description
+आइटमआइटम
+"ववरण"ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूयमूय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  "वभाजन"वभाजन (INR)| (INR)|
+Tax BifurcationTax Bifurcation
+(INR)(INR)
+मूयमूय  
+(INR (INR मtमt  सभीसभी
+शुकशुक  औरऔर  करकर
+स"हतस"हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ|पादउ|पाद  काका  नामनाम |Product Name :  |Product Name : KETOBAI Dry Fruits and Nuts Almond Kernels (बादाम क गुठली) 1
+kg
+ांडांड|Brand : |Brand : KETOBAI
+ांडांड  @कार@कार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  ""त""त|Catalogue Status: |Catalogue Status: Catalogue not verified by OEM
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : Reseller not verified by OEM
+rेणीrेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Dry Fruits and Nuts (Q3)
+मॉडलमॉडल|Model:|Model: K-1 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: 0802 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+20packet1,798NA35,960
+कु ल ऑडNर मूय |Total Order Value (in INR)35,96035,960
+ 
+परे"षतीपरे"षती  "ववरण"ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे"षतीपरे"षती|Consignee|Consigneeवgतुवgतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माFामाFा|Quantity|Quantity
+"दनांक"दनांक  केके  बादबाद
+"डलीवरी"डलीवरी  शुAशुA
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+"वतरण"वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : section officer
+ईमेल आईडी|Email ID : vk.vikrosy@gov.in
+KETOBAI Dry Fruits and
+
+1
+संपकN|Contact : 011-23385116-
+जीएसटbआईएन|GSTIN : -
+पता|Address : Room No. 248-C, Krishi Bhawan.,
+CENTRAL DELHI, DELHI-110001, India
+Nuts Almond Kernels
+(बादाम क गुठली) 1 kg
+-2027-May-202611-Jun-2026
+Product Specification for KETOBAI Dry Fruits and Nuts Almond Kernels (Product Specification for KETOBAI Dry Fruits and Nuts Almond Kernels (बादामबादाम  कक  गुठलीगुठली) 1 kg) 1 kg
+"व"नदzश"व"नदzश|Specification|Specificationउपउप--"व"नदzश"व"नदzश|Sub-Spec|Sub-Specमूयमूय|Value|Value
+General
+TypeAlmond Kernels (बादाम क गुठली)  
+FormPieces  
+Governing Standards and
+Certifications
+Compliance to FSSAI Standards & Availability of valid FSSAI LicenseYes  
+Compliance to Good Manufacturing Practice as per FSSAIYes  
+Compliance to Hygienic and Sanitary Requirements as per FSSAI RegulationsYes  
+Compliance to Agmark Standards & Availability of Agmark LicenseNo  
+Packing and Marking
+Packing Size1 kg  
+PackagingAs per Food Safety and Standards (Packaging) Regulation  
+Labelling and Display
+As per Food Safety and Standards (Labelling and Display)
+Regulations  
+Shelf Life3 months  
+Residual Shelf Life
+Agree to provide product with residual shelf life of not less
+than 75% at the time of supply  
+Test Reports
+Agree to provide all relevant documents Test Report/supporting document /reports
+etc to the buyer at the time of Supply/Bid
+Yes  
+ 
+"टपणी"टपणी|Note:: |Note:: Seller has given an undertaking that it has made arrangements for getting the stores from an authorized distributor / dealer / channel partner of the OEM of the
+offered product. At the time of delivery of goods, Seller will provide necessary chain documents (in the form of GST Invoice) to prove that the supplied goods are genuine and are
+being sourced from an authorized distributor / dealer / channel partner of the OEM. In case of any complaint about genuineness of the supplied products, Seller shall be
+responsible for providing genuine replacement supplies.
+ 
+ईपीबीजीईपीबीजी  "ववरण"ववरण  | ePBG Detail| ePBG Detail
+NANA
+"नयम"नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 01-10-2025Version:1 effective from 01-10-2025
+1.11.111. . Buyer should verify the validity of FSSAI license of Original Product producer/OEM/Retail supplier at the time of supply.Buyer should verify the validity of FSSAI license of Original Product producer/OEM/Retail supplier at the time of supply.
+22. . Buyer should also verify the expiry of the product and ensure that it is well within the residual shelf life period mentioned in the product specification.Buyer should also verify the expiry of the product and ensure that it is well within the residual shelf life period mentioned in the product specification.
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह "सgटम जनरेटेड फाइल है। कोई हgताOर क आवयकता नह है। इस दgतावेज़ का "@ंट आउट भुगतान/लेनदेन उेय के "लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

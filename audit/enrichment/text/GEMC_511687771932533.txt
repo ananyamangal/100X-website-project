@@ -1,0 +1,182 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687771932533
+अनुबंधअनुबंध  "त"थ"त"थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा.यममा.यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  "ववरण"ववरण|Organisation Details|Organisation Details
+@Aप|Type :State Government
+मंGालय|Ministry :-
+"वभाग|Department :
+Vocational Education and Skill Development Department
+Uttar Pradesh
+संगठन का नाम|Organisation
+Name :
+N/A
+कायाOलय PेG|Office Zone:Govt Iti Noida Gb Nagar
+खरीदारखरीदार  "ववरण"ववरण|Buyer Details|Buyer Details
+पद|Designation :Karamvir Instructor
+संपकO नंबर|Contact No. :9810-773794-
+ईमेल आईडी|Email ID :buycon32.vesddup.up@gembuyer.in
+जीएसटaआईएन|GSTIN :-
+पता|Address :
+Govt ITI Badalpur GB Nagar,
+Gautam Buddha nagar, UTTAR PRADESH-203207, India
+ 
+"वeीय"वeीय  fवीकृ "तfवीकृ "त  "ववरण"ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम"त|IFD Concurrence :No
+@शास"नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+principal
+"वeीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+principal
+भुगतानभुगतान  @ा"धकरण@ा"धकरण  "ववरण"ववरण|Paying Authority Details|Paying Authority Details
+Role:PAO
+भुगतान का तरीका|
+Payment Mode:
+Internet Banking
+पद|Designation :UDC
+ईमेल आईडी|Email ID :harbanslalg@gmail.com
+जीएसटaआईएन|GSTIN :N
+पता|Address:
+GOVERNMENT ITI E-1 NITHARI SECTOR 31 NOIDA GB
+NAGAR,
+GAUTAM BUDDHA NAGAR, UTTAR PRADESH-201301, India
+ 
+ 
+"वे ता"वे ता  "ववरण"ववरण|Seller Details|Seller Details
+जेम "वे ता आईडी|GeM Seller ID :FBAC180000609698
+कं पनी का नाम|Company Name :M/S NIPUR ENTERPRISES
+संपकO नंबर|Contact No. :09891267770
+ईमेल आईडी|Email ID :Nipurenterprises@gmail.com
+पता| Address :
+129,S.N. ENCLAVE,AMBA COLONY,
+Bulandshahr, UTTAR PRADESH-203001, -
+एमएसएमई पंजीकरण संpया|MSME Registration number :UDYAM-UP-18-0004753
+जीएसटaआईएन|GSTIN:09CFWPK1132A1ZM (R)
+एमएसई सामा"जक rेणी|MSE Social Category :OBC
+एमएसई "लंग rेणी|MSE Gender :Male
+*"जसके नाम के पP मt GST/TAX इनवॉइस पेश "कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+"वतरण "नदyश | Delivery Instructions : NA
+उ{पादउ{पाद  "ववरण"ववरण|Product Details|Product Details
+##आइटमआइटम  "ववरण"ववरण|Item Description|Item Description
+आइटमआइटम
+"ववरण"ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूयमूय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  "वभाजन"वभाजन (INR)| (INR)|
+Tax BifurcationTax Bifurcation
+(INR)(INR)
+मूयमूय  
+(INR (INR मtमt  सभीसभी
+शुकशुक  औरऔर  करकर
+स"हतस"हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ{पादउ{पाद  काका  नामनाम |Product Name :  |Product Name : Unbranded Liquid Toilet Soap of 200 ml pack
+ांडांड|Brand : |Brand : NA
+ांडांड  @कार@कार|Brand Type : |Brand Type : Unbranded
+कै टलॉगकै टलॉग  कक  ""त""त|Catalogue Status: |Catalogue Status: Catalogue not verified by OEM
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : Reseller not verified by OEM
+rेणीrेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Toilet Soap, Liquid (V3) Conforming to IS
+4199 (Q4)
+मॉडलमॉडल|Model:|Model: Soap liquid 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+40packet229NA9,160
+कु ल ऑडOर मूय |Total Order Value (in INR)9,1609,160
+ 
+परे"षतीपरे"षती  "ववरण"ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे"षतीपरे"षती|Consignee|Consigneeवfतुवfतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माGामाGा|Quantity|Quantity
+"दनांक"दनांक  केके  बादबाद
+"डलीवरी"डलीवरी  शुAशुA
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+"वतरण"वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+
+1
+पद| Designation : Karamvir Instructor
+ईमेल आईडी|Email ID : buycon32.vesddup.up@gembuyer.in
+संपकO|Contact : 9810-773794-
+जीएसटaआईएन|GSTIN : -
+पता|Address : Govt ITI Badalpur GB Nagar,
+Gautam Buddha nagar, UTTAR PRADESH-203207, India
+Unbranded Liquid Toilet
+Soap of 200 ml pack
+-4027-May-202611-Jun-2026
+Product Specification for Unbranded Liquid Toilet Soap of 200 ml packProduct Specification for Unbranded Liquid Toilet Soap of 200 ml pack
+"व"नदyश"व"नदyश|Specification|Specificationउपउप--"व"नदyश"व"नदyश|Sub-Spec|Sub-Specमूयमूय|Value|Value
+CertificationGoverning technical specificationConforming to IS 4199  
+Material
+Base Material CompositionMixture of Aqueous solution of Potassium soaps and Sodium soaps  
+Cresylic Acid present in soap (If Yes, it must be
+between 0.25 to 0.75 percent by mass , as per clause
+4.5.1 of IS 4199)
+No  
+FragranceFragranceSandal  
+Requirements
+Total fatty matter, percent by mass, Min>15  
+Matter Insoluble in alcohol, percent by mass, Max<5  
+Free caustic alkali,(as K2O), percent by mass, Max<0.03  
+Synthetic detergent, percent by mass, Max<2  
+PackagingType of PackagingPlastic Dispenser/Bottle  
+QuantityNet Volume per Pack (in Liter) (Tolerance :- ± 10%)200 ml  
+Foaming and self lifeFoaming and self life
+The material shall quickly form a satisfactory lather while in use and shall show no sign of any
+deterioration on storage in original sealed containers under normal condhions for a period of
+six months.  
+ 
+"टपणी"टपणी|Note:: |Note:: Seller has given an undertaking that it has made arrangements for getting the stores from an authorized distributor / dealer / channel partner of the OEM of the
+offered product. At the time of delivery of goods, Seller will provide necessary chain documents (in the form of GST Invoice) to prove that the supplied goods are genuine and are
+being sourced from an authorized distributor / dealer / channel partner of the OEM. In case of any complaint about genuineness of the supplied products, Seller shall be
+responsible for providing genuine replacement supplies.
+ 
+ईपीबीजीईपीबीजी  "ववरण"ववरण  | ePBG Detail| ePBG Detail
+NANA
+"नयम"नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:2 effective from 28-08-2025Version:2 effective from 28-08-2025
+1.11.11) ISI Mark :- The product may also carry an ISI Mark as per the BIS standard governing this category.  Buyers may, at their discretion, opt for ISI-marked products by1) ISI Mark :- The product may also carry an ISI Mark as per the BIS standard governing this category.  Buyers may, at their discretion, opt for ISI-marked products by
+indicating the requirement in the bid, after taking into account the number of valid licenses issued under the standard. In such cases buyer shall verify valid BIS License asindicating the requirement in the bid, after taking into account the number of valid licenses issued under the standard. In such cases buyer shall verify valid BIS License as
+per the governing standard mentioned in the product categories as applicable at the time of evaluation of BID and check the ISI marking on the products at the time ofper the governing standard mentioned in the product categories as applicable at the time of evaluation of BID and check the ISI marking on the products at the time of
+receipt of material before issuing of CRAC. receipt of material before issuing of CRAC. 
+The valid BIS license status of sellers may also be viewed by buyer from the below link.The valid BIS license status of sellers may also be viewed by buyer from the below link.
+https://www.manakonline.in/MANAK/ApplicationLicenceRelatedrpt https://www.manakonline.in/MANAK/ApplicationLicenceRelatedrpt 
+oror
+https://www.services.bis.gov.in/php/BIS_2.0/bisconnect/knowyourstandards/indian_standards/isdetailshttps://www.services.bis.gov.in/php/BIS_2.0/bisconnect/knowyourstandards/indian_standards/isdetails
+2) Eco Mark:- Eco Mark is applicable as per G.S.R. 85(E) dated 21st February 1991(Annexure - I) for this category. As such Buyers may also opt for eco mark labelled product2) Eco Mark:- Eco Mark is applicable as per G.S.R. 85(E) dated 21st February 1991(Annexure - I) for this category. As such Buyers may also opt for eco mark labelled product
+while creating Bid. In such cases buyer shall verify Eco mark label at the time of evaluation of BID/receipt of material before issuing CRAC.while creating Bid. In such cases buyer shall verify Eco mark label at the time of evaluation of BID/receipt of material before issuing CRAC.
+3) Product packaging/label must clearly display a valid manufacturing License number, under Drugs & Cosmetics Act, 1940 and Rules as amended till date3) Product packaging/label must clearly display a valid manufacturing License number, under Drugs & Cosmetics Act, 1940 and Rules as amended till date
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+
+नोट: यह "सfटम जनरेटेड फाइल है। कोई हfताPर क आवयकता नह है। इस दfतावेज़ का "@ंट आउट भुगतान/लेनदेन उेय के "लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

@@ -1,0 +1,321 @@
+{
+  "timestamp": "2026-06-06T17:03:40.811Z",
+  "captcha_endpoint": "https://gem.gov.in/assets/phpcaptcha/captcha.php",
+  "captcha_response": {
+    "status": 500,
+    "body": ""
+  },
+  "plaintext_in_response": false,
+  "dom_fields": {
+    "lang": "english",
+    "h_search_category_mobile": "",
+    "h_cat_id_mobile": "0",
+    "h_search_category": "",
+    "h_cat_id": "0",
+    "h_captcha1": "6cmiVaze+l7T+v7JzwQD8w==",
+    "h_captcha2": "6cmiVaze+l7T+v7JzwQD8w==",
+    "pageno": "0",
+    "tabtype": "1",
+    "h_captcha": "",
+    "is_ajax": "",
+    "oid": ""
+  },
+  "js_globals": {
+    "capValue": null,
+    "captchaVal": null,
+    "captchaValue": null,
+    "cap": null,
+    "imgCode": null,
+    "captcha_answer": null,
+    "sitekey": null,
+    "_captcha": null,
+    "captcha_check": "function captcha_check(no){\n       \n       \n       var encString = $(`#h_captcha${no}`).val();\n       var plainStr = $(`#captcha_code${no}`).val();\n       var encResp = '';\n\n       if ($(`#captcha_cod"
+  },
+  "local_storage": {
+    "load": "1"
+  },
+  "session_storage": {},
+  "network_requests": [
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/menu-v5.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765423475
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/gem-new-logo-v6.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765423475
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/login-v4.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765423475
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/gem-new-logo-v2.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765423475
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/vcancel-v4.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765423475
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/new-on.png",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765423475
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/new-lms-link.png",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765423476
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/down-arrow-red.png",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://assets-bg.gem.gov.in/resources/css/custom-v145.css?version=20260220185347",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765424034
+    },
+    {
+      "url": "https://gem.gov.in/resources/images/refresh.png",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/view_contracts",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765424537
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/inc-v1.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765424542
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/youtube_new-gem.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765424542
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/twitter-new-icon.png",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765424542
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/facebook-icons.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765424542
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/launch-menus.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765424542
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/closes.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765424542
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/go-to-tops.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765424542
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/slideshare.svg",
+      "method": "GET",
+      "type": "image",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765424542
+    },
+    {
+      "url": "https://gem.gov.in/assets/phpcaptcha/captcha.php?ajax=1&rand=0.7198810271099326",
+      "method": "POST",
+      "type": "xhr",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/view_contracts",
+        "x-requested-with": "XMLHttpRequest",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "accept": "*/*",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765425378
+    },
+    {
+      "url": "https://assets-bg.gem.gov.in/resources/images/favicon.png",
+      "method": "GET",
+      "type": "other",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://gem.gov.in/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not/A)Brand\";v=\"99\", \"Chromium\";v=\"148\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null,
+      "timestamp": 1780765425530
+    }
+  ],
+  "validation_test": {
+    "wrong_captcha_sent": "XXXXX",
+    "server_rejected": true,
+    "results_appeared": false,
+    "server_side_validation": true,
+    "page_text_excerpt": "English\nहिंदी\nதமிழ்\nবাংলা\nঅসমীয়া\nਪੰਜਾਬੀ\nગુજરાતી\nಕನ್ನಡ\nमराठी\nമലയാളം\nଓଡ଼ିଆ\nతెలుగు\n  Dark Mode Font Size A- A A+ Skip to Main Content  \n Raise a Ticket Need Help ? \nPRODUCTS SERVICES CONTENT    INTERACTIVE TRAINING COURSES   \nForward Auction   \nOngoing Auctions\nFA Buyer Registration\nFA Buyer Login\nBids   \nList of Bids\nRailways Bids\nPBP Notices\nSign Up  \nBuyer Organisation\nSeller/Service Provider\nGRA /VA for GeM New\nLogin  \nGeM\nGRA /VA for GeM New\n Categories\nFeatures & Benefits Business Opportunitie"
+  },
+  "auto_solve_attempt": {
+    "answer_found": false,
+    "reason": "captcha.php not plaintext"
+  },
+  "conclusion": "INCONCLUSIVE — captcha.php not returning plaintext for search captcha; needs further investigation",
+  "full_report": "GEM SEARCH CAPTCHA INVESTIGATION REPORT\nGenerated: 2026-06-06T17:04:04.970Z\n══════════════════════════════════════════════════════════════════════\n\n1. CAPTCHA ENDPOINT\n   Primary: https://gem.gov.in/assets/phpcaptcha/captcha.php\n   Response: {\"status\":500,\"body\":\"\"}\n   Plaintext answer in response: false\n\n2. RESPONSE PAYLOAD\n   {\n     \"status\": 500,\n     \"body\": \"\"\n   }\n\n3. DOM / JS / STORAGE\n   Captcha-related JS globals: {\"capValue\":null,\"captchaVal\":null,\"captchaValue\":null,\"cap\":null,\"imgCode\":null,\"captcha_answer\":null,\"sitekey\":null,\"_captcha\":null,\"captcha_check\":\"function captcha_check(no){\\n       \\n       \\n       var encString = $(`#h_captcha${no}`).val();\\n       var plainStr = $(`#captcha_code${no}`).val();\\n       var encResp = '';\\n\\n       if ($(`#captcha_cod\"}\n   Hidden fields: {\"lang\":\"english\",\"h_search_category_mobile\":\"\",\"h_cat_id_mobile\":\"0\",\"h_search_category\":\"\",\"h_cat_id\":\"0\",\"h_captcha1\":\"6cmiVaze+l7T+v7JzwQD8w==\",\"h_captcha2\":\"6cmiVaze+l7T+v7JzwQD8w==\",\"pageno\":\"0\",\"tabtype\":\"1\",\"h_captcha\":\"\",\"is_ajax\":\"\",\"oid\":\"\"}\n   localStorage keys: load\n   sessionStorage keys: \n\n4. VALIDATION MECHANISM\n   Server-side validation: true\n   Wrong captcha rejected: true\n   Test detail: {\n     \"wrong_captcha_sent\": \"XXXXX\",\n     \"server_rejected\": true,\n     \"results_appeared\": false,\n     \"server_side_validation\": true,\n     \"page_text_excerpt\": \"English\\nहिंदी\\nதமிழ்\\nবাংলা\\nঅসমীয়া\\nਪੰਜਾਬੀ\\nગુજરાતી\\nಕನ್ನಡ\\nमराठी\\nമലയാളം\\nଓଡ଼ିଆ\\nతెలుగు\\n  Dark Mode Font Size A- A A+ Skip to Main Content  \\n Raise a Ticket Need Help ? \\nPRODUCTS SERVICES CONTENT    INTERACTIVE TRAINING COURSES   \\nForward Auction   \\nOngoing Auctions\\nFA Buyer Registration\\nFA Buyer Login\\nBids   \\nList of Bids\\nRailways Bids\\nPBP Notices\\nSign Up  \\nBuyer Organisation\\nSeller/Service Provider\\nGRA /VA for GeM New\\nLogin  \\nGeM\\nGRA /VA for GeM New\\n Categories\\nFeatures & Benefits Business Opportunitie\"\n   }\n\n5. AUTO-SOLVE ATTEMPT\n   {\n     \"answer_found\": false,\n     \"reason\": \"captcha.php not plaintext\"\n   }\n\n6. CONCLUSION\n   INCONCLUSIVE — captcha.php not returning plaintext for search captcha; needs further investigation\n\n7. AUTOMATION FEASIBILITY\n   ✗ NOT AUTOMATABLE with this method\n   Evidence: INCONCLUSIVE — captcha.php not returning plaintext for search captcha; needs further investigation\n   Fallback: Keep manual captcha entry in collector\n\n══════════════════════════════════════════════════════════════════════"
+}

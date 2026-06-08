@@ -1,0 +1,176 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687771679134
+अनुबंधअनुबंध  "त"थ"त"थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा/यममा/यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  "ववरण"ववरण|Organisation Details|Organisation Details
+ABप|Type :Central PSU
+मंHालय|Ministry :Ministry of Finance
+"वभाग|Department :Department of Financial Services
+संगठन का नाम|Organisation Name :LIC - Life Insurance Corporation of India
+कायाPलय QेH|Office Zone:DO2
+खरीदारखरीदार  "ववरण"ववरण|Buyer Details|Buyer Details
+पद|Designation :AOESTATEDO2
+संपकP नंबर|Contact No. :-
+ईमेल आईडी|Email ID :as.janardhana@licindia.com
+जीएसट`आईएन|GSTIN :-
+पता|Address :
+LIC OF INDIA, DIVISIONAL OFFICE, SECOND STAGE,
+INDIRANAGAR,
+Bangalore, KARNATAKA-560038, India
+ 
+"वeीय"वeीय  fवीकृ "तfवीकृ "त  "ववरण"ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम"त|IFD Concurrence :No
+Aशास"नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+ADMINISTRATIVE OFFICER
+"वeीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+ADMINISTRATIVE OFFICER
+भुगतानभुगतान  Aा"धकरणAा"धकरण  "ववरण"ववरण|Paying Authority Details|Paying Authority Details
+Role:BUYER
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :AOESTATEDO2
+ईमेल आईडी|Email ID :as.janardhana@licindia.com
+जीएसट`आईएन|GSTIN :29AAACL0582H2ZH
+पता|Address:
+LIC OF INDIA, DIVISIONAL OFFICE, SECOND STAGE,
+INDIRANAGAR,
+Bangalore, KARNATAKA-560038, India
+ 
+ 
+"वे ता"वे ता  "ववरण"ववरण|Seller Details|Seller Details
+जेम "वे ता आईडी|GeM Seller ID :GMXZ230008192370
+कं पनी का नाम|Company Name :SRI NAVDURGA STATIONERS
+संपकP नंबर|Contact No. :09448460000
+ईमेल आईडी|Email ID :snsstationery2019@gmail.com
+पता| Address :
+#63,,Avenue Road Cross,Sanjeevappa Lane,
+Bangalore, KARNATAKA-560002, -
+एमएसएमई पंजीकरण संpया|MSME Registration number :UDYAM-KR-03-0312477
+जीएसट`आईएन|GSTIN:29EHLPS0683H2ZO (R)
+एमएसई सामा"जक rेणी|MSE Social Category :General
+एमएसई "लंग rेणी|MSE Gender :Female
+*"जसके नाम के पQ मt GST/TAX इनवॉइस पेश "कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+"वतरण "नदyश | Delivery Instructions : NA
+उ{पादउ{पाद  "ववरण"ववरण|Product Details|Product Details
+##आइटमआइटम  "ववरण"ववरण|Item Description|Item Description
+आइटमआइटम
+"ववरण"ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मू~यमू~य
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  "वभाजन"वभाजन
+(INR)|(INR)|
+TaxTax
+BifurcationBifurcation
+(INR)(INR)
+मू~यमू~य  
+(INR (INR मtमt  सभीसभी
+शु~कशु~क  औरऔर  करकर
+स"हतस"हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ{पादउ{पाद  काका  नामनाम |Product Name :  |Product Name : Unbranded--Ashoka Paper Products Type 1 - Pocket shape envelope
+Without Window 229 x 324 (C4) mm
+ांडांड|Brand : |Brand : Unbranded--Ashoka Paper Products
+ांडांड  AकारAकार|Brand Type : |Brand Type : Unbranded
+कै टलॉगकै टलॉग  कक  ""त""त|Catalogue Status: |Catalogue Status: OEM verified catalogue
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+rेणीrेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Correspondence Envelopes (V3) Conforming to
+IS 13892 (Q4)
+मॉडलमॉडल|Model:|Model: BROWN ENVELOPES 229-324 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+1,000pieces7.6NA7,600
+कु ल ऑडPर मू~य |Total Order Value (in INR)7,6007,600
+ 
+परे"षतीपरे"षती  "ववरण"ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे"षतीपरे"षती|Consignee|Consigneeवfतुवfतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माHामाHा|Quantity|Quantity
+"दनांक"दनांक  केके  बादबाद
+"डलीवरी"डलीवरी  शुBशुB
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+"वतरण"वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+
+1
+पद| Designation : AOESTATEDO2
+ईमेल आईडी|Email ID : as.janardhana@licindia.com
+संपकP|Contact : -
+जीएसट`आईएन|GSTIN : -
+पता|Address : LIC OF INDIA, DIVISIONAL OFFICE, SECOND STAGE,
+INDIRANAGAR,
+Bangalore, KARNATAKA-560038, India
+Unbranded--Ashoka
+Paper Products Type 1 -
+Pocket shape envelope
+Without Window 229 x
+324 (C4) mm
+-1,00027-May-202611-Jun-2026
+Product Specification for Unbranded--Ashoka Paper Products Type 1 - Pocket shape envelope Without Window 229 x 324 (C4) mmProduct Specification for Unbranded--Ashoka Paper Products Type 1 - Pocket shape envelope Without Window 229 x 324 (C4) mm
+"व"नदyश"व"नदyश|Specification|Specificationउपउप--"व"नदyश"व"नदyश|Sub-Spec|Sub-Specमू~यमू~य|Value|Value
+STANDARDS
+Type of EnvelopeType 1 - Pocket shape envelope  
+Dimensions of the Envelope (Size Symbol) (In mm)229 x 324 (C4)  
+Minimum Grammage for the area of Envelopeas per the table 2 of IS 13892  
+Colour of the EnvelopeLight Brown  
+Cloth LiningNon-Cloth Lining  
+Window on EnvelopeWithout Window  
+Window MaterialNA ( For Without Window)  
+Sealing FlapNon-Gummed  
+PACKING AND MARKINGPacking and MarkingAs per the clause 7 of the Governing specification of IS 13892  
+CERTIFICATION / TEST REPORT
+Availability of test report governing the specificationsAs per in the IS 13892  
+Agreed to furnish all the test reports and certificates to the buyer on demandYes  
+ 
+"टपणी"टपणी|Note:: |Note:: Seller has given an undertaking that it has made arrangements for getting the stores from an authorized distributor / dealer / channel partner of the OEM of the
+offered product. At the time of delivery of goods, Seller will provide necessary chain documents (in the form of GST Invoice) to prove that the supplied goods are genuine and are
+being sourced from an authorized distributor / dealer / channel partner of the OEM. In case of any complaint about genuineness of the supplied products, Seller shall be
+responsible for providing genuine replacement supplies.
+ 
+ईपीबीजीईपीबीजी  "ववरण"ववरण  | ePBG Detail| ePBG Detail
+NANA
+"नयम"नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 11-11-2024Version:1 effective from 11-11-2024
+1.11.1Note toNote to
+BuyersBuyers
+For printing on the envelope as per Buyers requirement the buyer shall create the BID and mentioned the contents to be printed in the ATC such as Logo orFor printing on the envelope as per Buyers requirement the buyer shall create the BID and mentioned the contents to be printed in the ATC such as Logo or
+any texts etc.,any texts etc.,
+Note toNote to
+SellersSellers
+1) Sellers must declare their catalog price for 1 Unprinted Piece of Correspondence envelope1) Sellers must declare their catalog price for 1 Unprinted Piece of Correspondence envelope
+2) The seller shall quote their price during bidding in accordance to the buyers requirements for printing contents.2) The seller shall quote their price during bidding in accordance to the buyers requirements for printing contents.
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह "सfटम जनरेटेड फाइल है। कोई हfताQर क आवयकता नह है। इस दfतावेज़ का "Aंट आउट भुगतान/लेनदेन उेय के "लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

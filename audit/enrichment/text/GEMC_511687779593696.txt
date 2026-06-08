@@ -1,0 +1,210 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687779593696
+अनुबंधअनुबंध  !त!थ!त!थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा.यममा.यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  !ववरण!ववरण|Organisation Details|Organisation Details
+@Aप|Type :State Government
+मंGालय|Ministry :-
+!वभाग|Department :
+Medical Health and Family Welfare Department Uttar
+Pradesh
+संगठन का नाम|Organisation
+Name :
+N/A
+कायाQलय RेG|Office Zone:E Hospital Basti
+खरीदारखरीदार  !ववरण!ववरण|Buyer Details|Buyer Details
+पद|Designation :SMO
+संपकQ नंबर|Contact No. :-
+ईमेल आईडी|Email ID :smo-disthosp.bs@up.gov.in
+जीएसटaआईएन|GSTIN :-
+पता|Address :
+DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+ 
+!वeीय!वeीय  fवीकृ !तfवीकृ !त  !ववरण!ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम!त|IFD Concurrence :No
+@शास!नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+SIC DH BASTI
+!वeीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+FO DH BASTI
+भुगतानभुगतान  @ा!धकरण@ा!धकरण  !ववरण!ववरण|Paying Authority Details|Paying Authority Details
+Role:BUYER
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :SMO
+ईमेल आईडी|Email ID :smo-disthosp.bs@up.gov.in
+जीएसटaआईएन|GSTIN :-
+पता|Address:
+DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+ 
+ 
+!वे ता!वे ता  !ववरण!ववरण|Seller Details|Seller Details
+जेम !वे ता आईडी|GeM Seller ID :C61B240011974537
+कं पनी का नाम|Company Name :AHANA ENTERPRISES
+संपकQ नंबर|Contact No. :09616070425
+ईमेल आईडी|Email ID :ahanaenterprises20@gmail.com
+पता| Address :
+MUDILA,ORWARA,ORWARA,ORWARA,
+Basti, UTTAR PRADESH-272002, -
+एमएसएमई पंजीकरण संnया|MSME Registration number :UDYAM-UP-16-0043955
+जीएसटaआईएन|GSTIN:09AKMPC5285H1ZV (R)
+एमएसई सामा!जक qेणी|MSE Social Category :OBC
+एमएसई !लंग qेणी|MSE Gender :Male
+*!जसके नाम के पR मs GST/TAX इनवॉइस पेश !कया जाएगा|GST / Tax invoice to be raised in the name of - Consignee
+!वतरण !नदxश | Delivery Instructions : NA
+उzपादउzपाद  !ववरण!ववरण|Product Details|Product Details
+##आइटमआइटम  !ववरण!ववरण|Item Description|Item Description
+आइटमआइटम
+!ववरण!ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मू~यमू~य
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  !वभाजन!वभाजन
+(INR)|(INR)|
+TaxTax
+BifurcationBifurcation
+(INR)(INR)
+मू~यमू~य  
+(INR (INR मsमs  सभीसभी
+शु~कशु~क  औरऔर  करकर
+स!हतस!हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उzपादउzपाद  काका  नामनाम |Product Name :  |Product Name : Unbranded--NAREENA LIFESCIENCES PRIVATE LIMITED Blood
+Pressure Monitor Cuff , Adult Normal
+ांडांड|Brand : |Brand : Unbranded--NAREENA LIFESCIENCES PRIVATE LIMITED
+ांडांड  @कार@कार|Brand Type : |Brand Type : Unbranded
+कै टलॉगकै टलॉग  कक  !!त!!त|Catalogue Status: |Catalogue Status: OEM verified catalogue
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+qेणीqेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Blood Pressure Monitor Cuff (V2) (Q2)
+मॉडलमॉडल|Model:|Model: (NLS/BP/003) 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+22pieces1,189NA26,158
+कु ल ऑडQर मू~य |Total Order Value (in INR)26,15826,158
+ 
+परे!षतीपरे!षती  !ववरण!ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे!षतीपरे!षती|Consignee|Consigneeवfतुवfतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माGामाGा|Quantity|Quantity
+!दनांक!दनांक  केके  बादबाद
+!डलीवरी!डलीवरी  शुAशुA
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+!वतरण!वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : SMO
+Unbranded--NAREENA
+
+1
+ईमेल आईडी|Email ID : smo-disthosp.bs@up.gov.in
+संपकQ|Contact : -
+जीएसटaआईएन|GSTIN : -
+पता|Address : DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+LIFESCIENCES PRIVATE
+LIMITED Blood Pressure
+Monitor Cuff , Adult
+Normal
+-2227-May-202611-Jun-2026
+Product Specification for Unbranded--NAREENA LIFESCIENCES PRIVATE LIMITED Blood Pressure Monitor Cuff , Adult NormalProduct Specification for Unbranded--NAREENA LIFESCIENCES PRIVATE LIMITED Blood Pressure Monitor Cuff , Adult Normal
+!व!नदxश!व!नदxश|Specification|Specificationउपउप--!व!नदxश!व!नदxश|Sub-Spec|Sub-Specमू~यमू~य|Value|Value
+GENERAL
+Product DescriptionBlood Pressure Monitor Cuff  
+Purpose
+Blood pressure monitor cuff is used to facilitate
+accurate and non-invasive measurement of blood
+pressure  
+PRODUCT
+INFORMATION
+Performance
+Type of cuffReusable  
+Material of the cuff coverNylon  
+BladderWithout Bladder  
+Hypoallergic MaterialYes  
+Closure MechanismVelcro Strip  
+Suitability of cuffAdult Normal  
+Size of cuff (with ±5% tolerance)(in cm)6x12  
+BP cuff suitable forManual BP Machine  
+Tubing to connect the cuff to the blood pressure monitorYes  
+No of air tubes provided2 (For Manual)  
+Minimum length of the tube≥ 50 cm  
+Latex free cuffYes  
+CERTIFICATIONS &
+REPORTS
+Compliance to Medical Device Rules (MDR) 2017 as amended till dateYes  
+Availability of valid drug/medical device license for the product issued from the competent
+authority defined under Drugs and Cosmetic Act 1940 and Rules made there under as amended
+till date
+Yes  
+Valid Drug/Medical Device License NumberMFG/MD/2024/00150  
+Manufacturing unit certificationISO:13485 (Latest)  
+Availability of Test Report for product as per Medical Device Rules (MDR) 2017 as amended till
+date
+Yes  
+Submission of all necessary certifications, licenses and test reports to the buyer at the time of bid
+submission and/or along with supplies as per buyer requirement
+Yes  
+WARRANTYWarranty3  year
+ADVANCE SAMPLE
+Agree to provide advance sample of the product for buyer's approval before commencement of
+supply in case of bidding
+No  
+ADDITIONAL
+REQUIREMENTS
+Additional RequirementsNA  
+ 
+ईपीबीजीईपीबीजी  !ववरण!ववरण  | ePBG Detail| ePBG Detail
+NANA
+!नयम!नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 15-03-2024Version:1 effective from 15-03-2024
+1.11.111. . All Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under as amended till date will always be applicable. ThisAll Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under as amended till date will always be applicable. This
+will include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW) and Department ofwill include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW) and Department of
+Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers time to time in this regard.Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers time to time in this regard.
+22. . The sellers are registered on GeM based on self-declaration of valid medical device License, product certification, test reports etc. However, buyers must check andThe sellers are registered on GeM based on self-declaration of valid medical device License, product certification, test reports etc. However, buyers must check and
+validate the details at their end for all applicable licenses and certifications e.g., validity and authenticity/genuineness of drug license, product certification,validate the details at their end for all applicable licenses and certifications e.g., validity and authenticity/genuineness of drug license, product certification,
+manufacturer certification/licenses, test reports etc.manufacturer certification/licenses, test reports etc.
+33. . In case of authorized resellers/distributors, it will be the legal & regulatory liability of the manufacturer to ensure that their resellers/distributors are operating inIn case of authorized resellers/distributors, it will be the legal & regulatory liability of the manufacturer to ensure that their resellers/distributors are operating in
+compliance with all relevant laws and regulations and are properly licensed to sell the manufacturer's products, including verifying the validity and authenticity ofcompliance with all relevant laws and regulations and are properly licensed to sell the manufacturer's products, including verifying the validity and authenticity of
+drug license held by them.drug license held by them.
+44. . The price offered by the seller/bidder shall not, in any case exceed the DPCO/NPPA controlled price or price fixed by State Government, if any. The seller must reduceThe price offered by the seller/bidder shall not, in any case exceed the DPCO/NPPA controlled price or price fixed by State Government, if any. The seller must reduce
+the prices if there is any reduction in DPCO/NPPA ceiling price or price fixed by State Government, if any.the prices if there is any reduction in DPCO/NPPA ceiling price or price fixed by State Government, if any.
+55. . Any other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional TermsAny other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional Terms
+
+and Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms andand Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms and
+conditions are in reverse order of precedence i.e. ATC shall supersede specific STC which shall supersede General Terms and Conditions (“GTC”), whenever there areconditions are in reverse order of precedence i.e. ATC shall supersede specific STC which shall supersede General Terms and Conditions (“GTC”), whenever there are
+any conflicting provisions.any conflicting provisions.
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह !सfटम जनरेटेड फाइल है। कोई हfताRर क आवयकता नह है। इस दfतावेज़ का !@ंट आउट भुगतान/लेनदेन उेय के !लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

@@ -1,0 +1,179 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687793128170
+अनुबंधअनुबंध  #त#थ#त#थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा.यममा.यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  #ववरण#ववरण|Organisation Details|Organisation Details
+@Aप|Type :Central PSU
+मंGालय|Ministry :
+Ministry of Consumer Affairs Food and Public
+Distribution
+#वभाग|Department :Department of Food and Public Distribution
+संगठन का नाम|Organisation Name :Food Corporation of India (FCI)
+कायाOलय PेG|Office Zone:FCI PURNEA EAST ZONE
+खरीदारखरीदार  #ववरण#ववरण|Buyer Details|Buyer Details
+पद|Designation :Manager HK
+संपकO नंबर|Contact No. :-
+ईमेल आईडी|Email ID :rajeev227411@fci.gov.in
+जीएसटcआईएन|GSTIN :-
+पता|Address :
+FCI DO Purena Navratan hata,
+Purnia, BIHAR-854301, India
+ 
+#वeीय#वeीय  fवीकृ #तfवीकृ #त  #ववरण#ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम#त|IFD Concurrence :No
+@शास#नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+DIVISIONAL MANAGER
+#वeीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+MANAGER ACCOUNT
+भुगतानभुगतान  @ा#धकरण@ा#धकरण  #ववरण#ववरण|Paying Authority Details|Paying Authority Details
+Role:PAO
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :MANAGER ACCOUNT
+ईमेल आईडी|Email ID :rabind168253.fci@gov.in
+जीएसटcआईएन|GSTIN :-
+पता|Address:
+FCI DO Purena Navratan Hata, Behind City Kart Mall, Ford
+Compony Chowk,
+Purnia, BIHAR-854301, India
+ 
+ 
+#वे ता#वे ता  #ववरण#ववरण|Seller Details|Seller Details
+जेम #वे ता आईडी|GeM Seller ID :HJH6220007612994
+कं पनी का नाम|Company Name :BIHAR PRESS
+संपकO नंबर|Contact No. :09835441594
+ईमेल आईडी|Email ID :hdfhj454@outlook.com
+पता| Address :
+Bihar Press Manjhili Chowk, Purnia,Bihar Press Manjhili Chowk, Purnia,
+Purnia, BIHAR-854301, -
+एमएसएमई पंजीकरण संqया|MSME Registration number :UDYAM-BR-27-0018353
+जीएसटcआईएन|GSTIN:10ADTPM9552H1Z8 (R)
+एमएसई सामा#जक sेणी|MSE Social Category :General
+एमएसई #लंग sेणी|MSE Gender :Male
+*#जसके नाम के पP मu GST/TAX इनवॉइस पेश #कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+#वतरण #नद{श | Delivery Instructions : NA
+उ}पादउ}पाद  #ववरण#ववरण|Product Details|Product Details
+##आइटमआइटम  #ववरण#ववरण|Item Description|Item Description
+आइटमआइटम
+#ववरण#ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूयमूय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  #वभाजन#वभाजन (INR)| (INR)|
+Tax Bifurcation (INR)Tax Bifurcation (INR)
+मूयमूय  
+(INR (INR मuमu  सभीसभी
+शुकशुक  औरऔर  करकर
+स#हतस#हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ}पादउ}पाद  काका  नामनाम |Product Name :  |Product Name : Unbranded Bill Book (G.A.R.-29)
+ांडांड|Brand : |Brand : NA
+ांडांड  @कार@कार|Brand Type : |Brand Type : Unbranded
+कै टलॉगकै टलॉग  कक  ##त##त|Catalogue Status: |Catalogue Status: Catalogue not verified by OEM
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : Reseller not verified by OEM
+sेणीsेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Bills or Bill Books (V2) (Q4)
+मॉडलमॉडल|Model:|Model: NA 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+100pieces165.2NA16,520
+कु ल ऑडOर मूय |Total Order Value (in INR)16,52016,520
+ 
+परे#षतीपरे#षती  #ववरण#ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे#षतीपरे#षती|Consignee|Consigneeवfतुवfतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माGामाGा|Quantity|Quantity
+#दनांक#दनांक  केके  बादबाद
+#डलीवरी#डलीवरी  शुAशुA
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+#वतरण#वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : Manager HK
+ईमेल आईडी|Email ID : rajeev227411@fci.gov.in
+
+1
+संपकO|Contact : -
+जीएसटcआईएन|GSTIN : -
+पता|Address : FCI DO Purena Navratan hata,
+Purnia, BIHAR-854301, India
+Unbranded Bill Book
+(G.A.R.-29)
+-10027-May-202611-Jun-2026
+Product Specification for Unbranded Bill Book (G.A.R.-29)Product Specification for Unbranded Bill Book (G.A.R.-29)
+#व#नद{श#व#नद{श|Specification|Specificationउपउप--#व#नद{श#व#नद{श|Sub-Spec|Sub-Specमूयमूय|Value|Value
+Generic
+Paper type
+Printing offset Conforming to IS 1848(Part 1):2018 with Latest
+amendment  
+Content and Description
+Printing as per G.A.R -29 See Rules 113,114,115(2) and 126(2)-
+Attached document only for reference  
+Bill book shall be printed with(Color)Black & white  
+Binding typeStapled cloth Binding  
+Top cover of Bill bookAs per Buyer's choice (to be indicated at the time of bid creation)  
+Bottom cover materialAs per Buyer's choice (to be indicated at the time of bid creation)  
+Dimension
+Width X Height of paper in pad(mm x mm)210 X 297 (mm)  
+Grammage of paper (GSM)min60 GSM  
+Grammage of Top Cover (GSM)min100 GSM  
+Grammage of Bottom Cover(GSM)min201-225 GSM  
+Color
+Color of pagesWhite  
+Color of Top CoverYellow  
+Color of Bottom CoverYellow  
+QuantityNumber of pages/Sheets(Nos)100 Nos.  
+Test Report Details
+Availability of Test Report from any ILAC/NABL accredited/Central Gov LAB to proof
+conformity of products to the specifications
+No  
+Agree to furnish the test reports to buyer on demand, if claimed to be availableNA  
+ 
+#टपणी#टपणी|Note:: |Note:: Seller has given an undertaking that it has made arrangements for getting the stores from an authorized distributor / dealer / channel partner of the OEM of the
+offered product. At the time of delivery of goods, Seller will provide necessary chain documents (in the form of GST Invoice) to prove that the supplied goods are genuine and are
+being sourced from an authorized distributor / dealer / channel partner of the OEM. In case of any complaint about genuineness of the supplied products, Seller shall be
+responsible for providing genuine replacement supplies.
+ 
+#वे ता#वे ता  #व#शता#व#शता  दfतावेज़दfतावेज़|Seller Specification Document:|Seller Specification Document:
+1. Applicable Drawing Document
+mkp.gem.gov.in/uploaded_documents/cms/tp/home_pape_pape_busi_bi44572728/51/16/877/CategorySc
+hema/gem_dgsnd_drawing_document/2023/6/26/gar29_2023-06-26-17-52-
+44_4e3546806b5d9d68e3aba0814fcaba71
+.pdf
+ईपीबीजीईपीबीजी  #ववरण#ववरण  | ePBG Detail| ePBG Detail
+NANA
+#नयम#नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. General Terms and Conditions-1. General Terms and Conditions-
+1.11.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+1.21.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+1.31.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह #सfटम जनरेटेड फाइल है। कोई हfताPर क आवयकता नह है। इस दfतावेज़ का #@ंट आउट भुगतान/लेनदेन उेय के #लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.
+

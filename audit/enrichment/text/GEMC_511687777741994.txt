@@ -1,0 +1,219 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687777741994
+अनुबंधअनुबंध  !त!थ!त!थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा.यममा.यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  !ववरण!ववरण|Organisation Details|Organisation Details
+@Aप|Type :Central Government
+मंFालय|Ministry :Ministry of Finance
+!वभाग|Department :Department of Revenue
+संगठन का नाम|Organisation Name :Central Board of Direct Taxes (CBDT)
+कायाNलय OेF|Office Zone:INCOME TAX DEPARTMENT PRCIT REAC VU2 DELHI
+खरीदारखरीदार  !ववरण!ववरण|Buyer Details|Buyer Details
+पद|Designation :OFFICE SUPERINTENDENT
+संपकN नंबर|Contact No. :011-23370354-
+ईमेल आईडी|Email ID :delhi.osprcitreacvu2@gov.in
+जीएसटdआईएन|GSTIN :07DELP22951F2D5
+पता|Address :
+ROOM NO 217 DRUM SHAPE BUILDING,
+Central Delhi, DELHI-110002, India
+ 
+!वfीय!वfीय  gवीकृ !तgवीकृ !त  !ववरण!ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम!त|IFD Concurrence :Yes
+@शास!नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+PR.CIT(VU)-2
+!वfीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+CIT(OSD)(Admin)(VU)-2
+भुगतानभुगतान  @ा!धकरण@ा!धकरण  !ववरण!ववरण|Paying Authority Details|Paying Authority Details
+Role:DDO
+भुगतान का तरीका|
+Payment Mode:
+PFMS
+पद|Designation :Laxman Singh Bisht
+ईमेल आईडी|Email ID :ddo.vu2-delhi@nic.in
+जीएसटdआईएन|GSTIN :07DELP22951F2D5
+पता|Address:
+ROOM NO 217 DRUM SHAPE BUILDING,
+Central Delhi, DELHI-110002, India
+ 
+ 
+!वे ता!वे ता  !ववरण!ववरण|Seller Details|Seller Details
+जेम !वे ता आईडी|GeM Seller ID :H17Q250013576562
+कं पनी का नाम|Company Name :VIKAS ENTERPRISES
+संपकN नंबर|Contact No. :09958436471
+ईमेल आईडी|Email ID :vikassurliya3@gmail.com
+पता| Address :
+1583/4,Bangali Colony,Sant Nagar, Burari,Burari,
+North West delhi, DELHI-110085, -
+एमएसएमई पंजीकरण संsया|MSME Registration number :UDYAM-DL-01-0065433
+जीएसटdआईएन|GSTIN:07bfaps7424g1ze (R)
+एमएसई सामा!जक vेणी|MSE Social Category :General
+एमएसई !लंग vेणी|MSE Gender :Male
+*!जसके नाम के पO मx GST/TAX इनवॉइस पेश !कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+!वतरण !नद{श | Delivery Instructions : NA
+उ}पादउ}पाद  !ववरण!ववरण|Product Details|Product Details
+##आइटमआइटम  !ववरण!ववरण|Item Description|Item Description
+आइटमआइटम
+!ववरण!ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूयमूय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  !वभाजन!वभाजन
+(INR)|(INR)|
+TaxTax
+BifurcationBifurcation
+(INR)(INR)
+मूयमूय  
+(INR (INR मxमx  सभीसभी
+शुकशुक  औरऔर  करकर
+स!हतस!हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ}पादउ}पाद  काका  नामनाम |Product Name :  |Product Name : FIRST CHOICE BRAND--VEDICA COMPUTER PRIVATE LIMITED
+Compatible Toner Cartridge Manufactured by Vedica Computer Private Limited
+ांडांड|Brand : |Brand : FIRST CHOICE BRAND--VEDICA COMPUTER PRIVATE LIMITED
+ांडांड  @कार@कार|Brand Type : |Brand Type : Unregistered Brand
+कै टलॉगकै टलॉग  कक  !!त!!त|Catalogue Status: |Catalogue Status: OEM verified catalogue
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+vेणीvेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Toner Cartridges / Ink Cartridges / Consumables
+for Printers (Q2)
+मॉडलमॉडल|Model:|Model: VCPL 054/045 CMYK 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+1pieces9,000NA9,000
+कु ल ऑडNर मूय |Total Order Value (in INR)9,0009,000
+ 
+परे!षतीपरे!षती  !ववरण!ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे!षतीपरे!षती|Consignee|Consigneeवgतुवgतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माFामाFा|Quantity|Quantity
+!दनांक!दनांक  केके  बादबाद
+!डलीवरी!डलीवरी  शुAशुA
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+!वतरण!वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : OFFICE SUPERINTENDENT
+FIRST CHOICE BRAND--
+
+1
+ईमेल आईडी|Email ID : delhi.osprcitreacvu2@gov.in
+संपकN|Contact : 011-23370354-
+जीएसटdआईएन|GSTIN : 07DELP22951F2D5
+पता|Address : ROOM NO 217 DRUM SHAPE BUILDING,
+Central Delhi, DELHI-110002, India
+VEDICA COMPUTER
+PRIVATE LIMITED
+Compatible Toner
+Cartridge Manufactured
+by Vedica Computer
+Private Limited
+-127-May-202611-Jun-2026
+Product Specification for FIRST CHOICE BRAND--VEDICA COMPUTER PRIVATE LIMITED Compatible Toner Cartridge Manufactured byProduct Specification for FIRST CHOICE BRAND--VEDICA COMPUTER PRIVATE LIMITED Compatible Toner Cartridge Manufactured by
+Vedica Computer Private LimitedVedica Computer Private Limited
+!व!नद{श!व!नद{श|Specification|Specificationउपउप--!व!नद{श!व!नद{श|Sub-Spec|Sub-Specमूयमूय|Value|Value
+GENERIC
+Description of Stores
+OEM Cartridges/Compatible Cartridges / Consumables for
+Computer Printers and Multi Function Machines  
+Product Class of CartridgeCompatible  
+Name of the OEM/Compatible Manufacturer of Cartridge/Consumable OfferedVedica Computer Private Limited  
+Printer/Multifunction Machines Brand for which offered Cartridge/Consumable is SuitableCanon  
+Type of Cartridge/ConsumableToner Cartridge  
+Color of the Ink/TonerBlack  
+Model Number of OEM's Printer/OEM's Multi Function MachineLBP621cw / LBP623cdw / MF641cw / MF643cdw / MF645cx  
+Model Number of OEM's Printer Cartridge/ConsumableCanon - 054K  
+Model Number of cartridges /Consumable offered by compatible manufacturerVCPL 054/045 CMYK  
+Method for the Determination of Toner Cartridge Yield for Monochromatic
+Electrophotographic Printers and Multi-Function Devices that Contain Printer Components
+As per IS/ISO/IEC 19752 : 2017  
+Method for the Determination of Toner Cartridge Yield for Colour Printers and Multi-
+Function Devices that Contain Printer Components
+As per IS/ISO/IEC 19798 : 2017  
+Minimum Yield of the Replacement Cartridge/Consumable offered (Number of Pages)1001 to 2000  
+ 
+ईपीबीजीईपीबीजी  !ववरण!ववरण  | ePBG Detail| ePBG Detail
+NANA
+!नयम!नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:4 effective from 09-10-2025Version:4 effective from 09-10-2025
+1.11.111. . This category covers two classes of products — OEM Cartridges/Consumables and Compatible Cartridges/Consumables — to enable buyers to procure both originalThis category covers two classes of products — OEM Cartridges/Consumables and Compatible Cartridges/Consumables — to enable buyers to procure both original
+and compatible options in a transparent and competitive manner.and compatible options in a transparent and competitive manner.
+22. . Definitions:Definitions:
+(a) (a) OEM Cartridge/ConsumableOEM Cartridge/Consumable refers to a cartridge manufactured by a company that also manufactures printing machines such as printers, multifunction (all-in- refers to a cartridge manufactured by a company that also manufactures printing machines such as printers, multifunction (all-in-
+one) devices, or plotter printers, and is intended for use with those machines.one) devices, or plotter printers, and is intended for use with those machines.
+(b) (b) Compatible Cartridge/ConsumableCompatible Cartridge/Consumable refers to a cartridge manufactured by an entity other than the OEM of the printing machine but designed to be compatible refers to a cartridge manufactured by an entity other than the OEM of the printing machine but designed to be compatible
+with, and functionally replace, the OEM cartridge.with, and functionally replace, the OEM cartridge.
+33. . The parameter “Product Class of Cartridge” has two values — OEM and Compatible. ‘OEM’ denotes a cartridge having a brand same as that of the printer, whileThe parameter “Product Class of Cartridge” has two values — OEM and Compatible. ‘OEM’ denotes a cartridge having a brand same as that of the printer, while
+‘Compatible’ denotes a cartridge having a brand different from the printer(s) but compatible with the printer(s). Buyers can select only ‘OEM’ or only ‘Compatible’ or‘Compatible’ denotes a cartridge having a brand different from the printer(s) but compatible with the printer(s). Buyers can select only ‘OEM’ or only ‘Compatible’ or
+both ‘OEM’ and ‘Compatible’ (or ‘any value’) as per their requirement.both ‘OEM’ and ‘Compatible’ (or ‘any value’) as per their requirement.
+44. . Printer OEMs authorised in this category and granted dashboard access shall upload catalogues under Product Class of Cartridge – OEM. Compatible OEMs shallPrinter OEMs authorised in this category and granted dashboard access shall upload catalogues under Product Class of Cartridge – OEM. Compatible OEMs shall
+upload catalogues under Product Class of Cartridge – Compatible strictly in accordance with their approved Vendor Assessment (VA) report.upload catalogues under Product Class of Cartridge – Compatible strictly in accordance with their approved Vendor Assessment (VA) report.
+55. . Incorrect selection of product class or deviation from the approved VA report by the sellers may attract administrative action, including removal of catalogues,Incorrect selection of product class or deviation from the approved VA report by the sellers may attract administrative action, including removal of catalogues,
+temporary suspension, or any other action deemed appropriate by GeM.temporary suspension, or any other action deemed appropriate by GeM.
+66. . The parameter “Model Number of OEM Printer/MFP” shall indicate the printer or multifunction model for which the offered cartridge/consumable is suitable. SellersThe parameter “Model Number of OEM Printer/MFP” shall indicate the printer or multifunction model for which the offered cartridge/consumable is suitable. Sellers
+shall ensure correct mapping of cartridges/consumables to printer models while creating catalogues.shall ensure correct mapping of cartridges/consumables to printer models while creating catalogues.
+77. . Printer OEMs and Compatible OEMs shall have their respective model/part numbers included in the drop-down options prior to catalogue creation. CataloguesPrinter OEMs and Compatible OEMs shall have their respective model/part numbers included in the drop-down options prior to catalogue creation. Catalogues
+created using unapproved or incorrect model numbers may be removed and attract administrative action.created using unapproved or incorrect model numbers may be removed and attract administrative action.
+88. . Compatible OEMs shall ensure that their model or part numbers do not resemble those of printer OEMs in any manner likely to mislead or confuse buyers.Compatible OEMs shall ensure that their model or part numbers do not resemble those of printer OEMs in any manner likely to mislead or confuse buyers.
+99. . Sellers requiring inclusion of new model/part numbers (against parameter “Model Number of OEM's Printer Cartridge/Consumable          ”) or the OEM’s nameSellers requiring inclusion of new model/part numbers (against parameter “Model Number of OEM's Printer Cartridge/Consumable          ”) or the OEM’s name
+(against the parameter “Name of the OEM/Compatible Manufacturer of Cartridge/Consumable Offered”) in drop-down options shall submit such requests to the GeM(against the parameter “Name of the OEM/Compatible Manufacturer of Cartridge/Consumable Offered”) in drop-down options shall submit such requests to the GeM
+Helpdesk along with supporting documentation. Requests shall be processed by GeM based on verification of the vendor’s eligibility and the applicable VA report.Helpdesk along with supporting documentation. Requests shall be processed by GeM based on verification of the vendor’s eligibility and the applicable VA report.
+1010. . The parameter “Name of the OEM/Compatible Manufacturer of Cartridge/Consumable Offered” shall indicate the name of either the printer OEM or the compatibleThe parameter “Name of the OEM/Compatible Manufacturer of Cartridge/Consumable Offered” shall indicate the name of either the printer OEM or the compatible
+OEM, as applicable. Sellers shall select their name only from the approved drop-down options available after completion of Vendor Assessment and inclusionOEM, as applicable. Sellers shall select their name only from the approved drop-down options available after completion of Vendor Assessment and inclusion
+through the Helpdesk process.through the Helpdesk process.
+1111. . Buyers should select only one brand/make under the parameter: “Printer:: Multifunction Machines Brand for which offered Cartridge:: Consumable is Suitable.”Buyers should select only one brand/make under the parameter: “Printer:: Multifunction Machines Brand for which offered Cartridge:: Consumable is Suitable.”
+1212. . Buyers procuring only ‘OEM’ cartridges for multiple printer brands through bunched bids shall opt for item-wise evaluation and not total value-wise evaluation, so asBuyers procuring only ‘OEM’ cartridges for multiple printer brands through bunched bids shall opt for item-wise evaluation and not total value-wise evaluation, so as
+to enable participation by resellers of individual brands. Bunching of only ‘OEM’ Cartridges and only ‘Compatible’ Cartridges can be resorted to only when evaluationto enable participation by resellers of individual brands. Bunching of only ‘OEM’ Cartridges and only ‘Compatible’ Cartridges can be resorted to only when evaluation
+is item-wise. In case the buyer selects both ‘OEM’ and ‘Compatible’ against ‘Product Class of Cartridge’ or alternatively chooses ‘any value’ against ‘Product Class ofis item-wise. In case the buyer selects both ‘OEM’ and ‘Compatible’ against ‘Product Class of Cartridge’ or alternatively chooses ‘any value’ against ‘Product Class of
+Cartridge’, then the bid evaluation method of either ‘Total Value-wise’ or ‘Item-wise’ can be opted for by the buyer as per his/her requirement and desired level ofCartridge’, then the bid evaluation method of either ‘Total Value-wise’ or ‘Item-wise’ can be opted for by the buyer as per his/her requirement and desired level of
+competition based on the availability of sellers.competition based on the availability of sellers.
+1313. . By selecting “As per IS/ISO/IEC 19752:2017”, the seller confirms compliance with equivalent or relevant ISO standards such as ISO/IEC 24711 or ISO/IEC 29102, asBy selecting “As per IS/ISO/IEC 19752:2017”, the seller confirms compliance with equivalent or relevant ISO standards such as ISO/IEC 24711 or ISO/IEC 29102, as
+applicable to the technology or type of cartridge (Inkjet, Laser, Toner, or Ink).applicable to the technology or type of cartridge (Inkjet, Laser, Toner, or Ink).
+1414. . Buyers procuring cartridges through bidding and selecting Product Class – only ‘OEM’ should follow the PAC procurement method after following the prescribed dueBuyers procuring cartridges through bidding and selecting Product Class – only ‘OEM’ should follow the PAC procurement method after following the prescribed due
+
+process, and the PAC certificate duly signed by the competent authority shall be uploaded at the time of bid creation. GeM, however, does not prescribe PACprocess, and the PAC certificate duly signed by the competent authority shall be uploaded at the time of bid creation. GeM, however, does not prescribe PAC
+procurement on its own, and the decision to follow the PAC mode of procurement is the buyer’s call. In case the buyer selects both ‘OEM’ and ‘Compatible’ againstprocurement on its own, and the decision to follow the PAC mode of procurement is the buyer’s call. In case the buyer selects both ‘OEM’ and ‘Compatible’ against
+‘Product Class of Cartridge’ or alternatively chooses ‘any value’ against ‘Product Class of Cartridge’, then such PAC may not be required in the bid.‘Product Class of Cartridge’ or alternatively chooses ‘any value’ against ‘Product Class of Cartridge’, then such PAC may not be required in the bid.
+1515. . The L-1 comparison buying method for Product Class – only ‘OEM’ is not permissible. In case the buyer selects both ‘OEM’ and ‘Compatible’ against ‘Product Class ofThe L-1 comparison buying method for Product Class – only ‘OEM’ is not permissible. In case the buyer selects both ‘OEM’ and ‘Compatible’ against ‘Product Class of
+Cartridge’ or alternatively chooses ‘any value’ against ‘Product Class of Cartridge’, then the L-1 comparison buying method shall be available subject to other standardCartridge’ or alternatively chooses ‘any value’ against ‘Product Class of Cartridge’, then the L-1 comparison buying method shall be available subject to other standard
+prerequisites. The L-1 comparison buying method for Product Class – only ‘Compatible’ is possible subject to other standard prerequisites.prerequisites. The L-1 comparison buying method for Product Class – only ‘Compatible’ is possible subject to other standard prerequisites.
+1616. . For procurement through bidding involving a specific brand of Compatible Cartridges, PAC procurement may be undertaken only after following the prescribed dueFor procurement through bidding involving a specific brand of Compatible Cartridges, PAC procurement may be undertaken only after following the prescribed due
+process. GeM, however, does not prescribe PAC procurement on its own, and the decision to follow the PAC mode of procurement is the buyer’s call.process. GeM, however, does not prescribe PAC procurement on its own, and the decision to follow the PAC mode of procurement is the buyer’s call.
+1717. . Single Tender procurement without PAC is permissible only where the buying organisation permits such procurement under specific circumstances and where GeMSingle Tender procurement without PAC is permissible only where the buying organisation permits such procurement under specific circumstances and where GeM
+has enabled the Single Tender functionality for that organisation. GeM, however, does not prescribe the Single Tender mode of procurement on its own, and thehas enabled the Single Tender functionality for that organisation. GeM, however, does not prescribe the Single Tender mode of procurement on its own, and the
+decision to follow the Single Tender mode of procurement is the buyer’s call.decision to follow the Single Tender mode of procurement is the buyer’s call.
+1818. . By procuring items under this category, buyers confirm that they have understood the above clauses and agree to them. Any query with regard to the above clausesBy procuring items under this category, buyers confirm that they have understood the above clauses and agree to them. Any query with regard to the above clauses
+should be made prior to the procurement or floating of the bid. GeM shall not entertain any bid- or contract-specific query.should be made prior to the procurement or floating of the bid. GeM shall not entertain any bid- or contract-specific query.
+1919. . By uploading catalogues under this category, sellers confirm that they have understood the above clauses and agree to them. Any query with regard to the aboveBy uploading catalogues under this category, sellers confirm that they have understood the above clauses and agree to them. Any query with regard to the above
+clauses should be made prior to uploading a catalogue or participating in a bid. GeM shall not entertain any bid- or contract-specific query.clauses should be made prior to uploading a catalogue or participating in a bid. GeM shall not entertain any bid- or contract-specific query.
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह !सgटम जनरेटेड फाइल है। कोई हgताOर क आवयकता नह है। इस दgतावेज़ का !@ंट आउट भुगतान/लेनदेन उेय के !लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

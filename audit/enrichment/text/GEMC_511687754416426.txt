@@ -1,0 +1,168 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687754416426
+अनुबंधअनुबंध  !त!थ!त!थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा-यममा-यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  !ववरण!ववरण|Organisation Details|Organisation Details
+?@प|Type :State Government
+मंFालय|Ministry :-
+!वभाग|Department :
+Prisons Administration and Reforms Department Uttar
+Pradesh
+संगठन का नाम|Organisation
+Name :
+N/A
+कायाNलय OेF|Office Zone:Prisons Administration and Reform Department UP
+खरीदारखरीदार  !ववरण!ववरण|Buyer Details|Buyer Details
+पद|Designation :JAIL SUPERINTENDENT KAUSHAMBI
+संपकN नंबर|Contact No. :00000-000000-
+ईमेल आईडी|Email ID :sj.ks-up@gov.in
+जीएसटcआईएन|GSTIN :09ALDS05600A1DC
+पता|Address :
+DISTRCIT JAIL KAUSHAMBI,
+Kaushambi, UTTAR PRADESH-212202, India
+ 
+!वgीय!वgीय  hवीकृ !तhवीकृ !त  !ववरण!ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम!त|IFD Concurrence :No
+?शास!नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+Ajitesh Kumar
+!वgीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+JAIL SUPERINTENDENT KAUSHAMBI
+भुगतानभुगतान  ?ा!धकरण?ा!धकरण  !ववरण!ववरण|Paying Authority Details|Paying Authority Details
+Role:CONSIGNEE
+ 
+ 
+!वे ता!वे ता  !ववरण!ववरण|Seller Details|Seller Details
+जेम !वे ता आईडी|GeM Seller ID :HK0V240012490323
+कं पनी का नाम|Company Name :M/s NEW ANAND ENTERPRISES
+संपकN नंबर|Contact No. :08317090116
+ईमेल आईडी|Email ID :mohitassociates1994@gmail.com
+पता| Address :
+0,Malak Pinjari,Chakiya,Sirathu,
+Kaushambi, UTTAR PRADESH-212217, -
+एमएसएमई पंजीकरण संrया|MSME Registration number :-
+जीएसटcआईएन|GSTIN:09GHPPS3371L1ZD (R)
+*!जसके नाम के पO मt GST/TAX इनवॉइस पेश !कया जाएगा|GST / Tax invoice to be raised in the name of - Consignee
+!वतरण !नदyश | Delivery Instructions : NA
+उ{पादउ{पाद  !ववरण!ववरण|Product Details|Product Details
+##आइटमआइटम  !ववरण!ववरण|Item Description|Item Description
+आइटमआइटम
+!ववरण!ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूयमूय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  !वभाजन!वभाजन (INR)| (INR)|
+Tax BifurcationTax Bifurcation
+(INR)(INR)
+मूयमूय  
+(INR (INR मtमt  सभीसभी
+शुकशुक  औरऔर  करकर
+स!हतस!हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ{पादउ{पाद  काका  नामनाम |Product Name :  |Product Name : MENGINER 65 mm (Medium) Disc Tumbler Padlocks (DTP) Type
+Grade I Padlock
+ांडांड|Brand : |Brand : MENGINER
+ांडांड  ?कार?कार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  !!त!!त|Catalogue Status: |Catalogue Status: Catalogue not verified by OEM
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : Reseller not verified by OEM
+ेणीेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Padlocks (ताले) conforming To Is 15275 (Q3)
+मॉडलमॉडल|Model:|Model: PAD LOCK 65 MM 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+10pieces1,490NA14,900
+कु ल ऑडNर मूय |Total Order Value (in INR)14,90014,900
+ 
+परे!षतीपरे!षती  !ववरण!ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे!षतीपरे!षती|Consignee|Consigneeवhतुवhतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माFामाFा|Quantity|Quantity
+!दनांक!दनांक  केके  बादबाद
+!डलीवरी!डलीवरी  शु@शु@
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+!वतरण!वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+1
+पद| Designation : JAIL SUPERINTENDENT KAUSHAMBI
+ईमेल आईडी|Email ID : sj.ks-up@gov.in
+संपकN|Contact : 00000-000000-
+जीएसटcआईएन|GSTIN : 09ALDS05600A1DC
+पता|Address : DISTRCIT JAIL KAUSHAMBI,
+Kaushambi, UTTAR PRADESH-212202, India
+MENGINER 65 mm
+(Medium) Disc Tumbler
+Padlocks (DTP) Type
+Grade I Padlock
+-1027-May-202611-Jun-2026
+
+Product Specification for MENGINER 65 mm (Medium) Disc Tumbler Padlocks (DTP) Type Grade I PadlockProduct Specification for MENGINER 65 mm (Medium) Disc Tumbler Padlocks (DTP) Type Grade I Padlock
+!व!नदyश!व!नदyश|Specification|Specificationउपउप--!व!नदyश!व!नदyश|Sub-Spec|Sub-Specमूयमूय|Value|Value
+CONSTRUCTION PARAMETERS
+Type of Padlock (as per clause 4)Disc Tumbler Padlocks (DTP)  
+Grade of Padlock (as per Table 2)Grade I  
+Type of key set included with padlockSingle Bitted Key (key with a bit on one sideof its shank)  
+Type of Shank in key included with padlockFlat  
+Type of Shackle in PadlockClosed Shackle  
+Type of Case in Padlock (as per Clause 7)Solid Case  
+Is shackle in Padlock hardened?Yes  
+Is Key Not Removable?No  
+MATERIAL PARAMETERS
+Material of Case / Body of Padlock (As per Clause 6, Table 3)Stainless Sheet  
+Material of Each key for Padlock (As per Clause 6, Table 3)Brass Sheet  
+Material of Body and Plug for Padlock (As per Clause 6)Zinc Base Alloy Die Castings  
+Material of Shackle in Padlock (As per Clause 6, Table 3)Bright Bars  
+DIMENSION PARAMETERSNominal Size of Lock (as per clause 4, table 1) (in mm)65 mm (Medium)  
+WARRANTY
+Minimum Standard Warranty (in years)1  
+Standard Warranty (in years)1  
+TEST REPORT
+Availability of test report certifying conformity to IS 15275No  
+Type of test reportNA  
+ 
+!टपणी!टपणी|Note:: |Note:: Seller has given an undertaking that it has made arrangements for getting the stores from an authorized distributor / dealer / channel partner of the OEM of the
+offered product. At the time of delivery of goods, Seller will provide necessary chain documents (in the form of GST Invoice) to prove that the supplied goods are genuine and are
+being sourced from an authorized distributor / dealer / channel partner of the OEM. In case of any complaint about genuineness of the supplied products, Seller shall be
+responsible for providing genuine replacement supplies.
+ 
+ईपीबीजीईपीबीजी  !ववरण!ववरण  | ePBG Detail| ePBG Detail
+NANA
+!नयम!नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 01-10-2025Version:1 effective from 01-10-2025
+1.11.1Presently, the products under this category are not covered under mandatory BIS licensing scheme. Hence, both ISI Marked and non-ISI Marked products may be available inPresently, the products under this category are not covered under mandatory BIS licensing scheme. Hence, both ISI Marked and non-ISI Marked products may be available in
+this category. However, if a buyer intends to procure ISI Marked products, buyer may, at his discretion, opt for the same by indicating the requirement in the bid, after takingthis category. However, if a buyer intends to procure ISI Marked products, buyer may, at his discretion, opt for the same by indicating the requirement in the bid, after taking
+into account the number of valid licenses issued under the standard. In such cases, buyer shall verify valid BIS License as per the applicable governing standard at the time ofinto account the number of valid licenses issued under the standard. In such cases, buyer shall verify valid BIS License as per the applicable governing standard at the time of
+evaluation of bid and check the ISI marking on the products at the time of receipt of material before issuing of CRAC. The valid BIS license status of sellers may be viewed byevaluation of bid and check the ISI marking on the products at the time of receipt of material before issuing of CRAC. The valid BIS license status of sellers may be viewed by
+buyer from the below link: buyer from the below link: Manak onlineManak online (https://www.manakonline.in/MANAK/ApplicationLicenceRelatedrpt) or  (https://www.manakonline.in/MANAK/ApplicationLicenceRelatedrpt) or BIS ConnectBIS Connect
+(https://www.services.bis.gov.in/php/BIS_2.0/bisconnect/knowyourstandards/Indian_standards/isdetails/)(https://www.services.bis.gov.in/php/BIS_2.0/bisconnect/knowyourstandards/Indian_standards/isdetails/)
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह !सhटम जनरेटेड फाइल है। कोई हhताOर क आवयकता नह है। इस दhतावेज़ का !?ंट आउट भुगतान/लेनदेन उेय के !लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

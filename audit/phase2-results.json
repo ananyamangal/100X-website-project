@@ -1,0 +1,488 @@
+{
+  "timestamp": "2026-06-04T09:04:15.966Z",
+  "duration": "209.9s",
+  "totalIssues": 29,
+  "critical": 1,
+  "high": 20,
+  "pages": [
+    {
+      "path": "/",
+      "label": "Homepage",
+      "status": 200,
+      "title": "Best Thermal Fogging Machine Manufacturer | 100x Circle",
+      "h1": null,
+      "canonical": "https://www.100xcircle.com",
+      "issues": [
+        "BROKEN_IMAGES: https://www.100xcircle.com/logo-main.png, https://res.cloudinary.com/dhbvzugv6/image/upload/f_auto,q_auto,w_300,c_limit,dpr_auto/v1780214929/npfovt85oy1y1rfm2siu.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1769349865/acvbqlp3gkomkr5savzi.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1772555199/gmi21xhk49rcrqlb6u5b.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1769349924/j9ehjqz4lw87q5uarlra.png"
+      ],
+      "errors": []
+    },
+    {
+      "path": "/products",
+      "label": "Products Listing",
+      "status": 200,
+      "title": "Thermal Fogging Machines — Complete Product Range | 100X Circle",
+      "h1": "Fogging machines for every application.",
+      "canonical": "https://www.100xcircle.com/products",
+      "issues": [
+        "BROKEN_IMAGES: https://www.100xcircle.com/Logos%20clipart%202/MadeInIndia.png, https://www.100xcircle.com/Logos%20clipart%202/MadeInIndia.png, https://www.100xcircle.com/Logos%20clipart%202/MadeInIndia.png, https://www.100xcircle.com/Logos%20clipart%202/MadeInIndia.png, https://www.100xcircle.com/Logos%20clipart%202/MadeInIndia.png"
+      ],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ]
+    },
+    {
+      "path": "/about",
+      "label": "About",
+      "status": 200,
+      "title": "About 100X Circle — Indian Thermal Fogging Machine Manufacturer",
+      "h1": "About 100X Circle Pvt Ltd",
+      "canonical": "https://www.100xcircle.com/about",
+      "issues": [
+        "BROKEN_IMAGES: https://www.100xcircle.com/new.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png"
+      ],
+      "errors": []
+    },
+    {
+      "path": "/contact-us",
+      "label": "Contact Us",
+      "status": 200,
+      "title": "Contact Us | 100x Circle",
+      "h1": "Talk to our team.",
+      "canonical": "https://www.100xcircle.com/contact-us",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/blog",
+      "label": "Blog Index",
+      "status": 200,
+      "title": "Knowledge & Industry Insights | 100x Circle",
+      "h1": "Industry insights & guides.",
+      "canonical": "https://www.100xcircle.com/blog",
+      "issues": [
+        "BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1773894767/ql94rf7spy97be7dxihh.jpg, https://res.cloudinary.com/dhbvzugv6/image/upload/v1773380213/dqxv6wncd1vd8czqmt5m.jpg, https://res.cloudinary.com/dhbvzugv6/image/upload/v1761559376/pzsjk2uvjf28vuxcomz8.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1761561531/ahvbyq89orjqidbbyu3z.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1761136085/zbgy5hrkr85m3qxms4nl.png"
+      ],
+      "errors": []
+    },
+    {
+      "path": "/spare-parts",
+      "label": "Spare Parts",
+      "status": 200,
+      "title": "Spare Parts for Thermal Fogging Machines | 100X Circle",
+      "h1": "Genuine parts.Guaranteed compatibility.",
+      "canonical": "https://www.100xcircle.com/spare-parts",
+      "issues": [
+        "BROKEN_IMAGES: https://www.bestfoggerthailand.com/wp-content/uploads/2025/08/48.png, https://www.bestfoggerthailand.com/wp-content/uploads/2025/08/66.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1780514429/100x-final/f-4LmB4Lia4LiV4LmA4LiV4Lit4Lij4Li14LmI4LmA4LiX4Li14Lii4Li.jpg, https://res.cloudinary.com/dhbvzugv6/image/upload/v1780514429/100x-final/f-4LmB4Lia4LiV4LmA4LiV4Lit4Lij4Li14LmI4LmA4LiX4Li14Lii4Li.jpg, https://res.cloudinary.com/dhbvzugv6/image/upload/v1780514438/100x-final/f-4Liq4Liy4Lii4LmE4Lif4LmA4LiC4LmJ4Liy4Lib4Lix4LmK4Lih4Li.jpg"
+      ],
+      "errors": []
+    },
+    {
+      "path": "/knowledge",
+      "label": "Knowledge Hub",
+      "status": 200,
+      "title": "Knowledge Hub — Thermal Fogging, Vector Control, Government Procurement | 100X Circle",
+      "h1": "Knowledge Hub",
+      "canonical": "https://www.100xcircle.com/knowledge",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/compare",
+      "label": "Compare Hub",
+      "status": 200,
+      "title": "Fogging Machine Comparisons & Buyer Guides — 100X Circle",
+      "h1": "Choose the right fogging machine.",
+      "canonical": "https://www.100xcircle.com/compare",
+      "issues": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 400 ()"
+      ]
+    },
+    {
+      "path": "/videos",
+      "label": "Videos",
+      "status": 200,
+      "title": "Video Knowledge Center | 100x Circle Thermal Fogging",
+      "h1": "See our machines in action.",
+      "canonical": "https://www.100xcircle.com/videos",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/deployments",
+      "label": "Deployments",
+      "status": 200,
+      "title": "Government & Institutional Deployments | 100x Circle",
+      "h1": "Deployed across India.",
+      "canonical": "https://www.100xcircle.com/deployments",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/case-studies",
+      "label": "Case Studies",
+      "status": 200,
+      "title": "100X Circle Case Studies — Government & Municipal Supply Track Record",
+      "h1": "Government & commercial deployments.",
+      "canonical": "https://www.100xcircle.com/case-studies",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/factory",
+      "label": "Factory",
+      "status": 200,
+      "title": "100X Circle Factory — IMT Manesar Manufacturing Facility | Gurugram",
+      "h1": "100X Circle Manufacturing Facility",
+      "canonical": "https://www.100xcircle.com/factory",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/thank-you",
+      "label": "Thank You",
+      "status": 200,
+      "title": "Thank You | 100x Circle",
+      "h1": "Thank you — we received your inquiry",
+      "canonical": "https://www.100xcircle.com",
+      "issues": [
+        "BROKEN_IMAGES: https://www.100xcircle.com/logo-main.png"
+      ],
+      "errors": []
+    },
+    {
+      "path": "/knowledge/how-thermal-fogging-works",
+      "label": "Knowledge: How Fogging Works",
+      "status": 200,
+      "title": "How Thermal Fogging Works: Pulse-Jet Technology Explained | 100X Circle",
+      "h1": "How Thermal Fogging Works: Pulse-Jet Technology Explained",
+      "canonical": "https://www.100xcircle.com/knowledge/how-thermal-fogging-works",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/knowledge/thermal-vs-ulv-fogging",
+      "label": "Knowledge: Thermal vs ULV",
+      "status": 200,
+      "title": "Thermal Fogging vs ULV Cold Fogging: Complete Comparison | 100X Circle",
+      "h1": "Thermal Fogging vs ULV Cold Fogging: Complete Comparison",
+      "canonical": "https://www.100xcircle.com/knowledge/thermal-vs-ulv-fogging",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/knowledge/dengue-prevention-thermal-fogging",
+      "label": "Knowledge: Dengue Prevention",
+      "status": 200,
+      "title": "Dengue Prevention Using Thermal Fogging — Municipal & Government Guide | 100X Circle",
+      "h1": "Dengue Prevention Using Thermal Fogging",
+      "canonical": "https://www.100xcircle.com/knowledge/dengue-prevention-thermal-fogging",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/knowledge/malaria-control-fogging-india",
+      "label": "Knowledge: Malaria Control",
+      "status": 200,
+      "title": "Malaria Control Using Thermal Fogging in India — Municipal & Health Dept Guide | 100X Circle",
+      "h1": "Malaria Control Using Thermal Fogging in India",
+      "canonical": "https://www.100xcircle.com/knowledge/malaria-control-fogging-india",
+      "issues": [
+        "BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png"
+      ],
+      "errors": []
+    },
+    {
+      "path": "/knowledge/mosquito-control-india",
+      "label": "Knowledge: Mosquito Control",
+      "status": 200,
+      "title": "Mosquito Control and Thermal Fogging in India | 100X Circle",
+      "h1": "Mosquito Control and Thermal Fogging in India",
+      "canonical": "https://www.100xcircle.com/knowledge/mosquito-control-india",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/knowledge/agricultural-fogging-guide",
+      "label": "Knowledge: Agricultural Fogging",
+      "status": 200,
+      "title": "Agricultural Fogging Guide — Crop Protection Using Thermal Foggers | 100X Circle",
+      "h1": "Agricultural Fogging Guide — Crop Protection Using Thermal Foggers",
+      "canonical": "https://www.100xcircle.com/knowledge/agricultural-fogging-guide",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/knowledge/how-to-choose-fogging-machine",
+      "label": "Knowledge: How to Choose",
+      "status": 200,
+      "title": "How to Choose a Thermal Fogging Machine in India (2026 Buyer's Guide) | 100X Circle",
+      "h1": "How to Choose a Thermal Fogging Machine in India (2026)",
+      "canonical": "https://www.100xcircle.com/knowledge/how-to-choose-fogging-machine",
+      "issues": [
+        "BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png"
+      ],
+      "errors": []
+    },
+    {
+      "path": "/knowledge/thermal-fogging-chemicals-guide",
+      "label": "Knowledge: Chemicals Guide",
+      "status": 200,
+      "title": "Thermal Fogging Chemicals Guide — Insecticides, Fungicides & Formulations | 100X Circle",
+      "h1": "Thermal Fogging Chemicals Guide",
+      "canonical": "https://www.100xcircle.com/knowledge/thermal-fogging-chemicals-guide",
+      "issues": [
+        "BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png"
+      ],
+      "errors": []
+    },
+    {
+      "path": "/knowledge/fogging-machine-operators-guide",
+      "label": "Knowledge: Operators Guide",
+      "status": 200,
+      "title": "Fogging Machine Operator's Guide — Pre-Operation, Operation & Post-Operation | 100X Circle",
+      "h1": "Fogging Machine Operator's Guide",
+      "canonical": "https://www.100xcircle.com/knowledge/fogging-machine-operators-guide",
+      "issues": [
+        "BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png"
+      ],
+      "errors": [
+        "Permissions policy violation: compute-pressure is not allowed in this document."
+      ]
+    },
+    {
+      "path": "/knowledge/fogging-machine-maintenance-guide",
+      "label": "Knowledge: Maintenance",
+      "status": 200,
+      "title": "Thermal Fogging Machine Maintenance Guide — Cleaning, Storage, Troubleshooting | 100X Circle",
+      "h1": "Thermal Fogging Machine Maintenance Guide",
+      "canonical": "https://www.100xcircle.com/knowledge/fogging-machine-maintenance-guide",
+      "issues": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 400 ()"
+      ]
+    },
+    {
+      "path": "/knowledge/fogging-machine-safety-guide",
+      "label": "Knowledge: Safety Guide",
+      "status": 200,
+      "title": "Thermal Fogging Machine Safety Guide — Operator & Public Safety | 100X Circle",
+      "h1": "Thermal Fogging Machine Safety Guide",
+      "canonical": "https://www.100xcircle.com/knowledge/fogging-machine-safety-guide",
+      "issues": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 400 ()"
+      ]
+    },
+    {
+      "path": "/knowledge/government-procurement-guide",
+      "label": "Knowledge: GeM Procurement",
+      "status": 200,
+      "title": "Government Procurement Guide: Buying Fogging Machines via GeM | 100X Circle",
+      "h1": "Government Procurement Guide: Buying Fogging Machines via GeM",
+      "canonical": "https://www.100xcircle.com/knowledge/government-procurement-guide",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/compare/100x-circle-vs-korean-fogging-machines",
+      "label": "Compare: vs Korean",
+      "status": 200,
+      "title": "100X Circle vs Korean Fogging Machines — India Price & Quality Comparison",
+      "h1": "100X Circle vs Korean Fogging Machines: Which Should Indian Buyers Choose?",
+      "canonical": "https://www.100xcircle.com/compare/100x-circle-vs-korean-fogging-machines",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/compare/vehicle-mounted-vs-portable-thermal-fogger",
+      "label": "Compare: Vehicle vs Portable",
+      "status": 200,
+      "title": "Vehicle-Mounted vs Portable Thermal Fogger — Which Is Right for You?",
+      "h1": "Vehicle-Mounted vs Portable Thermal Fogger: Complete Buyer Guide",
+      "canonical": "https://www.100xcircle.com/compare/vehicle-mounted-vs-portable-thermal-fogger",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/compare/fogging-machine-buyer-guide-india",
+      "label": "Compare: Buyer Guide",
+      "status": 200,
+      "title": "Fogging Machine Buyer Guide India — Complete 2026 Decision Framework",
+      "h1": "Fogging Machine Buyer Guide India 2026 — Complete Decision Framework",
+      "canonical": "https://www.100xcircle.com/compare/fogging-machine-buyer-guide-india",
+      "issues": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 400 ()"
+      ]
+    },
+    {
+      "path": "/compare/gem-fogging-machines-india",
+      "label": "Compare: GeM",
+      "status": 200,
+      "title": "GeM Fogging Machines in India — MSME OEM Buyer Guide 2026",
+      "h1": "GeM Fogging Machines India — Complete Government e-Marketplace Buyer Guide",
+      "canonical": "https://www.100xcircle.com/compare/gem-fogging-machines-india",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/compare/best-thermal-fogging-machine-for-municipal-use",
+      "label": "Compare: Municipal",
+      "status": 200,
+      "title": "Best Thermal Fogging Machine for Municipal Use in India (2026 Guide)",
+      "h1": "Best Thermal Fogging Machine for Municipal Use in India — 2026 Buyer Guide",
+      "canonical": "https://www.100xcircle.com/compare/best-thermal-fogging-machine-for-municipal-use",
+      "issues": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 400 ()"
+      ]
+    },
+    {
+      "path": "/vehicle-mounted-fogging-machine",
+      "label": "Landing: Vehicle Mounted",
+      "status": 200,
+      "title": "Vehicle Mounted Fogging Machine in Delhi | 100x Circle",
+      "h1": "Vehicle Mounted Fogging Machine in Delhi",
+      "canonical": "https://www.100xcircle.com/vehicle-mounted-fogging-machine",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/power-tiller",
+      "label": "Landing: Power Tiller",
+      "status": 200,
+      "title": "Power Tiller in Delhi | 100x Circle",
+      "h1": "Power Tiller in Delhi",
+      "canonical": "https://www.100xcircle.com/power-tiller",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/gem-approved-fogging-machine-oem",
+      "label": "Landing: GeM OEM",
+      "status": 200,
+      "title": "GeM Approved OEM for Fogging Machines | 100x Circle",
+      "h1": "Sell Fogging Machines on GeM Portal with Approved OEM Support",
+      "canonical": "https://www.100xcircle.com/gem-approved-fogging-machine-oem",
+      "issues": [
+        "BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png"
+      ],
+      "errors": []
+    },
+    {
+      "path": "/privacy-policy",
+      "label": "Privacy Policy",
+      "status": 200,
+      "title": "Privacy Policy | 100x Circle",
+      "h1": "Privacy Policy",
+      "canonical": "https://www.100xcircle.com/privacy-policy",
+      "issues": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 400 ()"
+      ]
+    },
+    {
+      "path": "/terms-and-conditions",
+      "label": "Terms",
+      "status": 200,
+      "title": "Terms & Conditions | 100x Circle",
+      "h1": "Terms and Conditions",
+      "canonical": "https://www.100xcircle.com/terms-and-conditions",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/return-policy",
+      "label": "Return Policy",
+      "status": 200,
+      "title": "Return Policy | 100x Circle",
+      "h1": "Return Policy",
+      "canonical": "https://www.100xcircle.com/return-policy",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/warranty-policy",
+      "label": "Warranty Policy",
+      "status": 200,
+      "title": "Warranty Policy | 100x Circle",
+      "h1": "Warranty Policy",
+      "canonical": "https://www.100xcircle.com/warranty-policy",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/disclaimer",
+      "label": "Disclaimer",
+      "status": 200,
+      "title": "Disclaimer | 100x Circle",
+      "h1": "Disclaimer",
+      "canonical": "https://www.100xcircle.com/disclaimer",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/ai/about-100x",
+      "label": "AI: About",
+      "status": 200,
+      "title": "About 100X Circle Pvt Ltd — AI-Readable Company Profile",
+      "h1": "100X Circle Pvt Ltd — AI-Readable Company Profile",
+      "canonical": "https://www.100xcircle.com/ai/about-100x",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/ai/factory",
+      "label": "AI: Factory",
+      "status": 200,
+      "title": "100X Circle Manufacturing Facility — Factory Profile",
+      "h1": "100X Circle Manufacturing Facility",
+      "canonical": "https://www.100xcircle.com/ai/factory",
+      "issues": [],
+      "errors": []
+    },
+    {
+      "path": "/ai/certifications",
+      "label": "AI: Certifications",
+      "status": 200,
+      "title": "100X Circle Certifications — ISO 9001, CE, ISI, GeM, MSME",
+      "h1": "100X Circle — Certifications and Registrations",
+      "canonical": "https://www.100xcircle.com/ai/certifications",
+      "issues": [],
+      "errors": []
+    }
+  ],
+  "allIssues": [
+    "Homepage: BROKEN_IMAGES: https://www.100xcircle.com/logo-main.png, https://res.cloudinary.com/dhbvzugv6/image/upload/f_auto,q_auto,w_300,c_limit,dpr_auto/v1780214929/npfovt85oy1y1rfm2siu.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1769349865/acvbqlp3gkomkr5savzi.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1772555199/gmi21xhk49rcrqlb6u5b.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1769349924/j9ehjqz4lw87q5uarlra.png",
+    "Products Listing: BROKEN_IMAGES: https://www.100xcircle.com/Logos%20clipart%202/MadeInIndia.png, https://www.100xcircle.com/Logos%20clipart%202/MadeInIndia.png, https://www.100xcircle.com/Logos%20clipart%202/MadeInIndia.png, https://www.100xcircle.com/Logos%20clipart%202/MadeInIndia.png, https://www.100xcircle.com/Logos%20clipart%202/MadeInIndia.png",
+    "Products Listing: CONSOLE_ERRORS: Failed to load resource: the server responded with a status of 404 ()",
+    "About: BROKEN_IMAGES: https://www.100xcircle.com/new.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png",
+    "Blog Index: BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1773894767/ql94rf7spy97be7dxihh.jpg, https://res.cloudinary.com/dhbvzugv6/image/upload/v1773380213/dqxv6wncd1vd8czqmt5m.jpg, https://res.cloudinary.com/dhbvzugv6/image/upload/v1761559376/pzsjk2uvjf28vuxcomz8.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1761561531/ahvbyq89orjqidbbyu3z.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1761136085/zbgy5hrkr85m3qxms4nl.png",
+    "Spare Parts: BROKEN_IMAGES: https://www.bestfoggerthailand.com/wp-content/uploads/2025/08/48.png, https://www.bestfoggerthailand.com/wp-content/uploads/2025/08/66.png, https://res.cloudinary.com/dhbvzugv6/image/upload/v1780514429/100x-final/f-4LmB4Lia4LiV4LmA4LiV4Lit4Lij4Li14LmI4LmA4LiX4Li14Lii4Li.jpg, https://res.cloudinary.com/dhbvzugv6/image/upload/v1780514429/100x-final/f-4LmB4Lia4LiV4LmA4LiV4Lit4Lij4Li14LmI4LmA4LiX4Li14Lii4Li.jpg, https://res.cloudinary.com/dhbvzugv6/image/upload/v1780514438/100x-final/f-4Liq4Liy4Lii4LmE4Lif4LmA4LiC4LmJ4Liy4Lib4Lix4LmK4Lih4Li.jpg",
+    "Compare Hub: CONSOLE_ERRORS: Failed to load resource: the server responded with a status of 400 ()",
+    "Thank You: BROKEN_IMAGES: https://www.100xcircle.com/logo-main.png",
+    "Knowledge: Malaria Control: BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png",
+    "Knowledge: How to Choose: BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png",
+    "Knowledge: Chemicals Guide: BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png",
+    "Knowledge: Operators Guide: BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png",
+    "Knowledge: Operators Guide: CONSOLE_ERRORS: Permissions policy violation: compute-pressure is not allowed in this document.",
+    "Knowledge: Maintenance: CONSOLE_ERRORS: Failed to load resource: the server responded with a status of 400 ()",
+    "Knowledge: Safety Guide: CONSOLE_ERRORS: Failed to load resource: the server responded with a status of 400 ()",
+    "Compare: Buyer Guide: CONSOLE_ERRORS: Failed to load resource: the server responded with a status of 400 ()",
+    "Compare: Municipal: CONSOLE_ERRORS: Failed to load resource: the server responded with a status of 400 ()",
+    "Landing: GeM OEM: BROKEN_IMAGES: https://res.cloudinary.com/dhbvzugv6/image/upload/v1780131171/brm8mbydpz7hhm1ngprs.png",
+    "Privacy Policy: CONSOLE_ERRORS: Failed to load resource: the server responded with a status of 400 ()",
+    "CONTACT_FORM: email validation not catching invalid email",
+    "HORIZONTAL_SCROLL at iPhone SE: 32px overflow",
+    "HORIZONTAL_SCROLL at iPhone 15: 32px overflow",
+    "HORIZONTAL_SCROLL at iPhone 15 Pro: 32px overflow",
+    "HORIZONTAL_SCROLL at iPad: 24px overflow",
+    "CONSOLE_ERRORS at iPad: Failed to load resource: the server responded with a status of 400 ()",
+    "PRODUCT_PAGE double-barrel-thermal-fogging-machine-vehicle-mounted: no inquiry CTA",
+    "PRODUCT_PAGE 100xdb400-double-barrel-thermal-fogging-machine-vehicle-moun-f377e0: no inquiry CTA",
+    "PRODUCT_PAGE thermal-cold-fogging-machine-100xtfs50-90602f: no inquiry CTA",
+    "SEO /products: keywords missing: Products"
+  ]
+}

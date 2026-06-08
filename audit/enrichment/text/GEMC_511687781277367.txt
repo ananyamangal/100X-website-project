@@ -1,0 +1,288 @@
+
+
+ 
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687781277367
+अनुबंधअनुबंध  !त!थ!त!थ|Generated Date :|Generated Date : 27-May-2026
+बोलीबोली//आरएआरए//पीबीपीपीबीपी  सं2यासं2या|Bid/RA/PBP No.:|Bid/RA/PBP No.:  GEM/2025/B/6956171
+खरीदखरीद  काका  मा=यममा=यम|Procurement Mode: |Procurement Mode: Bid
+संगठनसंगठन  !ववरण!ववरण|Organisation Details|Organisation Details
+HIप|Type :Central Government
+मंMालय|Ministry :Ministry of Railways
+!वभाग|Department :Indian Railways
+संगठन का नाम|Organisation Name :Western Railway
+कायाSलय TेM|Office Zone:Western Railway
+खरीदारखरीदार  !ववरण!ववरण|Buyer Details|Buyer Details
+पद|Designation :DyCMM Sales
+संपकS नंबर|Contact No. :90044-90761-
+ईमेल आईडी|Email ID :dycmmsales@wr.railnet.gov.in
+जीएसट_आईएन|GSTIN :-
+पता|Address :
+4th floor, PCMM Office, Churchegate.,
+Mumbai - City, MAHARASHTRA-400020, India
+ 
+!नरीTण!नरीTण  काका  HकारHकार|Type of Inspection:|Type of Inspection: Pre
+Dispatch
+गुणवdा आeासन योजना के !लए कृ पया बोली देखg|For Quality Assurance Plan please refer to the
+bid GEM/2025/B/6956171
+!नरीTण!नरीTण  एजgसीएजgसी /  / Hा!धकरणHा!धकरण|Inspection Agency/ Authority:|Inspection Agency/ Authority: RITES
+!वdीय!वdीय  jवीकृ !तjवीकृ !त  !ववरण!ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम!त|IFD Concurrence :No
+Hशास!नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+PCEE/WR
+!वdीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+Sr.DFM/MMCT
+भुगतानभुगतान  Hा!धकरणHा!धकरण  !ववरण!ववरण|Paying Authority Details|Paying Authority Details
+Role:BUYER
+भुगतान का तरीका|
+Payment Mode:
+Railways
+पद|Designation :DyCMM Sales
+ईमेल आईडी|Email ID :dycmmsales@wr.railnet.gov.in
+जीएसट_आईएन|GSTIN :-
+पता|Address:
+4th floor, PCMM Office, Churchegate.,
+Mumbai - City, MAHARASHTRA-400020, India
+ 
+ 
+!वे ता!वे ता  !ववरण!ववरण|Seller Details|Seller Details
+जेम !वे ता आईडी|GeM Seller ID :07EB190000795435
+कं पनी का नाम|Company Name :POLYCAB INDIA LIMITED
+संपकS नंबर|Contact No. :09350043727
+ईमेल आईडी|Email ID :dhruv.kumar@polycab.com
+पता| Address :
+Village Nurpura,,Plot No 67-69,71-72,75-76,102,103,104/1- 2,105.106,116/2,,Halol Vadodara Road, Halol,,Tal Halol,
+Panchmahals, Gujarat, 389350,
+Panch Mahals, GUJARAT-389350, -
+एमएसएमई पंजीकरण सं2या|MSME Registration number :-
+जीएसट_आईएन|GSTIN:
+26AAACP6474E1ZF (B) , 24AAACP6474E1ZJ (M) , 26AAACP6474E1ZF (M) , 05AAACP6474E1ZJ (M) , 24AAACP6474E1ZJ (B) , (M) ,
+27AAACP6474E1ZD (M) , 24AAACP6474E1ZJ (M) , (R) , (M)
+खरीदार wारा मूyयां!कत एमआईआई !z!त | MII Status as
+evaluated by buyer :
+Verified
+खरीदार wारा स{या!पत एमएसएमई !z!त |MSME Status as
+verified by buyer :
+Not Verified
+*!जसके नाम के पT मg GST/TAX इनवॉइस पेश !कया जाएगा|GST / Tax invoice to be raised in the name of - Consignee
+!वतरण !नदश | Delivery Instructions : NA
+उ{पादउ{पाद  !ववरण!ववरण|Product Details|Product Details
+##आइटमआइटम  !ववरण!ववरण|Item Description|Item Description
+आइटमआइटम
+!ववरण!ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूyयमूyय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  !वभाजन!वभाजन
+(INR)|(INR)|
+TaxTax
+BifurcationBifurcation
+(INR)(INR)
+मूyयमूyय  
+(INR (INR मgमg  सभीसभी
+शुyकशुyक  औरऔर  करकर
+स!हतस!हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ{पादउ{पाद  काका  नामनाम |Product Name :  |Product Name : POLYCAB XLPE Cable Working Voltage from 3.3 kV to 33 kV Size 240 sq.
+mm
+ांडांड|Brand : |Brand : POLYCAB
+ांडांड  HकारHकार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  !z!त!z!त|Catalogue Status: |Catalogue Status: Catalogue not verified by OEM
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+ेणीेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : XLPE Cables for Working Voltages From 3.3 KV up
+to and Including 33 KV as per IS 7098 (Part 2) (Q3)
+मॉडलमॉडल|Model:|Model: Polycab 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: 85446090 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+15,000meter2,037.86NA30,567,900
+कु ल ऑडSर मूyय |Total Order Value (in INR)30,567,90030,567,900
+
+!नरीTण!नरीTण  अ!धकारीअ!धकारी|Inspection Officer:|Inspection Officer:
+नामनाम|Name:|Name:Western Region Inspection Officer, 2ND FLOOR, CHURCH GATE, M.K ROAD, CHURCH GATE MUMBAI -400020
+ईमेलईमेल|E-mail:|E-mail:wrinspn@rites.com
+संपकSसंपकS|Phone:|Phone:+91932644430
+Place of Inspection:Place of Inspection:
+पतापता|Address:|Address:Polycab India Limited 74/7,8,9, Daman Industrial Estate, Village-Kadaiya, Daman-396210
+नामनाम|person name:|person name:M A Qureshi
+संपकSसंपकS  नंबरनंबर|contact number:|contact number:9322596223
+ 
+परे!षतीपरे!षती  !ववरण!ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे!षतीपरे!षती|Consignee|Consigneeवjतुवjतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माMामाMा|Quantity|Quantity
+!दनांक!दनांक  केके  बादबाद
+!डलीवरी!डलीवरी  शुIशुI
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+!वतरण!वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+1
+पद| Designation : -
+ईमेल आईडी|Email ID : ujjwal.3108@gov.in
+संपकS|Contact : -
+जीएसट_आईएन|GSTIN : -
+पता|Address : CABLE DEPOT ,ALIBHAI PREMJI ROAD, GRANT ROAD (E),
+MUMBAI 400007,
+Mumbai, MAHARASHTRA-400007, India
+POLYCAB XLPE Cable
+Working Voltage from
+3.3 kV to 33 kV Size 240
+sq. mm
+-15,00027-May-202626-Jul-2026
+Product Specification for POLYCAB XLPE Cable Working Voltage from 3.3 kV to 33 kV Size 240 sq. mmProduct Specification for POLYCAB XLPE Cable Working Voltage from 3.3 kV to 33 kV Size 240 sq. mm
+!व!नदश!व!नदश|Specification|Specificationउपउप--!व!नदश!व!नदश|Sub-Spec|Sub-Specमूyयमूyय|Value|Value
+GENERIC
+Crosslinked Polyethylene Insulated Thermoplastics Sheathed Cables, for Working Voltages from 3.3 kV up to and Including 33 kV
+conforming to
+IS:7098-Part 2:2011
+latest  
+BIS MarkedYes  
+BIS Marekd if "Yes" BIS License Number (CM/L Number) - Must declare7180366  
+Types of cable
+Three-core armoured,
+screened  
+Voltage Grade
+Earthed systems:
+12.7/22 kV  
+Armoured cables upto 11 kV Grade specified in this standard are suitable for use in mines (as per Cl. 1.3 , 4.1.1, Cl. 17.5 and Cl.
+21.2.1 of IS:7098 (Part 2):2011 (If "Yes" manufacturer shall have valid BIS License for the same )
+No  
+Low temperature appliction (If "Yes" manufacturer shall have valid BIS License for the same )No  
+Conductor material (as per Cl.4 of IS:7098 (Part 2):2011 latestAluminium  
+Outer sheath (Type ST2)PVC  
+"Nominal Area of Conductor (in Sq.mm)240  
+CONSTRUCTIONAL
+Insulation (conforming to the requiremnt as per Table.1 of IS:7098 (Part 2):2011 latest
+cross linked
+polyethylene  
+Armouring
+Galvanized round
+steel wire armoured  
+Cable packing type (Wound on drum) (as per Cl. 22.1 of I:7098 (Part 2):2011 latestSteel drum  
+Identification on cable as per Cl. 21 of IS:7098 (Part 2):2011 latestYes  
+Marking on cable (as per Cl. 22.2 of I:7098 (Part 2):2011 latestYes  
+CERTIFICATIONS
+Availability of Type test report from Central government/NABL/ILAC accridiated laoratory to prove conformity to the specificationYes  
+Test report number - Must declare2981F  
+Report date - Must declare26-10-23  
+Name of lab - Must declareRTRC  
+Address of lab - Must declareHaryana-122050  
+All the test reports and certificates shall furnish by the supplier to the buyer/consignee on demandYes  
+ 
+उ{पादउ{पाद  काका  बीआईएसबीआईएस  लाइसgसलाइसgस|BIS license of the product:|BIS license of the product: 7180366
+खरीदारखरीदार  प!रभा!षतप!रभा!षत  अ!त!रतअ!त!रत  !व!शता!व!शता  केके  !लए!लए  |Buyer Defined Additional Specification for POLYCAB XLPE Cable Working Voltage from 3.3 kV to 33|Buyer Defined Additional Specification for POLYCAB XLPE Cable Working Voltage from 3.3 kV to 33
+kV Size 240 sq. mmkV Size 240 sq. mm
+!व!नदश!व!नदश|Specification|Specificationमूyयमूyय|Value|Value
+
+DESCRIPTION (Ns
+Demand-No. WR-18065-
+25-00020 , Stores Case
+No. 10255018)
+22Kv grade (E) cable (12.7 / 22Kv Uo/U) 3 x 240 sqmm standed compact circular aluminum conductor screening with extruded semiconducting XLPE
+insulated insulated screen with extruded semiconducting compound / metallic screening extruded PVC inner sheath with PVC filled extrude filler
+galvanized steel round wire armoured and overall PVC sheathed cable confirming to IS - 7098 Part-II (2011) with latest Amendment with improve fire
+performance category - 01
+ 
+शु!पMशु!पM|Corrigendum|Corrigendum
+11. . GeM-Bidding-Corr-8662783-1.pdf :GeM-Bidding-Corr-8662783-1.pdf :यहांयहां  !लक!लक  करgकरg|click here|click here
+ईपीबीजीईपीबीजी  !ववरण!ववरण  | ePBG Detail| ePBG Detail
+!नयम!नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. General Terms and Conditions-1. General Terms and Conditions-
+1.11.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+1.21.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+1.31.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+2. Buyer Added Bid Specific Terms and Conditions-2. Buyer Added Bid Specific Terms and Conditions-
+2.12.1  GenericGeneric: : 
+OPTION CLAUSE: The Purchaser reserves the right to increase or decrease the quantity to be ordered up to 25 percent of bid quantity at the time of placement of contract. TheOPTION CLAUSE: The Purchaser reserves the right to increase or decrease the quantity to be ordered up to 25 percent of bid quantity at the time of placement of contract. The
+purchaser also reserves the right to increase the ordered quantity up to 25% of the contracted quantity during the currency of the contract at the contracted rates. The deliverypurchaser also reserves the right to increase the ordered quantity up to 25% of the contracted quantity during the currency of the contract at the contracted rates. The delivery
+period of quantity shall commence from the last date of original delivery order and in cases where option clause is exercised during the extended delivery period the additionalperiod of quantity shall commence from the last date of original delivery order and in cases where option clause is exercised during the extended delivery period the additional
+time shall commence from the last date of extended delivery period. The additional delivery time shall be (Increased quantity ÷ Original quantity) × Original delivery period (intime shall commence from the last date of extended delivery period. The additional delivery time shall be (Increased quantity ÷ Original quantity) × Original delivery period (in
+days), subject to minimum of 30 days. If the original delivery period is less than 30 days, the additional time equals the original delivery period. The Purchaser may extend thisdays), subject to minimum of 30 days. If the original delivery period is less than 30 days, the additional time equals the original delivery period. The Purchaser may extend this
+calculated delivery duration up to the original delivery period while exercising the option clause. Bidders must comply with these terms.calculated delivery duration up to the original delivery period while exercising the option clause. Bidders must comply with these terms.
+2.22.2  InspectionInspection: : 
+Nominated Inspection Agency:Nominated Inspection Agency: On behalf of the Buyer organization, any one of the following Inspection Agency would be conducting inspection of stores before acceptance: On behalf of the Buyer organization, any one of the following Inspection Agency would be conducting inspection of stores before acceptance:
+Pre-dispatch Inspection at Seller Premises (applicable only if pre-dispatch inspection clause has been selected in ATC):Pre-dispatch Inspection at Seller Premises (applicable only if pre-dispatch inspection clause has been selected in ATC):
+RITESRITES
+Post Receipt Inspection at consignee site before acceptance of stores:Post Receipt Inspection at consignee site before acceptance of stores:
+ConsigneeConsignee
+2.32.3  Scope of SupplyScope of Supply: : 
+Scope of supply (Bid price to include all cost components) : Only supply of GoodsScope of supply (Bid price to include all cost components) : Only supply of Goods
+2.42.4  Buyer Added Bid Specific ATCBuyer Added Bid Specific ATC: : 
+Buyer Added text based ATC clausesBuyer Added text based ATC clauses
+(i) (i) DescriptionDescription:-:-22Kv grade (E) cable (12.7 / 22Kv Uo/U) 3 x 240 sqmm standed compact circular aluminum conductor screening with extruded semiconducting XLPE insulated ins22Kv grade (E) cable (12.7 / 22Kv Uo/U) 3 x 240 sqmm standed compact circular aluminum conductor screening with extruded semiconducting XLPE insulated ins
+ulated screen with extruded semiconducting compound / metallic screening extruded PVC inner sheath with PVC filled extrude filler galvanized steel round wire armoured and oulated screen with extruded semiconducting compound / metallic screening extruded PVC inner sheath with PVC filled extrude filler galvanized steel round wire armoured and o
+verall PVC sheathed cable confirming to IS - 7098 Part-II (2011) with latest Amendment with improve fire performance category - 01.verall PVC sheathed cable confirming to IS - 7098 Part-II (2011) with latest Amendment with improve fire performance category - 01.
+(ii) (ii) Eligiblity:Eligiblity:  
+(a) Purchase restricted from BIS certified firms or their authorized agent/dealer for IS 7098 part-II (2011) or latest.Firm to submit valid BIS certificate of OEM along with the offer,e(a) Purchase restricted from BIS certified firms or their authorized agent/dealer for IS 7098 part-II (2011) or latest.Firm to submit valid BIS certificate of OEM along with the offer,e
+lse offer will be rejected.lse offer will be rejected.
+  
+(b)The cable manufacturer should submit a type test report from the NABL accredited laboratory/Govt. approved laboratory as prescribed in IS 7098 part-II (2011) or latest along (b)The cable manufacturer should submit a type test report from the NABL accredited laboratory/Govt. approved laboratory as prescribed in IS 7098 part-II (2011) or latest along 
+with the offer, else offer will be rejected.with the offer, else offer will be rejected. 
+(iii)(iii)  Other Other Condition:-Condition:-
+(A)(A) Inspection by RITES , Deviation in inspection clause will not be accepted. Inspection by RITES , Deviation in inspection clause will not be accepted.
+(B)(B)    Procurement from Authorized Agents/Dealers/Distributors etc. Procurement from Authorized Agents/Dealers/Distributors etc. 
+a).a).OEMs should quote directly preferably or an OEM can authorize and give Tender Specific Authorization (TSA) to its Agent/Dealer to quote on their behalf.OEMs should quote directly preferably or an OEM can authorize and give Tender Specific Authorization (TSA) to its Agent/Dealer to quote on their behalf.
+ b)  b) The Authorized Dealer/Agent should upload valid tender specific authorization, along with the offer, failing which their offer is liable to be passed over.The Authorized Dealer/Agent should upload valid tender specific authorization, along with the offer, failing which their offer is liable to be passed over.
+c) Trader/Authorized Dealer should mention name of Manufacturer, make and complete address in their bid for inspection of material at OEM works.c) Trader/Authorized Dealer should mention name of Manufacturer, make and complete address in their bid for inspection of material at OEM works.
+d) In a tender, either the authorized agent/dealer on behalf of the Principal/OEM or the Principal/OEM itself can bid, but both cannot bid simultaneously for the same item in the sd) In a tender, either the authorized agent/dealer on behalf of the Principal/OEM or the Principal/OEM itself can bid, but both cannot bid simultaneously for the same item in the s
+ame tender and such bids will be summarily rejected.ame tender and such bids will be summarily rejected.
+e).Further, against a particular tender, one Principal/OEM should not issue Tender Specific Authorization to more than one agent/ dealer. Such offers will be treated as ambiguouse).Further, against a particular tender, one Principal/OEM should not issue Tender Specific Authorization to more than one agent/ dealer. Such offers will be treated as ambiguous
+सलाहकारसलाहकार  बकबक |  | Advisory Bank :Advisory Bank :State Bank of India
+ईपीबीजीईपीबीजी  H!तशतH!तशत (%)  (%) | ePBG Percentage(%):| ePBG Percentage(%):5.00
+बोलीबोली  लगानेलगाने  वालेवाले  कोको  बोलीबोली  केके  !नयम!नयम  औरऔर  शतशत  केके  अनुसारअनुसार  लागूलागू  ईपीबीजीईपीबीजी  HjतुतHjतुत  करनाकरना  होगाहोगा  |The bidder shall furnish ePBG as applicable as per bid's terms and conditions|The bidder shall furnish ePBG as applicable as per bid's terms and conditions
+ 
+
+offers, the bidder(s) or their Principal/OEM will have no right to lodge any claim.offers, the bidder(s) or their Principal/OEM will have no right to lodge any claim.
+f) If an authorized agent/dealer submits bid on behalf of a Principal/OEM, the same agent/dealer shall not submit a bid on behalf of another Principal/OEM in the same tender for tf) If an authorized agent/dealer submits bid on behalf of a Principal/OEM, the same agent/dealer shall not submit a bid on behalf of another Principal/OEM in the same tender for t
+he same item/product and such bids will be summarily rejected.he same item/product and such bids will be summarily rejected.
+g) In case tenderer participate as an authorized agent, then the performance as required above shall be that of the Principal, authorizing the agent. It may so happen that the ageg) In case tenderer participate as an authorized agent, then the performance as required above shall be that of the Principal, authorizing the agent. It may so happen that the age
+nt has credentials of past supply for a different Principal but this will not be considered as performance for placing bulk order in case of change of Principal.nt has credentials of past supply for a different Principal but this will not be considered as performance for placing bulk order in case of change of Principal.
+(iv)(iv) MSE BENEFITS AND EMD MSE BENEFITS AND EMD: MSE benefits will be given to OEMs with valid UDYAM certificate. Hard copy of E MD should be submitted to Dy. CMM Sales, O/o PCMM WESTERN : MSE benefits will be given to OEMs with valid UDYAM certificate. Hard copy of E MD should be submitted to Dy. CMM Sales, O/o PCMM WESTERN 
+RAILWAY, 4th FLOO R, CHURCHGATE S T ATION BUILDING, MUMBAI 400020 within 5 working days of bid opening.RAILWAY, 4th FLOO R, CHURCHGATE S T ATION BUILDING, MUMBAI 400020 within 5 working days of bid opening.
+(v)(v) Latest word mentioned in description regarding specification means the latest Revision/amendment applicable on the date of closing of Bid. Latest word mentioned in description regarding specification means the latest Revision/amendment applicable on the date of closing of Bid.
+(vi) (vi) SplittingSplitting  Ctiteria:-Ctiteria:-    
+Price differentialPrice differential
+between L1 and L2between L1 and L2
+Quantity distribution ratioQuantity distribution ratio
+between L1between L1
+and L2and L2
+Up to 3%Up to 3%60:4060:40
+More than 3% and upMore than 3% and up
+to 5%to 5%
+65:3565:35
+More than 5%More than 5%At least 65% on the L1At least 65% on the L1
+Tenderer. For the quantity toTenderer. For the quantity to
+be ordered on the L-2be ordered on the L-2
+tenderer, TC/TAA shalltenderer, TC/TAA shall
+decide.decide.
+ 
+ However, the rate of the highest eligible tenderer within the zone of consideration has to be per se reasonable.
+SPECIAL INSTRUCTIONS: "Delivery mentioned in bid of 60 days to be read as 90 days.Bidders shall 
+note this and quote accordingly." 
+ 
+..
+Note:Note:  
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.and will also contribute to improving their ratings.
+नोटनोट: : यहयह  !सjटम!सjटम  जनरेटेडजनरेटेड  फाइलफाइल  हैहै। । कोईकोई  हjताTरहjताTर  कक  आव¡यकताआव¡यकता  नह¢नह¢  हैहै। । इसइस  दjतावेज़दjतावेज़  काका  !Hंट!Hंट  आउटआउट  भुगतानभुगतान//लेनदेनलेनदेन  उ¤े¡यउ¤े¡य  केके  !लए!लए  मा¥यमा¥य  नह¢नह¢  हैहै। । 
+Note: This is system generated file. No signature is required. Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.Print out of this document is not valid for payment/ transaction purpose.

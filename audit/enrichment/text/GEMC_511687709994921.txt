@@ -1,0 +1,224 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687709994921
+अनुबंधअनुबंध  #त#थ#त#थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा.यममा.यम|Procurement Mode: |Procurement Mode: Lowest price by
+comparison(L1)
+संगठनसंगठन  #ववरण#ववरण|Organisation Details|Organisation Details
+CDप|Type :State Government
+मंIालय|Ministry :-
+#वभाग|Department :
+Health Medical Education and Family Welfare Department
+Jharkhand
+संगठन का नाम|Organisation
+Name :
+N/A
+कायाUलय VेI|Office Zone:Civil Surgeon Office Giridih
+खरीदारखरीदार  #ववरण#ववरण|Buyer Details|Buyer Details
+पद|Designation :DAM DHS GIRIDIH
+संपकU नंबर|Contact No. :06532-250842-
+ईमेल आईडी|Email ID :sumitkg0608@gmail.com
+जीएसटfआईएन|GSTIN :20PTND02486B1D2
+पता|Address :
+SADAR HOSPITAL CAMPUS GIRIDIH,
+Giridh, JHARKHAND-815301, India
+ 
+#वjीय#वjीय  kवीकृ #तkवीकृ #त  #ववरण#ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम#त|IFD Concurrence :No
+Cशास#नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+CS CUM CEO DHS GIRIDIH
+#वjीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+CS CUM CEO DHS GIRIDIH
+भुगतानभुगतान  Cा#धकरणCा#धकरण  #ववरण#ववरण|Paying Authority Details|Paying Authority Details
+Role:PAO
+भुगतान का तरीका|
+Payment Mode:
+Internet Banking
+पद|Designation :PAO DHS
+ईमेल आईडी|Email ID :neeraj2619@gmail.com
+जीएसटfआईएन|GSTIN :20PTND02486B1D2
+पता|Address:
+SADAR HOSPITAL CAMPUS GIRIDIH,
+Giridh, JHARKHAND-815301, India
+ 
+ 
+#वे ता#वे ता  #ववरण#ववरण|Seller Details|Seller Details
+जेम #वे ता आईडी|GeM Seller ID :OEYH250012842414
+कं पनी का नाम|Company Name :BABA BHRIGUNATH ENTERPRISES
+संपकU नंबर|Contact No. :06387287393
+ईमेल आईडी|Email ID :ranjansingh8052@gmail.com
+पता| Address :
+KHATA N0-8 KHESARA-2495,BLOCK COLONY,PHUSRO BAZAR,
+BOKARO, JHARKHAND-829144, -
+एमएसएमई पंजीकरण संsया|MSME Registration number :UDYAM-JH-01-0040402
+जीएसटfआईएन|GSTIN:20DKJPS6918B1Z9 (R)
+एमएसई सामा#जक tेणी|MSE Social Category :General
+एमएसई #लंग tेणी|MSE Gender :Male
+*#जसके नाम के पV मv GST/TAX इनवॉइस पेश #कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+#वतरण #नद{श | Delivery Instructions : NA
+उ}पादउ}पाद  #ववरण#ववरण|Product Details|Product Details
+##आइटमआइटम  #ववरण#ववरण|Item Description|Item Description
+आइटमआइटम
+#ववरण#ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूयमूय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  #वभाजन#वभाजन (INR)| (INR)|
+Tax BifurcationTax Bifurcation
+(INR)(INR)
+मूयमूय  
+(INR (INR मvमv  सभीसभी
+शुकशुक  औरऔर  करकर
+स#हतस#हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ}पादउ}पाद  काका  नामनाम |Product Name :  |Product Name : Laerdal Manikin for Tracheal Intubation Training , Adult
+ांडांड|Brand : |Brand : Laerdal
+ांडांड  CकारCकार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  ##त##त|Catalogue Status: |Catalogue Status: Catalogue not verified by OEM
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : Reseller not verified by OEM
+tेणीtेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Manikin for Tracheal Intubation
+Training (Q3)
+मॉडलमॉडल|Model:|Model: 25000033 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: Norway
+4pieces100,000NA400,000
+कु ल ऑडUर मूय |Total Order Value (in INR)400,000400,000
+ 
+परे#षतीपरे#षती  #ववरण#ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे#षतीपरे#षती|Consignee|Consigneeवkतुवkतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माIामाIा|Quantity|Quantity
+#दनांक#दनांक  केके  बादबाद
+#डलीवरी#डलीवरी  शुDशुD
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+#वतरण#वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+
+1
+पद| Designation : DAM DHS GIRIDIH
+ईमेल आईडी|Email ID : sumitkg0608@gmail.com
+संपकU|Contact : 06532-250842-
+जीएसटfआईएन|GSTIN : 20PTND02486B1D2
+पता|Address : SADAR HOSPITAL CAMPUS GIRIDIH,
+Giridh, JHARKHAND-815301, India
+Laerdal Manikin for
+Tracheal Intubation
+Training , Adult
+-427-May-202611-Jun-2026
+Product Specification for Laerdal Manikin for Tracheal Intubation Training , AdultProduct Specification for Laerdal Manikin for Tracheal Intubation Training , Adult
+#व#नद{श#व#नद{श|Specification|Specificationउपउप--#व#नद{श#व#नद{श|Sub-Spec|Sub-Specमूयमूय|Value|Value
+GENERAL
+Product DescriptionManikin for Tracheal Intubation Training  
+Purpose
+Tracheal intubation trainer is to teach and refine the skills necessary for performing
+this critical life-saving procedure, ensuring proper airway management and
+minimizing complications across different age groups  
+PRODUCT
+INFORMATION
+Size of the SimulatorAdult  
+Type of ManikinUpper Torso with Tongue, teeth and lungs  
+Anatomically accurate reproduction of a torso for teaching the
+differences airway management procedures
+Yes  
+Realistic anatomy with
+Nostrils,Lips,Teeth,Tongue,Pharynx-oral,Nasal,Larynx with glottis
+opening,Vallecula,Arytenoids,Vocal cords,Sub Glottis Cricoid Ring,Lungs,Trachea
+with Carina,Esophagus,Stomach  
+Simulation of Intubation Procedures
+Tracheal (Oral and Nasal),Pharyngeal (Oral and Nasal),Esophageal,Fiber optic
+intubation (Oral / Nasal)  
+Anatomically accurate airway allowing sizing and insertion of
+various airway adjuncts
+Oropharyngeal Airway Insertion,Nasopharyngeal Airway Insertion,Laryngeal Mask
+Airway (LMA)  
+Manually Generated Carotid PulseNo  
+Training in all intubation procedures tracheal-oral and nasal and
+the use
+Tracheal-oral,Nasal  
+Use of the Laryngeal Mask Airway and CombitubeYes  
+Realistic head positioning, Neck flexion, extension and rotation,
+head lift and jaw movability
+Yes  
+Provide realistic complicationsLaryngospasm,Vomiting,Excessive laryngoscope pressure on teeth,Tongue Edema  
+Realistic checking for proper tube placement with visual
+inspection of lung expansion during ventilation
+Yes  
+Auscultation of breathing soundsYes  
+Establish and maintain an open airway by head tilt, chin lift, neck
+lift and jaw thrust
+Yes  
+Realistic practice in lung ventilation with the use of Bag Mask
+Ventilation
+Yes  
+Practical training in clearing the obstructed airway by suctioning
+liquid foreign matter from, oral cavity, oro- or naso pharynx, oro-
+or naso trachea, via endotracheal tube
+Yes  
+Gastric DrainageYes  
+Cricoid Pressure feature availabilityYes  
+Surgical AirwayYes  
+CERTIFICATIONSCertification for manufacturing unitISO:9001 (Latest)  
+WARRANTY
+Warranty in years (Option of comprehensive warranty is available
+through bidding only, which if opted will supersede normal
+warranty in the catalogue)
+3  year
+ 
+#टपणी#टपणी|Note:: |Note:: Seller has given an undertaking that it has made arrangements for getting the stores from an authorized distributor / dealer / channel partner of the OEM of the
+offered product. At the time of delivery of goods, Seller will provide necessary chain documents (in the form of GST Invoice) to prove that the supplied goods are genuine and are
+being sourced from an authorized distributor / dealer / channel partner of the OEM. In case of any complaint about genuineness of the supplied products, Seller shall be
+responsible for providing genuine replacement supplies.
+ 
+ईपीबीजीईपीबीजी  #ववरण#ववरण  | ePBG Detail| ePBG Detail
+NANA
+#नयम#नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 23-10-2024Version:1 effective from 23-10-2024
+1.11.111. . AAll Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under as amended till date will always be applicable. Thisll Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under as amended till date will always be applicable. This
+will include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW) and Department ofwill include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW) and Department of
+Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers time to time in this regard, if applicable.Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers time to time in this regard, if applicable.
+22. . The sellers are registered on GeM based on self declaration of valid Medical Device License, product certification, test reports etc. However, buyers must check andThe sellers are registered on GeM based on self declaration of valid Medical Device License, product certification, test reports etc. However, buyers must check and
+validate the details at their end for all applicable licenses and certifications e.g., validity and authenticity/genuineness of Medical Device license, product certification,validate the details at their end for all applicable licenses and certifications e.g., validity and authenticity/genuineness of Medical Device license, product certification,
+manufacturer certification/licenses, test reports etc., if applicable.manufacturer certification/licenses, test reports etc., if applicable.
+33. . In case of authorized resellers/distributors, it will be the legal & regulatory liability of the manufacturer to ensure that their resellers/distributors are operating inIn case of authorized resellers/distributors, it will be the legal & regulatory liability of the manufacturer to ensure that their resellers/distributors are operating in
+compliance with all relevant laws and regulations and are properly licensed to sell the manufacturer's products, including verifying the validity and authenticity ofcompliance with all relevant laws and regulations and are properly licensed to sell the manufacturer's products, including verifying the validity and authenticity of
+Medical Device license held by them.Medical Device license held by them.
+44. . The price offered by the seller/bidder shall not, in any case exceed the DPCO/NPPA controlled price or price fixed by State Government, if any. The seller must reduceThe price offered by the seller/bidder shall not, in any case exceed the DPCO/NPPA controlled price or price fixed by State Government, if any. The seller must reduce
+the prices if there is any reduction in DPCO/NPPA ceiling price or price fixed by State Government, if any.the prices if there is any reduction in DPCO/NPPA ceiling price or price fixed by State Government, if any.
+55. . Any other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional TermsAny other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional Terms
+and Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms andand Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms and
+conditions are in reverse order of precedence i.e. ATC shall supersede specific STC which shall supersede General Terms and Conditions (GTC), whenever there areconditions are in reverse order of precedence i.e. ATC shall supersede specific STC which shall supersede General Terms and Conditions (GTC), whenever there are
+any conflicting provisions.any conflicting provisions.
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह #सkटम जनरेटेड फाइल है। कोई हkताVर क आवयकता नह है। इस दkतावेज़ का #Cंट आउट भुगतान/लेनदेन उेय के #लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

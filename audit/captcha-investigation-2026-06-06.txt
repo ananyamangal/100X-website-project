@@ -1,0 +1,47 @@
+GEM SEARCH CAPTCHA INVESTIGATION REPORT
+Generated: 2026-06-06T17:04:04.970Z
+══════════════════════════════════════════════════════════════════════
+
+1. CAPTCHA ENDPOINT
+   Primary: https://gem.gov.in/assets/phpcaptcha/captcha.php
+   Response: {"status":500,"body":""}
+   Plaintext answer in response: false
+
+2. RESPONSE PAYLOAD
+   {
+     "status": 500,
+     "body": ""
+   }
+
+3. DOM / JS / STORAGE
+   Captcha-related JS globals: {"capValue":null,"captchaVal":null,"captchaValue":null,"cap":null,"imgCode":null,"captcha_answer":null,"sitekey":null,"_captcha":null,"captcha_check":"function captcha_check(no){\n       \n       \n       var encString = $(`#h_captcha${no}`).val();\n       var plainStr = $(`#captcha_code${no}`).val();\n       var encResp = '';\n\n       if ($(`#captcha_cod"}
+   Hidden fields: {"lang":"english","h_search_category_mobile":"","h_cat_id_mobile":"0","h_search_category":"","h_cat_id":"0","h_captcha1":"6cmiVaze+l7T+v7JzwQD8w==","h_captcha2":"6cmiVaze+l7T+v7JzwQD8w==","pageno":"0","tabtype":"1","h_captcha":"","is_ajax":"","oid":""}
+   localStorage keys: load
+   sessionStorage keys: 
+
+4. VALIDATION MECHANISM
+   Server-side validation: true
+   Wrong captcha rejected: true
+   Test detail: {
+     "wrong_captcha_sent": "XXXXX",
+     "server_rejected": true,
+     "results_appeared": false,
+     "server_side_validation": true,
+     "page_text_excerpt": "English\nहिंदी\nதமிழ்\nবাংলা\nঅসমীয়া\nਪੰਜਾਬੀ\nગુજરાતી\nಕನ್ನಡ\nमराठी\nമലയാളം\nଓଡ଼ିଆ\nతెలుగు\n  Dark Mode Font Size A- A A+ Skip to Main Content  \n Raise a Ticket Need Help ? \nPRODUCTS SERVICES CONTENT    INTERACTIVE TRAINING COURSES   \nForward Auction   \nOngoing Auctions\nFA Buyer Registration\nFA Buyer Login\nBids   \nList of Bids\nRailways Bids\nPBP Notices\nSign Up  \nBuyer Organisation\nSeller/Service Provider\nGRA /VA for GeM New\nLogin  \nGeM\nGRA /VA for GeM New\n Categories\nFeatures & Benefits Business Opportunitie"
+   }
+
+5. AUTO-SOLVE ATTEMPT
+   {
+     "answer_found": false,
+     "reason": "captcha.php not plaintext"
+   }
+
+6. CONCLUSION
+   INCONCLUSIVE — captcha.php not returning plaintext for search captcha; needs further investigation
+
+7. AUTOMATION FEASIBILITY
+   ✗ NOT AUTOMATABLE with this method
+   Evidence: INCONCLUSIVE — captcha.php not returning plaintext for search captcha; needs further investigation
+   Fallback: Keep manual captcha entry in collector
+
+══════════════════════════════════════════════════════════════════════

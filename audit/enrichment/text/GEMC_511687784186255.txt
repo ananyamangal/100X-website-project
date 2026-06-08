@@ -1,0 +1,189 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687784186255
+अनुबंधअनुबंध  !त!थ!त!थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा-यममा-यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  !ववरण!ववरण|Organisation Details|Organisation Details
+?@प|Type :State Government
+मंFालय|Ministry :-
+!वभाग|Department :
+Medical Health and Family Welfare Department Uttar
+Pradesh
+संगठन का नाम|Organisation
+Name :
+N/A
+कायाPलय QेF|Office Zone:209725
+खरीदारखरीदार  !ववरण!ववरण|Buyer Details|Buyer Details
+पद|Designation :SR CONSULTANT
+संपकP नंबर|Contact No. :05694-237627-7992
+ईमेल आईडी|Email ID :buycon464.mhfwdup.up@gembuyer.in
+जीएसटeआईएन|GSTIN :-
+पता|Address :
+COMBINED DISTT. HOSPITAL G.T. ROAD KANNAUJ,
+Kannauj, UTTAR PRADESH-209725, India
+ 
+!वjीय!वjीय  kवीकृ !तkवीकृ !त  !ववरण!ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम!त|IFD Concurrence :No
+?शास!नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+CMS
+!वjीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+CMS
+भुगतानभुगतान  ?ा!धकरण?ा!धकरण  !ववरण!ववरण|Paying Authority Details|Paying Authority Details
+Role:PAO
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :CMS
+ईमेल आईडी|Email ID :cmskannauj1@gmail.com
+जीएसटeआईएन|GSTIN :-
+पता|Address:
+G.T. ROAD KANNAUJ,
+Kannauj, UTTAR PRADESH-209725, India
+ 
+ 
+!वे ता!वे ता  !ववरण!ववरण|Seller Details|Seller Details
+जेम !वे ता आईडी|GeM Seller ID :B778190001010445
+कं पनी का नाम|Company Name :ANAND AGENCIES
+संपकP नंबर|Contact No. :09628222269
+ईमेल आईडी|Email ID :kamalagenciesmkt@gmail.com
+पता| Address :
+18/59,KURSAWAN,THE MALL,
+KANPUR NAGAR, UTTAR PRADESH-208001, -
+एमएसएमई पंजीकरण संrया|MSME Registration number :UDYAM-UP-43-0115829
+जीएसटeआईएन|GSTIN:09BSIPB9739G1ZE (R)
+एमएसई सामा!जक tेणी|MSE Social Category :General
+एमएसई !लंग tेणी|MSE Gender :Male
+*!जसके नाम के पQ मv GST/TAX इनवॉइस पेश !कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+!वतरण !नद{श | Delivery Instructions : NA
+उ}पादउ}पाद  !ववरण!ववरण|Product Details|Product Details
+##आइटमआइटम  !ववरण!ववरण|Item Description|Item Description
+आइटमआइटम
+!ववरण!ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूयमूय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  !वभाजन!वभाजन (INR)| (INR)|
+Tax BifurcationTax Bifurcation
+(INR)(INR)
+मूयमूय  
+(INR (INR मvमv  सभीसभी
+शुकशुक  औरऔर  करकर
+स!हतस!हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ}पादउ}पाद  काका  नामनाम |Product Name :  |Product Name : LIFE-O-MED Nasogastric (NG) Infant Feeding Tube , of Size 10
+Fr
+ांडांड|Brand : |Brand : LIFE-O-MED
+ांडांड  ?कार?कार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  !!त!!त|Catalogue Status: |Catalogue Status: OEM verified catalogue
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+tेणीtेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Infant Feeding Tube (V3) (Q2)
+मॉडलमॉडल|Model:|Model: Infant Feeding Tube-10 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+100pieces32NA3,200
+कु ल ऑडPर मूय |Total Order Value (in INR)3,2003,200
+ 
+परे!षतीपरे!षती  !ववरण!ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे!षतीपरे!षती|Consignee|Consigneeवkतुवkतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माFामाFा|Quantity|Quantity
+!दनांक!दनांक  केके  बादबाद
+!डलीवरी!डलीवरी  शु@शु@
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+!वतरण!वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : CHIEF PHARMACIST
+
+1
+ईमेल आईडी|Email ID : con169.mhfwdup.up@gembuyer.in
+संपकP|Contact : 05694-256565-000000
+जीएसटeआईएन|GSTIN : -
+पता|Address : G.T. ROAD KANNAUJ,
+Kannauj, UTTAR PRADESH-209725, India
+LIFE-O-MED Nasogastric
+(NG) Infant Feeding
+Tube , of Size 10 Fr
+-10027-May-202611-Jun-2026
+Product Specification for LIFE-O-MED Nasogastric (NG) Infant Feeding Tube , of Size 10 FrProduct Specification for LIFE-O-MED Nasogastric (NG) Infant Feeding Tube , of Size 10 Fr
+!व!नद{श!व!नद{श|Specification|Specificationउपउप--!व!नद{श!व!नद{श|Sub-Spec|Sub-Specमूयमूय|Value|Value
+Generic
+Scope
+A sterile, single-use, disposable tube designed for short-term enteral feeding in neonates and
+infants. It is intended for administration of nutrition, fluids, and medication directly into the
+stomach.  
+Intended PlacementNasogastric (NG)  
+Performance &
+Construction
+Tube MaterialMedical Grade Polyvinyl Chloride (PVC)  
+Size (French Gauge - Fr)[External Diameter]10 Fr  
+Length of the tube (± 2 cm)50 cm  
+Lateral eyes(holes at the distal end)Two-Eyes  
+Radio-OpaquenessA full-length radio-opaque line, to allow for confirmation of placement via X-ray.  
+Shelf LifeResidual shelf life of the product
+Agree to provide residual shelf life of atleast 75% of total shelf life at the time of delivery to the
+consignee  
+Certification
+Compliance to Drugs and Cosmetic Act 1940 and
+Medical Device Rules (MDR) 2017 as amended till
+date
+Yes  
+Availability of valid Medical Device license for the
+product issued from the competent authority
+Yes  
+Valid CDSCO Medical Device License NumberMFG/MD/2019/000084  
+License issuing authority as per MDRCentral Licensing Authority  
+ 
+ईपीबीजीईपीबीजी  !ववरण!ववरण  | ePBG Detail| ePBG Detail
+NANA
+!नयम!नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. Special terms and conditions- 1. Special terms and conditions- Version:1 effective from 26-11-2025Version:1 effective from 26-11-2025
+1.11.111. . All Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under as amended till date will always be applicable. ThisAll Provisions of Drugs and Cosmetics Act, 1940 and Rules (including Medical Device Rule 2017) made there under as amended till date will always be applicable. This
+will include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW) and Department ofwill include all notifications issued by Central Drugs Standard Control Organization (CDSCO), Ministry of Health & Family Welfare (MoHFW) and Department of
+Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers time to time in this regard.Pharmaceuticals (DOP), Ministry of Chemicals & Fertilizers time to time in this regard.
+22. . The sellers are registered on GeM based on self declaration of valid Medical Device License, product certification, test reports etc. However, buyers must check andThe sellers are registered on GeM based on self declaration of valid Medical Device License, product certification, test reports etc. However, buyers must check and
+validate the details at their end for all applicable licenses and certifications e.g., validity and authenticity/genuineness of Medical Device license, product certification,validate the details at their end for all applicable licenses and certifications e.g., validity and authenticity/genuineness of Medical Device license, product certification,
+manufacturer certification/licenses, test reports etc.manufacturer certification/licenses, test reports etc.
+33. . In case of authorized resellers/distributors, it will be the legal & regulatory liability of the manufacturer to ensure that their resellers/distributors are operating inIn case of authorized resellers/distributors, it will be the legal & regulatory liability of the manufacturer to ensure that their resellers/distributors are operating in
+compliance with all relevant laws and regulations and are properly licensed to sell the manufacturer's products, including verifying the validity and authenticity ofcompliance with all relevant laws and regulations and are properly licensed to sell the manufacturer's products, including verifying the validity and authenticity of
+Medical Device license held by them.Medical Device license held by them.
+44. . The price offered by the seller/bidder shall not, in any case exceed the DPCO/NPPA controlled price or price fixed by State Government, if any. The seller must reduceThe price offered by the seller/bidder shall not, in any case exceed the DPCO/NPPA controlled price or price fixed by State Government, if any. The seller must reduce
+the prices if there is any reduction in DPCO/NPPA ceiling price or price fixed by State Government, if any.the prices if there is any reduction in DPCO/NPPA ceiling price or price fixed by State Government, if any.
+55. . Any other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional TermsAny other Terms and Conditions which is not included or at variance with the conditions specified in STC/GTC, may be added by the buyer through Additional Terms
+and Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms andand Conditions (ATC) in the bid to ensure items are procured from authentic/validated source with appropriate and applicable quality. The above terms and
+conditions are in reverse order of precedence i.e. ATC shall supersede specific STC which shall supersede General Terms and Conditions (GTC), whenever there areconditions are in reverse order of precedence i.e. ATC shall supersede specific STC which shall supersede General Terms and Conditions (GTC), whenever there are
+any conflicting provisions.any conflicting provisions.
+  
+2. General Terms and Conditions-2. General Terms and Conditions-
+2.12.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+2.22.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+2.32.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+
+नोट: यह !सkटम जनरेटेड फाइल है। कोई हkताQर क आवयकता नह है। इस दkतावेज़ का !?ंट आउट भुगतान/लेनदेन उेय के !लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

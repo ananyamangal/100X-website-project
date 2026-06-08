@@ -1,0 +1,166 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687731949865
+अनुबंधअनुबंध  "त"थ"त"थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा/यममा/यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  "ववरण"ववरण|Organisation Details|Organisation Details
+ABप|Type :State Government
+मंHालय|Ministry :-
+"वभाग|Department :Home Affairs and Justice Department Punjab
+संगठन का नाम|Organisation Name :Punjab Police
+कायाQलय RेH|Office Zone:Intelligence Wing
+खरीदारखरीदार  "ववरण"ववरण|Buyer Details|Buyer Details
+पद|Designation :Supdt Grade 2
+संपकQ नंबर|Contact No. :0172-2293500-9312
+ईमेल आईडी|Email ID :parvinder.singh89@punjabpolice.gov.in
+जीएसटaआईएन|GSTIN :-
+पता|Address :
+Room No.312, 2nd Floor, O/o Director General of Police,
+Intelligence,Punjab, Sector-77, SAS Nagar, Near Maharaja
+Ranjit Singh Defence Academy,
+SAS NAGAR, PUNJAB-160062, India
+ 
+"वgीय"वgीय  hवीकृ "तhवीकृ "त  "ववरण"ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम"त|IFD Concurrence :No
+Aशास"नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+AIG/Int./Hqrs.
+"वgीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+AIG/Int./Hqrs.
+भुगतानभुगतान  Aा"धकरणAा"धकरण  "ववरण"ववरण|Paying Authority Details|Paying Authority Details
+Role:BUYER
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :Supdt Grade 2
+ईमेल आईडी|Email ID :parvinder.singh89@punjabpolice.gov.in
+जीएसटaआईएन|GSTIN :-
+पता|Address:
+Room No.312, 2nd Floor, O/o Director General of Police,
+Intelligence,Punjab, Sector-77, SAS Nagar, Near Maharaja
+Ranjit Singh Defence Academy,
+SAS NAGAR, PUNJAB-160062, India
+ 
+ 
+"वे ता"वे ता  "ववरण"ववरण|Seller Details|Seller Details
+जेम "वे ता आईडी|GeM Seller ID :D489180000091330
+कं पनी का नाम|Company Name :PARAMOUNT IT SERVICES
+संपकQ नंबर|Contact No. :09216316457
+ईमेल आईडी|Email ID :amit_paramount@yahoo.co.in
+पता| Address :
+SCO 2413-14,SECTOR 22C,
+CHANDIGARH, CHANDIGARH-160022, -
+एमएसएमई पंजीकरण संrया|MSME Registration number :UDYAM-CH-01-0005433
+जीएसटaआईएन|GSTIN:04AAIFP8750A1ZG (B) , (R) , (S) , 04aaifp8750a1zg (G)
+एमएसई सामा"जक tेणी|MSE Social Category :General
+एमएसई "लंग tेणी|MSE Gender :Male
+*"जसके नाम के पR मv GST/TAX इनवॉइस पेश "कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+"वतरण "नद{श | Delivery Instructions : NA
+उ}पादउ}पाद  "ववरण"ववरण|Product Details|Product Details
+##आइटमआइटम  "ववरण"ववरण|Item Description|Item Description
+आइटमआइटम
+"ववरण"ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मूयमूय
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  "वभाजन"वभाजन (INR)| (INR)|
+Tax Bifurcation (INR)Tax Bifurcation (INR)
+मूयमूय  
+(INR (INR मvमv  सभीसभी
+शुकशुक  औरऔर  करकर
+स"हतस"हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उ}पादउ}पाद  काका  नामनाम |Product Name :  |Product Name : hp Non-Mechanical Wired Computer Keyboard
+ांडांड|Brand : |Brand : hp
+ांडांड  AकारAकार|Brand Type : |Brand Type : Registered Brand
+कै टलॉगकै टलॉग  कक  ""त""त|Catalogue Status: |Catalogue Status: OEM verified catalogue
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+tेणीtेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Computer Keyboards (Q2)
+मॉडलमॉडल|Model:|Model: HP 115 Wired Keyboard INDIA 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+2pieces825NA1,650
+कु ल ऑडQर मूय |Total Order Value (in INR)1,6501,650
+ 
+परे"षतीपरे"षती  "ववरण"ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे"षतीपरे"षती|Consignee|Consigneeवhतुवhतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माHामाHा|Quantity|Quantity
+"दनांक"दनांक  केके  बादबाद
+"डलीवरी"डलीवरी  शुBशुB
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+"वतरण"वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+
+1
+पद| Designation : BUYER-CONSIGNEE
+ईमेल आईडी|Email ID : parvinder.singh89@punjabpolice.gov.in
+संपकQ|Contact : 0172-2293500-9312
+जीएसटaआईएन|GSTIN : -
+पता|Address : Room No.312, 2nd Floor, O/o Director General of Police,
+Intelligence,Punjab, Sector-77, SAS Nagar, Near Maharaja Ranjit Singh
+Defence Academy,
+SAS NAGAR, PUNJAB-160062, India
+hp Non-Mechanical
+Wired Computer
+Keyboard
+-227-May-202611-Jun-2026
+Product Specification for hp Non-Mechanical Wired Computer KeyboardProduct Specification for hp Non-Mechanical Wired Computer Keyboard
+"व"नद{श"व"नद{श|Specification|Specificationउपउप--"व"नद{श"व"नद{श|Sub-Spec|Sub-Specमूयमूय|Value|Value
+Generic
+TypeWired  
+Number of Keys104  
+Connectivity InterfaceUSB Type-A  
+Key Switch TypeNon-Mechanical  
+Backlight IlluminationNone  
+Keyboard Layout LanguageEnglish (QWERTY)  
+Features
+Spill Resistant,Stand/elevated Option,Caps Lock Indicator,Num Lock Indicator,Plug and Play Support,Multimedia
+Keys  
+Maximum Wireless Connectivity
+Range
+Not Applicable  
+Cable Length (for Wired)1.31 to 1.5 Meter  
+Power Source (for Wireless)Not Applicable  
+Compatible Operating SystemsWindows  
+Certification and
+Warranty
+BIS CRS ComplianceYes as per IS 13252 (Part 1)  
+On Site Warranty (in Year)1  
+ 
+उ}पादउ}पाद  काका  बीआईएसबीआईएस  लाइसvसलाइसvस|BIS license of the product:|BIS license of the product: 62005673
+ईपीबीजीईपीबीजी  "ववरण"ववरण  | ePBG Detail| ePBG Detail
+NANA
+"नयम"नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. General Terms and Conditions-1. General Terms and Conditions-
+1.11.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+1.21.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+1.31.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह "सhटम जनरेटेड फाइल है। कोई हhताRर क आवयकता नह है। इस दhतावेज़ का "Aंट आउट भुगतान/लेनदेन उेय के "लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

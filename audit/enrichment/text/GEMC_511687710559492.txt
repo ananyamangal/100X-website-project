@@ -1,0 +1,161 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687710559492
+अनुबंधअनुबंध  #त#थ#त#थ|Generated Date :|Generated Date : 27-May-2026
+खरीदखरीद  काका  मा.यममा.यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन  #ववरण#ववरण|Organisation Details|Organisation Details
+@Aप|Type :State Government
+मंGालय|Ministry :-
+#वभाग|Department :
+Medical Health and Family Welfare Department Uttar
+Pradesh
+संगठन का नाम|Organisation
+Name :
+N/A
+कायाQलय RेG|Office Zone:E Hospital Basti
+खरीदारखरीदार  #ववरण#ववरण|Buyer Details|Buyer Details
+पद|Designation :SMO
+संपकQ नंबर|Contact No. :-
+ईमेल आईडी|Email ID :smo-disthosp.bs@up.gov.in
+जीएसटaआईएन|GSTIN :-
+पता|Address :
+DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+ 
+#वeीय#वeीय  fवीकृ #तfवीकृ #त  #ववरण#ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम#त|IFD Concurrence :No
+@शास#नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+SIC DH BASTI
+#वeीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+FO DH BASTI
+भुगतानभुगतान  @ा#धकरण@ा#धकरण  #ववरण#ववरण|Paying Authority Details|Paying Authority Details
+Role:BUYER
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :SMO
+ईमेल आईडी|Email ID :smo-disthosp.bs@up.gov.in
+जीएसटaआईएन|GSTIN :-
+पता|Address:
+DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+ 
+ 
+#वे ता#वे ता  #ववरण#ववरण|Seller Details|Seller Details
+जेम #वे ता आईडी|GeM Seller ID :0XS9230009859078
+कं पनी का नाम|Company Name :PRINCE ENTERPRISES
+संपकQ नंबर|Contact No. :07398175502
+ईमेल आईडी|Email ID :MISHRAE316@GMAIL.COM
+पता| Address :
+749,DHNEWA DHANEI MAHARAJGANJ,NICHLUAL ROAD,MAHRAJGANJ,
+MAHARAJGANJ, UTTAR PRADESH-273303, -
+एमएसएमई पंजीकरण संpया|MSME Registration number :udyam-up-51-0017559
+जीएसटaआईएन|GSTIN:09CWMPR9543P1Z8 (R)
+एमएसई सामा#जक qेणी|MSE Social Category :General
+एमएसई #लंग qेणी|MSE Gender :Female
+*#जसके नाम के पR मs GST/TAX इनवॉइस पेश #कया जाएगा|GST / Tax invoice to be raised in the name of - Consignee
+#वतरण #नदwश | Delivery Instructions : NA
+उyपादउyपाद  #ववरण#ववरण|Product Details|Product Details
+##आइटमआइटम  #ववरण#ववरण|Item Description|Item Description
+आइटमआइटम
+#ववरण#ववरण||
+OrderedOrdered
+QuantityQuantity
+इकाईइकाई | |
+UnitUnit
+इकाईइकाई  मू}यमू}य
+(INR)|(INR)|
+Unit PriceUnit Price
+(INR)(INR)
+करकर  #वभाजन#वभाजन (INR)| (INR)|
+Tax BifurcationTax Bifurcation
+(INR)(INR)
+मू}यमू}य  
+(INR (INR मsमs  सभीसभी
+शु}कशु}क  औरऔर  करकर
+स#हतस#हत)|)|
+PricePrice
+(Inclusive of(Inclusive of
+all Duties andall Duties and
+Taxes in INR)Taxes in INR)
+1
+उyपादउyपाद  काका  नामनाम |Product Name :  |Product Name : Unbranded--Kiran Infotech 250 mm x 345 mm Green Dak Pad
+with 4 Flappers
+ांडांड|Brand : |Brand : Unbranded--Kiran Infotech
+ांडांड  @कार@कार|Brand Type : |Brand Type : Unbranded
+कै टलॉगकै टलॉग  कक  ##त##त|Catalogue Status: |Catalogue Status: OEM verified catalogue
+कै सेकै से  बेचाबेचा  जाजा  रहारहा  हैहै|Selling As : |Selling As : OEM verified Reseller
+qेणीqेणी  काका  नामनाम  औरऔर  चतुथाशचतुथाश|Category Name & Quadrant : |Category Name & Quadrant : Dak Pad (V3) (Q4)
+मॉडलमॉडल|Model:|Model: VRASHANK01 
+एचएसएनएचएसएन  कोडकोड|HSN Code: |HSN Code: HSN not specified by seller 
+उमउम  देशदेश|Country Of Origin: |Country Of Origin: India
+25pieces72NA1,800
+कु ल ऑडQर मू}य |Total Order Value (in INR)1,8001,800
+ 
+परे#षतीपरे#षती  #ववरण#ववरण|Consignee Detail|Consignee Detail
+.सं..सं.|S.No|S.Noपरे#षतीपरे#षती|Consignee|Consigneeवfतुवfतु|Item|Item
+लॉटलॉट  नंबरनंबर||
+Lot No.Lot No.
+माGामाGा|Quantity|Quantity
+#दनांक#दनांक  केके  बादबाद
+#डलीवरी#डलीवरी  शुAशुA
+करनाकरना  हैहै||
+Delivery StartDelivery Start
+AfterAfter
+#वतरण#वतरण  पूरापूरा  कबकब
+तकतक  करनाकरना  हैहै||
+Delivery ToDelivery To
+BeBe
+CompletedCompleted
+ByBy
+पद| Designation : SMO
+
+1
+ईमेल आईडी|Email ID : smo-disthosp.bs@up.gov.in
+संपकQ|Contact : -
+जीएसटaआईएन|GSTIN : -
+पता|Address : DISTRICT HOSPITAL BASTI,
+Basti, UTTAR PRADESH-272002, India
+Unbranded--Kiran
+Infotech 250 mm x 345
+mm Green Dak Pad with
+4 Flappers
+-2527-May-202611-Jun-2026
+Product Specification for Unbranded--Kiran Infotech 250 mm x 345 mm Green Dak Pad with 4 FlappersProduct Specification for Unbranded--Kiran Infotech 250 mm x 345 mm Green Dak Pad with 4 Flappers
+#व#नदwश#व#नदwश|Specification|Specificationउपउप--#व#नदwश#व#नदwश|Sub-Spec|Sub-Specमू}यमू}य|Value|Value
+STANDARD
+Description of the ProductDak Pad with 4 Flappers  
+Size of the Dak Pad250 mm x 345 mm  
+Material of the Dak PadStraw Board  
+Thickness of the Dak Pad (Board Thickness)2 mm  
+Coverings for Dak PadCloth Covering (Book-binding Cloth)  
+Closure in Dak PadString / Cord Tie Closure  
+Horizontal Flap Dimensions12 x 8 inch  
+Vertical Flap Dimensions7.5 X 8.5 inch  
+Colour of the Dak PadGreen  
+ 
+#टपणी#टपणी|Note:: |Note:: Seller has given an undertaking that it has made arrangements for getting the stores from an authorized distributor / dealer / channel partner of the OEM of the
+offered product. At the time of delivery of goods, Seller will provide necessary chain documents (in the form of GST Invoice) to prove that the supplied goods are genuine and are
+being sourced from an authorized distributor / dealer / channel partner of the OEM. In case of any complaint about genuineness of the supplied products, Seller shall be
+responsible for providing genuine replacement supplies.
+ 
+ईपीबीजीईपीबीजी  #ववरण#ववरण  | ePBG Detail| ePBG Detail
+NANA
+#नयम#नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. General Terms and Conditions-1. General Terms and Conditions-
+1.11.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+1.21.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+1.31.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Sellers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment processing,
+and will also contribute to improving their ratings.
+नोट: यह #सfटम जनरेटेड फाइल है। कोई हfताRर क आवयकता नह है। इस दfतावेज़ का #@ंट आउट भुगतान/लेनदेन उेय के #लए माय नह है। 
+Note: This is system generated file. No signature is required. Print out of this document is not valid for payment/ transaction purpose.

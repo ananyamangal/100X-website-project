@@ -1,0 +1,268 @@
+
+
+ 
+अनुबंधअनुबंध|Contract|Contract
+अनुबंधअनुबंध  मांकमांक|Contract No: |Contract No: GEMC-511687761618371
+अनुबंधअनुबंध   त थ त थ|Contract Generated Date :|Contract Generated Date : 27-May-2026
+खरीदखरीद  काका  मा-यममा-यम|Procurement Mode: |Procurement Mode: Direct Purchase(DP)
+संगठनसंगठन   ववरण ववरण|Organisation Details|Organisation Details
+?@प|Type :State Government
+मंFालय|Ministry :-
+ वभाग|Department :School Education Department Jammu and Kashmir
+संगठन का नाम|Organisation Name :Directorate of School Education
+कायाLलय MेF|Office Zone:SIE JAMMU
+खरीदारखरीदार   ववरण ववरण|Buyer Details|Buyer Details
+पद|Designation :Academic Officer
+संपकL नंबर|Contact No. :-
+ईमेल आईडी|Email ID :rakeshkumcho.79126@jk.gov.in
+जीएसट`आईएन|GSTIN :-
+पता|Address :
+Muthi Behind Directorate of School Education Jammu
+181205,
+Jammu, JAMMU & KASHMIR-181205, India
+ 
+ वeीय वeीय  fवीकृ  तfवीकृ  त   ववरण ववरण|Financial Approval Detail|Financial Approval Detail
+आईएफडी सहम त|IFD Concurrence :No
+?शास नक अनुमोदन का पदनाम|
+Designation of Administrative Approval:
+Joint Director SCERT Jammu
+ वeीय अनुमोदन का पदनाम|
+Designation of Financial Approval :
+JD SCERT Jammu
+भुगतानभुगतान  ?ा धकरण?ा धकरण   ववरण ववरण|Paying Authority Details|Paying Authority Details
+Role:PAO
+भुगतान का तरीका|
+Payment Mode:
+Offline
+पद|Designation :Academic Officer
+ईमेल आईडी|Email ID :paawanviv.78325@jk.gov.in
+जीएसट`आईएन|GSTIN :-
+पता|Address:
+Muthi Behind Directorate of School Education Jammu
+181205,
+Jammu, JAMMU & KASHMIR-181205, India
+ 
+परे षतीपरे षती   ववरण ववरण|Consignee Details|Consignee Details
+.सं..सं.|S.No|S.Noपरे षतीपरे षती  नामनाम &  & पतापता|Consignee Name & Address|Consignee Name & Addressसेवासेवा   ववरण ववरण|Service Description|Service DescriptionमाFामाFा|Quantity|Quantity
+1
+संपकL|Contact : 0191-9797692-
+ईमेल आईडी|Email ID : anilsha.9046@jk.gov.in
+जीएसट`आईएन|GSTIN : -
+पता|Address : Muthi Behind Directorate of School
+Education Jammu 181205,
+Jammu, JAMMU & KASHMIR-181205, India
+Paper-based Printing Services - Printing with Material; Certificate; Offset150
+ 
+सेवासेवा  ?दाता?दाता   ववरण ववरण|Service Provider Details|Service Provider Details
+जेम  वे ता आईडी|GeM Seller ID :5W64220007394509
+कं पनी का नाम|Company Name :G V DTP WORKS
+संपकL नंबर|Contact No. :07006889338
+ईमेल आईडी|Email ID :gvdtpworks@gmail.com
+पता| Address :
+H. No 8,Near Punjab National Bank,NC Vij Road,Kachi Chawni,
+Jammu, JAMMU & KASHMIR-180001, -
+एमएसएमई पंजीकरण संuया|MSME Registration number :-
+जीएसट`आईएन|GSTIN:01BDHPG2776E1ZY (R) , (S)
+* जसके नाम के पM मx GST/TAX इनवॉइस पेश  कया जाएगा|GST / Tax invoice to be raised in the name of - Buyer
+सेवासेवा   ववरण ववरण|Service Details|Service Details
+सेवासेवा  ?ारंभ?ारंभ   दनांक दनांक ( (नवीनतमनवीनतम) |Service Start Date (latest by): ) |Service Start Date (latest by): 30-May-2026सेवासेवा  समा ~तसमा ~त   त थ त थ|Service End Date : |Service End Date : 01-Jun-2026
+ ब लंग ब लंग  चच|Billing Cycle: weekly|Billing Cycle: weekly
+Type of PrintingType of PrintingPrinting with Material
+Category of PrintingCategory of PrintingCertificate
+Mode of PrintingMode of PrintingOffset
+Single/ Double SidedSingle/ Double SidedSingle Sided (One Sided)
+Colour of PrintingColour of PrintingFour Color
+Printing ContentPrinting ContentText + Pictorial
+Paper MaterialPaper MaterialArt Paper
+Standards of PaperStandards of PaperConformity to Indian Standard IS 1848
+Size of the Paper (in cm)Size of the Paper (in cm)A4 (21.0 x 29.7)
+Thickness of Paper in GSMThickness of Paper in GSM71-75 GSM
+InsertsInsertsNot Required
+Number of languages of printingNumber of languages of printingSingle
+LanguageLanguageEnglish
+ेणीेणी  नामनाम|Category Name : Paper-based Printing Services|Category Name : Paper-based Printing Services
+ ववरण ववरण|Description|DescriptionNumber of CopiesNumber of CopiesPrice per page Price per page 
+15030
+
+Number of pages per ItemNumber of pages per Item1
+कु लकु ल  रा शरा श ( (सूFसूF) |Total Amount (Formula) : ) |Total Amount (Formula) : 
+(Number of Copies*Price per page*Number of pages per Item)
+ऐडऑनऐडऑन  केके   बना बना  कु लकु ल  मूयमूय  |Total Value without Addons(INR)|Total Value without Addons(INR)4500
+कु लकु ल  एडऑनएडऑन  मूयमूय |Total Addon Value(INR) |Total Addon Value(INR)0
+ऐडऑनऐडऑन  स हतस हत  कु लकु ल  मूयमूय |Total Value Including Addons(INR) |Total Value Including Addons(INR)4500.00
+अनुबंधअनुबंध  कक  रा शरा श|Amount of Contract|Amount of Contract
+सभीसभी  शुकशुक  औरऔर  करकर  स हतस हत  कु लकु ल  अनुबंधअनुबंध  मूयमूय|Total Contract Value Including All Duties and Taxes(INR)|Total Contract Value Including All Duties and Taxes(INR)45004500
+एसएलएएसएलए   ववरण ववरण|SLA Details|SLA Details
+Special Terms and ConditionsSpecial Terms and Conditions
+forfor
+Paper-Based Printing ServicePaper-Based Printing Service
+1. Agreement Overview1. Agreement Overview
+This Agreement represents a Special Terms and Conditions (STC) and Service Level Agreement (“SLA” or “Agreement”) between the Buyer and Printing Service provider. The
+purpose of this Agreement is to facilitate the implementation of Paper-Based Printing Services for the use of the Buyer or any other designated person/ representative of the
+Buyer. This Agreement outlines the Scope of Work, Buyer’s Obligations, Special Terms and Conditions related to service delivery, and payment of services for mutual understanding
+of the Stakeholders. The Agreement remains valid till the completion of Services or end of contractual duration (whichever is earlier) unless either superseded by a revised
+Agreement mutually endorsed by the Stakeholders or terminated by either of the parties thereof.
+The Services contracts placed through GeM shall be governed by the following set of Terms and Conditions:
+1. General terms and conditions for Services (GTC).
+2. Service Specific STC of the Services contracts shall include the Service Level Agreement (SLA) for the Service.
+3. BID / Reverse Auction specific ATC.
+The above terms and conditions are in reverse order of precedence i.e., ATC supersedes Service specific STC which supersede GTC, whenever there are any conflicting provisions.
+The above set of terms and conditions along with the Scope of Work and Service Level Agreement as enumerated in the document shall be construed to be part of the Agreement
+between Buyer and Service Provider.
+2. Objectives and Goals2. Objectives and Goals
+The objective of this Agreement is to ensure that all the commitments and obligations are in place to ensure consistent delivery of services to Buyer by Service Provider. The goals
+of this Agreement are to:
+1. Provide clear reference to service ownership, accountability, roles, and responsibilities of both parties.
+2. Present a clear, concise, and measurable description of services offered to the Buyer.
+3. Establish terms and conditions for all the involved stakeholders, it also includes the actions to be taken in case of failure to comply with the conditions specified.
+4. To ensure that both the parties understand the consequences in case of termination of services due to any of the stated reasons.
+The Agreement will act as a reference document that both the parties have understood the above-mentioned terms and conditions and have agreed to comply by the same. The
+Agreement can also be revised/ modified on mutual consent of the stakeholders.
+3. Parties to the Agreement3. Parties to the Agreement
+The main stakeholders associated with this agreement are below-
+1. BuyerBuyer: The buyer is responsible to provide clear instructions, approvals, and timely payments for the services availed.
+2. Service ProviderService Provider: The service provider is responsible to provide all the required services in a timely manner. The service provider may also include the seller, any authorized
+agents, assignees, successors, and nominees as described in the Agreement.
+The responsibilities and obligations of the stakeholders have been outlined in this document. The document also encompasses service level/ penalties in case of non-adherence to
+the defined terms and conditions. It is assumed that all stakeholders have read and understood the same before signing the document.
+4. Scope of Services4. Scope of Services
+Paper-based Printing Service shall be provided end-to-end by the Service Provider along-with cost-effective solutions and services to print a wide variety of books, booklets,
+brochures, forms, envelopes, cards, note cards, flyers, posters, letterheads, forms, business cards, Diary, Planner, Desk Calendar, Wall Calendar, Poster Calendar, Bill Books and
+any other paper-based printing demand along with a complete customizing package.
+The scope of the service requires the Vendor to provide Paper-based Printing Services to the Buyer as per the specifications stipulated by the Buyer.
+       4.1. Service Details and Standards       4.1. Service Details and Standards
+1. All the printed orders should be of the desired quantity. Any shortfall in numbers will attract a Deductions.
+2. The order should be aligned to the specifications chosen by the buyer. The quality of the material should not deviate from what is chosen by the buyer.
+      4.2. Defined Timelines      4.2. Defined Timelines
+1. Since timely delivery is the biggest essence of the contract, the Service Provider shall ensure that the order should be delivered as and when mentioned by the buyer.Any
+kind of delay in the delivery of printed orders shall attract deductions..
+      4.3. Service Assumptions      4.3. Service Assumptions
+1. The Service Provider shall not transfer or assign or sublet any part of the service once agreed or any share or interest here in any manner or degree directly or indirectly to
+any person, firm, or corporation whatsoever.
+2. The Service Provider at his/ her own cost will arrange all the equipment(s), materials (in case of printing with the material), and other things/ services, etc. necessary for
+printing depending on the type of printing (with or without material).
+
+5. Terms & Conditions5. Terms & Conditions
+      5.1. Buyer's Obligations      5.1. Buyer's Obligations
+1. The Buyer Department may choose to provide a specimen in the form of a hard or soft copy indicating the rough layout of tables/graphs/text matters/Photographs of
+Installations etc. to give an idea in general. This is, however, not to be treated as a sample.
+2. The buyer will rigorously verify the materials (content etc) provided for printing for authenticity, clearness, and legibility, before handing them over to the service provider.
+3. In case of printing only type of Service, Buyer should provide the required material to Service Provider well on time, to avoid the delay in the start of Printing Service.
+4. Price Variation Clause: "It is advisable to include Price Variation Clause in the long-term contracts to take care of the increase/decrease in prices of various ingredients
+which majorly affect the overall price of the service. Buyers are therefore advised to include the Price Variation Clause (PVC) in the bid document through ATC for long-
+term contracts. The additional payment, if any, on account of PVC can be done offline till such time online functionality is developed on GeM."
+      5.2. Service Provider's Obligations      5.2. Service Provider's Obligations
+1. The service provider shall ensure the level of service delivered is of the highest professional standard and shall ensure full compliance with the terms and conditions of the
+contract.
+2. The Service Provider shall conduct printing activities and deliver printed material in accordance with the conditions of the Agreement at the time and place and in the
+manner as specified by the Buyer.
+3. The Service Provider shall print, bind, and deliver the work in clear and legible type, form and style and with other fit and proper material in a good and workmanlike
+manner, and by the process specified, and where a sample is supplied, in accordance therewith.
+4. The awarded Service Provider shall deliver 3 (three) hard copies of the initial edited version of the compendium along with a soft copy in Word/PDF or any other preferred
+format for approval (stage one).
+5. The Service Provider shall whenever called upon to do so, give full particulars, and information with regard to any work in hand and shall also permit an official deputed by
+the Buyer to inspect his printing premises at all required times. The Service Provider shall give assistance and information as may be required by him/ her in connection
+with any contract or contracts.
+6. Page Design should be given by Service Provider based on the Buyer’s requirement. The service provider shall provide a sample copy with the final page design to the
+Buyer before proceeding with the printing of the complete assignment. The service provider should clearly work as per detailed layout design, font size, style, color,
+alignment, spacing, pagination, etc. 
+6. Payment Terms & Conditions6. Payment Terms & Conditions
+           6.1 Payment shall be made once the service provider submits the invoice online on GeM along                            with other relevant documents and after generation of service
+delivery acceptance certificates                        (SDAC) by consignee for the submitted invoice
+           6.2 All deductions (If applicable) will be accounted/deducted during SDAC generation before making                  the payments. Payment will be made through bank transfer
+only in no circumstance cash/ cheque                  payment will be made.
+7. Deductions and Liquidity Damages7. Deductions and Liquidity Damages
+Breach of SLA is defined as performance lower than requisite performance in this Agreement. The following conditions shall specify breach of contract and the Buyer shall have the
+right to immediately terminate the Agreement.
+1. Cumulative penalties reach 10% of the Contract Value; and
+2. Subcontracting or outsourcing of the contract/ Agreement, in part or whole.
+Penalties shall be levied on the Service Provider, for the violation of the Service Level Agreement as mentioned below:
+##Nature of DefaultNature of DefaultDescription of defaultDescription of defaultDeductionsDeductions
+11
+Defective/Damaged GoodsDefective/Damaged Goods  
+a. Defect/Damage of up to 25% of the order
+(by volume)
+Any kind of damage/destruction of printed
+material and/or Damage of product during
+logistics, or defect in the product such as
+low quality of material/printing, error in
+content, printing not according to buyer’s
+specifications: Improper
+logo/pictures/color shades/improper
+binding/finishing, etc.
+i. 2% of the contract value
+b. Defect/Damage from 25%-50% of the
+order (by volume)
+ii. 3% of the contract value
+c. Defect/Damage of more than 50% of the
+order.
+iii. 4% of the contract value or option
+to terminate the contract.
+22Delay in DeliveryDelay in Delivery
+Delay in delivery of the order or order not
+received at the desired location on time, as
+specified.
+0.5% per week. Cumulative every
+week.
+33
+Non-supply of complete order (Shortfall)Non-supply of complete order (Shortfall)
+The quantity of order supplied is less than
+ordered.
+ 
+a. Up to 25% of the ordera. 3% of the contract value
+b. from 25% - 50% of the orderb. 5% of the contract value
+c. more than 50% of the order
+c. 7% of the contract value or option
+to terminate the contract
+The maximum cumulative deductions on all the occasions put together shall not exceed 10% of the contract value and exceeding the limit is liable for cancellation of the
+Agreement.
+8. Amendment of contract8. Amendment of contract
+During the service delivery period, some conditions may occur when the Buyer and/ or Service Provider may require amending the Agreement, some of such conditions may be as
+followed-
+
+ 
+ईपीबीजीईपीबीजी   ववरण ववरण  | ePBG Detail| ePBG Detail
+NANA
+ नयम नयम  औरऔर  शतशत|Terms and Conditions|Terms and Conditions
+1. General Terms and Conditions-1. General Terms and Conditions-
+1.11.1This contract is governed by the This contract is governed by the General Terms and ConditionsGeneral Terms and Conditions, conditions stipulated to this Product/Service as provided in the Marketplace., conditions stipulated to this Product/Service as provided in the Marketplace.
+1.21.2This Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms andThis Contract between the Seller and the Buyer, is for the supply of the Goods and/ or Services, detailed in the schedule above, in accordance with the General Terms and
+Conditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and ConditionsConditions (GTC) unless otherwise superseded by Goods / Services specific Special Terms and Conditions (STC) and/ or BID/Reverse Auction Additional Terms and Conditions
+(ATC), as applicable(ATC), as applicable
+1.31.3All GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as TheAll GeM Sellers / Service Providers are mandated to ensure compliance with all the applicable laws / acts / rules including but not limited to all Labour Laws such as The
+Minimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. AnyMinimum Wages Act, 1948, The Payment of Wages Act, 1936, The Payment of Bonus Act, 1965, The Equal Remuneration Act, 1976, The Payment of Gratuity Act, 1972 etc. Any
+non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.non-compliance will be treated as breach of contract and Buyer may take suitable actions as per GeM Contract.
+Note:Note: 
+1. Service Providers are required to raise invoices online as per the contract terms on GeM portal. Timely invoice submission is mandatory for compliances, smooth payment
+processing, and will also contribute to improving their ratings. 
+2. The Excess settlement has been enabled for this contract. The service provider can claim additional charges, if applicable, in the invoice. Any additional charges must be
+supported with documentary evidence.
+नोट: यह  सfटम जनरेटेड फाइल है। कोई हfताMर क आवयकता नह है। 
+Note: This is system generated file. No signature is required.
+    8.1 Amendment of the Contract after the event of Force Majeure:    8.1 Amendment of the Contract after the event of Force Majeure: In case of occurrence of any exceptional event/ circumstance which has affected either party directly             to
+perform the agreed services, the agreement can be amended. However, the cause, evidence, and nature of such effect shall be notified to the other party.
+    8.2 Amendment in statutory variations    8.2 Amendment in statutory variations: All statutory variations leading to an increase in the cost of the contract will be debited to the buyer accounts.
+    8.3    8.3 Amendment of the Contract as per both parties’ consentAmendment of the Contract as per both parties’ consent: Amendment of the Contract shall be done as per mutual consent of both the parties; no party shall be                 
+made liable to pay/ get any compensation for agreement amendment. However, the variation put together shall not reduce or exceed 25% of the contract value.
+9. Termination of Contract9. Termination of Contract
+The Agreement shall come to an end either on completion of the Contract Period or shall be terminated for the following reasons:
+     9.1     9.1 Mutual consent:Mutual consent: The contract may be terminated based on mutual consent in case the services are no longer required. Termination based on mutual consent will not             
+ attract any deductions or shall not be liable for any extra payments other than payment of invoices raised till the time of termination including the notice period.
+     9.2     9.2 Breach of contractual obligations:Breach of contractual obligations: Any incidents considered as a breach of contract will result in immediate termination of services. The Buyer shall have the right to           
+ terminate the Contract effective immediately by giving written notice to the Service Provider if, the Service Provider breaches a material provision of this Contract                      where
+that breach is not capable of remedy; or if the Service Provider breaches any provision of this Contract and fails to remedy the breach within 14 days after                        receiving
+notice requiring it to do so.
+     9.3     9.3 Breach of SLAs:Breach of SLAs: The contract may also be terminated if i) the cumulative penalties rise to 10% of the contract value ii) repeated breach of any SLA beyond 3 instances           
+ as per buyer discretion.
+However, termination of this Contract shall not affect any accrued rights or remedies of either party.
+10. Calculation Formula10. Calculation Formula
+Total Contract Value will be calculated as:
+Total Contract ValueTotal Contract Value = n * r * q, Where
+nn = No. of Pages per Item
+rr = Rate per Page
+qq = Quantity (No. of items)
+Cost of Add-ons (if selected by the buyer in bid) will be added to the above values. Calculation of Add-Ons will be as per the below formula:
+Add-Ons Value = (r1 + r2 + r3 + r4.....)*qAdd-Ons Value = (r1 + r2 + r3 + r4.....)*q
+where r1, r2, r3, r4, etc. are the rates quoted by the service provider for all individual Add-On services,
+and qq = Quantity (No. of items)
+ 
