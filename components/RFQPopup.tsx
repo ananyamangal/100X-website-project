@@ -95,12 +95,17 @@ export default function RFQPopup() {
       .catch(() => {})
   }, [])
 
-  // Determine whether to show the popup
+  // Determine whether to show the popup — also resets on every navigation so
+  // the z-[200] backdrop never persists across page changes and blocks the navbar.
   useEffect(() => {
     if (!config) return
-    // Never reopen once user explicitly dismissed
     if (userDismissedRef.current) return
-    if (visible) return
+
+    // Always close any currently-open popup on navigation / config reload.
+    // This prevents the full-screen backdrop from blocking links on new pages.
+    setVisible(false)
+    clearTimeout(timerRef.current!)
+    clearTimeout(autoCloseRef.current!)
 
     // Path checks
     const hidden = config.hiddenPages || []
@@ -132,15 +137,15 @@ export default function RFQPopup() {
     // Delay timer
     timerRef.current = setTimeout(show, config.delayMs)
 
-    // Exit intent (desktop only)
+    // Exit intent (desktop only) — listener is always cleaned up in the return
     let exitBound = false
+    let onMouseLeave: ((e: MouseEvent) => void) | null = null
     if (config.exitIntent && !isMobile) {
-      const onMouseLeave = (e: MouseEvent) => {
+      onMouseLeave = (e: MouseEvent) => {
         if (e.clientY <= 0 && !exitBound) {
           exitBound = true
           clearTimeout(timerRef.current!)
           show()
-          document.removeEventListener("mouseleave", onMouseLeave)
         }
       }
       document.addEventListener("mouseleave", onMouseLeave)
@@ -149,6 +154,9 @@ export default function RFQPopup() {
     return () => {
       clearTimeout(timerRef.current!)
       clearTimeout(autoCloseRef.current!)
+      // Always remove the exit-intent listener — previously it leaked if the
+      // popup was dismissed via timer before the mouse-leave fired.
+      if (onMouseLeave) document.removeEventListener("mouseleave", onMouseLeave)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config, pathname])

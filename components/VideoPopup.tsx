@@ -74,7 +74,12 @@ export default function VideoPopup() {
     if (!config.enabled) return
     // Never reopen if user explicitly dismissed
     if (userDismissedRef.current) return
-    if (visible) return
+
+    // Reset on navigation — clear timers and close any open popup so it
+    // doesn't persist as an overlay on a new page.
+    setVisible(false)
+    clearTimeout(timerRef.current!)
+    clearTimeout(autoCloseRef.current!)
 
     // Path check — normalize stored values: strip any leading domain so
     // full URLs pasted by the admin ("https://site.com/path") still match.

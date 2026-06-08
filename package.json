@@ -6,7 +6,10 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:prod": "BASE_URL=https://100xcircle.com playwright test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",
@@ -70,6 +73,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22",
     "@types/react": "^19",
