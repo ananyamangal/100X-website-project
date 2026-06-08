@@ -4,18 +4,26 @@ import {
   FileSearch, Users, Map, RefreshCw,
   TrendingUp, Building2, Search, X,
   BarChart3, PlusCircle, Download, HardDrive, Zap, Sparkles,
+  Network, Star, Package, SlidersHorizontal,
 } from "lucide-react"
-import { CollectTab }      from "./CollectTab"
-import { BatchTab }        from "./BatchTab"
-import { DealerPanel }     from "./DealerPanel"
-import { BidPanel }        from "./BidPanel"
-import { BuyersTab }       from "./BuyersTab"
-import { TargetsTab }      from "./TargetsTab"
-import { ReportTab }       from "./ReportTab"
-import { ContractsTab }    from "./ContractsTab"
-import { StorageTab }      from "./StorageTab"
-import { OpportunityTab }  from "./OpportunityTab"
-import { AiAnalystTab }    from "./AiAnalystTab"
+import { CollectTab }         from "./CollectTab"
+import { BatchTab }           from "./BatchTab"
+import { DealerPanel }        from "./DealerPanel"
+import { BidPanel }           from "./BidPanel"
+import { BuyersTab }          from "./BuyersTab"
+import { TargetsTab }         from "./TargetsTab"
+import { ReportTab }          from "./ReportTab"
+import { ContractsTab }       from "./ContractsTab"
+import { StorageTab }         from "./StorageTab"
+import { OpportunityTab }     from "./OpportunityTab"
+import { AiAnalystTab }       from "./AiAnalystTab"
+import { DataQualityPanel }   from "./DataQualityPanel"
+import { FilterBar, EMPTY_FILTER, type ProcFilter } from "./FilterBar"
+import { InsightsTab }        from "./InsightsTab"
+import { DealerAcquisitionTab } from "./DealerAcquisitionTab"
+import { ProductDiscoveryTab }  from "./ProductDiscoveryTab"
+import { RelationshipTab }    from "./RelationshipTab"
+import { AlertsBell, AlertsPanel, useAlertCount } from "./AlertsPanel"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -120,7 +128,7 @@ interface IntelData {
   variant_distribution: { variant: string; count: number }[]
 }
 
-type Tab = "ai-analyst" | "intelligence" | "contracts" | "storage" | "opportunity" | "bids" | "dealers" | "heatmap" | "buyers" | "targets" | "report" | "batch" | "collect"
+type Tab = "ai-analyst" | "insights" | "dealer-acq" | "product-disc" | "relationships" | "intelligence" | "contracts" | "storage" | "opportunity" | "bids" | "dealers" | "heatmap" | "buyers" | "targets" | "report" | "batch" | "collect"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -824,10 +832,13 @@ function HeatMapTab({ onDealerClick }: { onDealerClick: (name: string) => void }
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function ProcurementIntelligence() {
-  const [activeTab, setActiveTab]         = useState<Tab>("ai-analyst")
-  const [stats, setStats]                 = useState<Stats | null>(null)
+  const [activeTab, setActiveTab]           = useState<Tab>("ai-analyst")
+  const [stats, setStats]                   = useState<Stats | null>(null)
   const [selectedDealer, setSelectedDealer] = useState<string | null>(null)
-  const [selectedBid, setSelectedBid]     = useState<string | null>(null)
+  const [selectedBid, setSelectedBid]       = useState<string | null>(null)
+  const [filter, setFilter]                 = useState<ProcFilter>(EMPTY_FILTER)
+  const [alertsOpen, setAlertsOpen]         = useState(false)
+  const alertCount = useAlertCount()
 
   const loadStats = () => {
     fetch("/api/admin/procurement/stats").then(r => r.json()).then(setStats).catch(() => {})
@@ -848,20 +859,24 @@ export default function ProcurementIntelligence() {
     setSelectedBid(bidNumber)
   }, [])
 
-  const TABS: { id: Tab; label: string; icon: React.ElementType; highlight?: boolean; group?: string }[] = [
-    { id: "ai-analyst",   label: "AI Analyst",         icon: Sparkles,   highlight: true },
-    { id: "intelligence", label: "Intelligence",        icon: BarChart3,  highlight: true },
-    { id: "contracts",    label: "Contracts Intel",    icon: TrendingUp, highlight: true },
-    { id: "opportunity",  label: "Opportunity Engine",  icon: Zap,        highlight: true },
-    { id: "storage",      label: "PDF Storage",         icon: HardDrive },
-    { id: "buyers",       label: "Buyer Profiles",     icon: Building2,  highlight: true },
-    { id: "targets",      label: "Target Lists",       icon: TrendingUp, highlight: true },
-    { id: "report",       label: "Sales Report",       icon: BarChart3,  highlight: true },
-    { id: "bids",         label: "Bid Explorer",       icon: FileSearch },
-    { id: "dealers",      label: "All Dealers",        icon: Users },
-    { id: "heatmap",      label: "Procurement Map",    icon: Map },
-    { id: "batch",        label: "Batch Collect",      icon: TrendingUp },
-    { id: "collect",      label: "Single Bid",         icon: PlusCircle },
+  const TABS: { id: Tab; label: string; icon: React.ElementType; highlight?: boolean }[] = [
+    { id: "ai-analyst",    label: "AI Analyst",       icon: Sparkles,   highlight: true },
+    { id: "insights",      label: "Auto Insights",    icon: Zap,        highlight: true },
+    { id: "dealer-acq",    label: "Dealer Acquisition",icon: Star,      highlight: true },
+    { id: "product-disc",  label: "Product Discovery", icon: Package,   highlight: true },
+    { id: "relationships", label: "Relationships",     icon: Network,   highlight: true },
+    { id: "intelligence",  label: "Intelligence",      icon: BarChart3  },
+    { id: "contracts",     label: "Contracts Intel",   icon: TrendingUp },
+    { id: "opportunity",   label: "Opportunity Engine",icon: SlidersHorizontal },
+    { id: "buyers",        label: "Buyer Profiles",    icon: Building2  },
+    { id: "targets",       label: "Target Lists",      icon: TrendingUp },
+    { id: "report",        label: "Sales Report",      icon: BarChart3  },
+    { id: "bids",          label: "Bid Explorer",      icon: FileSearch },
+    { id: "dealers",       label: "All Dealers",       icon: Users      },
+    { id: "heatmap",       label: "Procurement Map",   icon: Map        },
+    { id: "storage",       label: "PDF Storage",       icon: HardDrive  },
+    { id: "batch",         label: "Batch Collect",     icon: TrendingUp },
+    { id: "collect",       label: "Single Bid",        icon: PlusCircle },
   ]
 
   return (
@@ -881,15 +896,24 @@ export default function ProcurementIntelligence() {
               </p>
             </div>
           </div>
-          <button onClick={loadStats}
-            className="text-[11px] text-gray-400 hover:text-gray-700 flex items-center gap-1">
-            <RefreshCw size={11} />Refresh
-          </button>
+          <div className="flex items-center gap-3">
+            <AlertsBell onClick={() => setAlertsOpen(true)} count={alertCount} />
+            <button onClick={loadStats}
+              className="text-[11px] text-gray-400 hover:text-gray-700 flex items-center gap-1">
+              <RefreshCw size={11} />Refresh
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="px-8 py-6 max-w-[1600px] space-y-6">
-        {/* Summary stats */}
+      <div className="px-8 py-6 max-w-[1600px] space-y-4">
+        {/* Data Quality Panel */}
+        <DataQualityPanel />
+
+        {/* Filter bar */}
+        <FilterBar filter={filter} onChange={setFilter} />
+
+        {/* Legacy summary stats — hidden if data quality panel is visible */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           {[
             { label: "Contracts",     value: stats?.total_contracts?.toLocaleString("en-IN")    ?? "—", color: "text-gray-800",   border: "border-gray-200" },
@@ -924,19 +948,23 @@ export default function ProcurementIntelligence() {
         </div>
 
         {/* Tab content */}
-        {activeTab === "ai-analyst"   && <AiAnalystTab onDealerClick={handleDealerClick} />}
-        {activeTab === "intelligence" && <IntelligenceTab onDealerClick={handleDealerClick} />}
-        {activeTab === "contracts"    && <ContractsTab />}
-        {activeTab === "opportunity"  && <OpportunityTab />}
-        {activeTab === "storage"      && <StorageTab />}
-        {activeTab === "buyers"       && <BuyersTab onDealerClick={handleDealerClick} />}
-        {activeTab === "targets"      && <TargetsTab onDealerClick={handleDealerClick} />}
-        {activeTab === "report"       && <ReportTab onDealerClick={handleDealerClick} />}
-        {activeTab === "bids"         && <BidsTab onBidClick={handleBidClick} onDealerClick={handleDealerClick} />}
-        {activeTab === "dealers"      && <DealersTab onDealerClick={handleDealerClick} />}
-        {activeTab === "heatmap"      && <HeatMapTab onDealerClick={handleDealerClick} />}
-        {activeTab === "batch"        && <BatchTab onSaved={loadStats} />}
-        {activeTab === "collect"      && <CollectTab onSaved={loadStats} />}
+        {activeTab === "ai-analyst"    && <AiAnalystTab onDealerClick={handleDealerClick} filter={filter} />}
+        {activeTab === "insights"      && <InsightsTab onDealerClick={handleDealerClick} />}
+        {activeTab === "dealer-acq"    && <DealerAcquisitionTab onDealerClick={handleDealerClick} />}
+        {activeTab === "product-disc"  && <ProductDiscoveryTab />}
+        {activeTab === "relationships" && <RelationshipTab onDealerClick={handleDealerClick} />}
+        {activeTab === "intelligence"  && <IntelligenceTab onDealerClick={handleDealerClick} />}
+        {activeTab === "contracts"     && <ContractsTab />}
+        {activeTab === "opportunity"   && <OpportunityTab />}
+        {activeTab === "storage"       && <StorageTab />}
+        {activeTab === "buyers"        && <BuyersTab onDealerClick={handleDealerClick} />}
+        {activeTab === "targets"       && <TargetsTab onDealerClick={handleDealerClick} />}
+        {activeTab === "report"        && <ReportTab onDealerClick={handleDealerClick} />}
+        {activeTab === "bids"          && <BidsTab onBidClick={handleBidClick} onDealerClick={handleDealerClick} />}
+        {activeTab === "dealers"       && <DealersTab onDealerClick={handleDealerClick} />}
+        {activeTab === "heatmap"       && <HeatMapTab onDealerClick={handleDealerClick} />}
+        {activeTab === "batch"         && <BatchTab onSaved={loadStats} />}
+        {activeTab === "collect"       && <CollectTab onSaved={loadStats} />}
       </div>
 
       {/* Dealer detail panel (slide-over) */}
@@ -957,6 +985,9 @@ export default function ProcurementIntelligence() {
           onDealerClick={name => { setSelectedBid(null); setSelectedDealer(name) }}
         />
       )}
+
+      {/* Alerts slide-over */}
+      <AlertsPanel open={alertsOpen} onClose={() => setAlertsOpen(false)} />
     </div>
   )
 }

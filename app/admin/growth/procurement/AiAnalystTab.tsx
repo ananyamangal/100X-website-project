@@ -2,8 +2,9 @@
 import { useEffect, useRef, useState } from "react"
 import {
   Sparkles, Send, RefreshCw, Database, AlertCircle,
-  ChevronDown, ChevronUp, ExternalLink, Loader2, BrainCircuit,
+  ChevronDown, ChevronUp, ExternalLink, Loader2, BrainCircuit, ShieldCheck,
 } from "lucide-react"
+import type { ProcFilter } from "./FilterBar"
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -26,6 +27,16 @@ interface AnalystResult {
   error?: string
   setup?: string
   detail?: string
+  audit?: {
+    data_range:           { from: string | null; to: string | null }
+    contracts_analyzed:   number
+    sellers_analyzed:     number
+    departments_analyzed: number
+    pipeline_stages:      number
+    confidence_score:     number
+    collection_queried:   string
+    generated_at:         string
+  }
 }
 
 interface ChatMessage {
@@ -303,13 +314,50 @@ function ResultCard({ result, onDealerClick }: {
         </div>
       )}
 
+      {/* Auditability */}
+      {result.audit && (
+        <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+          <div className="flex items-center gap-1.5 mb-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
+            <ShieldCheck size={11} className="text-green-500" />Audit Trail
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[10px]">
+            <div>
+              <p className="text-gray-400">Contracts Analysed</p>
+              <p className="font-semibold text-gray-700">{result.audit.contracts_analyzed.toLocaleString("en-IN")}</p>
+            </div>
+            <div>
+              <p className="text-gray-400">Sellers Analysed</p>
+              <p className="font-semibold text-gray-700">{result.audit.sellers_analyzed.toLocaleString("en-IN")}</p>
+            </div>
+            <div>
+              <p className="text-gray-400">Data Range</p>
+              <p className="font-semibold text-gray-700">
+                {result.audit.data_range.from
+                  ? `${new Date(result.audit.data_range.from).toLocaleDateString("en-IN", { month: "short", year: "2-digit" })} – ${new Date(result.audit.data_range.to || "").toLocaleDateString("en-IN", { month: "short", year: "2-digit" })}`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-400">Confidence</p>
+              <div className="flex items-center gap-1.5">
+                <div className="flex-1 bg-gray-200 rounded-full h-1.5">
+                  <div className={`h-1.5 rounded-full ${result.audit.confidence_score >= 70 ? "bg-green-500" : result.audit.confidence_score >= 50 ? "bg-amber-500" : "bg-red-400"}`}
+                    style={{ width: `${result.audit.confidence_score}%` }} />
+                </div>
+                <span className="font-semibold text-gray-700">{result.audit.confidence_score}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Pipeline debug */}
       <div>
         <button
           onClick={() => setShowPipeline(v => !v)}
           className="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-1">
           <Database size={10} />
-          {showPipeline ? "Hide" : "Show"} generated pipeline
+          {showPipeline ? "Hide" : "Show"} generated pipeline · {result.audit?.pipeline_stages} stages · {result.collection}
         </button>
         {showPipeline && (
           <pre className="mt-2 text-[10px] bg-gray-900 text-green-400 rounded-xl p-4 overflow-x-auto max-h-48">
@@ -323,7 +371,7 @@ function ResultCard({ result, onDealerClick }: {
 
 // ─── Main Tab ───────────────────────────────────────────────────────────────────
 
-export function AiAnalystTab({ onDealerClick }: { onDealerClick?: (name: string) => void }) {
+export function AiAnalystTab({ onDealerClick, filter }: { onDealerClick?: (name: string) => void; filter?: ProcFilter }) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
@@ -347,7 +395,7 @@ export function AiAnalystTab({ onDealerClick }: { onDealerClick?: (name: string)
       const res = await fetch("/api/admin/procurement/ai-analyst", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ question }),
+        body:    JSON.stringify({ question, filter }),
       })
       const data: AnalystResult = await res.json()
       setMessages(prev => [...prev, {
