@@ -227,37 +227,11 @@ export function ProductExperienceTab({ product, onChange }: Props) {
         <Helper text="Format each line as: Value | Label | Description" />
       </SectionCard>
 
-      {/* ── SECTION 7: CERTIFICATIONS ─────────────── */}
+      {/* ── SECTION 7: FAQs ───────────────────────── */}
+      {/* NOTE: Certifications managed via CMS → Admin > Certifications tab */}
+      {/* NOTE: Applications managed via CMS → Product form > Applications Manager */}
       <SectionCard
-        title="⑦ Certifications & Approvals"
-        helper="List certifications shown in the 'Certified & Approved' section. These also appear in the accordion as individual items. Shown as green badge pills with checkmark icons."
-      >
-        <label className="block text-xs font-600 text-gray-700 mb-1">Certifications (one per line)</label>
-        <Textarea
-          rows={4}
-          value={toLines(product.certifications)}
-          onChange={e => onChange("certifications", e.target.value.split("\n").filter(Boolean))}
-          placeholder={"ISO 9001:2015\nCE Marking\nGeM Registered OEM\nBIS Approved\nMSME/UDYAM Registered"}
-        />
-      </SectionCard>
-
-      {/* ── SECTION 8: APPLICATIONS ───────────────── */}
-      <SectionCard
-        title="⑧ Applications"
-        helper="Where this product is used. Each item appears as a card with an icon in the 'Deployed wherever performance matters' section."
-      >
-        <label className="block text-xs font-600 text-gray-700 mb-1">Applications (one per line)</label>
-        <Textarea
-          rows={5}
-          value={toLines(product.applications)}
-          onChange={e => onChange("applications", e.target.value.split("\n").filter(Boolean))}
-          placeholder={"Municipal mosquito control\nAgricultural crop protection\nIndustrial pest control\nGovernment health campaigns\nVehicle-mounted area coverage"}
-        />
-      </SectionCard>
-
-      {/* ── SECTION 9: FAQs ───────────────────────── */}
-      <SectionCard
-        title="⑨ Product-Specific FAQs"
+        title="⑦ Product-Specific FAQs"
         helper="These FAQs appear in the accordion on the product page. Leave blank to show the global FAQ set."
       >
         {(() => {

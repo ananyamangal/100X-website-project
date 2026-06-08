@@ -1869,43 +1869,134 @@ function CategoryCombobox({
   )
 }
 
+const ISSUE_LABELS: Record<string, { label: string; color: string }> = {
+  'legacy-features':   { label: 'Legacy Features',   color: 'bg-orange-100 text-orange-700' },
+  'legacy-specs':      { label: 'Legacy Specs',       color: 'bg-orange-100 text-orange-700' },
+  'legacy-apps':       { label: 'Legacy Apps',        color: 'bg-orange-100 text-orange-700' },
+  'duplicate-specs':   { label: 'Duplicate Specs',    color: 'bg-red-100 text-red-700' },
+  'unmatched-badges':  { label: 'Badge not in CMS',   color: 'bg-yellow-100 text-yellow-700' },
+  'legacy-certs':      { label: 'Legacy Certs',       color: 'bg-blue-100 text-blue-700' },
+  'missing-cert-ids':  { label: 'No CMS Cert IDs',    color: 'bg-blue-100 text-blue-700' },
+  'empty-features':    { label: 'No Features',        color: 'bg-gray-100 text-gray-500' },
+  'empty-specs':       { label: 'No Specs',           color: 'bg-gray-100 text-gray-500' },
+  'empty-apps':        { label: 'No Apps',            color: 'bg-gray-100 text-gray-500' },
+}
+
+function StatCard({ label, value, sub, color }: { label: string; value: number | string; sub?: string; color?: string }) {
+  return (
+    <div className={`p-4 rounded-xl border text-center ${color || 'bg-gray-50 border-gray-200'}`}>
+      <div className="text-2xl font-bold">{value}</div>
+      <div className="text-xs font-medium mt-0.5">{label}</div>
+      {sub && <div className="text-[10px] opacity-70 mt-0.5">{sub}</div>}
+    </div>
+  )
+}
+
+function FieldBar({ label, migrated, legacy, empty, total, withDupes }: { label: string; migrated: number; legacy: number; empty: number; total: number; withDupes?: number }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-24 text-xs font-medium text-gray-600 text-right flex-shrink-0">{label}</div>
+      <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden flex">
+        {migrated > 0 && <div style={{ width: `${(migrated / total) * 100}%` }} className="bg-green-400 h-full" title={`${migrated} migrated`} />}
+        {legacy > 0 && <div style={{ width: `${(legacy / total) * 100}%` }} className="bg-orange-400 h-full" title={`${legacy} legacy`} />}
+        {empty > 0 && <div style={{ width: `${(empty / total) * 100}%` }} className="bg-gray-300 h-full" title={`${empty} empty`} />}
+      </div>
+      <div className="text-xs text-gray-500 flex-shrink-0 w-40 text-left">
+        <span className="text-green-600 font-medium">{migrated}✓</span>
+        {legacy > 0 && <span className="text-orange-600 ml-1">{legacy} legacy</span>}
+        {empty > 0 && <span className="text-gray-400 ml-1">{empty} empty</span>}
+        {(withDupes ?? 0) > 0 && <span className="text-red-500 ml-1">{withDupes} dupes</span>}
+      </div>
+    </div>
+  )
+}
+
 // Migration Tab Component
 function MigrationTab() {
-  const [preview, setPreview] = useState<any>(null)
+  const [health, setHealth] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [migrating, setMigrating] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [deduping, setDeduping] = useState(false)
+  const [seedingBadges, setSeedingBadges] = useState(false)
+  const [seedingCerts, setSeedingCerts] = useState(false)
   const [notification, setNotification] = useState<{ type: "success" | "error"; msg: string } | null>(null)
+  const [showAllProducts, setShowAllProducts] = useState(false)
 
   const notify = (type: "success" | "error", msg: string) => {
-    setNotification({ type, msg }); setTimeout(() => setNotification(null), 5000)
+    setNotification({ type, msg }); setTimeout(() => setNotification(null), 6000)
   }
 
-  const loadPreview = async () => {
+  const loadHealth = async () => {
     setLoading(true)
     try {
       const r = await fetch("/api/admin/migrate")
-      if (r.ok) setPreview(await r.json())
+      if (r.ok) setHealth(await r.json())
     } finally { setLoading(false) }
   }
 
+  useEffect(() => { loadHealth() }, [])
+
   const runMigration = async () => {
-    if (!confirm("Run migration? This will convert legacy string arrays to structured objects in MongoDB. This is REVERSIBLE but creates a new data format.")) return
+    if (!confirm("Run migration? Converts legacy string arrays → structured CMS objects. Already-structured products are skipped (idempotent).")) return
     setMigrating(true)
     try {
       const r = await fetch("/api/admin/migrate", { method: "POST" })
       const d = await r.json()
-      setResult(d)
-      notify("success", `Migration complete: ${d.migratedCount} products updated.`)
+      notify("success", `Migration done: ${d.migratedCount} updated, ${d.skippedCount} skipped. Features: ${d.byField?.features}, Specs: ${d.byField?.specs}, Apps: ${d.byField?.apps}.`)
+      loadHealth()
     } catch { notify("error", "Migration failed.") }
     finally { setMigrating(false) }
   }
 
+  const runDedup = async () => {
+    if (!confirm("Remove duplicate specs from all products? Keeps only the first occurrence of each spec label.")) return
+    setDeduping(true)
+    try {
+      const r = await fetch("/api/admin/migrate?action=dedup-specs", { method: "POST" })
+      const d = await r.json()
+      notify("success", `Dedup done: ${d.repairedCount} products had duplicate specs removed.`)
+      loadHealth()
+    } catch { notify("error", "Dedup failed.") }
+    finally { setDeduping(false) }
+  }
+
+  const runSeedBadges = async () => {
+    setSeedingBadges(true)
+    try {
+      const r = await fetch("/api/admin/product-badges/seed", { method: "POST" })
+      const d = await r.json()
+      notify("success", `Badges: ${d.created} created, ${d.skipped} already existed.`)
+      loadHealth()
+    } catch { notify("error", "Badge seed failed.") }
+    finally { setSeedingBadges(false) }
+  }
+
+  const runSeedCerts = async () => {
+    setSeedingCerts(true)
+    try {
+      const r = await fetch("/api/admin/certifications/seed", { method: "POST" })
+      const d = await r.json()
+      notify("success", `Certifications: ${d.created} created, ${d.skipped} already existed.`)
+      loadHealth()
+    } catch { notify("error", "Cert seed failed.") }
+    finally { setSeedingCerts(false) }
+  }
+
+  const total = health?.summary?.total || 0
+  const products: any[] = health?.products || []
+  const problemProducts = products.filter((p: any) => p.status !== 'full')
+  const displayProducts = showAllProducts ? products : problemProducts.slice(0, 20)
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold text-gray-900">Data Migration</h2>
-        <p className="text-gray-600 mt-1">Convert legacy string-based product fields to structured CMS objects.</p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900">Migration Health Dashboard</h2>
+          <p className="text-gray-600 mt-1">Single source of truth — every product should reference CMS entities only.</p>
+        </div>
+        <Button variant="outline" onClick={loadHealth} disabled={loading} className="text-sm">
+          {loading ? "Loading…" : "Refresh Report"}
+        </Button>
       </div>
 
       {notification && (
@@ -1914,78 +2005,113 @@ function MigrationTab() {
         </div>
       )}
 
-      <Card className="border-blue-200 bg-blue-50">
-        <CardContent className="py-4">
-          <p className="text-sm font-semibold text-blue-800 mb-1">What this migration does</p>
-          <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
-            <li>Converts <code>features: string[]</code> → <code>FeatureItem[]</code> with id, title, value, order</li>
-            <li>Converts <code>specifications: string[]</code> → <code>SpecItem[]</code> with auto-detected group</li>
-            <li>Converts <code>applications: string[]</code> → <code>ApplicationItem[]</code> with id, title, priority</li>
-            <li>Strings with colons ("Engine: 2-stroke") are split into title+value</li>
-            <li>Already-structured products are skipped (idempotent)</li>
-          </ul>
-        </CardContent>
-      </Card>
-
-      <div className="flex gap-3">
-        <Button variant="outline" onClick={loadPreview} disabled={loading}>
-          {loading ? "Loading…" : "Preview (Dry Run)"}
+      {/* Action buttons */}
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={runMigration} disabled={migrating} className="bg-orange-600 hover:bg-orange-700 text-sm">
+          {migrating ? "Migrating…" : "Run Migration (Features/Specs/Apps)"}
         </Button>
-        <Button onClick={runMigration} disabled={migrating} className="bg-orange-600 hover:bg-orange-700">
-          {migrating ? "Migrating…" : "Run Migration"}
+        <Button onClick={runDedup} disabled={deduping} variant="outline" className="text-sm border-red-300 text-red-700 hover:bg-red-50">
+          {deduping ? "Deduplicating…" : "Remove Duplicate Specs"}
+        </Button>
+        <Button onClick={runSeedBadges} disabled={seedingBadges} variant="outline" className="text-sm">
+          {seedingBadges ? "Seeding…" : "Seed Badge CMS"}
+        </Button>
+        <Button onClick={runSeedCerts} disabled={seedingCerts} variant="outline" className="text-sm">
+          {seedingCerts ? "Seeding…" : "Seed Certification CMS"}
         </Button>
       </div>
 
-      {preview && (
-        <Card>
-          <CardHeader><CardTitle>Migration Preview</CardTitle></CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-gray-900">{preview.totalProducts}</div>
-                <div className="text-xs text-gray-500 mt-1">Total Products</div>
+      {health && (
+        <>
+          {/* Summary stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <StatCard label="Total Products" value={total} color="bg-gray-50 border-gray-200 text-gray-800" />
+            <StatCard label="Fully Migrated" value={health.summary.fullyMigrated}
+              sub={`${Math.round((health.summary.fullyMigrated / Math.max(total, 1)) * 100)}%`}
+              color="bg-green-50 border-green-200 text-green-800" />
+            <StatCard label="Partially Migrated" value={health.summary.partiallyMigrated} color="bg-amber-50 border-amber-200 text-amber-800" />
+            <StatCard label="Legacy (no migration)" value={health.summary.legacy} color="bg-red-50 border-red-200 text-red-800" />
+          </div>
+
+          {/* CMS health */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <StatCard label="Badges in CMS" value={health.cms.badgesInCms} color="bg-blue-50 border-blue-200 text-blue-800" />
+            <StatCard label="Certs in CMS" value={health.cms.certificationsInCms} color="bg-blue-50 border-blue-200 text-blue-800" />
+            <StatCard label="Products w/ Unmatched Badges" value={health.fields.badges.productsWithUnmatched} color="bg-yellow-50 border-yellow-200 text-yellow-800" />
+            <StatCard label="Products w/ Legacy Cert Strings" value={health.fields.certs.productsWithLegacy} color="bg-yellow-50 border-yellow-200 text-yellow-800" />
+          </div>
+
+          {/* Field migration bars */}
+          <Card>
+            <CardHeader><CardTitle className="text-sm">Field Migration Status</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex gap-4 text-[11px] mb-2">
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-400 inline-block" />Migrated</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-orange-400 inline-block" />Legacy strings</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gray-300 inline-block" />Empty</span>
               </div>
-              <div className="p-4 bg-orange-50 rounded-lg">
-                <div className="text-2xl font-bold text-orange-700">{preview.needsMigration}</div>
-                <div className="text-xs text-orange-600 mt-1">Need Migration</div>
+              <FieldBar label="Features"     {...health.fields.features} total={total} />
+              <FieldBar label="Specs"        {...health.fields.specs}    total={total} withDupes={health.fields.specs.withDuplicates} />
+              <FieldBar label="Applications" {...health.fields.apps}     total={total} />
+              <div className="text-xs text-gray-500 pt-1">
+                FAQs: {health.fields.faqs.withFaqs} products have FAQs, {health.fields.faqs.withoutFaqs} don't.
+                Certifications: {health.fields.certs.productsWithCertIds} products have CMS cert IDs.
               </div>
-              <div className="p-4 bg-green-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-700">{preview.alreadyMigrated}</div>
-                <div className="text-xs text-green-600 mt-1">Already Migrated</div>
-              </div>
-            </div>
-            {preview.sampleProducts?.length > 0 && (
-              <div className="mt-4">
-                <p className="text-xs font-semibold text-gray-600 mb-2">Sample products needing migration:</p>
-                <ul className="text-xs text-gray-500 space-y-0.5">
-                  {preview.sampleProducts.map((p: any) => <li key={p.id}>{p.name}</li>)}
-                </ul>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          {/* Per-product table */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between text-sm">
+                <span>
+                  {showAllProducts ? `All ${products.length} Products` : `Products with Issues (${problemProducts.length})`}
+                </span>
+                <button type="button" onClick={() => setShowAllProducts(!showAllProducts)} className="text-xs text-blue-600 hover:underline font-normal">
+                  {showAllProducts ? "Show issues only" : "Show all products"}
+                </button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {displayProducts.length === 0 ? (
+                <div className="text-center py-8 text-sm text-green-700 font-medium">
+                  All products are fully migrated. ✓
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {displayProducts.map((p: any) => (
+                    <div key={p.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-gray-50">
+                      <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${
+                        p.status === 'full' ? 'bg-green-400' : p.status === 'partial' ? 'bg-amber-400' : 'bg-red-400'
+                      }`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-800 truncate">{p.name}</div>
+                        {p.issues.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {p.issues.map((issue: string) => {
+                              const meta = ISSUE_LABELS[issue] || { label: issue, color: 'bg-gray-100 text-gray-600' }
+                              return <span key={issue} className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${meta.color}`}>{meta.label}</span>
+                            })}
+                          </div>
+                        )}
+                      </div>
+                      <a href={`/${p.slug}`} target="_blank" rel="noreferrer" className="text-[11px] text-blue-500 hover:underline flex-shrink-0 mt-0.5">view ↗</a>
+                    </div>
+                  ))}
+                  {!showAllProducts && problemProducts.length > 20 && (
+                    <div className="px-4 py-2 text-xs text-gray-400 text-center">
+                      Showing 20 of {problemProducts.length} products with issues. <button type="button" onClick={() => setShowAllProducts(true)} className="text-blue-500 underline">Show all</button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
       )}
 
-      {result && (
-        <Card className="border-green-200">
-          <CardHeader><CardTitle className="text-green-800">Migration Complete</CardTitle></CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-4 bg-green-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-700">{result.migratedCount}</div>
-                <div className="text-xs text-green-600 mt-1">Products Updated</div>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-gray-700">{result.skippedCount}</div>
-                <div className="text-xs text-gray-500 mt-1">Skipped (Already Migrated)</div>
-              </div>
-              <div className="p-4 bg-red-50 rounded-lg">
-                <div className="text-2xl font-bold text-red-700">{result.errorCount}</div>
-                <div className="text-xs text-red-500 mt-1">Errors</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {!health && !loading && (
+        <div className="text-center py-12 text-gray-400 text-sm">Click Refresh to load the health report.</div>
       )}
     </div>
   )
@@ -2053,17 +2179,27 @@ function ProductForm({
   const [cmsBadges, setCmsBadges] = useState<{ _id?: string; name: string; colorClass: string }[]>([]);
   const [cmsCerts, setCmsCerts]   = useState<{ _id?: string; name: string; logoUrl: string }[]>([]);
   const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
+  const [seedingBadges, setSeedingBadges] = useState(false);
+  const [seedingCerts, setSeedingCerts] = useState(false);
 
-  useEffect(() => {
-    fetch("/api/admin/product-badges")
-      .then(r => r.json())
-      .then(d => { if (Array.isArray(d)) setCmsBadges(d) })
-      .catch(() => {})
-    fetch("/api/admin/certifications")
-      .then(r => r.json())
-      .then(d => { if (Array.isArray(d)) setCmsCerts(d) })
-      .catch(() => {})
-  }, []);
+  const reloadBadges = () => fetch("/api/admin/product-badges").then(r => r.json()).then(d => { if (Array.isArray(d)) setCmsBadges(d) }).catch(() => {})
+  const reloadCerts  = () => fetch("/api/admin/certifications").then(r => r.json()).then(d => { if (Array.isArray(d)) setCmsCerts(d) }).catch(() => {})
+
+  const seedBadges = async () => {
+    setSeedingBadges(true)
+    await fetch("/api/admin/product-badges/seed", { method: "POST" }).catch(() => {})
+    await reloadBadges()
+    setSeedingBadges(false)
+  }
+
+  const seedCerts = async () => {
+    setSeedingCerts(true)
+    await fetch("/api/admin/certifications/seed", { method: "POST" }).catch(() => {})
+    await reloadCerts()
+    setSeedingCerts(false)
+  }
+
+  useEffect(() => { reloadBadges(); reloadCerts() }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -2135,9 +2271,13 @@ function ProductForm({
                   className="text-xs text-green-600 hover:underline">Manage badges →</a>
               </div>
               {cmsBadges.length === 0 ? (
-                <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200">
-                  No badges in CMS yet. <a href="/admin#productBadges" className="underline">Add badges in the Badge Manager tab</a> to enable selection here.
-                </p>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-3 space-y-2">
+                  <p className="text-xs text-amber-700 font-medium">Badge CMS is empty — products still display legacy badges.</p>
+                  <button type="button" onClick={seedBadges} disabled={seedingBadges}
+                    className="text-xs bg-amber-600 text-white px-3 py-1.5 rounded hover:bg-amber-700 disabled:opacity-50">
+                    {seedingBadges ? "Importing…" : "⚡ Import all badges from products"}
+                  </button>
+                </div>
               ) : (
                 <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-white">
                   {cmsBadges.map((badge) => (
@@ -2182,9 +2322,13 @@ function ProductForm({
                 <a href="/admin#certifications" className="text-xs text-green-600 hover:underline">Manage certifications →</a>
               </div>
               {cmsCerts.length === 0 ? (
-                <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200">
-                  No certifications in CMS yet. Add them in the Certifications tab first.
-                </p>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-3 space-y-2">
+                  <p className="text-xs text-amber-700 font-medium">Certifications CMS is empty — products still use legacy certification strings.</p>
+                  <button type="button" onClick={seedCerts} disabled={seedingCerts}
+                    className="text-xs bg-amber-600 text-white px-3 py-1.5 rounded hover:bg-amber-700 disabled:opacity-50">
+                    {seedingCerts ? "Importing…" : "⚡ Import all certifications from products"}
+                  </button>
+                </div>
               ) : (
                 <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-white">
                   {cmsCerts.map((cert) => (
