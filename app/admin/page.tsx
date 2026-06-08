@@ -1793,6 +1793,7 @@ function MigrationTab() {
   const [dedupingApps, setDedupingApps] = useState(false)
   const [seedingBadges, setSeedingBadges] = useState(false)
   const [seedingCerts, setSeedingCerts] = useState(false)
+  const [cleaningEntities, setCleaningEntities] = useState(false)
   const [notification, setNotification] = useState<{ type: "success" | "error"; msg: string } | null>(null)
   const [showAllProducts, setShowAllProducts] = useState(false)
   const [showSsot, setShowSsot] = useState(false)
@@ -1900,6 +1901,18 @@ function MigrationTab() {
     finally { setSeedingCerts(false) }
   }
 
+  const runCleanEntities = async () => {
+    if (!confirm("Decode HTML entities (&nbsp; &amp; etc.) stored literally in badge names? This repairs CMS records and product badge arrays.")) return
+    setCleaningEntities(true)
+    try {
+      const r = await fetch("/api/admin/migrate?action=clean-entities", { method: "POST" })
+      const d = await r.json()
+      notify("success", d.message || "Entity cleanup complete.")
+      loadHealth()
+    } catch { notify("error", "Entity cleanup failed.") }
+    finally { setCleaningEntities(false) }
+  }
+
   const total = health?.summary?.total || 0
   const productRows: any[] = health?.products || []
   const problemProducts = productRows.filter((p: any) => p.issues.length > 0)
@@ -1967,6 +1980,9 @@ function MigrationTab() {
         </Button>
         <Button onClick={runSeedCerts} disabled={seedingCerts} variant="outline" className="text-sm">
           {seedingCerts ? "Seeding…" : "Seed Certification CMS"}
+        </Button>
+        <Button onClick={runCleanEntities} disabled={cleaningEntities} variant="outline" className="text-sm border-purple-300 text-purple-700 hover:bg-purple-50">
+          {cleaningEntities ? "Cleaning…" : "Clean HTML Entities"}
         </Button>
       </div>
 

@@ -7,15 +7,23 @@ import BrochureLeadModal from '@/components/BrochureLeadModal'
 import { BUSINESS } from '@/lib/seo/site-config'
 
 const badgeLogoMap: Record<string, string> = {
-  'German Technology': '/Logos clipart 2/german technology.png',
+  'German Technology':  '/Logos clipart 2/german technology.png',
   'Japnese Technology': '/Logos clipart 2/Japnese technology.png',
-  GeM: '/Logos clipart 2/GeM logo.png',
-  'GeM logo': '/Logos clipart 2/GeM logo.png',
-  'Heavy Duty': '/Logos clipart 2/Heavy duty.png',
-  'Heavy duty': '/Logos clipart 2/Heavy duty.png',
-  'Eco Friendly': '/Logos clipart 2/Ecofreidly.png',
-  Ecofreidly: '/Logos clipart 2/Ecofreidly.png',
-  'BIS Approved': '/Logos clipart 2/BIS approved.png',
+  'Korean Technology':  '/Logos clipart 2/Korean Technology.png',
+  GeM:                  '/Logos clipart 2/GeM logo.png',
+  'GeM logo':           '/Logos clipart 2/GeM logo.png',
+  'GeM Registered':     '/Logos clipart 2/GeM logo.png',
+  'GeM Approved':       '/Logos clipart 2/GeM logo.png',
+  'Heavy Duty':         '/Logos clipart 2/Heavy duty.png',
+  'Heavy duty':         '/Logos clipart 2/Heavy duty.png',
+  'Eco Friendly':       '/Logos clipart 2/Ecofreidly.png',
+  Ecofreidly:           '/Logos clipart 2/Ecofreidly.png',
+  'BIS Approved':       '/Logos clipart 2/BIS approved.png',
+  BIS:                  '/Logos clipart 2/BIS approved.png',
+}
+
+function decodeBadge(b: string): string {
+  return b.replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/&#39;/gi, "'").trim()
 }
 
 function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p: any) => void }) {
@@ -45,7 +53,9 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
           draggable="false"
         />
         {/* Badges */}
-        {product.badges?.slice(0, 2).map((badge: string, i: number) => (
+        {product.badges?.slice(0, 2).map((rawBadge: string, i: number) => {
+          const badge = decodeBadge(rawBadge)
+          return (
           <span key={i} className="absolute top-3 left-3 inline-flex items-center gap-1 bg-brand-600/90 text-white text-[10px] font-600 px-2.5 py-1 rounded-full backdrop-blur-sm">
             {badgeLogoMap[badge] && (
               // eslint-disable-next-line @next/next/no-img-element
@@ -53,7 +63,8 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
             )}
             {badge}
           </span>
-        ))}
+          )
+        })}
         {/* Rating pill */}
         {product.rating && (
           <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/95 backdrop-blur-sm rounded-full px-2.5 py-1 shadow-sm">

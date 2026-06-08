@@ -389,6 +389,42 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, action: 'dedup-apps', repairedCount: repaired })
     }
 
+    if (action === 'clean-entities') {
+      // Decode HTML entities stored as literal chars in badge name strings in both
+      // products.badges[] and product_badges.name
+      function decodeEnt(str: string): string {
+        return str
+          .replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<')
+          .replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/&#39;/gi, "'")
+          .replace(/&#x27;/gi, "'").replace(/&apos;/gi, "'").trim()
+      }
+      const products = await db.collection('products').find({}, { projection: { _id: 1, badges: 1 } }).toArray()
+      let productsFixed = 0
+      for (const p of products) {
+        if (!Array.isArray(p.badges)) continue
+        const cleaned = p.badges.map((b: unknown) => typeof b === 'string' ? decodeEnt(b) : b)
+        const changed = cleaned.some((b: unknown, i: number) => b !== p.badges[i])
+        if (changed) {
+          await db.collection('products').updateOne({ _id: p._id }, { $set: { badges: cleaned, updatedAt: new Date() } })
+          productsFixed++
+        }
+      }
+      const cmsBadges = await db.collection('product_badges').find({}).toArray()
+      let cmsBadgesFixed = 0
+      for (const b of cmsBadges) {
+        const cleaned = decodeEnt(String(b.name || ''))
+        if (cleaned !== b.name) {
+          await db.collection('product_badges').updateOne({ _id: b._id }, { $set: { name: cleaned, updatedAt: new Date() } })
+          cmsBadgesFixed++
+        }
+      }
+      return NextResponse.json({
+        success: true, action: 'clean-entities',
+        productsFixed, cmsBadgesFixed,
+        message: `Cleaned HTML entities from ${productsFixed} products and ${cmsBadgesFixed} CMS badge records`,
+      })
+    }
+
     // Default: full migration
     const products = await db.collection('products').find({}).toArray()
     const report = {

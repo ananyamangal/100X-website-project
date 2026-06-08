@@ -20,7 +20,19 @@ import ProductCinematicHero from '@/components/product/ProductCinematicHero';
 function s(v: unknown): string { return typeof v === 'string' ? v : v == null ? '' : String(v); }
 function arr(v: unknown): string[] {
   if (!v) return [];
-  if (Array.isArray(v)) return v.map(x => typeof x === 'string' ? x : (x && typeof x === 'object' && 'name' in x && 'value' in x) ? `${(x as any).name}: ${(x as any).value}` : String(x)).filter(Boolean);
+  if (Array.isArray(v)) return v.map(x => {
+    if (typeof x === 'string') return x;
+    if (x && typeof x === 'object') {
+      const o = x as Record<string, unknown>;
+      // FeatureItem: { title, value }
+      if (typeof o.title === 'string') return o.value ? `${o.title}: ${o.value}` : o.title;
+      // SpecItem: { label, value }
+      if (typeof o.label === 'string') return o.value ? `${o.label}: ${o.value}` : o.label;
+      // Legacy: { name, value }
+      if (typeof o.name === 'string') return o.value ? `${o.name}: ${o.value}` : o.name;
+    }
+    return '';
+  }).filter(Boolean);
   if (typeof v === 'string') return v.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
   return [];
 }

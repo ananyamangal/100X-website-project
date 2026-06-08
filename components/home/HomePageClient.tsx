@@ -78,13 +78,34 @@ const getYouTubeId = (url: string): string | null => {
 }
 
 const badgeLogoMap: Record<string, string> = {
-  "German Technology": "/Logos clipart 2/german technology.png",
+  "German Technology":  "/Logos clipart 2/german technology.png",
   "Japnese Technology": "/Logos clipart 2/Japnese technology.png",
-  GeM: "/Logos clipart 2/GeM logo.png",
-  "GeM logo": "/Logos clipart 2/GeM logo.png",
-  "Eco Friendly": "/Logos clipart 2/Ecofreidly.png",
-  Ecofreidly: "/Logos clipart 2/Ecofreidly.png",
-  "BIS Approved": "/Logos clipart 2/BIS approved.png",
+  "Korean Technology":  "/Logos clipart 2/Korean Technology.png",
+  GeM:                  "/Logos clipart 2/GeM logo.png",
+  "GeM logo":           "/Logos clipart 2/GeM logo.png",
+  "GeM Registered":     "/Logos clipart 2/GeM logo.png",
+  "GeM Approved":       "/Logos clipart 2/GeM logo.png",
+  "Heavy Duty":         "/Logos clipart 2/Heavy duty.png",
+  "Heavy duty":         "/Logos clipart 2/Heavy duty.png",
+  "Eco Friendly":       "/Logos clipart 2/Ecofreidly.png",
+  Ecofreidly:           "/Logos clipart 2/Ecofreidly.png",
+  "BIS Approved":       "/Logos clipart 2/BIS approved.png",
+  BIS:                  "/Logos clipart 2/BIS approved.png",
+}
+
+function decodeBadge(b: string): string {
+  return b.replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/&#39;/gi, "'").trim()
+}
+
+function itemToString(x: unknown): string {
+  if (typeof x === 'string') return x
+  if (x && typeof x === 'object') {
+    const o = x as Record<string, unknown>
+    if (typeof o.title === 'string') return o.value ? `${o.title}: ${o.value}` : o.title
+    if (typeof o.label === 'string') return o.value ? `${o.label}: ${o.value}` : o.label
+    if (typeof o.name === 'string') return o.value ? `${o.name}: ${o.value}` : o.name
+  }
+  return ''
 }
 
 const LOGO_PLACEHOLDER =
@@ -453,7 +474,9 @@ function _unused_ProductDetailPage({
           </div>
           <div>
             <div className="flex flex-wrap gap-3 mb-4">
-              {(product.badges || [product.badge]).map((badge: string, index: number) => (
+              {(product.badges || [product.badge]).map((rawBadge: string, index: number) => {
+                const badge = decodeBadge(rawBadge)
+                return (
                 <Badge
                   key={index}
                   className={`${
@@ -472,7 +495,8 @@ function _unused_ProductDetailPage({
                   )}
                   {badge}
                 </Badge>
-              ))}
+                )
+              })}
             </div>
             <h1 className="text-4xl font-bold text-gray-800 mb-4">{product.name}</h1>
             <div className="flex items-center space-x-4 mb-6">
@@ -524,23 +548,37 @@ function _unused_ProductDetailPage({
             <div>
               <h3 className="text-2xl font-bold text-gray-800 mb-6">Key Features</h3>
               <div className="space-y-4">
-                {product.features.map((feature: string, index: number) => (
+                {product.features.map((feature: unknown, index: number) => {
+                  const text = itemToString(feature)
+                  if (!text) return null
+                  const ci = text.indexOf(':')
+                  const label = ci !== -1 ? text.slice(0, ci).trim() : text
+                  const detail = ci !== -1 ? text.slice(ci + 1).trim() : ''
+                  return (
                   <div key={index} className="flex items-center space-x-3 p-4 bg-brand-50 rounded-lg">
                     <CheckCircle className="text-brand-600" size={20} />
-                    <span className="text-gray-700 font-medium">{feature}</span>
+                    <span className="text-gray-700 font-medium">{label}{detail ? `: ${detail}` : ''}</span>
                   </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
             <div>
               <h3 className="text-2xl font-bold text-gray-800 mb-6">Technical Specifications</h3>
               <div className="space-y-3">
-                {product.specifications.map((spec: string, index: number) => (
+                {product.specifications.map((spec: unknown, index: number) => {
+                  const text = itemToString(spec)
+                  if (!text) return null
+                  const ci = text.indexOf(':')
+                  const label = ci !== -1 ? text.slice(0, ci).trim() : text
+                  const val = ci !== -1 ? text.slice(ci + 1).trim() : ''
+                  return (
                   <div key={index} className="flex justify-between items-center py-3 border-b border-gray-200">
-                    <span className="text-gray-600">{spec.split(":")[0]}:</span>
-                    <span className="font-semibold text-gray-800">{spec.split(":")[1]}</span>
+                    <span className="text-gray-600">{label}:</span>
+                    <span className="font-semibold text-gray-800">{val}</span>
                   </div>
-                ))}
+                  )
+                })}
                 {product.youtubeLink && (
                   <div className="flex justify-between items-center py-3 border-b border-gray-200">
                     <span className="text-gray-600">YouTube Demo:</span>
@@ -562,12 +600,16 @@ function _unused_ProductDetailPage({
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
           <h3 className="text-2xl font-bold text-gray-800 mb-6">Applications</h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {product.applications.map((application: string, index: number) => (
+            {product.applications.map((application: unknown, index: number) => {
+              const text = itemToString(application)
+              if (!text) return null
+              return (
               <div key={index} className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
                 <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                <span className="text-gray-700">{application}</span>
+                <span className="text-gray-700">{text}</span>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 

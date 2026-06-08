@@ -7,19 +7,36 @@ import { Star } from 'lucide-react';
 import Link from 'next/link';
 import { plainTextFromHtml } from '@/lib/rich-text';
 
-// Map badge to logo if needed (copy logic from homepage)
 const badgeLogoMap: Record<string, string> = {
-  'Korean Technology': '/Logos clipart 2/Korean Technology.png',
-  'German Technology': '/Logos clipart 2/german technology.png',
+  'Korean Technology':  '/Logos clipart 2/Korean Technology.png',
+  'German Technology':  '/Logos clipart 2/german technology.png',
   'Japnese Technology': '/Logos clipart 2/Japnese technology.png',
-  'GeM': '/Logos clipart 2/GeM logo.png',
-  'GeM logo': '/Logos clipart 2/GeM logo.png',
-  'Heavy Duty': '/Logos clipart 2/Heavy Duty.png',
-  'Heavy duty': '/Logos clipart 2/Heavy Duty.png', // Case variation
-  'Eco Friendly': '/Logos clipart 2/Ecofreidly.png',
-  'Ecofreidly': '/Logos clipart 2/Ecofreidly.png',
-  'BIS Approved': '/Logos clipart 2/BIS approved.png',
+  'GeM':                '/Logos clipart 2/GeM logo.png',
+  'GeM logo':           '/Logos clipart 2/GeM logo.png',
+  'GeM Registered':     '/Logos clipart 2/GeM logo.png',
+  'GeM Approved':       '/Logos clipart 2/GeM logo.png',
+  'Heavy Duty':         '/Logos clipart 2/Heavy duty.png',
+  'Heavy duty':         '/Logos clipart 2/Heavy duty.png',
+  'Eco Friendly':       '/Logos clipart 2/Ecofreidly.png',
+  'Ecofreidly':         '/Logos clipart 2/Ecofreidly.png',
+  'BIS Approved':       '/Logos clipart 2/BIS approved.png',
+  'BIS':                '/Logos clipart 2/BIS approved.png',
 };
+
+function decodeBadge(b: string): string {
+  return b.replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/&#39;/gi, "'").trim()
+}
+
+function featureToString(x: unknown): string {
+  if (typeof x === 'string') return x
+  if (x && typeof x === 'object') {
+    const o = x as Record<string, unknown>
+    if (typeof o.title === 'string') return o.value ? `${o.title}: ${o.value}` : o.title
+    if (typeof o.label === 'string') return o.value ? `${o.label}: ${o.value}` : o.label
+    if (typeof o.name === 'string') return o.value ? `${o.name}: ${o.value}` : o.name
+  }
+  return ''
+}
 
 export default function ProductCard({
   product,
@@ -95,7 +112,9 @@ export default function ProductCard({
           </div>
         )}
         <div className="absolute top-4 left-4 flex flex-wrap gap-1 max-w-[calc(100%-2rem)] pointer-events-none">
-          {(product.badges || [] as string[]).slice(0, 3).map((badge: string, index: number) => (
+          {(product.badges || [] as string[]).slice(0, 3).map((rawBadge: string, index: number) => {
+            const badge = decodeBadge(rawBadge)
+            return (
             <Badge
               key={index}
               className={`${badge === 'Best Seller'
@@ -116,7 +135,8 @@ export default function ProductCard({
               )}
               <span className="truncate">{badge}</span>
             </Badge>
-          ))}
+            )
+          })}
           {(product.badges || [product.badge]).length > 3 && (
             <Badge className="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 text-xs">
               +{(product.badges || [product.badge]).length - 3}
@@ -149,12 +169,18 @@ export default function ProductCard({
         </div>
         <p className="text-sm md:text-base text-gray-600 mb-5 line-clamp-2 leading-relaxed">{plainTextFromHtml(product.detailedDescription || '')}</p>
         <ul className="space-y-1.5 mb-6 list-none">
-          {product.features?.slice(0, 3).map((feature: string, idx: number) => (
+          {product.features?.slice(0, 3).map((feature: unknown, idx: number) => {
+            const text = featureToString(feature)
+            if (!text) return null
+            const ci = text.indexOf(':')
+            const label = ci !== -1 ? text.slice(0, ci).trim() : text
+            return (
             <li key={idx} className="flex items-start text-sm text-gray-700">
               <span aria-hidden="true" className="mt-2 mr-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span>
-              <span className="line-clamp-1">{feature}</span>
+              <span className="line-clamp-1">{label}</span>
             </li>
-          ))}
+            )
+          })}
         </ul>
         <div className="flex gap-2.5">
           <Button

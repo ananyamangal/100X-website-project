@@ -9,6 +9,7 @@ import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
 import { getLandingPage } from '@/lib/seo/landing-pages';
 import RFQForm from '@/components/forms/RFQForm';
 import PremiumAccordion from '@/components/cinematic/PremiumAccordion';
+import { decodeHtmlEntities } from '@/lib/utils';
 
 // ── Utilities ────────────────────────────────────────────────────────────
 
@@ -56,15 +57,19 @@ function safeStrArray(val: unknown): string[] {
 // Badge definitions are now CMS-managed. Fallback map kept for legacy local files
 // while product_badges collection is being populated.
 const LEGACY_BADGE_LOGOS: Record<string, string> = {
-    'German Technology': '/Logos clipart 2/german technology.png',
-    'Japnese Technology': '/Logos clipart 2/Japnese technology.png',
-    'GeM':                '/Logos clipart 2/GeM logo.png',
-    'GeM logo':           '/Logos clipart 2/GeM logo.png',
-    'Heavy Duty':         '/Logos clipart 2/Heavy duty.png',
-    'Heavy duty':         '/Logos clipart 2/Heavy duty.png',
-    'Eco Friendly':       '/Logos clipart 2/Ecofreidly.png',
-    'Ecofreidly':         '/Logos clipart 2/Ecofreidly.png',
-    'BIS Approved':       '/Logos clipart 2/BIS approved.png',
+    'German Technology':   '/Logos clipart 2/german technology.png',
+    'Japnese Technology':  '/Logos clipart 2/Japnese technology.png',
+    'Korean Technology':   '/Logos clipart 2/Korean Technology.png',
+    'GeM':                 '/Logos clipart 2/GeM logo.png',
+    'GeM logo':            '/Logos clipart 2/GeM logo.png',
+    'GeM Registered':      '/Logos clipart 2/GeM logo.png',
+    'GeM Approved':        '/Logos clipart 2/GeM logo.png',
+    'Heavy Duty':          '/Logos clipart 2/Heavy duty.png',
+    'Heavy duty':          '/Logos clipart 2/Heavy duty.png',
+    'Eco Friendly':        '/Logos clipart 2/Ecofreidly.png',
+    'Ecofreidly':          '/Logos clipart 2/Ecofreidly.png',
+    'BIS Approved':        '/Logos clipart 2/BIS approved.png',
+    'BIS':                 '/Logos clipart 2/BIS approved.png',
 };
 
 // ── Spec grouper ─────────────────────────────────────────────────────────
@@ -375,7 +380,8 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
                 if (!Array.isArray(data)) return;
                 const cmsMap: Record<string, string> = {}
                 for (const b of data) {
-                    if (b.name && b.iconUrl) cmsMap[b.name] = b.iconUrl
+                    const name = decodeHtmlEntities(b.name || '')
+                    if (name && b.iconUrl) cmsMap[name] = b.iconUrl
                 }
                 // CMS entries override legacy; both present for graceful transition
                 setBadgeLogoMap({ ...LEGACY_BADGE_LOGOS, ...cmsMap })
@@ -683,12 +689,15 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
                             {/* Badges */}
                             {badges.length > 0 && (
                                 <div className="flex flex-wrap gap-2">
-                                    {badges.slice(0, 3).map((badge, i) => (
-                                        <span key={i} className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-600 border ${badge === 'Best Seller' ? 'bg-red-500/20 text-red-300 border-red-500/30' : badge.includes('GeM') ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : 'bg-brand-500/20 text-brand-300 border-brand-500/30'}`}>
+                                    {badges.map((rawBadge, i) => {
+                                        const badge = decodeHtmlEntities(rawBadge)
+                                        return (
+                                        <span key={i} className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-600 border ${badge === 'Best Seller' ? 'bg-red-500/20 text-red-300 border-red-500/30' : badge.includes('GeM') || badge.includes('MSME') || badge.includes('BIS') ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : badge.includes('Made in India') ? 'bg-green-500/20 text-green-300 border-green-500/30' : 'bg-brand-500/20 text-brand-300 border-brand-500/30'}`}>
                                             {badgeLogoMap[badge] && <img src={badgeLogoMap[badge]} alt="" className="w-3.5 h-3.5 object-contain" />}
                                             {badge}
                                         </span>
-                                    ))}
+                                        )
+                                    })}
                                 </div>
                             )}
 
