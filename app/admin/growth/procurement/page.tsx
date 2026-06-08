@@ -17,7 +17,6 @@ import { ContractsTab }       from "./ContractsTab"
 import { StorageTab }         from "./StorageTab"
 import { OpportunityTab }     from "./OpportunityTab"
 import { AiAnalystTab }       from "./AiAnalystTab"
-import { DataQualityPanel }   from "./DataQualityPanel"
 import { FilterBar, EMPTY_FILTER, type ProcFilter } from "./FilterBar"
 import { InsightsTab }        from "./InsightsTab"
 import { DealerAcquisitionTab } from "./DealerAcquisitionTab"
@@ -130,6 +129,51 @@ interface IntelData {
 }
 
 type Tab = "ai-analyst" | "insights" | "dealer-acq" | "product-disc" | "relationships" | "intelligence" | "contracts" | "storage" | "opportunity" | "bids" | "dealers" | "heatmap" | "buyers" | "targets" | "report" | "batch" | "collect"
+
+// ─── 2-level navigation groups ────────────────────────────────────────────────
+
+interface SubTab { id: Tab; label: string; icon: React.ElementType }
+interface NavGroup { id: string; label: string; icon: React.ElementType; highlight?: boolean; tabs: SubTab[] }
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    id: "intelligence", label: "Intelligence", icon: Sparkles, highlight: true,
+    tabs: [
+      { id: "ai-analyst",    label: "AI Analyst",      icon: Sparkles   },
+      { id: "insights",      label: "Auto Insights",   icon: Zap        },
+      { id: "opportunity",   label: "Recommendations", icon: TrendingUp },
+      { id: "relationships", label: "Relationships",   icon: Network    },
+    ],
+  },
+  {
+    id: "acquire", label: "Acquire", icon: Star, highlight: true,
+    tabs: [
+      { id: "dealer-acq",   label: "Dealer Acq.",   icon: Star      },
+      { id: "product-disc", label: "Products",      icon: Package   },
+      { id: "buyers",       label: "Buyers",        icon: Building2 },
+      { id: "targets",      label: "Targets",       icon: TrendingUp},
+    ],
+  },
+  {
+    id: "data", label: "Data", icon: Search,
+    tabs: [
+      { id: "contracts", label: "Contracts",  icon: Search    },
+      { id: "bids",      label: "Bids",       icon: FileSearch},
+      { id: "dealers",   label: "All Dealers",icon: Users     },
+      { id: "heatmap",   label: "Proc. Map",  icon: Map       },
+    ],
+  },
+  {
+    id: "ops", label: "Operations", icon: BarChart3,
+    tabs: [
+      { id: "intelligence", label: "Legacy Intel",  icon: BarChart3  },
+      { id: "report",       label: "Sales Report",  icon: BarChart3  },
+      { id: "storage",      label: "PDF Storage",   icon: HardDrive  },
+      { id: "batch",        label: "Batch Collect", icon: TrendingUp },
+      { id: "collect",      label: "Single Bid",    icon: PlusCircle },
+    ],
+  },
+]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -860,95 +904,80 @@ export default function ProcurementIntelligence() {
     setSelectedBid(bidNumber)
   }, [])
 
-  const TABS: { id: Tab; label: string; icon: React.ElementType; highlight?: boolean }[] = [
-    { id: "ai-analyst",    label: "AI Analyst",       icon: Sparkles,   highlight: true },
-    { id: "insights",      label: "Auto Insights",    icon: Zap,        highlight: true },
-    { id: "dealer-acq",    label: "Dealer Acquisition",icon: Star,      highlight: true },
-    { id: "product-disc",  label: "Product Discovery", icon: Package,   highlight: true },
-    { id: "relationships", label: "Relationships",     icon: Network,   highlight: true },
-    { id: "intelligence",  label: "Intelligence",      icon: BarChart3  },
-    { id: "contracts",     label: "Contract Search",   icon: Search,    highlight: true },
-    { id: "opportunity",   label: "Recommendations",   icon: TrendingUp, highlight: true },
-    { id: "buyers",        label: "Buyer Profiles",    icon: Building2  },
-    { id: "targets",       label: "Target Lists",      icon: TrendingUp },
-    { id: "report",        label: "Sales Report",      icon: BarChart3  },
-    { id: "bids",          label: "Bid Explorer",      icon: FileSearch },
-    { id: "dealers",       label: "All Dealers",       icon: Users      },
-    { id: "heatmap",       label: "Procurement Map",   icon: Map        },
-    { id: "storage",       label: "PDF Storage",       icon: HardDrive  },
-    { id: "batch",         label: "Batch Collect",     icon: TrendingUp },
-    { id: "collect",       label: "Single Bid",        icon: PlusCircle },
-  ]
+  const activeGroup = NAV_GROUPS.find(g => g.tabs.some(t => t.id === activeTab)) ?? NAV_GROUPS[0]
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-8 py-5 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Building2 size={18} className="text-brand-600" />
-            <div>
-              <h1 className="text-base font-bold text-gray-900">Procurement Intelligence</h1>
-              <p className="text-gray-400 text-[11px]">
-                {stats
-                  ? `${stats.total_contracts.toLocaleString("en-IN")} contracts · ₹${(stats.total_gmv / 1e7).toFixed(1)} Cr GMV · ${stats.total_dealers.toLocaleString("en-IN")} dealers · ${stats.dept_coverage} depts · 3-year historical`
-                  : "GeM contracts intelligence · 3-year historical · dealer acquisition engine"
-                }
-              </p>
-            </div>
+    <div className="flex-1 bg-gray-50 min-h-screen overflow-x-hidden">
+      {/* Compact header — 50% height vs old py-5 */}
+      <div className="bg-white border-b border-gray-200 px-4 py-2 sticky top-0 z-10">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <Building2 size={16} className="text-brand-600 flex-shrink-0" />
+            <h1 className="text-sm font-bold text-gray-900 truncate">Procurement Intelligence</h1>
+            {stats && (
+              <span className="hidden md:inline text-[11px] text-gray-400 truncate">
+                {stats.total_contracts.toLocaleString("en-IN")} contracts · ₹{(stats.total_gmv / 1e7).toFixed(1)} Cr · {stats.total_dealers.toLocaleString("en-IN")} dealers
+              </span>
+            )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <AlertsBell onClick={() => setAlertsOpen(true)} count={alertCount} />
             <button onClick={loadStats}
               className="text-[11px] text-gray-400 hover:text-gray-700 flex items-center gap-1">
-              <RefreshCw size={11} />Refresh
+              <RefreshCw size={11} />
             </button>
           </div>
         </div>
       </div>
 
-      <div className="px-8 py-6 max-w-[1600px] space-y-4">
-        {/* Data Governance strip — always visible */}
+      <div className="px-4 py-4 max-w-[1600px] space-y-3 overflow-x-hidden">
+        {/* Governance strip — single-line health bar */}
         <GovernanceStrip />
 
-        {/* Data Quality Panel */}
-        <DataQualityPanel />
-
-        {/* Filter bar */}
+        {/* Filter bar — collapsed by default */}
         <FilterBar filter={filter} onChange={setFilter} />
 
-        {/* Legacy summary stats — hidden if data quality panel is visible */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-          {[
-            { label: "Contracts",     value: stats?.total_contracts?.toLocaleString("en-IN")    ?? "—", color: "text-gray-800",   border: "border-gray-200" },
-            { label: "Total GMV",     value: stats ? `₹${(stats.total_gmv / 1e7).toFixed(1)} Cr` : "—", color: "text-orange-600",  border: "border-orange-200" },
-            { label: "Enriched",      value: stats ? `${stats.enriched_contracts.toLocaleString("en-IN")} (${stats.pct_enriched}%)` : "—", color: "text-green-600",  border: "border-green-200" },
-            { label: "Dealers",       value: stats?.total_dealers?.toLocaleString("en-IN")      ?? "—", color: "text-teal-600",   border: "border-teal-200" },
-            { label: "States",        value: stats?.states_covered?.toString()                  ?? "—", color: "text-amber-600",  border: "border-amber-200"},
-            { label: "Depts Covered", value: stats?.dept_coverage?.toString()                   ?? "—", color: "text-purple-600", border: "border-purple-200"},
-            { label: "Last Seen",     value: stats?.last_sync ? fmtDate(stats.last_sync) : "—", color: "text-blue-600",  border: "border-blue-200" },
-          ].map(({ label, value, color, border }) => (
-            <div key={label} className={`bg-white rounded-xl border ${border} p-4 shadow-sm`}>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">{label}</p>
-              <p className={`text-xl font-bold ${color}`}>{value}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm w-fit">
-          {TABS.map(({ id, label, icon: Icon, highlight }) => (
-            <button key={id} onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-1.5 text-xs px-4 py-1.5 rounded-lg font-medium transition-colors ${
-                activeTab === id
-                  ? "bg-brand-600 text-white"
-                  : highlight
-                  ? "text-brand-600 border border-brand-200 hover:bg-brand-50"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}>
-              <Icon size={12} />{label}
-            </button>
-          ))}
+        {/* 2-level grouped navigation */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          {/* Level 1: Groups */}
+          <div className="flex border-b border-gray-100 bg-gray-50 px-2 pt-2 gap-0.5 overflow-x-auto">
+            {NAV_GROUPS.map(group => {
+              const isActive = group.tabs.some(t => t.id === activeTab)
+              return (
+                <button
+                  key={group.id}
+                  onClick={() => { if (!isActive) setActiveTab(group.tabs[0].id) }}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-t-lg transition-colors border border-b-0 whitespace-nowrap flex-shrink-0 ${
+                    isActive
+                      ? "bg-white border-gray-200 text-brand-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-white/70"
+                  }`}
+                >
+                  <group.icon size={11} />
+                  {group.label}
+                  {group.highlight && !isActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-500 flex-shrink-0" />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+          {/* Level 2: Sub-tabs */}
+          <div className="flex gap-1 p-1.5 overflow-x-auto">
+            {activeGroup.tabs.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                  activeTab === id
+                    ? "bg-brand-600 text-white"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <Icon size={11} />{label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Tab content */}

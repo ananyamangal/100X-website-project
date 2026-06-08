@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import {
   Sparkles, Send, RefreshCw, Database, AlertCircle,
   ChevronDown, ChevronUp, ExternalLink, Loader2, BrainCircuit, ShieldCheck,
-  Cpu, Key, Terminal, Clock, Zap,
+  Cpu, Key, Terminal, Clock, Zap, ChevronLeft, ChevronRight, History,
 } from "lucide-react"
 import type { ProcFilter } from "./FilterBar"
 
@@ -73,7 +73,6 @@ function fmtVal(v: unknown): string {
   if (v === null || v === undefined) return "—"
   if (typeof v === "number") {
     const s = String(v)
-    // Looks like GMV (large rupee value)?
     if (v > 50000 && s.length >= 6) return fmtInr(v)
     return v.toLocaleString("en-IN")
   }
@@ -100,6 +99,14 @@ function guessDisplayName(key: string, userColumns: Record<string, string>): str
   return map[key] || key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
 }
 
+function timeAgo(iso: string) {
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
+  if (s < 60)    return `${s}s ago`
+  if (s < 3600)  return `${Math.floor(s / 60)}m ago`
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`
+  return `${Math.floor(s / 86400)}d ago`
+}
+
 // ─── Example questions ──────────────────────────────────────────────────────────
 
 const EXAMPLES = [
@@ -121,80 +128,55 @@ function DiagnosticsBanner({ health }: { health: HealthData }) {
   const [open, setOpen] = useState(false)
   const isFallback = health.status === "fallback"
 
-  function timeAgo(iso: string) {
-    const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
-    if (s < 60)   return `${s}s ago`
-    if (s < 3600) return `${Math.floor(s / 60)}m ago`
-    if (s < 86400)return `${Math.floor(s / 3600)}h ago`
-    return `${Math.floor(s / 86400)}d ago`
-  }
-
   return (
     <div className={`rounded-xl border text-xs ${
-      isFallback
-        ? "bg-amber-50 border-amber-200"
-        : "bg-gray-50 border-gray-200"
+      isFallback ? "bg-amber-50 border-amber-200" : "bg-gray-50 border-gray-200"
     }`}>
       <button
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors rounded-xl">
-        <Cpu size={12} className={isFallback ? "text-amber-600" : "text-green-600"} />
-        <span className={`font-semibold ${isFallback ? "text-amber-800" : "text-gray-700"}`}>
-          {isFallback ? "Fallback Mode — Deterministic queries" : `AI Mode — ${health.model}`}
+        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-black/5 transition-colors rounded-xl">
+        <Cpu size={11} className={isFallback ? "text-amber-600" : "text-green-600"} />
+        <span className={`font-semibold text-[11px] ${isFallback ? "text-amber-800" : "text-gray-700"}`}>
+          {isFallback ? "Fallback Mode" : `AI · ${health.model}`}
         </span>
-        {isFallback && (
-          <span className="text-amber-700 text-[10px]">
-            ANTHROPIC_API_KEY not configured · Examples still work
-          </span>
-        )}
         {!isFallback && health.last_query && (
           <span className="text-gray-400 text-[10px] ml-auto mr-1">
-            Last query: {timeAgo(health.last_query.ts)}
+            {timeAgo(health.last_query.ts)}
           </span>
         )}
-        {open ? <ChevronUp size={11} className="text-gray-400 ml-auto" /> : <ChevronDown size={11} className="text-gray-400 ml-auto" />}
+        {open ? <ChevronUp size={10} className="text-gray-400 ml-auto" /> : <ChevronDown size={10} className="text-gray-400 ml-auto" />}
       </button>
 
       {open && (
-        <div className="px-4 pb-3 pt-0 border-t border-gray-100 space-y-3">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
-            <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 space-y-0.5">
-              <div className="flex items-center gap-1 text-gray-400"><Cpu size={9} />Model</div>
-              <p className="font-mono font-semibold text-gray-800 text-[10px]">{health.model}</p>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 space-y-0.5">
-              <div className="flex items-center gap-1 text-gray-400"><Key size={9} />API Key</div>
+        <div className="px-3 pb-3 pt-0 border-t border-gray-100 space-y-2">
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            <div className="bg-white rounded-lg border border-gray-200 px-2 py-1.5 space-y-0.5">
+              <div className="flex items-center gap-1 text-gray-400 text-[9px]"><Key size={8} />API Key</div>
               <p className={`font-semibold text-[10px] ${health.api_key_detected ? "text-green-600" : "text-red-500"}`}>
                 {health.api_key_detected ? "✓ Detected" : "✗ Not found"}
               </p>
             </div>
-            <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 space-y-0.5">
-              <div className="flex items-center gap-1 text-gray-400"><Terminal size={9} />Environment</div>
+            <div className="bg-white rounded-lg border border-gray-200 px-2 py-1.5 space-y-0.5">
+              <div className="flex items-center gap-1 text-gray-400 text-[9px]"><Terminal size={8} />Env</div>
               <p className="font-semibold text-gray-800 text-[10px]">{health.environment}</p>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 space-y-0.5">
-              <div className="flex items-center gap-1 text-gray-400"><Zap size={9} />Mode</div>
-              <p className={`font-semibold text-[10px] ${isFallback ? "text-amber-600" : "text-green-600"}`}>
-                {isFallback ? "Fallback" : "AI-powered"}
-              </p>
             </div>
           </div>
 
           {health.last_query && (
-            <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 text-[10px] space-y-0.5">
-              <div className="flex items-center gap-1 text-gray-400"><Clock size={9} />Last Query</div>
+            <div className="bg-white rounded-lg border border-gray-200 px-2 py-1.5 text-[10px] space-y-0.5">
+              <div className="flex items-center gap-1 text-gray-400 text-[9px]"><Clock size={8} />Last Query</div>
               <p className="text-gray-700 font-medium truncate">"{health.last_query.question}"</p>
-              <p className="text-gray-400">{health.last_query.result_count} results · {health.last_query.collection} · {timeAgo(health.last_query.ts)}{health.last_query.fallback ? " · fallback" : ""}</p>
+              <p className="text-gray-400">{health.last_query.result_count} results · {timeAgo(health.last_query.ts)}</p>
             </div>
           )}
 
           {isFallback && (
-            <div className="bg-amber-100 rounded-lg border border-amber-200 px-3 py-2 text-[10px] space-y-1">
+            <div className="bg-amber-100 rounded-lg border border-amber-200 px-2 py-1.5 text-[10px] space-y-1">
               <p className="font-semibold text-amber-800">To enable AI mode:</p>
               <ol className="space-y-0.5 text-amber-700 list-decimal list-inside">
-                <li>Add <code className="bg-amber-200 px-1 rounded">ANTHROPIC_API_KEY=sk-ant-...</code> to <code className="bg-amber-200 px-1 rounded">.env.local</code></li>
-                <li>In Vercel: Settings → Environment Variables → Add <code className="bg-amber-200 px-1 rounded">ANTHROPIC_API_KEY</code></li>
-                <li>Redeploy the project</li>
+                <li>Add <code className="bg-amber-200 px-1 rounded">ANTHROPIC_API_KEY=sk-ant-…</code> to <code className="bg-amber-200 px-1 rounded">.env.local</code></li>
+                <li>In Vercel: Settings → Environment Variables</li>
+                <li>Redeploy</li>
               </ol>
             </div>
           )}
@@ -235,38 +217,34 @@ function KgStatusBar() {
   const total = status.collections.reduce((s, c) => s + c.count, 0)
 
   return (
-    <div className={`rounded-xl border px-4 py-3 text-xs flex flex-wrap items-center gap-3 ${
+    <div className={`rounded-xl border px-3 py-2.5 text-xs ${
       status.built ? "bg-green-50 border-green-200" : "bg-amber-50 border-amber-200"
     }`}>
-      <BrainCircuit size={14} className={status.built ? "text-green-600" : "text-amber-600"} />
-      <span className={`font-semibold ${status.built ? "text-green-800" : "text-amber-800"}`}>
-        {status.built ? `Knowledge Graph Built — ${total.toLocaleString("en-IN")} relationship nodes` : "Knowledge Graph Not Built"}
-      </span>
-      {!status.built && (
-        <span className="text-amber-700">Build it for richer cross-collection queries.</span>
-      )}
-
-      <button
-        onClick={() => setShowDetails(v => !v)}
-        className="text-gray-500 hover:text-gray-700 flex items-center gap-1 ml-auto">
-        {showDetails ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-        {showDetails ? "Hide" : "Details"}
-      </button>
-
-      <button
-        onClick={build}
-        disabled={building}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 shadow-sm">
-        {building ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
-        {building ? "Building…" : status.built ? "Rebuild" : "Build Now"}
-      </button>
+      <div className="flex items-center gap-2">
+        <BrainCircuit size={12} className={status.built ? "text-green-600" : "text-amber-600"} />
+        <span className={`font-semibold text-[11px] flex-1 ${status.built ? "text-green-800" : "text-amber-800"}`}>
+          {status.built ? `KG · ${total.toLocaleString("en-IN")} nodes` : "KG Not Built"}
+        </span>
+        <button
+          onClick={() => setShowDetails(v => !v)}
+          className="text-gray-400 hover:text-gray-600">
+          {showDetails ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+        </button>
+        <button
+          onClick={build}
+          disabled={building}
+          className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 text-[10px]">
+          {building ? <Loader2 size={9} className="animate-spin" /> : <RefreshCw size={9} />}
+          {building ? "Building…" : status.built ? "Rebuild" : "Build"}
+        </button>
+      </div>
 
       {showDetails && (
-        <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1">
+        <div className="grid grid-cols-2 gap-1.5 mt-2">
           {status.collections.map(c => (
-            <div key={c.collection} className="bg-white rounded-lg border border-gray-200 px-3 py-2">
-              <p className="text-[10px] text-gray-400 truncate">{c.collection.replace("gem_kg_", "")}</p>
-              <p className="font-bold text-gray-800">{c.count.toLocaleString("en-IN")}</p>
+            <div key={c.collection} className="bg-white rounded-lg border border-gray-200 px-2 py-1.5">
+              <p className="text-[9px] text-gray-400 truncate">{c.collection.replace("gem_kg_", "")}</p>
+              <p className="font-bold text-gray-800 text-[10px]">{c.count.toLocaleString("en-IN")}</p>
             </div>
           ))}
         </div>
@@ -302,7 +280,6 @@ function ResultCard({ result, onDealerClick }: {
     )
   }
 
-  // Determine column keys from data
   const allKeys = result.data.length > 0 ? Object.keys(result.data[0]) : []
   const displayKeys = allKeys.filter(k => !["_id", "year_trend"].includes(k)).slice(0, 10)
   const visibleRows = showAll ? result.data : result.data.slice(0, 15)
@@ -364,8 +341,7 @@ function ResultCard({ result, onDealerClick }: {
                       return (
                         <td key={k} className="px-3 py-2 text-gray-700">
                           {isDealer && onDealerClick ? (
-                            <button
-                              onClick={() => onDealerClick(raw)}
+                            <button onClick={() => onDealerClick(raw)}
                               className="text-brand-600 hover:underline font-medium text-left">
                               {raw.length > 35 ? raw.slice(0, 33) + "…" : raw}
                             </button>
@@ -398,8 +374,7 @@ function ResultCard({ result, onDealerClick }: {
               <span className="text-[10px] text-gray-400">
                 Showing {showAll ? result.data.length : 15} of {result.data.length}
               </span>
-              <button
-                onClick={() => setShowAll(v => !v)}
+              <button onClick={() => setShowAll(v => !v)}
                 className="text-[10px] text-brand-600 hover:text-brand-700 font-medium">
                 {showAll ? "Show less" : `Show all ${result.data.length}`}
               </button>
@@ -415,7 +390,7 @@ function ResultCard({ result, onDealerClick }: {
         </div>
       )}
 
-      {/* Auditability */}
+      {/* Audit trail */}
       {result.audit && (
         <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
           <div className="flex items-center gap-1.5 mb-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
@@ -463,7 +438,7 @@ function ResultCard({ result, onDealerClick }: {
           onClick={() => setShowPipeline(v => !v)}
           className="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-1">
           <Database size={10} />
-          {showPipeline ? "Hide" : "Show"} generated pipeline · {result.audit?.pipeline_stages} stages · {result.collection}
+          {showPipeline ? "Hide" : "Show"} pipeline · {result.audit?.pipeline_stages} stages · {result.collection}
         </button>
         {showPipeline && (
           <pre className="mt-2 text-[10px] bg-gray-900 text-green-400 rounded-xl p-4 overflow-x-auto max-h-48">
@@ -475,15 +450,69 @@ function ResultCard({ result, onDealerClick }: {
   )
 }
 
+// ─── Left history panel ──────────────────────────────────────────────────────────
+
+function HistoryPanel({ messages, onAsk }: { messages: ChatMessage[]; onAsk: (q: string) => void }) {
+  const userMessages = messages.filter(m => m.role === "user")
+
+  return (
+    <div className="flex flex-col gap-2 h-full">
+      <div className="flex items-center gap-1.5 px-1">
+        <History size={11} className="text-gray-400" />
+        <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">History</span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto rounded-xl border border-gray-200 bg-white">
+        {userMessages.length === 0 ? (
+          <div className="p-3 space-y-1">
+            <p className="text-[10px] text-gray-400 mb-2">Try asking:</p>
+            {EXAMPLES.slice(0, 6).map(q => (
+              <button key={q} onClick={() => onAsk(q)}
+                className="w-full text-left text-[10px] text-gray-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg px-2 py-1.5 transition-colors leading-tight">
+                {q.length > 52 ? q.slice(0, 50) + "…" : q}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="py-1">
+            {userMessages.map((m, i) => (
+              <button key={i} onClick={() => onAsk(m.question || "")}
+                className="w-full text-left px-2.5 py-2 text-[10px] text-gray-600 hover:bg-brand-50 hover:text-brand-700 transition-colors border-b border-gray-50 last:border-0 leading-tight">
+                {(m.question || "").length > 55 ? (m.question || "").slice(0, 53) + "…" : m.question}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── Right context panel ─────────────────────────────────────────────────────────
+
+function ContextPanel({ health }: { health: HealthData | null }) {
+  return (
+    <div className="flex flex-col gap-2 h-full overflow-y-auto">
+      <div className="flex items-center gap-1.5 px-1">
+        <Zap size={11} className="text-gray-400" />
+        <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Context</span>
+      </div>
+      <KgStatusBar />
+      {health && <DiagnosticsBanner health={health} />}
+    </div>
+  )
+}
+
 // ─── Main Tab ───────────────────────────────────────────────────────────────────
 
 export function AiAnalystTab({ onDealerClick, filter }: { onDealerClick?: (name: string) => void; filter?: ProcFilter }) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [input, setInput] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [health, setHealth] = useState<HealthData | null>(null)
+  const [input, setInput]       = useState("")
+  const [loading, setLoading]   = useState(false)
+  const [health, setHealth]     = useState<HealthData | null>(null)
+  const [showRight, setShowRight] = useState(true)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const inputRef  = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     fetch("/api/admin/procurement/ai-health")
@@ -500,8 +529,7 @@ export function AiAnalystTab({ onDealerClick, filter }: { onDealerClick?: (name:
     const question = q.trim()
     if (!question || loading) return
 
-    const userMsg: ChatMessage = { role: "user", question, ts: Date.now() }
-    setMessages(prev => [...prev, userMsg])
+    setMessages(prev => [...prev, { role: "user", question, ts: Date.now() }])
     setInput("")
     setLoading(true)
 
@@ -512,21 +540,16 @@ export function AiAnalystTab({ onDealerClick, filter }: { onDealerClick?: (name:
         body:    JSON.stringify({ question, filter }),
       })
       const data: AnalystResult = await res.json()
-      setMessages(prev => [...prev, {
-        role:   "assistant",
-        result: data,
-        ts:     Date.now(),
-      }])
-      // Refresh health diagnostics after a query
+      setMessages(prev => [...prev, { role: "assistant", result: data, ts: Date.now() }])
       fetch("/api/admin/procurement/ai-health")
         .then(r => r.json())
         .then(setHealth)
         .catch(() => {})
     } catch (err) {
       setMessages(prev => [...prev, {
-        role:   "assistant",
+        role: "assistant",
         result: { error: "Network error. Is the server running?", detail: String(err) } as AnalystResult,
-        ts:     Date.now(),
+        ts: Date.now(),
       }])
     } finally {
       setLoading(false)
@@ -541,117 +564,139 @@ export function AiAnalystTab({ onDealerClick, filter }: { onDealerClick?: (name:
     }
   }
 
+  // Panel height: viewport minus sticky header (~44px) + governance strip (~36px) + filter (~36px) + 2-level nav (~56px) + padding (~48px)
+  const panelH = "calc(100vh - 240px)"
+
   return (
-    <div className="flex flex-col gap-4">
-      {/* Diagnostics banner */}
-      {health && <DiagnosticsBanner health={health} />}
+    <div className="flex gap-3 overflow-hidden" style={{ height: panelH, minHeight: 420 }}>
 
-      {/* Knowledge Graph status */}
-      <KgStatusBar />
+      {/* LEFT: Question history — visible on lg+ */}
+      <div className="hidden lg:flex w-44 xl:w-48 flex-shrink-0 flex-col overflow-hidden">
+        <HistoryPanel messages={messages} onAsk={ask} />
+      </div>
 
-      {/* Chat history */}
-      {messages.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
-          <div className="text-center space-y-2">
-            <div className="flex justify-center">
-              <div className="w-10 h-10 rounded-full bg-brand-50 flex items-center justify-center">
-                <Sparkles size={18} className="text-brand-600" />
-              </div>
-            </div>
-            <h3 className="text-sm font-semibold text-gray-800">AI Procurement Analyst</h3>
-            <p className="text-xs text-gray-500 max-w-md mx-auto">
-              Ask any question about the 16,000+ GeM contracts database. The AI converts your question into a MongoDB query and synthesises the results.
-            </p>
-          </div>
-
-          <div>
-            <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2 font-medium">Example questions</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {EXAMPLES.map(q => (
-                <button key={q} onClick={() => ask(q)}
-                  className="text-left text-xs text-gray-600 bg-gray-50 hover:bg-brand-50 hover:text-brand-700 border border-gray-200 hover:border-brand-200 rounded-lg px-3 py-2 transition-colors">
-                  {q}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-5">
-          {messages.map((msg, i) => (
-            <div key={i}>
-              {msg.role === "user" ? (
-                <div className="flex justify-end">
-                  <div className="bg-brand-600 text-white rounded-2xl rounded-br-sm px-4 py-2.5 max-w-[80%] text-sm">
-                    {msg.question}
+      {/* CENTER: Conversation */}
+      <div className="flex-1 min-w-0 flex flex-col overflow-hidden gap-2">
+        {/* Message area */}
+        <div className="flex-1 overflow-y-auto">
+          {messages.length === 0 ? (
+            <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+              <div className="text-center space-y-2">
+                <div className="flex justify-center">
+                  <div className="w-10 h-10 rounded-full bg-brand-50 flex items-center justify-center">
+                    <Sparkles size={18} className="text-brand-600" />
                   </div>
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  {msg.result && (
-                    <ResultCard result={msg.result} onDealerClick={onDealerClick} />
-                  )}
-                  {msg.error && (
-                    <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                      {msg.error}
+                <h3 className="text-sm font-semibold text-gray-800">AI Procurement Analyst</h3>
+                <p className="text-xs text-gray-500 max-w-md mx-auto">
+                  Ask any question about the 16,000+ GeM contracts database. The AI converts your question into a MongoDB query and synthesises the results.
+                </p>
+              </div>
+
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2 font-medium">Example questions</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {EXAMPLES.map(q => (
+                    <button key={q} onClick={() => ask(q)}
+                      className="text-left text-xs text-gray-600 bg-gray-50 hover:bg-brand-50 hover:text-brand-700 border border-gray-200 hover:border-brand-200 rounded-lg px-3 py-2 transition-colors">
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-5">
+              {messages.map((msg, i) => (
+                <div key={i}>
+                  {msg.role === "user" ? (
+                    <div className="flex justify-end">
+                      <div className="bg-brand-600 text-white rounded-2xl rounded-br-sm px-4 py-2.5 max-w-[80%] text-sm">
+                        {msg.question}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {msg.result && <ResultCard result={msg.result} onDealerClick={onDealerClick} />}
+                      {msg.error && (
+                        <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                          {msg.error}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          ))}
+              ))}
 
-          {loading && (
-            <div className="flex items-center gap-2 text-xs text-gray-400 px-1">
-              <Loader2 size={12} className="animate-spin text-brand-500" />
-              Generating query and analysing data…
+              {loading && (
+                <div className="flex items-center gap-2 text-xs text-gray-400 px-1">
+                  <Loader2 size={12} className="animate-spin text-brand-500" />
+                  Generating query and analysing data…
+                </div>
+              )}
+
+              <div ref={bottomRef} />
+
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2 font-medium">More questions</p>
+                <div className="flex flex-wrap gap-2">
+                  {EXAMPLES.slice(0, 4).map(q => (
+                    <button key={q} onClick={() => ask(q)}
+                      className="text-[11px] text-gray-600 bg-gray-50 hover:bg-brand-50 hover:text-brand-700 border border-gray-200 hover:border-brand-200 rounded-full px-3 py-1 transition-colors">
+                      {q.slice(0, 50)}{q.length > 50 ? "…" : ""}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
-
-          <div ref={bottomRef} />
-
-          {/* New example questions after first message */}
-          <div>
-            <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2 font-medium">More questions</p>
-            <div className="flex flex-wrap gap-2">
-              {EXAMPLES.slice(0, 4).map(q => (
-                <button key={q} onClick={() => ask(q)}
-                  className="text-[11px] text-gray-600 bg-gray-50 hover:bg-brand-50 hover:text-brand-700 border border-gray-200 hover:border-brand-200 rounded-full px-3 py-1 transition-colors">
-                  {q.slice(0, 50)}{q.length > 50 ? "…" : ""}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
-      )}
 
-      {/* Input bar */}
-      <div className="sticky bottom-0 bg-gray-50 pt-2 pb-1">
-        <div className="bg-white border border-gray-300 rounded-xl shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100 transition-all">
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask a question about procurement data… (Enter to send, Shift+Enter for new line)"
-            className="w-full px-4 pt-3 pb-2 text-sm text-gray-800 placeholder:text-gray-400 bg-transparent resize-none outline-none min-h-[56px] max-h-36"
-            rows={2}
-            disabled={loading}
-          />
-          <div className="px-3 pb-2 flex items-center justify-between">
-            <span className="text-[10px] text-gray-400">
-              Queries <span className="font-mono bg-gray-100 px-1 rounded">gem_contracts</span> + knowledge graph
-            </span>
-            <button
-              onClick={() => ask(input)}
-              disabled={loading || !input.trim()}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 text-white rounded-lg text-xs font-medium disabled:opacity-40 hover:bg-brand-700 transition-colors">
-              {loading ? <Loader2 size={11} className="animate-spin" /> : <Send size={11} />}
-              {loading ? "Thinking…" : "Send"}
-            </button>
+        {/* Input bar — fixed at bottom of center column */}
+        <div className="flex-shrink-0 bg-gray-50 pt-1">
+          <div className="bg-white border border-gray-300 rounded-xl shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100 transition-all">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask a question about procurement data… (Enter to send, Shift+Enter for new line)"
+              className="w-full px-4 pt-3 pb-2 text-sm text-gray-800 placeholder:text-gray-400 bg-transparent resize-none outline-none min-h-[52px] max-h-32"
+              rows={2}
+              disabled={loading}
+            />
+            <div className="px-3 pb-2 flex items-center justify-between">
+              <span className="text-[10px] text-gray-400">
+                Queries <span className="font-mono bg-gray-100 px-1 rounded">gem_contracts</span> + knowledge graph
+              </span>
+              <button
+                onClick={() => ask(input)}
+                disabled={loading || !input.trim()}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 text-white rounded-lg text-xs font-medium disabled:opacity-40 hover:bg-brand-700 transition-colors">
+                {loading ? <Loader2 size={11} className="animate-spin" /> : <Send size={11} />}
+                {loading ? "Thinking…" : "Send"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* RIGHT toggle button — always visible on xl+ */}
+      <div className="hidden xl:flex flex-col items-center justify-start pt-1">
+        <button
+          onClick={() => setShowRight(v => !v)}
+          title={showRight ? "Hide context panel" : "Show context panel"}
+          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+          {showRight ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
+        </button>
+      </div>
+
+      {/* RIGHT: Context (KG status + diagnostics) — xl+ only, collapsible */}
+      {showRight && (
+        <div className="hidden xl:flex w-56 flex-shrink-0 flex-col overflow-hidden">
+          <ContextPanel health={health} />
+        </div>
+      )}
     </div>
   )
 }

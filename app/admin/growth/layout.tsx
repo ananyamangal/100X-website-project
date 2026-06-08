@@ -8,7 +8,19 @@ export default function GrowthOSLayout({ children }: { children: React.ReactNode
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f3f4f6" }}>
       <GrowthSidebar />
-      <div style={{ marginLeft: 224, flex: 1, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      {/* marginLeft tracks CSS variable set by GrowthSidebar on collapse/expand */}
+      <div
+        style={{
+          marginLeft: "var(--sidebar-w, 224px)",
+          flex: 1,
+          minHeight: "100vh",
+          minWidth: 0,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          transition: "margin-left 0.2s",
+        }}
+      >
         {children}
       </div>
     </div>
