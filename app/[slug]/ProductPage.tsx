@@ -721,7 +721,7 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
 
                             {/* Short description (not the long one) */}
                             {shortDesc && (
-                                <p className="text-sm text-cinema-300 leading-relaxed line-clamp-3">{shortDesc.replace(/<[^>]*>/g, '')}</p>
+                                <p className="text-sm text-cinema-300 leading-relaxed line-clamp-3">{decodeHtmlEntities(shortDesc.replace(/<[^>]*>/g, ''))}</p>
                             )}
 
                             {/* Featured Specs — 5 most important */}
