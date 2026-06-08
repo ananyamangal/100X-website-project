@@ -8,6 +8,7 @@ const AUTH_WHITELIST = new Set([
   "/api/admin/auth",
   "/api/admin/auth/logout",
   "/api/admin/auth/change-password",
+  "/api/admin/auth/sessions/heartbeat",
   "/api/admin/health",
   "/api/admin/gsc/oauth/callback",
   "/api/admin/rbac/seed",

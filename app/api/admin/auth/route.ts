@@ -1,22 +1,23 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createHash } from "crypto"
 import clientPromise from "@/lib/mongodb"
-import { signJWT, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/rbac/jwt"
+import { signJWT, SESSION_COOKIE, getRoleTimeout } from "@/lib/rbac/jwt"
 import { verifyPassword } from "@/lib/rbac/password"
 import { getEffectivePermissions } from "@/lib/rbac/engine"
 import { writeAuditLog } from "@/lib/rbac/server"
+import { createSession, ensureSessionIndexes } from "@/lib/rbac/sessions"
 import type { DBUser } from "@/lib/rbac/types"
 
 function legacySha256(password: string): string {
   return createHash("sha256").update(`100x-admin-v1:${password}`).digest("hex")
 }
 
-function setCookie(response: NextResponse, token: string) {
+function setCookie(response: NextResponse, token: string, maxAge: number) {
   response.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: SESSION_MAX_AGE,
+    maxAge,
     path: "/",
   })
 }
@@ -64,14 +65,26 @@ export async function POST(request: NextRequest) {
       }
 
       const permissions = await getEffectivePermissions(String(dbUser._id), dbUser.role)
+      await ensureSessionIndexes()
 
+      const sessionId = await createSession({
+        userId:    String(dbUser._id),
+        userEmail: dbUser.email,
+        userName:  dbUser.name,
+        userRole:  dbUser.role,
+        ip:        request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown",
+        userAgent: request.headers.get("user-agent") ?? "",
+      })
+
+      const ttl   = getRoleTimeout(dbUser.role)
       const token = await signJWT({
         sub: String(dbUser._id),
         email: dbUser.email,
         name: dbUser.name,
         role: dbUser.role,
         permissions,
-      })
+        sessionId,
+      }, ttl)
 
       // Update last login + history
       await db.collection("rbac_users").updateOne(
@@ -88,15 +101,15 @@ export async function POST(request: NextRequest) {
       )
 
       await writeAuditLog(
-        { sub: String(dbUser._id), email: dbUser.email, name: dbUser.name, role: dbUser.role, permissions, iat: 0, exp: 0 },
+        { sub: String(dbUser._id), email: dbUser.email, name: dbUser.name, role: dbUser.role, permissions, sessionId, iat: 0, exp: 0 },
         "login",
         "auth",
-        { email },
+        { email, sessionId },
         request
       )
 
       const response = NextResponse.json({ success: true, role: dbUser.role })
-      setCookie(response, token)
+      setCookie(response, token, ttl)
       return response
     }
 
@@ -133,13 +146,24 @@ export async function POST(request: NextRequest) {
 
     if (superAdmin) {
       const permissions = await getEffectivePermissions(String(superAdmin._id), superAdmin.role)
+      await ensureSessionIndexes()
+      const sessionId = await createSession({
+        userId:    String(superAdmin._id),
+        userEmail: superAdmin.email,
+        userName:  superAdmin.name,
+        userRole:  superAdmin.role,
+        ip:        request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown",
+        userAgent: request.headers.get("user-agent") ?? "",
+      })
+      const ttl = getRoleTimeout(superAdmin.role)
       token = await signJWT({
         sub: String(superAdmin._id),
         email: superAdmin.email,
         name: superAdmin.name,
         role: superAdmin.role,
         permissions,
-      })
+        sessionId,
+      }, ttl)
 
       await db.collection("rbac_users").updateOne(
         { _id: superAdmin._id },
@@ -154,7 +178,7 @@ export async function POST(request: NextRequest) {
         name: "Super Admin",
         role: "super_admin",
         permissions: ROLE_PERMISSIONS.super_admin,
-      })
+      }, getRoleTimeout("super_admin"))
     }
 
     await writeAuditLog(
@@ -166,7 +190,7 @@ export async function POST(request: NextRequest) {
     )
 
     const response = NextResponse.json({ success: true, role: "super_admin" })
-    setCookie(response, token)
+    setCookie(response, token, getRoleTimeout("super_admin"))
     return response
   } catch (error) {
     console.error("Auth error:", error)

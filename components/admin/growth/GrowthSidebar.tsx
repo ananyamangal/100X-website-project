@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Search, Bot, Radar, Lightbulb, FileText,
   Users, ShoppingBag, Megaphone, Settings2, ScrollText,
   BarChart2, TrendingUp, ArrowLeft, Zap, Plug,
-  PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck, ClipboardList,
+  PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck, ClipboardList, Monitor,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import type { Permission } from "@/lib/rbac/permissions"
@@ -41,9 +41,11 @@ const MODULES: Module[] = [
   { href: "/admin/growth/logs",             label: "Activity Logs",        icon: ScrollText,      permission: "logs.view" },
   { href: "/admin/growth/reports",          label: "Reporting Center",     icon: BarChart2,       permission: "reports.view" },
   { href: "/admin/growth/paid",             label: "Paid Growth",          icon: TrendingUp,      permission: "ads.view" },
-  { href: "/admin/growth/users",            label: "User Management",      icon: UserCog,         permission: "users.view" },
+  { href: "/admin/growth/users",             label: "User Management",      icon: UserCog,         permission: "users.view" },
   { href: "/admin/growth/permissions",      label: "Permission Matrix",    icon: ShieldCheck,     permission: "permissions.view" },
   { href: "/admin/growth/audit/permissions",label: "Permission Audit",     icon: ClipboardList,   permission: "users.view",        sub: true },
+  { href: "/admin/growth/security",         label: "Security",             icon: ShieldCheck,     permission: "dashboard.view" },
+  { href: "/admin/growth/security/sessions",label: "↳ Active Sessions",    icon: Monitor,         permission: "dashboard.view",    sub: true },
 ]
 
 const SIDEBAR_KEY = "growth:sidebar:collapsed"
@@ -178,10 +180,19 @@ export function GrowthSidebar() {
       <div className="px-2 py-3 border-t border-gray-800 space-y-1">
         {/* User chip */}
         {!collapsed && !loading && user && (
-          <div className="px-3 py-2 mb-1 rounded-lg bg-gray-900">
-            <p className="text-white text-xs font-medium truncate">{user.name}</p>
-            <p className="text-gray-500 text-[10px] truncate capitalize">{user.role.replace("_", " ")}</p>
-          </div>
+          <a href="/admin/growth/security/sessions"
+            className="flex items-center gap-2.5 px-3 py-2 mb-1 rounded-lg bg-gray-900 hover:bg-gray-800 transition-colors group">
+            <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
+              <span className="text-[10px] font-bold text-white">
+                {user.name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2)}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-xs font-medium truncate">{user.name}</p>
+              <p className="text-gray-500 text-[10px] truncate capitalize">{user.role.replace(/_/g, " ")}</p>
+            </div>
+            <ShieldCheck size={11} className="text-gray-600 group-hover:text-brand-400 transition-colors flex-shrink-0" />
+          </a>
         )}
 
         <button

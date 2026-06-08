@@ -30,12 +30,24 @@ async function importKey(secret: string, usage: "sign" | "verify"): Promise<Cryp
   )
 }
 
+// Role-based session timeout in seconds
+const ROLE_TIMEOUT: Record<string, number> = {
+  super_admin:  8 * 3600,   // 8 hours
+  growth_admin: 8 * 3600,   // 8 hours
+}
+const DEFAULT_TIMEOUT = 4 * 3600  // 4 hours
+
+export function getRoleTimeout(role: string): number {
+  return ROLE_TIMEOUT[role] ?? DEFAULT_TIMEOUT
+}
+
 export async function signJWT(
   payload: Omit<JWTPayload, "iat" | "exp">,
-  expiresInSeconds = 86400
+  expiresInSeconds?: number
 ): Promise<string> {
+  const ttl = expiresInSeconds ?? getRoleTimeout(payload.role)
   const now = Math.floor(Date.now() / 1000)
-  const full: JWTPayload = { ...payload, iat: now, exp: now + expiresInSeconds }
+  const full: JWTPayload = { ...payload, iat: now, exp: now + ttl }
 
   const header = b64url(new TextEncoder().encode(JSON.stringify({ alg: "HS256", typ: "JWT" })).buffer as ArrayBuffer)
   const body   = b64url(new TextEncoder().encode(JSON.stringify(full)).buffer as ArrayBuffer)

@@ -106,6 +106,30 @@ export type AuditAction =
   | "user_disabled" | "user_enabled"
   | "password_reset" | "seed"
   | "access_denied"
+  | "session_revoked" | "force_logout" | "kill_all" | "session_expired"
+
+// ── Active session document ───────────────────────────────────────────────────
+
+export interface ActiveSession {
+  _id?: string
+  sessionId:    string
+  userId:       string
+  userEmail:    string
+  userName:     string
+  userRole:     string
+  ip:           string
+  userAgent:    string
+  browser:      string
+  os:           string
+  deviceType:   "desktop" | "mobile" | "tablet"
+  createdAt:    Date
+  lastActivity: Date
+  expiresAt:    Date
+  isRevoked:    boolean
+  revokedAt:    Date | null
+  revokedBy:    string | null
+  revokedReason: "logout" | "force_logout" | "kill_all" | "expired" | null
+}
 
 // ── JWT payload ───────────────────────────────────────────────────────────────
 
@@ -115,6 +139,7 @@ export interface JWTPayload {
   name: string
   role: RoleSlug
   permissions: Permission[]
+  sessionId?: string
   iat: number
   exp: number
 }
