@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react"
 import {
   FileSearch, Users, Map, RefreshCw,
   TrendingUp, Building2, Search, X,
-  BarChart3, PlusCircle, Download, HardDrive, Zap,
+  BarChart3, PlusCircle, Download, HardDrive, Zap, Sparkles,
 } from "lucide-react"
 import { CollectTab }      from "./CollectTab"
 import { BatchTab }        from "./BatchTab"
@@ -15,6 +15,7 @@ import { ReportTab }       from "./ReportTab"
 import { ContractsTab }    from "./ContractsTab"
 import { StorageTab }      from "./StorageTab"
 import { OpportunityTab }  from "./OpportunityTab"
+import { AiAnalystTab }    from "./AiAnalystTab"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -119,7 +120,7 @@ interface IntelData {
   variant_distribution: { variant: string; count: number }[]
 }
 
-type Tab = "intelligence" | "contracts" | "storage" | "opportunity" | "bids" | "dealers" | "heatmap" | "buyers" | "targets" | "report" | "batch" | "collect"
+type Tab = "ai-analyst" | "intelligence" | "contracts" | "storage" | "opportunity" | "bids" | "dealers" | "heatmap" | "buyers" | "targets" | "report" | "batch" | "collect"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -823,7 +824,7 @@ function HeatMapTab({ onDealerClick }: { onDealerClick: (name: string) => void }
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function ProcurementIntelligence() {
-  const [activeTab, setActiveTab]         = useState<Tab>("intelligence")
+  const [activeTab, setActiveTab]         = useState<Tab>("ai-analyst")
   const [stats, setStats]                 = useState<Stats | null>(null)
   const [selectedDealer, setSelectedDealer] = useState<string | null>(null)
   const [selectedBid, setSelectedBid]     = useState<string | null>(null)
@@ -848,18 +849,19 @@ export default function ProcurementIntelligence() {
   }, [])
 
   const TABS: { id: Tab; label: string; icon: React.ElementType; highlight?: boolean; group?: string }[] = [
-    { id: "intelligence", label: "Intelligence",       icon: BarChart3,  highlight: true },
-    { id: "contracts",    label: "Contracts Intel",   icon: TrendingUp, highlight: true },
-    { id: "opportunity",  label: "Opportunity Engine", icon: Zap,        highlight: true },
-    { id: "storage",      label: "PDF Storage",        icon: HardDrive },
-    { id: "buyers",       label: "Buyer Profiles",    icon: Building2,  highlight: true },
-    { id: "targets",      label: "Target Lists",      icon: TrendingUp, highlight: true },
-    { id: "report",       label: "Sales Report",      icon: BarChart3,  highlight: true },
-    { id: "bids",         label: "Bid Explorer",      icon: FileSearch },
-    { id: "dealers",      label: "All Dealers",       icon: Users },
-    { id: "heatmap",      label: "Procurement Map",   icon: Map },
-    { id: "batch",        label: "Batch Collect",     icon: TrendingUp },
-    { id: "collect",      label: "Single Bid",        icon: PlusCircle },
+    { id: "ai-analyst",   label: "AI Analyst",         icon: Sparkles,   highlight: true },
+    { id: "intelligence", label: "Intelligence",        icon: BarChart3,  highlight: true },
+    { id: "contracts",    label: "Contracts Intel",    icon: TrendingUp, highlight: true },
+    { id: "opportunity",  label: "Opportunity Engine",  icon: Zap,        highlight: true },
+    { id: "storage",      label: "PDF Storage",         icon: HardDrive },
+    { id: "buyers",       label: "Buyer Profiles",     icon: Building2,  highlight: true },
+    { id: "targets",      label: "Target Lists",       icon: TrendingUp, highlight: true },
+    { id: "report",       label: "Sales Report",       icon: BarChart3,  highlight: true },
+    { id: "bids",         label: "Bid Explorer",       icon: FileSearch },
+    { id: "dealers",      label: "All Dealers",        icon: Users },
+    { id: "heatmap",      label: "Procurement Map",    icon: Map },
+    { id: "batch",        label: "Batch Collect",      icon: TrendingUp },
+    { id: "collect",      label: "Single Bid",         icon: PlusCircle },
   ]
 
   return (
@@ -922,6 +924,7 @@ export default function ProcurementIntelligence() {
         </div>
 
         {/* Tab content */}
+        {activeTab === "ai-analyst"   && <AiAnalystTab onDealerClick={handleDealerClick} />}
         {activeTab === "intelligence" && <IntelligenceTab onDealerClick={handleDealerClick} />}
         {activeTab === "contracts"    && <ContractsTab />}
         {activeTab === "opportunity"  && <OpportunityTab />}
