@@ -1,12 +1,12 @@
 "use client"
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import {
   User, Shield, Monitor, Key, LogOut,
   ChevronDown, Clock, AlertTriangle,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
+import { performAdminLogout } from "@/components/admin/AdminUserMenu"
 
 function initials(name: string): string {
   if (!name) return "?"
@@ -40,7 +40,6 @@ export function UserMenu() {
   const { user, loading }     = useAuth()
 
   useEffect(() => { setLoginTime(new Date()) }, [])
-  const router                = useRouter()
   const ref                   = useRef<HTMLDivElement>(null)
 
   // Close on outside click
@@ -51,11 +50,6 @@ export function UserMenu() {
     document.addEventListener("mousedown", handler)
     return () => document.removeEventListener("mousedown", handler)
   }, [])
-
-  const handleLogout = async () => {
-    await fetch("/api/admin/auth/logout", { method: "POST" })
-    router.push("/admin/login")
-  }
 
   if (loading || !user) {
     return <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
@@ -141,7 +135,7 @@ export function UserMenu() {
           {/* Divider */}
           <div className="border-t border-gray-100 py-1">
             <button
-              onClick={handleLogout}
+              onClick={performAdminLogout}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-colors"
             >
               <LogOut size={13} />Sign Out

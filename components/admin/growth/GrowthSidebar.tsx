@@ -9,6 +9,7 @@ import {
   PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck, ClipboardList, Monitor,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
+import { performAdminLogout } from "@/components/admin/AdminUserMenu"
 import type { Permission } from "@/lib/rbac/permissions"
 import { MODULE_PERMISSIONS } from "@/lib/rbac/permissions"
 
@@ -83,10 +84,6 @@ export function GrowthSidebar() {
     })
   }
 
-  const handleLogout = async () => {
-    await fetch("/api/admin/auth/logout", { method: "POST" })
-    window.location.href = "/admin/login"
-  }
 
   if (!mounted) {
     return <aside className="fixed left-0 top-0 bottom-0 w-56 bg-gray-950 z-40" />
@@ -215,7 +212,7 @@ export function GrowthSidebar() {
         )}
 
         <button
-          onClick={handleLogout}
+          onClick={performAdminLogout}
           title="Sign out"
           className={`w-full flex items-center rounded-lg text-xs text-red-500 hover:text-red-400 hover:bg-red-950/30 transition-colors ${
             collapsed ? "p-2 justify-center" : "px-3 py-2 gap-2"

@@ -48,6 +48,7 @@ import { ReviewsTab } from "@/components/admin/ReviewsTab"
 import { SiteSettingsTab } from "@/components/admin/SiteSettingsTab"
 import { ProductExperienceTab } from "@/components/admin/ProductExperienceTab"
 import { ProcurementTab } from "@/components/admin/ProcurementTab"
+import { AdminUserMenu, AdminSignOutButton } from "@/components/admin/AdminUserMenu"
 import { toStringArray } from "@/lib/normalizeProduct"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
@@ -948,9 +949,7 @@ function AdminDashboardContent() {
                 <Eye className="mr-2" size={16} />
                 View Website
               </Button>
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <Settings className="text-green-600" size={16} />
-              </div>
+              <AdminUserMenu />
             </div>
           </div>
         </div>
@@ -1299,6 +1298,9 @@ function AdminDashboardContent() {
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                   Growth OS ↗
                 </a>
+              </div>
+              <div className="pt-2 mt-2 border-t border-gray-200">
+                <AdminSignOutButton className="w-full px-4 py-3 text-left rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 text-sm font-medium" />
               </div>
             </nav>
           </div>

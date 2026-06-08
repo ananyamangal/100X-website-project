@@ -20,13 +20,21 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.json({ success: true })
-  // Clear both the JWT cookie and the legacy cookie (same name, different values)
+  const secure = process.env.NODE_ENV === "production"
+
+  // Clear the HTTP-only JWT cookie (path=/)
   response.cookies.set(SESSION_COOKIE, "", {
     httpOnly: true,
-    secure:   process.env.NODE_ENV === "production",
+    secure,
     sameSite: "strict",
     maxAge:   0,
     path:     "/",
   })
+
+  // Also clear the legacy client-set cookie that the legacy admin writes at path=/admin.
+  // Must use headers.append because cookies.set() with the same name overwrites the first Set-Cookie.
+  const legacyCookieStr = `${SESSION_COOKIE}=; path=/admin; max-age=0; SameSite=Strict${secure ? "; Secure" : ""}`
+  response.headers.append("Set-Cookie", legacyCookieStr)
+
   return response
 }
