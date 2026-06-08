@@ -1,4 +1,4 @@
-import type { Permission } from "./permissions"
+import type { Permission, PermAction, PermGroup } from "./permissions"
 
 // ── Role slugs ────────────────────────────────────────────────────────────────
 
@@ -20,13 +20,13 @@ export interface DBUser {
   name: string
   passwordHash: string
   role: RoleSlug
-  customPermissions: Permission[]   // additive beyond role defaults
-  deniedPermissions: Permission[]   // strip from role defaults
+  customPermissions: Permission[]
+  deniedPermissions: Permission[]
   isActive: boolean
   createdAt: Date
   updatedAt: Date
   lastLoginAt: Date | null
-  createdBy: string | null          // userId of creator
+  createdBy: string | null
   loginHistory: LoginEvent[]
 }
 
@@ -43,9 +43,47 @@ export interface DBRole {
   name: string
   description: string
   permissions: Permission[]
-  isSystem: boolean                 // system roles cannot be deleted
+  isSystem: boolean
   createdAt: Date
   updatedAt: Date
+}
+
+// Permission registry entry (mirrors PermDef, stored in rbac_permissions)
+export interface DBPermission {
+  _id?: string
+  key: string
+  label: string
+  description: string
+  group: PermGroup
+  subgroup?: string
+  module: string
+  action: PermAction
+  critical: boolean
+  sortOrder: number
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+// Role → permission mapping (stored in rbac_role_permissions)
+// Replaces hardcoded ROLE_PERMISSIONS for live updates
+export interface DBRolePermissions {
+  _id?: string
+  roleSlug: RoleSlug
+  permissions: Permission[]
+  updatedAt: Date
+  updatedBy: string | null
+}
+
+// Per-user permission overrides (stored in rbac_user_permissions)
+export interface DBUserPermissions {
+  _id?: string
+  userId: string
+  grantedPermissions: Permission[]   // additive beyond role
+  deniedPermissions: Permission[]    // strip from role
+  updatedAt: Date
+  updatedBy: string | null
+  notes?: string
 }
 
 export interface DBAuditLog {
@@ -62,24 +100,17 @@ export interface DBAuditLog {
 }
 
 export type AuditAction =
-  | "login"
-  | "logout"
-  | "login_failed"
-  | "export"
-  | "delete"
-  | "create"
-  | "edit"
-  | "permission_change"
-  | "role_change"
-  | "user_disabled"
-  | "user_enabled"
-  | "password_reset"
-  | "seed"
+  | "login" | "logout" | "login_failed"
+  | "export" | "delete" | "create" | "edit"
+  | "permission_change" | "role_change"
+  | "user_disabled" | "user_enabled"
+  | "password_reset" | "seed"
+  | "access_denied"
 
-// ── JWT payload stored in the admin-token cookie ─────────────────────────────
+// ── JWT payload ───────────────────────────────────────────────────────────────
 
 export interface JWTPayload {
-  sub: string           // userId (string representation of _id)
+  sub: string
   email: string
   name: string
   role: RoleSlug
@@ -88,7 +119,7 @@ export interface JWTPayload {
   exp: number
 }
 
-// ── Safe user shape returned to client (no password hash) ────────────────────
+// ── Safe user shape returned to client ───────────────────────────────────────
 
 export interface SafeUser {
   id: string
@@ -99,4 +130,13 @@ export interface SafeUser {
   isActive: boolean
   createdAt: string
   lastLoginAt: string | null
+}
+
+// ── Permission resolution result ──────────────────────────────────────────────
+
+export interface PermissionResolution {
+  base: Permission[]          // from role template
+  granted: Permission[]       // user-specific grants
+  denied: Permission[]        // user-specific denials
+  effective: Permission[]     // final computed set
 }

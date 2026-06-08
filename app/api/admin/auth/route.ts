@@ -3,7 +3,7 @@ import { createHash } from "crypto"
 import clientPromise from "@/lib/mongodb"
 import { signJWT, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/rbac/jwt"
 import { verifyPassword } from "@/lib/rbac/password"
-import { resolvePermissions } from "@/lib/rbac/roles"
+import { getEffectivePermissions } from "@/lib/rbac/engine"
 import { writeAuditLog } from "@/lib/rbac/server"
 import type { DBUser } from "@/lib/rbac/types"
 
@@ -63,11 +63,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
       }
 
-      const permissions = resolvePermissions(
-        dbUser.role,
-        dbUser.customPermissions ?? [],
-        dbUser.deniedPermissions ?? []
-      )
+      const permissions = await getEffectivePermissions(String(dbUser._id), dbUser.role)
 
       const token = await signJWT({
         sub: String(dbUser._id),
@@ -136,11 +132,7 @@ export async function POST(request: NextRequest) {
     let token: string
 
     if (superAdmin) {
-      const permissions = resolvePermissions(
-        superAdmin.role,
-        superAdmin.customPermissions ?? [],
-        superAdmin.deniedPermissions ?? []
-      )
+      const permissions = await getEffectivePermissions(String(superAdmin._id), superAdmin.role)
       token = await signJWT({
         sub: String(superAdmin._id),
         email: superAdmin.email,

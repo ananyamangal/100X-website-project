@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useCallback } from "react"
 import {
   UserPlus, RefreshCw, Shield, Check, X, Key, Trash2,
-  ChevronDown, Clock, Activity, Eye, EyeOff, Copy, CheckCheck,
+  ChevronDown, Clock, Activity, Eye, EyeOff, Copy, CheckCheck, ShieldCheck,
 } from "lucide-react"
 import { useAuth, PermissionGate } from "@/lib/rbac/client"
 import { ROLE_DEFINITIONS } from "@/lib/rbac/roles"
 import type { RoleSlug } from "@/lib/rbac/types"
+import { UserPermissionOverride } from "@/components/admin/growth/UserPermissionOverride"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -155,10 +156,12 @@ function UserRow({
   u,
   isSelf,
   onRefresh,
+  onOpenPermissions,
 }: {
   u: User
   isSelf: boolean
   onRefresh: () => void
+  onOpenPermissions: (u: User) => void
 }) {
   const [expanded,   setExpanded]   = useState(false)
   const [loading,    setLoading]    = useState(false)
@@ -247,6 +250,15 @@ function UserRow({
             >
               <Activity size={13} />
             </button>
+            <PermissionGate permission="permissions.view">
+              <button
+                onClick={() => onOpenPermissions(u)}
+                title="Manage permissions"
+                className="p-1.5 rounded text-gray-500 hover:text-purple-400 hover:bg-purple-900/20 transition-colors"
+              >
+                <ShieldCheck size={13} />
+              </button>
+            </PermissionGate>
             <PermissionGate permission="users.delete">
               <button
                 onClick={softDelete}
@@ -314,6 +326,7 @@ export default function UserManagementPage() {
   const [showCreate,  setShowCreate]  = useState(false)
   const [filter,      setFilter]      = useState<"all" | "active" | "inactive">("active")
   const [roleFilter,  setRoleFilter]  = useState<string>("all")
+  const [permUser,    setPermUser]    = useState<User | null>(null)
 
   const fetchUsers = useCallback(async () => {
     setLoading(true)
@@ -453,6 +466,7 @@ export default function UserManagementPage() {
                       u={u}
                       isSelf={self?.id === u.id || self?.email === u.email}
                       onRefresh={fetchUsers}
+                      onOpenPermissions={setPermUser}
                     />
                   ))}
                 </tbody>
@@ -466,6 +480,15 @@ export default function UserManagementPage() {
         <CreateUserModal
           onClose={() => setShowCreate(false)}
           onCreated={() => { setShowCreate(false); fetchUsers() }}
+        />
+      )}
+
+      {permUser && (
+        <UserPermissionOverride
+          userId={permUser.id}
+          userName={permUser.name}
+          userRole={permUser.role}
+          onClose={() => setPermUser(null)}
         />
       )}
     </PermissionGate>

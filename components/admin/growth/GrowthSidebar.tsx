@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Search, Bot, Radar, Lightbulb, FileText,
   Users, ShoppingBag, Megaphone, Settings2, ScrollText,
   BarChart2, TrendingUp, ArrowLeft, Zap, Plug,
-  PanelLeftClose, PanelLeftOpen, UserCog, LogOut,
+  PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import type { Permission } from "@/lib/rbac/permissions"
@@ -42,6 +42,7 @@ const MODULES: Module[] = [
   { href: "/admin/growth/reports",          label: "Reporting Center",     icon: BarChart2,       permission: "reports.view" },
   { href: "/admin/growth/paid",             label: "Paid Growth",          icon: TrendingUp,      permission: "ads.view" },
   { href: "/admin/growth/users",            label: "User Management",      icon: UserCog,         permission: "users.view" },
+  { href: "/admin/growth/permissions",      label: "Permission Matrix",    icon: ShieldCheck,     permission: "permissions.view" },
 ]
 
 const SIDEBAR_KEY = "growth:sidebar:collapsed"
