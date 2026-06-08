@@ -48,6 +48,7 @@ export interface Product {
   problem?: string;
   solution?: string;
   certifications?: string[];
+  certificationIds?: string[];         // IDs from the certifications collection
   performanceMetrics?: string[];
   // Product Experience Builder
   filmChapters?: FilmChapter[];

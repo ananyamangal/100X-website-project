@@ -22,6 +22,7 @@ import {
   Check,
   CheckCircle,
   Award,
+  Tag,
   Video,
   Download,
   GripVertical,
@@ -49,6 +50,9 @@ import { SiteSettingsTab } from "@/components/admin/SiteSettingsTab"
 import { ProductExperienceTab } from "@/components/admin/ProductExperienceTab"
 import { ProcurementTab } from "@/components/admin/ProcurementTab"
 import { AdminUserMenu, AdminSignOutButton } from "@/components/admin/AdminUserMenu"
+import { ProductBadgesTab } from "@/components/admin/ProductBadgesTab"
+import { CertificationsManagerTab } from "@/components/admin/CertificationsManagerTab"
+import { MediaLibraryTab } from "@/components/admin/MediaLibraryTab"
 import { toStringArray } from "@/lib/normalizeProduct"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
@@ -86,7 +90,9 @@ interface Product {
   problem?: string;
   solution?: string;
   certifications?: string[];
+  certificationIds?: string[];
   performanceMetrics?: string[];
+  ugcImages?: string[];
   filmChapters?: any[];
   boxContents?: any[];
   productFaqs?: Array<{ q: string; a: string }>;
@@ -1290,6 +1296,43 @@ function AdminDashboardContent() {
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
                 GeM Intelligence
               </button>
+              {/* CMS Foundation */}
+              <div className="pt-2 mt-2 border-t border-gray-200">
+                <p className="px-4 pt-1 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">CMS</p>
+                <button
+                  onClick={() => setActiveTab("productBadges")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "productBadges"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Tag className="mr-3" size={20} />
+                  Product Badges
+                </button>
+                <button
+                  onClick={() => setActiveTab("certifications")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "certifications"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Award className="mr-3" size={20} />
+                  Certifications
+                </button>
+                <button
+                  onClick={() => setActiveTab("mediaLibrary")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "mediaLibrary"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <ImageIcon className="mr-3" size={20} />
+                  Media Library
+                </button>
+              </div>
               <div className="pt-2 mt-2 border-t border-gray-200">
                 <a
                   href="/admin/growth"
@@ -1411,6 +1454,9 @@ function AdminDashboardContent() {
             {activeTab === "siteSettings" && <SiteSettingsTab />}
             {activeTab === "settings" && <SettingsTab />}
             {activeTab === "procurement" && <ProcurementTab />}
+            {activeTab === "productBadges" && <ProductBadgesTab />}
+            {activeTab === "certifications" && <CertificationsManagerTab />}
+            {activeTab === "mediaLibrary" && <MediaLibraryTab />}
           </div>
         </div>
       </div>
@@ -1843,6 +1889,7 @@ function ProductForm({
     problem: product?.problem || "",
     solution: product?.solution || "",
     certifications: toStringArray(product?.certifications).join("\n"),
+    certificationIds: Array.isArray(product?.certificationIds) ? (product.certificationIds as string[]) : [],
     performanceMetrics: toStringArray(product?.performanceMetrics).join("\n"),
     filmChapters: Array.isArray(product?.filmChapters) ? product.filmChapters : [],
     boxContents: Array.isArray(product?.boxContents) ? product.boxContents : [],
@@ -1862,6 +1909,19 @@ function ProductForm({
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingBrochure, setUploadingBrochure] = useState(false);
   const [descriptionError, setDescriptionError] = useState("");
+  const [cmsBadges, setCmsBadges] = useState<{ _id?: string; name: string; colorClass: string }[]>([]);
+  const [cmsCerts, setCmsCerts]   = useState<{ _id?: string; name: string; logoUrl: string }[]>([]);
+
+  useEffect(() => {
+    fetch("/api/admin/product-badges")
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d)) setCmsBadges(d) })
+      .catch(() => {})
+    fetch("/api/admin/certifications")
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d)) setCmsCerts(d) })
+      .catch(() => {})
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -1877,6 +1937,7 @@ function ProductForm({
       specifications: toStringArray(formData.specifications),
       applications: toStringArray(formData.applications),
       certifications: toStringArray(formData.certifications),
+      certificationIds: formData.certificationIds || [],
       performanceMetrics: toStringArray(formData.performanceMetrics),
       productFaqs: Array.isArray(formData.productFaqs) ? formData.productFaqs : [],
       ugcImages: toStringArray(formData.ugcImages),
@@ -1925,40 +1986,38 @@ function ProductForm({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Badges (Select multiple)</label>
-              <div className="space-y-2">
-                {[
-                  "Korean Technology",
-                  "German Technology", 
-                  "Japnese Technology",
-                  "GeM",
-                  "Heavy Duty",
-                  "Eco Friendly",
-                  "Ecofreidly",
-                  "BIS Approved",
-                  "Best Seller",
-                  "Eco-Friendly",
-                  "New Launch",
-                  "Budget Friendly",
-                  "Precision Tech"
-                ].map((badge) => (
-                  <label key={badge} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.badges.includes(badge)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setFormData({ ...formData, badges: [...formData.badges, badge] });
-                        } else {
-                          setFormData({ ...formData, badges: formData.badges.filter(b => b !== badge) });
-                        }
-                      }}
-                      className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                    />
-                    <span className="text-sm text-gray-700">{badge}</span>
-                  </label>
-                ))}
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">Badges (Select multiple)</label>
+                <a href="#" onClick={(e) => { e.preventDefault(); (window as any).adminSetTab?.("productBadges") }}
+                  className="text-xs text-green-600 hover:underline">Manage badges →</a>
               </div>
+              {cmsBadges.length === 0 ? (
+                <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200">
+                  No badges in CMS yet. <a href="/admin#productBadges" className="underline">Add badges in the Badge Manager tab</a> to enable selection here.
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-white">
+                  {cmsBadges.map((badge) => (
+                    <label key={badge.name} className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.badges.includes(badge.name)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData({ ...formData, badges: [...formData.badges, badge.name] });
+                          } else {
+                            setFormData({ ...formData, badges: formData.badges.filter(b => b !== badge.name) });
+                          }
+                        }}
+                        className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                      />
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${badge.colorClass || "bg-gray-100 text-gray-700"}`}>
+                        {badge.name}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
               {formData.badges.length > 0 && (
                 <div className="mt-3 p-3 bg-gray-50 rounded-lg">
                   <p className="text-sm font-medium text-gray-700 mb-2">Selected Badges:</p>
@@ -1969,6 +2028,41 @@ function ProductForm({
                       </Badge>
                     ))}
                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* Certifications (CMS-linked) */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">Certifications & Approvals</label>
+                <a href="/admin#certifications" className="text-xs text-green-600 hover:underline">Manage certifications →</a>
+              </div>
+              {cmsCerts.length === 0 ? (
+                <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200">
+                  No certifications in CMS yet. Add them in the Certifications tab first.
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-white">
+                  {cmsCerts.map((cert) => (
+                    <label key={String(cert._id)} className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.certificationIds.includes(String(cert._id))}
+                        onChange={(e) => {
+                          const id = String(cert._id)
+                          if (e.target.checked) {
+                            setFormData({ ...formData, certificationIds: [...formData.certificationIds, id] });
+                          } else {
+                            setFormData({ ...formData, certificationIds: formData.certificationIds.filter(c => c !== id) });
+                          }
+                        }}
+                        className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                      />
+                      {cert.logoUrl && <img src={cert.logoUrl} alt={cert.name} className="h-5 object-contain" />}
+                      <span className="text-sm text-gray-700">{cert.name}</span>
+                    </label>
+                  ))}
                 </div>
               )}
             </div>

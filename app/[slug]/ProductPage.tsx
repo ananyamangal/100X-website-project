@@ -42,16 +42,18 @@ function safeStrArray(val: unknown): string[] {
     return [];
 }
 
-const badgeLogoMap: Record<string, string> = {
+// Badge definitions are now CMS-managed. Fallback map kept for legacy local files
+// while product_badges collection is being populated.
+const LEGACY_BADGE_LOGOS: Record<string, string> = {
     'German Technology': '/Logos clipart 2/german technology.png',
     'Japnese Technology': '/Logos clipart 2/Japnese technology.png',
-    'GeM': '/Logos clipart 2/GeM logo.png',
-    'GeM logo': '/Logos clipart 2/GeM logo.png',
-    'Heavy Duty': '/Logos clipart 2/Heavy duty.png',
-    'Heavy duty': '/Logos clipart 2/Heavy duty.png',
-    'Eco Friendly': '/Logos clipart 2/Ecofreidly.png',
-    'Ecofreidly': '/Logos clipart 2/Ecofreidly.png',
-    'BIS Approved': '/Logos clipart 2/BIS approved.png',
+    'GeM':                '/Logos clipart 2/GeM logo.png',
+    'GeM logo':           '/Logos clipart 2/GeM logo.png',
+    'Heavy Duty':         '/Logos clipart 2/Heavy duty.png',
+    'Heavy duty':         '/Logos clipart 2/Heavy duty.png',
+    'Eco Friendly':       '/Logos clipart 2/Ecofreidly.png',
+    'Ecofreidly':         '/Logos clipart 2/Ecofreidly.png',
+    'BIS Approved':       '/Logos clipart 2/BIS approved.png',
 };
 
 // ── Spec grouper ─────────────────────────────────────────────────────────
@@ -140,14 +142,20 @@ function ApplicationsTabContent({ applications }: { applications: string[] }) {
     );
 }
 
-function CertificationsTabContent({ certifications, badges }: { certifications: string[]; badges: string[] }) {
+function CertificationsTabContent({
+    certifications, badges, logoMap,
+}: {
+    certifications: string[]
+    badges: string[]
+    logoMap: Record<string, string>
+}) {
     const all = [...new Set([...certifications, ...badges])];
     return (
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
             {all.map((item, i) => (
                 <div key={i} className="flex items-center gap-3 p-3.5 bg-gray-50 rounded-xl border border-gray-100">
-                    {badgeLogoMap[item]
-                        ? <img src={badgeLogoMap[item]} alt={item} className="w-9 h-9 object-contain shrink-0" />
+                    {logoMap[item]
+                        ? <img src={logoMap[item]} alt={item} className="w-9 h-9 object-contain shrink-0" />
                         : <CheckCircle size={18} className="text-brand-600 shrink-0" />}
                     <span className="text-sm font-500 text-gray-800">{item}</span>
                 </div>
@@ -331,6 +339,9 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
     const [fetchedProduct, setFetchedProduct] = useState<Record<string, unknown> | null>(null);
     const [loading, setLoading] = useState(!productProp);
 
+    // CMS badge logo map — fetched once per page load, falls back to legacy static map
+    const [badgeLogoMap, setBadgeLogoMap] = useState<Record<string, string>>(LEGACY_BADGE_LOGOS);
+
     useEffect(() => {
         if (productProp) return;
         if (!slug) { setLoading(false); return; }
@@ -344,6 +355,22 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
             })
             .catch(() => setLoading(false));
     }, [slug, productProp]);
+
+    // Fetch CMS badge definitions and build logo map (merge over legacy fallback)
+    useEffect(() => {
+        fetch('/api/product-badges')
+            .then(r => r.ok ? r.json() : null)
+            .then((data: Array<{ name: string; iconUrl: string }> | null) => {
+                if (!Array.isArray(data)) return;
+                const cmsMap: Record<string, string> = {}
+                for (const b of data) {
+                    if (b.name && b.iconUrl) cmsMap[b.name] = b.iconUrl
+                }
+                // CMS entries override legacy; both present for graceful transition
+                setBadgeLogoMap({ ...LEGACY_BADGE_LOGOS, ...cmsMap })
+            })
+            .catch(() => {})
+    }, []);
 
     const product: Record<string, unknown> | null = productProp ?? fetchedProduct;
 
@@ -481,7 +508,7 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
             label: 'Certifications & Approvals',
             badge: `${[...new Set([...certifications, ...badges])].length}`,
             icon: <Award size={14} />,
-            children: <CertificationsTabContent certifications={certifications} badges={badges} />,
+            children: <CertificationsTabContent certifications={certifications} badges={badges} logoMap={badgeLogoMap} />,
         },
         warranty.enabled && {
             id: 'warranty',
