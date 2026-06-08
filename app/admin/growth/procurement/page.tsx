@@ -3,27 +3,26 @@ import { useEffect, useState, useCallback } from "react"
 import {
   FileSearch, Users, Map, RefreshCw,
   TrendingUp, Building2, Search, X,
-  BarChart3, PlusCircle, Download, HardDrive, Zap, Sparkles,
+  BarChart3, PlusCircle, Download, Sparkles, Zap,
   Network, Star, Package, SlidersHorizontal,
 } from "lucide-react"
-import { CollectTab }         from "./CollectTab"
-import { BatchTab }           from "./BatchTab"
-import { DealerPanel }        from "./DealerPanel"
-import { BidPanel }           from "./BidPanel"
-import { BuyersTab }          from "./BuyersTab"
-import { TargetsTab }         from "./TargetsTab"
-import { ReportTab }          from "./ReportTab"
-import { ContractsTab }       from "./ContractsTab"
-import { StorageTab }         from "./StorageTab"
-import { OpportunityTab }     from "./OpportunityTab"
-import { AiAnalystTab }       from "./AiAnalystTab"
+import { DealerPanel }          from "./DealerPanel"
+import { BidPanel }             from "./BidPanel"
+import { ReportTab }            from "./ReportTab"
+import { ContractsTab }         from "./ContractsTab"
+import { OpportunityTab }       from "./OpportunityTab"
+import { AiAnalystTab }         from "./AiAnalystTab"
 import { FilterBar, EMPTY_FILTER, type ProcFilter } from "./FilterBar"
-import { InsightsTab }        from "./InsightsTab"
+import { InsightsTab }          from "./InsightsTab"
 import { DealerAcquisitionTab } from "./DealerAcquisitionTab"
 import { ProductDiscoveryTab }  from "./ProductDiscoveryTab"
-import { RelationshipTab }    from "./RelationshipTab"
+import { RelationshipTab }      from "./RelationshipTab"
 import { AlertsBell, AlertsPanel, useAlertCount } from "./AlertsPanel"
-import { GovernanceStrip }   from "./GovernanceStrip"
+import { GovernanceStrip }      from "./GovernanceStrip"
+import { CopilotTab }           from "./CopilotTab"
+import { CollectionHealthTab }  from "./CollectionHealthTab"
+import { BuyerIntelTab }        from "./BuyerIntelTab"
+import { CollectDataTab }       from "./CollectDataTab"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -128,9 +127,13 @@ interface IntelData {
   variant_distribution: { variant: string; count: number }[]
 }
 
-type Tab = "ai-analyst" | "insights" | "dealer-acq" | "product-disc" | "relationships" | "intelligence" | "contracts" | "storage" | "opportunity" | "bids" | "dealers" | "heatmap" | "buyers" | "targets" | "report" | "batch" | "collect"
+type Tab =
+  | "copilot" | "ai-analyst" | "insights" | "opportunity" | "relationships"
+  | "dealer-acq" | "product-disc" | "buyer-intel"
+  | "contracts" | "dealers" | "heatmap"
+  | "health" | "collect-data" | "report"
 
-// ─── 2-level navigation groups ────────────────────────────────────────────────
+// ─── 2-level navigation groups (simplified: 17 → 14 tabs) ────────────────────
 
 interface SubTab { id: Tab; label: string; icon: React.ElementType }
 interface NavGroup { id: string; label: string; icon: React.ElementType; highlight?: boolean; tabs: SubTab[] }
@@ -139,8 +142,9 @@ const NAV_GROUPS: NavGroup[] = [
   {
     id: "intelligence", label: "Intelligence", icon: Sparkles, highlight: true,
     tabs: [
-      { id: "ai-analyst",    label: "AI Analyst",      icon: Sparkles   },
-      { id: "insights",      label: "Auto Insights",   icon: Zap        },
+      { id: "copilot",       label: "Copilot",        icon: Sparkles   },
+      { id: "ai-analyst",    label: "AI Analyst",      icon: Zap        },
+      { id: "insights",      label: "Auto Insights",   icon: BarChart3  },
       { id: "opportunity",   label: "Recommendations", icon: TrendingUp },
       { id: "relationships", label: "Relationships",   icon: Network    },
     ],
@@ -148,29 +152,25 @@ const NAV_GROUPS: NavGroup[] = [
   {
     id: "acquire", label: "Acquire", icon: Star, highlight: true,
     tabs: [
-      { id: "dealer-acq",   label: "Dealer Acq.",   icon: Star      },
-      { id: "product-disc", label: "Products",      icon: Package   },
-      { id: "buyers",       label: "Buyers",        icon: Building2 },
-      { id: "targets",      label: "Targets",       icon: TrendingUp},
+      { id: "dealer-acq",   label: "Dealer Targets",   icon: Star      },
+      { id: "product-disc", label: "Product Discovery", icon: Package  },
+      { id: "buyer-intel",  label: "Buyer Intel",       icon: Building2 },
     ],
   },
   {
     id: "data", label: "Data", icon: Search,
     tabs: [
-      { id: "contracts", label: "Contracts",  icon: Search    },
-      { id: "bids",      label: "Bids",       icon: FileSearch},
-      { id: "dealers",   label: "All Dealers",icon: Users     },
-      { id: "heatmap",   label: "Proc. Map",  icon: Map       },
+      { id: "contracts", label: "Contracts",   icon: Search },
+      { id: "dealers",   label: "All Dealers", icon: Users  },
+      { id: "heatmap",   label: "Geo Map",     icon: Map    },
     ],
   },
   {
-    id: "ops", label: "Operations", icon: BarChart3,
+    id: "ops", label: "Operations", icon: SlidersHorizontal,
     tabs: [
-      { id: "intelligence", label: "Legacy Intel",  icon: BarChart3  },
-      { id: "report",       label: "Sales Report",  icon: BarChart3  },
-      { id: "storage",      label: "PDF Storage",   icon: HardDrive  },
-      { id: "batch",        label: "Batch Collect", icon: TrendingUp },
-      { id: "collect",      label: "Single Bid",    icon: PlusCircle },
+      { id: "health",       label: "System Health", icon: BarChart3  },
+      { id: "collect-data", label: "Collect Data",  icon: PlusCircle },
+      { id: "report",       label: "Sales Report",  icon: Download   },
     ],
   },
 ]
@@ -981,23 +981,20 @@ export default function ProcurementIntelligence() {
         </div>
 
         {/* Tab content */}
+        {activeTab === "copilot"       && <CopilotTab onDealerClick={handleDealerClick} />}
         {activeTab === "ai-analyst"    && <AiAnalystTab onDealerClick={handleDealerClick} filter={filter} />}
         {activeTab === "insights"      && <InsightsTab onDealerClick={handleDealerClick} />}
+        {activeTab === "opportunity"   && <OpportunityTab onDealerClick={handleDealerClick} />}
+        {activeTab === "relationships" && <RelationshipTab onDealerClick={handleDealerClick} />}
         {activeTab === "dealer-acq"    && <DealerAcquisitionTab onDealerClick={handleDealerClick} />}
         {activeTab === "product-disc"  && <ProductDiscoveryTab />}
-        {activeTab === "relationships" && <RelationshipTab onDealerClick={handleDealerClick} />}
-        {activeTab === "intelligence"  && <IntelligenceTab onDealerClick={handleDealerClick} />}
+        {activeTab === "buyer-intel"   && <BuyerIntelTab onDealerClick={handleDealerClick} />}
         {activeTab === "contracts"     && <ContractsTab />}
-        {activeTab === "opportunity"   && <OpportunityTab onDealerClick={handleDealerClick} />}
-        {activeTab === "storage"       && <StorageTab />}
-        {activeTab === "buyers"        && <BuyersTab onDealerClick={handleDealerClick} />}
-        {activeTab === "targets"       && <TargetsTab onDealerClick={handleDealerClick} />}
-        {activeTab === "report"        && <ReportTab onDealerClick={handleDealerClick} />}
-        {activeTab === "bids"          && <BidsTab onBidClick={handleBidClick} onDealerClick={handleDealerClick} />}
         {activeTab === "dealers"       && <DealersTab onDealerClick={handleDealerClick} />}
         {activeTab === "heatmap"       && <HeatMapTab onDealerClick={handleDealerClick} />}
-        {activeTab === "batch"         && <BatchTab onSaved={loadStats} />}
-        {activeTab === "collect"       && <CollectTab onSaved={loadStats} />}
+        {activeTab === "health"        && <CollectionHealthTab />}
+        {activeTab === "collect-data"  && <CollectDataTab onSaved={loadStats} />}
+        {activeTab === "report"        && <ReportTab onDealerClick={handleDealerClick} />}
       </div>
 
       {/* Dealer detail panel (slide-over) */}
