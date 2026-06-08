@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import {
   Sparkles, Send, RefreshCw, Database, AlertCircle,
   ChevronDown, ChevronUp, ExternalLink, Loader2, BrainCircuit, ShieldCheck,
+  Cpu, Key, Terminal, Clock, Zap,
 } from "lucide-react"
 import type { ProcFilter } from "./FilterBar"
 
@@ -36,6 +37,7 @@ interface AnalystResult {
     confidence_score:     number
     collection_queried:   string
     generated_at:         string
+    mode?:                "ai" | "fallback"
   }
 }
 
@@ -45,6 +47,16 @@ interface ChatMessage {
   result?: AnalystResult
   error?: string
   ts: number
+}
+
+interface HealthData {
+  model:             string
+  configured:        boolean
+  api_key_detected:  boolean
+  environment:       string
+  last_query:        { question: string; collection: string; result_count: number; ts: string; fallback?: boolean } | null
+  last_error:        { question: string; error: string; ts: string } | null
+  status:            "ready" | "fallback" | "db_error" | "unconfigured"
 }
 
 // ─── Format helpers ─────────────────────────────────────────────────────────────
@@ -102,6 +114,95 @@ const EXAMPLES = [
   "Which dealers could distribute 100X products?",
   "Show departments buying waste management and fogging together",
 ]
+
+// ─── Diagnostics Banner ─────────────────────────────────────────────────────────
+
+function DiagnosticsBanner({ health }: { health: HealthData }) {
+  const [open, setOpen] = useState(false)
+  const isFallback = health.status === "fallback"
+
+  function timeAgo(iso: string) {
+    const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
+    if (s < 60)   return `${s}s ago`
+    if (s < 3600) return `${Math.floor(s / 60)}m ago`
+    if (s < 86400)return `${Math.floor(s / 3600)}h ago`
+    return `${Math.floor(s / 86400)}d ago`
+  }
+
+  return (
+    <div className={`rounded-xl border text-xs ${
+      isFallback
+        ? "bg-amber-50 border-amber-200"
+        : "bg-gray-50 border-gray-200"
+    }`}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors rounded-xl">
+        <Cpu size={12} className={isFallback ? "text-amber-600" : "text-green-600"} />
+        <span className={`font-semibold ${isFallback ? "text-amber-800" : "text-gray-700"}`}>
+          {isFallback ? "Fallback Mode — Deterministic queries" : `AI Mode — ${health.model}`}
+        </span>
+        {isFallback && (
+          <span className="text-amber-700 text-[10px]">
+            ANTHROPIC_API_KEY not configured · Examples still work
+          </span>
+        )}
+        {!isFallback && health.last_query && (
+          <span className="text-gray-400 text-[10px] ml-auto mr-1">
+            Last query: {timeAgo(health.last_query.ts)}
+          </span>
+        )}
+        {open ? <ChevronUp size={11} className="text-gray-400 ml-auto" /> : <ChevronDown size={11} className="text-gray-400 ml-auto" />}
+      </button>
+
+      {open && (
+        <div className="px-4 pb-3 pt-0 border-t border-gray-100 space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
+            <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 space-y-0.5">
+              <div className="flex items-center gap-1 text-gray-400"><Cpu size={9} />Model</div>
+              <p className="font-mono font-semibold text-gray-800 text-[10px]">{health.model}</p>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 space-y-0.5">
+              <div className="flex items-center gap-1 text-gray-400"><Key size={9} />API Key</div>
+              <p className={`font-semibold text-[10px] ${health.api_key_detected ? "text-green-600" : "text-red-500"}`}>
+                {health.api_key_detected ? "✓ Detected" : "✗ Not found"}
+              </p>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 space-y-0.5">
+              <div className="flex items-center gap-1 text-gray-400"><Terminal size={9} />Environment</div>
+              <p className="font-semibold text-gray-800 text-[10px]">{health.environment}</p>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 space-y-0.5">
+              <div className="flex items-center gap-1 text-gray-400"><Zap size={9} />Mode</div>
+              <p className={`font-semibold text-[10px] ${isFallback ? "text-amber-600" : "text-green-600"}`}>
+                {isFallback ? "Fallback" : "AI-powered"}
+              </p>
+            </div>
+          </div>
+
+          {health.last_query && (
+            <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 text-[10px] space-y-0.5">
+              <div className="flex items-center gap-1 text-gray-400"><Clock size={9} />Last Query</div>
+              <p className="text-gray-700 font-medium truncate">"{health.last_query.question}"</p>
+              <p className="text-gray-400">{health.last_query.result_count} results · {health.last_query.collection} · {timeAgo(health.last_query.ts)}{health.last_query.fallback ? " · fallback" : ""}</p>
+            </div>
+          )}
+
+          {isFallback && (
+            <div className="bg-amber-100 rounded-lg border border-amber-200 px-3 py-2 text-[10px] space-y-1">
+              <p className="font-semibold text-amber-800">To enable AI mode:</p>
+              <ol className="space-y-0.5 text-amber-700 list-decimal list-inside">
+                <li>Add <code className="bg-amber-200 px-1 rounded">ANTHROPIC_API_KEY=sk-ant-...</code> to <code className="bg-amber-200 px-1 rounded">.env.local</code></li>
+                <li>In Vercel: Settings → Environment Variables → Add <code className="bg-amber-200 px-1 rounded">ANTHROPIC_API_KEY</code></li>
+                <li>Redeploy the project</li>
+              </ol>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ─── Knowledge Graph Status Bar ─────────────────────────────────────────────────
 
@@ -319,6 +420,11 @@ function ResultCard({ result, onDealerClick }: {
         <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
           <div className="flex items-center gap-1.5 mb-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
             <ShieldCheck size={11} className="text-green-500" />Audit Trail
+            {result.audit.mode === "fallback" && (
+              <span className="ml-auto text-[9px] bg-amber-100 text-amber-700 border border-amber-200 rounded-full px-1.5 py-0.5 normal-case font-medium">
+                Deterministic · No AI key
+              </span>
+            )}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[10px]">
             <div>
@@ -375,8 +481,16 @@ export function AiAnalystTab({ onDealerClick, filter }: { onDealerClick?: (name:
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
+  const [health, setHealth] = useState<HealthData | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    fetch("/api/admin/procurement/ai-health")
+      .then(r => r.json())
+      .then(setHealth)
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -403,6 +517,11 @@ export function AiAnalystTab({ onDealerClick, filter }: { onDealerClick?: (name:
         result: data,
         ts:     Date.now(),
       }])
+      // Refresh health diagnostics after a query
+      fetch("/api/admin/procurement/ai-health")
+        .then(r => r.json())
+        .then(setHealth)
+        .catch(() => {})
     } catch (err) {
       setMessages(prev => [...prev, {
         role:   "assistant",
@@ -424,6 +543,9 @@ export function AiAnalystTab({ onDealerClick, filter }: { onDealerClick?: (name:
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Diagnostics banner */}
+      {health && <DiagnosticsBanner health={health} />}
+
       {/* Knowledge Graph status */}
       <KgStatusBar />
 

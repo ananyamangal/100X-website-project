@@ -3,30 +3,32 @@ import { useState } from "react"
 import { SlidersHorizontal, X, ChevronDown, ChevronUp } from "lucide-react"
 
 export interface ProcFilter {
-  dateFrom:  string
-  dateTo:    string
-  seller:    string
-  dept:      string
-  product:   string
-  state:     string
-  ministry:  string
-  valueMin:  string
-  valueMax:  string
-  msme:      boolean
-  status:    string
+  dateFrom:          string
+  dateTo:            string
+  seller:            string
+  dept:              string
+  product:           string
+  state:             string
+  ministry:          string
+  valueMin:          string
+  valueMax:          string
+  msme:              boolean
+  oem:               boolean
+  country_of_origin: string
+  status:            string
 }
 
 export const EMPTY_FILTER: ProcFilter = {
   dateFrom: "", dateTo: "", seller: "", dept: "",
   product: "", state: "", ministry: "", valueMin: "", valueMax: "",
-  msme: false, status: "",
+  msme: false, oem: false, country_of_origin: "", status: "",
 }
 
 function activeCount(f: ProcFilter): number {
   return [
     f.dateFrom, f.dateTo, f.seller, f.dept, f.product,
-    f.state, f.ministry, f.valueMin, f.valueMax, f.status,
-  ].filter(Boolean).length + (f.msme ? 1 : 0)
+    f.state, f.ministry, f.valueMin, f.valueMax, f.status, f.country_of_origin,
+  ].filter(Boolean).length + (f.msme ? 1 : 0) + (f.oem ? 1 : 0)
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -80,7 +82,9 @@ export function FilterBar({ filter, onChange }: Props) {
                 filter.product  && `product: ${filter.product.slice(0, 20)}`,
                 filter.state    && filter.state,
                 filter.ministry && filter.ministry,
-                filter.msme     && "MSME only",
+                filter.msme              && "MSME only",
+                filter.oem               && "OEM only",
+                filter.country_of_origin && `origin: ${filter.country_of_origin}`,
               ].filter(Boolean).join(" · ")}
             </span>
           )}
@@ -152,6 +156,18 @@ export function FilterBar({ filter, onChange }: Props) {
                   className="w-3.5 h-3.5 rounded border-gray-300 text-brand-600" />
                 <span className="text-xs text-gray-700">MSME sellers</span>
               </label>
+            </Field>
+            <Field label="OEM Only">
+              <label className="flex items-center gap-2 pt-1.5 cursor-pointer">
+                <input type="checkbox" checked={filter.oem}
+                  onChange={e => set("oem", e.target.checked)}
+                  className="w-3.5 h-3.5 rounded border-gray-300 text-brand-600" />
+                <span className="text-xs text-gray-700">OEM suppliers</span>
+              </label>
+            </Field>
+            <Field label="Country of Origin">
+              <input placeholder="e.g. India, China…" value={filter.country_of_origin}
+                onChange={e => set("country_of_origin", e.target.value)} className={INPUT_CLS} />
             </Field>
           </div>
 
