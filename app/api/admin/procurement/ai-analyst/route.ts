@@ -5,6 +5,49 @@ import clientPromise from "@/lib/mongodb"
 
 export const maxDuration = 60
 
+// ─── Query cache helpers ───────────────────────────────────────────────────────
+
+const CACHE_TTL_SECONDS = 3600
+let _ttlIndexCreated = false
+
+async function ensureCacheTtlIndex(db: Db): Promise<void> {
+  if (_ttlIndexCreated) return
+  try {
+    await db.collection("gem_procurement_query_cache")
+      .createIndex({ expires_at: 1 }, { expireAfterSeconds: 0 })
+  } catch {
+    // Index already exists or non-critical error — ignore
+  }
+  _ttlIndexCreated = true
+}
+
+function makeCacheKey(question: string): string {
+  return question.slice(0, 100).toLowerCase().trim()
+}
+
+interface CacheDoc {
+  key: string
+  question: string
+  result: Record<string, unknown>
+  created_at: Date
+  expires_at: Date
+}
+
+async function getCached(db: Db, key: string): Promise<CacheDoc | null> {
+  return db.collection<CacheDoc>("gem_procurement_query_cache")
+    .findOne({ key, expires_at: { $gt: new Date() } })
+}
+
+async function setCache(db: Db, key: string, question: string, result: Record<string, unknown>): Promise<void> {
+  const now = new Date()
+  const expires = new Date(now.getTime() + CACHE_TTL_SECONDS * 1000)
+  await db.collection("gem_procurement_query_cache").updateOne(
+    { key },
+    { $set: { key, question, result, created_at: now, expires_at: expires } },
+    { upsert: true }
+  )
+}
+
 const ALLOWED_COLLECTIONS = new Set([
   "gem_contracts",
   "gem_kg_dealer_scores",
@@ -310,6 +353,18 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.ANTHROPIC_API_KEY
   const db = (await clientPromise).db()
 
+  // ── Cache setup (once per cold start) ────────────────────────────────────────
+  await ensureCacheTtlIndex(db).catch(() => {})
+
+  // ── Cache lookup (AI mode only — no key = skip cache) ────────────────────────
+  const cacheKey = makeCacheKey(question)
+  if (apiKey) {
+    const hit = await getCached(db, cacheKey).catch(() => null)
+    if (hit) {
+      return NextResponse.json({ ...hit.result, cached: true, cache_key: cacheKey })
+    }
+  }
+
   // ── Shared audit stats ────────────────────────────────────────────────────────
   async function getDbStats() {
     const gc = db.collection("gem_contracts")
@@ -542,9 +597,11 @@ Respond with ONLY valid JSON:
     fallback:        false,
   })
 
-  return NextResponse.json({
+  const responseBody: Record<string, unknown> = {
     success:        true,
     fallback:       false,
+    cached:         false,
+    cache_key:      cacheKey,
     question,
     summary:        synthesis.summary  || "",
     findings:       synthesis.findings || [],
@@ -565,5 +622,10 @@ Respond with ONLY valid JSON:
       generated_at:         new Date().toISOString(),
       mode:                 "ai",
     },
-  })
+  }
+
+  // Store successful AI response in cache
+  await setCache(db, cacheKey, question, responseBody).catch(() => {})
+
+  return NextResponse.json(responseBody)
 }

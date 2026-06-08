@@ -24,6 +24,7 @@ import { DealerAcquisitionTab } from "./DealerAcquisitionTab"
 import { ProductDiscoveryTab }  from "./ProductDiscoveryTab"
 import { RelationshipTab }    from "./RelationshipTab"
 import { AlertsBell, AlertsPanel, useAlertCount } from "./AlertsPanel"
+import { GovernanceStrip }   from "./GovernanceStrip"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -866,8 +867,8 @@ export default function ProcurementIntelligence() {
     { id: "product-disc",  label: "Product Discovery", icon: Package,   highlight: true },
     { id: "relationships", label: "Relationships",     icon: Network,   highlight: true },
     { id: "intelligence",  label: "Intelligence",      icon: BarChart3  },
-    { id: "contracts",     label: "Contracts Intel",   icon: TrendingUp },
-    { id: "opportunity",   label: "Opportunity Engine",icon: SlidersHorizontal },
+    { id: "contracts",     label: "Contract Search",   icon: Search,    highlight: true },
+    { id: "opportunity",   label: "Recommendations",   icon: TrendingUp, highlight: true },
     { id: "buyers",        label: "Buyer Profiles",    icon: Building2  },
     { id: "targets",       label: "Target Lists",      icon: TrendingUp },
     { id: "report",        label: "Sales Report",      icon: BarChart3  },
@@ -907,6 +908,9 @@ export default function ProcurementIntelligence() {
       </div>
 
       <div className="px-8 py-6 max-w-[1600px] space-y-4">
+        {/* Data Governance strip — always visible */}
+        <GovernanceStrip />
+
         {/* Data Quality Panel */}
         <DataQualityPanel />
 
@@ -955,7 +959,7 @@ export default function ProcurementIntelligence() {
         {activeTab === "relationships" && <RelationshipTab onDealerClick={handleDealerClick} />}
         {activeTab === "intelligence"  && <IntelligenceTab onDealerClick={handleDealerClick} />}
         {activeTab === "contracts"     && <ContractsTab />}
-        {activeTab === "opportunity"   && <OpportunityTab />}
+        {activeTab === "opportunity"   && <OpportunityTab onDealerClick={handleDealerClick} />}
         {activeTab === "storage"       && <StorageTab />}
         {activeTab === "buyers"        && <BuyersTab onDealerClick={handleDealerClick} />}
         {activeTab === "targets"       && <TargetsTab onDealerClick={handleDealerClick} />}
