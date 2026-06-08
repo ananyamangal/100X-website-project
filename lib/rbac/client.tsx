@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       const data = await res.json() as { user: SafeUser }
       setUser(data.user)
-      setPerms(data.user.permissions as Permission[])
+      setPerms((data.user.permissions ?? []) as Permission[])
     } catch {
       setUser(null)
       setPerms([])

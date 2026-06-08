@@ -57,15 +57,16 @@ export default function GrowthDashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const ok = (r: Response) => r.ok ? r.json() : null
     Promise.all([
-      fetch("/api/admin/growth/dashboard").then(r => r.json()),
-      fetch("/api/admin/growth/opportunities?status=pending").then(r => r.json()),
-      fetch("/api/admin/growth/logs?limit=10").then(r => r.json()),
-      fetch("/api/admin/growth/content?status=draft").then(r => r.json()),
+      fetch("/api/admin/growth/dashboard").then(ok),
+      fetch("/api/admin/growth/opportunities?status=pending").then(ok),
+      fetch("/api/admin/growth/logs?limit=10").then(ok),
+      fetch("/api/admin/growth/content?status=draft").then(ok),
     ]).then(([s, o, l, d]) => {
       setStats(s)
       setOpps(Array.isArray(o) ? o : [])
-      setLogs(Array.isArray(l.logs) ? l.logs : [])
+      setLogs(Array.isArray(l?.logs) ? l.logs : [])
       setDrafts(Array.isArray(d) ? d : [])
       setLoading(false)
     }).catch(() => setLoading(false))
@@ -88,8 +89,8 @@ export default function GrowthDashboard() {
   const logsToday = logs.filter(l => l.ts?.startsWith(todayStr)).length
 
   const maxType = Math.max(
-    stats?.byType.rfq ?? 0, stats?.byType.gem ?? 0,
-    stats?.byType.contact ?? 0, stats?.byType.brochure ?? 0, 1
+    stats?.byType?.rfq ?? 0, stats?.byType?.gem ?? 0,
+    stats?.byType?.contact ?? 0, stats?.byType?.brochure ?? 0, 1
   )
 
   return (
@@ -162,10 +163,10 @@ export default function GrowthDashboard() {
         <section>
           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Lead Volume — Answers "What produced leads?"</p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard label="Today" value={stats?.leads.today ?? 0} sub="new leads" accent="bg-brand-50 text-brand-600" icon={TrendingUp} />
-            <StatCard label="This Week" value={stats?.leads.week ?? 0} sub="last 7 days" accent="bg-blue-50 text-blue-600" icon={Activity} />
-            <StatCard label="This Month" value={stats?.leads.month ?? 0} sub="last 30 days" accent="bg-green-50 text-green-600" icon={Users} />
-            <StatCard label="All Time" value={stats?.leads.total ?? 0} sub="total leads" accent="bg-purple-50 text-purple-600" icon={CheckCircle2} />
+            <StatCard label="Today" value={stats?.leads?.today ?? 0} sub="new leads" accent="bg-brand-50 text-brand-600" icon={TrendingUp} />
+            <StatCard label="This Week" value={stats?.leads?.week ?? 0} sub="last 7 days" accent="bg-blue-50 text-blue-600" icon={Activity} />
+            <StatCard label="This Month" value={stats?.leads?.month ?? 0} sub="last 30 days" accent="bg-green-50 text-green-600" icon={Users} />
+            <StatCard label="All Time" value={stats?.leads?.total ?? 0} sub="total leads" accent="bg-purple-50 text-purple-600" icon={CheckCircle2} />
           </div>
         </section>
 
@@ -175,11 +176,11 @@ export default function GrowthDashboard() {
             <p className="text-xs font-semibold text-gray-700 mb-4">Lead Sources — "What produced dealer inquiries?"</p>
             <div className="space-y-3">
               {[
-                { label: "RFQ Leads", count: stats?.byType.rfq ?? 0, bar: "bg-blue-500" },
-                { label: "GeM Inquiries", count: stats?.byType.gem ?? 0, bar: "bg-brand-500" },
-                { label: "Contact / Other", count: stats?.byType.contact ?? 0, bar: "bg-gray-400" },
-                { label: "Brochure", count: stats?.byType.brochure ?? 0, bar: "bg-purple-500" },
-                { label: "Tender Support", count: stats?.byType.tender ?? 0, bar: "bg-amber-500" },
+                { label: "RFQ Leads", count: stats?.byType?.rfq ?? 0, bar: "bg-blue-500" },
+                { label: "GeM Inquiries", count: stats?.byType?.gem ?? 0, bar: "bg-brand-500" },
+                { label: "Contact / Other", count: stats?.byType?.contact ?? 0, bar: "bg-gray-400" },
+                { label: "Brochure", count: stats?.byType?.brochure ?? 0, bar: "bg-purple-500" },
+                { label: "Tender Support", count: stats?.byType?.tender ?? 0, bar: "bg-amber-500" },
               ].map(({ label, count, bar }) => (
                 <div key={label}>
                   <div className="flex justify-between text-xs mb-1">
@@ -289,10 +290,10 @@ export default function GrowthDashboard() {
         <section>
           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Growth OS System Status</p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard label="Active Agents" value={stats?.automations.active ?? 0} sub={`of ${stats?.automations.total ?? 0} total`} accent="bg-green-50 text-green-600" icon={Zap} />
+            <StatCard label="Active Agents" value={stats?.automations?.active ?? 0} sub={`of ${stats?.automations?.total ?? 0} total`} accent="bg-green-50 text-green-600" icon={Zap} />
             <StatCard label="Opportunities" value={opps.length} sub="pending review" accent="bg-amber-50 text-amber-600" icon={AlertCircle} />
-            <StatCard label="Content Drafts" value={pendingDrafts} sub={`${stats?.content.published ?? 0} published`} accent="bg-blue-50 text-blue-600" icon={FileText} />
-            <StatCard label="Log Entries" value={stats?.logs.total ?? 0} sub={`${logsToday} today`} accent="bg-purple-50 text-purple-600" icon={ScrollText} />
+            <StatCard label="Content Drafts" value={pendingDrafts} sub={`${stats?.content?.published ?? 0} published`} accent="bg-blue-50 text-blue-600" icon={FileText} />
+            <StatCard label="Log Entries" value={stats?.logs?.total ?? 0} sub={`${logsToday} today`} accent="bg-purple-50 text-purple-600" icon={ScrollText} />
           </div>
         </section>
 
