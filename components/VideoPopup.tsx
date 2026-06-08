@@ -146,7 +146,7 @@ export default function VideoPopup() {
 
   return (
     <div
-      className="fixed right-6 z-[51] flex flex-col items-end gap-1"
+      className="fixed right-6 z-[49] flex flex-col items-end gap-1"
       style={{ bottom: "7rem" }}
     >
       {/* Close + mute controls */}
