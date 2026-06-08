@@ -1,53 +1,183 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createHash } from "crypto"
 import clientPromise from "@/lib/mongodb"
+import { signJWT, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/rbac/jwt"
+import { verifyPassword } from "@/lib/rbac/password"
+import { resolvePermissions } from "@/lib/rbac/roles"
+import { writeAuditLog } from "@/lib/rbac/server"
+import type { DBUser } from "@/lib/rbac/types"
 
-function hashPw(password: string): string {
+function legacySha256(password: string): string {
   return createHash("sha256").update(`100x-admin-v1:${password}`).digest("hex")
+}
+
+function setCookie(response: NextResponse, token: string) {
+  response.cookies.set(SESSION_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: SESSION_MAX_AGE,
+    path: "/",
+  })
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    // Accept either { username, password } (legacy) or { password } only
-    const password = body.password || ""
+    const body     = await request.json()
+    const email    = (body.email as string | undefined)?.trim().toLowerCase() ?? ""
+    const password = (body.password as string | undefined) ?? ""
 
-    // Check MongoDB override hash first
-    try {
-      const client = await clientPromise
-      const db = client.db()
-      const settings = await db.collection("admin_settings").findOne({ key: "password" })
-      if (settings?.hash && hashPw(password) === String(settings.hash)) {
-        const response = NextResponse.json({ success: true })
-        response.cookies.set("admin-token", "authenticated", {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 60 * 60 * 24,
-          path: "/",
-        })
-        return response
-      }
-    } catch {
-      // MongoDB unavailable — fall through to env/hardcoded check
+    if (!password) {
+      return NextResponse.json({ error: "Password required" }, { status: 400 })
     }
 
-    // Fall back to env var or hardcoded default
-    const envPassword = process.env.ADMIN_PASSWORD || "dtu@ananya"
-    if (password === envPassword) {
-      const response = NextResponse.json({ success: true })
-      response.cookies.set("admin-token", "authenticated", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 60 * 60 * 24,
-        path: "/",
+    const client = await clientPromise
+    const db     = client.db()
+
+    // ── Path 1: email + password (new per-user auth) ──────────────────────────
+    if (email) {
+      const dbUser = await db.collection<DBUser>("rbac_users").findOne({
+        email: email,
+        isActive: true,
       })
+
+      if (!dbUser) {
+        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+      }
+
+      const valid = verifyPassword(password, dbUser.passwordHash)
+      if (!valid) {
+        // Log failed attempt
+        await db.collection("rbac_users").updateOne(
+          { email },
+          {
+            $push: {
+              loginHistory: {
+                $each: [{ ip: request.headers.get("x-forwarded-for") ?? "unknown", userAgent: request.headers.get("user-agent") ?? "", timestamp: new Date(), success: false }],
+                $slice: -50,
+              },
+            },
+          }
+        )
+        await writeAuditLog(null, "login_failed", "auth", { email }, request)
+        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+      }
+
+      const permissions = resolvePermissions(
+        dbUser.role,
+        dbUser.customPermissions ?? [],
+        dbUser.deniedPermissions ?? []
+      )
+
+      const token = await signJWT({
+        sub: String(dbUser._id),
+        email: dbUser.email,
+        name: dbUser.name,
+        role: dbUser.role,
+        permissions,
+      })
+
+      // Update last login + history
+      await db.collection("rbac_users").updateOne(
+        { email },
+        {
+          $set: { lastLoginAt: new Date() },
+          $push: {
+            loginHistory: {
+              $each: [{ ip: request.headers.get("x-forwarded-for") ?? "unknown", userAgent: request.headers.get("user-agent") ?? "", timestamp: new Date(), success: true }],
+              $slice: -50,
+            },
+          },
+        }
+      )
+
+      await writeAuditLog(
+        { sub: String(dbUser._id), email: dbUser.email, name: dbUser.name, role: dbUser.role, permissions, iat: 0, exp: 0 },
+        "login",
+        "auth",
+        { email },
+        request
+      )
+
+      const response = NextResponse.json({ success: true, role: dbUser.role })
+      setCookie(response, token)
       return response
     }
 
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+    // ── Path 2: password-only (legacy super admin — backward compat) ──────────
+    let legacyMatch = false
+
+    // Check MongoDB override hash
+    try {
+      const settings = await db.collection("admin_settings").findOne({ key: "password" })
+      if (settings?.hash && legacySha256(password) === String(settings.hash)) {
+        legacyMatch = true
+      }
+    } catch {
+      // DB unavailable — fall through
+    }
+
+    if (!legacyMatch) {
+      const envPassword = process.env.ADMIN_PASSWORD || "dtu@ananya"
+      legacyMatch = password === envPassword
+    }
+
+    if (!legacyMatch) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+    }
+
+    // Legacy login: issue super-admin JWT (or legacy cookie if no JWT_SECRET configured)
+    // Try to find the super admin in DB first
+    const superAdmin = await db.collection<DBUser>("rbac_users").findOne({
+      role: "super_admin",
+      isActive: true,
+    })
+
+    let token: string
+
+    if (superAdmin) {
+      const permissions = resolvePermissions(
+        superAdmin.role,
+        superAdmin.customPermissions ?? [],
+        superAdmin.deniedPermissions ?? []
+      )
+      token = await signJWT({
+        sub: String(superAdmin._id),
+        email: superAdmin.email,
+        name: superAdmin.name,
+        role: superAdmin.role,
+        permissions,
+      })
+
+      await db.collection("rbac_users").updateOne(
+        { _id: superAdmin._id },
+        { $set: { lastLoginAt: new Date() } }
+      )
+    } else {
+      // No DB users yet — issue a minimal super-admin JWT for migration
+      const { ROLE_PERMISSIONS } = await import("@/lib/rbac/roles")
+      token = await signJWT({
+        sub: "legacy-super-admin",
+        email: "sulabh.mangal@gmail.com",
+        name: "Super Admin",
+        role: "super_admin",
+        permissions: ROLE_PERMISSIONS.super_admin,
+      })
+    }
+
+    await writeAuditLog(
+      { sub: "legacy", email: "legacy-admin", name: "Legacy Admin", role: "super_admin", permissions: [], iat: 0, exp: 0 },
+      "login",
+      "auth",
+      { method: "legacy-password" },
+      request
+    )
+
+    const response = NextResponse.json({ success: true, role: "super_admin" })
+    setCookie(response, token)
+    return response
   } catch (error) {
+    console.error("Auth error:", error)
     return NextResponse.json({ error: "Authentication failed" }, { status: 500 })
   }
 }
