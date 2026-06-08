@@ -31,6 +31,17 @@ function safeStrArray(val: unknown): string[] {
             if (typeof item === 'string') return item;
             if (item && typeof item === 'object') {
                 const o = item as Record<string, unknown>;
+                // FeatureItem: { title, value }
+                if (typeof o.title === 'string' && o.value !== undefined) {
+                    return o.value ? `${o.title}: ${o.value}` : o.title;
+                }
+                // SpecItem: { label, value }
+                if (typeof o.label === 'string' && o.value !== undefined) {
+                    return o.value ? `${o.label}: ${o.value}` : o.label;
+                }
+                // ApplicationItem: { title }
+                if (typeof o.title === 'string') return o.title;
+                // Legacy: { name, value }
                 if (typeof o.name === 'string' && typeof o.value === 'string') return `${o.name}: ${o.value}`;
                 if (typeof o.item === 'string') return o.item;
                 return JSON.stringify(item);

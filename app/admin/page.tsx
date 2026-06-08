@@ -53,6 +53,11 @@ import { AdminUserMenu, AdminSignOutButton } from "@/components/admin/AdminUserM
 import { ProductBadgesTab } from "@/components/admin/ProductBadgesTab"
 import { CertificationsManagerTab } from "@/components/admin/CertificationsManagerTab"
 import { MediaLibraryTab } from "@/components/admin/MediaLibraryTab"
+import { FeaturesManager, type FeatureItem } from "@/components/admin/FeaturesManager"
+import { SpecificationsManager, type SpecItem } from "@/components/admin/SpecificationsManager"
+import { ApplicationsManager, type ApplicationItem } from "@/components/admin/ApplicationsManager"
+import { SectionBuilder, type ProductSection } from "@/components/admin/SectionBuilder"
+import { SectionTemplateLibrary } from "@/components/admin/SectionTemplateLibrary"
 import { toStringArray } from "@/lib/normalizeProduct"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
@@ -72,9 +77,10 @@ interface Product {
   reviewsCount: number;
   shortDescription: string;
   detailedDescription: string;
-  features: string[];
-  specifications: string[];
-  applications: string[];
+  features: any[];
+  specifications: any[];
+  applications: any[];
+  sections?: any[];
   badges: string[];
   youtubeLink?: string;
   whatsappMessageText: string;
@@ -1332,6 +1338,17 @@ function AdminDashboardContent() {
                   <ImageIcon className="mr-3" size={20} />
                   Media Library
                 </button>
+                <button
+                  onClick={() => setActiveTab("migration")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "migration"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <ArrowUp className="mr-3" size={20} />
+                  Migration
+                </button>
               </div>
               <div className="pt-2 mt-2 border-t border-gray-200">
                 <a
@@ -1457,6 +1474,7 @@ function AdminDashboardContent() {
             {activeTab === "productBadges" && <ProductBadgesTab />}
             {activeTab === "certifications" && <CertificationsManagerTab />}
             {activeTab === "mediaLibrary" && <MediaLibraryTab />}
+            {activeTab === "migration" && <MigrationTab />}
           </div>
         </div>
       </div>
@@ -1851,6 +1869,128 @@ function CategoryCombobox({
   )
 }
 
+// Migration Tab Component
+function MigrationTab() {
+  const [preview, setPreview] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [migrating, setMigrating] = useState(false)
+  const [result, setResult] = useState<any>(null)
+  const [notification, setNotification] = useState<{ type: "success" | "error"; msg: string } | null>(null)
+
+  const notify = (type: "success" | "error", msg: string) => {
+    setNotification({ type, msg }); setTimeout(() => setNotification(null), 5000)
+  }
+
+  const loadPreview = async () => {
+    setLoading(true)
+    try {
+      const r = await fetch("/api/admin/migrate")
+      if (r.ok) setPreview(await r.json())
+    } finally { setLoading(false) }
+  }
+
+  const runMigration = async () => {
+    if (!confirm("Run migration? This will convert legacy string arrays to structured objects in MongoDB. This is REVERSIBLE but creates a new data format.")) return
+    setMigrating(true)
+    try {
+      const r = await fetch("/api/admin/migrate", { method: "POST" })
+      const d = await r.json()
+      setResult(d)
+      notify("success", `Migration complete: ${d.migratedCount} products updated.`)
+    } catch { notify("error", "Migration failed.") }
+    finally { setMigrating(false) }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold text-gray-900">Data Migration</h2>
+        <p className="text-gray-600 mt-1">Convert legacy string-based product fields to structured CMS objects.</p>
+      </div>
+
+      {notification && (
+        <div className={`px-4 py-3 rounded-lg text-sm font-medium ${notification.type === "success" ? "bg-green-50 text-green-800 border border-green-200" : "bg-red-50 text-red-800 border border-red-200"}`}>
+          {notification.msg}
+        </div>
+      )}
+
+      <Card className="border-blue-200 bg-blue-50">
+        <CardContent className="py-4">
+          <p className="text-sm font-semibold text-blue-800 mb-1">What this migration does</p>
+          <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
+            <li>Converts <code>features: string[]</code> → <code>FeatureItem[]</code> with id, title, value, order</li>
+            <li>Converts <code>specifications: string[]</code> → <code>SpecItem[]</code> with auto-detected group</li>
+            <li>Converts <code>applications: string[]</code> → <code>ApplicationItem[]</code> with id, title, priority</li>
+            <li>Strings with colons ("Engine: 2-stroke") are split into title+value</li>
+            <li>Already-structured products are skipped (idempotent)</li>
+          </ul>
+        </CardContent>
+      </Card>
+
+      <div className="flex gap-3">
+        <Button variant="outline" onClick={loadPreview} disabled={loading}>
+          {loading ? "Loading…" : "Preview (Dry Run)"}
+        </Button>
+        <Button onClick={runMigration} disabled={migrating} className="bg-orange-600 hover:bg-orange-700">
+          {migrating ? "Migrating…" : "Run Migration"}
+        </Button>
+      </div>
+
+      {preview && (
+        <Card>
+          <CardHeader><CardTitle>Migration Preview</CardTitle></CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-gray-900">{preview.totalProducts}</div>
+                <div className="text-xs text-gray-500 mt-1">Total Products</div>
+              </div>
+              <div className="p-4 bg-orange-50 rounded-lg">
+                <div className="text-2xl font-bold text-orange-700">{preview.needsMigration}</div>
+                <div className="text-xs text-orange-600 mt-1">Need Migration</div>
+              </div>
+              <div className="p-4 bg-green-50 rounded-lg">
+                <div className="text-2xl font-bold text-green-700">{preview.alreadyMigrated}</div>
+                <div className="text-xs text-green-600 mt-1">Already Migrated</div>
+              </div>
+            </div>
+            {preview.sampleProducts?.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs font-semibold text-gray-600 mb-2">Sample products needing migration:</p>
+                <ul className="text-xs text-gray-500 space-y-0.5">
+                  {preview.sampleProducts.map((p: any) => <li key={p.id}>{p.name}</li>)}
+                </ul>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {result && (
+        <Card className="border-green-200">
+          <CardHeader><CardTitle className="text-green-800">Migration Complete</CardTitle></CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="p-4 bg-green-50 rounded-lg">
+                <div className="text-2xl font-bold text-green-700">{result.migratedCount}</div>
+                <div className="text-xs text-green-600 mt-1">Products Updated</div>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-gray-700">{result.skippedCount}</div>
+                <div className="text-xs text-gray-500 mt-1">Skipped (Already Migrated)</div>
+              </div>
+              <div className="p-4 bg-red-50 rounded-lg">
+                <div className="text-2xl font-bold text-red-700">{result.errorCount}</div>
+                <div className="text-xs text-red-500 mt-1">Errors</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
+
 // Product Form Component
 function ProductForm({
   product,
@@ -1873,9 +2013,10 @@ function ProductForm({
     reviewsCount: product?.reviewsCount || 0,
     shortDescription: product?.shortDescription || "",
     detailedDescription: product?.detailedDescription || "",
-    features: toStringArray(product?.features).join("\n"),
-    specifications: toStringArray(product?.specifications).join("\n"),
-    applications: toStringArray(product?.applications).join("\n"),
+    features: Array.isArray(product?.features) ? product.features : [],
+    specifications: Array.isArray(product?.specifications) ? product.specifications : [],
+    applications: Array.isArray(product?.applications) ? product.applications : [],
+    sections: Array.isArray(product?.sections) ? product.sections : [],
     badges: toStringArray(product?.badges),
     youtubeLink: product?.youtubeLink || "",
     whatsappMessageText: product?.whatsappMessageText || "",
@@ -1911,6 +2052,7 @@ function ProductForm({
   const [descriptionError, setDescriptionError] = useState("");
   const [cmsBadges, setCmsBadges] = useState<{ _id?: string; name: string; colorClass: string }[]>([]);
   const [cmsCerts, setCmsCerts]   = useState<{ _id?: string; name: string; logoUrl: string }[]>([]);
+  const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/product-badges")
@@ -1932,10 +2074,11 @@ function ProductForm({
     }
     const productData = {
       ...formData,
-      // toStringArray handles both string (main form textarea) and array (ProductExperienceTab onChange)
-      features: toStringArray(formData.features),
-      specifications: toStringArray(formData.specifications),
-      applications: toStringArray(formData.applications),
+      // Structured arrays — pass as-is; normalizeProduct.ts preserves them
+      features: Array.isArray(formData.features) ? formData.features : toStringArray(formData.features as any),
+      specifications: Array.isArray(formData.specifications) ? formData.specifications : toStringArray(formData.specifications as any),
+      applications: Array.isArray(formData.applications) ? formData.applications : toStringArray(formData.applications as any),
+      sections: Array.isArray(formData.sections) ? formData.sections : [],
       certifications: toStringArray(formData.certifications),
       certificationIds: formData.certificationIds || [],
       performanceMetrics: toStringArray(formData.performanceMetrics),
@@ -2237,34 +2380,35 @@ function ProductForm({
             />
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Features (one per line)</label>
-              <Textarea
-                value={formData.features}
-                onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                rows={4}
-                placeholder="50L tank capacity&#10;Adjustable nozzle system&#10;Fuel-efficient engine"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Specifications (one per line)</label>
-              <Textarea
-                value={formData.specifications}
-                onChange={(e) => setFormData({ ...formData, specifications: e.target.value })}
-                rows={4}
-                placeholder="Engine: 2-stroke, air-cooled&#10;Tank Capacity: 50 liters&#10;Weight: 12 kg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Applications (one per line)</label>
-              <Textarea
-                value={formData.applications}
-                onChange={(e) => setFormData({ ...formData, applications: e.target.value })}
-                rows={4}
-                placeholder="Pest control in crops&#10;Disease prevention&#10;Fertilizer application"
-              />
-            </div>
+          <div className="space-y-6">
+            <FeaturesManager
+              value={formData.features}
+              onChange={(items: FeatureItem[]) => setFormData((p: any) => ({ ...p, features: items }))}
+            />
+            <SpecificationsManager
+              value={formData.specifications}
+              onChange={(items: SpecItem[]) => setFormData((p: any) => ({ ...p, specifications: items }))}
+            />
+            <ApplicationsManager
+              value={formData.applications}
+              onChange={(items: ApplicationItem[]) => setFormData((p: any) => ({ ...p, applications: items }))}
+            />
+          </div>
+
+          {/* ── Page Section Builder ──────────────────────── */}
+          <div className="border-t pt-6 mt-2">
+            <SectionBuilder
+              value={formData.sections as ProductSection[] || []}
+              onChange={(sections: ProductSection[]) => setFormData((p: any) => ({ ...p, sections }))}
+              onOpenTemplates={() => setShowTemplateLibrary(true)}
+            />
+            <SectionTemplateLibrary
+              open={showTemplateLibrary}
+              onClose={() => setShowTemplateLibrary(false)}
+              onUseTemplate={(section: ProductSection) => {
+                setFormData((p: any) => ({ ...p, sections: [...(p.sections || []), { ...section, order: (p.sections || []).length }] }))
+              }}
+            />
           </div>
 
           <div>

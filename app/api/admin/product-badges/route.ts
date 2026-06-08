@@ -5,8 +5,28 @@ export async function GET() {
   try {
     const client = await clientPromise
     const db = client.db()
-    const badges = await db.collection('product_badges').find({}).sort({ order: 1 }).toArray()
-    return NextResponse.json(badges)
+
+    const [badges, products] = await Promise.all([
+      db.collection('product_badges').find({}).sort({ order: 1 }).toArray(),
+      db.collection('products').find({}, { projection: { _id: 1, name: 1, slug: 1, badges: 1 } }).toArray(),
+    ])
+
+    // Build usage map: badgeName → [{ id, name, slug }]
+    const usageMap: Record<string, { id: string; name: string; slug: string }[]> = {}
+    for (const p of products) {
+      for (const b of (p.badges as string[] | undefined) ?? []) {
+        if (typeof b === 'string') {
+          if (!usageMap[b]) usageMap[b] = []
+          usageMap[b].push({ id: String(p._id), name: String(p.name || ''), slug: String(p.slug || '') })
+        }
+      }
+    }
+
+    return NextResponse.json(badges.map(b => ({
+      ...b,
+      usageCount: (usageMap[b.name] || []).length,
+      usedByProducts: usageMap[b.name] || [],
+    })))
   } catch (error) {
     console.error('Error fetching product badges:', error)
     return NextResponse.json({ error: 'Failed to fetch product badges' }, { status: 500 })

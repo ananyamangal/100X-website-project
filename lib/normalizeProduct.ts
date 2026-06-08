@@ -22,6 +22,15 @@ export function toStringArray(val: unknown): string[] {
   return []
 }
 
+/**
+ * Returns true if the array contains structured CMS objects rather than raw strings.
+ * Structured means every non-empty item is a plain object (not a string).
+ */
+function isStructuredArray(val: unknown): boolean {
+  if (!Array.isArray(val) || val.length === 0) return false
+  return val.some((item) => item !== null && typeof item === "object" && !Array.isArray(item))
+}
+
 /** Coerce any value into a typed object array (filmChapters, boxContents, etc.). */
 export function toObjectArray(val: unknown): any[] {
   if (Array.isArray(val)) return val
@@ -79,10 +88,11 @@ export function normalizeProduct(raw: any): any {
 
   return {
     ...raw,
-    // Core array fields — safe for both new and legacy products
-    features: toStringArray(raw.features),
-    specifications: toStringArray(raw.specifications),
-    applications: toStringArray(raw.applications),
+    // Core array fields — preserve structured CMS objects; coerce legacy strings
+    features: isStructuredArray(raw.features) ? raw.features : toStringArray(raw.features),
+    specifications: isStructuredArray(raw.specifications) ? raw.specifications : toStringArray(raw.specifications),
+    applications: isStructuredArray(raw.applications) ? raw.applications : toStringArray(raw.applications),
+    sections: Array.isArray(raw.sections) ? raw.sections : [],
     badges: toStringArray(raw.badges),
     certifications: toStringArray(raw.certifications),
     performanceMetrics: toStringArray(raw.performanceMetrics),
