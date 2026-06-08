@@ -34,6 +34,7 @@ function SectionCard({ title, helper, children }: { title: string; helper?: stri
 interface Props {
   product: any
   onChange: (key: string, value: any) => void
+  hideSeoSection?: boolean
 }
 
 async function uploadToCloudinary(file: File): Promise<string | null> {
@@ -49,7 +50,7 @@ async function uploadToCloudinary(file: File): Promise<string | null> {
   }
 }
 
-export function ProductExperienceTab({ product, onChange }: Props) {
+export function ProductExperienceTab({ product, onChange, hideSeoSection }: Props) {
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null)
 
   /* ── Film Chapters ─────────────────────────────── */
@@ -318,7 +319,7 @@ export function ProductExperienceTab({ product, onChange }: Props) {
       </SectionCard>
 
       {/* ── SECTION 11: SEO OVERRIDES ─────────────── */}
-      <SectionCard
+      {!hideSeoSection && <SectionCard
         title="⑪ SEO & URL Settings"
         helper="Override the auto-generated SEO values for this product. The slug controls the URL. Leave fields blank to use auto-generated values."
       >
@@ -354,7 +355,7 @@ export function ProductExperienceTab({ product, onChange }: Props) {
             <Input value={product.ogDescription || ""} onChange={e => onChange("ogDescription", e.target.value)} placeholder="Open Graph description" />
           </div>
         </div>
-      </SectionCard>
+      </SectionCard>}
 
     </div>
   )

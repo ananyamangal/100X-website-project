@@ -53,16 +53,9 @@ import { AdminUserMenu, AdminSignOutButton } from "@/components/admin/AdminUserM
 import { ProductBadgesTab } from "@/components/admin/ProductBadgesTab"
 import { CertificationsManagerTab } from "@/components/admin/CertificationsManagerTab"
 import { MediaLibraryTab } from "@/components/admin/MediaLibraryTab"
-import { FeaturesManager, type FeatureItem } from "@/components/admin/FeaturesManager"
-import { SpecificationsManager, type SpecItem } from "@/components/admin/SpecificationsManager"
-import { ApplicationsManager, type ApplicationItem } from "@/components/admin/ApplicationsManager"
-import { SectionBuilder, type ProductSection } from "@/components/admin/SectionBuilder"
-import { SectionTemplateLibrary } from "@/components/admin/SectionTemplateLibrary"
-import { toStringArray } from "@/lib/normalizeProduct"
+import { ProductForm } from "@/components/admin/ProductForm"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import Cookies from 'js-cookie';
 
@@ -70,6 +63,7 @@ interface Product {
   _id?: string;
   id?: string;
   name: string;
+  family?: string;
   imageUrl?: string;
   imageUrls?: string[];
   priceRange: string;
@@ -266,32 +260,19 @@ function AdminDashboardContent() {
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [uploadingBrochure, setUploadingBrochure] = useState(false)
-  const [categories, setCategories] = useState<string[]>(() => {
-    // Try to load categories from localStorage, fallback to default categories
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('admin-categories')
-      if (saved) {
-        try {
-          return JSON.parse(saved)
-        } catch (e) {
-          console.error('Failed to parse saved categories:', e)
-        }
-      }
-    }
-    return [
-      "Vehicle mountable Fogging Machines",
-      "Cold Foggers",
-      "Agriculture Sprayers",
-      "Power Weeders and Tillers",
-      "Brush Cutter",
-      "Lawn mower",
-      "Water pumps",
-      "Chain Saw",
-      "Chaff Cutter",
-      "seeders",
-      "Trolleys"
-    ]
-  })
+  const [categories, setCategories] = useState<string[]>([
+    "Vehicle mountable Fogging Machines",
+    "Cold Foggers",
+    "Agriculture Sprayers",
+    "Power Weeders and Tillers",
+    "Brush Cutter",
+    "Lawn mower",
+    "Water pumps",
+    "Chain Saw",
+    "Chaff Cutter",
+    "seeders",
+    "Trolleys",
+  ])
 
   // Fetch products from API
   useEffect(() => {
@@ -387,6 +368,14 @@ function AdminDashboardContent() {
       });
   }, [])
 
+  // Fetch categories from DB (derived from products.distinct('category'))
+  useEffect(() => {
+    fetch("/api/admin/categories")
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data) && data.length > 0) setCategories(data) })
+      .catch(() => {})
+  }, [])
+
   // Add product
   const handleAddProduct = async (newProduct: Omit<Product, "id" | "createdAt" | "updatedAt" | "_id">) => {
     const res = await fetch("/api/admin/products", {
@@ -409,19 +398,11 @@ function AdminDashboardContent() {
     }]
     setProducts(updatedProducts)
     
-    // Check if the new product has a category that's not in our categories list
+    // Refresh categories from DB to include any new category from the saved product
     if (newProduct.category && !categories.includes(newProduct.category)) {
-      const updatedCategories = [...categories, newProduct.category]
-      setCategories(updatedCategories)
-
-      // Update localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(new Event('categoriesUpdated'))
-      }
+      fetch("/api/admin/categories").then(r => r.json()).then(d => { if (Array.isArray(d)) setCategories(d) }).catch(() => {})
     }
-    
+
     setIsAddingProduct(false)
     setNotification({ type: 'success', message: `✅ Product "${newProduct.name}" created. Changes visible on site within ~1 minute.` })
     setTimeout(() => setNotification(null), 6000)
@@ -452,21 +433,8 @@ function AdminDashboardContent() {
     } : p)
     setProducts(updatedProducts)
 
-    // Check if the updated product has a new category that's not in our categories list
-    if (updatedProduct.category && !categories.includes(updatedProduct.category)) {
-      const updatedCategories = [...categories, updatedProduct.category]
-      setCategories(updatedCategories)
-
-      // Update localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(new Event('categoriesUpdated'))
-      }
-    }
-
-    // Clean up empty categories (this will handle the old category if it's no longer used)
-    cleanupEmptyCategories(updatedProducts)
+    // Refresh categories from DB
+    fetch("/api/admin/categories").then(r => r.json()).then(d => { if (Array.isArray(d)) setCategories(d) }).catch(() => {})
 
     setEditingProduct(null)
     const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
@@ -482,12 +450,10 @@ function AdminDashboardContent() {
         credentials: "include",
       })
       
-      // Remove the product from state
+      // Remove the product from state and refresh categories
       const updatedProducts = products.filter(p => p.id !== productId)
       setProducts(updatedProducts)
-      
-      // Clean up empty categories
-      cleanupEmptyCategories(updatedProducts)
+      fetch("/api/admin/categories").then(r => r.json()).then(d => { if (Array.isArray(d)) setCategories(d) }).catch(() => {})
     }
   }
 
@@ -877,47 +843,25 @@ function AdminDashboardContent() {
     }
   }
 
-  // Utility function to clean up empty categories
-  const cleanupEmptyCategories = (currentProducts: Product[]) => {
-    const remainingCategories = new Set(currentProducts.map(p => p.category))
-    const categoriesToRemove = categories.filter(cat => !remainingCategories.has(cat))
-    
-    if (categoriesToRemove.length > 0) {
-      const updatedCategories = categories.filter(cat => remainingCategories.has(cat))
-      setCategories(updatedCategories)
-      
-      // Update localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(new Event('categoriesUpdated'))
-      }
-      
-      // Show notification about removed categories
-      if (categoriesToRemove.length === 1) {
-        alert(`Category "${categoriesToRemove[0]}" has been removed as it no longer has any products.`)
-      } else {
-        alert(`Categories "${categoriesToRemove.join(', ')}" have been removed as they no longer have any products.`)
-      }
-      
-      return true // Categories were cleaned up
-    }
-    return false // No cleanup needed
-  }
-
-  // Add new category
+  // Add new category to local state (becomes permanent once a product uses it)
   const handleAddCategory = (newCategory: string) => {
     if (!categories.includes(newCategory)) {
-      const updatedCategories = [...categories, newCategory]
-      setCategories(updatedCategories)
-      // Save to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('admin-categories', JSON.stringify(updatedCategories))
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(new Event('categoriesUpdated'))
-      }
+      setCategories(prev => [...prev, newCategory].sort((a, b) => a.localeCompare(b)))
     }
   }
+
+  const [normPct, setNormPct] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetch("/api/admin/migrate")
+      .then(res => res.json())
+      .then(data => {
+        if (data?.normalizationScore?.pct !== undefined) {
+          setNormPct(data.normalizationScore.pct)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const stats = {
     totalProducts: products.length,
@@ -966,6 +910,25 @@ function AdminDashboardContent() {
           </div>
         </div>
       </header>
+
+      {/* Normalization Warning Banner */}
+      {normPct !== null && normPct < 100 && (
+        <div className={`border-b px-4 py-2.5 text-sm font-medium flex items-center justify-between ${
+          normPct >= 75 ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-red-50 border-red-200 text-red-800'
+        }`}>
+          <span>
+            ⚠ Data normalization is at <strong>{normPct}%</strong> — resolve all migration issues before adding new features.
+          </span>
+          <button
+            onClick={() => setActiveTab("migration")}
+            className={`text-xs underline underline-offset-2 hover:no-underline ${
+              normPct >= 75 ? 'text-amber-700' : 'text-red-700'
+            }`}
+          >
+            View Migration Dashboard →
+          </button>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">
@@ -1776,110 +1739,19 @@ function ProductsTab({
   )
 }
 
-// Category Combobox Component
-function CategoryCombobox({
-  value,
-  onValueChange,
-  categories,
-  onAddCategory,
-}: {
-  value: string
-  onValueChange: (value: string) => void
-  categories: string[]
-  onAddCategory: (category: string) => void
-}) {
-  const [open, setOpen] = useState(false)
-  const [inputValue, setInputValue] = useState(value)
-
-  // Update input value when value prop changes
-  useEffect(() => {
-    setInputValue(value)
-  }, [value])
-
-  const handleSelect = (selectedValue: string) => {
-    if (selectedValue === "add-new") {
-      // Add new category
-      if (inputValue.trim()) {
-        onAddCategory(inputValue.trim())
-        onValueChange(inputValue.trim())
-      }
-    } else {
-      onValueChange(selectedValue)
-      setInputValue(selectedValue)
-    }
-    setOpen(false)
-  }
-
-  const handleInputChange = (newValue: string) => {
-    setInputValue(newValue)
-    onValueChange(newValue) // Update the form value as user types
-  }
-
-  const filteredCategories = categories.filter(category =>
-    category.toLowerCase().includes(inputValue.toLowerCase())
-  )
-
-  return (
-    <div className="relative">
-      <Input
-        value={inputValue}
-        onChange={(e) => handleInputChange(e.target.value)}
-        placeholder="Type or select category..."
-        className="w-full"
-        onFocus={() => setOpen(true)}
-        onBlur={() => {
-          // Delay closing to allow clicking on dropdown items
-          setTimeout(() => setOpen(false), 200)
-        }}
-      />
-      {open && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
-          {inputValue.trim() && !categories.includes(inputValue.trim()) && (
-            <div
-              className="px-3 py-2 text-sm text-green-600 hover:bg-gray-100 cursor-pointer flex items-center"
-              onClick={() => handleSelect("add-new")}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Use "{inputValue.trim()}" as new category
-            </div>
-          )}
-          {filteredCategories.map((category) => (
-            <div
-              key={category}
-              className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer flex items-center"
-              onClick={() => handleSelect(category)}
-            >
-              <Check
-                className={cn(
-                  "mr-2 h-4 w-4",
-                  value === category ? "opacity-100" : "opacity-0"
-                )}
-              />
-              {category}
-            </div>
-          ))}
-          {filteredCategories.length === 0 && !inputValue.trim() && (
-            <div className="px-3 py-2 text-sm text-gray-500">
-              No categories found
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
 const ISSUE_LABELS: Record<string, { label: string; color: string }> = {
-  'legacy-features':   { label: 'Legacy Features',   color: 'bg-orange-100 text-orange-700' },
-  'legacy-specs':      { label: 'Legacy Specs',       color: 'bg-orange-100 text-orange-700' },
-  'legacy-apps':       { label: 'Legacy Apps',        color: 'bg-orange-100 text-orange-700' },
-  'duplicate-specs':   { label: 'Duplicate Specs',    color: 'bg-red-100 text-red-700' },
-  'unmatched-badges':  { label: 'Badge not in CMS',   color: 'bg-yellow-100 text-yellow-700' },
-  'legacy-certs':      { label: 'Legacy Certs',       color: 'bg-blue-100 text-blue-700' },
-  'missing-cert-ids':  { label: 'No CMS Cert IDs',    color: 'bg-blue-100 text-blue-700' },
-  'empty-features':    { label: 'No Features',        color: 'bg-gray-100 text-gray-500' },
-  'empty-specs':       { label: 'No Specs',           color: 'bg-gray-100 text-gray-500' },
-  'empty-apps':        { label: 'No Apps',            color: 'bg-gray-100 text-gray-500' },
+  'legacy-features':    { label: 'Legacy Features',    color: 'bg-orange-100 text-orange-700' },
+  'legacy-specs':       { label: 'Legacy Specs',        color: 'bg-orange-100 text-orange-700' },
+  'legacy-apps':        { label: 'Legacy Apps',         color: 'bg-orange-100 text-orange-700' },
+  'duplicate-specs':    { label: 'Duplicate Specs',     color: 'bg-red-100 text-red-700' },
+  'duplicate-features': { label: 'Duplicate Features',  color: 'bg-red-100 text-red-700' },
+  'duplicate-apps':     { label: 'Duplicate Apps',      color: 'bg-red-100 text-red-700' },
+  'unmatched-badges':   { label: 'Badge not in CMS',    color: 'bg-yellow-100 text-yellow-700' },
+  'legacy-certs':       { label: 'Legacy Certs',        color: 'bg-blue-100 text-blue-700' },
+  'missing-cert-ids':   { label: 'No CMS Cert IDs',     color: 'bg-blue-100 text-blue-700' },
+  'empty-features':     { label: 'No Features',         color: 'bg-gray-100 text-gray-500' },
+  'empty-specs':        { label: 'No Specs',            color: 'bg-gray-100 text-gray-500' },
+  'empty-apps':         { label: 'No Apps',             color: 'bg-gray-100 text-gray-500' },
 }
 
 function StatCard({ label, value, sub, color }: { label: string; value: number | string; sub?: string; color?: string }) {
@@ -1917,20 +1789,44 @@ function MigrationTab() {
   const [loading, setLoading] = useState(false)
   const [migrating, setMigrating] = useState(false)
   const [deduping, setDeduping] = useState(false)
+  const [dedupingFeatures, setDedupingFeatures] = useState(false)
+  const [dedupingApps, setDedupingApps] = useState(false)
   const [seedingBadges, setSeedingBadges] = useState(false)
   const [seedingCerts, setSeedingCerts] = useState(false)
   const [notification, setNotification] = useState<{ type: "success" | "error"; msg: string } | null>(null)
   const [showAllProducts, setShowAllProducts] = useState(false)
+  const [showSsot, setShowSsot] = useState(false)
 
   const notify = (type: "success" | "error", msg: string) => {
-    setNotification({ type, msg }); setTimeout(() => setNotification(null), 6000)
+    setNotification({ type, msg }); setTimeout(() => setNotification(null), 7000)
   }
 
   const loadHealth = async () => {
     setLoading(true)
     try {
       const r = await fetch("/api/admin/migrate")
-      if (r.ok) setHealth(await r.json())
+      if (!r.ok) return
+      const data = await r.json()
+
+      // Auto-seed if CMS is empty and there are products to seed from
+      let needsReload = false
+      if (data.cms.badgesInCms === 0 && data.summary.total > 0) {
+        await fetch("/api/admin/product-badges/seed", { method: "POST" }).catch(() => {})
+        notify("success", "Badge CMS was empty — auto-seeded from existing products.")
+        needsReload = true
+      }
+      if (data.cms.certificationsInCms === 0 && data.summary.total > 0) {
+        await fetch("/api/admin/certifications/seed", { method: "POST" }).catch(() => {})
+        notify("success", "Certification CMS was empty — auto-seeded from existing products.")
+        needsReload = true
+      }
+
+      if (needsReload) {
+        const r2 = await fetch("/api/admin/migrate")
+        if (r2.ok) setHealth(await r2.json())
+      } else {
+        setHealth(data)
+      }
     } finally { setLoading(false) }
   }
 
@@ -1949,15 +1845,37 @@ function MigrationTab() {
   }
 
   const runDedup = async () => {
-    if (!confirm("Remove duplicate specs from all products? Keeps only the first occurrence of each spec label.")) return
+    if (!confirm("Remove duplicate specs from all products?")) return
     setDeduping(true)
     try {
       const r = await fetch("/api/admin/migrate?action=dedup-specs", { method: "POST" })
       const d = await r.json()
-      notify("success", `Dedup done: ${d.repairedCount} products had duplicate specs removed.`)
+      notify("success", `Dedup specs: ${d.repairedCount} products repaired.`)
       loadHealth()
-    } catch { notify("error", "Dedup failed.") }
+    } catch { notify("error", "Spec dedup failed.") }
     finally { setDeduping(false) }
+  }
+
+  const runDedupFeatures = async () => {
+    setDedupingFeatures(true)
+    try {
+      const r = await fetch("/api/admin/migrate?action=dedup-features", { method: "POST" })
+      const d = await r.json()
+      notify("success", `Dedup features: ${d.repairedCount} products repaired.`)
+      loadHealth()
+    } catch { notify("error", "Feature dedup failed.") }
+    finally { setDedupingFeatures(false) }
+  }
+
+  const runDedupApps = async () => {
+    setDedupingApps(true)
+    try {
+      const r = await fetch("/api/admin/migrate?action=dedup-apps", { method: "POST" })
+      const d = await r.json()
+      notify("success", `Dedup apps: ${d.repairedCount} products repaired.`)
+      loadHealth()
+    } catch { notify("error", "App dedup failed.") }
+    finally { setDedupingApps(false) }
   }
 
   const runSeedBadges = async () => {
@@ -1983,21 +1901,46 @@ function MigrationTab() {
   }
 
   const total = health?.summary?.total || 0
-  const products: any[] = health?.products || []
-  const problemProducts = products.filter((p: any) => p.status !== 'full')
-  const displayProducts = showAllProducts ? products : problemProducts.slice(0, 20)
+  const productRows: any[] = health?.products || []
+  const problemProducts = productRows.filter((p: any) => p.issues.length > 0)
+  const displayProducts = showAllProducts ? productRows : problemProducts.slice(0, 20)
+  const normPct: number = health?.normalizationScore?.pct ?? 0
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Migration Health Dashboard</h2>
-          <p className="text-gray-600 mt-1">Single source of truth — every product should reference CMS entities only.</p>
+          <p className="text-gray-600 mt-1">Normalize to a single source of truth before building new features.</p>
         </div>
         <Button variant="outline" onClick={loadHealth} disabled={loading} className="text-sm">
           {loading ? "Loading…" : "Refresh Report"}
         </Button>
       </div>
+
+      {/* Overall normalization score */}
+      {health && (
+        <div className={`p-4 rounded-xl border-2 ${normPct === 100 ? 'bg-green-50 border-green-300' : normPct >= 75 ? 'bg-amber-50 border-amber-300' : 'bg-red-50 border-red-300'}`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-semibold text-gray-900 text-sm">Normalization Progress</span>
+            <span className={`text-2xl font-bold ${normPct === 100 ? 'text-green-700' : normPct >= 75 ? 'text-amber-700' : 'text-red-700'}`}>{normPct}%</span>
+          </div>
+          <div className="h-3 bg-white rounded-full overflow-hidden border border-gray-200">
+            <div
+              className={`h-full rounded-full transition-all ${normPct === 100 ? 'bg-green-500' : normPct >= 75 ? 'bg-amber-500' : 'bg-red-500'}`}
+              style={{ width: `${normPct}%` }}
+            />
+          </div>
+          {normPct < 100 && (
+            <p className="text-xs text-gray-600 mt-2">
+              {health.normalizationScore?.fullyNormalized ?? 0} of {total} products fully normalized. Fix all issues below before building new features.
+            </p>
+          )}
+          {normPct === 100 && (
+            <p className="text-xs text-green-700 font-medium mt-2">All products fully normalized. Ready to build new features.</p>
+          )}
+        </div>
+      )}
 
       {notification && (
         <div className={`px-4 py-3 rounded-lg text-sm font-medium ${notification.type === "success" ? "bg-green-50 text-green-800 border border-green-200" : "bg-red-50 text-red-800 border border-red-200"}`}>
@@ -2011,7 +1954,13 @@ function MigrationTab() {
           {migrating ? "Migrating…" : "Run Migration (Features/Specs/Apps)"}
         </Button>
         <Button onClick={runDedup} disabled={deduping} variant="outline" className="text-sm border-red-300 text-red-700 hover:bg-red-50">
-          {deduping ? "Deduplicating…" : "Remove Duplicate Specs"}
+          {deduping ? "Deduping…" : "Dedup Specs"}
+        </Button>
+        <Button onClick={runDedupFeatures} disabled={dedupingFeatures} variant="outline" className="text-sm border-red-300 text-red-700 hover:bg-red-50">
+          {dedupingFeatures ? "Deduping…" : "Dedup Features"}
+        </Button>
+        <Button onClick={runDedupApps} disabled={dedupingApps} variant="outline" className="text-sm border-red-300 text-red-700 hover:bg-red-50">
+          {dedupingApps ? "Deduping…" : "Dedup Apps"}
         </Button>
         <Button onClick={runSeedBadges} disabled={seedingBadges} variant="outline" className="text-sm">
           {seedingBadges ? "Seeding…" : "Seed Badge CMS"}
@@ -2037,8 +1986,8 @@ function MigrationTab() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard label="Badges in CMS" value={health.cms.badgesInCms} color="bg-blue-50 border-blue-200 text-blue-800" />
             <StatCard label="Certs in CMS" value={health.cms.certificationsInCms} color="bg-blue-50 border-blue-200 text-blue-800" />
-            <StatCard label="Products w/ Unmatched Badges" value={health.fields.badges.productsWithUnmatched} color="bg-yellow-50 border-yellow-200 text-yellow-800" />
-            <StatCard label="Products w/ Legacy Cert Strings" value={health.fields.certs.productsWithLegacy} color="bg-yellow-50 border-yellow-200 text-yellow-800" />
+            <StatCard label="Unmatched Badges" value={health.fields.badges.productsWithUnmatched} color="bg-yellow-50 border-yellow-200 text-yellow-800" />
+            <StatCard label="Legacy Cert Strings" value={health.fields.certs.productsWithLegacy} color="bg-yellow-50 border-yellow-200 text-yellow-800" />
           </div>
 
           {/* Field migration bars */}
@@ -2050,14 +1999,105 @@ function MigrationTab() {
                 <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-orange-400 inline-block" />Legacy strings</span>
                 <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gray-300 inline-block" />Empty</span>
               </div>
-              <FieldBar label="Features"     {...health.fields.features} total={total} />
+              <FieldBar label="Features"     {...health.fields.features} total={total} withDupes={health.fields.features.withDuplicates} />
               <FieldBar label="Specs"        {...health.fields.specs}    total={total} withDupes={health.fields.specs.withDuplicates} />
-              <FieldBar label="Applications" {...health.fields.apps}     total={total} />
+              <FieldBar label="Applications" {...health.fields.apps}     total={total} withDupes={health.fields.apps.withDuplicates} />
               <div className="text-xs text-gray-500 pt-1">
                 FAQs: {health.fields.faqs.withFaqs} products have FAQs, {health.fields.faqs.withoutFaqs} don't.
-                Certifications: {health.fields.certs.productsWithCertIds} products have CMS cert IDs.
+                Certs: {health.fields.certs.productsWithCertIds} products use CMS cert IDs.
               </div>
             </CardContent>
+          </Card>
+
+          {/* Audit: Unmatched badges */}
+          {(health.audit?.unmatchedBadges?.length ?? 0) > 0 && (
+            <Card>
+              <CardHeader><CardTitle className="text-sm text-yellow-800">Missing Badges — in products but not in CMS</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-xs text-gray-500 mb-3">Run "Seed Badge CMS" to create them, or edit products to use registered badges.</p>
+                <div className="flex flex-wrap gap-2">
+                  {health.audit.unmatchedBadges.map((b: any) => (
+                    <span key={b.name} className="text-xs bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-full">
+                      {b.name} <span className="opacity-60">×{b.count}</span>
+                    </span>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Audit: Unmatched certs */}
+          {(health.audit?.unmatchedCerts?.length ?? 0) > 0 && (
+            <Card>
+              <CardHeader><CardTitle className="text-sm text-blue-800">Missing Certifications — cert strings without CMS records</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-xs text-gray-500 mb-3">Run "Seed Certification CMS" to create them.</p>
+                <div className="flex flex-wrap gap-2">
+                  {health.audit.unmatchedCerts.map((c: any) => (
+                    <span key={c.name} className="text-xs bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full">
+                      {c.name} <span className="opacity-60">×{c.count}</span>
+                    </span>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* SSOT Report */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm flex items-center justify-between">
+                Single Source of Truth Report
+                <button type="button" onClick={() => setShowSsot(!showSsot)} className="text-xs text-blue-600 hover:underline font-normal">
+                  {showSsot ? "Hide" : "Show"}
+                </button>
+              </CardTitle>
+            </CardHeader>
+            {showSsot && (
+              <CardContent className="p-0">
+                <table className="w-full text-xs">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="text-left px-4 py-2 text-gray-600 font-medium">Field</th>
+                      <th className="text-left px-4 py-2 text-gray-600 font-medium">Source</th>
+                      <th className="text-left px-4 py-2 text-gray-600 font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {([
+                      { field: 'Product Name',      source: 'products.name',                                          status: 'ok' },
+                      { field: 'Product Family',     source: 'products.family (BF/DB Series grouping)',                status: 'ok' },
+                      { field: 'Category',           source: 'products.category (DB-derived)',                         status: 'ok' },
+                      { field: 'Price Range',        source: 'products.priceRange',                                    status: 'ok' },
+                      { field: 'Features',           source: 'products.features[] (FeatureItem objects)',              status: health.fields.features.legacy > 0 ? 'warn' : 'ok' },
+                      { field: 'Specifications',     source: 'products.specifications[] (SpecItem objects)',           status: (health.fields.specs.legacy > 0 || (health.fields.specs.withDuplicates ?? 0) > 0) ? 'warn' : 'ok' },
+                      { field: 'Applications',       source: 'products.applications[] (ApplicationItem objects)',      status: health.fields.apps.legacy > 0 ? 'warn' : 'ok' },
+                      { field: 'Badges',             source: 'product_badges collection → products.badges[]',          status: health.fields.badges.productsWithUnmatched > 0 ? 'warn' : 'ok' },
+                      { field: 'Certifications',     source: 'certifications collection → products.certificationIds[]', status: health.fields.certs.productsWithLegacy > 0 ? 'warn' : 'ok' },
+                      { field: 'Legacy Cert Strings', source: 'products.certifications[] — DEPRECATED',               status: health.fields.certs.productsWithLegacy > 0 ? 'error' : 'ok' },
+                      { field: 'SEO Fields',         source: 'products.seoTitle/metaDescription/h1Title/ogTitle',      status: 'ok' },
+                      { field: 'Images',             source: 'products.imageUrls[] (Cloudinary CDN)',                  status: 'ok' },
+                      { field: 'Sections',           source: 'products.sections[] (SectionBuilder)',                   status: 'ok' },
+                      { field: 'FAQs',               source: 'products.productFaqs[]',                                 status: 'ok' },
+                    ] as { field: string; source: string; status: string }[]).map(row => (
+                      <tr key={row.field} className="hover:bg-gray-50">
+                        <td className="px-4 py-2 font-medium text-gray-800">{row.field}</td>
+                        <td className="px-4 py-2 text-gray-500 font-mono text-[11px]">{row.source}</td>
+                        <td className="px-4 py-2">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${
+                            row.status === 'ok' ? 'bg-green-100 text-green-700' :
+                            row.status === 'warn' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-red-100 text-red-700'
+                          }`}>
+                            {row.status === 'ok' ? '✓ OK' : row.status === 'warn' ? '⚠ Issues' : '✗ Deprecated'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </CardContent>
+            )}
           </Card>
 
           {/* Per-product table */}
@@ -2065,7 +2105,7 @@ function MigrationTab() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-sm">
                 <span>
-                  {showAllProducts ? `All ${products.length} Products` : `Products with Issues (${problemProducts.length})`}
+                  {showAllProducts ? `All ${productRows.length} Products` : `Products with Issues (${problemProducts.length})`}
                 </span>
                 <button type="button" onClick={() => setShowAllProducts(!showAllProducts)} className="text-xs text-blue-600 hover:underline font-normal">
                   {showAllProducts ? "Show issues only" : "Show all products"}
@@ -2075,14 +2115,14 @@ function MigrationTab() {
             <CardContent className="p-0">
               {displayProducts.length === 0 ? (
                 <div className="text-center py-8 text-sm text-green-700 font-medium">
-                  All products are fully migrated. ✓
+                  All products are fully normalized. ✓
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100">
                   {displayProducts.map((p: any) => (
                     <div key={p.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-gray-50">
                       <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${
-                        p.status === 'full' ? 'bg-green-400' : p.status === 'partial' ? 'bg-amber-400' : 'bg-red-400'
+                        p.issues.length === 0 ? 'bg-green-400' : p.status === 'partial' ? 'bg-amber-400' : 'bg-red-400'
                       }`} />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-gray-800 truncate">{p.name}</div>
@@ -2114,527 +2154,6 @@ function MigrationTab() {
         <div className="text-center py-12 text-gray-400 text-sm">Click Refresh to load the health report.</div>
       )}
     </div>
-  )
-}
-
-// Product Form Component
-function ProductForm({
-  product,
-  categories,
-  onAddCategory,
-  onSave,
-  onCancel,
-}: {
-  product?: Product | null
-  categories: string[]
-  onAddCategory: (category: string) => void
-  onSave: (product: any) => void
-  onCancel: () => void
-}) {
-  const [formData, setFormData] = useState({
-    name: product?.name || "",
-    imageUrls: product?.imageUrls || [],
-    priceRange: product?.priceRange || "",
-    rating: product?.rating || 4.5,
-    reviewsCount: product?.reviewsCount || 0,
-    shortDescription: product?.shortDescription || "",
-    detailedDescription: product?.detailedDescription || "",
-    features: Array.isArray(product?.features) ? product.features : [],
-    specifications: Array.isArray(product?.specifications) ? product.specifications : [],
-    applications: Array.isArray(product?.applications) ? product.applications : [],
-    sections: Array.isArray(product?.sections) ? product.sections : [],
-    badges: toStringArray(product?.badges),
-    youtubeLink: product?.youtubeLink || "",
-    whatsappMessageText: product?.whatsappMessageText || "",
-    category: product?.category || "",
-    brochureUrl: product?.brochureUrl || "",
-    slideshowInterval: product?.slideshowInterval || 5000,
-    order: product?.order !== undefined ? product.order : undefined,
-    // ── Cinematic product page fields ──────────────────────────
-    tagline: product?.tagline || "",
-    heroVideoUrl: product?.heroVideoUrl || "",
-    problem: product?.problem || "",
-    solution: product?.solution || "",
-    certifications: toStringArray(product?.certifications).join("\n"),
-    certificationIds: Array.isArray(product?.certificationIds) ? (product.certificationIds as string[]) : [],
-    performanceMetrics: toStringArray(product?.performanceMetrics).join("\n"),
-    filmChapters: Array.isArray(product?.filmChapters) ? product.filmChapters : [],
-    boxContents: Array.isArray(product?.boxContents) ? product.boxContents : [],
-    productFaqs: Array.isArray(product?.productFaqs) ? product.productFaqs : [],
-    warrantyEnabled: product?.warrantyEnabled ?? false,
-    warrantyPeriod: product?.warrantyPeriod || "",
-    warrantyDescription: product?.warrantyDescription || "",
-    warrantyIcon: product?.warrantyIcon || "",
-    ugcImages: toStringArray(product?.ugcImages).join("\n"),
-    slug: product?.slug || "",
-    seoTitle: product?.seoTitle || "",
-    metaDescription: product?.metaDescription || "",
-    h1Title: product?.h1Title || "",
-    ogTitle: product?.ogTitle || "",
-    ogDescription: product?.ogDescription || "",
-  })
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [uploadingBrochure, setUploadingBrochure] = useState(false);
-  const [descriptionError, setDescriptionError] = useState("");
-  const [cmsBadges, setCmsBadges] = useState<{ _id?: string; name: string; colorClass: string }[]>([]);
-  const [cmsCerts, setCmsCerts]   = useState<{ _id?: string; name: string; logoUrl: string }[]>([]);
-  const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
-  const [seedingBadges, setSeedingBadges] = useState(false);
-  const [seedingCerts, setSeedingCerts] = useState(false);
-
-  const reloadBadges = () => fetch("/api/admin/product-badges").then(r => r.json()).then(d => { if (Array.isArray(d)) setCmsBadges(d) }).catch(() => {})
-  const reloadCerts  = () => fetch("/api/admin/certifications").then(r => r.json()).then(d => { if (Array.isArray(d)) setCmsCerts(d) }).catch(() => {})
-
-  const seedBadges = async () => {
-    setSeedingBadges(true)
-    await fetch("/api/admin/product-badges/seed", { method: "POST" }).catch(() => {})
-    await reloadBadges()
-    setSeedingBadges(false)
-  }
-
-  const seedCerts = async () => {
-    setSeedingCerts(true)
-    await fetch("/api/admin/certifications/seed", { method: "POST" }).catch(() => {})
-    await reloadCerts()
-    setSeedingCerts(false)
-  }
-
-  useEffect(() => { reloadBadges(); reloadCerts() }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setDescriptionError("")
-    if (!plainTextFromHtml(formData.shortDescription || "").trim() || !plainTextFromHtml(formData.detailedDescription || "").trim()) {
-      setDescriptionError("Please add both short and detailed descriptions (not only empty formatting).")
-      return
-    }
-    const productData = {
-      ...formData,
-      // Structured arrays — pass as-is; normalizeProduct.ts preserves them
-      features: Array.isArray(formData.features) ? formData.features : toStringArray(formData.features as any),
-      specifications: Array.isArray(formData.specifications) ? formData.specifications : toStringArray(formData.specifications as any),
-      applications: Array.isArray(formData.applications) ? formData.applications : toStringArray(formData.applications as any),
-      sections: Array.isArray(formData.sections) ? formData.sections : [],
-      certifications: toStringArray(formData.certifications),
-      certificationIds: formData.certificationIds || [],
-      performanceMetrics: toStringArray(formData.performanceMetrics),
-      productFaqs: Array.isArray(formData.productFaqs) ? formData.productFaqs : [],
-      ugcImages: toStringArray(formData.ugcImages),
-      badges: toStringArray(formData.badges),
-      ...(product && { id: product.id, createdAt: product.createdAt }),
-    }
-    onSave(productData)
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{product ? "Edit Product" : "Add New Product"}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {descriptionError && <p className="text-sm text-red-600">{descriptionError}</p>}
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Product Name</label>
-              <Input
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-              <CategoryCombobox
-                value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
-                categories={categories}
-                onAddCategory={onAddCategory}
-              />
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
-              <Input
-                value={formData.priceRange}
-                onChange={(e) => setFormData({ ...formData, priceRange: e.target.value })}
-                placeholder="₹10,000 - ₹15,000"
-                required
-              />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">Badges (Select multiple)</label>
-                <a href="#" onClick={(e) => { e.preventDefault(); (window as any).adminSetTab?.("productBadges") }}
-                  className="text-xs text-green-600 hover:underline">Manage badges →</a>
-              </div>
-              {cmsBadges.length === 0 ? (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-3 space-y-2">
-                  <p className="text-xs text-amber-700 font-medium">Badge CMS is empty — products still display legacy badges.</p>
-                  <button type="button" onClick={seedBadges} disabled={seedingBadges}
-                    className="text-xs bg-amber-600 text-white px-3 py-1.5 rounded hover:bg-amber-700 disabled:opacity-50">
-                    {seedingBadges ? "Importing…" : "⚡ Import all badges from products"}
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-white">
-                  {cmsBadges.map((badge) => (
-                    <label key={badge.name} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.badges.includes(badge.name)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData({ ...formData, badges: [...formData.badges, badge.name] });
-                          } else {
-                            setFormData({ ...formData, badges: formData.badges.filter(b => b !== badge.name) });
-                          }
-                        }}
-                        className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                      />
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${badge.colorClass || "bg-gray-100 text-gray-700"}`}>
-                        {badge.name}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              )}
-              {formData.badges.length > 0 && (
-                <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Selected Badges:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.badges.map((badge, index) => (
-                      <Badge key={index} className="bg-green-100 text-green-800">
-                        {badge}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Certifications (CMS-linked) */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">Certifications & Approvals</label>
-                <a href="/admin#certifications" className="text-xs text-green-600 hover:underline">Manage certifications →</a>
-              </div>
-              {cmsCerts.length === 0 ? (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-3 space-y-2">
-                  <p className="text-xs text-amber-700 font-medium">Certifications CMS is empty — products still use legacy certification strings.</p>
-                  <button type="button" onClick={seedCerts} disabled={seedingCerts}
-                    className="text-xs bg-amber-600 text-white px-3 py-1.5 rounded hover:bg-amber-700 disabled:opacity-50">
-                    {seedingCerts ? "Importing…" : "⚡ Import all certifications from products"}
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-white">
-                  {cmsCerts.map((cert) => (
-                    <label key={String(cert._id)} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.certificationIds.includes(String(cert._id))}
-                        onChange={(e) => {
-                          const id = String(cert._id)
-                          if (e.target.checked) {
-                            setFormData({ ...formData, certificationIds: [...formData.certificationIds, id] });
-                          } else {
-                            setFormData({ ...formData, certificationIds: formData.certificationIds.filter(c => c !== id) });
-                          }
-                        }}
-                        className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                      />
-                      {cert.logoUrl && <img src={cert.logoUrl} alt={cert.name} className="h-5 object-contain" />}
-                      <span className="text-sm text-gray-700">{cert.name}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
-              <Input
-                type="number"
-                min="1"
-                max="5"
-                step="0.1"
-                value={formData.rating}
-                onChange={(e) => setFormData({ ...formData, rating: Number.parseFloat(e.target.value) })}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Reviews Count</label>
-              <Input
-                type="number"
-                min="0"
-                value={formData.reviewsCount}
-                onChange={(e) => setFormData({ ...formData, reviewsCount: Number.parseInt(e.target.value) })}
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Product Images (max 5)</label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={async (e) => {
-                if (e.target.files && e.target.files.length > 0) {
-                  let files = Array.from(e.target.files);
-                  // Prevent more than 5 images
-                  if ((formData.imageUrls?.length || 0) + files.length > 5) {
-                    files = files.slice(0, 5 - (formData.imageUrls?.length || 0));
-                  }
-                  setUploadingImage(true);
-                  const urls: string[] = [];
-                  for (const file of files) {
-                    const formDataCloud = new FormData();
-                    formDataCloud.append("file", file);
-                    formDataCloud.append("upload_preset", "product_uploads");
-                    const res = await fetch(
-                      "https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload",
-                      {
-                        method: "POST",
-                        body: formDataCloud,
-                      }
-                    );
-                    const data = await res.json();
-                    if (data.secure_url) {
-                      urls.push(data.secure_url);
-                    }
-                  }
-                  setFormData(prev => ({
-                    ...prev,
-                    imageUrls: [...(prev.imageUrls || []), ...urls].slice(0, 5)
-                  }));
-                  setUploadingImage(false);
-                }
-              }}
-              disabled={(formData.imageUrls?.length || 0) >= 5}
-            />
-            {uploadingImage && <span>Uploading images...</span>}
-            {formData.imageUrls && formData.imageUrls.length > 0 && (
-              <div className="mt-2 flex gap-4 flex-wrap">
-                {formData.imageUrls.map((url, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={url}
-                      alt={`Product Image ${index + 1}`}
-                      className="w-32 h-32 object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-80 hover:opacity-100 group-hover:opacity-100"
-                      onClick={() => setFormData(prev => ({
-                        ...prev,
-                        imageUrls: prev.imageUrls.filter((_, i) => i !== index)
-                      }))}
-                      aria-label="Remove image"
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="p-4 rounded-lg border-2 border-dashed border-green-200 bg-green-50/50">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Product Brochure (PDF)</label>
-            <p className="text-xs text-gray-500 mb-3">Optional. Upload a PDF brochure for this product. Visitors can download it from the product card or product detail page.</p>
-            <div className="flex flex-wrap items-center gap-3">
-              <label className="cursor-pointer">
-                <span className="inline-flex items-center px-3 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-medium">
-                  {uploadingBrochure ? "Uploading…" : "Choose PDF file"}
-                </span>
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  onChange={async (e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setUploadingBrochure(true);
-                      const file = e.target.files[0];
-                      const fd = new FormData();
-                      fd.append("file", file);
-                      const res = await fetch("/api/admin/upload-file", { method: "POST", body: fd });
-                      const data = await res.json();
-                      if (res.ok && data.url) {
-                        setFormData(prev => ({ ...prev, brochureUrl: data.url }));
-                      }
-                      setUploadingBrochure(false);
-                    }
-                  }}
-                  className="hidden"
-                  disabled={uploadingBrochure}
-                />
-              </label>
-              {formData.brochureUrl && (
-                <>
-                  <a href={formData.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline text-sm">View Brochure</a>
-                  <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, brochureUrl: "" }))}
-                    className="text-sm text-gray-500 hover:text-red-600"
-                  >
-                    Remove
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* UGC / Deployment Images carousel */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Deployment / UGC Images <span className="text-xs text-gray-400 font-normal">(one URL per line — shown as scrollable carousel on product page)</span>
-            </label>
-            <Textarea
-              value={formData.ugcImages as any}
-              onChange={(e) => setFormData({ ...formData, ugcImages: e.target.value as any })}
-              placeholder={"https://…/photo1.jpg\nhttps://…/photo2.jpg\nhttps://…/photo3.jpg"}
-              rows={4}
-              className="font-mono text-xs"
-            />
-            <p className="text-xs text-gray-400 mt-1">Add photos of the machine being used in the field — government deployments, farmers, pest control operators. These display as a horizontal scroll carousel.</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Short Description</label>
-            <AdminRichTextEditor
-              value={formData.shortDescription}
-              onChange={(v) => setFormData({ ...formData, shortDescription: v })}
-              placeholder="Brief product summary…"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Detailed Description</label>
-            <AdminRichTextEditor
-              value={formData.detailedDescription}
-              onChange={(v) => setFormData({ ...formData, detailedDescription: v })}
-              placeholder="Full product details…"
-            />
-          </div>
-
-          <div className="space-y-6">
-            <FeaturesManager
-              value={formData.features}
-              onChange={(items: FeatureItem[]) => setFormData((p: any) => ({ ...p, features: items }))}
-            />
-            <SpecificationsManager
-              value={formData.specifications}
-              onChange={(items: SpecItem[]) => setFormData((p: any) => ({ ...p, specifications: items }))}
-            />
-            <ApplicationsManager
-              value={formData.applications}
-              onChange={(items: ApplicationItem[]) => setFormData((p: any) => ({ ...p, applications: items }))}
-            />
-          </div>
-
-          {/* ── Page Section Builder ──────────────────────── */}
-          <div className="border-t pt-6 mt-2">
-            <SectionBuilder
-              value={formData.sections as ProductSection[] || []}
-              onChange={(sections: ProductSection[]) => setFormData((p: any) => ({ ...p, sections }))}
-              onOpenTemplates={() => setShowTemplateLibrary(true)}
-            />
-            <SectionTemplateLibrary
-              open={showTemplateLibrary}
-              onClose={() => setShowTemplateLibrary(false)}
-              onUseTemplate={(section: ProductSection) => {
-                setFormData((p: any) => ({ ...p, sections: [...(p.sections || []), { ...section, order: (p.sections || []).length }] }))
-              }}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">YouTube Link (Optional)</label>
-            <Input
-              value={formData.youtubeLink}
-              onChange={(e) => setFormData({ ...formData, youtubeLink: e.target.value })}
-              placeholder="https://www.youtube.com/watch?v=..."
-              type="url"
-            />
-            <p className="text-xs text-gray-500 mt-1">Enter the full YouTube URL for product demo or review videos</p>
-          </div>
-
-          {/* ── Product Experience Builder ──────────────────────── */}
-          <div className="border-t pt-6 mt-2">
-            <div className="flex items-center gap-2 mb-1">
-              <h4 className="text-sm font-700 text-gray-800">Product Experience Builder</h4>
-              <span className="text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-600 uppercase tracking-wide">Cinematic</span>
-            </div>
-            <p className="text-xs text-gray-500 mb-5">Build the full cinematic product page without any code. All sections are optional — add only what you have content for.</p>
-            <ProductExperienceTab
-              product={formData}
-              onChange={(key, value) => setFormData((p: any) => ({ ...p, [key]: value }))}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp Message Text</label>
-            <Input
-              value={formData.whatsappMessageText}
-              onChange={(e) => setFormData({ ...formData, whatsappMessageText: e.target.value })}
-              placeholder="I'm interested in the [Product Name]"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Product Image Slideshow Timer (seconds)</label>
-            <Input
-              type="number"
-              value={formData.slideshowInterval != null ? Math.round(formData.slideshowInterval / 1000) : 5}
-              onChange={(e) => {
-                const seconds = parseInt(e.target.value, 10)
-                const ms = Number.isNaN(seconds) ? 5000 : Math.max(1, Math.min(30, seconds)) * 1000
-                setFormData({ ...formData, slideshowInterval: ms })
-              }}
-              min={1}
-              max={30}
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Time between product image slides in <strong>seconds</strong> (1–30). Only applies if product has multiple images.
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
-            <Input
-              type="number"
-              value={formData.order !== undefined ? formData.order : ""}
-              onChange={(e) => setFormData({ ...formData, order: e.target.value === "" ? undefined : parseInt(e.target.value) })}
-              min="0"
-              placeholder="Leave empty for top position"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Lower numbers appear first (0 is top). Leave empty to place at top. Existing products will shift down automatically.
-            </p>
-          </div>
-
-          <div className="flex justify-end space-x-4">
-            <Button type="button" variant="outline" onClick={onCancel} className="bg-transparent">
-              <X className="mr-2" size={16} />
-              Cancel
-            </Button>
-            <Button type="submit" className="bg-green-600 hover:bg-green-700">
-              <Save className="mr-2" size={16} />
-              {product ? "Update Product" : "Add Product"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
   )
 }
 

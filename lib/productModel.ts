@@ -105,6 +105,8 @@ export interface Product {
   warrantyPeriod?: string;
   warrantyDescription?: string;
   warrantyIcon?: string;
+  // Product family grouping (BF Series, DB Series, etc.)
+  family?: string;
   // UGC / deployment carousel images
   ugcImages?: string[];
   // SEO overrides

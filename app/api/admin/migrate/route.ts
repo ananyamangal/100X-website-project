@@ -98,26 +98,70 @@ function dedupStructuredSpecs(val: unknown): object[] | null {
     seen.add(key)
     result.push(item)
   }
-  return result.length < val.length ? result : null // null = no change needed
+  return result.length < val.length ? result : null
+}
+
+function dedupStructuredFeatures(val: unknown): object[] | null {
+  if (!Array.isArray(val) || val.length === 0) return null
+  if (!isStructured(val, 'features')) return null
+  const seen = new Set<string>()
+  const result: object[] = []
+  for (const item of val as any[]) {
+    const key = String(item.title || '').toLowerCase().trim()
+    if (!key || seen.has(key)) continue
+    seen.add(key)
+    result.push(item)
+  }
+  return result.length < val.length ? result : null
+}
+
+function dedupStructuredApps(val: unknown): object[] | null {
+  if (!Array.isArray(val) || val.length === 0) return null
+  if (!isStructured(val, 'applications')) return null
+  const seen = new Set<string>()
+  const result: object[] = []
+  for (const item of val as any[]) {
+    const key = String(item.title || '').toLowerCase().trim()
+    if (!key || seen.has(key)) continue
+    seen.add(key)
+    result.push(item)
+  }
+  return result.length < val.length ? result : null
+}
+
+function hasDuplicateFeatures(val: unknown): boolean {
+  if (!Array.isArray(val) || val.length === 0) return false
+  if (!isStructured(val, 'features')) return false
+  const titles = (val as any[]).map(i => String(i.title || '').toLowerCase().trim()).filter(Boolean)
+  return titles.length !== new Set(titles).size
+}
+
+function hasDuplicateApps(val: unknown): boolean {
+  if (!Array.isArray(val) || val.length === 0) return false
+  if (!isStructured(val, 'applications')) return false
+  const titles = (val as any[]).map(i => String(i.title || '').toLowerCase().trim()).filter(Boolean)
+  return titles.length !== new Set(titles).size
 }
 
 // ── Health report helpers ────────────────────────────────────────────────────
 
 type ProductIssue =
   | 'legacy-features' | 'legacy-specs' | 'legacy-apps'
-  | 'duplicate-specs' | 'unmatched-badges' | 'legacy-certs' | 'missing-cert-ids'
+  | 'duplicate-specs' | 'duplicate-features' | 'duplicate-apps'
+  | 'unmatched-badges' | 'legacy-certs' | 'missing-cert-ids'
   | 'empty-features' | 'empty-specs' | 'empty-apps'
 
 function getProductIssues(
   p: any,
   cmsBadgeNames: Set<string>,
-  cmsCertIds: Set<string>,
+  cmsCertNames: Set<string>,
 ): ProductIssue[] {
   const issues: ProductIssue[] = []
 
   // Features
   if (!Array.isArray(p.features) || p.features.length === 0) issues.push('empty-features')
   else if (!isStructured(p.features, 'features')) issues.push('legacy-features')
+  else if (hasDuplicateFeatures(p.features)) issues.push('duplicate-features')
 
   // Specs
   if (!Array.isArray(p.specifications) || p.specifications.length === 0) issues.push('empty-specs')
@@ -131,6 +175,7 @@ function getProductIssues(
   // Applications
   if (!Array.isArray(p.applications) || p.applications.length === 0) issues.push('empty-apps')
   else if (!isStructured(p.applications, 'applications')) issues.push('legacy-apps')
+  else if (hasDuplicateApps(p.applications)) issues.push('duplicate-apps')
 
   // Badges
   const badges: string[] = Array.isArray(p.badges) ? p.badges.filter((b: any) => typeof b === 'string') : []
@@ -162,26 +207,32 @@ export async function GET() {
     ])
 
     const cmsBadgeNames = new Set(cmsBadges.map((b: any) => String(b.name || '').toLowerCase()))
-    const cmsCertIds = new Set(cmsCerts.map((c: any) => String(c._id)))
+    const cmsCertNames = new Set(cmsCerts.map((c: any) => String(c.name || '').toLowerCase().trim()))
 
     // Aggregate counters
-    let featMigrated = 0, featLegacy = 0, featEmpty = 0
+    let featMigrated = 0, featLegacy = 0, featEmpty = 0, featDupes = 0
     let specMigrated = 0, specLegacy = 0, specEmpty = 0, specDupes = 0
-    let appMigrated = 0, appLegacy = 0, appEmpty = 0
+    let appMigrated = 0, appLegacy = 0, appEmpty = 0, appDupes = 0
     let productsWithFaqs = 0
     let productsWithUnmatchedBadges = 0
     let productsWithLegacyCerts = 0
     let productsWithCertIds = 0
 
+    // Audit maps: name → count (for badges/certs not in CMS)
+    const unmatchedBadgeMap: Record<string, number> = {}
+    const unmatchedCertMap: Record<string, number> = {}
+
     const productRows: any[] = []
 
     for (const p of products) {
-      const issues = getProductIssues(p, cmsBadgeNames, cmsCertIds)
+      const issues = getProductIssues(p, cmsBadgeNames, cmsCertNames)
 
       // Features
       if (!Array.isArray(p.features) || p.features.length === 0) featEmpty++
-      else if (isStructured(p.features, 'features')) featMigrated++
-      else featLegacy++
+      else if (isStructured(p.features, 'features')) {
+        featMigrated++
+        if (issues.includes('duplicate-features')) featDupes++
+      } else featLegacy++
 
       // Specs
       if (!Array.isArray(p.specifications) || p.specifications.length === 0) specEmpty++
@@ -192,21 +243,45 @@ export async function GET() {
 
       // Apps
       if (!Array.isArray(p.applications) || p.applications.length === 0) appEmpty++
-      else if (isStructured(p.applications, 'applications')) appMigrated++
-      else appLegacy++
+      else if (isStructured(p.applications, 'applications')) {
+        appMigrated++
+        if (issues.includes('duplicate-apps')) appDupes++
+      } else appLegacy++
 
       // FAQs
       if (Array.isArray(p.productFaqs) && p.productFaqs.length > 0) productsWithFaqs++
 
-      // Badges/certs
-      if (issues.includes('unmatched-badges')) productsWithUnmatchedBadges++
-      if (issues.includes('legacy-certs')) productsWithLegacyCerts++
+      // Badges — collect unmatched names
+      const badges: string[] = Array.isArray(p.badges) ? p.badges.filter((b: any) => typeof b === 'string') : []
+      const unmatched = badges.filter(b => !cmsBadgeNames.has(b.toLowerCase()))
+      if (unmatched.length > 0) {
+        productsWithUnmatchedBadges++
+        for (const b of unmatched) {
+          unmatchedBadgeMap[b] = (unmatchedBadgeMap[b] || 0) + 1
+        }
+      }
+
+      // Certs — collect unmatched cert strings
+      const legacyCerts: string[] = Array.isArray(p.certifications) ? p.certifications.filter((c: any) => typeof c === 'string') : []
+      if (legacyCerts.length > 0) {
+        productsWithLegacyCerts++
+        for (const c of legacyCerts) {
+          if (!cmsCertNames.has(c.toLowerCase().trim())) {
+            unmatchedCertMap[c] = (unmatchedCertMap[c] || 0) + 1
+          }
+        }
+      }
       if (Array.isArray(p.certificationIds) && p.certificationIds.length > 0) productsWithCertIds++
 
+      const legacyIssueCount = issues.filter(i => i.startsWith('legacy')).length
+      const blockingIssueCount = issues.filter(i =>
+        i.startsWith('legacy') || i.startsWith('duplicate') || i === 'unmatched-badges' || i === 'missing-cert-ids'
+      ).length
+
       const status: 'full' | 'partial' | 'legacy' =
-        issues.filter(i => i.startsWith('legacy') || i === 'duplicate-specs').length === 0
-          ? 'full'
-          : issues.filter(i => i.startsWith('legacy')).length === 3 ? 'legacy' : 'partial'
+        blockingIssueCount === 0 ? 'full'
+        : legacyIssueCount >= 3 ? 'legacy'
+        : 'partial'
 
       productRows.push({
         id: String(p._id),
@@ -221,6 +296,10 @@ export async function GET() {
     const partiallyMigrated = productRows.filter(p => p.status === 'partial').length
     const legacyCount = productRows.filter(p => p.status === 'legacy').length
 
+    // Overall normalization score: products with zero blocking issues
+    const fullyNormalized = productRows.filter(p => p.issues.length === 0).length
+    const normPct = products.length > 0 ? Math.round((fullyNormalized / products.length) * 100) : 100
+
     return NextResponse.json({
       generatedAt: new Date().toISOString(),
       summary: {
@@ -234,12 +313,25 @@ export async function GET() {
         certificationsInCms: cmsCerts.length,
       },
       fields: {
-        features:  { migrated: featMigrated, legacy: featLegacy, empty: featEmpty },
+        features:  { migrated: featMigrated, legacy: featLegacy, empty: featEmpty, withDuplicates: featDupes },
         specs:     { migrated: specMigrated, legacy: specLegacy, empty: specEmpty, withDuplicates: specDupes },
-        apps:      { migrated: appMigrated,  legacy: appLegacy,  empty: appEmpty  },
+        apps:      { migrated: appMigrated,  legacy: appLegacy,  empty: appEmpty, withDuplicates: appDupes  },
         faqs:      { withFaqs: productsWithFaqs, withoutFaqs: products.length - productsWithFaqs },
         badges:    { cmsDefined: cmsBadges.length, productsWithUnmatched: productsWithUnmatchedBadges },
         certs:     { cmsDefined: cmsCerts.length, productsWithLegacy: productsWithLegacyCerts, productsWithCertIds },
+      },
+      audit: {
+        unmatchedBadges: Object.entries(unmatchedBadgeMap)
+          .sort((a, b) => b[1] - a[1])
+          .map(([name, count]) => ({ name, count })),
+        unmatchedCerts: Object.entries(unmatchedCertMap)
+          .sort((a, b) => b[1] - a[1])
+          .map(([name, count]) => ({ name, count })),
+      },
+      normalizationScore: {
+        pct: normPct,
+        fullyNormalized,
+        total: products.length,
       },
       products: productRows,
     })
@@ -269,6 +361,32 @@ export async function POST(request: NextRequest) {
         }
       }
       return NextResponse.json({ success: true, action: 'dedup-specs', repairedCount: repaired })
+    }
+
+    if (action === 'dedup-features') {
+      const products = await db.collection('products').find({}, { projection: { _id: 1, features: 1 } }).toArray()
+      let repaired = 0
+      for (const p of products) {
+        const fixed = dedupStructuredFeatures(p.features)
+        if (fixed !== null) {
+          await db.collection('products').updateOne({ _id: p._id }, { $set: { features: fixed, updatedAt: new Date() } })
+          repaired++
+        }
+      }
+      return NextResponse.json({ success: true, action: 'dedup-features', repairedCount: repaired })
+    }
+
+    if (action === 'dedup-apps') {
+      const products = await db.collection('products').find({}, { projection: { _id: 1, applications: 1 } }).toArray()
+      let repaired = 0
+      for (const p of products) {
+        const fixed = dedupStructuredApps(p.applications)
+        if (fixed !== null) {
+          await db.collection('products').updateOne({ _id: p._id }, { $set: { applications: fixed, updatedAt: new Date() } })
+          repaired++
+        }
+      }
+      return NextResponse.json({ success: true, action: 'dedup-apps', repairedCount: repaired })
     }
 
     // Default: full migration
