@@ -140,8 +140,7 @@ function GalleryV2({ images, videoId, name }: { images: string[]; videoId: strin
 
       {/* Main viewer */}
       <div
-        className="order-1 lg:order-2 flex-1 relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 select-none"
-        style={{ aspectRatio: '1/1' }}
+        className="order-1 lg:order-2 flex-1 aspect-square relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 select-none"
         onMouseMove={e => {
           if (cur?.kind !== 'image') return
           const r = e.currentTarget.getBoundingClientRect()
@@ -388,8 +387,8 @@ function ProductFeaturesSection({ chapters }: { chapters: any[] }) {
         return (
           <section key={i} className={`border-t ${isDark ? 'bg-gray-950 border-white/5' : 'bg-white border-gray-100'}`}>
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
-              <div className={`flex flex-col ${i % 2 !== 0 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-10 lg:gap-16 items-center`}>
-                <div className="w-full lg:w-[60%] shrink-0">
+              <div className="grid lg:grid-cols-[3fr_2fr] gap-10 lg:gap-16 items-center">
+                <div className={`w-full${i % 2 !== 0 ? ' lg:order-2' : ''}`}>
                   <div className="relative rounded-2xl overflow-hidden aspect-video bg-gray-100 shadow-xl">
                     {chVid ? (
                       <iframe
@@ -409,7 +408,7 @@ function ProductFeaturesSection({ chapters }: { chapters: any[] }) {
                     )}
                   </div>
                 </div>
-                <div className="w-full lg:w-[40%] space-y-5">
+                <div className={`w-full${i % 2 !== 0 ? ' lg:order-1' : ''} space-y-5`}>
                   <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-brand-400' : 'text-brand-600'}`}>
                     {String(i + 1).padStart(2, '0')}
                   </p>
@@ -672,7 +671,7 @@ export default function ProductDetailV2({ product }: Props) {
 
       {/* ══ PURCHASE AREA — 55 / 45 SPLIT ════════════════════════════════════ */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 bg-white">
-        <div className="grid lg:grid-cols-[55%_45%] gap-8 xl:gap-14 py-8 md:py-12">
+        <div className="grid lg:grid-cols-[55fr_45fr] gap-8 xl:gap-14 py-8 md:py-12">
 
           {/* LEFT — gallery, sticky on desktop */}
           <div className="lg:sticky lg:top-20 lg:self-start">
