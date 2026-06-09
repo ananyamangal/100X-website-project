@@ -1797,6 +1797,8 @@ function MigrationTab() {
   const [buildingRelationships, setBuildingRelationships] = useState(false)
   const [spAudit, setSpAudit] = useState<any>(null)
   const [runningSpAudit, setRunningSpAudit] = useState(false)
+  const [migratingCerts, setMigratingCerts] = useState(false)
+  const [certMigResult, setCertMigResult] = useState<any>(null)
   const [notification, setNotification] = useState<{ type: "success" | "error"; msg: string } | null>(null)
   const [showAllProducts, setShowAllProducts] = useState(false)
   const [showSsot, setShowSsot] = useState(false)
@@ -1904,6 +1906,20 @@ function MigrationTab() {
     finally { setSeedingCerts(false) }
   }
 
+  const runMigrateCerts = async () => {
+    if (!confirm("Migrate legacy cert strings → CMS cert IDs?\n\nThis will:\n• Populate certificationIds[] from CMS matches\n• Clear the deprecated certifications[] field\n• Recalculate normalization\n\nThis is reversible via the product editor.")) return
+    setMigratingCerts(true)
+    try {
+      const r = await fetch("/api/admin/migrate?action=migrate-certs", { method: "POST" })
+      const d = await r.json()
+      setCertMigResult(d)
+      const unmatchedMsg = d.unmatched?.length > 0 ? ` Unmatched: ${d.unmatched.join(", ")}.` : ""
+      notify("success", `Cert migration: ${d.migrated} products migrated, ${d.skipped} skipped.${unmatchedMsg}`)
+      loadHealth()
+    } catch { notify("error", "Cert migration failed.") }
+    finally { setMigratingCerts(false) }
+  }
+
   const runCleanEntities = async () => {
     if (!confirm("Decode HTML entities (&nbsp; &amp; etc.) stored literally in badge names? This repairs CMS records and product badge arrays.")) return
     setCleaningEntities(true)
@@ -2006,6 +2022,9 @@ function MigrationTab() {
         <Button onClick={runSeedCerts} disabled={seedingCerts} variant="outline" className="text-sm">
           {seedingCerts ? "Seeding…" : "Seed Certification CMS"}
         </Button>
+        <Button onClick={runMigrateCerts} disabled={migratingCerts} variant="outline" className="text-sm border-orange-400 text-orange-700 hover:bg-orange-50">
+          {migratingCerts ? "Migrating Certs…" : "Migrate Legacy Certs → CMS IDs"}
+        </Button>
         <Button onClick={runCleanEntities} disabled={cleaningEntities} variant="outline" className="text-sm border-purple-300 text-purple-700 hover:bg-purple-50">
           {cleaningEntities ? "Cleaning…" : "Clean HTML Entities"}
         </Button>
@@ -2062,6 +2081,47 @@ function MigrationTab() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {certMigResult && (
+        <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-sm space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-orange-900">Cert Migration Results</h3>
+            <button onClick={() => setCertMigResult(null)} className="text-orange-400 hover:text-orange-700 text-xs">Dismiss</button>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-white rounded-lg p-2 text-center border border-orange-100">
+              <p className="text-xl font-bold text-orange-700">{certMigResult.migrated}</p>
+              <p className="text-xs text-gray-500">Migrated</p>
+            </div>
+            <div className="bg-white rounded-lg p-2 text-center border border-orange-100">
+              <p className="text-xl font-bold text-gray-500">{certMigResult.skipped}</p>
+              <p className="text-xs text-gray-500">Skipped</p>
+            </div>
+            <div className="bg-white rounded-lg p-2 text-center border border-orange-100">
+              <p className={`text-xl font-bold ${certMigResult.unmatched?.length > 0 ? 'text-red-600' : 'text-green-600'}`}>{certMigResult.unmatched?.length ?? 0}</p>
+              <p className="text-xs text-gray-500">Unmatched Cert Strings</p>
+            </div>
+          </div>
+          {certMigResult.unmatched?.length > 0 && (
+            <div className="bg-red-50 rounded-lg p-2 border border-red-200">
+              <p className="text-xs font-semibold text-red-700 mb-1">Unmatched (no CMS cert found — add manually):</p>
+              {certMigResult.unmatched.map((u: string, i: number) => (
+                <span key={i} className="inline-block text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded mr-1 mb-1">{u}</span>
+              ))}
+            </div>
+          )}
+          <div className="max-h-40 overflow-y-auto divide-y divide-orange-100 rounded border border-orange-100">
+            {certMigResult.perProduct?.map((r: any, i: number) => (
+              <div key={i} className="flex items-center justify-between px-2 py-1 text-xs">
+                <span className="text-gray-700 truncate mr-2">{r.name}</span>
+                <span className={`flex-shrink-0 font-medium ${r.action === 'migrated' ? 'text-green-700' : 'text-gray-400'}`}>
+                  {r.action === 'migrated' ? `${r.matched} IDs linked` : r.reason}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -2195,49 +2255,87 @@ function MigrationTab() {
             )}
           </Card>
 
-          {/* Per-product table */}
+          {/* Per-product audit table */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-sm">
-                <span>
-                  {showAllProducts ? `All ${productRows.length} Products` : `Products with Issues (${problemProducts.length})`}
-                </span>
+                <span>Product Normalization Audit — {productRows.length} products</span>
                 <button type="button" onClick={() => setShowAllProducts(!showAllProducts)} className="text-xs text-blue-600 hover:underline font-normal">
                   {showAllProducts ? "Show issues only" : "Show all products"}
                 </button>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              {displayProducts.length === 0 ? (
-                <div className="text-center py-8 text-sm text-green-700 font-medium">
-                  All products are fully normalized. ✓
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-100">
-                  {displayProducts.map((p: any) => (
-                    <div key={p.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-gray-50">
-                      <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${
-                        p.issues.length === 0 ? 'bg-green-400' : p.status === 'partial' ? 'bg-amber-400' : 'bg-red-400'
-                      }`} />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-800 truncate">{p.name}</div>
-                        {p.issues.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {p.issues.map((issue: string) => {
-                              const meta = ISSUE_LABELS[issue] || { label: issue, color: 'bg-gray-100 text-gray-600' }
-                              return <span key={issue} className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${meta.color}`}>{meta.label}</span>
-                            })}
-                          </div>
-                        )}
-                      </div>
-                      <a href={`/${p.slug}`} target="_blank" rel="noreferrer" className="text-[11px] text-blue-500 hover:underline flex-shrink-0 mt-0.5">view ↗</a>
-                    </div>
-                  ))}
-                  {!showAllProducts && problemProducts.length > 20 && (
-                    <div className="px-4 py-2 text-xs text-gray-400 text-center">
-                      Showing 20 of {problemProducts.length} products with issues. <button type="button" onClick={() => setShowAllProducts(true)} className="text-blue-500 underline">Show all</button>
-                    </div>
-                  )}
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="text-left px-3 py-2 font-semibold text-gray-600 min-w-[160px]">Product</th>
+                      <th className="text-center px-2 py-2 font-semibold text-gray-600">Features</th>
+                      <th className="text-center px-2 py-2 font-semibold text-gray-600">Specs</th>
+                      <th className="text-center px-2 py-2 font-semibold text-gray-600">Apps</th>
+                      <th className="text-center px-2 py-2 font-semibold text-gray-600">FAQs</th>
+                      <th className="text-center px-2 py-2 font-semibold text-gray-600">Badges</th>
+                      <th className="text-center px-2 py-2 font-semibold text-gray-600">Cert IDs</th>
+                      <th className="text-center px-2 py-2 font-semibold text-gray-600">Norm%</th>
+                      <th className="px-2 py-2"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {displayProducts.map((p: any) => {
+                      const iss: string[] = p.issues || []
+                      const featOk = !iss.some(i => ['legacy-features','empty-features','duplicate-features'].includes(i))
+                      const specOk = !iss.some(i => ['legacy-specs','empty-specs','duplicate-specs'].includes(i))
+                      const appOk  = !iss.some(i => ['legacy-apps','empty-apps','duplicate-apps'].includes(i))
+                      const faqOk  = !!p.hasFaqs
+                      const badgeOk = !iss.includes('unmatched-badges')
+                      const certOk  = p.hasCertIds && !iss.includes('legacy-certs')
+                      const score = [featOk, specOk, appOk, faqOk, badgeOk, certOk].filter(Boolean).length
+                      const pct = Math.round((score / 6) * 100)
+                      const Chip = ({ ok, warn, tip }: { ok: boolean; warn?: boolean; tip?: string }) => (
+                        <span title={tip} className={`inline-block w-5 h-5 rounded text-center leading-5 font-bold ${ok ? 'bg-green-100 text-green-700' : warn ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-600'}`}>
+                          {ok ? '✓' : warn ? '!' : '✗'}
+                        </span>
+                      )
+                      return (
+                        <tr key={p.id} className="hover:bg-gray-50">
+                          <td className="px-3 py-2 font-medium text-gray-800">{p.name}</td>
+                          <td className="px-2 py-2 text-center">
+                            <Chip ok={featOk} warn={iss.includes('duplicate-features')} tip={iss.find(i=>i.startsWith('legacy-feat')||i.startsWith('empty-feat')||i.startsWith('dup-feat'))||''} />
+                          </td>
+                          <td className="px-2 py-2 text-center">
+                            <Chip ok={specOk} warn={iss.includes('duplicate-specs')} tip={iss.find(i=>i.startsWith('legacy-spec')||i.startsWith('empty-spec')||i.startsWith('dup-spec'))||''} />
+                          </td>
+                          <td className="px-2 py-2 text-center">
+                            <Chip ok={appOk} warn={iss.includes('duplicate-apps')} tip={iss.find(i=>i.startsWith('legacy-app')||i.startsWith('empty-app')||i.startsWith('dup-app'))||''} />
+                          </td>
+                          <td className="px-2 py-2 text-center">
+                            <Chip ok={faqOk} tip={faqOk ? '' : 'no FAQs'} />
+                          </td>
+                          <td className="px-2 py-2 text-center">
+                            <Chip ok={badgeOk} tip={badgeOk ? '' : 'unmatched badges'} />
+                          </td>
+                          <td className="px-2 py-2 text-center">
+                            <Chip ok={certOk} tip={!certOk ? (p.hasCertIds ? 'legacy strings remain' : 'no cert IDs') : ''} />
+                          </td>
+                          <td className="px-2 py-2 text-center">
+                            <span className={`font-bold ${pct === 100 ? 'text-green-700' : pct >= 80 ? 'text-amber-600' : 'text-red-600'}`}>{pct}%</span>
+                          </td>
+                          <td className="px-2 py-2">
+                            <a href={`/${p.slug}`} target="_blank" rel="noreferrer" className="text-[10px] text-blue-500 hover:underline">view ↗</a>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                    {displayProducts.length === 0 && (
+                      <tr><td colSpan={9} className="text-center py-6 text-green-700 font-medium">All products are fully normalized. ✓</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              {!showAllProducts && problemProducts.length > 20 && (
+                <div className="px-4 py-2 text-xs text-gray-400 text-center border-t border-gray-100">
+                  Showing 20 of {problemProducts.length} products with issues. <button type="button" onClick={() => setShowAllProducts(true)} className="text-blue-500 underline">Show all</button>
                 </div>
               )}
             </CardContent>

@@ -289,6 +289,8 @@ export async function GET() {
         slug: p.slug || '',
         status,
         issues,
+        hasFaqs: Array.isArray(p.productFaqs) && p.productFaqs.length > 0,
+        hasCertIds: Array.isArray(p.certificationIds) && p.certificationIds.length > 0,
       })
     }
 
@@ -296,8 +298,8 @@ export async function GET() {
     const partiallyMigrated = productRows.filter(p => p.status === 'partial').length
     const legacyCount = productRows.filter(p => p.status === 'legacy').length
 
-    // Overall normalization score: products with zero blocking issues
-    const fullyNormalized = productRows.filter(p => p.issues.length === 0).length
+    // Normalization score: products with zero blocking issues (same as status=full)
+    const fullyNormalized = fullyMigrated
     const normPct = products.length > 0 ? Math.round((fullyNormalized / products.length) * 100) : 100
 
     return NextResponse.json({
@@ -561,6 +563,67 @@ export async function POST(request: NextRequest) {
           missingSlugParts: missingSlug.map((p: any) => ({ name: p.name, id: String(p._id) })),
         },
       })
+    }
+
+    if (action === 'migrate-certs') {
+      const [products, cmsCerts] = await Promise.all([
+        db.collection('products').find({}, {
+          projection: { _id: 1, name: 1, certifications: 1, certificationIds: 1 }
+        }).toArray(),
+        db.collection('certifications').find({}).toArray(),
+      ])
+
+      // Build name → _id map (case-insensitive, also index legacyString alias)
+      const certNameToId = new Map<string, string>()
+      for (const c of cmsCerts) {
+        certNameToId.set(String(c.name || '').toLowerCase().trim(), String(c._id))
+        if (c.legacyString) certNameToId.set(String(c.legacyString).toLowerCase().trim(), String(c._id))
+      }
+
+      const report: {
+        total: number; migrated: number; skipped: number
+        unmatched: string[]; perProduct: any[]
+      } = { total: products.length, migrated: 0, skipped: 0, unmatched: [], perProduct: [] }
+
+      for (const p of products) {
+        const legacyCerts: string[] = Array.isArray(p.certifications)
+          ? p.certifications.filter((c: any) => typeof c === 'string')
+          : []
+
+        if (legacyCerts.length === 0) {
+          report.skipped++
+          report.perProduct.push({ name: p.name, action: 'skipped', reason: 'no legacy cert strings' })
+          continue
+        }
+
+        const matchedIds: string[] = []
+        const unmatched: string[] = []
+        for (const cert of legacyCerts) {
+          const id = certNameToId.get(cert.toLowerCase().trim())
+          if (id) { if (!matchedIds.includes(id)) matchedIds.push(id) }
+          else { unmatched.push(cert) }
+        }
+
+        // Merge with existing certificationIds, dedup
+        const existingIds: string[] = Array.isArray(p.certificationIds) ? p.certificationIds : []
+        const allIds = [...new Set([...existingIds, ...matchedIds])]
+
+        await db.collection('products').updateOne(
+          { _id: p._id },
+          { $set: { certificationIds: allIds, certifications: [], updatedAt: new Date() } }
+        )
+
+        report.migrated++
+        for (const u of unmatched) {
+          if (!report.unmatched.includes(u)) report.unmatched.push(u)
+        }
+        report.perProduct.push({
+          name: p.name, action: 'migrated',
+          matched: matchedIds.length, unmatched, certificationIds: allIds,
+        })
+      }
+
+      return NextResponse.json({ success: true, action: 'migrate-certs', ...report })
     }
 
     // Default: full migration
