@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import {
   ChevronDown, ChevronUp, GripVertical, Eye, EyeOff,
-  Save, RotateCcw, CheckCircle, Loader2, AlertCircle,
+  Save, RotateCcw, CheckCircle, Loader2, AlertCircle, Image as ImageIcon, X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,10 +15,12 @@ interface SectionDraft {
   isEnabled:        boolean
   order:            number
   variant:          string
+  icon:             string
   heading:          string
   subheading:       string
   eyebrow:          string
   bgColor:          string
+  bgImage:          string
   ctaText:          string
   ctaHref:          string
   ctaSecondaryText: string
@@ -36,6 +38,13 @@ const BG_OPTIONS = [
   { key: 'brand',  label: 'Brand',  color: '#15803d' },
 ]
 
+// Common emoji used in section icons — quick-pick palette
+const ICON_PALETTE = [
+  '🎬','🖼️','🏆','📦','⚙️','🏭','🏗️','⚡','📋','▶️',
+  '🤝','⭐','🛡️','🎯','📰','❓','📢','🛒','📊','🎥',
+  '📖','📸','📁','🔧','📥','🔗','🌟','💡','🚀','✅',
+]
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function toDraft(s: ResolvedSection): SectionDraft {
@@ -43,10 +52,12 @@ function toDraft(s: ResolvedSection): SectionDraft {
     isEnabled:        s.isEnabled,
     order:            s.order,
     variant:          s.variant,
+    icon:             s.icon,
     heading:          s.heading,
     subheading:       s.subheading,
     eyebrow:          s.eyebrow,
     bgColor:          s.bgColor,
+    bgImage:          s.bgImage,
     ctaText:          s.ctaText,
     ctaHref:          s.ctaHref,
     ctaSecondaryText: s.ctaSecondaryText,
@@ -55,7 +66,125 @@ function toDraft(s: ResolvedSection): SectionDraft {
   }
 }
 
-// ── SectionRow ─────────────────────────────────────────────────────────────────
+// ── ImageField — URL input with live preview ───────────────────────────────────
+
+function ImageField({
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  label:    string
+  hint?:    string
+  value:    string
+  onChange: (v: string) => void
+}) {
+  const [inputVal, setInputVal] = useState(value)
+  const [previewErr, setPreviewErr] = useState(false)
+
+  // Sync when draft resets
+  useEffect(() => { setInputVal(value); setPreviewErr(false) }, [value])
+
+  const commit = () => {
+    onChange(inputVal.trim())
+    setPreviewErr(false)
+  }
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
+      {hint && <p className="text-[10px] text-gray-400 mb-1.5">{hint}</p>}
+
+      {/* Preview */}
+      {inputVal && !previewErr ? (
+        <div className="relative w-full rounded-lg overflow-hidden border border-gray-200 bg-gray-100 mb-2" style={{ height: 120 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={inputVal}
+            alt=""
+            className="w-full h-full object-cover"
+            onError={() => setPreviewErr(true)}
+          />
+          <button
+            onClick={() => { onChange(''); setInputVal(''); setPreviewErr(false) }}
+            className="absolute top-1.5 right-1.5 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors"
+            title="Remove image"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      ) : previewErr ? (
+        <div className="w-full rounded-lg border border-red-200 bg-red-50 flex items-center gap-2 px-3 py-2 mb-2 text-xs text-red-600">
+          <AlertCircle size={12} /> Image URL could not load — check the URL
+        </div>
+      ) : null}
+
+      <div className="flex gap-2">
+        <Input
+          value={inputVal}
+          onChange={e => setInputVal(e.target.value)}
+          onBlur={commit}
+          onKeyDown={e => e.key === 'Enter' && commit()}
+          placeholder="https://res.cloudinary.com/… or /image.jpg"
+          className="text-xs flex-1"
+        />
+        {inputVal !== value && (
+          <button
+            onClick={commit}
+            className="px-3 py-1.5 bg-brand-600 text-white text-xs rounded-lg hover:bg-brand-500"
+          >
+            Apply
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── IconPicker ────────────────────────────────────────────────────────────────
+
+function IconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [custom, setCustom] = useState('')
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-600 mb-1">Section Icon</label>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setOpen(o => !o)}
+          className="w-10 h-10 text-xl bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-200 flex items-center justify-center transition-colors"
+          title="Pick emoji"
+        >
+          {value || '?'}
+        </button>
+        <input
+          value={custom}
+          onChange={e => setCustom(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter' && custom.trim()) { onChange(custom.trim()); setCustom(''); setOpen(false) } }}
+          placeholder="Paste emoji or type…"
+          className="text-sm px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-400 w-44"
+        />
+      </div>
+
+      {open && (
+        <div className="mt-2 flex flex-wrap gap-1 bg-white border border-gray-200 rounded-xl p-3 shadow-md max-w-xs">
+          {ICON_PALETTE.map(e => (
+            <button
+              key={e}
+              onClick={() => { onChange(e); setOpen(false) }}
+              className={`w-8 h-8 text-base hover:bg-brand-50 rounded-lg flex items-center justify-center transition-colors ${value === e ? 'bg-brand-100 ring-1 ring-brand-400' : ''}`}
+            >
+              {e}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── SectionRow ────────────────────────────────────────────────────────────────
 
 interface SectionRowProps {
   section:     ResolvedSection
@@ -96,12 +225,7 @@ function SectionRow({ section, pageKey, index, total, onDragStart, onDragOver, o
     }
   }
 
-  const reset = async () => {
-    if (!draft._id) {
-      setDraft(toDraft(section))
-      return
-    }
-    // Find current _id from API — for simplicity just reset draft to section defaults
+  const reset = () => {
     setDraft(toDraft(section))
     setStatus('idle')
   }
@@ -117,8 +241,13 @@ function SectionRow({ section, pageKey, index, total, onDragStart, onDragOver, o
   }
 
   const variants: SectionVariant[] = section.def.variants
+  const hasImageFields = section.def.fields.some(f => f.type === 'image')
 
-  const rowBg = isOver ? "bg-brand-50 border-brand-300" : isDragging ? "opacity-40 border-gray-200" : "bg-white border-gray-200"
+  const rowBg = isOver
+    ? "bg-brand-50 border-brand-300"
+    : isDragging
+    ? "opacity-40 border-gray-200"
+    : "bg-white border-gray-200"
 
   return (
     <div
@@ -130,47 +259,49 @@ function SectionRow({ section, pageKey, index, total, onDragStart, onDragOver, o
     >
       {/* Row header */}
       <div className="flex items-center gap-2 px-4 py-3">
-        {/* Drag handle */}
         <GripVertical size={14} className="text-gray-300 cursor-grab flex-shrink-0" />
 
         {/* Move up/down */}
         <div className="flex flex-col gap-0.5 flex-shrink-0">
-          <button
-            onClick={() => onReorder(index, 'up')}
-            disabled={index === 0}
-            className="text-gray-300 hover:text-gray-500 disabled:opacity-20 transition-colors"
-          >
+          <button onClick={() => onReorder(index, 'up')} disabled={index === 0}
+            className="text-gray-300 hover:text-gray-500 disabled:opacity-20 transition-colors">
             <ChevronUp size={12} />
           </button>
-          <button
-            onClick={() => onReorder(index, 'down')}
-            disabled={index === total - 1}
-            className="text-gray-300 hover:text-gray-500 disabled:opacity-20 transition-colors"
-          >
+          <button onClick={() => onReorder(index, 'down')} disabled={index === total - 1}
+            className="text-gray-300 hover:text-gray-500 disabled:opacity-20 transition-colors">
             <ChevronDown size={12} />
           </button>
         </div>
 
-        {/* Icon + label */}
-        <span className="text-base flex-shrink-0">{section.icon}</span>
+        {/* Icon */}
+        <span className="text-base flex-shrink-0 select-none">{draft.icon}</span>
+
+        {/* Label + description */}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-gray-800 leading-tight">{section.label}</p>
           <p className="text-[11px] text-gray-400 truncate">{section.def.description}</p>
         </div>
+
+        {/* Image indicator */}
+        {draft.bgImage && (
+          <span title="Has background image" className="flex-shrink-0 text-[10px] font-medium bg-indigo-50 text-indigo-600 border border-indigo-200 px-2 py-0.5 rounded-full">
+            img
+          </span>
+        )}
 
         {/* Variant badge */}
         <span className="hidden sm:inline-flex text-[10px] font-medium bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full flex-shrink-0">
           {draft.variant}
         </span>
 
-        {/* isRequired indicator */}
+        {/* Required indicator */}
         {section.def.isRequired && (
           <span className="text-[10px] font-medium bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full flex-shrink-0">
             required
           </span>
         )}
 
-        {/* Toggle */}
+        {/* Visibility toggle */}
         <button
           onClick={toggleEnabled}
           disabled={section.def.isRequired}
@@ -184,7 +315,7 @@ function SectionRow({ section, pageKey, index, total, onDragStart, onDragOver, o
           {draft.isEnabled ? <Eye size={14} /> : <EyeOff size={14} />}
         </button>
 
-        {/* Expand button */}
+        {/* Expand */}
         <button
           onClick={() => setExpanded(e => !e)}
           className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors text-gray-500"
@@ -195,7 +326,10 @@ function SectionRow({ section, pageKey, index, total, onDragStart, onDragOver, o
 
       {/* Expanded editor */}
       {expanded && (
-        <div className="border-t border-gray-100 px-4 py-4 space-y-4 bg-gray-50">
+        <div className="border-t border-gray-100 px-4 py-4 space-y-5 bg-gray-50">
+
+          {/* Icon picker */}
+          <IconPicker value={draft.icon} onChange={v => set('icon', v)} />
 
           {/* Variant picker */}
           {variants.length > 1 && (
@@ -228,23 +362,15 @@ function SectionRow({ section, pageKey, index, total, onDragStart, onDragOver, o
             {section.def.defaultEyebrow !== undefined && (
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Eyebrow</label>
-                <Input
-                  value={draft.eyebrow}
-                  onChange={e => set('eyebrow', e.target.value)}
-                  placeholder={section.def.defaultEyebrow}
-                  className="text-xs"
-                />
+                <Input value={draft.eyebrow} onChange={e => set('eyebrow', e.target.value)}
+                  placeholder={section.def.defaultEyebrow} className="text-xs" />
               </div>
             )}
             {section.def.defaultHeading !== undefined && (
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Heading</label>
-                <Input
-                  value={draft.heading}
-                  onChange={e => set('heading', e.target.value)}
-                  placeholder={section.def.defaultHeading}
-                  className="text-xs"
-                />
+                <Input value={draft.heading} onChange={e => set('heading', e.target.value)}
+                  placeholder={section.def.defaultHeading} className="text-xs" />
               </div>
             )}
             {section.def.defaultSubheading !== undefined && (
@@ -261,46 +387,41 @@ function SectionRow({ section, pageKey, index, total, onDragStart, onDragOver, o
             )}
           </div>
 
+          {/* Image fields — rendered for every field of type 'image' in the section def */}
+          {section.def.fields.filter(f => f.type === 'image').map(field => (
+            <ImageField
+              key={field.key}
+              label={field.label}
+              hint={field.hint}
+              value={field.key === 'bgImage' ? draft.bgImage : (draft as any)[field.key] ?? ''}
+              onChange={v => set(field.key === 'bgImage' ? 'bgImage' : field.key as any, v)}
+            />
+          ))}
+
           {/* CTA fields */}
           {section.def.fields.some(f => f.key.startsWith('cta')) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Primary CTA Text</label>
-                <Input
-                  value={draft.ctaText}
-                  onChange={e => set('ctaText', e.target.value)}
-                  placeholder="Get a Quote"
-                  className="text-xs"
-                />
+                <Input value={draft.ctaText} onChange={e => set('ctaText', e.target.value)}
+                  placeholder="Get a Quote" className="text-xs" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Primary CTA URL</label>
-                <Input
-                  value={draft.ctaHref}
-                  onChange={e => set('ctaHref', e.target.value)}
-                  placeholder="/contact-us"
-                  className="text-xs"
-                />
+                <Input value={draft.ctaHref} onChange={e => set('ctaHref', e.target.value)}
+                  placeholder="/contact-us" className="text-xs" />
               </div>
               {section.def.fields.some(f => f.key === 'ctaSecondaryText') && (
                 <>
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1">Secondary CTA Text</label>
-                    <Input
-                      value={draft.ctaSecondaryText}
-                      onChange={e => set('ctaSecondaryText', e.target.value)}
-                      placeholder="Browse Products"
-                      className="text-xs"
-                    />
+                    <Input value={draft.ctaSecondaryText} onChange={e => set('ctaSecondaryText', e.target.value)}
+                      placeholder="Browse Products" className="text-xs" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1">Secondary CTA URL</label>
-                    <Input
-                      value={draft.ctaSecondaryHref}
-                      onChange={e => set('ctaSecondaryHref', e.target.value)}
-                      placeholder="/products"
-                      className="text-xs"
-                    />
+                    <Input value={draft.ctaSecondaryHref} onChange={e => set('ctaSecondaryHref', e.target.value)}
+                      placeholder="/products" className="text-xs" />
                   </div>
                 </>
               )}
@@ -309,23 +430,18 @@ function SectionRow({ section, pageKey, index, total, onDragStart, onDragOver, o
 
           {/* Background color */}
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-2">Background</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-2">Background Color</label>
             <div className="flex gap-2 flex-wrap">
               {BG_OPTIONS.map(opt => (
-                <button
-                  key={opt.key}
-                  onClick={() => set('bgColor', opt.key)}
-                  title={opt.label}
+                <button key={opt.key} onClick={() => set('bgColor', opt.key)} title={opt.label}
                   className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-all ${
                     draft.bgColor === opt.key
                       ? "border-brand-600 ring-1 ring-brand-400"
                       : "border-gray-200 hover:border-gray-400"
                   }`}
                 >
-                  <span
-                    className="w-3 h-3 rounded-full border border-gray-300 flex-shrink-0"
-                    style={{ background: opt.color }}
-                  />
+                  <span className="w-3 h-3 rounded-full border border-gray-300 flex-shrink-0"
+                    style={{ background: opt.color }} />
                   {opt.label}
                 </button>
               ))}
@@ -335,19 +451,15 @@ function SectionRow({ section, pageKey, index, total, onDragStart, onDragOver, o
           {/* Dynamic content notice */}
           {section.def.isDynamic && (
             <div className="bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 text-[11px] text-blue-700">
-              Content for this section is managed automatically from your product catalog, customer list, or other dynamic sources.
-              Heading and layout overrides apply on top.
+              Content is pulled automatically from your catalog/customer list. Heading and layout overrides apply on top.
             </div>
           )}
 
           {/* Actions */}
           <div className="flex items-center justify-between pt-1">
-            <button
-              onClick={reset}
-              className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1 transition-colors"
-            >
-              <RotateCcw size={12} />
-              Reset to defaults
+            <button onClick={reset}
+              className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1 transition-colors">
+              <RotateCcw size={12} />Reset to defaults
             </button>
             <div className="flex items-center gap-2">
               {status === 'error' && (
@@ -355,19 +467,11 @@ function SectionRow({ section, pageKey, index, total, onDragStart, onDragOver, o
                   <AlertCircle size={12} />Save failed
                 </span>
               )}
-              <Button
-                onClick={save}
-                disabled={status === 'saving'}
-                size="sm"
-                className="bg-brand-600 hover:bg-brand-500 text-white gap-1.5 text-xs"
-              >
-                {status === 'saving' ? (
-                  <><Loader2 size={12} className="animate-spin" />Saving…</>
-                ) : status === 'saved' ? (
-                  <><CheckCircle size={12} />Saved</>
-                ) : (
-                  <><Save size={12} />Save Section</>
-                )}
+              <Button onClick={save} disabled={status === 'saving'} size="sm"
+                className="bg-brand-600 hover:bg-brand-500 text-white gap-1.5 text-xs">
+                {status === 'saving' ? <><Loader2 size={12} className="animate-spin" />Saving…</>
+                  : status === 'saved' ? <><CheckCircle size={12} />Saved</>
+                  : <><Save size={12} />Save Section</>}
               </Button>
             </div>
           </div>
@@ -404,12 +508,8 @@ export function PageSectionsBuilder({ pageKey }: PageSectionsBuilderProps) {
 
   useEffect(() => { load() }, [load])
 
-  // Move item in local state and persist order to DB
   const reorder = async (newSections: ResolvedSection[]) => {
-    const reindexed = newSections.map((s, i) => ({
-      ...s,
-      order: (i + 1) * 10,
-    }))
+    const reindexed = newSections.map((s, i) => ({ ...s, order: (i + 1) * 10 }))
     setSections(reindexed)
     setSaving(true)
     try {
@@ -426,8 +526,7 @@ export function PageSectionsBuilder({ pageKey }: PageSectionsBuilderProps) {
 
   const handleDrop = async () => {
     if (dragFrom === null || dragOver === null || dragFrom === dragOver) {
-      setDragFrom(null); setDragOver(null)
-      return
+      setDragFrom(null); setDragOver(null); return
     }
     const next = [...sections]
     const [moved] = next.splice(dragFrom, 1)
@@ -439,8 +538,8 @@ export function PageSectionsBuilder({ pageKey }: PageSectionsBuilderProps) {
   const handleReorder = (index: number, direction: 'up' | 'down') => {
     const next = [...sections]
     const swap = direction === 'up' ? index - 1 : index + 1
-    if (swap < 0 || swap >= next.length) return;
-    [next[index], next[swap]] = [next[swap], next[index]]
+    if (swap < 0 || swap >= next.length) return
+    ;[next[index], next[swap]] = [next[swap], next[index]]
     reorder(next)
   }
 
@@ -449,7 +548,7 @@ export function PageSectionsBuilder({ pageKey }: PageSectionsBuilderProps) {
       {/* Toolbar */}
       <div className="flex items-center justify-between">
         <p className="text-xs text-gray-500">
-          {sections.length} sections · drag rows or use arrows to reorder
+          {sections.length} sections · drag or use arrows to reorder · click row to edit
         </p>
         <div className="flex items-center gap-2">
           {saving && (
@@ -457,10 +556,8 @@ export function PageSectionsBuilder({ pageKey }: PageSectionsBuilderProps) {
               <Loader2 size={12} className="animate-spin" />Saving order…
             </span>
           )}
-          <button
-            onClick={load}
-            className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
-          >
+          <button onClick={load}
+            className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1">
             <RotateCcw size={12} />Reload
           </button>
         </div>

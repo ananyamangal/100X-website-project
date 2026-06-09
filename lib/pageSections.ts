@@ -54,11 +54,12 @@ export interface PageSectionRecord {
   isEnabled:    boolean
   order:        number
   variant:      string
+  icon?:        string            // emoji override (e.g. "🏭") — falls back to SectionDef.icon
   heading?:     string
   subheading?:  string
   eyebrow?:     string
   bgColor?:     string
-  bgImage?:     string
+  bgImage?:     string            // section background / hero image URL
   ctaText?:     string
   ctaHref?:     string
   ctaSecondaryText?: string
@@ -119,6 +120,7 @@ export const HOMEPAGE_SECTIONS: SectionDef[] = [
     fields: [
       { key: 'heading',    label: 'H1 Headline',   type: 'text',     placeholder: 'India\'s Most Trusted...' },
       { key: 'subheading', label: 'Subheading',    type: 'text',     placeholder: 'Manufactured in Gurugram...' },
+      { key: 'bgImage',    label: 'Background Image', type: 'image', hint: '1920×1080px JPG/WebP, dark overlay applied automatically' },
       { key: 'ctaText',    label: 'Primary CTA',   type: 'text',     placeholder: 'Get a Quote' },
       { key: 'ctaHref',    label: 'Primary CTA URL', type: 'url',   placeholder: '/contact-us' },
     ],
@@ -490,6 +492,7 @@ export const HOMEPAGE_SECTIONS: SectionDef[] = [
     fields: [
       { key: 'heading',           label: 'Heading',           type: 'text' },
       { key: 'subheading',        label: 'Subheading',        type: 'text' },
+      { key: 'bgImage',           label: 'Background Image',  type: 'image', hint: '1920×1080px JPG/WebP — used as subtle dark-overlay background' },
       { key: 'ctaText',           label: 'Primary CTA',       type: 'text', placeholder: 'Get a Quote on WhatsApp' },
       { key: 'ctaHref',           label: 'Primary CTA URL',   type: 'url' },
       { key: 'ctaSecondaryText',  label: 'Secondary CTA',     type: 'text', placeholder: 'Browse Products' },
@@ -851,7 +854,7 @@ function mergeRecord(def: SectionDef, record?: PageSectionRecord): ResolvedSecti
     pageKey:         record?.pageKey ?? def.pageKey,
     type:            def.type,
     label:           def.label,
-    icon:            def.icon,
+    icon:            record?.icon ?? def.icon,
     isEnabled:       record?.isEnabled ?? true,
     order:           record?.order ?? def.defaultOrder,
     variant:         record?.variant ?? def.defaultVariant,
