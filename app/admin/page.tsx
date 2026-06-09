@@ -31,6 +31,7 @@ import {
   Loader2,
   Activity,
   ClipboardCheck,
+  Search,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -55,6 +56,7 @@ import { AdminUserMenu, AdminSignOutButton } from "@/components/admin/AdminUserM
 import { ProductBadgesTab } from "@/components/admin/ProductBadgesTab"
 import { CertificationsManagerTab } from "@/components/admin/CertificationsManagerTab"
 import { MediaLibraryTab } from "@/components/admin/MediaLibraryTab"
+import { SeoHealthTab } from "@/components/admin/SeoHealthTab"
 import { ProductForm } from "@/components/admin/ProductForm"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
@@ -1315,6 +1317,17 @@ function AdminDashboardContent() {
                   <ArrowUp className="mr-3" size={20} />
                   Migration
                 </button>
+                <button
+                  onClick={() => setActiveTab("seoHealth")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "seoHealth"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Search className="mr-3" size={20} />
+                  SEO Health
+                </button>
                 <a
                   href="/admin/system-health"
                   className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
@@ -1454,6 +1467,7 @@ function AdminDashboardContent() {
             {activeTab === "productBadges" && <ProductBadgesTab />}
             {activeTab === "certifications" && <CertificationsManagerTab />}
             {activeTab === "mediaLibrary" && <MediaLibraryTab />}
+            {activeTab === "seoHealth" && <SeoHealthTab />}
             {activeTab === "migration" && <MigrationTab />}
           </div>
         </div>

@@ -44,21 +44,36 @@ export async function generateMetadata({
   }
   const name = String(product.name ?? "Product")
   const productSlug = typeof product.slug === "string" ? product.slug : String(product._id ?? id)
-  const canonicalPath = `/products/${productSlug}`
-  const title = `${name} | 100x Circle`
+
+  // Stored SEO fields take full priority — never overwrite with fallback if they exist
+  const storedSeoTitle = typeof product.seoTitle === "string" ? product.seoTitle.trim() : ""
+  const storedMetaDesc = typeof product.metaDescription === "string" ? product.metaDescription.trim() : ""
+  const storedOgTitle = typeof product.ogTitle === "string" ? product.ogTitle.trim() : ""
+  const storedOgDesc = typeof product.ogDescription === "string" ? product.ogDescription.trim() : ""
+  const storedCanonical = typeof product.canonicalUrl === "string" ? product.canonicalUrl.trim() : ""
+
+  // Canonical: respect override; otherwise derive from slug (NEVER change the slug)
+  const canonicalPath = storedCanonical || `/products/${productSlug}`
+
   const rawDesc = String(product.shortDescription || product.detailedDescription || "")
-  const description =
+  const fallbackDesc =
     plainTextFromHtml(rawDesc).slice(0, 155) ||
     `Buy ${name} from 100x Circle — thermal fogging and agricultural equipment in India.`
-  const url = `${SITE_URL}${canonicalPath}`
+
+  const title = storedSeoTitle || `${name} | 100x Circle`
+  const description = storedMetaDesc || fallbackDesc
+  const ogTitle = storedOgTitle || title
+  const ogDescription = storedOgDesc || description
+
+  const url = `${SITE_URL}${canonicalPath.startsWith("http") ? "" : canonicalPath}`
   const imgs = absolutizeImages((product.imageUrls as string[]) || [])
   return {
     title,
     description,
     alternates: { canonical: canonicalPath },
     openGraph: {
-      title,
-      description,
+      title: ogTitle,
+      description: ogDescription,
       url,
       siteName: "100x Circle",
       locale: "en_IN",
@@ -67,8 +82,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
+      title: ogTitle,
+      description: ogDescription,
     },
   }
 }
