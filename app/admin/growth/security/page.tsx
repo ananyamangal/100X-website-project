@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { Shield, Monitor, Key, Clock, Users, AlertTriangle } from "lucide-react"
+import { Shield, Monitor, Key, Clock, Users, AlertTriangle, FileText, Mail } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 
 export default function SecurityPage() {
@@ -74,6 +74,20 @@ export default function SecurityPage() {
               label: "Permission Audit",
               desc:  "Review effective permissions per user.",
               color: "text-amber-600 bg-amber-50",
+            },
+            {
+              href:  "/admin/growth/security/audit-log",
+              icon:  FileText,
+              label: "Auth Audit Log",
+              desc:  "Login history, failed attempts, and password change events.",
+              color: "text-indigo-600 bg-indigo-50",
+            },
+            {
+              href:  "/admin/growth/security/email-templates",
+              icon:  Mail,
+              label: "Email Templates",
+              desc:  "Customise password reset, welcome, and account notification emails.",
+              color: "text-pink-600 bg-pink-50",
             },
           ].map(item => (
             <Link

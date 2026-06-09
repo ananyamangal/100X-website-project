@@ -21,16 +21,20 @@ export async function GET(request: NextRequest) {
     .toArray()
 
   const safe = users.map(u => ({
-    id:           String(u._id),
-    email:        u.email,
-    name:         u.name,
-    role:         u.role,
-    isActive:     u.isActive,
-    createdAt:    u.createdAt,
-    lastLoginAt:  u.lastLoginAt,
-    loginHistory: (u.loginHistory ?? []).slice(-10),
-    customPermissions: u.customPermissions ?? [],
-    deniedPermissions: u.deniedPermissions ?? [],
+    id:               String(u._id),
+    email:            u.email,
+    name:             u.name,
+    role:             u.role,
+    isActive:         u.isActive,
+    createdAt:        u.createdAt,
+    lastLoginAt:      u.lastLoginAt,
+    loginHistory:     (u.loginHistory ?? []).slice(-10),
+    customPermissions:  u.customPermissions ?? [],
+    deniedPermissions:  u.deniedPermissions ?? [],
+    passwordChangedAt:  u.passwordChangedAt ?? null,
+    failedLoginCount:   u.failedLoginCount ?? 0,
+    lockedAt:           u.lockedAt ?? null,
+    lockedBy:           u.lockedBy ?? null,
   }))
 
   return NextResponse.json({ users: safe })

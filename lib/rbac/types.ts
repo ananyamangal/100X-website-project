@@ -28,6 +28,11 @@ export interface DBUser {
   lastLoginAt: Date | null
   createdBy: string | null
   loginHistory: LoginEvent[]
+  // auth recovery fields
+  passwordChangedAt: Date | null
+  failedLoginCount: number
+  lockedAt: Date | null
+  lockedBy: string | null   // userId or "system"
 }
 
 export interface LoginEvent {
@@ -155,6 +160,9 @@ export interface SafeUser {
   isActive: boolean
   createdAt: string
   lastLoginAt: string | null
+  passwordChangedAt: string | null
+  failedLoginCount: number
+  lockedAt: string | null
 }
 
 // ── Permission resolution result ──────────────────────────────────────────────

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react"
 import {
   UserPlus, RefreshCw, Shield, Check, X, Key, Trash2,
-  ChevronDown, Clock, Activity, Eye, EyeOff, Copy, CheckCheck, ShieldCheck,
+  ChevronDown, Clock, Activity, Eye, EyeOff, Copy, CheckCheck, ShieldCheck, Mail,
 } from "lucide-react"
 import { useAuth, PermissionGate } from "@/lib/rbac/client"
 import { ROLE_DEFINITIONS } from "@/lib/rbac/roles"
@@ -23,6 +23,9 @@ interface User {
   loginHistory: Array<{ ip: string; userAgent: string; timestamp: string; success: boolean }>
   customPermissions: string[]
   deniedPermissions: string[]
+  passwordChangedAt: string | null
+  failedLoginCount: number
+  lockedAt: string | null
 }
 
 // ── Role badge colors ──────────────────────────────────────────────────────────
@@ -163,10 +166,12 @@ function UserRow({
   onRefresh: () => void
   onOpenPermissions: (u: User) => void
 }) {
-  const [expanded,   setExpanded]   = useState(false)
-  const [loading,    setLoading]    = useState(false)
-  const [tempPw,     setTempPw]     = useState<string | null>(null)
-  const [copied,     setCopied]     = useState(false)
+  const [expanded,      setExpanded]      = useState(false)
+  const [loading,       setLoading]       = useState(false)
+  const [tempPw,        setTempPw]        = useState<string | null>(null)
+  const [copied,        setCopied]        = useState(false)
+  const [resetSent,     setResetSent]     = useState(false)
+  const [resetSending,  setResetSending]  = useState(false)
 
   const toggle = async (field: "isActive", value: boolean) => {
     setLoading(true)
@@ -194,6 +199,14 @@ function UserRow({
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const sendResetEmail = async () => {
+    setResetSending(true)
+    await fetch(`/api/admin/users/${u.id}/send-reset`, { method: "POST" })
+    setResetSending(false)
+    setResetSent(true)
+    setTimeout(() => setResetSent(false), 5000)
+  }
+
   const softDelete = async () => {
     if (!confirm(`Disable ${u.email}? They will lose access immediately.`)) return
     await fetch(`/api/admin/users/${u.id}`, { method: "DELETE" })
@@ -218,17 +231,50 @@ function UserRow({
             {u.isActive ? <><Check size={9} /> Active</> : <><X size={9} /> Inactive</>}
           </span>
         </td>
-        <td className="px-4 py-3 text-gray-400 text-xs">{formatDate(u.lastLoginAt)}</td>
+        <td className="px-4 py-3 text-gray-400 text-xs">
+          <div>{formatDate(u.lastLoginAt)}</div>
+          {u.failedLoginCount > 0 && (
+            <div className="text-red-400 text-[10px] mt-0.5">
+              {u.failedLoginCount} failed attempt{u.failedLoginCount !== 1 ? "s" : ""}
+            </div>
+          )}
+          {u.lockedAt && (
+            <div className="text-red-400 font-semibold text-[10px] mt-0.5">Locked</div>
+          )}
+          {u.passwordChangedAt && (
+            <div className="text-gray-600 text-[10px] mt-0.5">
+              pw changed {formatDate(u.passwordChangedAt)}
+            </div>
+          )}
+        </td>
         <td className="px-4 py-3">
           <div className="flex items-center gap-1">
             <PermissionGate permission="users.edit">
               <button
                 onClick={() => resetPassword()}
                 disabled={loading || isSelf}
-                title="Reset password"
+                title="Generate temp password"
                 className="p-1.5 rounded text-gray-500 hover:text-amber-400 hover:bg-amber-900/20 transition-colors disabled:opacity-30"
               >
                 <Key size={13} />
+              </button>
+              <button
+                onClick={sendResetEmail}
+                disabled={resetSending || isSelf || !u.isActive}
+                title={resetSent ? "Reset email sent!" : "Send reset email"}
+                className={`p-1.5 rounded transition-colors disabled:opacity-30 ${
+                  resetSent
+                    ? "text-green-400 bg-green-900/20"
+                    : "text-gray-500 hover:text-blue-400 hover:bg-blue-900/20"
+                }`}
+              >
+                {resetSending ? (
+                  <RefreshCw size={13} className="animate-spin" />
+                ) : resetSent ? (
+                  <CheckCheck size={13} />
+                ) : (
+                  <Mail size={13} />
+                )}
               </button>
               <button
                 onClick={() => toggle("isActive", !u.isActive)}
