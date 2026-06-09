@@ -26,6 +26,17 @@ function decodeBadge(b: string): string {
   return b.replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/&#39;/gi, "'").trim()
 }
 
+// Safely extract a display label from a feature that may be either a plain
+// string ("Engine Power: 2HP") or a structured FeatureItem object ({title, value}).
+function featLabel(f: unknown): string {
+  if (typeof f === 'string') return f.split(':')[0].trim()
+  if (f && typeof f === 'object') {
+    const o = f as Record<string, unknown>
+    return String(o.title ?? o.label ?? o.name ?? '').trim()
+  }
+  return ''
+}
+
 function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p: any) => void }) {
   const [imgIdx, setImgIdx] = React.useState(0)
   const images: string[] = product.imageUrls?.length ? product.imageUrls : ['/placeholder.svg']
@@ -96,14 +107,18 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
         {product.priceRange && (
           <p className="text-brand-600 font-700 text-lg mb-3">{product.priceRange}</p>
         )}
-        {product.features?.slice(0, 2).length > 0 && (
+        {Array.isArray(product.features) && product.features.length > 0 && (
           <ul className="space-y-1 mb-4 flex-1">
-            {product.features.slice(0, 2).map((f: string, i: number) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-gray-500">
-                <span className="mt-1.5 w-1 h-1 rounded-full bg-brand-400 shrink-0" aria-hidden="true" />
-                <span className="line-clamp-1">{f.split(':')[0]}</span>
-              </li>
-            ))}
+            {product.features.slice(0, 2).map((f: unknown, i: number) => {
+              const label = featLabel(f)
+              if (!label) return null
+              return (
+                <li key={i} className="flex items-start gap-2 text-xs text-gray-500">
+                  <span className="mt-1.5 w-1 h-1 rounded-full bg-brand-400 shrink-0" aria-hidden="true" />
+                  <span className="line-clamp-1">{label}</span>
+                </li>
+              )
+            })}
           </ul>
         )}
         <div className="flex gap-2 mt-auto pt-3 border-t border-gray-50">
