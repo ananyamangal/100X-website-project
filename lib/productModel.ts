@@ -116,4 +116,6 @@ export interface Product {
   ogTitle?: string;
   ogDescription?: string;
   canonicalUrl?: string;
+  // Publishing
+  isPublished?: boolean;
 }

@@ -106,6 +106,7 @@ interface Product {
   h1Title?: string;
   ogTitle?: string;
   ogDescription?: string;
+  isPublished?: boolean;
 }
 
 interface Banner {
@@ -1628,6 +1629,9 @@ function ProductsTab({
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
                       <h3 className="text-xl font-bold text-gray-900">{product.name}</h3>
+                      {product.isPublished === false && (
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">Draft</span>
+                      )}
                       <div className="flex flex-wrap gap-2">
                         {(product.badges || []).slice(0, 3).map((badge, index) => (
                           <Badge

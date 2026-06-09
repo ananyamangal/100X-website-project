@@ -1,8 +1,9 @@
 "use client"
-import React, { useState } from "react"
-import { Plus, Trash2, Info, Upload, Loader2 } from "lucide-react"
+import React from "react"
+import { Plus, Trash2, Info } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageUploadField } from "./ImageUploadField"
 
 // Admin form stores arrays-as-strings for textarea fields (certifications, performanceMetrics, applications).
 // This helper handles both string and array inputs safely.
@@ -37,22 +38,8 @@ interface Props {
   hideSeoSection?: boolean
 }
 
-async function uploadToCloudinary(file: File): Promise<string | null> {
-  const fd = new FormData()
-  fd.append("file", file)
-  fd.append("upload_preset", "product_uploads")
-  try {
-    const res = await fetch("https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload", { method: "POST", body: fd })
-    const data = await res.json()
-    return data.secure_url ?? null
-  } catch {
-    return null
-  }
-}
 
 export function ProductExperienceTab({ product, onChange, hideSeoSection }: Props) {
-  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null)
-
   /* ── Film Chapters ─────────────────────────────── */
   const filmChapters: any[] = product.filmChapters || []
   const addChapter = () => onChange("filmChapters", [...filmChapters, { title: "", subtitle: "", description: "", videoUrl: "", imageUrl: "", sortOrder: filmChapters.length }])
@@ -61,12 +48,6 @@ export function ProductExperienceTab({ product, onChange, hideSeoSection }: Prop
     onChange("filmChapters", updated)
   }
   const removeChapter = (i: number) => onChange("filmChapters", filmChapters.filter((_, idx) => idx !== i))
-  const uploadChapterImage = async (i: number, file: File) => {
-    setUploadingIdx(i)
-    const url = await uploadToCloudinary(file)
-    if (url) updateChapter(i, "imageUrl", url)
-    setUploadingIdx(null)
-  }
 
   /* ── Box Contents ──────────────────────────────── */
   const boxContents: any[] = product.boxContents || []
@@ -141,16 +122,12 @@ export function ProductExperienceTab({ product, onChange, hideSeoSection }: Prop
                 <Input value={ch.videoUrl || ""} onChange={e => updateChapter(i, "videoUrl", e.target.value)} placeholder="https://www.youtube.com/..." />
               </div>
               <div>
-                <label className="block text-[11px] font-500 text-gray-600 mb-1">Image</label>
-                <div className="flex gap-2 items-center">
-                  <Input value={ch.imageUrl || ""} onChange={e => updateChapter(i, "imageUrl", e.target.value)} placeholder="https://res.cloudinary.com/..." className="flex-1" />
-                  <label className="cursor-pointer shrink-0 flex items-center gap-1 px-2 py-1.5 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 text-[11px] text-gray-600">
-                    {uploadingIdx === i ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-                    <input type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) uploadChapterImage(i, e.target.files[0]) }} />
-                    Upload
-                  </label>
-                </div>
-                {ch.imageUrl && <img src={ch.imageUrl} className="mt-2 h-16 rounded-md object-cover border border-gray-100" alt="Chapter preview" />}
+                <ImageUploadField
+                  label="Chapter Image"
+                  value={ch.imageUrl || ""}
+                  onChange={url => updateChapter(i, "imageUrl", url)}
+                  standards="JPG/WebP · max 1MB · 16:9 ratio recommended"
+                />
               </div>
             </div>
           </div>
@@ -197,15 +174,21 @@ export function ProductExperienceTab({ product, onChange, hideSeoSection }: Prop
           <p className="text-sm text-gray-400 py-2">No items added. List everything included in the box.</p>
         )}
         {boxContents.map((b, i) => (
-          <div key={i} className="flex items-center gap-3 bg-gray-50/50 rounded-lg p-3 border border-gray-100">
-            <div className="flex-1 grid grid-cols-[2fr_1fr] gap-2">
-              <Input value={b.item || ""} onChange={e => updateBox(i, "item", e.target.value)} placeholder="Item name (e.g. Machine Body)" />
-              <Input value={b.quantity || ""} onChange={e => updateBox(i, "quantity", e.target.value)} placeholder="Qty (e.g. 1)" />
+          <div key={i} className="bg-gray-50/50 rounded-lg p-3 border border-gray-100 space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 grid grid-cols-[2fr_1fr] gap-2">
+                <Input value={b.item || ""} onChange={e => updateBox(i, "item", e.target.value)} placeholder="Item name (e.g. Machine Body)" />
+                <Input value={b.quantity || ""} onChange={e => updateBox(i, "quantity", e.target.value)} placeholder="Qty (e.g. 1)" />
+              </div>
+              <button onClick={() => removeBox(i)} className="text-red-400 hover:text-red-600 shrink-0">
+                <Trash2 size={14} />
+              </button>
             </div>
-            <Input value={b.imageUrl || ""} onChange={e => updateBox(i, "imageUrl", e.target.value)} placeholder="Image URL (optional)" className="w-56" />
-            <button onClick={() => removeBox(i)} className="text-red-400 hover:text-red-600 shrink-0">
-              <Trash2 size={14} />
-            </button>
+            <ImageUploadField
+              value={b.imageUrl || ""}
+              onChange={url => updateBox(i, "imageUrl", url)}
+              standards="JPG/PNG · max 1MB · square preferred"
+            />
           </div>
         ))}
         <button onClick={addBoxItem} className="flex items-center gap-2 text-brand-600 hover:text-brand-700 text-sm font-500 mt-1">

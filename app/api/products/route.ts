@@ -7,7 +7,7 @@ export async function GET() {
   const products = await client
     .db()
     .collection("products")
-    .find({})
+    .find({ isPublished: { $ne: false } })
     .sort({ order: 1, createdAt: -1 })
     .toArray()
 

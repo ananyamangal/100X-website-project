@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import { Copy } from "lucide-react"
 import { AssetPicker, type CelebrityAsset } from "./AssetPicker"
+import { ImageUploadField } from "./ImageUploadField"
 
 const SECTION_TYPES = [
   { value: "before", label: "Before 100X (Problem)" },
@@ -464,6 +466,17 @@ export function HomepageSectionsTab() {
   const removeCompRow = (side: "comparisonBad" | "comparisonGood", i: number) =>
     set(side, form[side].filter((_: any, j: number) => j !== i))
 
+  const duplicateSection = async (s: any) => {
+    const { _id, ...rest } = s
+    await fetch("/api/admin/homepage-sections", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...rest, headline: `${rest.headline || ""} (copy)`, enabled: false }),
+    })
+    load()
+    setMsg({ type: "success", text: "Section duplicated (disabled by default)." })
+  }
+
   const seedCampaign = async () => {
     if (!confirm(`Seed 4 OEM Trust Campaign sections? They start disabled — enable them after adding content.`)) return
     setSeeding(true)
@@ -538,17 +551,16 @@ export function HomepageSectionsTab() {
 
               {/* Image */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Celebrity Image</label>
-                <div className="flex gap-4 items-center">
-                  {form.imageUrl && (
-                    <img src={form.imageUrl} alt="" className="w-24 h-20 object-cover rounded-xl border shadow-sm" />
-                  )}
-                  <div className="flex gap-2 flex-wrap">
-                    <Button type="button" variant="outline" onClick={() => setPickerOpen(true)} className="bg-transparent">
-                      Pick from Library
-                    </Button>
-                    <Input value={form.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="or paste URL directly" className="flex-1 min-w-48" />
-                  </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Section Image</label>
+                <ImageUploadField
+                  value={form.imageUrl || ""}
+                  onChange={url => set("imageUrl", url)}
+                  standards="JPG/WebP · max 2MB · recommended 1200×800px"
+                />
+                <div className="mt-2">
+                  <Button type="button" variant="outline" size="sm" onClick={() => setPickerOpen(true)} className="bg-transparent text-xs">
+                    Or pick from Celebrity Library
+                  </Button>
                 </div>
               </div>
 
@@ -742,6 +754,9 @@ export function HomepageSectionsTab() {
                   <Button variant="outline" size="sm" onClick={() => updateOrder(s, -1)} className="bg-transparent px-2">↑</Button>
                   <Button variant="outline" size="sm" onClick={() => updateOrder(s, 1)} className="bg-transparent px-2">↓</Button>
                   <Button variant="outline" size="sm" onClick={() => startEdit(s)} className="bg-transparent">Edit</Button>
+                  <Button variant="outline" size="sm" onClick={() => duplicateSection(s)} className="bg-transparent" title="Duplicate section">
+                    <Copy size={13} />
+                  </Button>
                   <Button variant="outline" size="sm" onClick={() => handleDelete(s._id)} className="bg-transparent text-red-600 border-red-200">Del</Button>
                 </div>
               </CardContent>

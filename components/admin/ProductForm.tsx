@@ -1,11 +1,10 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { Plus, Save, X, Upload, Check } from "lucide-react"
+import React, { useState, useEffect, useRef } from "react"
+import { Plus, Save, X, ExternalLink, RotateCcw, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { AdminRichTextEditor } from "@/components/admin/AdminRichTextEditor"
 import { FeaturesManager, type FeatureItem } from "@/components/admin/FeaturesManager"
@@ -14,6 +13,7 @@ import { ApplicationsManager, type ApplicationItem } from "@/components/admin/Ap
 import { SectionBuilder, type ProductSection } from "@/components/admin/SectionBuilder"
 import { SectionTemplateLibrary } from "@/components/admin/SectionTemplateLibrary"
 import { ProductExperienceTab } from "@/components/admin/ProductExperienceTab"
+import { ImageUploadMultiField } from "@/components/admin/ImageUploadField"
 import { toStringArray } from "@/lib/normalizeProduct"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { cn } from "@/lib/utils"
@@ -26,14 +26,15 @@ const PRODUCT_FAMILIES = [
   "Other",
 ]
 
-type FormTab = "basics" | "technical" | "marketing" | "seo" | "advanced"
+type FormTab = "basics" | "technical" | "marketing" | "seo" | "advanced" | "history"
 
-const FORM_TABS: { id: FormTab; label: string; description: string }[] = [
+const FORM_TABS: { id: FormTab; label: string; description: string; editOnly?: boolean }[] = [
   { id: "basics",    label: "Basics",    description: "Name, family, category, pricing" },
   { id: "technical", label: "Technical", description: "Features, specs, applications" },
   { id: "marketing", label: "Marketing", description: "Images, descriptions, badges" },
   { id: "seo",       label: "SEO",       description: "Slug, titles, meta" },
   { id: "advanced",  label: "Advanced",  description: "Sections, cinematic content" },
+  { id: "history",   label: "History",   description: "Change history and rollback", editOnly: true },
 ]
 
 function CategoryCombobox({
@@ -86,7 +87,7 @@ function CategoryCombobox({
           )}
           {filteredCategories.map(category => (
             <div key={category} className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer flex items-center" onClick={() => handleSelect(category)}>
-              <Check className={cn("mr-2 h-4 w-4", value === category ? "opacity-100" : "opacity-0")} />
+              <span className={cn("mr-2 inline-block w-4 h-4 text-[10px]", value === category ? "opacity-100" : "opacity-0")}>✓</span>
               {category}
             </div>
           ))}
@@ -109,6 +110,7 @@ interface ProductData {
   rating?: number
   reviewsCount?: number
   inStock?: boolean
+  isPublished?: boolean
   shortDescription?: string
   detailedDescription?: string
   features?: any[]
@@ -154,16 +156,31 @@ interface ProductFormProps {
   onCancel: () => void
 }
 
+function relativeTime(date: Date): string {
+  const diff = (Date.now() - date.getTime()) / 1000
+  if (diff < 60) return "just now"
+  if (diff < 3600) return `${Math.round(diff / 60)}m ago`
+  if (diff < 86400) return `${Math.round(diff / 3600)}h ago`
+  return `${Math.round(diff / 86400)}d ago`
+}
+
 export function ProductForm({ product, categories, onAddCategory, onSave, onCancel }: ProductFormProps) {
   const [activeTab, setActiveTab] = useState<FormTab>("basics")
   const [descriptionError, setDescriptionError] = useState("")
-  const [uploadingImage, setUploadingImage] = useState(false)
   const [uploadingBrochure, setUploadingBrochure] = useState(false)
   const [showTemplateLibrary, setShowTemplateLibrary] = useState(false)
   const [seedingBadges, setSeedingBadges] = useState(false)
   const [seedingCerts, setSeedingCerts] = useState(false)
   const [cmsBadges, setCmsBadges] = useState<{ _id?: string; name: string; colorClass: string }[]>([])
   const [cmsCerts, setCmsCerts] = useState<{ _id?: string; name: string; logoUrl: string }[]>([])
+  const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved">("idle")
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([])
+  const [showWarnings, setShowWarnings] = useState(false)
+  const [revisions, setRevisions] = useState<any[]>([])
+  const [loadingRevisions, setLoadingRevisions] = useState(false)
+  const [restoring, setRestoring] = useState<string | null>(null)
+  const autosaveTimer = useRef<NodeJS.Timeout | null>(null)
+  const isFirstRender = useRef(true)
 
   const [formData, setFormData] = useState({
     name: product?.name || "",
@@ -173,6 +190,7 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
     rating: product?.rating || 4.5,
     reviewsCount: product?.reviewsCount || 0,
     inStock: product?.inStock ?? true,
+    isPublished: product?.isPublished ?? true,
     shortDescription: product?.shortDescription || "",
     detailedDescription: product?.detailedDescription || "",
     features: Array.isArray(product?.features) ? product.features : [],
@@ -200,7 +218,7 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
     warrantyPeriod: product?.warrantyPeriod || "",
     warrantyDescription: product?.warrantyDescription || "",
     warrantyIcon: product?.warrantyIcon || "",
-    ugcImages: toStringArray(product?.ugcImages).join("\n"),
+    ugcImages: toStringArray(product?.ugcImages),
     slug: product?.slug || "",
     seoTitle: product?.seoTitle || "",
     metaDescription: product?.metaDescription || "",
@@ -232,9 +250,81 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
 
   const set = (key: string, value: any) => setFormData(p => ({ ...p, [key]: value }))
 
+  const buildProductData = () => ({
+    ...formData,
+    features: Array.isArray(formData.features) ? formData.features : toStringArray(formData.features as any),
+    specifications: Array.isArray(formData.specifications) ? formData.specifications : toStringArray(formData.specifications as any),
+    applications: Array.isArray(formData.applications) ? formData.applications : toStringArray(formData.applications as any),
+    sections: Array.isArray(formData.sections) ? formData.sections : [],
+    certifications: toStringArray(formData.certifications),
+    certificationIds: formData.certificationIds || [],
+    performanceMetrics: toStringArray(formData.performanceMetrics),
+    productFaqs: Array.isArray(formData.productFaqs) ? formData.productFaqs : [],
+    ugcImages: Array.isArray(formData.ugcImages) ? formData.ugcImages : toStringArray(formData.ugcImages as any),
+    badges: toStringArray(formData.badges),
+    family: formData.family || undefined,
+    inStock: formData.inStock,
+    isPublished: formData.isPublished,
+    ...(product && { id: product.id, createdAt: product.createdAt }),
+  })
+
+  /* Autosave — debounced 4s, edit mode only */
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    const productId = product?._id || product?.id
+    if (!productId) return
+
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current)
+    autosaveTimer.current = setTimeout(async () => {
+      setAutosaveStatus("saving")
+      try {
+        await fetch(`/api/admin/products/${productId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(buildProductData()),
+        })
+        setAutosaveStatus("saved")
+        setTimeout(() => setAutosaveStatus("idle"), 3000)
+      } catch {
+        setAutosaveStatus("idle")
+      }
+    }, 4000)
+
+    return () => { if (autosaveTimer.current) clearTimeout(autosaveTimer.current) }
+  }, [formData]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* Load revisions when History tab is opened */
+  useEffect(() => {
+    const productId = product?._id || product?.id
+    if (activeTab !== "history" || !productId) return
+    setLoadingRevisions(true)
+    fetch(`/api/admin/products/${productId}/revisions`)
+      .then(r => r.json())
+      .then(d => setRevisions(Array.isArray(d) ? d : []))
+      .catch(() => setRevisions([]))
+      .finally(() => setLoadingRevisions(false))
+  }, [activeTab]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setDescriptionError("")
+
+    // Content validation — non-blocking
+    const warnings: string[] = []
+    if (!formData.imageUrls?.length) warnings.push("No product images uploaded")
+    if (!formData.whatsappMessageText?.trim()) warnings.push("WhatsApp message text is missing")
+    const shortLen = plainTextFromHtml(formData.shortDescription || "").trim().length
+    if (shortLen < 50) warnings.push(`Short description is too brief (${shortLen} chars — aim for 50+)`)
+    if (!formData.ugcImages?.length) warnings.push("No deployment/UGC images — add field photos for social proof")
+
+    if (warnings.length > 0) {
+      setValidationWarnings(warnings)
+      setShowWarnings(true)
+    }
+
     if (
       !plainTextFromHtml(formData.shortDescription || "").trim() ||
       !plainTextFromHtml(formData.detailedDescription || "").trim()
@@ -243,23 +333,27 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
       setActiveTab("marketing")
       return
     }
-    const productData = {
-      ...formData,
-      features: Array.isArray(formData.features) ? formData.features : toStringArray(formData.features as any),
-      specifications: Array.isArray(formData.specifications) ? formData.specifications : toStringArray(formData.specifications as any),
-      applications: Array.isArray(formData.applications) ? formData.applications : toStringArray(formData.applications as any),
-      sections: Array.isArray(formData.sections) ? formData.sections : [],
-      certifications: toStringArray(formData.certifications),
-      certificationIds: formData.certificationIds || [],
-      performanceMetrics: toStringArray(formData.performanceMetrics),
-      productFaqs: Array.isArray(formData.productFaqs) ? formData.productFaqs : [],
-      ugcImages: toStringArray(formData.ugcImages),
-      badges: toStringArray(formData.badges),
-      family: formData.family || undefined,
-      inStock: formData.inStock,
-      ...(product && { id: product.id, createdAt: product.createdAt }),
-    }
-    onSave(productData)
+
+    onSave(buildProductData())
+  }
+
+  const handleRestore = async (revId: string) => {
+    const productId = product?._id || product?.id
+    if (!productId) return
+    if (!confirm("Restore this version? Unsaved changes will be overwritten.")) return
+    setRestoring(revId)
+    try {
+      const res = await fetch(`/api/admin/products/${productId}/revisions?full=1&rev=${revId}`)
+      const rev = await res.json()
+      if (!rev.snapshot) return
+      await fetch(`/api/admin/products/${productId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(rev.snapshot),
+      })
+      onSave(rev.snapshot)
+    } catch {}
+    finally { setRestoring(null) }
   }
 
   const tabBadge = (tab: FormTab): string | null => {
@@ -267,13 +361,30 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
     return null
   }
 
+  const productId = product?._id || product?.id
+
   return (
     <Card>
       <CardHeader className="pb-0">
-        <CardTitle>{product ? "Edit Product" : "Add New Product"}</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>{product ? "Edit Product" : "Add New Product"}</CardTitle>
+          {productId && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-xs bg-transparent"
+              onClick={() => window.open(`/products/${formData.slug || productId}`, "_blank")}
+            >
+              <ExternalLink size={13} className="mr-1.5" />
+              Preview
+            </Button>
+          )}
+        </div>
+
         {/* Tab navigation */}
         <div className="flex border-b border-gray-200 mt-4 overflow-x-auto">
-          {FORM_TABS.map(tab => (
+          {FORM_TABS.filter(t => !t.editOnly || !!productId).map(tab => (
             <button
               key={tab.id}
               type="button"
@@ -285,6 +396,7 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
+              {tab.id === "history" ? <History size={13} className="inline mr-1 opacity-70" /> : null}
               {tab.label}
               {tabBadge(tab.id) && (
                 <span className="ml-1.5 inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold bg-red-500 text-white rounded-full">
@@ -298,6 +410,20 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
 
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-6">
+
+          {/* Validation warnings (non-blocking amber panel) */}
+          {showWarnings && validationWarnings.length > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-amber-800">Content warnings (save will still proceed):</p>
+                <button type="button" onClick={() => setShowWarnings(false)} className="text-amber-600 hover:text-amber-800 text-[11px]">Dismiss</button>
+              </div>
+              {validationWarnings.map((w, i) => (
+                <p key={i} className="text-xs text-amber-700">⚠ {w}</p>
+              ))}
+            </div>
+          )}
+
           {descriptionError && (
             <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">{descriptionError}</p>
           )}
@@ -390,7 +516,7 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
                   <Input
@@ -415,6 +541,18 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
                     required
                   />
                   <p className="text-xs text-gray-400 mt-1">Seconds between image slides (1–30).</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <select
+                    value={formData.isPublished ? "published" : "draft"}
+                    onChange={e => set("isPublished", e.target.value === "published")}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
+                  >
+                    <option value="published">Published</option>
+                    <option value="draft">Draft (hidden from public)</option>
+                  </select>
+                  <p className="text-xs text-gray-400 mt-1">Drafts are hidden from the public products page.</p>
                 </div>
               </div>
             </div>
@@ -522,47 +660,12 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
               {/* Product Images */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Product Images (max 5)</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  disabled={(formData.imageUrls?.length || 0) >= 5}
-                  onChange={async e => {
-                    if (!e.target.files?.length) return
-                    let files = Array.from(e.target.files)
-                    if ((formData.imageUrls?.length || 0) + files.length > 5) {
-                      files = files.slice(0, 5 - (formData.imageUrls?.length || 0))
-                    }
-                    setUploadingImage(true)
-                    const urls: string[] = []
-                    for (const file of files) {
-                      const fd = new FormData()
-                      fd.append("file", file)
-                      fd.append("upload_preset", "product_uploads")
-                      const res = await fetch("https://api.cloudinary.com/v1_1/dhbvzugv6/image/upload", { method: "POST", body: fd })
-                      const data = await res.json()
-                      if (data.secure_url) urls.push(data.secure_url)
-                    }
-                    setFormData(p => ({ ...p, imageUrls: [...(p.imageUrls || []), ...urls].slice(0, 5) }))
-                    setUploadingImage(false)
-                  }}
+                <ImageUploadMultiField
+                  value={formData.imageUrls || []}
+                  onChange={urls => set("imageUrls", urls)}
+                  max={5}
+                  standards="JPG/PNG/WebP · max 2MB each · recommended 800×800px square"
                 />
-                {uploadingImage && <span className="text-xs text-gray-500">Uploading…</span>}
-                {formData.imageUrls?.length > 0 && (
-                  <div className="mt-2 flex gap-3 flex-wrap">
-                    {formData.imageUrls.map((url: string, i: number) => (
-                      <div key={i} className="relative group">
-                        <img src={url} alt={`Image ${i + 1}`} className="w-24 h-24 object-cover rounded-lg" />
-                        <button type="button"
-                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 opacity-80 hover:opacity-100"
-                          onClick={() => setFormData(p => ({ ...p, imageUrls: p.imageUrls.filter((_: string, idx: number) => idx !== i) }))}
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* Brochure */}
@@ -571,7 +674,6 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
                 <div className="flex flex-wrap items-center gap-3 mt-2">
                   <label className="cursor-pointer">
                     <span className="inline-flex items-center px-3 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-medium">
-                      <Upload size={14} className="mr-1.5" />
                       {uploadingBrochure ? "Uploading…" : "Choose PDF"}
                     </span>
                     <input type="file" accept="application/pdf" className="hidden" disabled={uploadingBrochure}
@@ -616,17 +718,16 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
                 />
               </div>
 
-              {/* UGC Images */}
+              {/* UGC / Deployment Images */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Deployment / UGC Images <span className="text-xs text-gray-400 font-normal">(one URL per line)</span>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Deployment / UGC Images
                 </label>
-                <Textarea
-                  value={formData.ugcImages as any}
-                  onChange={e => set("ugcImages", e.target.value as any)}
-                  placeholder={"https://…/photo1.jpg\nhttps://…/photo2.jpg"}
-                  rows={3}
-                  className="font-mono text-xs"
+                <ImageUploadMultiField
+                  value={Array.isArray(formData.ugcImages) ? formData.ugcImages : []}
+                  onChange={urls => set("ugcImages", urls)}
+                  max={20}
+                  standards="JPG/PNG · max 5MB each · landscape preferred · customer deployment photos"
                 />
               </div>
 
@@ -687,12 +788,13 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Meta Description {formData.metaDescription && <span className="text-xs font-normal text-gray-400">({formData.metaDescription.length}/155)</span>}
                 </label>
-                <Textarea
+                <textarea
                   rows={2}
                   value={formData.metaDescription}
                   onChange={e => set("metaDescription", e.target.value)}
                   placeholder="Buy the BF-105 ULV cold fogger…"
                   maxLength={160}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 />
               </div>
               <div className="grid md:grid-cols-2 gap-4">
@@ -754,10 +856,54 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
             </div>
           )}
 
+          {/* ── HISTORY TAB ────────────────────────────────────────── */}
+          {activeTab === "history" && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-semibold text-gray-800 mb-1">Change History</h4>
+                <p className="text-xs text-gray-500">Up to 20 saved versions. Click Restore to revert to a previous state.</p>
+              </div>
+              {loadingRevisions ? (
+                <p className="text-sm text-gray-400 py-4">Loading revisions…</p>
+              ) : revisions.length === 0 ? (
+                <div className="text-center py-8 border border-dashed border-gray-200 rounded-lg bg-gray-50">
+                  <History size={20} className="text-gray-300 mx-auto mb-2" />
+                  <p className="text-xs text-gray-400">No revisions yet. Revisions are saved automatically on each update.</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {revisions.map((rev: any) => {
+                    const savedAt = new Date(rev.savedAt)
+                    return (
+                      <div key={rev._id} className="flex items-center justify-between px-4 py-3 rounded-lg border border-gray-100 bg-white hover:bg-gray-50">
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">
+                            {savedAt.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}{" "}
+                            {savedAt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                          </p>
+                          <p className="text-xs text-gray-400">{relativeTime(savedAt)}</p>
+                        </div>
+                        <button
+                          type="button"
+                          disabled={restoring === rev._id}
+                          onClick={() => handleRestore(rev._id)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 bg-white hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700 disabled:opacity-50 transition-colors"
+                        >
+                          <RotateCcw size={11} />
+                          {restoring === rev._id ? "Restoring…" : "Restore"}
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Always-visible footer */}
           <div className="flex justify-between items-center pt-6 border-t mt-6">
-            <div className="flex gap-2">
-              {FORM_TABS.map(tab => (
+            <div className="flex gap-2 items-center">
+              {FORM_TABS.filter(t => !t.editOnly || !!productId).map(tab => (
                 <button
                   key={tab.id}
                   type="button"
@@ -767,6 +913,8 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
                   {tab.label}
                 </button>
               ))}
+              {autosaveStatus === "saving" && <span className="text-xs text-gray-400 ml-2">Saving…</span>}
+              {autosaveStatus === "saved" && <span className="text-xs text-green-600 ml-2">✓ Autosaved</span>}
             </div>
             <div className="flex space-x-3">
               <Button type="button" variant="outline" onClick={onCancel} className="bg-transparent">

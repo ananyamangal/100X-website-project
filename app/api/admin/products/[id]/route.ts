@@ -95,6 +95,26 @@ export async function PUT(request: NextRequest, context: { params?: { id?: strin
     );
     // MongoDB driver v6 returns the document directly (not wrapped in {value: ...})
     if (!result) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    // Save revision snapshot (fire-and-forget — never fail the save)
+    db.collection("product_revisions").insertOne({
+      productId: id,
+      savedAt: new Date(),
+      snapshot: JSON.parse(JSON.stringify(currentProduct)),
+    }).then(async () => {
+      const count = await db.collection("product_revisions").countDocuments({ productId: id })
+      if (count > 20) {
+        const oldest = await db.collection("product_revisions")
+          .find({ productId: id }, { projection: { _id: 1 } })
+          .sort({ savedAt: 1 })
+          .limit(count - 20)
+          .toArray()
+        if (oldest.length) {
+          db.collection("product_revisions").deleteMany({ _id: { $in: oldest.map(r => r._id) } }).catch(() => {})
+        }
+      }
+    }).catch(() => {})
+
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
