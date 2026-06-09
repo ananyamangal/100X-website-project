@@ -29,6 +29,8 @@ import {
   ArrowUp,
   ArrowDown,
   Loader2,
+  Activity,
+  ClipboardCheck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -1313,6 +1315,20 @@ function AdminDashboardContent() {
                   <ArrowUp className="mr-3" size={20} />
                   Migration
                 </button>
+                <a
+                  href="/admin/system-health"
+                  className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
+                >
+                  <Activity className="mr-3" size={20} />
+                  System Health
+                </a>
+                <a
+                  href="/admin/catalog-audit"
+                  className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
+                >
+                  <ClipboardCheck className="mr-3" size={20} />
+                  Catalog Audit
+                </a>
               </div>
               <div className="pt-2 mt-2 border-t border-gray-200">
                 <a

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { RefreshCw, CheckCircle, AlertCircle, XCircle, Database, Package, FileText, Tag, Award } from 'lucide-react'
+import { RefreshCw, CheckCircle, AlertCircle, XCircle, Database, Package, FileText, Tag, Award, Wrench, ExternalLink, ClipboardList } from 'lucide-react'
 
 type HealthStatus = 'ok' | 'warn' | 'error' | 'loading'
 
@@ -22,12 +22,15 @@ function StatusIcon({ status }: { status: HealthStatus }) {
   return <span className="w-4 h-4 rounded-full border-2 border-gray-300 border-t-gray-600 animate-spin inline-block" />
 }
 
-function Card({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
+function Card({ title, icon, children, action }: { title: string; icon: React.ReactNode; children: React.ReactNode; action?: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100 bg-gray-50">
-        <span className="text-gray-500">{icon}</span>
-        <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
+      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <div className="flex items-center gap-2">
+          <span className="text-gray-500">{icon}</span>
+          <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
+        </div>
+        {action}
       </div>
       <div className="p-4">{children}</div>
     </div>
@@ -46,21 +49,32 @@ function Row({ label, value, status }: { label: string; value: string | number; 
   )
 }
 
+const PUBLIC_ROUTES = [
+  { label: 'Homepage', path: '/' },
+  { label: 'Products', path: '/products' },
+  { label: 'Spare Parts', path: '/spare-parts' },
+  { label: 'Blog', path: '/blog' },
+  { label: 'Contact', path: '/contact-us' },
+]
+
 export default function SystemHealthPage() {
   const [health, setHealth] = useState<any>(null)
   const [migration, setMigration] = useState<any>(null)
+  const [audit, setAudit] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [refreshedAt, setRefreshedAt] = useState<Date | null>(null)
 
   const load = async () => {
     setLoading(true)
     try {
-      const [h, m] = await Promise.all([
+      const [h, m, a] = await Promise.all([
         fetch('/api/admin/health').then(r => r.json()).catch(() => null),
         fetch('/api/admin/migrate').then(r => r.json()).catch(() => null),
+        fetch('/api/admin/catalog-audit').then(r => r.json()).catch(() => null),
       ])
       setHealth(h)
       setMigration(m)
+      setAudit(a)
       setRefreshedAt(new Date())
     } finally {
       setLoading(false)
@@ -71,6 +85,9 @@ export default function SystemHealthPage() {
 
   const normPct: number = migration?.normalizationScore?.pct ?? 0
   const normStatus: HealthStatus = normPct === 100 ? 'ok' : normPct >= 60 ? 'warn' : 'error'
+  const criticals: number = audit?.criticalCount ?? 0
+  const warnings: number = audit?.warningCount ?? 0
+  const auditStatus: HealthStatus = audit == null ? 'loading' : criticals > 0 ? 'error' : warnings > 0 ? 'warn' : 'ok'
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
@@ -95,8 +112,8 @@ export default function SystemHealthPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'MongoDB', status: (health?.mongodb?.connected ? 'ok' : health ? 'error' : 'loading') as HealthStatus, value: health?.mongodb?.connected ? 'Connected' : health ? 'Down' : '—' },
-          { label: 'Email', status: (health?.email?.configured ? 'ok' : health ? 'warn' : 'loading') as HealthStatus, value: health?.email?.configured ? 'Configured' : health ? 'Missing config' : '—' },
           { label: 'Normalization', status: loading ? 'loading' as HealthStatus : normStatus, value: loading ? '—' : `${normPct}%` },
+          { label: 'Catalog Audit', status: auditStatus, value: audit == null ? '—' : criticals > 0 ? `${criticals} critical` : warnings > 0 ? `${warnings} warnings` : 'Clean' },
           { label: 'Products', status: (migration?.summary?.total > 0 ? 'ok' : migration ? 'warn' : 'loading') as HealthStatus, value: migration?.summary?.total ?? '—' },
         ].map((s) => (
           <div key={s.label} className={`p-4 rounded-xl border ${s.status === 'ok' ? 'bg-green-50 border-green-200' : s.status === 'error' ? 'bg-red-50 border-red-200' : s.status === 'warn' ? 'bg-amber-50 border-amber-200' : 'bg-gray-50 border-gray-200'}`}>
@@ -109,15 +126,45 @@ export default function SystemHealthPage() {
         ))}
       </div>
 
+      {/* Catalog Audit summary card */}
+      <Card
+        title="Catalog Integrity"
+        icon={<ClipboardList size={15} />}
+        action={
+          <a href="/admin/catalog-audit" className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1 font-medium">
+            Full Report <ExternalLink size={11} />
+          </a>
+        }
+      >
+        {audit ? (
+          <>
+            <Row label="Critical issues" value={audit.criticalCount} status={audit.criticalCount === 0 ? 'ok' : 'error'} />
+            <Row label="Warnings" value={audit.warningCount} status={audit.warningCount === 0 ? 'ok' : 'warn'} />
+            <Row label="Info notices" value={audit.infoCount} />
+            <Row label="Products scanned" value={audit.counts?.products ?? 0} />
+            <Row label="Spare parts scanned" value={audit.counts?.parts ?? 0} />
+            {audit.criticalCount > 0 && (
+              <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                <p className="text-xs text-red-700 font-medium">
+                  {audit.criticalCount} critical issue{audit.criticalCount > 1 ? 's' : ''} block production stability.{' '}
+                  <a href="/admin/catalog-audit" className="underline">Fix now →</a>
+                </p>
+              </div>
+            )}
+          </>
+        ) : <p className="text-xs text-gray-400">Loading…</p>}
+      </Card>
+
       <div className="grid md:grid-cols-2 gap-4">
         {/* MongoDB health */}
         <Card title="Database" icon={<Database size={15} />}>
           {health?.mongodb ? (
             <>
               <Row label="Connection" value={health.mongodb.connected ? 'OK' : 'Failed'} status={health.mongodb.connected ? 'ok' : 'error'} />
-              <Row label="Submissions" value={health.mongodb.collections?.submissions ?? '—'} />
-              <Row label="RFQ leads" value={health.mongodb.collections?.rfqPopupLeads ?? '—'} />
-              {health.brochure && <Row label="Brochure" value={health.brochure.configured ? 'Configured' : 'Not set'} status={health.brochure.configured ? 'ok' : 'warn'} />}
+              <Row label="Submissions" value={health.mongodb.collections?.submissions?.count ?? '—'} />
+              <Row label="RFQ leads" value={health.mongodb.collections?.rfq_popup_leads?.count ?? '—'} />
+              {health.brochure && <Row label="Brochure" value={health.brochure.mainBrochureUrl !== '(not set)' ? 'Set' : 'Not set'} status={health.brochure.mainBrochureUrl !== '(not set)' ? 'ok' : 'warn'} />}
+              <Row label="Email" value={health.email?.configured ? 'Configured' : 'Missing config'} status={health.email?.configured ? 'ok' : 'warn'} />
             </>
           ) : <p className="text-xs text-gray-400">Loading…</p>}
         </Card>
@@ -150,29 +197,48 @@ export default function SystemHealthPage() {
           ) : <p className="text-xs text-gray-400">Loading…</p>}
         </Card>
 
-        {/* Per-product issues summary */}
-        <Card title="Products with Issues" icon={<Award size={15} />}>
-          {migration?.products ? (
-            <div className="space-y-1 max-h-56 overflow-y-auto">
-              {migration.products.filter((p: any) => p.issues.length > 0).length === 0 ? (
-                <p className="text-xs text-green-700 font-medium">All products are fully normalized.</p>
-              ) : (
-                migration.products
-                  .filter((p: any) => p.issues.length > 0)
-                  .map((p: any) => (
-                    <div key={p.id} className="flex items-start gap-2 py-1.5 border-b border-gray-50 last:border-0">
-                      <StatusDot status={p.status === 'full' ? 'ok' : p.status === 'partial' ? 'warn' : 'error'} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-gray-800 truncate">{p.name}</p>
-                        <p className="text-[10px] text-gray-400">{p.issues.join(', ')}</p>
-                      </div>
-                    </div>
-                  ))
-              )}
-            </div>
+        {/* Spare Parts health */}
+        <Card title="Spare Parts" icon={<Wrench size={15} />}>
+          {audit ? (
+            <>
+              <Row label="Total parts" value={audit.counts?.parts ?? 0} status={audit.counts?.parts > 0 ? 'ok' : 'warn'} />
+              <Row
+                label="Orphan parts (broken links)"
+                value={audit.issues?.find((i: any) => i.category === 'Orphan Spare Parts')?.count ?? 0}
+                status={audit.issues?.find((i: any) => i.category === 'Orphan Spare Parts') ? 'warn' : 'ok'}
+              />
+              <Row
+                label="Unlinked parts (no product)"
+                value={audit.issues?.find((i: any) => i.category === 'Unlinked Spare Parts')?.count ?? 0}
+                status={audit.issues?.find((i: any) => i.category === 'Unlinked Spare Parts') ? 'warn' : 'ok'}
+              />
+            </>
           ) : <p className="text-xs text-gray-400">Loading…</p>}
         </Card>
       </div>
+
+      {/* Per-product issues summary */}
+      <Card title="Products with Migration Issues" icon={<Award size={15} />}>
+        {migration?.products ? (
+          <div className="space-y-1 max-h-56 overflow-y-auto">
+            {migration.products.filter((p: any) => p.issues.length > 0).length === 0 ? (
+              <p className="text-xs text-green-700 font-medium">All products are fully normalized.</p>
+            ) : (
+              migration.products
+                .filter((p: any) => p.issues.length > 0)
+                .map((p: any) => (
+                  <div key={p.id} className="flex items-start gap-2 py-1.5 border-b border-gray-50 last:border-0">
+                    <StatusDot status={p.status === 'full' ? 'ok' : p.status === 'partial' ? 'warn' : 'error'} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-gray-800 truncate">{p.name}</p>
+                      <p className="text-[10px] text-gray-400">{p.issues.join(', ')}</p>
+                    </div>
+                  </div>
+                ))
+            )}
+          </div>
+        ) : <p className="text-xs text-gray-400">Loading…</p>}
+      </Card>
 
       {/* Audit unmatched items */}
       {migration?.audit && (
@@ -208,8 +274,29 @@ export default function SystemHealthPage() {
         </div>
       )}
 
+      {/* Production regression links */}
+      <Card title="Production Routes — Quick Check" icon={<ExternalLink size={15} />}>
+        <div className="grid sm:grid-cols-2 gap-2">
+          {PUBLIC_ROUTES.map((r) => (
+            <a
+              key={r.path}
+              href={r.path}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-gray-100 hover:border-brand-200 hover:bg-brand-50 transition-all group text-sm"
+            >
+              <span className="text-gray-700 font-medium group-hover:text-brand-700">{r.label}</span>
+              <span className="text-gray-300 group-hover:text-brand-500 flex items-center gap-1 text-xs">
+                {r.path} <ExternalLink size={11} />
+              </span>
+            </a>
+          ))}
+        </div>
+        <p className="text-xs text-gray-400 mt-3">Open each route and verify no console errors, 404s, or hydration warnings.</p>
+      </Card>
+
       <p className="text-xs text-gray-400 text-right">
-        Data sources: /api/admin/health + /api/admin/migrate — Super Admin only
+        Data: /api/admin/health · /api/admin/migrate · /api/admin/catalog-audit — Super Admin only
       </p>
     </div>
   )

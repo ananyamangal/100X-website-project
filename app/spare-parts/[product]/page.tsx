@@ -118,7 +118,7 @@ export default async function ProductSparePartsPage({ params }: { params: Promis
             ← All spare parts
           </Link>
           {serializedProduct && (
-            <Link href={`/products/${serializedProduct._id}`} className="inline-flex items-center gap-2 text-sm font-500 text-gray-600 hover:text-brand-600 transition-colors">
+            <Link href={`/products/${serializedProduct.slug || serializedProduct._id}`} className="inline-flex items-center gap-2 text-sm font-500 text-gray-600 hover:text-brand-600 transition-colors">
               View {productName} <ArrowRight size={14} />
             </Link>
           )}

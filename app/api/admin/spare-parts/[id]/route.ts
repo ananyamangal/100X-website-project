@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { cookies } from "next/headers"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
-
-async function isAuthenticated() {
-  const cookieStore = await cookies()
-  return cookieStore.get("admin-token")?.value === "authenticated"
-}
+import { requireAuth } from "@/lib/rbac/server"
 
 function toObjectId(id: string) {
   try { return new ObjectId(id) } catch { return null }
@@ -14,7 +9,9 @@ function toObjectId(id: string) {
 
 // GET /api/admin/spare-parts/[id]
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await isAuthenticated())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await requireAuth(req)
+  if (auth instanceof NextResponse) return auth
+
   const { id } = await params
   const oid = toObjectId(id)
   const client = await clientPromise
@@ -25,7 +22,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 // PUT /api/admin/spare-parts/[id]
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await isAuthenticated())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await requireAuth(req)
+  if (auth instanceof NextResponse) return auth
+
   const { id } = await params
   const oid = toObjectId(id)
   if (!oid) return NextResponse.json({ error: "Invalid ID" }, { status: 400 })
@@ -43,7 +42,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 // DELETE /api/admin/spare-parts/[id]
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await isAuthenticated())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await requireAuth(req)
+  if (auth instanceof NextResponse) return auth
+
   const { id } = await params
   const oid = toObjectId(id)
   if (!oid) return NextResponse.json({ error: "Invalid ID" }, { status: 400 })
