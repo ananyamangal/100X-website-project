@@ -172,7 +172,7 @@ export async function getAllProductsForSitemap(): Promise<ProductSitemapRow[]> {
     const docs = await db
       .collection("products")
       .find(
-        {},
+        { isPublished: { $ne: false } },
         { projection: { _id: 1, slug: 1, updatedAt: 1, createdAt: 1, name: 1, category: 1 } },
       )
       .toArray()
@@ -221,7 +221,8 @@ export async function getProductsByCategory(
   try {
     const client = await clientPromise
     const db = client.db()
-    const query: Record<string, unknown> = category ? { category } : {}
+    const base: Record<string, unknown> = { isPublished: { $ne: false } }
+    const query: Record<string, unknown> = category ? { ...base, category } : base
     const docs = await db
       .collection("products")
       .find(query, {
@@ -281,6 +282,7 @@ export async function getRelatedProducts(
       .collection("products")
       .find(
         {
+          isPublished: { $ne: false },
           category,
           _id: { $ne: new ObjectId(excludeId) },
         },

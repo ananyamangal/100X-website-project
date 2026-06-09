@@ -96,8 +96,9 @@ export async function PUT(request: NextRequest, context: { params?: { id?: strin
     // MongoDB driver v6 returns the document directly (not wrapped in {value: ...})
     if (!result) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    // Save revision snapshot (fire-and-forget — never fail the save)
-    db.collection("product_revisions").insertOne({
+    // Save revision snapshot only for manual saves (not autosave — would flood history)
+    const isAutosave = request.headers.get("X-Autosave") === "1"
+    if (!isAutosave) db.collection("product_revisions").insertOne({
       productId: id,
       savedAt: new Date(),
       snapshot: JSON.parse(JSON.stringify(currentProduct)),

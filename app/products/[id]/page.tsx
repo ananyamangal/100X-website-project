@@ -1,7 +1,8 @@
-export const revalidate = 60
+export const dynamic = "force-dynamic"
 
 import type { Metadata } from "next"
-import { permanentRedirect } from "next/navigation"
+import { notFound, permanentRedirect } from "next/navigation"
+import { cookies } from "next/headers"
 import ProductDetailClient from "./ProductDetailClient"
 import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
@@ -33,6 +34,14 @@ export async function generateMetadata({
     }
   }
   const { product } = result
+  // Draft products return noindex metadata — page handler handles the actual 404
+  if (product.isPublished === false) {
+    return {
+      title: "Product | 100x Circle",
+      description: "This product could not be found.",
+      robots: { index: false, follow: false },
+    }
+  }
   const name = String(product.name ?? "Product")
   const productSlug = typeof product.slug === "string" ? product.slug : String(product._id ?? id)
   const canonicalPath = `/products/${productSlug}`
@@ -75,6 +84,12 @@ function getYouTubeId(url: string): string | null {
 export default async function ProductRoutePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const result = await getProductBySlugOrId(id)
+
+  // Block public access to draft products; allow logged-in admins to preview
+  if (result?.product?.isPublished === false) {
+    const adminToken = (await cookies()).get("admin-token")?.value
+    if (!adminToken) notFound()
+  }
 
   // Legacy ObjectId URL → 308 permanent redirect to slug URL
   if (result?.resolvedBy === "id") {

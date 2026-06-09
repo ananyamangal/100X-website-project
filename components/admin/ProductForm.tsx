@@ -283,7 +283,7 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
       try {
         await fetch(`/api/admin/products/${productId}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "X-Autosave": "1" },
           body: JSON.stringify(buildProductData()),
         })
         setAutosaveStatus("saved")
@@ -319,6 +319,10 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
     const shortLen = plainTextFromHtml(formData.shortDescription || "").trim().length
     if (shortLen < 50) warnings.push(`Short description is too brief (${shortLen} chars — aim for 50+)`)
     if (!formData.ugcImages?.length) warnings.push("No deployment/UGC images — add field photos for social proof")
+    if (!formData.seoTitle?.trim()) warnings.push("SEO title is missing — affects search engine ranking")
+    if (!formData.metaDescription?.trim()) warnings.push("Meta description is missing — affects Google snippet")
+    if (!formData.specifications?.length) warnings.push("No specifications added — helps buyers compare products")
+    if (!formData.applications?.length) warnings.push("No applications listed — helps buyers find relevant use cases")
 
     if (warnings.length > 0) {
       setValidationWarnings(warnings)
