@@ -174,8 +174,8 @@ export default async function ComparePage({
         {/* Dimension-by-dimension table */}
         <section>
           <h2 className="text-base font-bold text-white mb-4">Dimension-by-Dimension Analysis</h2>
-          <div className="rounded-xl border border-gray-700 overflow-hidden">
-            <div className="grid grid-cols-[200px_1fr_1fr_40px] text-[11px] font-bold text-gray-400 uppercase tracking-widest bg-gray-900 px-4 py-3 border-b border-gray-700">
+          <div className="rounded-xl border border-gray-700 overflow-hidden overflow-x-auto">
+            <div className="grid grid-cols-[180px_1fr_1fr_36px] min-w-[700px] text-[11px] font-bold text-gray-400 uppercase tracking-widest bg-gray-900 px-4 py-3 border-b border-gray-700">
               <span>Dimension</span>
               <span>Current (V1)</span>
               <span>Proposed (V2)</span>
@@ -184,7 +184,7 @@ export default async function ComparePage({
             {COMPARISON.map((row, i) => (
               <div
                 key={i}
-                className={`grid grid-cols-[200px_1fr_1fr_40px] px-4 py-3.5 gap-4 text-sm border-b border-gray-800/60 last:border-b-0 ${i % 2 === 0 ? 'bg-gray-900/40' : 'bg-gray-900/20'}`}
+                className={`grid grid-cols-[180px_1fr_1fr_36px] min-w-[700px] px-4 py-3.5 gap-4 text-sm border-b border-gray-800/60 last:border-b-0 ${i % 2 === 0 ? 'bg-gray-900/40' : 'bg-gray-900/20'}`}
               >
                 <span className="text-gray-300 font-medium leading-snug">{row.dimension}</span>
                 <span className="text-gray-400 leading-relaxed">{row.current}</span>

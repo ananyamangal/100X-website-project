@@ -3,12 +3,11 @@ export const dynamic = "force-dynamic"
 import type { Metadata } from "next"
 import { notFound, permanentRedirect } from "next/navigation"
 import { cookies } from "next/headers"
-import ProductDetailClient from "./ProductDetailClient"
+import ProductDetailV2 from "@/components/product/ProductDetailV2"
 import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import RelatedProductsSection from "@/components/RelatedProductsSection"
 import { getProductBySlugOrId } from "@/lib/productsQuery"
-import clientPromise from "@/lib/mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import ProductAiSummary from "@/components/seo/ProductAiSummary"
@@ -84,11 +83,7 @@ function getYouTubeId(url: string): string | null {
 
 export default async function ProductRoutePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const [result, pageSectionsRaw] = await Promise.all([
-    getProductBySlugOrId(id),
-    clientPromise.then(c => c.db().collection("page_sections").find({ pageKey: "product" }).toArray()),
-  ])
-  const pageSections = JSON.parse(JSON.stringify(pageSectionsRaw))
+  const result = await getProductBySlugOrId(id)
 
   // Block public access to draft products; allow logged-in admins to preview
   if (result?.product?.isPublished === false) {
@@ -106,24 +101,24 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
   }
 
   const product = result?.product ?? null
-  const rawId = product ? String(product._id ?? id) : id
-  const productSlug = product && typeof product.slug === "string" ? product.slug : rawId
+  if (!product) notFound()
+
+  const rawId = String(product._id ?? id)
+  const productSlug = typeof product.slug === "string" ? product.slug : rawId
   const url = `${SITE_URL}/products/${productSlug}`
-  const imgs = product ? absolutizeImages((product.imageUrls as string[]) || []) : []
-  const productName = product ? String(product.name) : ""
-  const category = product && typeof product.category === "string" ? product.category : undefined
-  const rating = product && typeof product.rating === "number" ? product.rating : undefined
-  const reviewsCount =
-    product && typeof product.reviewsCount === "number" ? product.reviewsCount : undefined
-  const priceRange =
-    product && typeof product.priceRange === "string" ? product.priceRange : undefined
-  const inStock = product ? product.inStock !== false : true
-  const features = product && Array.isArray(product.features) ? (product.features as string[]) : []
-  const badges = product && Array.isArray(product.badges) ? (product.badges as string[]) : []
-  const shortDescription = String(product?.shortDescription || product?.detailedDescription || "")
+  const imgs = absolutizeImages((product.imageUrls as string[]) || [])
+  const productName = String(product.name)
+  const category = typeof product.category === "string" ? product.category : undefined
+  const rating = typeof product.rating === "number" ? product.rating : undefined
+  const reviewsCount = typeof product.reviewsCount === "number" ? product.reviewsCount : undefined
+  const priceRange = typeof product.priceRange === "string" ? product.priceRange : undefined
+  const inStock = product.inStock !== false
+  const features = Array.isArray(product.features) ? (product.features as string[]) : []
+  const badges = Array.isArray(product.badges) ? (product.badges as string[]) : []
+  const shortDescription = String(product.shortDescription || product.detailedDescription || "")
 
   // VideoObject schema when product has a YouTube link
-  const youtubeLink = product && typeof product.youtubeLink === "string" ? product.youtubeLink : null
+  const youtubeLink = typeof product.youtubeLink === "string" ? product.youtubeLink : null
   const videoId = youtubeLink ? getYouTubeId(youtubeLink) : null
   const videoJsonLd = videoId
     ? {
@@ -141,49 +136,43 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
 
   return (
     <>
-      {product ? (
-        <>
-          <ProductAiSummary
-            id={rawId}
-            name={productName}
-            category={category ?? ""}
-            shortDescription={shortDescription}
-            priceRange={priceRange}
-            inStock={inStock}
-            features={features}
-            badges={badges}
-          />
-          <ProductJsonLd
-            name={productName}
-            description={shortDescription}
-            images={imgs.length ? imgs : [`${SITE_URL}/logo-main.png`]}
-            url={url}
-            sku={rawId}
-            inStock={inStock}
-            rating={rating}
-            reviewsCount={reviewsCount}
-            priceRange={priceRange}
-            category={category}
-          />
-          {videoJsonLd && (
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }}
-            />
-          )}
-          <BreadcrumbJsonLd
-            items={[
-              { name: "Home", url: "/" },
-              { name: "Products", url: "/products" },
-              { name: productName, url: `/products/${productSlug}` },
-            ]}
-          />
-        </>
-      ) : null}
-      <ProductDetailClient productId={rawId} initialProduct={product ? JSON.parse(JSON.stringify(product)) : undefined} pageSections={pageSections} />
-      {product ? (
-        <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
-      ) : null}
+      <ProductAiSummary
+        id={rawId}
+        name={productName}
+        category={category ?? ""}
+        shortDescription={shortDescription}
+        priceRange={priceRange}
+        inStock={inStock}
+        features={features}
+        badges={badges}
+      />
+      <ProductJsonLd
+        name={productName}
+        description={shortDescription}
+        images={imgs.length ? imgs : [`${SITE_URL}/logo-main.png`]}
+        url={url}
+        sku={rawId}
+        inStock={inStock}
+        rating={rating}
+        reviewsCount={reviewsCount}
+        priceRange={priceRange}
+        category={category}
+      />
+      {videoJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }}
+        />
+      )}
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "/" },
+          { name: "Products", url: "/products" },
+          { name: productName, url: `/products/${productSlug}` },
+        ]}
+      />
+      <ProductDetailV2 product={JSON.parse(JSON.stringify(product))} />
+      <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
     </>
   )
 }

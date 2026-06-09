@@ -60,28 +60,28 @@ export default function DesignComparison({
       </div>
 
       {/* Iframe views */}
-      <div className="mt-4 rounded-xl overflow-hidden border border-gray-700 bg-gray-900" style={{ height: "82vh" }}>
+      <div className="mt-4 rounded-xl overflow-hidden border border-gray-700 bg-gray-900" style={{ height: "82vh", minHeight: 500 }}>
         {tab === "split" && (
-          <div className="flex h-full">
-            <div className="w-1/2 flex flex-col border-r border-gray-700">
+          <div style={{ display: "flex", height: "100%" }}>
+            <div style={{ width: "50%", display: "flex", flexDirection: "column", borderRight: "1px solid #374151" }}>
               <div className="px-3 py-1.5 bg-gray-800 text-[10px] font-bold text-gray-400 uppercase tracking-widest flex-shrink-0">
                 V1 — Current Production
               </div>
-              <iframe src={currentUrl} className="flex-1 w-full" title="Current V1 design" />
+              <iframe src={currentUrl} style={{ flex: 1, width: "100%", height: "100%", border: "none" }} title="Current V1 design" />
             </div>
-            <div className="w-1/2 flex flex-col">
+            <div style={{ width: "50%", display: "flex", flexDirection: "column" }}>
               <div className="px-3 py-1.5 bg-gray-800 text-[10px] font-bold text-amber-400 uppercase tracking-widest flex-shrink-0">
                 V2 — Proposed Redesign
               </div>
-              <iframe src={v2Url} className="flex-1 w-full" title="New V2 design" />
+              <iframe src={v2Url} style={{ flex: 1, width: "100%", height: "100%", border: "none" }} title="New V2 design" />
             </div>
           </div>
         )}
         {tab === "current" && (
-          <iframe src={currentUrl} className="w-full h-full" title="Current V1 design" />
+          <iframe src={currentUrl} style={{ width: "100%", height: "100%", border: "none" }} title="Current V1 design" />
         )}
         {tab === "v2" && (
-          <iframe src={v2Url} className="w-full h-full" title="New V2 design" />
+          <iframe src={v2Url} style={{ width: "100%", height: "100%", border: "none" }} title="New V2 design" />
         )}
       </div>
     </>
