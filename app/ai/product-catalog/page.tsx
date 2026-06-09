@@ -4,6 +4,7 @@ import clientPromise from "@/lib/mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
 import AiSummaryBlock from "@/components/seo/AiSummaryBlock"
 import { AI_PRODUCT_CATEGORIES } from "@/lib/ai/knowledge"
+import { plainTextFromHtml } from "@/lib/rich-text"
 
 export const dynamic = "force-dynamic"
 
@@ -138,7 +139,7 @@ export default async function AiProductCatalogPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="font-semibold text-gray-800">{p.name}</h3>
-                      <p className="text-sm text-gray-500 mt-1">{p.shortDescription}</p>
+                      <p className="text-sm text-gray-500 mt-1">{plainTextFromHtml(p.shortDescription)}</p>
                     </div>
                     <div className="text-right shrink-0">
                       {p.priceRange && (

@@ -1,4 +1,5 @@
 import { SITE_URL } from "@/lib/seo/site-config"
+import { plainTextFromHtml } from "@/lib/rich-text"
 
 interface Props {
   id: string
@@ -18,7 +19,8 @@ interface Props {
 export default function ProductAiSummary({
   id, name, category, shortDescription, priceRange, inStock, features, badges
 }: Props) {
-  const summary = `${name} by 100X Circle Pvt Ltd. Category: ${category}. ${shortDescription ? shortDescription.slice(0, 200) : ""} ${priceRange ? `Price: ${priceRange}.` : ""} In stock: ${inStock ? "Yes" : "No"}. Manufacturer: 100X Circle Pvt Ltd, IMT Manesar, Gurugram, India. ISO 9001:2015 certified. GeM eligible.`
+  const descPlain = plainTextFromHtml(shortDescription)
+  const summary = `${name} by 100X Circle Pvt Ltd. Category: ${category}. ${descPlain ? descPlain.slice(0, 200) : ""} ${priceRange ? `Price: ${priceRange}.` : ""} In stock: ${inStock ? "Yes" : "No"}. Manufacturer: 100X Circle Pvt Ltd, IMT Manesar, Gurugram, India. ISO 9001:2015 certified. GeM eligible.`
 
   return (
     <aside
@@ -34,7 +36,7 @@ export default function ProductAiSummary({
         <dt>Product Name</dt><dd>{name}</dd>
         <dt>Category</dt><dd>{category}</dd>
         <dt>Manufacturer</dt><dd>100X Circle Pvt Ltd</dd>
-        <dt>Description</dt><dd>{shortDescription}</dd>
+        <dt>Description</dt><dd>{descPlain}</dd>
         {priceRange && <><dt>Price Range</dt><dd>{priceRange}</dd></>}
         <dt>Availability</dt><dd>{inStock ? "In Stock" : "Out of Stock"}</dd>
         <dt>Certifications</dt><dd>ISO 9001:2015, GeM listed, MSME/UDYAM</dd>

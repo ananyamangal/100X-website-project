@@ -9,7 +9,7 @@ import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
 import { getLandingPage } from '@/lib/seo/landing-pages';
 import RFQForm from '@/components/forms/RFQForm';
 import PremiumAccordion from '@/components/cinematic/PremiumAccordion';
-import { decodeHtmlEntities } from '@/lib/utils';
+import { plainTextFromHtml } from '@/lib/rich-text';
 
 // ── Utilities ────────────────────────────────────────────────────────────
 
@@ -721,7 +721,7 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
 
                             {/* Short description (not the long one) */}
                             {shortDesc && (
-                                <p className="text-sm text-cinema-300 leading-relaxed line-clamp-3">{decodeHtmlEntities(shortDesc.replace(/<[^>]*>/g, ''))}</p>
+                                <p className="text-sm text-cinema-300 leading-relaxed line-clamp-3">{plainTextFromHtml(shortDesc)}</p>
                             )}
 
                             {/* Featured Specs — 5 most important */}

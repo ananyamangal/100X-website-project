@@ -130,7 +130,7 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
   const inStock = product.inStock !== false
   const features = Array.isArray(product.features) ? (product.features as string[]) : []
   const badges = Array.isArray(product.badges) ? (product.badges as string[]) : []
-  const shortDescription = String(product.shortDescription || product.detailedDescription || "")
+  const shortDescription = plainTextFromHtml(product.shortDescription || product.detailedDescription || "")
 
   // VideoObject schema when product has a YouTube link
   const youtubeLink = typeof product.youtubeLink === "string" ? product.youtubeLink : null

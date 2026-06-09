@@ -11,6 +11,7 @@ import { BUSINESS } from '@/lib/seo/site-config'
 import { MobileCtaOverride } from '@/components/cta/MobileCtaContext'
 import BrochureLeadModal from '@/components/BrochureLeadModal'
 import RFQForm from '@/components/forms/RFQForm'
+import { plainTextFromHtml } from '@/lib/rich-text'
 
 // ── Utilities ──────────────────────────────────────────────────────────────────
 
@@ -632,7 +633,7 @@ export default function ProductDetailV2({ product }: Props) {
   const h1           = s(product.h1Title) || name
   const tagline      = s(product.tagline)
   const price        = s(product.priceRange)
-  const shortDesc    = s(product.shortDescription || product.detailedDescription)
+  const shortDesc    = plainTextFromHtml(product.shortDescription || product.detailedDescription)
   const brochureUrl  = s(product.brochureUrl) || undefined
   const rating       = Number(product.rating) || 0
   const reviews      = Number(product.reviewsCount) || 0

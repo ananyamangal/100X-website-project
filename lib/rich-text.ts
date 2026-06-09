@@ -54,6 +54,9 @@ export function isProbablyRichHtml(s: string | unknown): boolean {
 export function plainTextFromHtml(html: string | unknown): string {
   const str = asHtmlInput(html)
   if (!str) return ""
-  const text = sanitizeHtml(str, { allowedTags: [], allowedAttributes: {} })
-  return text.replace(/\s+/g, " ").trim()
+  // Insert a space before block-level tags so adjacent elements don't get merged
+  const spaced = str.replace(/<\/?(?:p|li|div|br|h[1-6]|ul|ol|tr|td|th)[^>]*>/gi, " ")
+  const text = sanitizeHtml(spaced, { allowedTags: [], allowedAttributes: {} })
+  // sanitize-html decodes &nbsp; to   (non-breaking space); \s does not match it
+  return text.replace(/ /g, " ").replace(/\s+/g, " ").trim()
 }
