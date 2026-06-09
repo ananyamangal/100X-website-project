@@ -7,21 +7,58 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Pencil, Trash2, Wrench, Upload, X, ExternalLink } from "lucide-react"
 
+const ASSEMBLY_GROUPS = [
+  "fuel-system",
+  "chemical-system",
+  "ignition-system",
+  "engine",
+  "blower",
+  "heating-system",
+  "nozzle-system",
+  "filtration",
+  "seals-gaskets",
+  "electrical",
+  "chassis-frame",
+  "other",
+]
+
+const INVENTORY_STATUSES = [
+  { value: "in_stock", label: "In Stock" },
+  { value: "out_of_stock", label: "Out of Stock" },
+  { value: "on_order", label: "On Order" },
+  { value: "discontinued", label: "Discontinued" },
+]
+
 const EMPTY = {
   name: "",
   slug: "",
   sku: "",
+  oemPartNumber: "",
   category: "",
+  assemblyGroup: "",
+  inventoryStatus: "in_stock",
   description: "",
   priceRange: "",
   images: [] as string[],
   specifications: [] as string[],
   compatibleProducts: [] as string[],
   compatibleProductNames: [] as string[],
+  relatedParts: [] as string[],
+  frequentlyBoughtTogether: [] as string[],
   videoUrl: "",
   downloads: [] as Array<{ label: string; url: string }>,
   isPublished: true,
   order: 0,
+}
+
+function buildPartUrl(part: any): string {
+  const productName = part.compatibleProductNames?.[0]
+  if (productName) {
+    const productSlug = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    return `/spare-parts/${productSlug}/${part.slug}`
+  }
+  const cat = (part.category || 'parts').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  return `/spare-parts/${cat}/${part.slug}`
 }
 
 function slugify(s: string) {
@@ -75,7 +112,7 @@ export function SparePartsTab() {
   const reset = () => { setForm({ ...EMPTY }); setEditing(null); setShowForm(false); setMsg(null) }
 
   const startEdit = (p: any) => {
-    setForm({ ...EMPTY, ...p, specifications: Array.isArray(p.specifications) ? p.specifications : [], compatibleProductNames: Array.isArray(p.compatibleProductNames) ? p.compatibleProductNames : [], compatibleProducts: Array.isArray(p.compatibleProducts) ? p.compatibleProducts : [], downloads: Array.isArray(p.downloads) ? p.downloads : [], images: Array.isArray(p.images) ? p.images : [] })
+    setForm({ ...EMPTY, ...p, specifications: Array.isArray(p.specifications) ? p.specifications : [], compatibleProductNames: Array.isArray(p.compatibleProductNames) ? p.compatibleProductNames : [], compatibleProducts: Array.isArray(p.compatibleProducts) ? p.compatibleProducts : [], downloads: Array.isArray(p.downloads) ? p.downloads : [], images: Array.isArray(p.images) ? p.images : [], relatedParts: Array.isArray(p.relatedParts) ? p.relatedParts : [], frequentlyBoughtTogether: Array.isArray(p.frequentlyBoughtTogether) ? p.frequentlyBoughtTogether : [] })
     setEditing(p._id)
     setShowForm(true)
     setMsg(null)
@@ -194,6 +231,23 @@ export function SparePartsTab() {
                   <label className="text-sm font-500 text-gray-700 mb-1 block">Display Order</label>
                   <Input type="number" value={form.order} onChange={(e) => set("order", Number(e.target.value))} />
                 </div>
+                <div>
+                  <label className="text-sm font-500 text-gray-700 mb-1 block">OEM Part Number</label>
+                  <Input value={form.oemPartNumber} onChange={(e) => set("oemPartNumber", e.target.value)} placeholder="e.g. TFS50-CARB-001" />
+                </div>
+                <div>
+                  <label className="text-sm font-500 text-gray-700 mb-1 block">Assembly Group</label>
+                  <select value={form.assemblyGroup} onChange={(e) => set("assemblyGroup", e.target.value)} className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                    <option value="">— Select group —</option>
+                    {ASSEMBLY_GROUPS.map((g) => <option key={g} value={g}>{g.replace(/-/g, ' ')}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-500 text-gray-700 mb-1 block">Inventory Status</label>
+                  <select value={form.inventoryStatus} onChange={(e) => set("inventoryStatus", e.target.value)} className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                    {INVENTORY_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  </select>
+                </div>
               </div>
 
               {/* Description */}
@@ -245,6 +299,19 @@ export function SparePartsTab() {
                 {(form.compatibleProductNames || []).length > 0 && (
                   <p className="text-xs text-green-600 mt-1">Selected: {(form.compatibleProductNames || []).join(", ")}</p>
                 )}
+              </div>
+
+              {/* Related Parts */}
+              <div>
+                <label className="text-sm font-500 text-gray-700 mb-1 block">Related Parts (slugs, one per line)</label>
+                <Textarea value={(form.relatedParts || []).join("\n")} onChange={(e) => set("relatedParts", e.target.value.split("\n").map((s: string) => s.trim()).filter(Boolean))} rows={3} placeholder={"carburetor-assembly\nfuel-filter\nfuel-line"} className="font-mono text-sm" />
+                <p className="text-[11px] text-gray-400 mt-1">Auto-populated by the relationship engine. Edit manually to override.</p>
+              </div>
+
+              {/* Frequently Bought Together */}
+              <div>
+                <label className="text-sm font-500 text-gray-700 mb-1 block">Frequently Bought Together (slugs, one per line)</label>
+                <Textarea value={(form.frequentlyBoughtTogether || []).join("\n")} onChange={(e) => set("frequentlyBoughtTogether", e.target.value.split("\n").map((s: string) => s.trim()).filter(Boolean))} rows={3} placeholder={"spark-plug\nignition-coil"} className="font-mono text-sm" />
               </div>
 
               {/* Downloads */}
@@ -323,7 +390,10 @@ export function SparePartsTab() {
                 </div>
                 <p className="text-xs text-gray-500 mt-0.5">
                   {part.sku && <span className="mr-3">SKU: {part.sku}</span>}
+                  {part.oemPartNumber && <span className="mr-3">OEM: {part.oemPartNumber}</span>}
                   {part.category && <span className="mr-3">{part.category}</span>}
+                  {part.assemblyGroup && <span className="mr-3 text-blue-600">{part.assemblyGroup}</span>}
+                  {part.inventoryStatus && part.inventoryStatus !== "in_stock" && <span className={`mr-3 font-600 ${part.inventoryStatus === "out_of_stock" ? "text-red-500" : part.inventoryStatus === "discontinued" ? "text-gray-400" : "text-amber-600"}`}>{part.inventoryStatus.replace(/_/g, ' ')}</span>}
                   {part.priceRange && <span className="text-green-600 font-600">{part.priceRange}</span>}
                 </p>
                 {part.compatibleProductNames?.length > 0 && (
@@ -332,7 +402,7 @@ export function SparePartsTab() {
               </div>
               {/* Actions */}
               <div className="flex items-center gap-2 flex-shrink-0">
-                <a href={`/spare-parts/${part.slug}`} target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="View on site">
+                <a href={buildPartUrl(part)} target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="View on site">
                   <ExternalLink size={14} />
                 </a>
                 <button onClick={() => startEdit(part)} className="p-2 text-gray-400 hover:text-green-600 transition-colors">

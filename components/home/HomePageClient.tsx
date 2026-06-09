@@ -108,6 +108,16 @@ function itemToString(x: unknown): string {
   return ''
 }
 
+function buildPartUrl(part: any): string {
+  const productName = part.compatibleProductNames?.[0]
+  if (productName) {
+    const productSlug = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    return `/spare-parts/${productSlug}/${part.slug}`
+  }
+  const cat = (part.category || 'parts').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  return `/spare-parts/${cat}/${part.slug}`
+}
+
 const LOGO_PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect fill='%23e5e7eb' width='80' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='10'%3ELogo%3C/text%3E%3C/svg%3E"
 
@@ -337,7 +347,7 @@ export default function HomePageClient({
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {spareParts.slice(0, 4).map((part: any) => (
-                <a key={part._id} href={`/spare-parts/${part.slug || part._id}`}
+                <a key={part._id} href={buildPartUrl(part)}
                   className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/8 hover:border-brand-500/30 transition-all">
                   {part.images?.[0] ? (
                     <div className="aspect-square overflow-hidden bg-gray-900">

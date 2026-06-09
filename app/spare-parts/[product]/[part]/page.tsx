@@ -51,6 +51,30 @@ export default async function SparePartDetailPage({
   const part: any = JSON.parse(JSON.stringify(partRaw))
   const productName = productSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
 
+  // Fetch related and frequently-bought-together parts
+  const relatedSlugs: string[] = Array.isArray(part.relatedParts) ? part.relatedParts.filter(Boolean).slice(0, 6) : []
+  const fbtSlugs: string[] = Array.isArray(part.frequentlyBoughtTogether) ? part.frequentlyBoughtTogether.filter(Boolean).slice(0, 4) : []
+  const allReferencedSlugs = [...new Set([...relatedSlugs, ...fbtSlugs])]
+
+  const referencedPartsRaw = allReferencedSlugs.length > 0
+    ? await db.collection("spare_parts").find({ slug: { $in: allReferencedSlugs }, isPublished: true }).toArray()
+    : []
+  const referencedParts = JSON.parse(JSON.stringify(referencedPartsRaw))
+  const partBySlug: Record<string, any> = {}
+  for (const p of referencedParts) partBySlug[p.slug] = p
+
+  function buildUrl(p: any): string {
+    const pn = p.compatibleProductNames?.[0]
+    if (pn) {
+      const ps = pn.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+      return `/spare-parts/${ps}/${p.slug}`
+    }
+    return `/spare-parts/${productSlug}/${p.slug}`
+  }
+
+  const relatedPartsData = relatedSlugs.map((s) => partBySlug[s]).filter(Boolean)
+  const fbtPartsData = fbtSlugs.map((s) => partBySlug[s]).filter(Boolean)
+
   const waText = `Hi, I need the spare part "${part.name}" for my ${productName}. Please share pricing.`
   const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waText)}`
 
@@ -120,7 +144,18 @@ export default async function SparePartDetailPage({
             {/* Info */}
             <div>
               {part.category && <p className="eyebrow text-brand-400 mb-3">{part.category}</p>}
-              {part.sku && <p className="text-cinema-500 text-xs font-600 mb-2 uppercase tracking-widest">SKU: {part.sku}</p>}
+              <div className="flex items-center gap-3 flex-wrap mb-2">
+                {part.sku && <p className="text-cinema-500 text-xs font-600 uppercase tracking-widest">SKU: {part.sku}</p>}
+                {part.oemPartNumber && <p className="text-cinema-500 text-xs font-600 uppercase tracking-widest">OEM: {part.oemPartNumber}</p>}
+                {part.inventoryStatus && part.inventoryStatus !== "in_stock" && (
+                  <span className={`text-xs font-600 px-2 py-0.5 rounded-full ${part.inventoryStatus === "out_of_stock" ? "bg-red-900/40 text-red-400" : part.inventoryStatus === "discontinued" ? "bg-gray-800 text-cinema-500" : "bg-amber-900/40 text-amber-400"}`}>
+                    {part.inventoryStatus === "out_of_stock" ? "Out of Stock" : part.inventoryStatus === "on_order" ? "On Order" : "Discontinued"}
+                  </span>
+                )}
+                {(!part.inventoryStatus || part.inventoryStatus === "in_stock") && (
+                  <span className="text-xs font-600 px-2 py-0.5 rounded-full bg-green-900/40 text-green-400">In Stock</span>
+                )}
+              </div>
               <h1 className="text-3xl md:text-4xl font-800 text-white mb-4 text-balance">{part.name}</h1>
 
               {part.priceRange && <p className="text-2xl font-800 text-brand-400 mb-5">{part.priceRange}</p>}
@@ -192,6 +227,65 @@ export default async function SparePartDetailPage({
                     </div>
                   )
                 })}
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+      )}
+
+      {/* ── FREQUENTLY BOUGHT TOGETHER ───────────────────────────── */}
+      {fbtPartsData.length > 0 && (
+        <section className="py-14 bg-gray-950">
+          <div className="container mx-auto px-4 md:px-6">
+            <ScrollReveal animation="fade-up">
+              <p className="eyebrow text-brand-400 mb-2">Often ordered together</p>
+              <h2 className="text-xl font-700 text-white mb-6">Frequently Bought Together</h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {fbtPartsData.map((p: any) => (
+                  <a key={p._id} href={buildUrl(p)} className="group flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-3 hover:border-brand-500/40 hover:bg-white/8 transition-all">
+                    {p.images?.[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.images[0]} alt={p.name} className="w-14 h-14 object-contain bg-white rounded-lg p-1 flex-shrink-0" loading="lazy" />
+                    ) : (
+                      <div className="w-14 h-14 bg-cinema-800 rounded-lg flex items-center justify-center flex-shrink-0"><Wrench size={18} className="text-cinema-600" /></div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-xs text-cinema-500 mb-0.5">{p.category || "Spare Part"}</p>
+                      <p className="text-sm font-600 text-white leading-snug group-hover:text-brand-400 transition-colors line-clamp-2">{p.name}</p>
+                      {p.priceRange && <p className="text-xs text-brand-400 font-600 mt-1">{p.priceRange}</p>}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+      )}
+
+      {/* ── RELATED SPARE PARTS ──────────────────────────────────── */}
+      {relatedPartsData.length > 0 && (
+        <section className="py-14 bg-white">
+          <div className="container mx-auto px-4 md:px-6">
+            <ScrollReveal animation="fade-up">
+              <p className="eyebrow text-brand-600 mb-2">Same assembly group</p>
+              <h2 className="text-xl font-700 text-gray-900 mb-6">Related Spare Parts</h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {relatedPartsData.map((p: any) => (
+                  <a key={p._id} href={buildUrl(p)} className="group flex items-center gap-3 border border-gray-100 rounded-xl p-3 hover:border-brand-200 hover:shadow-sm transition-all">
+                    {p.images?.[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.images[0]} alt={p.name} className="w-14 h-14 object-contain bg-gray-50 rounded-lg p-1 flex-shrink-0" loading="lazy" />
+                    ) : (
+                      <div className="w-14 h-14 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0"><Wrench size={18} className="text-gray-400" /></div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-400 mb-0.5">{p.category || "Spare Part"}</p>
+                      <p className="text-sm font-600 text-gray-900 leading-snug group-hover:text-brand-700 transition-colors line-clamp-2">{p.name}</p>
+                      {p.priceRange && <p className="text-xs text-brand-600 font-600 mt-1">{p.priceRange}</p>}
+                    </div>
+                    <ArrowRight size={14} className="ml-auto text-gray-300 group-hover:text-brand-500 flex-shrink-0 transition-colors" />
+                  </a>
+                ))}
               </div>
             </ScrollReveal>
           </div>

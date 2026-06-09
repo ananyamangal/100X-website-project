@@ -1794,6 +1794,9 @@ function MigrationTab() {
   const [seedingBadges, setSeedingBadges] = useState(false)
   const [seedingCerts, setSeedingCerts] = useState(false)
   const [cleaningEntities, setCleaningEntities] = useState(false)
+  const [buildingRelationships, setBuildingRelationships] = useState(false)
+  const [spAudit, setSpAudit] = useState<any>(null)
+  const [runningSpAudit, setRunningSpAudit] = useState(false)
   const [notification, setNotification] = useState<{ type: "success" | "error"; msg: string } | null>(null)
   const [showAllProducts, setShowAllProducts] = useState(false)
   const [showSsot, setShowSsot] = useState(false)
@@ -1913,6 +1916,28 @@ function MigrationTab() {
     finally { setCleaningEntities(false) }
   }
 
+  const runBuildRelationships = async () => {
+    if (!confirm("Auto-assign assembly groups and build relatedParts / frequentlyBoughtTogether for all spare parts? Safe to re-run.")) return
+    setBuildingRelationships(true)
+    try {
+      const r = await fetch("/api/admin/migrate?action=build-part-relationships", { method: "POST" })
+      const d = await r.json()
+      const groupSummary = Object.entries(d.groups || {}).map(([k, v]) => `${k}:${v}`).join(", ")
+      notify("success", `${d.message} | Groups: ${groupSummary}`)
+    } catch { notify("error", "Relationship build failed.") }
+    finally { setBuildingRelationships(false) }
+  }
+
+  const runSparePartsAudit = async () => {
+    setRunningSpAudit(true)
+    try {
+      const r = await fetch("/api/admin/migrate?action=spare-parts-audit", { method: "POST" })
+      const d = await r.json()
+      setSpAudit(d)
+    } catch { notify("error", "Spare parts audit failed.") }
+    finally { setRunningSpAudit(false) }
+  }
+
   const total = health?.summary?.total || 0
   const productRows: any[] = health?.products || []
   const problemProducts = productRows.filter((p: any) => p.issues.length > 0)
@@ -1984,7 +2009,61 @@ function MigrationTab() {
         <Button onClick={runCleanEntities} disabled={cleaningEntities} variant="outline" className="text-sm border-purple-300 text-purple-700 hover:bg-purple-50">
           {cleaningEntities ? "Cleaning…" : "Clean HTML Entities"}
         </Button>
+        <Button onClick={runBuildRelationships} disabled={buildingRelationships} variant="outline" className="text-sm border-green-400 text-green-700 hover:bg-green-50">
+          {buildingRelationships ? "Building…" : "Build Spare Part Relationships"}
+        </Button>
+        <Button onClick={runSparePartsAudit} disabled={runningSpAudit} variant="outline" className="text-sm border-teal-400 text-teal-700 hover:bg-teal-50">
+          {runningSpAudit ? "Auditing…" : "Spare Parts Audit"}
+        </Button>
       </div>
+
+      {/* Spare Parts Audit Results */}
+      {spAudit && (
+        <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 text-sm space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="font-700 text-teal-900">Spare Parts Audit</h3>
+            <button onClick={() => setSpAudit(null)} className="text-teal-400 hover:text-teal-700 text-xs">Dismiss</button>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-white rounded-lg p-2 text-center border border-teal-100">
+              <p className="text-xl font-bold text-teal-700">{spAudit.summary?.total}</p>
+              <p className="text-xs text-gray-500">Total Parts</p>
+            </div>
+            <div className="bg-white rounded-lg p-2 text-center border border-teal-100">
+              <p className="text-xl font-bold text-green-600">{spAudit.summary?.published}</p>
+              <p className="text-xs text-gray-500">Published</p>
+            </div>
+            <div className="bg-white rounded-lg p-2 text-center border border-teal-100">
+              <p className="text-xl font-bold text-amber-600">{spAudit.summary?.unpublished}</p>
+              <p className="text-xs text-gray-500">Unpublished</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-1 text-xs">
+            {Object.entries(spAudit.issues || {}).map(([k, v]) => (
+              <div key={k} className={`flex justify-between px-2 py-1 rounded ${Number(v) > 0 ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
+                <span>{k.replace(/([A-Z])/g, " $1").toLowerCase()}</span>
+                <span className="font-700">{String(v)}</span>
+              </div>
+            ))}
+          </div>
+          {spAudit.details?.slugAnomalies?.length > 0 && (
+            <div>
+              <p className="font-600 text-red-700 mb-1">Slug anomalies:</p>
+              {spAudit.details.slugAnomalies.map((a: any, i: number) => (
+                <p key={i} className="text-xs text-red-600 font-mono">{a.name}: slug="{a.slug}" expected="{a.expected}"</p>
+              ))}
+            </div>
+          )}
+          {spAudit.details?.orphanedParts?.length > 0 && (
+            <div>
+              <p className="font-600 text-red-700 mb-1">Orphaned parts (no compatible products):</p>
+              {spAudit.details.orphanedParts.map((p: any, i: number) => (
+                <p key={i} className="text-xs text-red-600">{p.name} ({p.slug})</p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {health && (
         <>

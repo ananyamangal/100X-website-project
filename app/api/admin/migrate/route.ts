@@ -425,6 +425,144 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    if (action === 'build-part-relationships') {
+      // Auto-detect assembly group from part name/category, then link related parts
+      const COMPLEMENTARY: Record<string, string[]> = {
+        'fuel-system':      ['ignition-system', 'filtration'],
+        'ignition-system':  ['fuel-system', 'electrical'],
+        'chemical-system':  ['nozzle-system', 'seals-gaskets'],
+        'nozzle-system':    ['chemical-system', 'filtration'],
+        'heating-system':   ['fuel-system'],
+        'blower':           ['chassis-frame'],
+        'seals-gaskets':    ['chemical-system', 'fuel-system'],
+        'filtration':       ['fuel-system', 'chemical-system'],
+        'electrical':       ['ignition-system'],
+        'engine':           ['fuel-system', 'ignition-system'],
+      }
+
+      function detectGroup(part: any): string {
+        const t = `${part.name} ${part.category || ''}`.toLowerCase()
+        if (t.match(/carburetor|carb|fuel.?cap|fuel.?tank|fuel.?line|fuel.?filter|fuel.?pipe|fuel.?hose/)) return 'fuel-system'
+        if (t.match(/valve|chemical.?tank|chemical.?hose|chemical.?pipe|spray.?tip/)) return 'chemical-system'
+        if (t.match(/ignition|spark.?plug|coil|igniter/)) return 'ignition-system'
+        if (t.match(/engine|piston|ring|crankshaft|cylinder|connecting.?rod/)) return 'engine'
+        if (t.match(/blower|fan|impeller/)) return 'blower'
+        if (t.match(/heat.?shield|heat.?element|vaporizer|heating/)) return 'heating-system'
+        if (t.match(/nozzle/)) return 'nozzle-system'
+        if (t.match(/filter/)) return 'filtration'
+        if (t.match(/seal|gasket|o.?ring/)) return 'seals-gaskets'
+        if (t.match(/electric|switch|wire|cable|battery|sensor/)) return 'electrical'
+        if (t.match(/frame|chassis|handle|strap|bracket/)) return 'chassis-frame'
+        return 'other'
+      }
+
+      const allParts = await db.collection('spare_parts').find({}).toArray()
+
+      // Assign assemblyGroup where missing
+      for (const p of allParts) {
+        if (!p.assemblyGroup) {
+          const g = detectGroup(p)
+          await db.collection('spare_parts').updateOne({ _id: p._id }, { $set: { assemblyGroup: g, updatedAt: new Date().toISOString() } })
+          p.assemblyGroup = g
+        }
+      }
+
+      // Re-fetch with updated groups
+      const parts = await db.collection('spare_parts').find({}).toArray()
+      const byGroup: Record<string, any[]> = {}
+      for (const p of parts) {
+        const g = p.assemblyGroup || 'other'
+        if (!byGroup[g]) byGroup[g] = []
+        byGroup[g].push(p)
+      }
+
+      let updated = 0
+      for (const p of parts) {
+        const g = p.assemblyGroup || 'other'
+        // Related = same group, excluding self
+        const relatedSlugs = (byGroup[g] || []).filter((x: any) => String(x._id) !== String(p._id)).map((x: any) => x.slug).filter(Boolean)
+        // Frequently bought together = parts from complementary groups (up to 4)
+        const complementGroups = COMPLEMENTARY[g] || []
+        const fbtSlugs: string[] = []
+        for (const cg of complementGroups) {
+          for (const cp of (byGroup[cg] || []).slice(0, 2)) {
+            if (cp.slug && !fbtSlugs.includes(cp.slug)) fbtSlugs.push(cp.slug)
+          }
+        }
+        // Only update if values actually changed (avoid unnecessary writes)
+        const existingRel = JSON.stringify((p.relatedParts || []).sort())
+        const newRel = JSON.stringify([...relatedSlugs].sort())
+        const existingFbt = JSON.stringify((p.frequentlyBoughtTogether || []).sort())
+        const newFbt = JSON.stringify([...fbtSlugs].sort())
+        if (existingRel !== newRel || existingFbt !== newFbt) {
+          await db.collection('spare_parts').updateOne(
+            { _id: p._id },
+            { $set: { relatedParts: relatedSlugs, frequentlyBoughtTogether: fbtSlugs, updatedAt: new Date().toISOString() } }
+          )
+          updated++
+        }
+      }
+
+      return NextResponse.json({
+        success: true, action: 'build-part-relationships',
+        totalParts: parts.length,
+        updatedParts: updated,
+        groups: Object.fromEntries(Object.entries(byGroup).map(([k, v]) => [k, v.length])),
+        message: `Built relationships for ${updated} of ${parts.length} spare parts across ${Object.keys(byGroup).length} assembly groups`,
+      })
+    }
+
+    if (action === 'spare-parts-audit') {
+      const allParts = await db.collection('spare_parts').find({}).toArray()
+      const products = await db.collection('products').find({}, { projection: { _id: 1, name: 1, slug: 1 } }).toArray()
+      const productNameSet = new Set(products.map((p: any) => String(p.name).toLowerCase()))
+
+      const total = allParts.length
+      const published = allParts.filter((p: any) => p.isPublished).length
+      const unpublished = total - published
+      const orphaned = allParts.filter((p: any) => !Array.isArray(p.compatibleProductNames) || p.compatibleProductNames.length === 0)
+      const missingSlug = allParts.filter((p: any) => !p.slug || p.slug.trim() === '')
+      const noAssemblyGroup = allParts.filter((p: any) => !p.assemblyGroup)
+      const noRelatedParts = allParts.filter((p: any) => !Array.isArray(p.relatedParts) || p.relatedParts.length === 0)
+      const noFbt = allParts.filter((p: any) => !Array.isArray(p.frequentlyBoughtTogether) || p.frequentlyBoughtTogether.length === 0)
+
+      // Slug anomalies: parts where slug doesn't match name
+      const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-')
+      const slugAnomalies = allParts
+        .filter((p: any) => p.slug && p.name && p.slug !== slugify(p.name) && Math.abs(p.slug.length - p.name.length) > 5)
+        .map((p: any) => ({ name: p.name, slug: p.slug, expected: slugify(p.name) }))
+
+      // Unresolved compatible product references
+      const unresolvedRefs: string[] = []
+      for (const p of allParts) {
+        for (const name of (p.compatibleProductNames || [])) {
+          if (!productNameSet.has(String(name).toLowerCase())) {
+            if (!unresolvedRefs.includes(String(name))) unresolvedRefs.push(String(name))
+          }
+        }
+      }
+
+      return NextResponse.json({
+        success: true, action: 'spare-parts-audit',
+        summary: { total, published, unpublished },
+        issues: {
+          orphaned: orphaned.length,
+          missingSlug: missingSlug.length,
+          noAssemblyGroup: noAssemblyGroup.length,
+          noRelatedParts: noRelatedParts.length,
+          noFrequentlyBoughtTogether: noFbt.length,
+          slugAnomalies: slugAnomalies.length,
+          unresolvedCompatibleProducts: unresolvedRefs.length,
+        },
+        details: {
+          orphanedParts: orphaned.map((p: any) => ({ name: p.name, slug: p.slug })),
+          slugAnomalies,
+          unresolvedCompatibleProducts: unresolvedRefs,
+          missingSlugParts: missingSlug.map((p: any) => ({ name: p.name, id: String(p._id) })),
+        },
+      })
+    }
+
     // Default: full migration
     const products = await db.collection('products').find({}).toArray()
     const report = {
