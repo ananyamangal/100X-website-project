@@ -17,6 +17,7 @@ import BrochureLeadModal from "@/components/BrochureLeadModal"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
 import { type HomeContent } from "@/lib/homeContentTypes"
+import { HOMEPAGE_SECTIONS, resolveSections, toSectionMap, type PageSectionRecord } from "@/lib/pageSections"
 
 // Below-the-fold: lazy-loaded — reduces initial JS bundle by ~40%
 const AccreditationsStrip = dynamic(() => import("@/components/home/AccreditationsStrip"))
@@ -67,6 +68,7 @@ interface HomePageClientProps {
   homepageSections?: any[]
   spareParts?: any[]
   trustBadges?: any[]
+  pageSections?: any[]  // raw PageSectionRecord[] from page_sections collection
 }
 
 const getYouTubeId = (url: string): string | null => {
@@ -283,6 +285,7 @@ export default function HomePageClient({
   homepageSections = [],
   spareParts = [],
   trustBadges = [],
+  pageSections = [],
 }: HomePageClientProps) {
   const router = useRouter()
   const [brochureModalOpen, setBrochureModalOpen] = useState(false)
@@ -311,105 +314,104 @@ export default function HomePageClient({
     setBrochureModalOpen(true)
   }
 
+  // ── CMS section control ────────────────────────────────────────────────────
+  // Merge DB overrides with hardcoded defaults. Falls back to all-enabled
+  // default order when pageSections is empty (DB never populated yet).
+  const resolvedSections = resolveSections(HOMEPAGE_SECTIONS, pageSections as PageSectionRecord[])
+  const sectionMap = toSectionMap(resolvedSections)
+  const isEnabled = (key: string) => sectionMap[key]?.isEnabled !== false
+
+  // Section renderer map — keys match HOMEPAGE_SECTIONS keys
+  const sectionRenderers: Record<string, () => React.ReactNode> = {
+    hero: () => (
+      <>
+        <HeroBlock heroSlides={heroSlides} />
+        <CelebritySectionsBlock sections={homepageSections} placement="after-hero" />
+      </>
+    ),
+    accreditations: () => <AccreditationsStrip accreditations={accreditations} />,
+    products: () => (
+      <>
+        <CinematicProductsSection products={products} onBrochureDownload={handleBrochureDownload} />
+        <CelebritySectionsBlock sections={homepageSections} placement="after-products" />
+      </>
+    ),
+    spare_parts: () => spareParts.length > 0 ? (
+      <section className="py-12 md:py-16 bg-gray-950" aria-labelledby="spare-parts-heading">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
+            <div>
+              <p className="text-xs font-700 text-brand-400 uppercase tracking-widest mb-1">
+                {sectionMap['spare_parts']?.eyebrow || 'Genuine Parts'}
+              </p>
+              <h2 id="spare-parts-heading" className="text-xl md:text-2xl font-700 text-white">
+                {sectionMap['spare_parts']?.heading || 'Spare Parts & Accessories'}
+              </h2>
+            </div>
+            <a href="/spare-parts" className="shrink-0 inline-flex items-center gap-2 px-4 py-2 border border-white/20 text-white hover:bg-white/10 rounded-full text-sm font-500 transition-all">
+              {sectionMap['spare_parts']?.ctaText || 'View All →'}
+            </a>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {spareParts.slice(0, 4).map((part: any) => (
+              <a key={part._id} href={buildPartUrl(part)}
+                className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/8 hover:border-brand-500/30 transition-all">
+                {part.images?.[0] ? (
+                  <div className="aspect-square overflow-hidden bg-gray-900">
+                    <img src={part.images[0]} alt={part.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                  </div>
+                ) : (
+                  <div className="aspect-square bg-gray-800 flex items-center justify-center">
+                    <span className="text-3xl text-gray-600">⚙️</span>
+                  </div>
+                )}
+                <div className="p-4">
+                  <p className="text-xs text-cinema-500 mb-1">{part.category || 'Spare Part'}</p>
+                  <h3 className="text-sm font-600 text-white mb-1 leading-snug group-hover:text-brand-400 transition-colors">{part.name}</h3>
+                  {part.priceRange && <p className="text-xs text-brand-400 font-600">{part.priceRange}</p>}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    ) : null,
+    industry_applications: () => <IndustryApplicationsSection />,
+    manufacturer_story: () => <ManufacturerIntroBlock content={homeContent.manufacturerIntro} />,
+    technology: () => <TechnologyBlock content={homeContent.technology} />,
+    rfq_midpage: () => (
+      <>
+        <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
+        <RFQMidPageBlock />
+      </>
+    ),
+    youtube_shorts: () => <YoutubeShortsCarousel />,
+    customers: () => <OurCustomersScroll customers={customers} />,
+    reviews: () => <ReviewsSection limit={4} />,
+    trust_certifications: () => <CinematicTrustSection accreditations={accreditations} />,
+    specialised_buyers: () => <SpecialisedBuyersBlock />,
+    blog: () => <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />,
+    faq: () => (
+      <>
+        <CelebritySectionsBlock sections={homepageSections} placement="before-faq" />
+        <FAQSection faqs={homeContent.faqs} />
+      </>
+    ),
+    cta_final: () => <CinematicCTASection />,
+  }
+
   const renderHomePage = () => (
     <>
       <HomepageJsonLd />
-
-      {/* Page-level H1 — visually hidden but present for SEO and screen readers.
-          The hero section uses image banners with no text overlay on desktop,
-          so this ensures a primary heading exists in all viewport contexts. */}
+      {/* Page-level H1 — visually hidden but present for SEO and screen readers */}
       <h1 className="sr-only">100X Circle — Thermal Fogging Machine Manufacturer in India</h1>
 
-      {/* 1. HERO */}
-      <HeroBlock heroSlides={heroSlides} />
-
-      {/* 2. ADMIN CUSTOM SECTIONS (after-hero placement only) */}
-      <CelebritySectionsBlock sections={homepageSections} placement="after-hero" />
-
-      {/* 3. ACCREDITATIONS — compact trust strip */}
-      <AccreditationsStrip accreditations={accreditations} />
-
-      {/* 4. PRODUCTS */}
-      <CinematicProductsSection products={products} onBrochureDownload={handleBrochureDownload} />
-
-      {/* 5. SPARE PARTS — cross-sell, 4 items max */}
-      {spareParts.length > 0 && (
-        <section className="py-12 md:py-16 bg-gray-950" aria-labelledby="spare-parts-heading">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
-              <div>
-                <p className="text-xs font-700 text-brand-400 uppercase tracking-widest mb-1">Genuine Parts</p>
-                <h2 id="spare-parts-heading" className="text-xl md:text-2xl font-700 text-white">Spare Parts &amp; Accessories</h2>
-              </div>
-              <a href="/spare-parts" className="shrink-0 inline-flex items-center gap-2 px-4 py-2 border border-white/20 text-white hover:bg-white/10 rounded-full text-sm font-500 transition-all">
-                View All →
-              </a>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {spareParts.slice(0, 4).map((part: any) => (
-                <a key={part._id} href={buildPartUrl(part)}
-                  className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/8 hover:border-brand-500/30 transition-all">
-                  {part.images?.[0] ? (
-                    <div className="aspect-square overflow-hidden bg-gray-900">
-                      <img src={part.images[0]} alt={part.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-                    </div>
-                  ) : (
-                    <div className="aspect-square bg-gray-800 flex items-center justify-center">
-                      <span className="text-3xl text-gray-600">⚙️</span>
-                    </div>
-                  )}
-                  <div className="p-4">
-                    <p className="text-xs text-cinema-500 mb-1">{part.category || 'Spare Part'}</p>
-                    <h3 className="text-sm font-600 text-white mb-1 leading-snug group-hover:text-brand-400 transition-colors">{part.name}</h3>
-                    {part.priceRange && <p className="text-xs text-brand-400 font-600">{part.priceRange}</p>}
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 6. ADMIN SECTIONS — after products (celebrity endorsement, comparison) */}
-      <CelebritySectionsBlock sections={homepageSections} placement="after-products" />
-
-      {/* 7. INDUSTRY APPLICATIONS */}
-      <IndustryApplicationsSection />
-
-      {/* 8. BRAND STORY */}
-      <ManufacturerIntroBlock content={homeContent.manufacturerIntro} />
-
-      {/* PULSE-JET TECHNOLOGY — how it works, video + accordion steps */}
-      <TechnologyBlock content={homeContent.technology} />
-
-      {/* 9. ADMIN SECTIONS — before trust (authority, technology pillars) */}
-      <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
-
-      {/* 10. MID-PAGE RFQ */}
-      <RFQMidPageBlock />
-
-      {/* 11. SOCIAL PROOF — YouTube + customers + reviews */}
-      <YoutubeShortsCarousel />
-      <OurCustomersScroll customers={customers} />
-      <ReviewsSection limit={4} />
-
-      {/* 12. TRUST & CERTIFICATIONS */}
-      <CinematicTrustSection accreditations={accreditations} />
-
-      {/* 13. SPECIALISED BUYERS — B2B segments */}
-      <SpecialisedBuyersBlock />
-
-      {/* 14. ADMIN SECTIONS — before FAQ (manufacturing authority) */}
-      <CelebritySectionsBlock sections={homepageSections} placement="before-faq" />
-
-      {/* 15. BLOG */}
-      <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />
-
-      {/* 16. FAQ */}
-      <FAQSection faqs={homeContent.faqs} />
-
-      {/* 17. FINAL CTA */}
-      <CinematicCTASection />
+      {resolvedSections.map(section => {
+        if (!section.isEnabled) return null
+        const renderer = sectionRenderers[section.key]
+        if (!renderer) return null
+        return <React.Fragment key={section.key}>{renderer()}</React.Fragment>
+      })}
     </>
   )
 

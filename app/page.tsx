@@ -38,7 +38,7 @@ export default async function HomePage() {
   const client = await clientPromise
   const db = client.db()
 
-  const [productsRaw, bannersRaw, blogsRaw, accreditationsRaw, customersRaw, brochureDoc, homeContent, homepageSectionsRaw, sparePartsRaw, trustBadgesRaw] =
+  const [productsRaw, bannersRaw, blogsRaw, accreditationsRaw, customersRaw, brochureDoc, homeContent, homepageSectionsRaw, sparePartsRaw, trustBadgesRaw, pageSectionsRaw] =
     await Promise.all([
       db.collection("products").find({}).toArray(),
       db.collection("banners").find({}).toArray(),
@@ -57,6 +57,7 @@ export default async function HomePage() {
       db.collection("homepage_sections").find({ enabled: true }).sort({ order: 1 }).toArray(),
       db.collection("spare_parts").find({ isPublished: true }).sort({ order: 1 }).limit(8).toArray(),
       db.collection("trust_badges").find({ isActive: true }).sort({ order: 1 }).toArray(),
+      db.collection("page_sections").find({ pageKey: "homepage" }).toArray(),
     ])
 
   // Serialize MongoDB docs (ObjectId → hex string, Date → ISO string)
@@ -80,6 +81,7 @@ export default async function HomePage() {
   const homepageSections = JSON.parse(JSON.stringify(homepageSectionsRaw))
   const spareParts = JSON.parse(JSON.stringify(sparePartsRaw))
   const trustBadges = JSON.parse(JSON.stringify(trustBadgesRaw))
+  const pageSections = JSON.parse(JSON.stringify(pageSectionsRaw))
 
   return (
     <>
@@ -97,6 +99,7 @@ export default async function HomePage() {
         homepageSections={homepageSections}
         spareParts={spareParts}
         trustBadges={trustBadges}
+        pageSections={pageSections}
       />
     </>
   )

@@ -7,6 +7,7 @@ import {
   Users, ShoppingBag, Megaphone, Settings2, ScrollText,
   BarChart2, TrendingUp, ArrowLeft, Zap, Plug,
   PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck, ClipboardList, Monitor,
+  Layout,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -32,6 +33,7 @@ const MODULES: Module[] = [
   { href: "/admin/growth/competitors",      label: "Competitor Intel",     icon: Radar,           permission: "competitors.view" },
   { href: "/admin/growth/opportunities",    label: "Opportunity Engine",   icon: Lightbulb,       permission: "opportunities.view", badge: "NEW" },
   { href: "/admin/growth/content",          label: "Content Factory",      icon: FileText,        permission: "content.view" },
+  { href: "/admin/growth/page-sections",   label: "Page Section Builder", icon: Layout,          permission: "content.view" },
   { href: "/admin/growth/procurement",      label: "Procurement Intel",    icon: ShoppingBag,     permission: "procurement.view",  badge: "NEW" },
   { href: "/admin/growth/dealers",          label: "Dealer Intelligence",  icon: Users,           permission: "dealer.view" },
   { href: "/admin/growth/gem",              label: "GeM Intel (Legacy)",   icon: ShoppingBag,     permission: "procurement.view" },

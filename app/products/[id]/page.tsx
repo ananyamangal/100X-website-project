@@ -8,6 +8,7 @@ import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import RelatedProductsSection from "@/components/RelatedProductsSection"
 import { getProductBySlugOrId } from "@/lib/productsQuery"
+import clientPromise from "@/lib/mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import ProductAiSummary from "@/components/seo/ProductAiSummary"
@@ -83,7 +84,11 @@ function getYouTubeId(url: string): string | null {
 
 export default async function ProductRoutePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const result = await getProductBySlugOrId(id)
+  const [result, pageSectionsRaw] = await Promise.all([
+    getProductBySlugOrId(id),
+    clientPromise.then(c => c.db().collection("page_sections").find({ pageKey: "product" }).toArray()),
+  ])
+  const pageSections = JSON.parse(JSON.stringify(pageSectionsRaw))
 
   // Block public access to draft products; allow logged-in admins to preview
   if (result?.product?.isPublished === false) {
@@ -175,7 +180,7 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
           />
         </>
       ) : null}
-      <ProductDetailClient productId={rawId} initialProduct={product ? JSON.parse(JSON.stringify(product)) : undefined} />
+      <ProductDetailClient productId={rawId} initialProduct={product ? JSON.parse(JSON.stringify(product)) : undefined} pageSections={pageSections} />
       {product ? (
         <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
       ) : null}

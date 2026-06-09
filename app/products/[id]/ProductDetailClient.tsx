@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { RichContent } from '@/components/RichContent';
+import { PRODUCT_SECTIONS, resolveSections, toSectionMap, type PageSectionRecord } from '@/lib/pageSections';
 import { MobileCtaOverride } from '@/components/cta/MobileCtaContext';
 import RFQForm from '@/components/forms/RFQForm';
 import BrochureLeadModal from '@/components/BrochureLeadModal';
@@ -692,9 +693,9 @@ const DEFAULT_FAQS = [
   { q: 'Can I get a demonstration before purchasing?', a: 'Yes. Product demonstrations at our Gurugram facility or at your location for bulk inquiries. Contact us to schedule.' },
 ];
 
-interface Props { productId: string; initialProduct?: Record<string, unknown>; }
+interface Props { productId: string; initialProduct?: Record<string, unknown>; pageSections?: any[] }
 
-export default function ProductDetailClient({ productId, initialProduct }: Props) {
+export default function ProductDetailClient({ productId, initialProduct, pageSections = [] }: Props) {
   const [product, setProduct] = useState<any>(initialProduct ?? null);
   const [loading, setLoading] = useState(!initialProduct);
   const [brochureOpen, setBrochureOpen] = useState(false);
@@ -908,42 +909,47 @@ export default function ProductDetailClient({ productId, initialProduct }: Props
         </div>
       </div>
 
-      {/* ══ FULL SPECS — always visible below two columns ═══════════════════ */}
-      {specs.length > 0 && (
-        <section className="py-16 bg-white border-t border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 md:px-6">
-            <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-2">Technical Details</p>
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Full Specifications</h2>
-            <div className="max-w-3xl">
-              <SpecsTable specs={specs} youtubeLink={s(product.youtubeLink) || undefined} />
-            </div>
-          </div>
-        </section>
-      )}
+      {/* ══ CMS-DRIVEN BELOW-FOLD SECTIONS ══════════════════════════════════ */}
+      {(() => {
+        const resolvedSections = resolveSections(PRODUCT_SECTIONS, pageSections as PageSectionRecord[])
+        const sectionMap = toSectionMap(resolvedSections)
+        const on = (key: string) => sectionMap[key]?.isEnabled !== false
 
-      {/* ══ FEATURED VIDEO — large embed, dark section ══════════════════════ */}
-      {videoId && <FeaturedVideoSection videoId={videoId} productName={name} />}
+        // Section renderers keyed by PRODUCT_SECTIONS key
+        const renderers: Record<string, () => React.ReactNode> = {
+          full_specs: () => specs.length > 0 ? (
+            <section className="py-16 bg-white border-t border-gray-100">
+              <div className="max-w-7xl mx-auto px-4 md:px-6">
+                <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-2">
+                  {sectionMap['full_specs']?.eyebrow || 'Technical Details'}
+                </p>
+                <h2 className="text-2xl font-bold text-gray-900 mb-8">
+                  {sectionMap['full_specs']?.heading || 'Full Specifications'}
+                </h2>
+                <div className="max-w-3xl">
+                  <SpecsTable specs={specs} youtubeLink={s(product.youtubeLink) || undefined} />
+                </div>
+              </div>
+            </section>
+          ) : null,
+          featured_video:  () => videoId ? <FeaturedVideoSection videoId={videoId} productName={name} /> : null,
+          film_chapters:   () => <ProductFeaturesSection chapters={chapters} />,
+          applications:    () => <ApplicationsSection features={features} applications={applications} />,
+          certifications:  () => <CertificationsSection certs={certs} badges={badges} />,
+          ugc_carousel:    () => <UGCCarousel images={ugcImages} productName={name} />,
+          spare_parts_product: () => <SparePartsSection productId={productId} productName={name} />,
+          case_studies:    () => <CaseStudiesSection productId={productId} productName={name} />,
+          faq_product:     () => <FAQSection faqs={faqItems} />,
+        }
 
-      {/* ══ PRODUCT FEATURES — editorial, large images, Nuuk-style ══════════ */}
-      <ProductFeaturesSection chapters={chapters} />
-
-      {/* ══ APPLICATIONS — always visible ══════════════════════════════════ */}
-      <ApplicationsSection features={features} applications={applications} />
-
-      {/* ══ CERTIFICATIONS — always visible ════════════════════════════════ */}
-      <CertificationsSection certs={certs} badges={badges} />
-
-      {/* ══ UGC CAROUSEL — deployment images from admin ═════════════════════ */}
-      <UGCCarousel images={ugcImages} productName={name} />
-
-      {/* ══ SPARE PARTS — always visible (async loaded) ════════════════════ */}
-      <SparePartsSection productId={productId} productName={name} />
-
-      {/* ══ CASE STUDIES — always visible (async loaded) ═══════════════════ */}
-      <CaseStudiesSection productId={productId} productName={name} />
-
-      {/* ══ FAQ — ONLY THIS IS AN ACCORDION ════════════════════════════════ */}
-      <FAQSection faqs={faqItems} />
+        // Render in CMS-controlled order, skipping disabled sections
+        return resolvedSections.map(section => {
+          if (!section.isEnabled) return null
+          const render = renderers[section.key]
+          if (!render) return null
+          return <React.Fragment key={section.key}>{render()}</React.Fragment>
+        })
+      })()}
 
       {/* ══ SEO crawlable hidden content ════════════════════════════════════ */}
       <div className="sr-only" aria-hidden>
