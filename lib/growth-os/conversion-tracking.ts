@@ -34,6 +34,20 @@ export interface ConversionAction {
   isRevenue:       boolean    // Whether this is a direct revenue signal
 }
 
+// gtmPageFilter: page path substring that scopes this conversion (undefined = all pages)
+export interface ConversionAction {
+  name:            string
+  conversionLabel: string
+  dataLayerEvent:  string
+  category:        "lead" | "contact" | "engagement"
+  defaultValue:    number
+  countingMode:    "ONE_PER_CLICK" | "MANY_PER_CLICK"
+  description:     string
+  gtmTriggerType:  "Custom Event"
+  gtmPageFilter?:  string
+  isRevenue:       boolean
+}
+
 export const CONVERSION_ACTIONS: ConversionAction[] = [
   {
     name:           "RFQ Submit",
@@ -42,7 +56,7 @@ export const CONVERSION_ACTIONS: ConversionAction[] = [
     category:        "lead",
     defaultValue:    2000,
     countingMode:    "ONE_PER_CLICK",
-    description:     "User submitted the Request for Quote form (any page). High-intent dealer/buyer lead.",
+    description:     "RFQ form submitted on any page. Primary Funnel B conversion signal.",
     gtmTriggerType:  "Custom Event",
     isRevenue:       true,
   },
@@ -53,31 +67,20 @@ export const CONVERSION_ACTIONS: ConversionAction[] = [
     category:        "contact",
     defaultValue:    500,
     countingMode:    "ONE_PER_CLICK",
-    description:     "User clicked a WhatsApp link (wa.me). Tracked globally across all pages.",
+    description:     "WhatsApp link clicked — any page. Fires alongside the page-specific actions below.",
     gtmTriggerType:  "Custom Event",
     isRevenue:       false,
   },
   {
-    name:           "Phone Call Click",
+    name:           "Phone Click",
     conversionLabel: "REPLACE_PHONE_CLICK_LABEL",
     dataLayerEvent:  "phone_click",
     category:        "contact",
     defaultValue:    500,
     countingMode:    "ONE_PER_CLICK",
-    description:     "User clicked a tel: phone link. Tracked globally. MobileCtaBar is primary source.",
+    description:     "tel: phone link clicked — any page. MobileCtaBar is primary source.",
     gtmTriggerType:  "Custom Event",
     isRevenue:       false,
-  },
-  {
-    name:           "Lead Generated",
-    conversionLabel: "REPLACE_GENERATE_LEAD_LABEL",
-    dataLayerEvent:  "generate_lead",
-    category:        "lead",
-    defaultValue:    2000,
-    countingMode:    "ONE_PER_CLICK",
-    description:     "Fires alongside rfq_submit. Use as the primary Smart Bidding signal once 30+ conversions/month.",
-    gtmTriggerType:  "Custom Event",
-    isRevenue:       true,
   },
   {
     name:           "Dealer Application",
@@ -85,9 +88,22 @@ export const CONVERSION_ACTIONS: ConversionAction[] = [
     dataLayerEvent:  "whatsapp_click",
     category:        "lead",
     defaultValue:    5000,
-    description:     "WhatsApp click from /dealer-application or /become-a-dealer pages. High-value Funnel A signal.",
-    gtmTriggerType:  "Custom Event",
     countingMode:    "ONE_PER_CLICK",
+    description:     "WhatsApp click from dealer pages. High-value Funnel A signal.",
+    gtmTriggerType:  "Custom Event",
+    gtmPageFilter:   "/dealer",
+    isRevenue:       true,
+  },
+  {
+    name:           "OEM Authorization",
+    conversionLabel: "REPLACE_OEM_AUTH_LABEL",
+    dataLayerEvent:  "whatsapp_click",
+    category:        "lead",
+    defaultValue:    5000,
+    countingMode:    "ONE_PER_CLICK",
+    description:     "WhatsApp click from /gem-oem-authorization. High-value Funnel A signal.",
+    gtmTriggerType:  "Custom Event",
+    gtmPageFilter:   "/gem-oem-authorization",
     isRevenue:       true,
   },
 ]
@@ -115,9 +131,9 @@ export function buildGTMTags(): GTMTag[] {
       tagType:         "Google Ads Conversion Tracking",
       conversionId:    AW_CONVERSION_ID,
       conversionLabel: "REPLACE_RFQ_SUBMIT_LABEL",
-      conversionValue: "{{dlv - value}}",  // dynamic from dataLayer value field
+      conversionValue: "{{dlv - value}}",
       currency:        "INR",
-      triggerName:     "Trigger — rfq_submit",
+      triggerName:     "CE — rfq_submit",
       triggerType:     "Custom Event",
       triggerEvent:    "rfq_submit",
     },
@@ -128,7 +144,7 @@ export function buildGTMTags(): GTMTag[] {
       conversionLabel: "REPLACE_WHATSAPP_CLICK_LABEL",
       conversionValue: "500",
       currency:        "INR",
-      triggerName:     "Trigger — whatsapp_click",
+      triggerName:     "CE — whatsapp_click",
       triggerType:     "Custom Event",
       triggerEvent:    "whatsapp_click",
     },
@@ -139,32 +155,33 @@ export function buildGTMTags(): GTMTag[] {
       conversionLabel: "REPLACE_PHONE_CLICK_LABEL",
       conversionValue: "500",
       currency:        "INR",
-      triggerName:     "Trigger — phone_click",
+      triggerName:     "CE — phone_click",
       triggerType:     "Custom Event",
       triggerEvent:    "phone_click",
     },
     {
-      tagName:         "GA Ads — Generate Lead",
-      tagType:         "Google Ads Conversion Tracking",
-      conversionId:    AW_CONVERSION_ID,
-      conversionLabel: "REPLACE_GENERATE_LEAD_LABEL",
-      conversionValue: "{{dlv - value}}",
-      currency:        "INR",
-      triggerName:     "Trigger — generate_lead",
-      triggerType:     "Custom Event",
-      triggerEvent:    "generate_lead",
-    },
-    {
-      tagName:         "GA Ads — Dealer Application (WhatsApp from dealer pages)",
+      tagName:         "GA Ads — Dealer Application",
       tagType:         "Google Ads Conversion Tracking",
       conversionId:    AW_CONVERSION_ID,
       conversionLabel: "REPLACE_DEALER_APPLICATION_LABEL",
       conversionValue: "5000",
       currency:        "INR",
-      triggerName:     "Trigger — whatsapp_click on dealer pages",
+      triggerName:     "CE — whatsapp_click (dealer pages)",
       triggerType:     "Custom Event",
       triggerEvent:    "whatsapp_click",
-      triggerFilter:   "Page Path contains /dealer-application OR /become-a-dealer OR /gem-oem-authorization",
+      triggerFilter:   "Page Path contains /dealer",
+    },
+    {
+      tagName:         "GA Ads — OEM Authorization",
+      tagType:         "Google Ads Conversion Tracking",
+      conversionId:    AW_CONVERSION_ID,
+      conversionLabel: "REPLACE_OEM_AUTH_LABEL",
+      conversionValue: "5000",
+      currency:        "INR",
+      triggerName:     "CE — whatsapp_click (OEM page)",
+      triggerType:     "Custom Event",
+      triggerEvent:    "whatsapp_click",
+      triggerFilter:   "Page Path contains /gem-oem-authorization",
     },
   ]
 }
@@ -173,14 +190,16 @@ export function buildGTMTags(): GTMTag[] {
 // Run this before enabling any Google Ads campaigns.
 
 export const GTM_VALIDATION_CHECKLIST = [
-  { step: 1, check: "Conversion Linker tag installed (all pages trigger)", critical: true },
-  { step: 2, check: "AW_CONVERSION_ID replaced with real value in Google Ads account", critical: true },
-  { step: 3, check: "All 5 conversion labels replaced with real labels from Google Ads", critical: true },
-  { step: 4, check: "GTM Preview: submit RFQ form → rfq_submit fires → GA Ads tag fires", critical: true },
-  { step: 5, check: "GTM Preview: click WhatsApp link → whatsapp_click fires → GA Ads tag fires", critical: true },
-  { step: 6, check: "GTM Preview: click phone link → phone_click fires → GA Ads tag fires", critical: true },
-  { step: 7, check: "GTM Preview: navigate to /dealer-application → click WA → dealer tag fires (not generic WA tag)", critical: true },
-  { step: 8, check: "Google Ads → Goals → Conversions: all 5 actions show 'Recording conversions' status", critical: true },
-  { step: 9, check: "DataLayer variable dlv - value configured in GTM for dynamic value passthrough", critical: false },
-  { step: 10, check: "Tag Assistant Chrome extension: end-to-end conversion path verified on production URL", critical: true },
+  { step: 1,  check: "GTM container JSON imported into GTM-5JMGCKRW (docs/gtm-container-import.json)", critical: true },
+  { step: 2,  check: "Conversion Linker tag present and firing on All Pages", critical: true },
+  { step: 3,  check: "AW_CONVERSION_ID filled in — numeric ID from Google Ads Goals → Conversions → Tag setup", critical: true },
+  { step: 4,  check: "All 5 conversion labels filled in from Google Ads (one per action)", critical: true },
+  { step: 5,  check: "GTM Preview: /public-health-equipment → submit RFQ → rfq_submit fires → GA Ads RFQ Submit tag fires", critical: true },
+  { step: 6,  check: "GTM Preview: any page → WhatsApp click → whatsapp_click fires → GA Ads WhatsApp Click tag fires", critical: true },
+  { step: 7,  check: "GTM Preview: any page → tel: click → phone_click fires → GA Ads Phone Click tag fires", critical: true },
+  { step: 8,  check: "GTM Preview: /become-a-dealer → WhatsApp click → Dealer Application tag fires (not generic WA tag)", critical: true },
+  { step: 9,  check: "GTM Preview: /gem-oem-authorization → WhatsApp click → OEM Authorization tag fires", critical: true },
+  { step: 10, check: "GTM container published (Submit → Publish)", critical: true },
+  { step: 11, check: "Google Ads → Goals → Conversions: all 5 actions show 'Recording conversions' within 24 h", critical: true },
+  { step: 12, check: "Tag Assistant extension confirms conversion tag fires end-to-end on production URL", critical: false },
 ]

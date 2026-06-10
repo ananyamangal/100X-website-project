@@ -1,0 +1,255 @@
+{
+  "exportFormatVersion": 2,
+  "exportTime": "2026-06-10 00:00:00",
+  "containerVersion": {
+    "path": "accounts/0/containers/0/versions/0",
+    "accountId": "0",
+    "containerId": "0",
+    "containerVersionId": "0",
+    "name": "100X Circle — Conversion Tracking v1",
+    "container": {
+      "path": "accounts/0/containers/0",
+      "accountId": "0",
+      "containerId": "0",
+      "name": "100X Circle",
+      "publicId": "GTM-5JMGCKRW",
+      "usageContext": ["WEB"]
+    },
+    "builtInVariable": [
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "type": "PAGE_URL",
+        "name": "Page URL"
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "type": "PAGE_PATH",
+        "name": "Page Path"
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "type": "PAGE_HOSTNAME",
+        "name": "Page Hostname"
+      }
+    ],
+    "variable": [
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "variableId": "1",
+        "name": "dlv - value",
+        "type": "v",
+        "parameter": [
+          {"type": "INTEGER", "key": "dataLayerVersion", "value": "2"},
+          {"type": "BOOLEAN", "key": "setDefaultValue", "value": "false"},
+          {"type": "TEMPLATE", "key": "name", "value": "value"}
+        ]
+      }
+    ],
+    "trigger": [
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "triggerId": "1",
+        "name": "All Pages",
+        "type": "PAGEVIEW"
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "triggerId": "2",
+        "name": "CE — rfq_submit",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"},
+              {"type": "TEMPLATE", "key": "arg1", "value": "rfq_submit"}
+            ]
+          }
+        ]
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "triggerId": "3",
+        "name": "CE — whatsapp_click",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"},
+              {"type": "TEMPLATE", "key": "arg1", "value": "whatsapp_click"}
+            ]
+          }
+        ]
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "triggerId": "4",
+        "name": "CE — phone_click",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"},
+              {"type": "TEMPLATE", "key": "arg1", "value": "phone_click"}
+            ]
+          }
+        ]
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "triggerId": "5",
+        "name": "CE — whatsapp_click (dealer pages)",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"},
+              {"type": "TEMPLATE", "key": "arg1", "value": "whatsapp_click"}
+            ]
+          }
+        ],
+        "filter": [
+          {
+            "type": "CONTAINS",
+            "parameter": [
+              {"type": "TEMPLATE", "key": "arg0", "value": "{{Page Path}}"},
+              {"type": "TEMPLATE", "key": "arg1", "value": "/dealer"}
+            ]
+          }
+        ]
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "triggerId": "6",
+        "name": "CE — whatsapp_click (OEM page)",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {"type": "TEMPLATE", "key": "arg0", "value": "{{_event}}"},
+              {"type": "TEMPLATE", "key": "arg1", "value": "whatsapp_click"}
+            ]
+          }
+        ],
+        "filter": [
+          {
+            "type": "CONTAINS",
+            "parameter": [
+              {"type": "TEMPLATE", "key": "arg0", "value": "{{Page Path}}"},
+              {"type": "TEMPLATE", "key": "arg1", "value": "/gem-oem-authorization"}
+            ]
+          }
+        ]
+      }
+    ],
+    "tag": [
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "tagId": "1",
+        "name": "Conversion Linker",
+        "type": "cl",
+        "parameter": [
+          {"type": "BOOLEAN", "key": "enableCrossDomainLinking", "value": "false"},
+          {"type": "BOOLEAN", "key": "enableCookiesOverriding", "value": "false"},
+          {"type": "BOOLEAN", "key": "decorateFormsOnly", "value": "false"}
+        ],
+        "firingTriggerId": ["1"]
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "tagId": "2",
+        "name": "GA Ads — RFQ Submit",
+        "type": "awct",
+        "parameter": [
+          {"type": "TEMPLATE", "key": "conversionId", "value": "REPLACE_AW_NUMERIC_ID"},
+          {"type": "TEMPLATE", "key": "conversionLabel", "value": "REPLACE_RFQ_SUBMIT_LABEL"},
+          {"type": "TEMPLATE", "key": "conversionValue", "value": "{{dlv - value}}"},
+          {"type": "BOOLEAN", "key": "conversionCookiesOnly", "value": "false"},
+          {"type": "TEMPLATE", "key": "currencyCode", "value": "INR"},
+          {"type": "BOOLEAN", "key": "remarketing_only", "value": "false"}
+        ],
+        "firingTriggerId": ["2"]
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "tagId": "3",
+        "name": "GA Ads — WhatsApp Click",
+        "type": "awct",
+        "parameter": [
+          {"type": "TEMPLATE", "key": "conversionId", "value": "REPLACE_AW_NUMERIC_ID"},
+          {"type": "TEMPLATE", "key": "conversionLabel", "value": "REPLACE_WHATSAPP_CLICK_LABEL"},
+          {"type": "TEMPLATE", "key": "conversionValue", "value": "500"},
+          {"type": "BOOLEAN", "key": "conversionCookiesOnly", "value": "false"},
+          {"type": "TEMPLATE", "key": "currencyCode", "value": "INR"},
+          {"type": "BOOLEAN", "key": "remarketing_only", "value": "false"}
+        ],
+        "firingTriggerId": ["3"]
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "tagId": "4",
+        "name": "GA Ads — Phone Click",
+        "type": "awct",
+        "parameter": [
+          {"type": "TEMPLATE", "key": "conversionId", "value": "REPLACE_AW_NUMERIC_ID"},
+          {"type": "TEMPLATE", "key": "conversionLabel", "value": "REPLACE_PHONE_CLICK_LABEL"},
+          {"type": "TEMPLATE", "key": "conversionValue", "value": "500"},
+          {"type": "BOOLEAN", "key": "conversionCookiesOnly", "value": "false"},
+          {"type": "TEMPLATE", "key": "currencyCode", "value": "INR"},
+          {"type": "BOOLEAN", "key": "remarketing_only", "value": "false"}
+        ],
+        "firingTriggerId": ["4"]
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "tagId": "5",
+        "name": "GA Ads — Dealer Application",
+        "type": "awct",
+        "parameter": [
+          {"type": "TEMPLATE", "key": "conversionId", "value": "REPLACE_AW_NUMERIC_ID"},
+          {"type": "TEMPLATE", "key": "conversionLabel", "value": "REPLACE_DEALER_APPLICATION_LABEL"},
+          {"type": "TEMPLATE", "key": "conversionValue", "value": "5000"},
+          {"type": "BOOLEAN", "key": "conversionCookiesOnly", "value": "false"},
+          {"type": "TEMPLATE", "key": "currencyCode", "value": "INR"},
+          {"type": "BOOLEAN", "key": "remarketing_only", "value": "false"}
+        ],
+        "firingTriggerId": ["5"]
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "tagId": "6",
+        "name": "GA Ads — OEM Authorization",
+        "type": "awct",
+        "parameter": [
+          {"type": "TEMPLATE", "key": "conversionId", "value": "REPLACE_AW_NUMERIC_ID"},
+          {"type": "TEMPLATE", "key": "conversionLabel", "value": "REPLACE_OEM_AUTH_LABEL"},
+          {"type": "TEMPLATE", "key": "conversionValue", "value": "5000"},
+          {"type": "BOOLEAN", "key": "conversionCookiesOnly", "value": "false"},
+          {"type": "TEMPLATE", "key": "currencyCode", "value": "INR"},
+          {"type": "BOOLEAN", "key": "remarketing_only", "value": "false"}
+        ],
+        "firingTriggerId": ["6"]
+      }
+    ]
+  }
+}
