@@ -24,6 +24,7 @@ interface Module {
 }
 
 const MODULES: Module[] = [
+  { href: "/admin/growth/founder",          label: "Founder Mode",         icon: Zap,             permission: "dashboard.view", badge: "NEW" },
   { href: "/admin/growth/dashboard",        label: "Executive Dashboard",  icon: LayoutDashboard, permission: "dashboard.view" },
   { href: "/admin/growth/seo",              label: "SEO Command Center",   icon: Search,          permission: "seo.view" },
   { href: "/admin/growth/seo/setup",        label: "↳ Search Console",     icon: Plug,            permission: "seo.view",         sub: true },
