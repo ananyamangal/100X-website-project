@@ -1,5 +1,8 @@
 # Revenue Capture Architecture
 
+> ⚠️ DEFERRED TO V2 (course correction 2026-06-10). Preserved, not deleted.
+> V1 treats enquiries (RFQ/call/WhatsApp/brochure) as the conversion event. See `demand-intelligence-acquisition-os.md`.
+>
 > Growth OS 3.0 — Revenue Entry Design  
 > Status: Architecture approved  
 > No code. No UI. Business architecture only.

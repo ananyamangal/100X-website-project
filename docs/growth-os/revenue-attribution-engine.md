@@ -1,5 +1,9 @@
 # Revenue Attribution Engine — Architecture
 
+> ⚠️ DEFERRED TO V2 (course correction 2026-06-10). Preserved, not deleted.
+> V1 uses enquiry-based ROAS (clicks → calls → WhatsApp → RFQ), not invoice attribution.
+> Re-activate after financial truth (Zoho/invoice) data exists. See `demand-intelligence-acquisition-os.md`.
+>
 > Growth OS 3.0 — Intelligence Layer  
 > Status: Architecture approved  
 > No code. No UI. Business architecture only.

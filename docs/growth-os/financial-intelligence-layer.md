@@ -1,5 +1,8 @@
 # Financial Intelligence Layer — Zoho Books Integration
 
+> ⚠️ DEFERRED TO V2 (course correction 2026-06-10). Preserved, not deleted.
+> Zoho Books / financial truth layer is out of scope for V1. See `demand-intelligence-acquisition-os.md`.
+>
 > Growth OS 3.0 — Financial Intelligence  
 > Status: Architecture approved  
 > Accounting system: Zoho Books (not Tally)  
