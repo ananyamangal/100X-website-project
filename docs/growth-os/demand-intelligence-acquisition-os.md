@@ -113,9 +113,24 @@ Canonical object: **DemandSignal** `{signal_id, source, captured_at, query/keywo
 - **State-wise opportunity ranking** — rank states by unworked dealer potential vs. current 100X coverage.
 - **Top dealer recommendations** — the weekly shortlist with contact details + why-now rationale.
 
-**Output:** `Top N dealers to contact this week` with `{dealer, state, score, why_now, contact, suggested_action}` + state-wise opportunity ranking. Delivered as a recommendation queue, not a chart wall.
-Canonical object: **Dealer** `{dealer_id, name, gstin, state/district, products, gem_activity, gmv_handled, contact, dealer_score, cluster, opportunity_rank, last_contacted, status}`.
-Canonical object: **DealerOpportunity** `{opportunity_id, dealer_id, score, why_now, suggested_action, generated_at, status}`.
+**Primary output (decided 2026-06-10):** **Top 20 Dealers to Contact This Week**, optimized for *"which dealers are most likely to become successful 100X dealers?"* — NOT "which are largest." Each row carries: **Score · Reason for ranking · Product fit explanation · GeM activity summary · Contact details · Recommended next action.** Delivered in **both** the `/admin/growth` recommendation queue **and** a weekly generated report archive (GeMArchive pattern).
+
+**Blended Dealer Score (weights):**
+| Component | Weight | Source |
+|---|---|---|
+| Product Fit (overlap with 100X catalogue: fogging/agri/sprayer/etc.) | 40% | `gem_contracts` product lines per seller |
+| GeM Contract Volume | 25% | count/GMV of seller contracts |
+| Recent Activity | 15% | recency of last GeM contract |
+| Geography Gap (weak 100X coverage where demand exists) | 10% | state/district vs. current coverage |
+| Contactability (phone/email/GSTIN present + quality) | 10% | dealer lead record |
+
+**OEM Authorization Probability Score** — bonus signal layered on top: likelihood a dealer would seek/accept 100X OEM authorization (strong product fit + active GeM seller + not already a competitor-OEM lock-in). Surfaces high-intent authorization targets first.
+
+**Dealer Action Status workflow:** `New → Contacted → Interested → OEM Sent → Follow-up → Won / Lost / Ignore`. The engine **suppresses Won/Lost/Ignore and downgrades** already-in-progress dealers so the weekly list surfaces fresh, actionable targets.
+
+Canonical object: **Dealer** `{dealer_id, name, gstin, state/district, products, gem_activity, gmv_handled, contact, last_contacted}`.
+Canonical object: **DealerScore** `{dealer_id, product_fit, gem_volume, recent_activity, geo_gap, contactability, blended_score, oem_auth_probability, computed_at}`.
+Canonical object: **DealerOpportunity** `{opportunity_id, dealer_id, week, rank, score, reason, product_fit_explanation, gem_activity_summary, contact, next_action, action_status, generated_at}`.
 
 ### L3 — Buyer Intent Engine
 **Job:** classify every lead. **Output:** Intent Score 1–10 + category ∈ {GeM reseller, dealer, OEM-authorization seeker, government buyer, municipal buyer, pest-control operator, agricultural buyer, distributor, unknown}.
