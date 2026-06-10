@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 
+export const dynamic = "force-dynamic"
+
 function daysBefore(n: number): Date {
   const d = new Date()
   d.setDate(d.getDate() - n)

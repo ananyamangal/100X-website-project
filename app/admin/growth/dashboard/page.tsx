@@ -55,9 +55,14 @@ export default function GrowthDashboard() {
   const [logs, setLogs] = useState<Log[]>([])
   const [drafts, setDrafts] = useState<Draft[]>([])
   const [loading, setLoading] = useState(true)
+  const [apiError, setApiError] = useState<string | null>(null)
 
   useEffect(() => {
-    const ok = (r: Response) => r.ok ? r.json() : null
+    const ok = async (r: Response) => {
+      if (r.ok) return r.json()
+      setApiError(`API ${r.url.split("/").pop()} → ${r.status}`)
+      return null
+    }
     Promise.all([
       fetch("/api/admin/growth/dashboard").then(ok),
       fetch("/api/admin/growth/opportunities?status=pending").then(ok),
@@ -69,7 +74,10 @@ export default function GrowthDashboard() {
       setLogs(Array.isArray(l?.logs) ? l.logs : [])
       setDrafts(Array.isArray(d) ? d : [])
       setLoading(false)
-    }).catch(() => setLoading(false))
+    }).catch((e: unknown) => {
+      setApiError(`Network error: ${e instanceof Error ? e.message : String(e)}`)
+      setLoading(false)
+    })
   }, [])
 
   if (loading) return (
@@ -95,6 +103,13 @@ export default function GrowthDashboard() {
 
   return (
     <div className="flex-1 bg-gray-50 min-h-screen">
+      {/* API error banner */}
+      {apiError && (
+        <div className="bg-red-50 border-b border-red-200 px-8 py-2 flex items-center gap-2 text-sm text-red-700">
+          <span className="font-bold">Dashboard API error:</span> {apiError}
+          <span className="text-red-400 text-xs ml-1">— open DevTools → Network to inspect the failed request</span>
+        </div>
+      )}
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
