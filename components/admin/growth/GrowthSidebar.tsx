@@ -39,6 +39,7 @@ const MODULES: Module[] = [
   { href: "/admin/growth/dealers",          label: "Dealer Intelligence",  icon: Users,           permission: "dealer.view" },
   { href: "/admin/growth/gem",              label: "GeM Intel (Legacy)",   icon: ShoppingBag,     permission: "procurement.view" },
   { href: "/admin/growth/ads",              label: "Google Ads Intel",     icon: Megaphone,       permission: "ads.view" },
+  { href: "/admin/growth/ads/director",     label: "↳ Ads Director",       icon: Megaphone,       permission: "ads.view",          sub: true },
   { href: "/admin/growth/ads/setup",        label: "↳ Ads Setup",          icon: Plug,            permission: "ads.view",          sub: true },
   { href: "/admin/growth/ads/dashboard",    label: "↳ Ads Dashboard",      icon: BarChart2,       permission: "ads.view",          sub: true },
   { href: "/admin/growth/automation",       label: "Automation Center",    icon: Settings2,       permission: "automation.view" },
