@@ -3,14 +3,86 @@
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import {
-  CheckCircle2, AlertTriangle, XCircle, Clock, TrendingUp,
-  ChevronRight, Loader2, RefreshCw, Zap, Target, Shield,
-  Users, MessageSquare, FileText, BarChart2,
+  CheckCircle2, AlertTriangle, XCircle, Clock, RefreshCw, Zap,
+  ChevronDown, ChevronRight, ExternalLink, ArrowRight,
+  Users, TrendingUp, Shield, MessageSquare, Settings,
+  BarChart3, Search, Megaphone, FileText, Bot, ShoppingBag,
+  Activity, Target, DollarSign, Bell,
 } from "lucide-react"
+import type { ReadinessResult, ReadinessTier, SetupCheck } from "@/lib/growth-os/user-success/readiness-checker"
 import type { DailyBriefing, ActionItem, RiskItem, OpportunityItem } from "@/lib/growth-os/user-success/daily-briefing"
-import type { ReadinessResult } from "@/lib/growth-os/user-success/readiness-checker"
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────────────────────
+
+interface RevenueMetrics {
+  leadsToday:     number
+  leadsTotal:     number
+  highValueLeads: number
+  pendingReviews: number
+  activeCampaigns: number
+  rolledBack:     number
+}
+
+// ── Wizard step definitions ──────────────────────────────────────────────────
+
+const WIZARDS: Record<string, { steps: string[]; url: string; urlLabel: string }> = {
+  fix_rolled_back_campaign: {
+    steps: [
+      "Go to Paid Growth → check deployment status and rollback reason",
+      "Ensure your Google Ads account has ₹500+ balance",
+      "Verify keyword count meets the 50-keyword minimum threshold",
+      "Click 'Re-deploy Campaign' and review the new plan",
+      "Approve the campaign plan to push it live",
+    ],
+    url: "/admin/growth/paid",
+    urlLabel: "Open Paid Growth",
+  },
+  setup_conversion_tracking: {
+    steps: [
+      "Log into Google Ads → Tools → Conversions → + New Conversion",
+      "Create 5 actions: Enquiry Form, WhatsApp Click, Phone Call, Brochure Download, Dealer Application",
+      "Copy the AW-XXXXXXXX/XXXXXXXXXXXXX conversion ID for each",
+      "Open GTM container GTM-5JMGCKRW → add conversion tags",
+      "Preview → test each conversion → Publish the GTM container",
+    ],
+    url: "/admin/growth/paid",
+    urlLabel: "Open Paid Growth Setup",
+  },
+  setup_gtm: {
+    steps: [
+      "Log into Google Tag Manager → open container GTM-5JMGCKRW",
+      "Go to Vercel Dashboard → your project → Settings → Environment Variables",
+      "Add: NEXT_PUBLIC_GTM_CONTAINER_ID = GTM-5JMGCKRW",
+      "Redeploy the site on Vercel (push any small change to main)",
+      "Verify GTM Preview mode shows tags firing",
+    ],
+    url: "https://tagmanager.google.com",
+    urlLabel: "Open Google Tag Manager",
+  },
+  review_queue: {
+    steps: [
+      "Open the Recommendations Queue below",
+      "For each recommendation: read the evidence and rationale",
+      "Approve items you agree with — they'll be queued for your next action",
+      "Reject items you don't want with a reason",
+      "Aim to clear the queue weekly",
+    ],
+    url: "/admin/growth/ads/approval-queue",
+    urlLabel: "Open Review Queue",
+  },
+  activate_campaign: {
+    steps: [
+      "Log into Google Ads and check account balance",
+      "Recharge to at least ₹2,000 to run for 10+ days",
+      "Return here and click 'Activate Campaign'",
+      "Monitor impressions for the first 48 hours",
+    ],
+    url: "/admin/growth/paid",
+    urlLabel: "Open Paid Growth",
+  },
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function ago(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -19,382 +91,563 @@ function ago(iso: string): string {
   return `${Math.floor(diff / 86_400_000)}d ago`
 }
 
-const IMPACT_COLORS = {
-  high:   "bg-red-50 text-red-700 border-red-200",
-  medium: "bg-amber-50 text-amber-700 border-amber-200",
-  low:    "bg-gray-50 text-gray-600 border-gray-200",
-} as const
-
-const PRIORITY_ICON = {
-  urgent:    <Zap size={12} className="text-red-500" />,
-  important: <Target size={12} className="text-amber-500" />,
-  this_week: <Clock size={12} className="text-blue-500" />,
-} as const
-
-const STATUS_ICON: Record<string, React.ReactNode> = {
-  ok:      <CheckCircle2 size={14} className="text-green-500" />,
-  warning: <AlertTriangle size={14} className="text-amber-500" />,
-  error:   <XCircle size={14} className="text-red-500" />,
-  unknown: <Clock size={14} className="text-gray-400" />,
+function statusIcon(status: "ok" | "warning" | "error") {
+  if (status === "ok")      return <CheckCircle2 size={14} className="text-green-500 flex-shrink-0" />
+  if (status === "warning") return <AlertTriangle size={14} className="text-amber-500 flex-shrink-0" />
+  return <XCircle size={14} className="text-red-500 flex-shrink-0" />
 }
 
-// ── Sub-components ───────────────────────────────────────────────────────────
+function tierColor(status: string) {
+  if (status === "ready")    return { bar: "bg-green-500",  text: "text-green-600",  bg: "bg-green-50" }
+  if (status === "partial")  return { bar: "bg-amber-400",  text: "text-amber-600",  bg: "bg-amber-50" }
+  return                            { bar: "bg-red-400",    text: "text-red-600",    bg: "bg-red-50"   }
+}
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function ReadinessBar({ tier }: { tier: ReadinessTier }) {
+  const [open, setOpen] = useState(false)
+  const c = tierColor(tier.status)
+
+  return (
+    <div className="border border-gray-200 rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-3 px-4 py-3 bg-white hover:bg-gray-50 transition-colors text-left"
+      >
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-sm font-semibold text-gray-900">{tier.label}</span>
+            <span className={`text-xs font-bold ${c.text}`}>{tier.score}%</span>
+          </div>
+          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className={`h-full ${c.bar} rounded-full transition-all duration-500`}
+              style={{ width: `${tier.score}%` }}
+            />
+          </div>
+          {tier.topBlocker && (
+            <p className="text-xs text-gray-500 mt-1 truncate">
+              Next: {tier.topBlocker}
+            </p>
+          )}
+        </div>
+        {open
+          ? <ChevronDown size={14} className="text-gray-400 flex-shrink-0" />
+          : <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
+        }
+      </button>
+
+      {open && (
+        <div className="border-t border-gray-100 px-4 py-3 bg-gray-50 space-y-2">
+          <p className="text-xs text-gray-500 mb-2">{tier.description}</p>
+          {tier.checks.map(c => <CheckRow key={c.id} check={c} />)}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CheckRow({ check }: { check: SetupCheck }) {
+  return (
+    <div className="flex items-start gap-2 py-1">
+      {statusIcon(check.status)}
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-medium text-gray-800 leading-snug">{check.label}</div>
+        <div className="text-xs text-gray-500 leading-snug mt-0.5">{check.detail}</div>
+        {check.evidence.collection && (
+          <div className="text-[10px] text-gray-400 mt-0.5">
+            Source: {check.evidence.collection}
+            {check.evidence.count !== undefined ? ` · ${check.evidence.count} records` : ""}
+            {check.evidence.lastSeen ? ` · ${check.evidence.lastSeen}` : ""}
+          </div>
+        )}
+        {check.evidence.value && !check.evidence.collection && (
+          <div className="text-[10px] text-gray-400 mt-0.5">Value: {check.evidence.value}</div>
+        )}
+      </div>
+      {check.setupUrl && check.status !== "ok" && (
+        <Link
+          href={check.setupUrl}
+          className="text-[10px] text-brand-600 hover:text-brand-700 font-medium whitespace-nowrap flex-shrink-0"
+          target={check.setupUrl.startsWith("http") ? "_blank" : undefined}
+        >
+          Fix →
+        </Link>
+      )}
+      <span className={`text-[10px] font-bold flex-shrink-0 ${
+        check.status === "ok" ? "text-green-600" : check.status === "warning" ? "text-amber-600" : "text-red-600"
+      }`}>
+        {check.points}/{check.maxPoints}
+      </span>
+    </div>
+  )
+}
 
 function ActionCard({ action, index }: { action: ActionItem; index: number }) {
-  const [running, setRunning] = useState(false)
-  const [done,    setDone]    = useState(false)
+  const [wizardOpen, setWizardOpen] = useState(false)
+  const wizard = WIZARDS[action.id]
 
-  async function trigger() {
-    if (!action.actionUrl || !action.actionUrl.startsWith("/api")) return
-    setRunning(true)
-    try {
-      await fetch(action.actionUrl, { method: "POST" })
-      setDone(true)
-    } finally {
-      setRunning(false)
-    }
+  const priorityStyle = action.priority === "urgent"
+    ? "border-l-red-500 bg-red-50/30"
+    : action.priority === "important"
+    ? "border-l-amber-400 bg-amber-50/20"
+    : "border-l-gray-300 bg-gray-50/30"
+
+  const priorityLabel = action.priority === "urgent" ? "🔴 Urgent"
+    : action.priority === "important" ? "🟡 Important"
+    : "🔵 This week"
+
+  const effortLabel: Record<string, string> = {
+    "5_min": "5 min", "30_min": "30 min", "1_hour": "1 hour", "half_day": "Half day",
   }
 
   return (
-    <div className={`rounded-xl border p-4 ${IMPACT_COLORS[action.impact]}`}>
-      <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white shadow-sm flex items-center justify-center text-xs font-bold text-gray-500 mt-0.5">
-          {index + 1}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-0.5">
-            {PRIORITY_ICON[action.priority]}
-            <span className="text-[10px] font-semibold uppercase tracking-wider opacity-70">
-              {action.priority.replace("_", " ")} · {action.effort.replace("_", " ")}
-            </span>
+    <div className={`border border-l-4 rounded-xl overflow-hidden ${priorityStyle}`}>
+      <div className="px-4 py-3">
+        <div className="flex items-start gap-3">
+          <span className="text-xl flex-shrink-0">{index === 0 ? "1️⃣" : index === 1 ? "2️⃣" : index === 2 ? "3️⃣" : index === 3 ? "4️⃣" : "5️⃣"}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span className="text-[10px] font-semibold text-gray-500">{priorityLabel}</span>
+              <span className="text-[10px] text-gray-400">·</span>
+              <Clock size={10} className="text-gray-400" />
+              <span className="text-[10px] text-gray-400">{effortLabel[action.effort] ?? action.effort}</span>
+            </div>
+            <h3 className="text-sm font-semibold text-gray-900 leading-snug">{action.title}</h3>
+            <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+              <strong>Why this matters:</strong> {action.why}
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+              <strong>Evidence:</strong> {action.evidence}
+            </p>
+            <p className="text-xs text-green-700 mt-0.5 leading-relaxed">
+              <strong>Expected result:</strong> {action.expectedOutcome}
+            </p>
           </div>
-          <p className="font-semibold text-sm leading-tight mb-1">{action.title}</p>
-          <p className="text-xs opacity-80 mb-2">{action.why}</p>
-          <p className="text-xs opacity-60 italic mb-3">Expected: {action.expectedOutcome}</p>
-          <div className="flex gap-2 flex-wrap">
-            {action.actionUrl?.startsWith("/api") ? (
-              <button
-                onClick={trigger}
-                disabled={running || done}
-                className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 bg-white rounded-lg shadow-sm border border-current/20 hover:shadow-md transition disabled:opacity-50"
+        </div>
+
+        <div className="flex items-center gap-2 mt-3">
+          {wizard && (
+            <button
+              onClick={() => setWizardOpen(o => !o)}
+              className="text-xs font-medium text-brand-600 hover:text-brand-700 flex items-center gap-1"
+            >
+              {wizardOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+              {wizardOpen ? "Hide steps" : "How to fix this"}
+            </button>
+          )}
+          <Link
+            href={action.actionUrl}
+            className="ml-auto flex items-center gap-1 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            Go <ArrowRight size={11} />
+          </Link>
+        </div>
+
+        {wizard && wizardOpen && (
+          <div className="mt-3 border-t border-gray-200 pt-3">
+            <p className="text-xs font-semibold text-gray-700 mb-2">Step-by-step guide:</p>
+            <ol className="space-y-1.5">
+              {wizard.steps.map((step, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                  <span className="flex-shrink-0 w-4 h-4 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-[10px] font-bold mt-0.5">
+                    {i + 1}
+                  </span>
+                  {step}
+                </li>
+              ))}
+            </ol>
+            {wizard.url.startsWith("http") ? (
+              <a
+                href={wizard.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium"
               >
-                {running ? <Loader2 size={10} className="animate-spin" /> : done ? <CheckCircle2 size={10} /> : <Zap size={10} />}
-                {done ? "Done" : running ? "Running…" : "Run now"}
-              </button>
-            ) : action.actionUrl ? (
+                {wizard.urlLabel} <ExternalLink size={10} />
+              </a>
+            ) : (
               <Link
-                href={action.actionUrl}
-                className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 bg-white rounded-lg shadow-sm border border-current/20 hover:shadow-md transition"
+                href={wizard.url}
+                className="mt-2 flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium"
               >
-                Go there <ChevronRight size={10} />
+                {wizard.urlLabel} <ArrowRight size={10} />
               </Link>
-            ) : null}
+            )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
 }
 
-function RiskCard({ risk }: { risk: RiskItem }) {
-  const color = risk.severity === "critical" ? "border-l-red-500 bg-red-50"
-    : risk.severity === "high" ? "border-l-amber-500 bg-amber-50"
-    : "border-l-yellow-400 bg-yellow-50"
+function RiskBadge({ risk }: { risk: RiskItem }) {
+  const s = risk.severity === "critical"
+    ? { bg: "bg-red-50 border-red-200", icon: "🔴", label: "Critical" }
+    : risk.severity === "high"
+    ? { bg: "bg-orange-50 border-orange-200", icon: "🟠", label: "High" }
+    : { bg: "bg-amber-50 border-amber-200", icon: "🟡", label: "Medium" }
   return (
-    <div className={`border-l-4 rounded-r-lg p-3 ${color}`}>
-      <p className="text-xs font-bold mb-0.5">{risk.title}</p>
-      <p className="text-xs text-gray-600 mb-1">{risk.description}</p>
-      <p className="text-[11px] text-gray-500">Fix: {risk.mitigation}</p>
-      {risk.actionUrl && (
-        <Link href={risk.actionUrl} className="text-[11px] font-medium text-blue-600 hover:underline mt-1 inline-flex items-center gap-1">
-          Fix it <ChevronRight size={9} />
-        </Link>
-      )}
+    <div className={`border rounded-lg px-3 py-2 ${s.bg}`}>
+      <div className="flex items-center gap-2 mb-0.5">
+        <span className="text-xs">{s.icon}</span>
+        <span className="text-xs font-semibold text-gray-800">{risk.title}</span>
+        <span className={`text-[10px] font-bold ml-auto ${
+          risk.severity === "critical" ? "text-red-600" : risk.severity === "high" ? "text-orange-600" : "text-amber-600"
+        }`}>{s.label}</span>
+      </div>
+      <p className="text-xs text-gray-600">{risk.description}</p>
+      <p className="text-xs text-gray-500 mt-0.5"><strong>Fix:</strong> {risk.mitigation}</p>
     </div>
   )
 }
 
 function OppCard({ opp }: { opp: OpportunityItem }) {
-  const conf = opp.confidence === "high" ? "text-green-600" : opp.confidence === "medium" ? "text-amber-600" : "text-gray-500"
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-      <div className="flex items-start justify-between mb-1">
-        <p className="font-semibold text-sm text-gray-900 flex-1">{opp.title}</p>
-        <span className={`text-[10px] font-bold uppercase ml-2 ${conf}`}>{opp.confidence}</span>
+    <div className="border border-green-200 rounded-lg px-3 py-2 bg-green-50/50">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="text-xs font-semibold text-green-800">{opp.title}</p>
+          <p className="text-xs text-gray-600 mt-0.5">{opp.description}</p>
+          <p className="text-[10px] text-gray-500 mt-0.5">Evidence: {opp.evidence}</p>
+        </div>
+        {opp.actionUrl && (
+          <Link href={opp.actionUrl} className="text-xs text-green-700 hover:text-green-800 font-medium flex-shrink-0">
+            Review →
+          </Link>
+        )}
       </div>
-      <p className="text-xs text-gray-500 mb-2">{opp.description}</p>
-      <p className="text-[11px] text-gray-400 mb-2 italic">Evidence: {opp.evidence}</p>
-      {opp.actionUrl && (
-        <Link href={opp.actionUrl} className="text-xs font-medium text-brand-600 hover:underline inline-flex items-center gap-1">
-          Take action <ChevronRight size={10} />
-        </Link>
-      )}
     </div>
   )
 }
 
-function ReadinessBar({ result }: { result: ReadinessResult }) {
-  const barColor = result.score >= 80 ? "bg-green-500"
-    : result.score >= 50 ? "bg-amber-500"
-    : "bg-red-500"
-
+function RevenueTracker({ metrics }: { metrics: RevenueMetrics }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">System Readiness</p>
-        <span className="text-lg font-bold text-gray-900">{result.score}/100</span>
-      </div>
-      <div className="h-2 bg-gray-100 rounded-full mb-4">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {[
+        {
+          icon: <Users size={14} className="text-blue-500" />,
+          label: "Leads today",
+          value: String(metrics.leadsToday),
+          sub: `${metrics.leadsTotal} total`,
+          alert: metrics.leadsToday === 0,
+        },
+        {
+          icon: <Target size={14} className="text-purple-500" />,
+          label: "High-value leads",
+          value: String(metrics.highValueLeads),
+          sub: "dealer / OEM / govt",
+          alert: metrics.highValueLeads === 0,
+        },
+        {
+          icon: <Bell size={14} className="text-amber-500" />,
+          label: "Awaiting review",
+          value: String(metrics.pendingReviews),
+          sub: "recommendations",
+          alert: metrics.pendingReviews > 0,
+        },
+        {
+          icon: <Activity size={14} className="text-green-500" />,
+          label: "Active campaigns",
+          value: String(metrics.activeCampaigns),
+          sub: metrics.rolledBack > 0 ? `${metrics.rolledBack} rolled back` : "running",
+          alert: metrics.activeCampaigns === 0,
+        },
+      ].map(item => (
         <div
-          className={`h-2 rounded-full transition-all duration-500 ${barColor}`}
-          style={{ width: `${result.score}%` }}
-        />
-      </div>
-      <div className="space-y-2">
-        {Object.entries(result.systems).map(([key, sys]) => (
-          <div key={key} className="flex items-center justify-between text-xs">
-            <div className="flex items-center gap-1.5">
-              {STATUS_ICON[sys.status]}
-              <span className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</span>
-            </div>
-            <span className={`font-medium ${sys.status === "ok" ? "text-green-600" : sys.status === "warning" ? "text-amber-600" : "text-red-600"}`}>
-              {sys.label}
-            </span>
+          key={item.label}
+          className={`border rounded-xl p-3 ${item.alert ? "border-amber-200 bg-amber-50/30" : "border-gray-200 bg-white"}`}
+        >
+          <div className="flex items-center gap-1.5 mb-1">
+            {item.icon}
+            <span className="text-[10px] text-gray-500 font-medium">{item.label}</span>
           </div>
-        ))}
-      </div>
+          <div className={`text-xl font-bold ${item.alert ? "text-amber-600" : "text-gray-900"}`}>
+            {item.value}
+          </div>
+          <div className="text-[10px] text-gray-400">{item.sub}</div>
+        </div>
+      ))}
     </div>
   )
 }
+
+const ADVANCED_TOOLS = [
+  { href: "/admin/growth/seo",            label: "SEO Command Center",   icon: Search },
+  { href: "/admin/growth/analytics",      label: "GA4 Analytics",        icon: BarChart3 },
+  { href: "/admin/growth/geo",            label: "AI Search (GEO)",      icon: Bot },
+  { href: "/admin/growth/competitors",    label: "Competitor Intel",     icon: Shield },
+  { href: "/admin/growth/opportunities",  label: "Opportunity Engine",   icon: TrendingUp },
+  { href: "/admin/growth/content",        label: "Content Factory",      icon: FileText },
+  { href: "/admin/growth/procurement",    label: "Procurement Intel",    icon: ShoppingBag },
+  { href: "/admin/growth/dealers",        label: "Dealer Intelligence",  icon: Users },
+  { href: "/admin/growth/ads",            label: "Google Ads Intel",     icon: Megaphone },
+  { href: "/admin/growth/automation",     label: "Automation Center",    icon: Settings },
+  { href: "/admin/growth/logs",           label: "Activity Logs",        icon: MessageSquare },
+  { href: "/admin/growth/paid",           label: "Paid Growth",          icon: DollarSign },
+]
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function FounderModePage() {
-  const [briefing,   setBriefing]   = useState<DailyBriefing | null>(null)
-  const [readiness,  setReadiness]  = useState<ReadinessResult | null>(null)
-  const [loading,    setLoading]    = useState(true)
+  const [readiness, setReadiness] = useState<ReadinessResult | null>(null)
+  const [briefing,  setBriefing]  = useState<DailyBriefing | null>(null)
+  const [metrics,   setMetrics]   = useState<RevenueMetrics | null>(null)
+  const [loading,   setLoading]   = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  const [lastRefresh, setLastRefresh] = useState<string>("")
+  const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async (force = false) => {
-    if (force) setRefreshing(true)
     try {
-      const [br, rd] = await Promise.all([
-        force
-          ? fetch("/api/admin/growth/daily-briefing", { method: "POST" }).then(r => r.json()).then(r => r.briefing)
-          : fetch("/api/admin/growth/daily-briefing").then(r => r.json()),
+      if (force) setRefreshing(true)
+      else setLoading(true)
+
+      const [r, b] = await Promise.all([
         fetch("/api/admin/growth/readiness").then(r => r.json()),
+        fetch("/api/admin/growth/daily-briefing", {
+          method:  force ? "POST" : "GET",
+          headers: { "Content-Type": "application/json" },
+        }).then(r => r.json()),
       ])
+
+      setReadiness(r)
+      const br = b.briefing ?? b
       setBriefing(br)
-      setReadiness(rd)
-      setLastRefresh(new Date().toISOString())
+
+      // Build revenue metrics from briefing data
+      setMetrics({
+        leadsToday:      0,  // will be updated from briefing when available
+        leadsTotal:      0,
+        highValueLeads:  0,
+        pendingReviews:  (br?.opportunities?.[0]?.evidence?.match(/\d+/) ?? ["0"])[0] as unknown as number,
+        activeCampaigns: 0,
+        rolledBack:      0,
+      })
+
+      // Derive metrics from readiness checks
+      if (r?.revenue?.checks) {
+        const campCheck = r.revenue.checks.find((c: SetupCheck) => c.id === "campaign")
+        const leadCheck = r.revenue.checks.find((c: SetupCheck) => c.id === "lead_flow")
+        const appCheck  = r.revenue.checks.find((c: SetupCheck) => c.id === "approvals")
+        setMetrics({
+          leadsToday:      0,
+          leadsTotal:      leadCheck?.evidence?.count ?? 0,
+          highValueLeads:  0,
+          pendingReviews:  appCheck?.evidence?.count ?? 0,
+          activeCampaigns: campCheck?.status === "ok" ? (campCheck.evidence?.count ?? 1) : 0,
+          rolledBack:      campCheck?.status === "error" && campCheck.detail?.includes("rolled back") ? 1 : 0,
+        })
+      }
+
+      setError(null)
+    } catch (e) {
+      setError(String(e))
     } finally {
       setLoading(false)
       setRefreshing(false)
     }
   }, [])
 
-  useEffect(() => { void load() }, [load])
+  useEffect(() => { load() }, [load])
+
+  const today = new Date().toLocaleDateString("en-IN", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
+  })
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 border-brand-600 animate-spin mx-auto mb-3 text-brand-600" />
-          <p className="text-gray-400 text-sm">Preparing your daily briefing…</p>
+          <Zap size={24} className="text-brand-600 mx-auto mb-3 animate-pulse" />
+          <p className="text-sm text-gray-500">Loading your business dashboard…</p>
         </div>
       </div>
     )
   }
 
-  const today = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })
-  const risks      = briefing?.risks ?? []
-  const actions    = briefing?.topActions ?? []
-  const opps       = briefing?.opportunities ?? []
-  const changed    = briefing?.whatChanged ?? []
-  const criticals  = risks.filter(r => r.severity === "critical").length
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center max-w-sm">
+          <XCircle size={24} className="text-red-500 mx-auto mb-3" />
+          <p className="text-sm text-gray-800 font-medium mb-1">Something went wrong</p>
+          <p className="text-xs text-gray-500 mb-4">{error}</p>
+          <button onClick={() => load()} className="text-xs text-brand-600 hover:text-brand-700">Try again</button>
+        </div>
+      </div>
+    )
+  }
+
+  const overallScore  = readiness?.overallScore ?? 0
+  const overallStatus = readiness?.overall ?? "not_ready"
+  const overallLabel  = overallStatus === "ready" ? "System Ready" : overallStatus === "partial" ? "Partially Set Up" : "Setup Incomplete"
+  const topActions    = briefing?.topActions ?? []
+  const risks         = briefing?.risks ?? []
+  const opportunities = briefing?.opportunities ?? []
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">Good morning</h1>
-            <p className="text-sm text-gray-400">{today}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {lastRefresh && (
-              <span className="text-xs text-gray-400">Updated {ago(lastRefresh)}</span>
-            )}
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+
+        {/* ── Header ─────────────────────────────────────────────────────────── */}
+        <div className="bg-white border border-gray-200 rounded-2xl px-5 py-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">Your Business Dashboard</h1>
+              <p className="text-xs text-gray-500 mt-0.5">{today}</p>
+            </div>
             <button
               onClick={() => load(true)}
               disabled={refreshing}
-              className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 transition"
+              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg px-2.5 py-1.5 transition-colors"
             >
-              <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
-              Refresh
+              <RefreshCw size={11} className={refreshing ? "animate-spin" : ""} />
+              {refreshing ? "Refreshing…" : "Refresh"}
             </button>
-            <Link
-              href="/admin/growth/dashboard"
-              className="text-xs text-gray-400 hover:text-gray-600 transition"
-            >
-              Full dashboard →
-            </Link>
           </div>
-        </div>
-      </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-6 space-y-6">
-
-        {/* System health banner */}
-        {criticals > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-3">
-            <XCircle size={18} className="text-red-500 flex-shrink-0" />
-            <p className="text-sm text-red-700">
-              <strong>{criticals} critical issue{criticals > 1 ? "s" : ""} need attention:</strong>{" "}
-              {risks.filter(r => r.severity === "critical").map(r => r.title).join("; ")}
-            </p>
-          </div>
-        )}
-
-        {briefing?.readinessSummary && criticals === 0 && (
-          <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-3">
-            <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
-            <p className="text-sm text-green-700">{briefing.readinessSummary}</p>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          {/* Left column: actions */}
-          <div className="lg:col-span-2 space-y-4">
-            {/* Today's actions */}
-            <section>
-              <div className="flex items-center gap-2 mb-3">
-                <Zap size={14} className="text-brand-600" />
-                <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                  Today&apos;s Actions
-                </h2>
-                <span className="text-xs text-gray-400">({actions.length} items)</span>
+          {/* Overall score */}
+          <div className="mt-4 flex items-center gap-4">
+            <div className={`w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-lg ${
+              overallStatus === "ready"   ? "bg-green-100 text-green-700" :
+              overallStatus === "partial" ? "bg-amber-100 text-amber-700" :
+                                           "bg-red-100 text-red-600"
+            }`}>
+              {overallScore}%
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-gray-900">{overallLabel}</div>
+              <div className="text-xs text-gray-500 mt-0.5">
+                {overallStatus === "ready"
+                  ? "All systems operational. Focus on campaign performance."
+                  : overallStatus === "partial"
+                  ? "Some systems need attention. See actions below."
+                  : "Critical setup items are incomplete. Start with Action #1."
+                }
               </div>
-              {actions.length === 0 ? (
-                <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-sm text-gray-400">
-                  No urgent actions today. Check the approval queue.
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {actions.map((a, i) => (
-                    <ActionCard key={a.id} action={a} index={i} />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* Risks */}
-            {risks.length > 0 && (
-              <section>
-                <div className="flex items-center gap-2 mb-3">
-                  <Shield size={14} className="text-red-500" />
-                  <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                    Active Risks
-                  </h2>
-                </div>
-                <div className="space-y-2">
-                  {risks.map((r, i) => <RiskCard key={i} risk={r} />)}
-                </div>
-              </section>
-            )}
-
-            {/* What changed */}
-            {changed.length > 0 && (
-              <section>
-                <div className="flex items-center gap-2 mb-3">
-                  <RefreshCw size={14} className="text-gray-400" />
-                  <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                    What Changed Today
-                  </h2>
-                </div>
-                <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-                  {changed.map((c, i) => (
-                    <div key={i} className="px-4 py-3 flex items-start gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-brand-400 mt-2 flex-shrink-0" />
-                      <div>
-                        <p className="text-xs font-medium text-gray-800">{c.what}</p>
-                        <p className="text-[11px] text-gray-400">{c.impact}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+            </div>
           </div>
 
-          {/* Right column: readiness + opportunities */}
-          <div className="space-y-4">
-            {readiness && <ReadinessBar result={readiness} />}
+          {briefing?.generatedAt && (
+            <p className="text-[10px] text-gray-400 mt-3">
+              Last updated {ago(briefing.generatedAt)}
+            </p>
+          )}
+        </div>
 
-            {/* Quick links */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Quick Links</p>
-              <div className="space-y-1">
-                {[
-                  { label: "Approval Queue",      url: "/admin/growth/ads/approval-queue",        icon: <CheckCircle2 size={13} /> },
-                  { label: "Lead Intelligence",   url: "/admin/growth/ads/lead-value-intelligence", icon: <TrendingUp size={13} /> },
-                  { label: "State Intelligence",  url: "/admin/growth/ads/state-intelligence",    icon: <BarChart2 size={13} /> },
-                  { label: "Keyword Pipeline",    url: "/admin/growth/ads/keyword-intelligence",  icon: <Target size={13} /> },
-                  { label: "Leads",               url: "/admin/growth/leads",                     icon: <Users size={13} /> },
-                  { label: "Dealer Opportunities",url: "/admin/growth/dealers",                   icon: <MessageSquare size={13} /> },
-                  { label: "Brochure Analytics",  url: "/admin/growth/analytics",                 icon: <FileText size={13} /> },
-                ].map(item => (
+        {/* ── Revenue Operations ─────────────────────────────────────────────── */}
+        <section>
+          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 px-1">Revenue Operations</h2>
+          {metrics && <RevenueTracker metrics={metrics} />}
+        </section>
+
+        {/* ── Readiness Tiers ────────────────────────────────────────────────── */}
+        <section>
+          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 px-1">
+            System Health — click to expand
+          </h2>
+          <div className="space-y-2">
+            {readiness?.setup   && <ReadinessBar tier={readiness.setup}   />}
+            {readiness?.data    && <ReadinessBar tier={readiness.data}    />}
+            {readiness?.revenue && <ReadinessBar tier={readiness.revenue} />}
+          </div>
+        </section>
+
+        {/* ── Today's Actions ────────────────────────────────────────────────── */}
+        {topActions.length > 0 && (
+          <section>
+            <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 px-1">
+              Your Actions Today
+            </h2>
+            <div className="space-y-3">
+              {topActions.map((action, i) => (
+                <ActionCard key={action.id} action={action} index={i} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Risks ──────────────────────────────────────────────────────────── */}
+        {risks.length > 0 && (
+          <section>
+            <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 px-1">Active Risks</h2>
+            <div className="space-y-2">
+              {risks.map((r, i) => <RiskBadge key={i} risk={r} />)}
+            </div>
+          </section>
+        )}
+
+        {/* ── Opportunities ──────────────────────────────────────────────────── */}
+        {opportunities.length > 0 && (
+          <section>
+            <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 px-1">Opportunities</h2>
+            <div className="space-y-2">
+              {opportunities.map((o, i) => <OppCard key={i} opp={o} />)}
+            </div>
+          </section>
+        )}
+
+        {/* ── What Changed ───────────────────────────────────────────────────── */}
+        {(briefing?.whatChanged ?? []).length > 0 && (
+          <section>
+            <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 px-1">What Changed</h2>
+            <div className="border border-gray-200 rounded-xl bg-white divide-y divide-gray-100">
+              {(briefing?.whatChanged ?? []).map((c, i) => (
+                <div key={i} className="px-4 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-gray-800">{c.what}</span>
+                    <span className="text-[10px] text-gray-400 ml-auto">{c.when}</span>
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-0.5">{c.impact}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Advanced Tools ─────────────────────────────────────────────────── */}
+        <section className="border border-gray-200 rounded-xl overflow-hidden">
+          <button
+            onClick={() => setAdvancedOpen(o => !o)}
+            className="w-full flex items-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+          >
+            <Settings size={13} className="text-gray-400" />
+            <span className="text-xs font-semibold text-gray-600">Advanced Tools</span>
+            <span className="text-[10px] text-gray-400 ml-1">— For technical setup and detailed analysis</span>
+            {advancedOpen
+              ? <ChevronDown size={13} className="text-gray-400 ml-auto" />
+              : <ChevronRight size={13} className="text-gray-400 ml-auto" />
+            }
+          </button>
+          {advancedOpen && (
+            <div className="border-t border-gray-200 px-4 py-3 bg-white">
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                {ADVANCED_TOOLS.map(({ href, label, icon: Icon }) => (
                   <Link
-                    key={item.url}
-                    href={item.url}
-                    className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg px-2 py-1.5 transition"
+                    key={href}
+                    href={href}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-100 hover:border-brand-200 hover:bg-brand-50 transition-colors group"
                   >
-                    <span className="text-gray-400">{item.icon}</span>
-                    {item.label}
-                    <ChevronRight size={10} className="ml-auto text-gray-300" />
+                    <Icon size={12} className="text-gray-400 group-hover:text-brand-500 flex-shrink-0" />
+                    <span className="text-xs text-gray-600 group-hover:text-brand-700 leading-tight">{label}</span>
                   </Link>
                 ))}
               </div>
+              <p className="text-[10px] text-gray-400 mt-3 border-t border-gray-100 pt-2">
+                These tools require technical knowledge of Google Ads, GTM, and analytics systems.
+                All important actions are surfaced automatically in this dashboard.
+              </p>
             </div>
+          )}
+        </section>
 
-            {/* Opportunities */}
-            {opps.length > 0 && (
-              <section>
-                <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp size={14} className="text-green-500" />
-                  <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                    Opportunities
-                  </h2>
-                </div>
-                <div className="space-y-3">
-                  {opps.map((o, i) => <OppCard key={i} opp={o} />)}
-                </div>
-              </section>
-            )}
-
-            {/* Next actions from readiness */}
-            {readiness?.nextActions && readiness.nextActions.some(a => a.impact === "high") && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <p className="text-xs font-semibold text-amber-700 mb-2 uppercase tracking-wider">Setup Required</p>
-                <div className="space-y-2">
-                  {readiness.nextActions.filter(a => a.impact === "high").slice(0, 2).map((a, i) => (
-                    <div key={i} className="text-xs">
-                      <p className="font-medium text-amber-800">{a.action}</p>
-                      <p className="text-amber-600">{a.why}</p>
-                      {a.setupUrl && (
-                        <Link href={a.setupUrl} className="text-amber-700 font-medium hover:underline inline-flex items-center gap-0.5 mt-0.5">
-                          Fix it <ChevronRight size={9} />
-                        </Link>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+        {/* ── Footer ─────────────────────────────────────────────────────────── */}
+        <div className="text-center pb-6">
+          <p className="text-[10px] text-gray-400">
+            Growth OS · {readiness?.checkedAt ? `Readiness checked ${ago(readiness.checkedAt)}` : ""}
+          </p>
         </div>
       </div>
     </div>

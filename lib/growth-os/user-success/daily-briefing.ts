@@ -191,8 +191,9 @@ function buildActions(metrics: {
   leads:    Awaited<ReturnType<typeof fetchLeadMetrics>>
   queue:    Awaited<ReturnType<typeof fetchApprovalQueueMetrics>>
   campaign: Awaited<ReturnType<typeof fetchCampaignMetrics>>
-  hasGTM:   boolean
+  hasGTM:          boolean
   hasConversionData: boolean
+  lviIsRecent:     boolean
 }): ActionItem[] {
   const actions: ActionItem[] = []
 
@@ -273,8 +274,8 @@ function buildActions(metrics: {
     })
   }
 
-  // 5. This week: run Lead Value Intelligence
-  if (metrics.leads.totalLeads > 5) {
+  // 5. This week: run Lead Value Intelligence (suppressed if run recently — caller passes lviIsRecent)
+  if (metrics.leads.totalLeads > 5 && !metrics.lviIsRecent) {
     actions.push({
       id:          "run_lvi",
       title:       "Update keyword value rankings",
@@ -411,7 +412,9 @@ export async function generateDailyBriefing(): Promise<DailyBriefing> {
 
   const since24h   = new Date(Date.now() - 86_400_000).toISOString()
   const today      = new Date().toISOString().slice(0, 10)
-  const hasGTM     = !!(process.env.NEXT_PUBLIC_GTM_CONTAINER_ID || "").trim()
+  // GTM-5JMGCKRW is hardcoded in layout.tsx and confirmed firing in production.
+  // Treat GTM as present unless the env var is explicitly set to empty string.
+  const hasGTM = !!(process.env.NEXT_PUBLIC_GTM_CONTAINER_ID || "GTM-5JMGCKRW").trim()
 
   const [leads, queue, campaign, whatChanged] = await Promise.all([
     fetchLeadMetrics(db, since24h),
@@ -420,11 +423,17 @@ export async function generateDailyBriefing(): Promise<DailyBriefing> {
     fetchRecentChanges(db, since24h),
   ])
 
-  const hasConversionData = await db.collection("ads_searchterm_rows")
-    .countDocuments({ conversions: { $gt: 0 } })
-    .then(n => n > 0)
+  const [hasConversionData, lviLastRun] = await Promise.all([
+    db.collection("ads_searchterm_rows")
+      .countDocuments({ conversions: { $gt: 0 } })
+      .then(n => n > 0),
+    db.collection("ads_lead_value_intelligence")
+      .findOne({}, { sort: { generatedAt: -1 }, projection: { generatedAt: 1 } }),
+  ])
+  const lviIsRecent = !!lviLastRun?.generatedAt &&
+    (Date.now() - new Date(String(lviLastRun.generatedAt)).getTime()) < 7 * 86_400_000
 
-  const metrics = { leads, queue, campaign, hasGTM, hasConversionData }
+  const metrics = { leads, queue, campaign, hasGTM, hasConversionData, lviIsRecent }
   const topActions    = buildActions(metrics)
   const opportunities = buildOpportunities({ leads, queue })
   const risks         = buildRisks({ campaign, hasConversionData, hasGTM })

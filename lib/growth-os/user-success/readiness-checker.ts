@@ -1,15 +1,12 @@
 /**
- * Growth OS — System Readiness Checker.
+ * Growth OS — System Readiness Checker (3-tier model).
  *
- * Checks whether each system is properly configured and operational.
- * Used by the Founder Mode dashboard and Readiness Score widget.
+ * Three separate readiness tiers:
+ *   1. Setup     — Is everything connected? (Google Ads, GTM, Search Console, Conversion Tracking)
+ *   2. Data      — Do we have enough data? (Leads, Keywords, Search Terms, Intelligence runs)
+ *   3. Revenue   — Is the system generating results? (Active campaigns, spend, approvals)
  *
- * Systems checked:
- *   1. Google Ads      — developer token, customer ID, campaign deployed
- *   2. GSC             — OAuth configured, recent query data
- *   3. GTM             — container ID set
- *   4. Conversion Tracking — conversion data in search term rows
- *   5. Campaign Activation — high-viability campaign ready to activate
+ * Each tier scores 0–100. Overall = average of the three.
  */
 
 import type { Db } from "mongodb"
@@ -17,283 +14,505 @@ import clientPromise from "@/lib/mongodb"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export type CheckStatus = "ok" | "warning" | "error" | "unknown"
+export type CheckStatus = "ok" | "warning" | "error"
 
-export interface SystemCheck {
+export interface SetupCheck {
+  id:        string
+  label:     string        // plain-English label: "Google Ads connected"
+  detail:    string        // one sentence: what this means
   status:    CheckStatus
-  label:     string        // short status label, e.g. "Connected", "Missing token"
-  detail:    string        // one-sentence explanation
-  setupUrl?: string        // where to go to fix it
-  score:     number        // 0–20 per system (5 systems × 20 = 100 max)
+  evidence:  {
+    collection?: string
+    count?:      number
+    value?:      string
+    lastSeen?:   string
+  }
+  setupUrl?: string
+  points:    number        // 0 | partial | maxPoints
+  maxPoints: number        // always 25
+}
+
+export interface ReadinessTier {
+  id:          "setup" | "data" | "revenue"
+  label:       string
+  description: string
+  score:       number    // 0–100
+  status:      "ready" | "partial" | "not_ready"
+  checks:      SetupCheck[]
+  topBlocker:  string | null
 }
 
 export interface ReadinessResult {
-  overall:          "ready" | "partial" | "not_ready"
-  score:            number        // 0–100
-  systems:          Record<string, SystemCheck>
-  nextActions:      NextAction[]  // sorted by impact
-  checkedAt:        string
+  overallScore: number   // 0–100
+  overall:      "ready" | "partial" | "not_ready"
+  setup:        ReadinessTier
+  data:         ReadinessTier
+  revenue:      ReadinessTier
+  nextActions:  NextAction[]
+  checkedAt:    string
 }
 
 export interface NextAction {
-  action:      string
-  why:         string
-  impact:      "high" | "medium" | "low"
-  setupUrl?:   string
+  action:    string
+  why:       string
+  impact:    "high" | "medium" | "low"
+  effort:    string
+  setupUrl?: string
 }
 
-// ── Individual system checks ──────────────────────────────────────────────────
+// ── Helper ────────────────────────────────────────────────────────────────────
 
-async function checkGoogleAds(db: Db): Promise<SystemCheck> {
-  const tokenSet   = !!(process.env.GOOGLE_ADS_DEVELOPER_TOKEN || "").trim()
-  const settings   = await db.collection("ads_settings").findOne({})
-  const customerId = settings?.customerId as string | undefined
-  const campaigns  = await db.collection("ads_deployments").countDocuments({})
-
-  if (!tokenSet) return {
-    status:   "error",
-    label:    "No developer token",
-    detail:   "GOOGLE_ADS_DEVELOPER_TOKEN is not set. Google Ads API calls will fail.",
-    setupUrl: "/admin/growth/paid",
-    score:    0,
-  }
-  if (!customerId) return {
-    status:   "error",
-    label:    "No customer ID",
-    detail:   "Google Ads customer ID not configured. Add it in Paid Ads settings.",
-    setupUrl: "/admin/growth/paid",
-    score:    5,
-  }
-  if (campaigns === 0) return {
-    status:   "warning",
-    label:    "No campaigns deployed",
-    detail:   "Google Ads is connected but no campaigns have been created yet.",
-    setupUrl: "/admin/growth/paid",
-    score:    12,
-  }
-  return {
-    status:  "ok",
-    label:   `Connected — ${campaigns} campaign(s)`,
-    detail:  `Google Ads API connected, customer ${customerId}, ${campaigns} deployment record(s).`,
-    score:   20,
-  }
+function tierStatus(score: number): ReadinessTier["status"] {
+  return score >= 75 ? "ready" : score >= 40 ? "partial" : "not_ready"
 }
 
-async function checkGSC(db: Db): Promise<SystemCheck> {
-  const clientId  = !!(process.env.GOOGLE_OAUTH_CLIENT_ID  || "").trim()
-  const clientSec = !!(process.env.GOOGLE_OAUTH_CLIENT_SECRET || "").trim()
+function tierScore(checks: SetupCheck[]): number {
+  const total = checks.reduce((s, c) => s + c.points, 0)
+  const max   = checks.reduce((s, c) => s + c.maxPoints, 0)
+  return max === 0 ? 0 : Math.round((total / max) * 100)
+}
 
-  if (!clientId || !clientSec) return {
-    status:   "error",
-    label:    "OAuth not configured",
-    detail:   "Google OAuth client credentials are missing. GSC data sync will not work.",
-    setupUrl: "/admin/growth/seo",
-    score:    0,
-  }
+// ── Tier 1: Setup ─────────────────────────────────────────────────────────────
+// "Is everything connected?"
 
-  const totalRows = await db.collection("gsc_query_rows").countDocuments({})
-  if (totalRows === 0) return {
-    status:   "error",
-    label:    "No GSC data",
-    detail:   "Google Search Console data has not been synced yet. Connect GSC to start.",
-    setupUrl: "/admin/growth/seo",
-    score:    5,
-  }
+async function buildSetupTier(db: Db): Promise<ReadinessTier> {
+  const settings = await db.collection("ads_settings").findOne({})
 
-  // GSC rows use `syncDate` (date string "YYYY-MM-DD"), not `syncedAt`.
-  // Compare against a 7-day-ago date string.
-  const sevenDaysAgoDate = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10)
+  // ── Check 1: Google Ads API ─────────────────────────────────────────────────
+  const hasToken      = !!(process.env.GOOGLE_ADS_DEVELOPER_TOKEN ?? "").trim()
+  const customerId    = String(settings?.customerId ?? "").trim()
+  const hasCustomerId = !!customerId
+
+  const googleAds: SetupCheck = hasToken && hasCustomerId
+    ? {
+        id: "google_ads", label: "Google Ads connected",
+        detail: `API connected. Account: ${customerId}. Your ads account is linked and ready.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "ads_settings", value: customerId },
+      }
+    : !hasToken
+    ? {
+        id: "google_ads", label: "Google Ads API key missing",
+        detail: "GOOGLE_ADS_DEVELOPER_TOKEN is not set in Vercel environment variables.",
+        status: "error", points: 0, maxPoints: 25,
+        evidence: {},
+        setupUrl: "/admin/growth/paid",
+      }
+    : {
+        id: "google_ads", label: "Google Ads account not linked",
+        detail: "API key is set but no customer ID configured. Add your Google Ads Customer ID in settings.",
+        status: "warning", points: 10, maxPoints: 25,
+        evidence: { collection: "ads_settings" },
+        setupUrl: "/admin/growth/paid",
+      }
+
+  // ── Check 2: GTM ────────────────────────────────────────────────────────────
+  // GTM-5JMGCKRW is hardcoded in layout.tsx and confirmed firing in production.
+  // Also check env var and ads_settings as config sources.
+  const gtmEnv      = (process.env.NEXT_PUBLIC_GTM_CONTAINER_ID ?? "").trim()
+  const gtmSettings = String(settings?.gtmContainerId ?? "").trim()
+  const gtmHardcoded = "GTM-5JMGCKRW"  // confirmed in app/layout.tsx
+  const gtmId       = gtmEnv || gtmSettings || gtmHardcoded
+
+  const gtm: SetupCheck = gtmEnv || gtmSettings
+    ? {
+        id: "gtm", label: `Google Tag Manager installed (${gtmId})`,
+        detail: `GTM container ${gtmId} is configured and firing. Conversion tags can be published.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { value: gtmId },
+        setupUrl: "https://tagmanager.google.com",
+      }
+    : {
+        // GTM is hardcoded in layout.tsx — it IS firing, but Growth OS can't confirm without the env var.
+        id: "gtm", label: `GTM installed (${gtmHardcoded}) — confirm in settings`,
+        detail: `${gtmHardcoded} is installed on the website. Set NEXT_PUBLIC_GTM_CONTAINER_ID in Vercel so Growth OS can confirm tracking.`,
+        status: "warning", points: 18, maxPoints: 25,
+        evidence: { value: gtmHardcoded },
+        setupUrl: "https://tagmanager.google.com",
+      }
+
+  // ── Check 3: Search Console ─────────────────────────────────────────────────
+  const hasOAuth = !!(process.env.GOOGLE_OAUTH_CLIENT_ID ?? "").trim()
+  const gscTotal = await db.collection("gsc_query_rows").countDocuments({})
   const latestGsc = await db.collection("gsc_query_rows")
-    .findOne({}, { sort: { syncDate: -1 }, projection: { syncDate: 1, endDate: 1 } })
+    .findOne({}, { sort: { syncDate: -1 }, projection: { syncDate: 1 } })
+  const latestSync  = String(latestGsc?.syncDate ?? "")
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10)
+  const isGscFresh   = !!latestSync && latestSync >= sevenDaysAgo
 
-  const latestSyncDate = String(latestGsc?.syncDate ?? latestGsc?.endDate ?? "")
-  const isRecent = latestSyncDate >= sevenDaysAgoDate
+  const gsc: SetupCheck = !hasOAuth
+    ? {
+        id: "gsc", label: "Search Console not connected",
+        detail: "Google OAuth credentials are missing. Connect Search Console to see which searches find your website.",
+        status: "error", points: 0, maxPoints: 25,
+        evidence: {},
+        setupUrl: "/admin/growth/seo/setup",
+      }
+    : gscTotal === 0
+    ? {
+        id: "gsc", label: "Search Console connected but no data",
+        detail: "OAuth is set up but no search data has synced yet. Run a sync from the SEO dashboard.",
+        status: "warning", points: 12, maxPoints: 25,
+        evidence: { collection: "gsc_query_rows", count: 0 },
+        setupUrl: "/admin/growth/seo",
+      }
+    : !isGscFresh
+    ? {
+        id: "gsc", label: `Search Console data stale (last sync ${latestSync})`,
+        detail: `${gscTotal} rows of search data exist, but the last sync was ${latestSync}. Re-sync to keep data current.`,
+        status: "warning", points: 18, maxPoints: 25,
+        evidence: { collection: "gsc_query_rows", count: gscTotal, lastSeen: latestSync },
+        setupUrl: "/admin/growth/seo",
+      }
+    : {
+        id: "gsc", label: `Search Console synced (${gscTotal} rows, ${latestSync})`,
+        detail: `${gscTotal} search query rows available. Data is current as of ${latestSync}.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "gsc_query_rows", count: gscTotal, lastSeen: latestSync },
+      }
 
-  if (!isRecent) {
-    return {
-      status:   "warning",
-      label:    `Data stale — last sync ${latestSyncDate || "unknown"}`,
-      detail:   `GSC has ${totalRows} rows but the latest sync date is ${latestSyncDate || "unknown"}. Run a fresh sync.`,
-      setupUrl: "/admin/growth/seo",
-      score:    12,
-    }
-  }
-
-  return {
-    status:  "ok",
-    label:   `${totalRows} rows — synced ${latestSyncDate}`,
-    detail:  `GSC data is current. Latest sync: ${latestSyncDate}. ${totalRows} query rows available.`,
-    score:   20,
-  }
-}
-
-async function checkGTM(): Promise<SystemCheck> {
-  const containerId = (process.env.NEXT_PUBLIC_GTM_CONTAINER_ID || "").trim()
-
-  if (!containerId) return {
-    status:   "error",
-    label:    "Container ID not set",
-    detail:   "NEXT_PUBLIC_GTM_CONTAINER_ID is missing. GTM tags are not firing.",
-    setupUrl: "https://tagmanager.google.com",
-    score:    0,
-  }
-
-  return {
-    status:  "ok",
-    label:   containerId,
-    detail:  `GTM container ${containerId} is configured. Verify tags are published in GTM.`,
-    score:   20,
-  }
-}
-
-async function checkConversionTracking(db: Db): Promise<SystemCheck> {
-  // Check if any search term rows have conversion data
-  const withConversions = await db.collection("ads_searchterm_rows")
+  // ── Check 4: Conversion Tracking ────────────────────────────────────────────
+  const stTotal    = await db.collection("ads_searchterm_rows").countDocuments({})
+  const stWithConv = await db.collection("ads_searchterm_rows")
     .countDocuments({ conversions: { $gt: 0 } })
 
-  if (withConversions > 0) return {
-    status:  "ok",
-    label:   `${withConversions} converting queries`,
-    detail:  `Conversion tracking is working — ${withConversions} search term rows have conversion data.`,
-    score:   20,
-  }
+  const conversion: SetupCheck = stWithConv > 0
+    ? {
+        id: "conversion", label: `Conversion tracking active (${stWithConv} converting searches)`,
+        detail: `${stWithConv} search queries have recorded conversions. You can see which searches generate leads.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "ads_searchterm_rows", count: stWithConv },
+      }
+    : stTotal > 0
+    ? {
+        id: "conversion", label: "Search data imported but zero conversions tracked",
+        detail: `${stTotal} search term rows imported but no conversions recorded. Create conversion actions in Google Ads and publish GTM tags.`,
+        status: "warning", points: 8, maxPoints: 25,
+        evidence: { collection: "ads_searchterm_rows", count: stTotal },
+        setupUrl: "/admin/growth/paid",
+      }
+    : {
+        id: "conversion", label: "Conversion tracking not set up",
+        detail: "No search term data imported. Without conversion tracking, you cannot tell which keywords generate leads.",
+        status: "error", points: 0, maxPoints: 25,
+        evidence: {},
+        setupUrl: "/admin/growth/paid",
+      }
 
-  const totalRows = await db.collection("ads_searchterm_rows").countDocuments({})
-  if (totalRows === 0) return {
-    status:   "error",
-    label:    "No search term data",
-    detail:   "Google Ads search term data has not been imported. Run the search term sync first.",
-    setupUrl: "/admin/growth/paid",
-    score:    0,
-  }
-
-  // Search term rows exist but zero conversions — GTM / conversion actions likely not configured
+  const checks = [googleAds, gtm, gsc, conversion]
+  const score  = tierScore(checks)
   return {
-    status:   "warning",
-    label:    "No conversions tracked",
-    detail:   `${totalRows} search term rows imported but zero conversions. Create conversion actions in Google Ads and import GTM container.`,
-    setupUrl: "/admin/growth/paid",
-    score:    8,
+    id: "setup", label: "Setup", description: "Is everything connected?",
+    score, status: tierStatus(score), checks,
+    topBlocker: checks.find(c => c.status === "error")?.label
+      ?? checks.find(c => c.status === "warning")?.label
+      ?? null,
   }
 }
 
-async function checkCampaignActivation(db: Db): Promise<SystemCheck> {
-  const pendingCount = await db.collection("ads_approval_queue")
-    .countDocuments({ status: "pending" })
+// ── Tier 2: Data ──────────────────────────────────────────────────────────────
+// "Do we have enough data to make decisions?"
 
-  const latestViability = await db.collection("ads_keyword_intelligence")
-    .findOne({}, { sort: { generatedAt: -1 }, projection: { meetsSuccessCriterion: 1, totalCount: 1 } })
+async function buildDataTier(db: Db): Promise<ReadinessTier> {
+  const since90d = new Date(Date.now() - 90 * 86_400_000).toISOString()
 
+  // ── Check 1: Lead pipeline ──────────────────────────────────────────────────
+  const [rfq, brochure, gem] = await Promise.all([
+    db.collection("rfq_popup_leads").countDocuments({ createdAt: { $gte: since90d } }),
+    db.collection("brochure_leads").countDocuments({ createdAt: { $gte: since90d } }),
+    db.collection("gem_inquiries").countDocuments({ createdAt: { $gte: since90d } }),
+  ])
+  const totalLeads = rfq + brochure + gem
+
+  const leads: SetupCheck = totalLeads >= 20
+    ? {
+        id: "leads", label: `Strong lead pipeline (${totalLeads} in 90 days)`,
+        detail: `${rfq} RFQ enquiries + ${brochure} brochure downloads + ${gem} government enquiries. Sufficient data for analysis.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "rfq_popup_leads", count: totalLeads },
+      }
+    : totalLeads >= 5
+    ? {
+        id: "leads", label: `${totalLeads} leads in 90 days — building up`,
+        detail: `${rfq} enquiries, ${brochure} brochure downloads, ${gem} government leads. Need more data for accurate recommendations.`,
+        status: "warning", points: 15, maxPoints: 25,
+        evidence: { collection: "rfq_popup_leads", count: totalLeads },
+      }
+    : {
+        id: "leads", label: `Only ${totalLeads} lead(s) in 90 days`,
+        detail: "Very few leads recorded. Traffic may not be reaching the website or lead capture may need improvement.",
+        status: "error", points: 5, maxPoints: 25,
+        evidence: { collection: "rfq_popup_leads", count: totalLeads },
+      }
+
+  // ── Check 2: Keyword intelligence ──────────────────────────────────────────
+  const kwLatest = await db.collection("ads_keyword_intelligence")
+    .findOne({}, { sort: { generatedAt: -1 }, projection: { generatedAt: 1, totalCount: 1, meetsSuccessCriterion: 1 } })
+
+  const keywords: SetupCheck = kwLatest?.meetsSuccessCriterion === true
+    ? {
+        id: "keywords", label: `Keyword list ready (${kwLatest.totalCount} keywords)`,
+        detail: `Keyword Intelligence has identified ${kwLatest.totalCount} viable keywords. Campaigns can be deployed.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "ads_keyword_intelligence", count: kwLatest.totalCount, lastSeen: kwLatest.generatedAt },
+      }
+    : kwLatest
+    ? {
+        id: "keywords", label: `${kwLatest.totalCount ?? 0} keywords found — threshold not met`,
+        detail: `Keyword Intelligence found ${kwLatest.totalCount ?? 0} keywords but needs more to meet the minimum campaign threshold.`,
+        status: "warning", points: 12, maxPoints: 25,
+        evidence: { collection: "ads_keyword_intelligence", count: kwLatest.totalCount ?? 0, lastSeen: kwLatest.generatedAt },
+        setupUrl: "/admin/growth/ads",
+      }
+    : {
+        id: "keywords", label: "Keyword Intelligence not run yet",
+        detail: "Run Keyword Intelligence to identify which search terms to bid on. Required before deploying any campaign.",
+        status: "error", points: 0, maxPoints: 25,
+        evidence: {},
+        setupUrl: "/admin/growth/ads",
+      }
+
+  // ── Check 3: Lead Value Intelligence ───────────────────────────────────────
+  const lviLatest = await db.collection("ads_lead_value_intelligence")
+    .findOne({}, { sort: { generatedAt: -1 }, projection: { generatedAt: 1, totalLeads: 1, totalWeightedScore: 1 } })
+  const siLatest = await db.collection("ads_state_intelligence")
+    .findOne({}, { sort: { generatedAt: -1 }, projection: { generatedAt: 1, statesAnalyzed: 1 } })
+
+  const intelligence: SetupCheck = lviLatest && siLatest
+    ? {
+        id: "intelligence", label: "Lead & State intelligence complete",
+        detail: `Lead Value Intelligence: ${lviLatest.totalLeads} leads scored. State Intelligence: ${siLatest.statesAnalyzed} states analyzed.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "ads_lead_value_intelligence", count: lviLatest.totalLeads, lastSeen: lviLatest.generatedAt },
+      }
+    : lviLatest
+    ? {
+        id: "intelligence", label: "Lead intelligence run — state intelligence pending",
+        detail: "Lead scoring is complete. Run State Intelligence to identify which regions have the highest opportunity.",
+        status: "warning", points: 15, maxPoints: 25,
+        evidence: { collection: "ads_lead_value_intelligence", count: lviLatest.totalLeads, lastSeen: lviLatest.generatedAt },
+        setupUrl: "/admin/growth/ads/state-intelligence",
+      }
+    : {
+        id: "intelligence", label: "Lead intelligence not run yet",
+        detail: "Run Lead Value Intelligence to score your leads and identify which keywords and regions to prioritize.",
+        status: "error", points: 0, maxPoints: 25,
+        evidence: {},
+        setupUrl: "/admin/growth/ads/lead-value-intelligence",
+      }
+
+  // ── Check 4: Search term coverage ──────────────────────────────────────────
+  const stRows = await db.collection("ads_searchterm_rows").countDocuments({})
+
+  const searchTerms: SetupCheck = stRows >= 50
+    ? {
+        id: "search_terms", label: `${stRows} search term rows imported`,
+        detail: `Google Ads search term data is available. Growth OS can analyze which searches are working.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "ads_searchterm_rows", count: stRows },
+      }
+    : stRows > 0
+    ? {
+        id: "search_terms", label: `${stRows} search term rows — limited data`,
+        detail: `Some search term data is imported but not enough for reliable recommendations. Import more data from Google Ads.`,
+        status: "warning", points: 12, maxPoints: 25,
+        evidence: { collection: "ads_searchterm_rows", count: stRows },
+        setupUrl: "/admin/growth/paid",
+      }
+    : {
+        id: "search_terms", label: "No search term data imported",
+        detail: "Import search term performance data from Google Ads. This shows which searches are generating clicks and leads.",
+        status: "error", points: 0, maxPoints: 25,
+        evidence: {},
+        setupUrl: "/admin/growth/paid",
+      }
+
+  const checks = [leads, keywords, intelligence, searchTerms]
+  const score  = tierScore(checks)
+  return {
+    id: "data", label: "Data", description: "Do we have enough data to make good decisions?",
+    score, status: tierStatus(score), checks,
+    topBlocker: checks.find(c => c.status === "error")?.label
+      ?? checks.find(c => c.status === "warning")?.label
+      ?? null,
+  }
+}
+
+// ── Tier 3: Revenue ───────────────────────────────────────────────────────────
+// "Is the system generating results?"
+
+async function buildRevenueTier(db: Db): Promise<ReadinessTier> {
+  // ── Check 1: Active campaign ────────────────────────────────────────────────
   const [active, paused, rolledBack] = await Promise.all([
     db.collection("ads_deployments").countDocuments({ state: "enabled" }),
     db.collection("ads_deployments").countDocuments({ state: "paused" }),
     db.collection("ads_deployments").countDocuments({ status: "rolled_back" }),
   ])
 
-  if (active > 0) return {
-    status:  "ok",
-    label:   `${active} active campaign(s)`,
-    detail:  `${active} campaign(s) are live and spending. Monitor performance in Paid Growth.`,
-    score:   20,
-  }
+  const campaign: SetupCheck = active > 0
+    ? {
+        id: "campaign", label: `${active} campaign(s) active`,
+        detail: `Your ads are live and spending. Impressions and leads should be accumulating.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "ads_deployments", count: active },
+      }
+    : rolledBack > 0
+    ? {
+        id: "campaign", label: "Campaign was deployed but rolled back",
+        detail: "Your campaign deployment was reversed. No ads are running. Review the rollback reason and re-deploy.",
+        status: "error", points: 0, maxPoints: 25,
+        evidence: { collection: "ads_deployments", count: rolledBack },
+        setupUrl: "/admin/growth/paid",
+      }
+    : paused > 0
+    ? {
+        id: "campaign", label: `${paused} campaign(s) paused`,
+        detail: "Campaigns exist but are paused. Recharge your Google Ads account to resume spending.",
+        status: "warning", points: 10, maxPoints: 25,
+        evidence: { collection: "ads_deployments", count: paused },
+        setupUrl: "/admin/growth/paid",
+      }
+    : {
+        id: "campaign", label: "No campaigns deployed yet",
+        detail: "No Google Ads campaigns have been created. Build and deploy your first campaign to start generating leads.",
+        status: "error", points: 0, maxPoints: 25,
+        evidence: {},
+        setupUrl: "/admin/growth/paid",
+      }
 
-  if (rolledBack > 0) return {
-    status:   "warning",
-    label:    `${rolledBack} deployment(s) rolled back`,
-    detail:   "Previous campaign deployment was rolled back. Review the deployment log and re-deploy once keywords and budget are validated.",
-    setupUrl: "/admin/growth/paid",
-    score:    8,
-  }
+  // ── Check 2: Lead flow ──────────────────────────────────────────────────────
+  const since7d   = new Date(Date.now() - 7 * 86_400_000).toISOString()
+  const since30d  = new Date(Date.now() - 30 * 86_400_000).toISOString()
+  const [leads7d, highValue30d] = await Promise.all([
+    db.collection("rfq_popup_leads").countDocuments({ createdAt: { $gte: since7d } }),
+    db.collection("rfq_popup_leads").countDocuments({
+      createdAt: { $gte: since30d },
+      leadType: { $in: ["dealer_application", "oem_authorization", "gem_inquiry"] },
+    }),
+  ])
 
-  if (paused > 0) return {
-    status:   "warning",
-    label:    `${paused} campaign(s) paused`,
-    detail:   "Campaign(s) are paused. Recharge account and enable in Google Ads to resume spend.",
-    setupUrl: "/admin/growth/paid",
-    score:    15,
-  }
+  const leadFlow: SetupCheck = highValue30d >= 3
+    ? {
+        id: "lead_flow", label: `${highValue30d} high-value leads in 30 days`,
+        detail: `${highValue30d} dealer/OEM/government leads received this month. Revenue pipeline is active.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "rfq_popup_leads", count: highValue30d },
+      }
+    : leads7d >= 2
+    ? {
+        id: "lead_flow", label: `${leads7d} lead(s) in last 7 days`,
+        detail: `${leads7d} enquiries received this week. No high-value (dealer/OEM) leads yet. Qualify and follow up.`,
+        status: "warning", points: 15, maxPoints: 25,
+        evidence: { collection: "rfq_popup_leads", count: leads7d },
+      }
+    : {
+        id: "lead_flow", label: "Very few recent leads",
+        detail: `${leads7d} lead(s) in the last 7 days. Lead volume is too low. Activate a campaign or check website traffic.`,
+        status: leads7d === 0 ? "error" : "warning",
+        points: leads7d === 0 ? 5 : 10, maxPoints: 25,
+        evidence: { collection: "rfq_popup_leads", count: leads7d },
+      }
 
-  if (pendingCount > 0) return {
-    status:   "warning",
-    label:    `${pendingCount} pending approvals`,
-    detail:   `${pendingCount} recommendation(s) waiting for your review in the Approval Queue.`,
-    setupUrl: "/admin/growth/ads/approval-queue",
-    score:    12,
-  }
+  // ── Check 3: Approval queue health ─────────────────────────────────────────
+  const [pendingIntelligence, pendingCampaignPlans] = await Promise.all([
+    db.collection("ads_approval_queue").countDocuments({ status: "pending" }),
+    db.collection("ads_campaign_plans").countDocuments({ status: "pending_approval" }),
+  ])
+  const totalPending = pendingIntelligence + pendingCampaignPlans
 
-  const hasKeywords = latestViability?.meetsSuccessCriterion === true
-  if (!hasKeywords) return {
-    status:   "error",
-    label:    "No viable campaign",
-    detail:   "No high-viability campaign is ready. Run Keyword Intelligence to generate one.",
-    setupUrl: "/admin/growth/paid",
-    score:    2,
-  }
+  const approvals: SetupCheck = totalPending === 0
+    ? {
+        id: "approvals", label: "No pending approvals — queue clear",
+        detail: "All Growth OS recommendations have been reviewed. Queue is clear.",
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "ads_approval_queue", count: 0 },
+      }
+    : totalPending <= 5
+    ? {
+        id: "approvals", label: `${totalPending} recommendation(s) waiting for your decision`,
+        detail: `${pendingIntelligence} keyword/budget/geo optimizations + ${pendingCampaignPlans} campaign plans need your review.`,
+        status: "warning", points: 15, maxPoints: 25,
+        evidence: { collection: "ads_approval_queue", count: totalPending },
+        setupUrl: "/admin/growth/ads/approval-queue",
+      }
+    : {
+        id: "approvals", label: `${totalPending} recommendations backlogged`,
+        detail: `${pendingIntelligence} optimizations + ${pendingCampaignPlans} campaign plans waiting. Review regularly to keep Growth OS running effectively.`,
+        status: "warning", points: 10, maxPoints: 25,
+        evidence: { collection: "ads_approval_queue", count: totalPending },
+        setupUrl: "/admin/growth/ads/approval-queue",
+      }
 
+  // ── Check 4: Budget recommendations ────────────────────────────────────────
+  const budgetRecs = await db.collection("ads_budget_recommendations_v2")
+    .findOne({}, { sort: { generatedAt: -1 }, projection: { generatedAt: 1, recommendations: 1 } })
+  const hasApprovedBudget = await db.collection("ads_approval_queue")
+    .countDocuments({ type: { $in: ["set_budget", "increase_budget"] }, status: "approved" })
+
+  const budget: SetupCheck = hasApprovedBudget > 0
+    ? {
+        id: "budget", label: "Budget strategy approved",
+        detail: `${hasApprovedBudget} budget recommendation(s) approved. Growth OS is operating with defined spend parameters.`,
+        status: "ok", points: 25, maxPoints: 25,
+        evidence: { collection: "ads_approval_queue", count: hasApprovedBudget },
+      }
+    : budgetRecs
+    ? {
+        id: "budget", label: "Budget recommendations generated — awaiting approval",
+        detail: "Budget recommendations have been created but not yet approved. Review in the Approval Queue.",
+        status: "warning", points: 12, maxPoints: 25,
+        evidence: { collection: "ads_budget_recommendations_v2", lastSeen: budgetRecs.generatedAt },
+        setupUrl: "/admin/growth/ads/approval-queue",
+      }
+    : {
+        id: "budget", label: "No budget strategy set",
+        detail: "Run Budget Recommendation V2 to get data-driven budget suggestions based on your lead scoring.",
+        status: "error", points: 0, maxPoints: 25,
+        evidence: {},
+        setupUrl: "/admin/growth/ads",
+      }
+
+  const checks = [campaign, leadFlow, approvals, budget]
+  const score  = tierScore(checks)
   return {
-    status:  "ok",
-    label:   "Campaign-ready",
-    detail:  "Keyword pipeline has met the success criterion. Campaign is ready for deployment.",
-    score:   20,
+    id: "revenue", label: "Revenue", description: "Is the system generating results?",
+    score, status: tierStatus(score), checks,
+    topBlocker: checks.find(c => c.status === "error")?.label
+      ?? checks.find(c => c.status === "warning")?.label
+      ?? null,
   }
 }
 
-// ── Next actions generator ────────────────────────────────────────────────────
+// ── Next actions ──────────────────────────────────────────────────────────────
 
-function buildNextActions(systems: Record<string, SystemCheck>): NextAction[] {
+function buildNextActions(
+  setup: ReadinessTier,
+  data: ReadinessTier,
+  revenue: ReadinessTier,
+): NextAction[] {
   const actions: NextAction[] = []
 
-  if (systems.googleAds.status === "error") {
+  // Pull from each tier's error checks first, then warnings
+  const allChecks = [
+    ...setup.checks, ...data.checks, ...revenue.checks,
+  ].sort((a, b) => {
+    const order = { error: 0, warning: 1, ok: 2 }
+    return order[a.status] - order[b.status]
+  })
+
+  for (const check of allChecks) {
+    if (check.status === "ok") break
+    if (actions.length >= 5) break
     actions.push({
-      action:    "Configure Google Ads developer token and customer ID",
-      why:       systems.googleAds.detail,
-      impact:    "high",
-      setupUrl:  systems.googleAds.setupUrl,
-    })
-  }
-  if (systems.conversionTracking.status === "warning" || systems.conversionTracking.status === "error") {
-    actions.push({
-      action:    "Set up conversion tracking in Google Ads + GTM",
-      why:       systems.conversionTracking.detail,
-      impact:    "high",
-      setupUrl:  systems.conversionTracking.setupUrl,
-    })
-  }
-  if (systems.gsc.status !== "ok") {
-    actions.push({
-      action:    "Connect Google Search Console and sync data",
-      why:       systems.gsc.detail,
-      impact:    "medium",
-      setupUrl:  systems.gsc.setupUrl,
-    })
-  }
-  if (systems.gtm.status !== "ok") {
-    actions.push({
-      action:    "Add GTM container ID to environment variables",
-      why:       systems.gtm.detail,
-      impact:    "medium",
-      setupUrl:  systems.gtm.setupUrl,
-    })
-  }
-  if (systems.campaignActivation.status === "warning") {
-    actions.push({
-      action:    "Review and approve pending campaign recommendations",
-      why:       systems.campaignActivation.detail,
-      impact:    "high",
-      setupUrl:  systems.campaignActivation.setupUrl,
+      action:   `Fix: ${check.label}`,
+      why:      check.detail,
+      impact:   check.status === "error" ? "high" : "medium",
+      effort:   "30 min",
+      setupUrl: check.setupUrl,
     })
   }
 
-  if (actions.length === 0) {
-    actions.push({
-      action:    "All systems operational — monitor campaign performance",
-      why:       "Every system is configured and active. Review the approval queue daily.",
-      impact:    "low",
-      setupUrl:  "/admin/growth/ads/approval-queue",
-    })
-  }
-
-  return actions.slice(0, 5)
+  return actions
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -302,28 +521,24 @@ export async function checkSystemReadiness(): Promise<ReadinessResult> {
   const client = await clientPromise
   const db     = client.db() as Db
 
-  const [googleAds, gsc, conversionTracking, campaignActivation] = await Promise.all([
-    checkGoogleAds(db),
-    checkGSC(db),
-    checkConversionTracking(db),
-    checkCampaignActivation(db),
+  const [setup, data, revenue] = await Promise.all([
+    buildSetupTier(db),
+    buildDataTier(db),
+    buildRevenueTier(db),
   ])
-  const gtm = await checkGTM()
 
-  const systems: Record<string, SystemCheck> = {
-    googleAds, gsc, gtm, conversionTracking, campaignActivation,
-  }
-
-  const score = Object.values(systems).reduce((s, c) => s + c.score, 0)
+  const overallScore = Math.round((setup.score + data.score + revenue.score) / 3)
   const overall: ReadinessResult["overall"] =
-    score >= 80 ? "ready" :
-    score >= 40 ? "partial" : "not_ready"
+    overallScore >= 75 ? "ready" :
+    overallScore >= 40 ? "partial" : "not_ready"
 
   return {
+    overallScore,
     overall,
-    score,
-    systems,
-    nextActions: buildNextActions(systems),
-    checkedAt:   new Date().toISOString(),
+    setup,
+    data,
+    revenue,
+    nextActions: buildNextActions(setup, data, revenue),
+    checkedAt: new Date().toISOString(),
   }
 }

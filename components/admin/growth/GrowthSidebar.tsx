@@ -15,47 +15,57 @@ import type { Permission } from "@/lib/rbac/permissions"
 import { MODULE_PERMISSIONS } from "@/lib/rbac/permissions"
 
 interface Module {
-  href: string
-  label: string
-  icon: React.ComponentType<{ size?: number; className?: string }>
-  badge?: string | null
-  sub?: boolean
+  href:       string
+  label:      string
+  icon:       React.ComponentType<{ size?: number; className?: string }>
+  badge?:     string | null
+  sub?:       boolean
   permission: Permission
+  advanced?:  boolean   // hidden behind Advanced Tools toggle
 }
 
-const MODULES: Module[] = [
-  { href: "/admin/growth/founder",          label: "Founder Mode",         icon: Zap,             permission: "dashboard.view", badge: "NEW" },
-  { href: "/admin/growth/dashboard",        label: "Executive Dashboard",  icon: LayoutDashboard, permission: "dashboard.view" },
-  { href: "/admin/growth/seo",              label: "SEO Command Center",   icon: Search,          permission: "seo.view" },
-  { href: "/admin/growth/seo/setup",        label: "↳ Search Console",     icon: Plug,            permission: "seo.view",         sub: true },
-  { href: "/admin/growth/analytics",        label: "GA4 Analytics",        icon: BarChart2,       permission: "analytics.view" },
-  { href: "/admin/growth/analytics/setup",  label: "↳ Analytics Setup",    icon: Plug,            permission: "analytics.view",   sub: true },
-  { href: "/admin/growth/geo",              label: "GEO / AI Search",      icon: Bot,             permission: "geo.view" },
-  { href: "/admin/growth/competitors",      label: "Competitor Intel",     icon: Radar,           permission: "competitors.view" },
-  { href: "/admin/growth/opportunities",    label: "Opportunity Engine",   icon: Lightbulb,       permission: "opportunities.view", badge: "NEW" },
-  { href: "/admin/growth/content",          label: "Content Factory",      icon: FileText,        permission: "content.view" },
-  { href: "/admin/growth/page-sections",   label: "Page Section Builder", icon: Layout,          permission: "content.view" },
-  { href: "/admin/growth/procurement",      label: "Procurement Intel",    icon: ShoppingBag,     permission: "procurement.view",  badge: "NEW" },
-  { href: "/admin/growth/contact-this-week", label: "Contact This Week",     icon: PhoneCall,       permission: "dealer.view",       badge: "NEW" },
-  { href: "/admin/growth/dealers",          label: "Dealer Intelligence",  icon: Users,           permission: "dealer.view" },
-  { href: "/admin/growth/gem",              label: "GeM Intel (Legacy)",   icon: ShoppingBag,     permission: "procurement.view" },
-  { href: "/admin/growth/ads",                   label: "Google Ads Intel",       icon: Megaphone,       permission: "ads.view" },
-  { href: "/admin/growth/ads/approval-queue",   label: "↳ Media Buyer Review",   icon: ClipboardCheck,  permission: "ads.view", sub: true, badge: "NEW" },
-  { href: "/admin/growth/ads/director",         label: "↳ Ads Director",         icon: Megaphone,       permission: "ads.view", sub: true },
-  { href: "/admin/growth/ads/setup",            label: "↳ Ads Setup",            icon: Plug,            permission: "ads.view", sub: true },
-  { href: "/admin/growth/ads/dashboard",        label: "↳ Ads Dashboard",        icon: BarChart2,       permission: "ads.view", sub: true },
-  { href: "/admin/growth/automation",       label: "Automation Center",    icon: Settings2,       permission: "automation.view" },
-  { href: "/admin/growth/logs",             label: "Activity Logs",        icon: ScrollText,      permission: "logs.view" },
-  { href: "/admin/growth/reports",          label: "Reporting Center",     icon: BarChart2,       permission: "reports.view" },
-  { href: "/admin/growth/paid",             label: "Paid Growth",          icon: TrendingUp,      permission: "ads.view" },
-  { href: "/admin/growth/users",             label: "User Management",      icon: UserCog,         permission: "users.view" },
-  { href: "/admin/growth/permissions",      label: "Permission Matrix",    icon: ShieldCheck,     permission: "permissions.view" },
-  { href: "/admin/growth/audit/permissions",label: "Permission Audit",     icon: ClipboardList,   permission: "users.view",        sub: true },
-  { href: "/admin/growth/security",         label: "Security",             icon: ShieldCheck,     permission: "dashboard.view" },
-  { href: "/admin/growth/security/sessions",label: "↳ Active Sessions",    icon: Monitor,         permission: "dashboard.view",    sub: true },
+// Primary modules — shown by default (founder-facing)
+const PRIMARY_MODULES: Module[] = [
+  { href: "/admin/growth/founder",            label: "Founder Mode",         icon: Zap,            permission: "dashboard.view", badge: "NEW" },
+  { href: "/admin/growth/ads/approval-queue", label: "Review Queue",         icon: ClipboardCheck, permission: "ads.view",       badge: "NEW" },
+  { href: "/admin/growth/contact-this-week",  label: "Contact This Week",    icon: PhoneCall,      permission: "dealer.view",    badge: "NEW" },
+  { href: "/admin/growth/paid",               label: "Paid Growth",          icon: TrendingUp,     permission: "ads.view" },
 ]
 
-const SIDEBAR_KEY = "growth:sidebar:collapsed"
+// Advanced modules — collapsed behind "Advanced Tools"
+const ADVANCED_MODULES: Module[] = [
+  { href: "/admin/growth/dashboard",          label: "Executive Dashboard",  icon: LayoutDashboard, permission: "dashboard.view",   advanced: true },
+  { href: "/admin/growth/seo",                label: "SEO Command Center",   icon: Search,          permission: "seo.view",         advanced: true },
+  { href: "/admin/growth/seo/setup",          label: "↳ Search Console",     icon: Plug,            permission: "seo.view",         advanced: true, sub: true },
+  { href: "/admin/growth/analytics",          label: "GA4 Analytics",        icon: BarChart2,       permission: "analytics.view",   advanced: true },
+  { href: "/admin/growth/analytics/setup",    label: "↳ Analytics Setup",    icon: Plug,            permission: "analytics.view",   advanced: true, sub: true },
+  { href: "/admin/growth/geo",                label: "GEO / AI Search",      icon: Bot,             permission: "geo.view",         advanced: true },
+  { href: "/admin/growth/competitors",        label: "Competitor Intel",     icon: Radar,           permission: "competitors.view", advanced: true },
+  { href: "/admin/growth/opportunities",      label: "Opportunity Engine",   icon: Lightbulb,       permission: "opportunities.view", advanced: true, badge: "NEW" },
+  { href: "/admin/growth/content",            label: "Content Factory",      icon: FileText,        permission: "content.view",     advanced: true },
+  { href: "/admin/growth/page-sections",      label: "Page Section Builder", icon: Layout,          permission: "content.view",     advanced: true },
+  { href: "/admin/growth/procurement",        label: "Procurement Intel",    icon: ShoppingBag,     permission: "procurement.view", advanced: true, badge: "NEW" },
+  { href: "/admin/growth/dealers",            label: "Dealer Intelligence",  icon: Users,           permission: "dealer.view",      advanced: true },
+  { href: "/admin/growth/gem",                label: "GeM Intel (Legacy)",   icon: ShoppingBag,     permission: "procurement.view", advanced: true },
+  { href: "/admin/growth/ads",                label: "Google Ads Intel",     icon: Megaphone,       permission: "ads.view",         advanced: true },
+  { href: "/admin/growth/ads/director",       label: "↳ Ads Director",       icon: Megaphone,       permission: "ads.view",         advanced: true, sub: true },
+  { href: "/admin/growth/ads/setup",          label: "↳ Ads Setup",          icon: Plug,            permission: "ads.view",         advanced: true, sub: true },
+  { href: "/admin/growth/ads/dashboard",      label: "↳ Ads Dashboard",      icon: BarChart2,       permission: "ads.view",         advanced: true, sub: true },
+  { href: "/admin/growth/automation",         label: "Automation Center",    icon: Settings2,       permission: "automation.view",  advanced: true },
+  { href: "/admin/growth/logs",               label: "Activity Logs",        icon: ScrollText,      permission: "logs.view",        advanced: true },
+  { href: "/admin/growth/reports",            label: "Reporting Center",     icon: BarChart2,       permission: "reports.view",     advanced: true },
+  { href: "/admin/growth/users",              label: "User Management",      icon: UserCog,         permission: "users.view",       advanced: true },
+  { href: "/admin/growth/permissions",        label: "Permission Matrix",    icon: ShieldCheck,     permission: "permissions.view", advanced: true },
+  { href: "/admin/growth/audit/permissions",  label: "Permission Audit",     icon: ClipboardList,   permission: "users.view",       advanced: true, sub: true },
+  { href: "/admin/growth/security",           label: "Security",             icon: ShieldCheck,     permission: "dashboard.view",   advanced: true },
+  { href: "/admin/growth/security/sessions",  label: "↳ Active Sessions",    icon: Monitor,         permission: "dashboard.view",   advanced: true, sub: true },
+]
+
+// Combined for active-route detection
+const MODULES = [...PRIMARY_MODULES, ...ADVANCED_MODULES]
+
+const SIDEBAR_KEY   = "growth:sidebar:collapsed"
+const ADVANCED_KEY  = "growth:sidebar:advanced"
 
 export function GrowthSidebar() {
   const pathname  = usePathname()
@@ -64,12 +74,15 @@ export function GrowthSidebar() {
   const [collapsed, setCollapsed]         = useState(false)
   const [mounted, setMounted]             = useState(false)
   const [gscConfigured, setGscConfigured] = useState<boolean | null>(null)
+  const [advancedOpen, setAdvancedOpen]   = useState(false)
 
   useEffect(() => {
     const stored = localStorage.getItem(SIDEBAR_KEY)
     const isCollapsed = stored === "true"
     setCollapsed(isCollapsed)
     document.documentElement.style.setProperty("--sidebar-w", isCollapsed ? "56px" : "224px")
+    const storedAdv = localStorage.getItem(ADVANCED_KEY)
+    if (storedAdv === "true") setAdvancedOpen(true)
     setMounted(true)
   }, [])
 
@@ -96,11 +109,54 @@ export function GrowthSidebar() {
   }
 
   // Filter to only permitted modules; hide inaccessible ones entirely
-  const visibleModules = loading
-    ? []
-    : MODULES.filter(m => permissions.includes(m.permission))
+  const visiblePrimary  = loading ? [] : PRIMARY_MODULES.filter(m => permissions.includes(m.permission))
+  const visibleAdvanced = loading ? [] : ADVANCED_MODULES.filter(m => permissions.includes(m.permission))
 
   const w = collapsed ? "w-14" : "w-56"
+
+  function NavLink({ href, label, icon: Icon, badge, sub }: Module) {
+    if (collapsed && sub) return null
+    const active = sub
+      ? pathname === href
+      : pathname === href || (
+          pathname.startsWith(href + "/") &&
+          href !== "/admin/growth/seo" &&
+          href !== "/admin/growth/analytics" &&
+          href !== "/admin/growth/ads"
+        )
+    return (
+      <Link
+        href={href}
+        title={collapsed ? label : undefined}
+        className={`flex items-center rounded-lg text-xs font-medium transition-all group ${
+          collapsed ? "p-2 justify-center"
+          : sub     ? "px-2 py-1.5 ml-3 gap-2.5"
+                    : "px-3 py-2 gap-2.5"
+        } ${
+          active
+            ? "bg-brand-600/15 text-brand-400 border border-brand-600/25"
+            : "text-gray-400 hover:text-white hover:bg-gray-800"
+        }`}
+      >
+        <Icon size={collapsed ? 16 : sub ? 12 : 14}
+          className={active ? "text-brand-400" : "text-gray-500 group-hover:text-gray-300"} />
+        {!collapsed && (
+          <>
+            <span className="flex-1 leading-tight truncate">{label}</span>
+            {href === "/admin/growth/seo/setup" && gscConfigured !== null && (
+              <span
+                className={`w-1.5 h-1.5 rounded-full shrink-0 ${gscConfigured ? "bg-green-500" : "bg-red-400"}`}
+                title={gscConfigured ? "Connected" : "Not connected"}
+              />
+            )}
+            {badge && (
+              <span className="text-[9px] bg-brand-600 text-white px-1.5 py-0.5 rounded-full font-bold">{badge}</span>
+            )}
+          </>
+        )}
+      </Link>
+    )
+  }
 
   return (
     <aside className={`fixed left-0 top-0 bottom-0 ${w} bg-gray-950 border-r border-gray-800 flex flex-col z-40 overflow-y-auto overflow-x-hidden transition-[width] duration-200`}>
@@ -121,61 +177,47 @@ export function GrowthSidebar() {
       <nav className="flex-1 px-2 py-3 space-y-0.5">
         {loading ? (
           <div className="space-y-1 px-1">
-            {[...Array(8)].map((_, i) => (
+            {[...Array(5)].map((_, i) => (
               <div key={i} className="h-8 bg-gray-800/50 rounded-lg animate-pulse" />
             ))}
           </div>
         ) : (
-          visibleModules.map(({ href, label, icon: Icon, badge, sub }) => {
-            if (collapsed && sub) return null
+          <>
+            {/* Primary modules */}
+            {visiblePrimary.map(m => <NavLink key={m.href} {...m} />)}
 
-            const active = sub
-              ? pathname === href
-              : pathname === href || (
-                  pathname.startsWith(href + "/") &&
-                  href !== "/admin/growth/seo" &&
-                  href !== "/admin/growth/analytics" &&
-                  href !== "/admin/growth/ads"
-                )
-
-            return (
-              <Link
-                key={href}
-                href={href}
-                title={collapsed ? label : undefined}
-                className={`flex items-center rounded-lg text-xs font-medium transition-all group ${
-                  collapsed
-                    ? "p-2 justify-center"
-                    : sub
-                    ? "px-2 py-1.5 ml-3 gap-2.5"
-                    : "px-3 py-2 gap-2.5"
-                } ${
-                  active
-                    ? "bg-brand-600/15 text-brand-400 border border-brand-600/25"
-                    : "text-gray-400 hover:text-white hover:bg-gray-800"
-                }`}
-              >
-                <Icon
-                  size={collapsed ? 16 : sub ? 12 : 14}
-                  className={active ? "text-brand-400" : "text-gray-500 group-hover:text-gray-300"}
-                />
-                {!collapsed && (
-                  <>
-                    <span className="flex-1 leading-tight truncate">{label}</span>
-                    {href === "/admin/growth/seo/setup" && gscConfigured !== null && (
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${gscConfigured ? "bg-green-500" : "bg-red-400"}`}
-                        title={gscConfigured ? "Connected" : "Not connected"}
-                      />
-                    )}
-                    {badge && (
-                      <span className="text-[9px] bg-brand-600 text-white px-1.5 py-0.5 rounded-full font-bold">{badge}</span>
-                    )}
-                  </>
+            {/* Advanced Tools toggle */}
+            {!collapsed && visibleAdvanced.length > 0 && (
+              <div className="pt-2">
+                <button
+                  onClick={() => {
+                    const next = !advancedOpen
+                    setAdvancedOpen(next)
+                    localStorage.setItem(ADVANCED_KEY, String(next))
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-gray-600 hover:text-gray-400 transition-colors"
+                >
+                  <Settings2 size={11} className="text-gray-600" />
+                  <span className="flex-1 text-left">Advanced Tools</span>
+                  {advancedOpen
+                    ? <span className="text-[10px] text-gray-600">▲</span>
+                    : <span className="text-[10px] text-gray-600">▼</span>
+                  }
+                </button>
+                {advancedOpen && (
+                  <div className="mt-0.5 border-l border-gray-800 ml-3 pl-1 space-y-0.5">
+                    {visibleAdvanced.map(m => <NavLink key={m.href} {...m} />)}
+                  </div>
                 )}
-              </Link>
-            )
-          })
+              </div>
+            )}
+
+            {/* Collapsed: show advanced icons without label */}
+            {collapsed && visibleAdvanced.map(m => {
+              if (m.sub) return null
+              return <NavLink key={m.href} {...m} />
+            })}
+          </>
         )}
       </nav>
 
