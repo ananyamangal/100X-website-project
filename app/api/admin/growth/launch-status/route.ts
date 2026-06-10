@@ -5,7 +5,7 @@ import { getValidAccessToken } from "@/lib/google-oauth"
 
 export const dynamic = "force-dynamic"
 
-const CAMPAIGN_ID  = "23926990781"
+const CAMPAIGN_ID  = "23421174455"  // 100X FGG Search 2026 DEL,UP,BHR,MUM,ASM
 const DEALER_PAGES = /dealer|oem|gem-oem|government/i
 const OEM_PAGES    = /gem-oem|oem-auth/i
 
@@ -132,6 +132,7 @@ export async function GET() {
     // Use the live campaign that matches the hardcoded ID, or fall back to first ENABLED campaign
     const activeCampaign = rawApi.targetedCampaign
       ?? rawApi.campaigns.find(c => c.status === "ENABLED")
+      ?? rawApi.campaigns.find(c => c.status === "PAUSED")
       ?? null
 
     const campaignStatusRaw = rawApi.targetedCampaign?.status ?? "NOT_FOUND"
