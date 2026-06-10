@@ -34,14 +34,15 @@ export async function POST(request: NextRequest) {
 
   await updateLastActivity(sessionId)
 
-  // Rotate the JWT when less than half its lifetime remains so active users
-  // never get logged out mid-session. Full lifetime restarted on each heartbeat.
+  // Rotate the JWT when less than half its lifetime remains.
+  // Also extends the session's expiresAt so the MongoDB TTL doesn't evict it.
   const now = Math.floor(Date.now() / 1000)
   const totalTtl = getRoleTimeout(payload.role)
   const remaining = payload.exp - now
-  const response = NextResponse.json({ ok: true, sessionId, rotated: remaining < totalTtl / 2 })
+  const shouldRotate = remaining < totalTtl / 2
+  const response = NextResponse.json({ ok: true, sessionId, rotated: shouldRotate })
 
-  if (remaining < totalTtl / 2) {
+  if (shouldRotate) {
     const { iat: _iat, exp: _exp, ...rest } = payload
     const newToken = await signJWT(rest)
     response.cookies.set(SESSION_COOKIE, newToken, {
@@ -51,6 +52,14 @@ export async function POST(request: NextRequest) {
       maxAge: SESSION_MAX_AGE,
       path: "/",
     })
+    // Extend the session record's expiresAt so TTL index doesn't evict the active session
+    if (sessionId) {
+      const db = (await (await import("@/lib/mongodb")).default).db()
+      await db.collection("active_sessions").updateOne(
+        { sessionId, isRevoked: false },
+        { $set: { expiresAt: new Date(Date.now() + totalTtl * 1000), lastActivity: new Date() } }
+      )
+    }
   }
 
   return response

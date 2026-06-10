@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createHash } from "crypto"
 import clientPromise from "@/lib/mongodb"
-import { signJWT, SESSION_COOKIE, getRoleTimeout } from "@/lib/rbac/jwt"
+import { signJWT, SESSION_COOKIE, SESSION_MAX_AGE, getRoleTimeout } from "@/lib/rbac/jwt"
 import { verifyPassword } from "@/lib/rbac/password"
 import { getEffectivePermissions } from "@/lib/rbac/engine"
 import { writeAuditLog } from "@/lib/rbac/server"
@@ -12,12 +12,12 @@ function legacySha256(password: string): string {
   return createHash("sha256").update(`100x-admin-v1:${password}`).digest("hex")
 }
 
-function setCookie(response: NextResponse, token: string, maxAge: number) {
+function setCookie(response: NextResponse, token: string) {
   response.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge,
+    maxAge: SESSION_MAX_AGE,  // always 24h — JWT TTL is enforced by the JWT exp claim
     path: "/",
   })
 }
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       )
 
       const response = NextResponse.json({ success: true, role: dbUser.role })
-      setCookie(response, token, ttl)
+      setCookie(response, token)
       return response
     }
 
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
     )
 
     const response = NextResponse.json({ success: true, role: "super_admin" })
-    setCookie(response, token, getRoleTimeout("super_admin"))
+    setCookie(response, token)
     return response
   } catch (error) {
     console.error("Auth error:", error)

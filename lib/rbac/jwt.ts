@@ -32,10 +32,10 @@ async function importKey(secret: string, usage: "sign" | "verify"): Promise<Cryp
 
 // Role-based session timeout in seconds
 const ROLE_TIMEOUT: Record<string, number> = {
-  super_admin:  8 * 3600,   // 8 hours
-  growth_admin: 8 * 3600,   // 8 hours
+  super_admin:  24 * 3600,  // 24 hours
+  growth_admin: 24 * 3600,  // 24 hours
 }
-const DEFAULT_TIMEOUT = 4 * 3600  // 4 hours
+const DEFAULT_TIMEOUT = 24 * 3600  // 24 hours
 
 export function getRoleTimeout(role: string): number {
   return ROLE_TIMEOUT[role] ?? DEFAULT_TIMEOUT
