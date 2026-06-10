@@ -118,7 +118,39 @@ export interface RSAAssets {
   structuredSnippets: { header: string; values: string[] }
 }
 
-export const RSA_ASSETS: Record<"dealer" | "oem" | "gem", RSAAssets> = {
+export const RSA_ASSETS: Record<"dealer" | "oem" | "gem" | "direct_buyer", RSAAssets> = {
+  direct_buyer: {
+    headlines: [
+      "Thermal Fogging Machine",
+      "India's Fogging Machine Brand",
+      "IS 14855 Certified Fogger",
+      "Mosquito Control Equipment",
+      "Vehicle Mounted Fogger",
+      "ULV Fogger India",
+      "Public Health Fogging",
+      "100X Fogging Machines",
+      "Thermal Fogger Manufacturer",
+      "Vector Control Equipment",
+      "Buy Direct from Factory",
+      "Enquire About Our Machines",
+    ],
+    descriptions: [
+      "IS 14855 certified fogging machines for municipal, government, and commercial use. Enquire now.",
+      "Thermal & ULV foggers for mosquito control, public health, and vector control programs.",
+      "Vehicle-mounted and portable fogging machines. Direct from manufacturer. Pan-India supply.",
+    ],
+    callouts: ["IS 14855 Certified", "GeM Listed", "Mosquito Control", "Pan-India Delivery"],
+    sitelinks: [
+      { text: "Product Range",       url: "/products" },
+      { text: "Public Health",       url: "/public-health-equipment" },
+      { text: "Vehicle Mounted",     url: "/vehicle-mounted-fogging-machine" },
+      { text: "Make in India",       url: "/make-in-india-fogging-machine" },
+    ],
+    structuredSnippets: {
+      header: "Products",
+      values: ["Thermal Foggers", "ULV Foggers", "Vehicle-Mounted", "Mosquito Control"],
+    },
+  },
   dealer: {
     headlines: [
       "Become a 100X Dealer",

@@ -363,10 +363,11 @@ export type KeywordIntent =
   | "dealer_acquisition"   // distributorship, dealership, franchise
   | "oem_authorization"    // OEM / brand authorization
   | "gem_reseller"         // GeM portal seller / government reseller
+  | "machine_purchase"     // direct machine-intent query — Funnel B (Direct Buyer)
   | "commercial_general"   // commercial but not specifically funnel-matched
   | "informational"        // research, how-to → candidate negative
 
-export type AdGroupTheme = "dealer" | "oem" | "gem"
+export type AdGroupTheme = "dealer" | "oem" | "gem" | "direct_buyer"
 
 export type KeywordSource =
   | "gsc"              // Google Search Console impression/click data
@@ -393,6 +394,7 @@ export interface GeneratedKeyword {
   usabilityScore?:     number   // GeM only: 0–100 phrase quality score; must be ≥ USABILITY_THRESHOLD
   effectiveScore?:     number   // confidence + EVIDENCE_BONUS[source] + qualityBonus; drives ranking
   originalPhrase?:     string   // GeM only: raw product_name before normalization (traceability)
+  observeOnly?:        boolean  // Bucket B: high-volume generic — tracked but NOT deployed to campaigns
 }
 
 export interface SourceContribution {
@@ -419,7 +421,7 @@ export interface KeywordIntelligenceRun {
 }
 
 export const KEYWORD_INTELLIGENCE_COLL = "ads_keyword_intelligence"
-const ENGINE_VERSION = "v2.3.0"  // GeM normalization engine + originalPhrase traceability
+const ENGINE_VERSION = "v2.4.0"  // FUNNEL_B_DIRECT_BUYER: machine_purchase intent + direct_buyer theme + observeOnly Bucket B
 const MAX_PER_GROUP  = 12
 
 // Source priority — kept for reference and tiebreaking outside ranking.
@@ -469,7 +471,7 @@ export function computeEffectiveScore(
 // Signal arrays define intent categories — not keyword lists.
 // Evaluated from most specific (gem, oem) to least specific (informational).
 
-const INTENT_SIGNALS: Record<Exclude<KeywordIntent, "commercial_general">, string[]> = {
+const INTENT_SIGNALS: Record<Exclude<KeywordIntent, "commercial_general" | "machine_purchase">, string[]> = {
   gem_reseller: [
     "gem", "gem portal", "government e-marketplace", "gem seller",
     "gem reseller", "gem vendor", "gem registration", "gem authorized",
@@ -494,8 +496,14 @@ const INTENT_SIGNALS: Record<Exclude<KeywordIntent, "commercial_general">, strin
 
 function classifyIntent(query: string): KeywordIntent {
   const q = query.toLowerCase()
+  // Funnel A signals evaluated first — preserves existing dealer/OEM/GeM routing unchanged.
   for (const intent of ["gem_reseller", "oem_authorization", "dealer_acquisition", "informational"] as const) {
     if (INTENT_SIGNALS[intent].some(sig => q.includes(sig))) return intent
+  }
+  // Funnel B: PRODUCT_INTENT pathway — only fires for queries not caught by Funnel A.
+  // Informational guard prevents "fogging machine price" or "what is a fogger" from entering.
+  if (PRODUCT_INTENT_RE.test(q) && !DIRECT_BUYER_GUARD_RE.test(q)) {
+    return "machine_purchase"
   }
   return "commercial_general"
 }
@@ -504,6 +512,7 @@ function intentToTheme(intent: KeywordIntent): AdGroupTheme | null {
   if (intent === "dealer_acquisition") return "dealer"
   if (intent === "oem_authorization")  return "oem"
   if (intent === "gem_reseller")       return "gem"
+  if (intent === "machine_purchase")   return "direct_buyer"
   return null
 }
 
@@ -517,7 +526,7 @@ function assignMatchType(
   source:     KeywordSource,
 ): { matchType: "EXACT" | "PHRASE" | "BROAD"; reason: string } {
   const wordCount = query.trim().split(/\s+/).length
-  const isSpecific = ["dealer_acquisition", "oem_authorization", "gem_reseller"].includes(intent)
+  const isSpecific = ["dealer_acquisition", "oem_authorization", "gem_reseller", "machine_purchase"].includes(intent)
 
   if (confidence >= 80 && isSpecific) {
     return { matchType: "EXACT", reason: "High-confidence specific intent — Exact protects budget efficiency" }
@@ -544,9 +553,9 @@ function computeLeadQuality(
   matchType:  "EXACT" | "PHRASE" | "BROAD",
   confidence: number,
 ): "high" | "medium" | "low" {
-  const isTopIntent = ["dealer_acquisition", "oem_authorization"].includes(intent)
+  const isTopIntent = ["dealer_acquisition", "oem_authorization", "machine_purchase"].includes(intent)
   if (isTopIntent && matchType === "EXACT" && confidence >= 75) return "high"
-  if (["dealer_acquisition", "oem_authorization", "gem_reseller"].includes(intent) && matchType !== "BROAD" && confidence >= 60) return "medium"
+  if (["dealer_acquisition", "oem_authorization", "gem_reseller", "machine_purchase"].includes(intent) && matchType !== "BROAD" && confidence >= 60) return "medium"
   return "low"
 }
 
@@ -568,6 +577,55 @@ const ANTI_FOG_MACHINE_CONTEXT_RE = /\b(machine|fogger|foggers|thermal|ulv|mosqu
 function isAntiFogFalsePositive(query: string): boolean {
   return ANTI_FOG_INTENT_RE.test(query) && !ANTI_FOG_MACHINE_CONTEXT_RE.test(query)
 }
+
+// ── FUNNEL_B_DIRECT_BUYER: Product intent patterns ────────────────────────────
+//
+// Classifies product-centric queries (no dealer/OEM/GeM role words) as
+// machine_purchase → direct_buyer theme. Separate from Funnel A.
+//
+// Bucket A (active, deploy):  specific machine-intent queries with ≥3 words
+// Bucket B (observe only):    bare generic product terms — high volume, no clicks yet
+//   observeOnly = true on extracted keywords; filtered out at campaign deployment
+//
+// Detection order inside classifyIntent():
+//   1. Existing INTENT_SIGNALS (gem, oem, dealer, informational) fire first.
+//   2. PRODUCT_INTENT_RE fires only for queries that escape all Funnel A signals.
+//   3. DIRECT_BUYER_GUARD blocks informational queries even if they match product patterns.
+
+const PRODUCT_INTENT_RE = new RegExp(
+  [
+    "fogging\\s+machine",
+    "fogger\\s+machine",
+    "\\bfogger\\b",
+    "thermal\\s+fog(?:ger|ging)",
+    "portable\\s+fogging",
+    "mosquito\\s+fogging",
+    "mosquito\\s+control\\s+machine",
+    "vector\\s+control\\s+(?:equipment|machine|fogger)",
+    "ULV\\s+fog(?:ger|ging)",
+    "vehicle[\\s-]+mounted\\s+fogging",
+    "truck[\\s-]+mounted\\s+fogging",
+    "fogging\\s+machine\\s+manufacturer",
+    "fogger\\s+manufacturer",
+    "mosquito\\s+fogging\\s+equipment",
+    "public\\s+health\\s+fogging",
+    "fogging\\s+system",
+    "fogging\\s+market",
+    "commercial\\s+mosquito\\s+fogger",
+    "agricultural\\s+fogger",
+    "double\\s+barrel\\s+fog",
+    "fogging\\s+machine\\s+for\\s+(?:mosquito|pest|dengue|malaria|municipal)",
+    "cold\\s+fog(?:ger|ging)?",
+  ].join("|"),
+  "i",
+)
+
+// Bucket B: bare generic product terms — classified machine_purchase but marked observe-only.
+// These have thousands of impressions and 0 clicks: not enough signal to bid on yet.
+const OBSERVE_ONLY_RE = /^(fogger\s+machine|fogging\s+machine|fogger|thermal\s+fogger(?:\s+machine)?|cold\s+fogging|fogging\s+system|fogger\s+kit|thermal\s+fogging|ulv\s+fogger|mist\s+fogger)$/i
+
+// Guards informational / consumer queries from entering Funnel B even when they match product patterns.
+const DIRECT_BUYER_GUARD_RE = /\b(price|cost|how\s+much|rate\b|review|compare|how\s+to|what\s+is|what\s+is\s+a|manual|tutorial|video|buy\b|purchase|amazon|flipkart|near\s+me|for\s+home|home\s+use|meaning|definition|near(?:by)?)\b/i
 
 // ── Source 1: Google Search Console ──────────────────────────────────────────
 
@@ -593,6 +651,10 @@ async function extractFromGSC(db: Db, funnel: Funnel): Promise<GeneratedKeyword[
     const { matchType, reason: matchTypeReason } = assignMatchType(query, intent, confidence, "gsc")
     const discoveryMethod = impressions >= 100 ? "gsc_high_impression" : "gsc_impression"
 
+    // Bucket B: bare generic product terms — classified but not deployed.
+    // These have high impressions and 0 clicks; deploy after CTR signal emerges.
+    const observeOnly = intent === "machine_purchase" && OBSERVE_ONLY_RE.test(query)
+
     return [{
       text: query, funnel, intent, matchType, matchTypeReason, confidence,
       expectedLeadQuality: computeLeadQuality(intent, matchType, confidence),
@@ -601,6 +663,7 @@ async function extractFromGSC(db: Db, funnel: Funnel): Promise<GeneratedKeyword[
       discoveryMethod,
       adGroupTheme: theme,
       impressions,
+      ...(observeOnly ? { observeOnly: true } : {}),
     }] satisfies GeneratedKeyword[]
   })
 }
@@ -810,6 +873,9 @@ const PRODUCT_BASES = [
 ]
 
 const EXPANSION_SPECS: Record<AdGroupTheme, Array<{ modifier: string; intent: KeywordIntent; confidence: number }>> = {
+  // direct_buyer has no algorithmic expansion — it is GSC-signal driven only.
+  // All direct_buyer keywords must come from real search impressions (Bucket A/B).
+  direct_buyer: [],
   dealer: [
     { modifier: "dealership",             intent: "dealer_acquisition", confidence: 75 },
     { modifier: "dealer",                 intent: "dealer_acquisition", confidence: 70 },
@@ -966,12 +1032,16 @@ export async function runKeywordIntelligence(opts: {
   ]))
 
   const byTheme: Record<AdGroupTheme, GeneratedKeyword[]> = {
-    dealer: selectBest(all, "dealer"),
-    oem:    selectBest(all, "oem"),
-    gem:    selectBest(all, "gem"),
+    dealer:       selectBest(all, "dealer"),
+    oem:          selectBest(all, "oem"),
+    gem:          selectBest(all, "gem"),
+    direct_buyer: selectBest(all, "direct_buyer"),  // Funnel B — includes Bucket A (active) + Bucket B (observeOnly)
   }
 
-  const flat = [...byTheme.dealer, ...byTheme.oem, ...byTheme.gem]
+  // Funnel A flat list (for source contribution + expansion % — Funnel B tracked separately)
+  const funnelAFlat = [...byTheme.dealer, ...byTheme.oem, ...byTheme.gem]
+  // All keywords for bySource/byIntent reporting
+  const flat = [...funnelAFlat, ...byTheme.direct_buyer]
 
   const bySource = flat.reduce((acc, k) => {
     acc[k.source] = (acc[k.source] ?? 0) + 1

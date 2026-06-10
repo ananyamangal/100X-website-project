@@ -198,12 +198,19 @@ const SITELINKS: Record<AdGroupTheme, Array<{ text: string; url: string }>> = {
     { text: "OEM Authorization", url: "/gem-oem-authorization" },
     { text: "Become a Dealer",   url: "/become-a-dealer" },
   ],
+  direct_buyer: [
+    { text: "Product Range",       url: "/products" },
+    { text: "Public Health",       url: "/public-health-equipment" },
+    { text: "Vehicle Mounted",     url: "/vehicle-mounted-fogging-machine" },
+    { text: "Make in India",       url: "/make-in-india-fogging-machine" },
+  ],
 }
 
 const CALLOUTS: Record<AdGroupTheme, string[]> = {
-  dealer: ["OEM Authorized", "GeM Listed", "Pan-India Dealers", "Govt Supply Experience"],
-  oem:    ["IS 14855 Certified", "GeM Listed", "OEM Support", "Govt Experience"],
-  gem:    ["GeM Listed", "Tender Support", "OEM Authorized", "Pan-India Supply"],
+  dealer:       ["OEM Authorized", "GeM Listed", "Pan-India Dealers", "Govt Supply Experience"],
+  oem:          ["IS 14855 Certified", "GeM Listed", "OEM Support", "Govt Experience"],
+  gem:          ["GeM Listed", "Tender Support", "OEM Authorized", "Pan-India Supply"],
+  direct_buyer: ["IS 14855 Certified", "GeM Listed", "Mosquito Control", "Pan-India Delivery"],
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -216,9 +223,10 @@ export async function runAdCopyFactory(opts: {
   const { funnel, byTheme } = opts
 
   const themeToLandingPage: Record<AdGroupTheme, string> = {
-    dealer: AD_GROUPS.find(g => g.theme === "dealer")?.landingPage ?? "/become-a-dealer",
-    oem:    AD_GROUPS.find(g => g.theme === "oem")?.landingPage    ?? "/gem-oem-authorization",
-    gem:    AD_GROUPS.find(g => g.theme === "gem")?.landingPage    ?? "/dealers-and-government",
+    dealer:       AD_GROUPS.find(g => g.theme === "dealer")?.landingPage ?? "/become-a-dealer",
+    oem:          AD_GROUPS.find(g => g.theme === "oem")?.landingPage    ?? "/gem-oem-authorization",
+    gem:          AD_GROUPS.find(g => g.theme === "gem")?.landingPage    ?? "/dealers-and-government",
+    direct_buyer: "/products",  // Funnel B — not yet deployed; ad copy generated when approved
   }
 
   const variants: RSAAdVariant[] = []
