@@ -276,6 +276,7 @@ export interface GeneratedKeyword {
   adGroupTheme:        AdGroupTheme
   impressions?:        number
   usabilityScore?:     number   // GeM only: 0–100 phrase quality score; must be ≥ USABILITY_THRESHOLD
+  effectiveScore?:     number   // confidence + EVIDENCE_BONUS[source] + qualityBonus; drives ranking
 }
 
 export interface SourceContribution {
@@ -302,11 +303,11 @@ export interface KeywordIntelligenceRun {
 }
 
 export const KEYWORD_INTELLIGENCE_COLL = "ads_keyword_intelligence"
-const ENGINE_VERSION = "v2.1.0"  // GeM phrase quality filter (4-gate classification)
+const ENGINE_VERSION = "v2.2.0"  // Evidence Bonus ranking model
 const MAX_PER_GROUP  = 12
 
-// Source priority for tiebreaking when confidence is equal.
-// Real-world demand signals always win over algorithmic expansion.
+// Source priority — kept for reference and tiebreaking outside ranking.
+// selectBest() now uses effectiveScore; SOURCE_PRIORITY is no longer the primary sort key.
 const SOURCE_PRIORITY: Record<KeywordSource, number> = {
   gsc:              100,
   ads_search_terms:  90,
@@ -315,6 +316,37 @@ const SOURCE_PRIORITY: Record<KeywordSource, number> = {
   competitor:        60,
   indiamart:         50,
   expansion:         10,
+}
+
+// Evidence Bonus: additive reward for real demand signals over algorithmic expansion.
+// The objective: a GSC/GeM/Ads keyword with moderate confidence should outrank
+// an expansion keyword with slightly higher confidence.
+export const EVIDENCE_BONUS: Record<KeywordSource, number> = {
+  ads_search_terms: 25,
+  gsc:              18,
+  gem_demand:       15,
+  ai_search:        10,
+  competitor:         8,
+  indiamart:          5,
+  expansion:          0,
+}
+
+// Quality Bonus: applied only when usabilityScore is present (GeM keywords).
+// Rewards high-quality machine-noun phrases over borderline-passing ones.
+function computeQualityBonus(usabilityScore: number | undefined): number {
+  if (usabilityScore === undefined) return 0
+  if (usabilityScore >= 90) return 8
+  if (usabilityScore >= 75) return 5
+  if (usabilityScore >= 60) return 3
+  return 0
+}
+
+// Effective score = basis for all ranking decisions.
+// effectiveScore = confidence + evidenceBonus + qualityBonus
+export function computeEffectiveScore(
+  kw: Pick<GeneratedKeyword, "confidence" | "source" | "usabilityScore">,
+): number {
+  return kw.confidence + EVIDENCE_BONUS[kw.source] + computeQualityBonus(kw.usabilityScore)
 }
 
 // ── Intent classification ─────────────────────────────────────────────────────
@@ -704,21 +736,25 @@ function generateExpansions(funnel: Funnel): GeneratedKeyword[] {
   return results
 }
 
+// ── Effective score attachment ─────────────────────────────────────────────────
+// Compute and attach effectiveScore to every keyword before dedup/selection.
+// Done as a single pass so dedup and selectBest always have the score available.
+
+function withEffectiveScores(kws: GeneratedKeyword[]): GeneratedKeyword[] {
+  return kws.map(kw => ({ ...kw, effectiveScore: computeEffectiveScore(kw) }))
+}
+
 // ── Deduplication ─────────────────────────────────────────────────────────────
-// When the same keyword text appears from multiple sources, keep the highest-confidence
-// version. Source priority breaks ties so real signals beat expansion.
+// When the same keyword text appears from multiple sources, keep the version
+// with the highest effectiveScore. A GSC keyword at conf 60 (effective 78) beats
+// an expansion keyword at conf 70 (effective 70).
 
 function deduplicate(keywords: GeneratedKeyword[]): GeneratedKeyword[] {
   const seen = new Map<string, GeneratedKeyword>()
   for (const kw of keywords) {
     const key = `${kw.adGroupTheme}:${kw.text}`
     const ex  = seen.get(key)
-    if (!ex) {
-      seen.set(key, kw)
-    } else if (
-      kw.confidence > ex.confidence ||
-      (kw.confidence === ex.confidence && SOURCE_PRIORITY[kw.source] > SOURCE_PRIORITY[ex.source])
-    ) {
+    if (!ex || (kw.effectiveScore ?? 0) > (ex.effectiveScore ?? 0)) {
       seen.set(key, kw)
     }
   }
@@ -726,19 +762,19 @@ function deduplicate(keywords: GeneratedKeyword[]): GeneratedKeyword[] {
 }
 
 // ── Selection ─────────────────────────────────────────────────────────────────
-// Select best keywords per theme. Real demand signals naturally score higher
-// and win ties via SOURCE_PRIORITY, so expansion fills gaps only.
+// Select best keywords per theme using effectiveScore as the primary sort key.
+// Evidence-backed keywords outrank expansion even when their raw confidence is lower.
 
 function selectBest(all: GeneratedKeyword[], theme: AdGroupTheme): GeneratedKeyword[] {
   const compareFn = (a: GeneratedKeyword, b: GeneratedKeyword) =>
-    b.confidence - a.confidence || SOURCE_PRIORITY[b.source] - SOURCE_PRIORITY[a.source]
+    (b.effectiveScore ?? b.confidence) - (a.effectiveScore ?? a.confidence)
 
   const group  = all.filter(k => k.adGroupTheme === theme)
   const exact  = group.filter(k => k.matchType === "EXACT").sort(compareFn)
   const phrase = group.filter(k => k.matchType === "PHRASE").sort(compareFn)
   const broad  = group.filter(k => k.matchType === "BROAD").sort(compareFn)
 
-  // Guarantee ≥1 EXACT + ≥1 PHRASE if available, then fill by confidence + source priority
+  // Guarantee ≥1 EXACT + ≥1 PHRASE if available, then fill by effectiveScore
   const selected: GeneratedKeyword[] = []
   if (exact.length)  selected.push(exact[0])
   if (phrase.length) selected.push(phrase[0])
@@ -794,7 +830,7 @@ export async function runKeywordIntelligence(opts: {
   // Expansion fills any gaps — should become < 30% as real signals accumulate
   const expKws = generateExpansions(funnel)
 
-  const all = deduplicate([
+  const all = deduplicate(withEffectiveScores([
     ...gscKws,
     ...adsKws,
     ...gemKws,
@@ -802,7 +838,7 @@ export async function runKeywordIntelligence(opts: {
     ...competitorKws,
     ...indiamartKws,
     ...expKws,
-  ])
+  ]))
 
   const byTheme: Record<AdGroupTheme, GeneratedKeyword[]> = {
     dealer: selectBest(all, "dealer"),

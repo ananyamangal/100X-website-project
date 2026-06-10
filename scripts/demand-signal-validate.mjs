@@ -53,6 +53,33 @@ const SOURCE_PRIORITY = {
   ai_search: 70, competitor: 60, indiamart: 50, expansion: 10,
 }
 
+// Evidence Bonus — mirrors EVIDENCE_BONUS in ads-keyword-intelligence.ts v2.2.0
+const EVIDENCE_BONUS = {
+  ads_search_terms: 25,
+  gsc:              18,
+  gem_demand:       15,
+  ai_search:        10,
+  competitor:        8,
+  indiamart:         5,
+  expansion:         0,
+}
+
+function computeQualityBonus(usabilityScore) {
+  if (usabilityScore === undefined || usabilityScore === null) return 0
+  if (usabilityScore >= 90) return 8
+  if (usabilityScore >= 75) return 5
+  if (usabilityScore >= 60) return 3
+  return 0
+}
+
+function computeEffectiveScore(kw) {
+  return kw.confidence + (EVIDENCE_BONUS[kw.source] ?? 0) + computeQualityBonus(kw.usabilityScore)
+}
+
+function withEffectiveScores(kws) {
+  return kws.map(kw => ({ ...kw, effectiveScore: computeEffectiveScore(kw) }))
+}
+
 const INTENT_SIGNALS = {
   gem_reseller: ["gem", "gem portal", "gem seller", "gem reseller", "gem vendor", "gem registration",
     "gem authorized", "gem listed", "gem portal seller", "government e-marketplace"],
@@ -385,15 +412,13 @@ function generateExpansions() {
   return kws
 }
 
-// ── Dedup + Select ────────────────────────────────────────────────────────────
+// ── Dedup + Select (Evidence Bonus ranking) ───────────────────────────────────
 function deduplicate(kws) {
   const seen = new Map()
   for (const kw of kws) {
     const key = `${kw.adGroupTheme}:${kw.text}`
     const ex = seen.get(key)
-    if (!ex) { seen.set(key, kw); continue }
-    const prio = (k) => SOURCE_PRIORITY[k.source] ?? 0
-    if (kw.confidence > ex.confidence || (kw.confidence === ex.confidence && prio(kw) > prio(ex))) {
+    if (!ex || (kw.effectiveScore ?? 0) > (ex.effectiveScore ?? 0)) {
       seen.set(key, kw)
     }
   }
@@ -401,7 +426,7 @@ function deduplicate(kws) {
 }
 
 function selectBest(all, theme) {
-  const cmp = (a,b) => (b.confidence - a.confidence) || ((SOURCE_PRIORITY[b.source]??0) - (SOURCE_PRIORITY[a.source]??0))
+  const cmp = (a,b) => (b.effectiveScore ?? b.confidence) - (a.effectiveScore ?? a.confidence)
   const group  = all.filter(k => k.adGroupTheme === theme)
   const exact  = group.filter(k => k.matchType === "EXACT").sort(cmp)
   const phrase = group.filter(k => k.matchType === "PHRASE").sort(cmp)
@@ -450,7 +475,7 @@ try {
 
   console.log(`Raw signals: GSC=${gscKws.length}  Ads=${adsKws.length}  GeM=${gemKws.length}  AI=${aiKws.length}  Expansion=${expKws.length}`)
 
-  const all = deduplicate([...gscKws, ...adsKws, ...gemKws, ...aiKws, ...expKws])
+  const all = deduplicate(withEffectiveScores([...gscKws, ...adsKws, ...gemKws, ...aiKws, ...expKws]))
 
   const byTheme = {
     dealer: selectBest(all, "dealer"),
@@ -547,21 +572,85 @@ try {
     console.log(`\n  No GeM phrases passed the quality filter.`)
   }
 
-  // ── 3. TOP 50 KEYWORDS ────────────────────────────────────────────────────
-  const sorted = [...flat].sort((a,b) => (b.confidence-a.confidence) || ((SOURCE_PRIORITY[b.source]??0)-(SOURCE_PRIORITY[a.source]??0)))
+  // ── 3. TOP 50 KEYWORDS (ranked by effectiveScore) ────────────────────────
+  const sorted = [...flat].sort((a,b) => (b.effectiveScore ?? b.confidence) - (a.effectiveScore ?? a.confidence))
   const top50  = sorted.slice(0, 50)
 
   console.log("\n" + "═".repeat(70))
-  console.log("  3. TOP 50 KEYWORDS")
+  console.log("  3. TOP 50 KEYWORDS  [ranked by effectiveScore = conf + evidenceBonus + qualityBonus]")
   console.log("═".repeat(70))
-  console.log(`${"#".padStart(3)}  ${"Keyword".padEnd(40)} ${"Src".padEnd(16)} ${"Cf".padStart(3)} ${"MT".padEnd(7)} ${"Intent".padEnd(22)} ${"LQ".padEnd(7)} Discovery`)
-  console.log("─".repeat(140))
+  console.log(`${"#".padStart(3)}  ${"Keyword".padEnd(40)} ${"Src".padEnd(16)} ${"Cf".padStart(3)} ${"Eff".padStart(4)} ${"MT".padEnd(7)} ${"Intent".padEnd(22)} ${"LQ".padEnd(7)} Discovery`)
+  console.log("─".repeat(150))
   for (let i=0; i<top50.length; i++) {
     const k = top50[i]
     const kText = k.text.length > 39 ? k.text.slice(0,36)+"..." : k.text
+    const eff = k.effectiveScore ?? computeEffectiveScore(k)
     console.log(
-      `${String(i+1).padStart(3)}  ${kText.padEnd(40)} ${k.source.padEnd(16)} ${String(k.confidence).padStart(3)} ${k.matchType.padEnd(7)} ${k.intent.padEnd(22)} ${k.expectedLeadQuality.padEnd(7)} ${k.discoveryMethod}`
+      `${String(i+1).padStart(3)}  ${kText.padEnd(40)} ${k.source.padEnd(16)} ${String(k.confidence).padStart(3)} ${String(eff).padStart(4)} ${k.matchType.padEnd(7)} ${k.intent.padEnd(22)} ${k.expectedLeadQuality.padEnd(7)} ${k.discoveryMethod}`
     )
+  }
+
+  // ── 3B. EFFECTIVE SCORE BREAKDOWN ─────────────────────────────────────────
+  const allSources = ["gsc","ads_search_terms","gem_demand","ai_search","competitor","indiamart","expansion"]
+  console.log("\n" + "═".repeat(70))
+  console.log("  3B. EFFECTIVE SCORE BREAKDOWN  [Evidence Bonus ranking model v2.2.0]")
+  console.log("═".repeat(70))
+  console.log(`${"Source".padEnd(20)} ${"EvidBonus".padStart(10)} ${"Selected".padStart(9)} ${"Min Eff".padStart(8)} ${"Max Eff".padStart(8)}  Example keyword`)
+  console.log("─".repeat(90))
+  for (const src of allSources) {
+    const selected = flat.filter(k => k.source === src)
+    const eb = EVIDENCE_BONUS[src] ?? 0
+    if (selected.length === 0) {
+      const pending = src === "competitor" || src === "indiamart" ? "PENDING" : "NO DATA"
+      console.log(`${src.padEnd(20)} ${("+"+eb).padStart(10)} ${"0".padStart(9)}           —           —  [${pending}]`)
+    } else {
+      const effs = selected.map(k => k.effectiveScore ?? computeEffectiveScore(k))
+      const minE = Math.min(...effs)
+      const maxE = Math.max(...effs)
+      const ex   = selected.sort((a,b) => (b.effectiveScore??0)-(a.effectiveScore??0))[0]
+      const exTxt = ex.text.length > 35 ? ex.text.slice(0,32)+"..." : ex.text
+      console.log(`${src.padEnd(20)} ${("+"+eb).padStart(10)} ${String(selected.length).padStart(9)} ${String(minE).padStart(8)} ${String(maxE).padStart(8)}  "${exTxt}"`)
+    }
+  }
+
+  // ── 3C. GeM KEYWORDS IN SELECTED SET ─────────────────────────────────────
+  console.log("\n" + "═".repeat(70))
+  console.log("  3C. GeM KEYWORDS ENTERING SELECTED SET")
+  console.log("═".repeat(70))
+  const gemSelected = flat.filter(k => k.source === "gem_demand")
+  if (gemSelected.length === 0) {
+    // Show GeM candidates that were generated but lost in ranking
+    const gemCandidates = all.filter(k => k.source === "gem_demand")
+    if (gemCandidates.length === 0) {
+      console.log("  GeM: 0 keywords selected. No GeM candidates in deduped pool (all filtered by quality gate).")
+    } else {
+      console.log(`  GeM: 0 keywords selected. ${gemCandidates.length} candidate(s) generated but lost to higher-scoring keywords:`)
+      for (const k of gemCandidates) {
+        const eff = k.effectiveScore ?? computeEffectiveScore(k)
+        // find the keyword that displaced it from its theme slot
+        const themeSelected = flat.filter(x => x.adGroupTheme === k.adGroupTheme)
+        const lowestSelected = themeSelected.sort((a,b) => (a.effectiveScore??0)-(b.effectiveScore??0))[0]
+        const lowestEff = lowestSelected ? (lowestSelected.effectiveScore ?? computeEffectiveScore(lowestSelected)) : "—"
+        console.log(`    GeM candidate: "${k.text}"`)
+        console.log(`      conf=${k.confidence}  evidBonus=+${EVIDENCE_BONUS.gem_demand}  qualityBonus=+${computeQualityBonus(k.usabilityScore)}  effectiveScore=${eff}`)
+        console.log(`      Lowest selected in ${k.adGroupTheme} theme: effectiveScore=${lowestEff}`)
+        if (typeof lowestEff === "number" && eff < lowestEff) {
+          console.log(`      ✗ Still below cut — needs higher confidence or more contracts to raise score`)
+        } else if (typeof lowestEff === "number" && eff >= lowestEff) {
+          console.log(`      ✓ SHOULD BE IN — check MAX_PER_GROUP or theme slot logic`)
+        }
+      }
+    }
+  } else {
+    console.log(`  GeM: ${gemSelected.length} keyword(s) selected:`)
+    for (const k of gemSelected) {
+      const eff = k.effectiveScore ?? computeEffectiveScore(k)
+      const qb  = computeQualityBonus(k.usabilityScore)
+      const rank = sorted.indexOf(k) + 1
+      console.log(`    ✓ "${k.text}"`)
+      console.log(`      conf=${k.confidence}  +evidBonus=${EVIDENCE_BONUS.gem_demand}  +qualityBonus=${qb}  = effectiveScore ${eff}`)
+      console.log(`      usabilityScore=${k.usabilityScore ?? "n/a"}  gemCount=${k.gemCount}  theme=${k.adGroupTheme}  rank=#${rank} in selected set`)
+    }
   }
 
   // ── 4. BUSINESS QUALITY REVIEW ────────────────────────────────────────────
