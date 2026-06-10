@@ -145,6 +145,9 @@ function extractAllText(lead: Record<string, unknown>): string {
   const parts: string[] = []
   const answers = lead.answers as Record<string, unknown> | undefined
   if (answers) parts.push(Object.values(answers).join(" "))
+  // Flatten nested utm object (RFQ leads store UTM under lead.utm.*)
+  const utmObj = lead.utm as Record<string, unknown> | undefined
+  if (utmObj && typeof utmObj === "object") parts.push(Object.values(utmObj).join(" "))
   for (const field of ["productName", "product", "message", "notes", "description", "requirement", "pagePath", "landingPage", "pageUrl", "utmTerm", "utmCampaign"]) {
     if (typeof lead[field] === "string") parts.push(String(lead[field]))
   }
@@ -170,8 +173,10 @@ function extractState(lead: Record<string, unknown>): string {
 }
 
 function extractKeyword(lead: Record<string, unknown>): string {
-  // RFQ leads: utm_term is the search keyword that drove the lead
-  if (typeof lead.utmTerm === "string" && lead.utmTerm.trim()) return lead.utmTerm.trim().toLowerCase()
+  // RFQ leads store UTM data nested under lead.utm.*
+  const utmObj = lead.utm as Record<string, string> | undefined
+  const utmTerm = (utmObj?.term ?? utmObj?.keyword ?? String(lead.utmTerm ?? "")).trim()
+  if (utmTerm) return utmTerm.toLowerCase()
   // Brochure leads: productName is what the prospect was researching
   if (typeof lead.productName === "string" && lead.productName.trim()) return lead.productName.trim().toLowerCase()
   return "(direct/unknown)"

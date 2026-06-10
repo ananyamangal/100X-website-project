@@ -91,24 +91,29 @@ async function checkGSC(db: Db): Promise<SystemCheck> {
     score:    0,
   }
 
-  // Check for recent GSC data (within 7 days)
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000).toISOString()
-  const recentRows   = await db.collection("gsc_query_rows")
-    .countDocuments({ syncedAt: { $gte: sevenDaysAgo } })
+  const totalRows = await db.collection("gsc_query_rows").countDocuments({})
+  if (totalRows === 0) return {
+    status:   "error",
+    label:    "No GSC data",
+    detail:   "Google Search Console data has not been synced yet. Connect GSC to start.",
+    setupUrl: "/admin/growth/seo",
+    score:    5,
+  }
 
-  if (recentRows === 0) {
-    const totalRows = await db.collection("gsc_query_rows").countDocuments({})
-    if (totalRows === 0) return {
-      status:   "error",
-      label:    "No GSC data",
-      detail:   "Google Search Console data has not been synced yet. Connect GSC to start.",
-      setupUrl: "/admin/growth/seo",
-      score:    5,
-    }
+  // GSC rows use `syncDate` (date string "YYYY-MM-DD"), not `syncedAt`.
+  // Compare against a 7-day-ago date string.
+  const sevenDaysAgoDate = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10)
+  const latestGsc = await db.collection("gsc_query_rows")
+    .findOne({}, { sort: { syncDate: -1 }, projection: { syncDate: 1, endDate: 1 } })
+
+  const latestSyncDate = String(latestGsc?.syncDate ?? latestGsc?.endDate ?? "")
+  const isRecent = latestSyncDate >= sevenDaysAgoDate
+
+  if (!isRecent) {
     return {
       status:   "warning",
-      label:    "Data stale (>7 days)",
-      detail:   `GSC has ${totalRows} rows but nothing synced in the last 7 days. Run a fresh sync.`,
+      label:    `Data stale — last sync ${latestSyncDate || "unknown"}`,
+      detail:   `GSC has ${totalRows} rows but the latest sync date is ${latestSyncDate || "unknown"}. Run a fresh sync.`,
       setupUrl: "/admin/growth/seo",
       score:    12,
     }
@@ -116,8 +121,8 @@ async function checkGSC(db: Db): Promise<SystemCheck> {
 
   return {
     status:  "ok",
-    label:   `${recentRows} rows synced recently`,
-    detail:  `GSC connected and data is current (${recentRows} rows in last 7 days).`,
+    label:   `${totalRows} rows — synced ${latestSyncDate}`,
+    detail:  `GSC data is current. Latest sync: ${latestSyncDate}. ${totalRows} query rows available.`,
     score:   20,
   }
 }
@@ -173,21 +178,37 @@ async function checkConversionTracking(db: Db): Promise<SystemCheck> {
 }
 
 async function checkCampaignActivation(db: Db): Promise<SystemCheck> {
-  // Check approval queue for pending items that are actionable
   const pendingCount = await db.collection("ads_approval_queue")
     .countDocuments({ status: "pending" })
 
-  // Check if there's a viable campaign ready to activate
   const latestViability = await db.collection("ads_keyword_intelligence")
     .findOne({}, { sort: { generatedAt: -1 }, projection: { meetsSuccessCriterion: 1, totalCount: 1 } })
 
-  const paused = await db.collection("ads_deployments")
-    .countDocuments({ state: "paused", status: { $in: ["pending", "approved"] } })
+  const [active, paused, rolledBack] = await Promise.all([
+    db.collection("ads_deployments").countDocuments({ state: "enabled" }),
+    db.collection("ads_deployments").countDocuments({ state: "paused" }),
+    db.collection("ads_deployments").countDocuments({ status: "rolled_back" }),
+  ])
 
-  if (paused > 0 && pendingCount === 0) return {
+  if (active > 0) return {
+    status:  "ok",
+    label:   `${active} active campaign(s)`,
+    detail:  `${active} campaign(s) are live and spending. Monitor performance in Paid Growth.`,
+    score:   20,
+  }
+
+  if (rolledBack > 0) return {
+    status:   "warning",
+    label:    `${rolledBack} deployment(s) rolled back`,
+    detail:   "Previous campaign deployment was rolled back. Review the deployment log and re-deploy once keywords and budget are validated.",
+    setupUrl: "/admin/growth/paid",
+    score:    8,
+  }
+
+  if (paused > 0) return {
     status:   "warning",
     label:    `${paused} campaign(s) paused`,
-    detail:   "Campaign(s) are paused and waiting to be activated. Recharge account and enable in Google Ads.",
+    detail:   "Campaign(s) are paused. Recharge account and enable in Google Ads to resume spend.",
     setupUrl: "/admin/growth/paid",
     score:    15,
   }

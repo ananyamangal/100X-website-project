@@ -122,15 +122,17 @@ async function fetchApprovalQueueMetrics(db: Db): Promise<{
 }
 
 async function fetchCampaignMetrics(db: Db): Promise<{
-  activeCampaigns:  number
-  pausedCampaigns:  number
-  accountBalance:   string
+  activeCampaigns:   number
+  pausedCampaigns:   number
+  rolledBackCount:   number
+  accountBalance:    string
 }> {
-  const [active, paused] = await Promise.all([
-    db.collection("ads_deployments").countDocuments({ state: "enabled"  }),
-    db.collection("ads_deployments").countDocuments({ state: "paused"   }),
+  const [active, paused, rolledBack] = await Promise.all([
+    db.collection("ads_deployments").countDocuments({ state: "enabled"      }),
+    db.collection("ads_deployments").countDocuments({ state: "paused"       }),
+    db.collection("ads_deployments").countDocuments({ status: "rolled_back" }),
   ])
-  return { activeCampaigns: active, pausedCampaigns: paused, accountBalance: "unknown" }
+  return { activeCampaigns: active, pausedCampaigns: paused, rolledBackCount: rolledBack, accountBalance: "unknown" }
 }
 
 async function fetchRecentChanges(db: Db, since24h: string): Promise<ChangeItem[]> {
@@ -226,8 +228,21 @@ function buildActions(metrics: {
     })
   }
 
-  // 3. Important: paused campaigns with no active spend
-  if (metrics.campaign.pausedCampaigns > 0 && metrics.campaign.activeCampaigns === 0) {
+  // 3. Important: rolled-back or paused campaigns with no active spend
+  if (metrics.campaign.rolledBackCount > 0 && metrics.campaign.activeCampaigns === 0) {
+    actions.push({
+      id:          "fix_rolled_back_campaign",
+      title:       "Fix rolled-back campaign and re-deploy",
+      why:         "Your campaign was deployed but rolled back. No ads are running — zero impressions, zero leads from paid search.",
+      evidence:    `${metrics.campaign.rolledBackCount} deployment(s) have status "rolled_back". Keyword threshold may not have been met or account balance was zero.`,
+      expectedOutcome: "Re-deploying with validated keywords at ₹150–₹200/day can generate 10–20 leads/month.",
+      impact:      "high",
+      priority:    "urgent",
+      effort:      "30_min",
+      actionUrl:   "/admin/growth/paid",
+      category:    "campaign",
+    })
+  } else if (metrics.campaign.pausedCampaigns > 0 && metrics.campaign.activeCampaigns === 0) {
     actions.push({
       id:          "activate_campaign",
       title:       "Recharge account to activate campaigns",
@@ -351,6 +366,16 @@ function buildRisks(metrics: {
       description: "Without conversion tracking, every rupee spent on Google Ads cannot be attributed to a lead or sale. You cannot tell which keywords are working.",
       severity:    "critical",
       mitigation:  "Set up 5 conversion actions in Google Ads and publish GTM container with conversion tags.",
+      actionUrl:   "/admin/growth/paid",
+    })
+  }
+
+  if (metrics.campaign.activeCampaigns === 0 && metrics.campaign.rolledBackCount > 0) {
+    risks.push({
+      title:       "Campaign deployment rolled back",
+      description: "A campaign was deployed but rolled back — no ads are currently running. Zero impressions, zero leads from paid search.",
+      severity:    "high",
+      mitigation:  "Review the rollback reason in Paid Growth, fix keyword count or account balance issues, and re-deploy.",
       actionUrl:   "/admin/growth/paid",
     })
   }
