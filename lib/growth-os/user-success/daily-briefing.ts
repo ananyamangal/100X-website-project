@@ -217,10 +217,10 @@ function buildActions(metrics: {
   if (!metrics.hasConversionData) {
     actions.push({
       id:          "setup_conversion_tracking",
-      title:       "Enable conversion tracking in Google Ads",
-      why:         "Without conversion tracking, you cannot see which keywords are generating leads. Every ₹ spent is unmeasured.",
-      evidence:    "No conversion data in the Google Ads search term rows. GTM container may not be published.",
-      expectedOutcome: "Once enabled, Growth OS can identify which keywords produce dealer applications vs brochure downloads.",
+      title:       "Set up 3 Phase 1 conversion actions",
+      why:         "Without conversion tracking, ad spend is unmeasured. Required before re-enabling the campaign.",
+      evidence:    "No conversions recorded yet. Create RFQ Submit, WhatsApp Click, and Phone Call in Google Ads, then publish GTM tags. Dealer Application and OEM Authorization are Phase 2 — not required for launch.",
+      expectedOutcome: "Once Phase 1 conversions are live, Growth OS can identify which keywords produce leads and optimize spend.",
       impact:      "high",
       priority:    "urgent",
       effort:      "1_hour",
@@ -366,7 +366,7 @@ function buildRisks(metrics: {
       title:       "Ad spend is unmeasured",
       description: "Without conversion tracking, every rupee spent on Google Ads cannot be attributed to a lead or sale. You cannot tell which keywords are working.",
       severity:    "critical",
-      mitigation:  "Set up 5 conversion actions in Google Ads and publish GTM container with conversion tags.",
+      mitigation:  "Set up 3 Phase 1 conversions (RFQ Submit, WhatsApp Click, Phone Call) in Google Ads and publish GTM container. Phase 2 conversions are optional at launch.",
       actionUrl:   "/admin/growth/paid",
     })
   }

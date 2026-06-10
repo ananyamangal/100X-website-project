@@ -40,10 +40,10 @@ const WIZARDS: Record<string, { steps: string[]; url: string; urlLabel: string }
   setup_conversion_tracking: {
     steps: [
       "Log into Google Ads → Tools → Conversions → + New Conversion",
-      "Create 5 actions: Enquiry Form, WhatsApp Click, Phone Call, Brochure Download, Dealer Application",
-      "Copy the AW-XXXXXXXX/XXXXXXXXXXXXX conversion ID for each",
-      "Open GTM container GTM-5JMGCKRW → add conversion tags",
-      "Preview → test each conversion → Publish the GTM container",
+      "Create 3 Phase 1 actions: RFQ Submit (Enquiry Form), WhatsApp Click, Phone Call",
+      "Copy the AW-XXXXXXXX/XXXXXXXXXXXXX conversion ID for each action",
+      "Open GTM container GTM-5JMGCKRW → add 3 conversion tags, one per action",
+      "Preview → test each conversion → Publish GTM. Phase 2 (Dealer Application, OEM Authorization) can be added after launch.",
     ],
     url: "/admin/growth/paid",
     urlLabel: "Open Paid Growth Setup",

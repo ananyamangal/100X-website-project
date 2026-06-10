@@ -185,16 +185,16 @@ async function buildSetupTier(db: Db): Promise<ReadinessTier> {
       }
     : stTotal > 0
     ? {
-        id: "conversion", label: "Search data imported but zero conversions tracked",
-        detail: `${stTotal} search term rows imported but no conversions recorded. Create conversion actions in Google Ads and publish GTM tags.`,
-        status: "warning", points: 8, maxPoints: 25,
+        id: "conversion", label: "Campaign data exists — verify Phase 1 conversion tags are firing",
+        detail: `${stTotal} search term rows imported but no conversions recorded yet. Publish GTM tags for the 3 Phase 1 actions: RFQ Submit, WhatsApp Click, Phone Call. Phase 2 conversions (Dealer Application, OEM Authorization) can be added after launch.`,
+        status: "warning", points: 12, maxPoints: 25,
         evidence: { collection: "ads_searchterm_rows", count: stTotal },
         setupUrl: "/admin/growth/paid",
       }
     : {
-        id: "conversion", label: "Conversion tracking not set up",
-        detail: "No search term data imported. Without conversion tracking, you cannot tell which keywords generate leads.",
-        status: "error", points: 0, maxPoints: 25,
+        id: "conversion", label: "Set up 3 Phase 1 conversion actions before launching",
+        detail: "Create RFQ Submit, WhatsApp Click, and Phone Call conversions in Google Ads, then publish GTM tags. Campaign can launch once these 3 are active. Phase 2 conversions (Dealer Application, OEM Authorization) are optional and do not block launch.",
+        status: "warning", points: 12, maxPoints: 25,
         evidence: {},
         setupUrl: "/admin/growth/paid",
       }
