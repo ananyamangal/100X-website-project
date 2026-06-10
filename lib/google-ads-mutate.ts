@@ -72,7 +72,7 @@ async function mutate(
   })
   if (!res.ok) {
     const text = await res.text()
-    throw new Error(`Ads mutate ${res.status} (customer ${customerId}): ${text.slice(0, 600)}`)
+    throw new Error(`Ads mutate ${res.status} (customer ${customerId}): ${text.slice(0, 2000)}`)
   }
   return res.json() as Promise<MutateResponse>
 }
