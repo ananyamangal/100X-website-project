@@ -2,7 +2,8 @@
 import { useEffect, useState, useCallback } from "react"
 import {
   PhoneCall, Phone, Mail, Play, RotateCw, Download, Users, Building2,
-  Star, ShieldCheck, MapPin,
+  Star, ShieldCheck, MapPin, MessageCircle, UserPlus, StickyNote, CalendarClock,
+  X, Zap,
 } from "lucide-react"
 
 type Segment = "dealer" | "machine_buyer"
@@ -24,7 +25,27 @@ interface Row {
   scoringVersion: string
   taxonomyVersion: string
   generatedAt: string
+  owner?: string | null
+  followUpAt?: string | null
+  notesCount?: number
   extra?: { tier?: string; oemAuthProbability?: number; dept?: string | null; signals?: string[]; intentPct?: number }
+}
+
+interface ActionRecord {
+  segment: Segment
+  entityKey: string
+  status: string
+  owner: string | null
+  followUpAt: string | null
+  notes: Array<{ text: string; at: string; by?: string }>
+  statusHistory: Array<{ status: string; at: string; by?: string }>
+}
+
+function waLink(phone?: string | null): string | null {
+  if (!phone) return null
+  const digits = phone.replace(/\D/g, "")
+  const intl = digits.length === 10 ? `91${digits}` : digits
+  return `https://wa.me/${intl}`
 }
 
 interface WeekData {
@@ -46,7 +67,9 @@ const STATUS_COLOR: Record<string, string> = {
   New: "bg-blue-50 text-blue-700 border-blue-200",
   Contacted: "bg-indigo-50 text-indigo-700 border-indigo-200",
   Interested: "bg-violet-50 text-violet-700 border-violet-200",
+  "Meeting Scheduled": "bg-cyan-50 text-cyan-700 border-cyan-200",
   "OEM Sent": "bg-purple-50 text-purple-700 border-purple-200",
+  "Quote Sent": "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200",
   "Follow-up": "bg-amber-50 text-amber-700 border-amber-200",
   Won: "bg-green-50 text-green-700 border-green-200",
   Lost: "bg-red-50 text-red-600 border-red-200",
@@ -64,8 +87,12 @@ export default function ContactThisWeek() {
   const [fState, setFState] = useState("")
   const [fScore, setFScore] = useState("0")
   const [fStatus, setFStatus] = useState("")
-  const [running, setRunning] = useState<Segment | "both" | null>(null)
+  const [running, setRunning] = useState<Segment | "both" | "summary" | null>(null)
   const [runMsg, setRunMsg] = useState<string | null>(null)
+  const [selected, setSelected] = useState<Row | null>(null)
+  const [rec, setRec] = useState<ActionRecord | null>(null)
+  const [noteText, setNoteText] = useState("")
+  const [ownerText, setOwnerText] = useState("")
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -107,6 +134,39 @@ export default function ContactThisWeek() {
     await load()
   }
 
+  const openDrawer = async (row: Row) => {
+    setSelected(row); setRec(null); setNoteText("")
+    const r = await fetch(`/api/admin/growth/opportunity-action?segment=${row.segment}&entityKey=${encodeURIComponent(row.entityName)}`).then((x) => x.json())
+    setRec(r); setOwnerText(r.owner || "")
+  }
+
+  const act = async (action: string, value?: string) => {
+    if (!selected) return
+    await fetch("/api/admin/growth/opportunity-action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ segment: selected.segment, entityKey: selected.entityName, action, value }),
+    })
+    const r = await fetch(`/api/admin/growth/opportunity-action?segment=${selected.segment}&entityKey=${encodeURIComponent(selected.entityName)}`).then((x) => x.json())
+    setRec(r)
+    if (action === "status" || action === "owner" || action === "followup") await load()
+  }
+
+  const logContact = (channel: string, href: string) => {
+    if (selected) act("logcontact", channel)
+    window.open(href, channel === "email" ? "_self" : "_blank")
+  }
+
+  const genSummary = async () => {
+    setRunning("summary"); setRunMsg(null)
+    try {
+      const d = await fetch("/api/admin/growth/exec-summary", { method: "POST" }).then((r) => r.json())
+      setRunMsg(`Exec summary ready for ${d.week}: ${d.wins ?? 0} won, ${d.lost ?? 0} lost, ${d.newOpportunities ?? 0} new.`)
+      window.open("/api/admin/growth/exec-summary?format=md", "_blank")
+    } catch { setRunMsg("Error generating summary") }
+    setRunning(null)
+  }
+
   const rows: Row[] = !data ? [] : view === "all" ? data.combined : view === "dealer" ? data.dealers : data.machineBuyers
   const highCount = data ? data.combined.filter((r) => r.confidence === "high").length : 0
   const meta = data?.meta
@@ -126,6 +186,11 @@ export default function ContactThisWeek() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button onClick={genSummary} disabled={!!running}
+              className="flex items-center gap-1.5 text-xs border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-lg hover:text-brand-600 disabled:opacity-50">
+              {running === "summary" ? <RotateCw size={12} className="animate-spin" /> : <Download size={12} />}
+              Weekly Exec Summary
+            </button>
             <button onClick={() => runEngine("both")} disabled={!!running}
               className="flex items-center gap-1.5 text-xs bg-brand-600 text-white px-3 py-1.5 rounded-lg hover:bg-brand-700 disabled:opacity-50">
               {running === "both" ? <RotateCw size={12} className="animate-spin" /> : <Play size={12} />}
@@ -220,7 +285,7 @@ export default function ContactThisWeek() {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50">
-                    {["#", "Name", "Score", "Conf.", view === "all" ? "Segment" : "OEM%", "State", "Contact", "GeM activity", "Recommended action", "Status"].map((h) => (
+                    {["#", "Name", "Score", "Conf.", view === "all" ? "Segment" : "OEM%", "State", "Contact", "Owner", "Status", "Action"].map((h) => (
                       <th key={h} className="text-left px-3 py-2.5 text-gray-400 font-medium whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
@@ -252,13 +317,21 @@ export default function ContactThisWeek() {
                           <a href={`mailto:${r.contact.email}`} className="flex items-center gap-1 hover:text-brand-600 max-w-[160px] truncate"><Mail size={10} />{r.contact.email}</a>
                         ) : "—"}
                       </td>
-                      <td className="px-3 py-3 text-gray-500 max-w-[200px]">{r.gemActivity}</td>
-                      <td className="px-3 py-3 text-gray-600 max-w-[220px]">{r.nextAction}</td>
+                      <td className="px-3 py-3 text-gray-500 whitespace-nowrap">
+                        {r.owner ? <span className="text-gray-700">{r.owner}</span> : <span className="text-gray-300">—</span>}
+                        {r.followUpAt && <span className="block text-[9px] text-amber-600">⏰ {new Date(r.followUpAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}</span>}
+                      </td>
                       <td className="px-3 py-3">
                         <select value={r.actionStatus} onChange={(e) => setStatus(r, e.target.value)}
                           className={`text-[10px] font-semibold rounded-md border px-1.5 py-1 ${STATUS_COLOR[r.actionStatus] || STATUS_COLOR.New}`}>
                           {(data?.statuses || []).map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
+                      </td>
+                      <td className="px-3 py-3">
+                        <button onClick={() => openDrawer(r)}
+                          className="flex items-center gap-1 text-[11px] text-brand-600 hover:text-brand-700 font-medium whitespace-nowrap">
+                          <Zap size={11} /> Action{(r.notesCount ?? 0) > 0 && <span className="text-gray-400">({r.notesCount})</span>}
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -275,6 +348,114 @@ export default function ContactThisWeek() {
           </p>
         )}
       </div>
+
+      {/* ── Action Center drawer ─────────────────────────────────────────── */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setSelected(null)}>
+          <div className="absolute inset-0 bg-black/30" />
+          <div className="relative w-full max-w-md bg-white h-full shadow-2xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-5 py-4 flex items-start justify-between">
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-gray-400">{selected.segment === "dealer" ? "Dealer" : "Machine Buyer"} · {selected.confidence} confidence</p>
+                <h3 className="text-sm font-bold text-gray-900 leading-tight">{selected.entityName}</h3>
+                <p className="text-[11px] text-gray-500 mt-0.5">{selected.score}/100 · {selected.geography || "—"}</p>
+              </div>
+              <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-700"><X size={16} /></button>
+            </div>
+
+            <div className="px-5 py-4 space-y-5">
+              {/* Contact actions */}
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-gray-400 mb-2">Reach out</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <button disabled={!selected.contact.phone} onClick={() => logContact("call", `tel:${selected.contact.phone}`)}
+                    className="flex flex-col items-center gap-1 border border-gray-200 rounded-lg py-2.5 text-[11px] text-gray-600 hover:border-brand-300 hover:text-brand-600 disabled:opacity-30">
+                    <Phone size={15} /> Call
+                  </button>
+                  <button disabled={!selected.contact.phone} onClick={() => logContact("whatsapp", waLink(selected.contact.phone) || "#")}
+                    className="flex flex-col items-center gap-1 border border-gray-200 rounded-lg py-2.5 text-[11px] text-gray-600 hover:border-green-300 hover:text-green-600 disabled:opacity-30">
+                    <MessageCircle size={15} /> WhatsApp
+                  </button>
+                  <button disabled={!selected.contact.email} onClick={() => logContact("email", `mailto:${selected.contact.email}`)}
+                    className="flex flex-col items-center gap-1 border border-gray-200 rounded-lg py-2.5 text-[11px] text-gray-600 hover:border-blue-300 hover:text-blue-600 disabled:opacity-30">
+                    <Mail size={15} /> Email
+                  </button>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-1.5">{selected.contact.phone || "no phone"}{selected.contact.email ? ` · ${selected.contact.email}` : ""}</p>
+              </div>
+
+              {/* Recommended next action */}
+              <div className="bg-brand-50 border border-brand-100 rounded-lg p-3">
+                <p className="text-[10px] uppercase tracking-wide text-brand-400 mb-1">Recommended next action</p>
+                <p className="text-xs text-gray-700">{selected.nextAction}</p>
+                <p className="text-[10px] text-gray-400 mt-1">{selected.gemActivity}</p>
+              </div>
+
+              {/* Outcome status */}
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-gray-400 mb-2">Outcome status</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {(data?.statuses || []).map((s) => (
+                    <button key={s} onClick={() => act("status", s)}
+                      className={`text-[10px] font-semibold px-2 py-1 rounded-md border ${rec?.status === s ? STATUS_COLOR[s] : "bg-white text-gray-400 border-gray-200 hover:border-gray-300"}`}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Assign owner */}
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-gray-400 mb-2 flex items-center gap-1"><UserPlus size={11} /> Owner</p>
+                <div className="flex gap-2">
+                  <input value={ownerText} onChange={(e) => setOwnerText(e.target.value)} placeholder="Assign a salesperson…"
+                    className="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1.5" />
+                  <button onClick={() => act("owner", ownerText)} className="text-xs bg-gray-800 text-white px-3 rounded-lg hover:bg-gray-900">Save</button>
+                </div>
+              </div>
+
+              {/* Schedule follow-up */}
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-gray-400 mb-2 flex items-center gap-1"><CalendarClock size={11} /> Follow-up date</p>
+                <input type="date" defaultValue={rec?.followUpAt?.split("T")[0] || ""} onChange={(e) => act("followup", e.target.value)}
+                  className="text-xs border border-gray-200 rounded-lg px-2 py-1.5" />
+              </div>
+
+              {/* Notes */}
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-gray-400 mb-2 flex items-center gap-1"><StickyNote size={11} /> Notes</p>
+                <div className="flex gap-2 mb-2">
+                  <input value={noteText} onChange={(e) => setNoteText(e.target.value)} placeholder="Add a note…"
+                    onKeyDown={(e) => { if (e.key === "Enter" && noteText.trim()) { act("note", noteText); setNoteText("") } }}
+                    className="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1.5" />
+                  <button onClick={() => { if (noteText.trim()) { act("note", noteText); setNoteText("") } }} className="text-xs bg-brand-600 text-white px-3 rounded-lg hover:bg-brand-700">Add</button>
+                </div>
+                <div className="space-y-1.5">
+                  {(rec?.notes || []).slice().reverse().map((n, i) => (
+                    <div key={i} className="bg-gray-50 rounded-lg px-2.5 py-1.5">
+                      <p className="text-[11px] text-gray-700">{n.text}</p>
+                      <p className="text-[9px] text-gray-400">{new Date(n.at).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                    </div>
+                  ))}
+                  {!rec?.notes?.length && <p className="text-[11px] text-gray-300">No notes yet.</p>}
+                </div>
+              </div>
+
+              {/* Status timeline */}
+              {!!rec?.statusHistory?.length && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-gray-400 mb-2">Timeline</p>
+                  <div className="space-y-1">
+                    {rec.statusHistory.slice().reverse().map((h, i) => (
+                      <p key={i} className="text-[10px] text-gray-500">{h.status} · {new Date(h.at).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

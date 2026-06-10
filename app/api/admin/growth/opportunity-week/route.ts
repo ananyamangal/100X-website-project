@@ -55,10 +55,24 @@ export async function GET(req: NextRequest) {
   if (status) baseFilter.actionStatus = status
 
   const items = await db.collection(COLL.opportunities).find(baseFilter).sort({ score: -1 }).toArray()
-  const clean = JSON.parse(JSON.stringify(items))
+  type Row = { segment: string; entityName: string; score: number; geography: string | null; [k: string]: unknown }
+  const clean = JSON.parse(JSON.stringify(items)) as Row[]
 
-  const dealers = clean.filter((r: { segment: string }) => r.segment === "dealer")
-  const machineBuyers = clean.filter((r: { segment: string }) => r.segment === "machine_buyer")
+  // Merge Action Center state (owner, follow-up, notes) into each row
+  const allStatus = await db.collection(COLL.status).find({}).toArray()
+  const actionMap = new Map<string, Record<string, unknown>>(
+    allStatus.map((s) => [`${s.segment}::${s.entityKey}`, s])
+  )
+  for (const r of clean) {
+    const rec = actionMap.get(`${r.segment}::${r.entityName}`)
+    r.owner = (rec?.owner as string) || null
+    r.followUpAt = (rec?.followUpAt as string) || null
+    r.notesCount = Array.isArray(rec?.noteLog) ? (rec!.noteLog as unknown[]).length : 0
+    r.contactLogCount = Array.isArray(rec?.contactLog) ? (rec!.contactLog as unknown[]).length : 0
+  }
+
+  const dealers = clean.filter((r) => r.segment === "dealer")
+  const machineBuyers = clean.filter((r) => r.segment === "machine_buyer")
   const combined = [...clean].sort((a, b) => b.score - a.score).slice(0, TOP_N_COMBINED)
 
   const reports = await db.collection(COLL.reports).find({ week }).toArray()
@@ -68,7 +82,7 @@ export async function GET(req: NextRequest) {
   }, {})
 
   // distinct states for filter UI
-  const states = Array.from(new Set(clean.map((r: { geography: string | null }) => r.geography).filter(Boolean))).sort()
+  const states = Array.from(new Set(clean.map((r) => r.geography).filter(Boolean))).sort()
 
   return NextResponse.json({ week, dealers, machineBuyers, combined, states, meta, statuses: ACTION_STATUSES })
 }
@@ -91,7 +105,7 @@ export async function PATCH(req: NextRequest) {
 
   await db.collection(COLL.status).updateOne(
     { segment, entityKey },
-    { $set: { segment, entityKey, status, notes, updatedAt: now }, $setOnInsert: { createdAt: now } },
+    { $set: { segment, entityKey, status, statusNote: notes, updatedAt: now }, $setOnInsert: { createdAt: now } },
     { upsert: true }
   )
   // reflect immediately on current rows so the UI updates without a re-run

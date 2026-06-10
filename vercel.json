@@ -16,6 +16,10 @@
     {
       "path": "/api/admin/growth/cron/machine-buyer-opportunity",
       "schedule": "30 2 * * 1"
+    },
+    {
+      "path": "/api/admin/growth/cron/weekly-exec-summary",
+      "schedule": "0 3 * * 1"
     }
   ]
 }

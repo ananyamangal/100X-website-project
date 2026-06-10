@@ -101,11 +101,15 @@ export const CONFIDENCE = {
 export const TOP_N_PER_SEGMENT = 20
 export const TOP_N_COMBINED = 50
 
-// ── Dealer Action Status workflow ───────────────────────────────────────────────
+// ── Action / Outcome status workflow ────────────────────────────────────────────
+// Full outcome funnel from first touch to closed.
 export const ACTION_STATUSES = [
-  "New", "Contacted", "Interested", "OEM Sent", "Follow-up", "Won", "Lost", "Ignore",
+  "New", "Contacted", "Interested", "Meeting Scheduled", "OEM Sent",
+  "Quote Sent", "Follow-up", "Won", "Lost", "Ignore",
 ] as const
 export type ActionStatus = (typeof ACTION_STATUSES)[number]
 export const SUPPRESSED_STATUSES: ActionStatus[] = ["Won", "Lost", "Ignore"]
-export const IN_PROGRESS_STATUSES: ActionStatus[] = ["Contacted", "Interested", "OEM Sent", "Follow-up"]
+export const IN_PROGRESS_STATUSES: ActionStatus[] = [
+  "Contacted", "Interested", "Meeting Scheduled", "OEM Sent", "Quote Sent", "Follow-up",
+]
 export const IN_PROGRESS_DOWNGRADE = 0.4 // surface fresh "New" entities ahead of in-progress ones
