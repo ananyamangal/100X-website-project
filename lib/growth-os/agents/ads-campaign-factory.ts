@@ -1,13 +1,14 @@
 /**
- * AI Media Buyer — Campaign Factory (FUV, Funnel A, Search only).
+ * AI Media Buyer — Campaign Factory (Phase 2, Funnel A, Search only).
  *
- * Orchestrates: Detect demand → Design campaign → Keywords → Match types →
- * RSA ads → LP recommendations → Quality scoring → Deploy as draft →
- * Approval request → Admin notification.
+ * Phase 2 pipeline (replaces manually curated FUV keyword/ad-copy lists):
+ *   2A+2B  Keyword Intelligence + Match-Type Intelligence
+ *   2C     Negative Keyword Intelligence
+ *   2D     Ad Copy Factory (LLM-generated RSA variants)
  *
- * Steps 1–7 are automatic and spend-free.
- * Step 8 creates non-serving Google Ads entities (PAUSED campaign).
- * Steps 9–10 queue the campaign for human review.
+ * Steps 1–8 are automatic and spend-free.
+ * Step 9 creates non-serving Google Ads entities (PAUSED campaign).
+ * Steps 10–11 queue the campaign for human review.
  * Only a human APPROVE can enable the campaign.
  */
 
@@ -40,12 +41,13 @@ import {
   SEED_TERMS,
   DEMAND_MIN_IMPRESSIONS,
   AD_GROUPS,
-  CAMPAIGN_NEGATIVES,
-  RSA_ASSETS,
   LANDING_PAGE_PROFILES,
   GEO_INDIA,
   CAMPAIGN_DAILY_BUDGET_MICROS,
 } from "@/lib/growth-os/ads-fuv-config"
+import { runKeywordIntelligence, type GeneratedKeyword, type AdGroupTheme } from "@/lib/growth-os/ads-keyword-intelligence"
+import { runNegativeIntelligence }                       from "@/lib/growth-os/ads-negative-intelligence"
+import { runAdCopyFactory }                              from "@/lib/growth-os/ads-copy-factory"
 
 const AGENT = "ads-campaign-factory"
 
@@ -107,30 +109,6 @@ async function detectDemand(): Promise<DemandSignal & { qualifyingTerms: string[
   }
 }
 
-// ── Steps 3–5: Build keyword sets per ad group ──────────────────────────────
-
-function buildKeywordSets(): KeywordSet[] {
-  return AD_GROUPS.map(group => ({
-    adGroup:      group.name,
-    keywords:     group.keywords,
-    negativeCount: CAMPAIGN_NEGATIVES.length,
-  }))
-}
-
-// ── Step 6: Build RSA specs ─────────────────────────────────────────────────
-
-function buildRSASpecs(): RSASpec[] {
-  return AD_GROUPS.map(group => {
-    const assets = RSA_ASSETS[group.theme]
-    return {
-      headlines:     assets.headlines,
-      descriptions:  assets.descriptions,
-      callouts:      assets.callouts,
-      sitelinkCount: assets.sitelinks.length,
-    }
-  })
-}
-
 // ── Persist campaign plan ───────────────────────────────────────────────────
 
 async function persistCampaignPlan(opts: {
@@ -139,6 +117,15 @@ async function persistCampaignPlan(opts: {
   qualityScores:   ReturnType<typeof scoreCampaign>
   deploymentId?:   string
   simulated:       boolean
+  // Phase 2 metadata
+  phase2: {
+    kwRunId:      string
+    negRunId:     string
+    copyRunId:    string
+    byTheme:      Record<string, GeneratedKeyword[]>
+    negatives:    unknown[]
+    adCopyVariants: unknown[]
+  }
 }): Promise<string> {
   const db = (await clientPromise).db()
   const now = new Date().toISOString()
@@ -152,14 +139,16 @@ async function persistCampaignPlan(opts: {
     simulated:     opts.simulated,
     deploymentId:  opts.deploymentId,
     demandSignal:  opts.demandSignal,
-    adGroups:      AD_GROUPS.map(g => ({
+    // Phase 2: generated keywords with full intelligence metadata
+    adGroups: AD_GROUPS.map(g => ({
       name:        g.name,
       theme:       g.theme,
       landingPage: g.landingPage,
-      keywords:    g.keywords,
-      rsa:         RSA_ASSETS[g.theme],
+      keywords:    opts.phase2.byTheme[g.theme] ?? [],
+      rsa:         opts.phase2.adCopyVariants.find((v: any) => v.adGroupTheme === g.theme),
     })),
-    campaignNegatives: CAMPAIGN_NEGATIVES,
+    // Phase 2C: generated negatives with reason/source/confidence
+    campaignNegatives: opts.phase2.negatives,
     landingPageRecs:   AD_GROUPS.map(g => ({
       adGroup:    g.name,
       page:       g.landingPage,
@@ -172,6 +161,12 @@ async function persistCampaignPlan(opts: {
       risk:       "Low",
       priority:   "Important",
       recommendation: opts.qualityScores.recommendation,
+    },
+    // Phase 2 run IDs for traceability
+    phase2RunIds: {
+      keywords: opts.phase2.kwRunId,
+      negatives: opts.phase2.negRunId,
+      adCopy:    opts.phase2.copyRunId,
     },
     fuvVersion: ADS_FUV_VERSION,
     agent:      AGENT,
@@ -262,11 +257,57 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
     }
   }
 
-  // Steps 3–5 — Build keyword sets (config-driven, deterministic in FUV)
-  const keywordSets = buildKeywordSets()
+  // Phase 2A+2B — Keyword Intelligence (signal-driven, replaces curated keyword lists)
+  const kwRun = await runKeywordIntelligence({ funnel: ADS_FUNNEL_A })
 
-  // Step 6 — Build RSA specs
-  const rsaSpecs = buildRSASpecs()
+  // Safety net: if Phase 2A generated 0 keywords for a theme, fall back to FUV config
+  const finalByTheme: Record<AdGroupTheme, GeneratedKeyword[]> = { ...kwRun.byTheme }
+  for (const group of AD_GROUPS) {
+    const theme = group.theme as AdGroupTheme
+    if ((finalByTheme[theme] ?? []).length === 0) {
+      finalByTheme[theme] = group.keywords.map(kw => ({
+        text:                kw.text,
+        funnel:              ADS_FUNNEL_A,
+        intent:              "dealer_acquisition" as const,
+        matchType:           kw.matchType as "EXACT" | "PHRASE" | "BROAD",
+        matchTypeReason:     kw.rationale ?? "FUV config fallback",
+        confidence:          70,
+        expectedLeadQuality: "medium" as const,
+        reason:              "FUV config fallback — Phase 2A returned 0 keywords for this theme",
+        source:              "expansion" as const,
+        adGroupTheme:        theme,
+      }))
+    }
+  }
+
+  // Phase 2C — Negative Keyword Intelligence
+  const allGeneratedKeywords: GeneratedKeyword[] = [
+    ...finalByTheme.dealer,
+    ...finalByTheme.oem,
+    ...finalByTheme.gem,
+  ]
+  const negRun = await runNegativeIntelligence({ positiveKeywords: allGeneratedKeywords })
+
+  // Phase 2D — Ad Copy Factory
+  const copyRun = await runAdCopyFactory({ funnel: ADS_FUNNEL_A, byTheme: finalByTheme })
+
+  // Build KeywordSet[] for quality scoring (Phase 2 counts, not FUV config)
+  const keywordSets: KeywordSet[] = AD_GROUPS.map(g => ({
+    adGroup:      g.name,
+    keywords:     (finalByTheme[g.theme as AdGroupTheme] ?? []).map(k => ({ text: k.text, matchType: k.matchType })),
+    negativeCount: negRun.totalCount,
+  }))
+
+  // Build RSASpec[] for quality scoring
+  const rsaSpecs: RSASpec[] = AD_GROUPS.map(g => {
+    const variant = copyRun.variants.find(v => v.adGroupTheme === g.theme)
+    return {
+      headlines:     variant?.headlines     ?? [],
+      descriptions:  variant?.descriptions  ?? [],
+      callouts:      variant?.callouts      ?? [],
+      sitelinkCount: variant?.sitelinks?.length ?? 0,
+    }
+  })
 
   // Step 7 — LP recommendations (from config profiles)
   const adGroupPages = AD_GROUPS.map(g => ({ landingPage: g.landingPage }))
@@ -342,8 +383,9 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
         loginCustomerId:       loginId,
       })
 
+      // Phase 2A+2B keywords — one entry per generated keyword, not FUV config
       const allKeywords = AD_GROUPS.flatMap((g, i) =>
-        g.keywords.map(kw => ({
+        (finalByTheme[g.theme as AdGroupTheme] ?? []).map(kw => ({
           adGroupResourceName: adGroupRns[i],
           text:      kw.text,
           matchType: kw.matchType,
@@ -354,21 +396,23 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
         loginCustomerId: loginId,
       })
 
+      // Phase 2C negatives — text-only for Google Ads API
       campaignCriteriaRns = await createCampaignCriteria(customerId, accessToken, {
         campaignResourceName: campaignRn,
         geoTargetConstant:    GEO_INDIA,
-        negativeKeywords:     CAMPAIGN_NEGATIVES,
+        negativeKeywords:     negRun.negatives.map(n => n.text),
         loginCustomerId:      loginId,
       })
 
+      // Phase 2D ad copy — LLM-generated headlines/descriptions with fallback
       adsRns = await createRSAAds(customerId, accessToken, {
         ads: AD_GROUPS.map((g, i) => {
-          const assets = RSA_ASSETS[g.theme]
+          const variant = copyRun.variants.find(v => v.adGroupTheme === g.theme)
           return {
             adGroupResourceName: adGroupRns[i],
             finalUrl:            g.landingPage,
-            headlines:           assets.headlines,
-            descriptions:        assets.descriptions,
+            headlines:           variant?.headlines    ?? rsaSpecs[i]?.headlines    ?? [],
+            descriptions:        variant?.descriptions ?? rsaSpecs[i]?.descriptions ?? [],
           }
         }),
         loginCustomerId: loginId,
@@ -416,6 +460,14 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
     qualityScores,
     deploymentId: deployment.deploymentId,
     simulated,
+    phase2: {
+      kwRunId:        kwRun.runId,
+      negRunId:       negRun.runId,
+      copyRunId:      copyRun.runId,
+      byTheme:        finalByTheme,
+      negatives:      negRun.negatives,
+      adCopyVariants: copyRun.variants,
+    },
   })
 
   // Link planId back into deployment
