@@ -143,6 +143,9 @@ const INVALID_CHARS_RE = /[?!@%^*()+,<>#&$\\;/|{}[\]~=]/g
 function sanitizeNegative(text: string): string | null {
   const cleaned = text.replace(INVALID_CHARS_RE, "").replace(/\s{2,}/g, " ").trim()
   if (!cleaned || cleaned.length < 2 || cleaned.length > 80) return null
+  // Google Ads rejects keywords with more than 10 words. Long FAQ sentences
+  // would never match real queries anyway — drop them, don't truncate.
+  if (cleaned.split(/\s+/).length > 10) return null
   return cleaned
 }
 

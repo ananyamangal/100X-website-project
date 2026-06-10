@@ -276,7 +276,9 @@ const INVALID_KW_CHARS_RE = /[?!@%^*()+,<>#&$\\;/|{}[\]~=]/g
 
 function sanitizeKwText(text: string): string | null {
   const s = text.replace(INVALID_KW_CHARS_RE, "").replace(/\s{2,}/g, " ").trim()
-  return s.length >= 2 && s.length <= 80 ? s : null
+  if (s.length < 2 || s.length > 80) return null
+  if (s.split(/\s+/).length > 10) return null  // Google Ads max 10 words per keyword
+  return s
 }
 
 export async function createCampaignCriteria(
