@@ -63,14 +63,15 @@ The system continuously **observes → learns → recommends → creates → opt
                 │ read intelligence                         │ write outputs
 ┌───────────────┴──────────────────────────────────────────┴─────────────────┐
 │  INTELLIGENCE LAYERS                                                         │
-│   L9 ROAS ENGINE          spend → clicks → calls → WhatsApp → RFQ (V1)       │
-│   L8 COMMUNICATION        WhatsApp · calls · RFQ · forms · brochure = conv.  │
-│   L7 MARKETPLACE          GeM · IndiaMART · Justdial movement                │
-│   L6 CONTENT FACTORY      demand-mapped pages / ad copy / GEO / scripts      │
-│   L5 GOOGLE ADS DIRECTOR  read-only → campaign factory → optimization        │
-│   L4 AI SEARCH INTEL      citation / authority / GEO visibility              │
-│   L3 BUYER INTENT         every lead → Intent Score 1–10 + category          │
-│   L2 DEALER INTEL ★       match · cluster · score · geo opportunity          │
+│   L10 COMPETITIVE INTEL   GeM · IndiaMART · Justdial · search · AI rivals    │
+│   L9  ROAS ENGINE         spend → clicks → calls → WhatsApp → RFQ (V1)       │
+│   L8  COMMUNICATION       WhatsApp · calls · RFQ · forms · brochure = conv.  │
+│   L7  MARKETPLACE         GeM · IndiaMART · Justdial movement                │
+│   L6  CONTENT FACTORY     demand-mapped pages / ad copy / GEO / scripts      │
+│   L5  GOOGLE ADS DIRECTOR read-only → campaign factory → optimization        │
+│   L4  AI SEARCH INTEL     query framework / citation DB (no paid API yet)    │
+│   L3  BUYER INTENT        every lead → Intent Score 1–10 + category          │
+│   L2  DEALER OPP ENGINE ★ score · cluster · contract-history · "contact this wk"│
 └───────────────▲──────────────────────────────────────────▲─────────────────┘
                 │ signals                                   │
 ┌───────────────┴──────────────────────────────────────────┴─────────────────┐
@@ -101,12 +102,20 @@ The system continuously **observes → learns → recommends → creates → opt
 
 Canonical object: **DemandSignal** `{signal_id, source, captured_at, query/keyword, geo, product_hint, raw_payload, normalized_intent}`.
 
-### L2 — Dealer Intelligence Engine ★ (highest priority)
-**Job:** convert the existing GeM dealer corpus into a ranked acquisition pipeline.
-**Existing assets:** `gem_dealers` (1,437 canonical) · `gem_contracts` (seller drill-down) · `DEALER-LEAD-REPORT` (3,815 leads w/ phone·email·GSTIN) · `/admin/growth` Target Lists tab.
-**Capabilities:** dealer matching, clustering, scoring, geographic opportunity detection.
-**Outputs:** top dealer opportunities · acquisition heatmaps · state-wise opportunities · weekly dealer report.
-Canonical object: **Dealer** `{dealer_id, name, gstin, state/district, products, gem_activity, contact, dealer_score, cluster, status}`.
+### L2 — Dealer Opportunity Engine ★ (highest business priority)
+**Job:** convert the existing GeM dealer corpus into a **weekly, actionable contact list** — not a dashboard. The single question it answers: **"Which dealers should 100X contact this week?"**
+**Existing assets:** `gem_dealers` (1,437 canonical) · `gem_contracts` (16,011, seller/product/dept drill-down) · `DEALER-LEAD-REPORT` (3,815 leads w/ phone·email·GSTIN) · `/admin/growth` Target Lists tab.
+
+**Build (this is the priority engine):**
+- **Dealer scoring** — rank each dealer on acquisition value (GeM activity volume, product fit with 100X catalogue, GMV handled, recency, contactability).
+- **Dealer clustering** — group by state/district + product line to reveal coverage gaps.
+- **Contract-history-based targeting** — use `gem_contracts` seller history to identify dealers already moving fogging/agri/sprayer volume (warm OEM-authorization candidates).
+- **State-wise opportunity ranking** — rank states by unworked dealer potential vs. current 100X coverage.
+- **Top dealer recommendations** — the weekly shortlist with contact details + why-now rationale.
+
+**Output:** `Top N dealers to contact this week` with `{dealer, state, score, why_now, contact, suggested_action}` + state-wise opportunity ranking. Delivered as a recommendation queue, not a chart wall.
+Canonical object: **Dealer** `{dealer_id, name, gstin, state/district, products, gem_activity, gmv_handled, contact, dealer_score, cluster, opportunity_rank, last_contacted, status}`.
+Canonical object: **DealerOpportunity** `{opportunity_id, dealer_id, score, why_now, suggested_action, generated_at, status}`.
 
 ### L3 — Buyer Intent Engine
 **Job:** classify every lead. **Output:** Intent Score 1–10 + category ∈ {GeM reseller, dealer, OEM-authorization seeker, government buyer, municipal buyer, pest-control operator, agricultural buyer, distributor, unknown}.
@@ -116,6 +125,13 @@ Canonical object: **Lead** `{lead_id, captured_at, channel, signals[], intent_sc
 
 ### L4 — AI Search Intelligence
 **Job:** monitor brand visibility across GPT, Claude, Gemini, Perplexity, Google AI Overviews. **Track:** is 100X cited · which competitors cited · which pages cited · which queries trigger citations. **Output:** GEO opportunity reports · citation gap · authority gap · AI Visibility Score + auto-generated recommendations.
+
+**Phase 1 = framework only. NO paid LLM API integrations yet.** Build the plumbing so probing can be switched on later without rework:
+- **Query tracking framework** — curated set of buyer/dealer/procurement queries to monitor (`ai_search_queries`).
+- **Citation database** — schema to record, per query, whether 100X was cited and which page (`ai_search_citations`).
+- **Competitor citation tracking** — same records capture competitor citations alongside 100X.
+- **Weekly visibility reporting** — report shape defined now; populated by manual/seed entries until paid probing is approved.
+Canonical object: **AICitation** `{query_id, platform, checked_at, cited_100x, page_cited?, competitors_cited[], source}`.
 
 ### L5 — Google Ads Director (highest implementation priority after Search Console)
 Three-phase capability, governed at every phase:
@@ -136,9 +152,20 @@ Track WhatsApp clicks · calls · RFQs · contact forms · brochure downloads �
 ### L9 — ROAS Engine (V1)
 `spend → clicks → calls → WhatsApp → RFQ`. Enquiry generation is the success metric. Complex revenue attribution is explicitly out of scope for V1 (see deferred docs).
 
+### L10 — Competitive Intelligence Engine
+**Job:** know who is winning the demand 100X should be winning, and where the gaps are. Cross-channel competitor monitoring feeding the Dealer, Ads, and Content engines.
+**Monitor:** GeM competitors (award/seller movement in `gem_contracts`) · IndiaMART competitors · Justdial competitors · Search competitors (Ads Auction Insights, GSC rivals) · AI-search competitors (from L4 citation tracking).
+**Outputs:**
+- **Competitor movement** — who is gaining/losing share by product, state, channel.
+- **Opportunity gaps** — segments competitors hold that 100X does not contest.
+- **Lost opportunities** — GeM contracts / queries won by competitors that 100X could have served.
+- **New opportunity recommendations** — concrete "go contest this" actions routed to Dealer/Ads/Content engines.
+Canonical object: **Competitor** `{competitor_id, name, channels[], products, states, share_signal, last_seen}`.
+Canonical object: **CompetitiveSignal** `{signal_id, competitor_id, channel, signal_type (movement/gap/lost/new), detail, generated_at, status}`.
+
 ---
 
-## 4. The Ten Autonomous Agents
+## 4. The Autonomous Agents
 
 Every agent obeys one contract: **Observe → Log → Recommend → Learn**, and **every action is auditable**.
 
@@ -146,7 +173,7 @@ Every agent obeys one contract: **Observe → Log → Recommend → Learn**, and
 |---|---|---|---|---|
 | 1 | Search Intelligence | L1 GSC | keyword/content gaps | suggest only |
 | 2 | AI Visibility | L4 | GEO/citation actions | suggest only |
-| 3 | Dealer Intelligence ★ | L2 | dealer target lists, heatmaps | suggest only |
+| 3 | Dealer Opportunity ★ | L2 | weekly "contact this week" list | suggest only |
 | 4 | GeM Intelligence | L1/L7 GeM | reseller & product opportunities | suggest only |
 | 5 | Tender Intelligence | L1 procurement | tender shortlists, bid windows | suggest only |
 | 6 | Google Ads Director | L5/L8/L9 | negatives, keywords, drafts, bids | draft + approval |
@@ -154,8 +181,20 @@ Every agent obeys one contract: **Observe → Log → Recommend → Learn**, and
 | 8 | Marketplace Intelligence | L7 | marketplace opportunity reports | suggest only |
 | 9 | Intent Scoring | L3 | lead scores + categories | auto-label, no spend |
 | 10 | Communication Intelligence | L8 | conversion events, channel ROAS | suggest only |
+| 11 | Competitive Intelligence | L10 | movement, gaps, lost, new-opportunity recs | suggest only |
 
 Canonical audit object: **AgentRun** `{run_id, agent, started_at, inputs_snapshot, observations[], recommendations[], status, reviewed_by?, decision?}` — immutable once written.
+
+### Scheduling — Vercel Cron (decided)
+All Phase 1 agents run on **Vercel Cron** invoking secured API routes. **No queue/worker infrastructure is built at this stage.** Each cron route: authenticates → runs the agent → writes an `AgentRun` audit record → emits recommendations to the approval queue. Long jobs stay within Fluid Compute timeout; if an agent outgrows a single invocation, revisit queues in a later phase (not now).
+
+```
+vercel.json crons (Phase 1):
+  /api/growth/cron/dealer-opportunity   weekly  → Dealer Opportunity Engine
+  /api/growth/cron/search-intelligence  weekly  → GSC opportunity report
+  /api/growth/cron/ai-visibility        weekly  → AI visibility report (framework data)
+  /api/growth/cron/competitive-intel    weekly  → competitor movement/gaps
+```
 
 ---
 
@@ -180,38 +219,43 @@ The weekly action queue is the product's primary surface.
 
 ---
 
-## 7. Revised Implementation Roadmap
+## 7. Revised 90-Day Implementation Roadmap
 
-Sequenced to the course-correction order, grounded in what already exists.
+**90-day goal:** generate more qualified **dealers, OEM-authorization requests, GeM reseller enquiries, and procurement opportunities.** Five focus tracks: demand generation · dealer acquisition · procurement opportunities · Google Ads Director · Competitive Intelligence. All agents on Vercel Cron. No queues. No financial/ERP. No paid AI-search APIs yet.
 
 ```
-PHASE 1 — SIGNAL FOUNDATION
-  Goal: real demand signals flowing + the priority dealer pipeline live.
-  1. Search Console — unblock consent screen (config, not code) → first sync → SEO opportunity report.
-  2. AI Search Intelligence — visibility probing baseline + AI Visibility Score.
-  3. Dealer Intelligence ★ — scoring/clustering/heatmaps on existing gem_dealers +
-     3,815 lead corpus; weekly dealer report; Target Lists upgraded in /admin/growth.
-  DoD: weekly dealer opportunity report generated; GSC live; first AI visibility baseline.
+DAYS 1–30 — DEALER ACQUISITION + SIGNAL ON  ("contact this week" live)
+  ★ Dealer Opportunity Engine — scoring, clustering, contract-history targeting,
+    state-wise ranking → weekly "Which dealers to contact this week?" queue.
+  • Search Console — unblock consent screen (config) → first sync → SEO opportunity report.
+  • AI Search FRAMEWORK only — query tracking + citation DB + competitor-citation schema
+    + weekly visibility report shell (no paid API).
+  • Vercel Cron wiring for dealer-opportunity + search-intelligence agents.
+  DoD: weekly dealer contact list in /admin/growth; GSC live; AI-search schema seeded.
 
-PHASE 2 — ACQUISITION ENGINE
-  4. Google Ads Director Phase 1 (read-only intelligence + suggestions).
-  5. Campaign Factory (draft campaigns via Ads API, never auto-publish).
-  6. ROAS Engine V1 (spend → clicks → calls → WhatsApp → RFQ).
-  DoD: first structured Ads recommendation set; first draft campaign awaiting approval; ROAS V1 dashboard.
+DAYS 31–60 — PROCUREMENT + COMPETITIVE INTELLIGENCE
+  • Procurement Opportunities — surface live GeM contract/tender opportunities as a
+    weekly actionable queue (build on 16,011-contract corpus), GeM reseller enquiry targets.
+  • Competitive Intelligence Engine — GeM/IndiaMART/Justdial/search/AI rivals →
+    movement, opportunity gaps, lost opportunities, new-opportunity recommendations.
+  • Cron wiring for competitive-intel agent.
+  DoD: weekly procurement opportunity queue; first competitor movement + gap report.
 
-PHASE 3 — DEMAND AMPLIFICATION
-  7. Content Factory (demand-mapped pages, GEO, ad copy).
-  8. Marketplace Intelligence (GeM · IndiaMART · Justdial monitoring).
-  9. GeM Intelligence agent (reseller + product opportunity surfacing).
-  DoD: first demand-evidenced content drafts; marketplace opportunity report.
+DAYS 61–90 — GOOGLE ADS DIRECTOR + ROAS V1
+  • Google Ads Director Phase 1 (read-only) — campaigns/keywords/search-terms/CPC/CTR
+    + calls/WhatsApp/RFQ proxies → negatives, new keywords, ad copy, budget suggestions.
+  • ROAS Engine V1 — spend → clicks → calls → WhatsApp → RFQ.
+  • Campaign Factory (draft-only via Ads API) — begin if Phase 1 signals are clean.
+  DoD: first structured Ads recommendation set; ROAS V1 view; (optional) first draft campaign awaiting approval.
 
-PHASE 4 — PREDICTIVE
-  10. Tender Intelligence (bid windows, shortlists).
-  11. Intent Engine (full 1–10 scoring across all channels).
-  DoD: every inbound lead auto-classified; tender shortlist with bid windows.
+LATER PHASES (post-90d): Content Factory · Marketplace deep-monitoring · Tender prediction ·
+  full Intent Engine · Campaign Factory scale-up.
 
-DEFERRED (V2): Revenue Attribution · Revenue Capture · Financial/Zoho · Offline conversions.
+DEFERRED (V2, frozen): Revenue Attribution · Revenue Capture · Financial/Zoho ·
+  Offline conversions · ERP/CRM · paid AI-search probing.
 ```
+
+**Output discipline:** every engine emits an **actionable recommendation queue**, not a dashboard. The product surface is the weekly action list answering "what should we act on this week?"
 
 **Model usage:** Claude **Opus** for architecture/sequencing/scoring-model decisions; Claude **Sonnet** for implementation.
 
