@@ -264,22 +264,80 @@ async function extractGeM(db, gemRejections) {
     .limit(1000)
     .toArray()
 
+  // ── GeM normalization (mirrors normalizeGeMToSearchPhrases in ads-keyword-intelligence.ts) ──
+  const GEM_NORM_MODIFIERS = [
+    { pattern: /\bthermal\b/i,          term: "thermal",          weight: 10 },
+    { pattern: /\bULV\b/,               term: "ULV",              weight: 9  },
+    { pattern: /\bportable\b/i,         term: "portable",         weight: 8  },
+    { pattern: /\bmosquito\b/i,         term: "mosquito",         weight: 8  },
+    { pattern: /\bdisinfect/i,          term: "disinfectant",     weight: 7  },
+    { pattern: /\bvector.?control\b/i,  term: "vector control",   weight: 7  },
+    { pattern: /\bcold.?fog\b/i,        term: "cold fog",         weight: 7  },
+    { pattern: /\bIS\s*14855\b/i,       term: "IS 14855",         weight: 6  },
+    { pattern: /\bpublic.?health\b/i,   term: "public health",    weight: 6  },
+    { pattern: /\bbattery/i,            term: "battery operated", weight: 6  },
+    { pattern: /\belectric\b/i,         term: "electric",         weight: 5  },
+    { pattern: /\bvehicle.?mount/i,     term: "vehicle mounted",  weight: 5  },
+    { pattern: /\bpetrol\b/i,           term: "petrol",           weight: 5  },
+    { pattern: /\bhandheld\b/i,         term: "handheld",         weight: 5  },
+    { pattern: /\bbackpack\b/i,         term: "backpack",         weight: 4  },
+  ]
+  const GEM_NORM_MACHINE_NOUNS = [
+    { pattern: /\bthermal\s+fogging\s+machine\b/i, canonical: "thermal fogging machine" },
+    { pattern: /\bULV\s+fog(?:ger|ging)/i,          canonical: "ULV fogger"             },
+    { pattern: /\bfogging\s+machine\b/i,            canonical: "fogging machine"        },
+    { pattern: /\bfogger\b/i,                       canonical: "fogger"                 },
+    { pattern: /\bmist\s*blow(?:er)?\b/i,           canonical: "mist blower"            },
+    { pattern: /\bfogging\b/i,                      canonical: "fogging machine"        },
+  ]
+  function gemNormalize(shortform, originalRaw, gemCount, rawUsability) {
+    let canonicalNoun = "fogging machine"
+    for (const { pattern, canonical } of GEM_NORM_MACHINE_NOUNS) {
+      if (pattern.test(shortform)) { canonicalNoun = canonical; break }
+    }
+    const canonicalIsSpecific = canonicalNoun !== "fogging machine" && canonicalNoun !== "fogger"
+    const mods = GEM_NORM_MODIFIERS
+      .filter(m => m.pattern.test(shortform) && !canonicalNoun.toLowerCase().includes(m.term.toLowerCase().split(" ")[0]))
+      .sort((a, b) => b.weight - a.weight)
+      .slice(0, 2)
+    const candidates = []
+    if (canonicalIsSpecific) {
+      candidates.push({ text: canonicalNoun, conf: gemCount >= 5 ? 74 : 70 })
+    }
+    const baseNoun = canonicalIsSpecific ? canonicalNoun : "fogging machine"
+    for (const { term } of mods) {
+      candidates.push({ text: `${term} ${baseNoun}`, conf: gemCount >= 5 ? 72 : 68 })
+    }
+    if (candidates.length === 0) {
+      candidates.push({ text: shortform, conf: gemCount >= 5 ? 65 : 62 })
+    }
+    return candidates.map(({ text, conf }) => {
+      const normUsability = checkGeMUsability(text)
+      const effUsability  = normUsability.pass ? normUsability.score : rawUsability
+      const mt = assignMatchType(text, "dealer_acquisition", conf, "gem_demand")
+      return {
+        text, source: "gem_demand", discoveryMethod: "gem_normalized",
+        intent: "dealer_acquisition", adGroupTheme: "dealer",
+        confidence: conf, matchType: mt,
+        expectedLeadQuality: leadQuality("dealer_acquisition", mt, conf),
+        gemCount, usabilityScore: effUsability, originalPhrase: originalRaw,
+      }
+    })
+  }
+
   const nameCount = new Map()
   let rejectedByExclusion = 0
   let rejectedByQuality   = 0
-  let acceptedCount        = 0
 
   for (const c of contracts) {
     const raw = String(c.product_name ?? "").trim()
     if (!raw || raw.length < 5) continue
 
-    // Step 1: normalize
     const normalized = raw.toLowerCase()
       .replace(/[^a-z0-9\s]/g, " ")
       .replace(/\b(?:is|as|for|with|and|the|of|in|on|by|at)\b/g, " ")
       .replace(/\s+/g, " ").trim()
 
-    // Step 2: agricultural exclusion guard
     if (isExcluded(normalized)) {
       rejectedByExclusion++
       gemRejections.push({ original: raw, normalized, rejectClass: "agricultural_filter",
@@ -287,17 +345,11 @@ async function extractGeM(db, gemRejections) {
       continue
     }
 
-    // Step 3: strip filler words (unbranded/branded)
     const noFiller = normalized.replace(GEM_FILLER_RE, "").replace(/\s+/g, " ").trim()
-
-    // Step 4: strip company suffixes (suffix word + preceding proper-name word)
     const stripped = stripCompanySuffixes(noFiller).replace(/\s+/g, " ").trim()
-
-    // Step 5: take first 6 words → shortform
     const shortform = stripped.split(/\s+/).filter(Boolean).slice(0, 6).join(" ")
     if (shortform.split(/\s+/).length < 2 || shortform.length < 6) continue
 
-    // Step 6: quality gate
     const result = checkGeMUsability(shortform)
     if (!result.pass || result.score < USABILITY_THRESHOLD) {
       rejectedByQuality++
@@ -307,31 +359,22 @@ async function extractGeM(db, gemRejections) {
       continue
     }
 
-    acceptedCount++
     const existing = nameCount.get(shortform)
     nameCount.set(shortform, {
-      count: (existing?.count ?? 0) + 1,
+      count:         (existing?.count ?? 0) + 1,
       usabilityScore: result.score,
-      originalSample: existing?.originalSample ?? raw,
-      normalizedSample: stripped,
+      originalRaw:   existing?.originalRaw ?? raw,
     })
   }
 
   console.log(`  GeM: ${contracts.length} contracts matched fogging regex`)
   console.log(`       → ${rejectedByExclusion} rejected by agricultural exclusion guard`)
   console.log(`       → ${rejectedByQuality} rejected by 4-gate quality filter`)
-  console.log(`       → ${nameCount.size} unique phrases accepted`)
+  console.log(`       → ${nameCount.size} unique phrases accepted (before normalization)`)
 
   const kws = []
-  for (const [text, { count, usabilityScore }] of nameCount) {
-    const intent = classifyIntent(text)
-    const theme  = intentToTheme(intent) ?? "dealer"
-    const resolvedIntent = intentToTheme(intent) ? intent : "dealer_acquisition"
-    const conf = count >= 20 ? 82 : count >= 5 ? 74 : 65
-    const mt = assignMatchType(text, resolvedIntent, conf, "gem_demand")
-    kws.push({ text, source: "gem_demand", discoveryMethod: "gem_product_name",
-      intent: resolvedIntent, adGroupTheme: theme, confidence: conf, matchType: mt,
-      expectedLeadQuality: leadQuality(resolvedIntent, mt, conf), gemCount: count, usabilityScore })
+  for (const [shortform, { count, usabilityScore, originalRaw }] of nameCount) {
+    kws.push(...gemNormalize(shortform, originalRaw, count, usabilityScore))
   }
   return kws.sort((a,b) => b.confidence - a.confidence)
 }
@@ -564,9 +607,19 @@ try {
   }
 
   if (gemKws.length > 0) {
-    console.log(`  Accepted phrases:`)
+    console.log(`\n  Accepted phrases (after normalization):`)
+    const seenOrig = new Set()
     for (const k of gemKws) {
-      console.log(`    ✓ "${k.text}"  [conf:${k.confidence}  usability:${k.usabilityScore}  count:${k.gemCount}  theme:${k.adGroupTheme}]`)
+      const origKey = k.originalPhrase ?? "(no original)"
+      if (!seenOrig.has(origKey)) {
+        seenOrig.add(origKey)
+        console.log(`\n    Source: "${origKey.slice(0, 70)}"`)
+      }
+      const eff = k.effectiveScore ?? computeEffectiveScore(k)
+      const qb  = computeQualityBonus(k.usabilityScore)
+      console.log(`    ✓ normalized → "${k.text}"`)
+      console.log(`       conf=${k.confidence}  +evidBonus=15  +qualityBonus=${qb}  = eff ${eff}`)
+      console.log(`       usability=${k.usabilityScore}  discovery=${k.discoveryMethod}  theme=${k.adGroupTheme}`)
     }
   } else {
     console.log(`\n  No GeM phrases passed the quality filter.`)
@@ -733,6 +786,198 @@ try {
     : `1. CONNECT ADS SEARCH TERMS. Run a small ₹200/day discovery campaign using current keywords.
      After 1–2 weeks, Ads Search Terms report will populate ads_searchterm_rows with real clicked
      queries — these convert at 88–90 confidence and will displace expansion keywords.`}
+`)
+
+  // ── PRIORITY 3: SEARCH-TERM DATA READINESS ────────────────────────────────
+  const gscCount   = contrib.gsc?.count ?? 0
+  const adsCount   = contrib.ads_search_terms?.count ?? 0
+  const gemCount2  = contrib.gem_demand?.count ?? 0
+  const aiCount    = contrib.ai_search?.count ?? 0
+  const expCount   = contrib.expansion?.count ?? 0
+
+  console.log("\n" + "═".repeat(70))
+  console.log("  PRIORITY 3: SEARCH-TERM DATA READINESS")
+  console.log("═".repeat(70))
+
+  console.log(`
+  CURRENTLY ACTIVE SOURCES
+  ─────────────────────────────────────────────────────────
+  Source            Status     Keywords   % of total   Trigger
+  ─────────────────────────────────────────────────────────
+  GSC               ACTIVE     ${String(gscCount).padStart(4)}       ${String(Math.round(gscCount/total*100)).padStart(4)}%       Organic search on 100xcircle.com
+  GeM demand        ACTIVE     ${String(gemCount2).padStart(4)}       ${String(Math.round(gemCount2/total*100)).padStart(4)}%       Government procurement DB
+  AI Search         ACTIVE     ${String(aiCount).padStart(4)}       ${String(Math.round(aiCount/total*100)).padStart(4)}%       growth_os_citations tracking
+  Expansion         ACTIVE     ${String(expCount).padStart(4)}       ${String(Math.round(expCount/total*100)).padStart(4)}%       Algorithmic (always available)
+  ─────────────────────────────────────────────────────────
+  Ads Search Terms  NO DATA    ${String(adsCount).padStart(4)}       ${String(Math.round(adsCount/total*100)).padStart(4)}%       REQUIRES LIVE CAMPAIGN TRAFFIC
+  Competitor        PENDING    ${String(0).padStart(4)}          0%       Not built yet (governance)
+  IndiaMART         PENDING    ${String(0).padStart(4)}          0%       Scraping freeze (governance)
+
+  SOURCES REQUIRING LIVE CAMPAIGN TRAFFIC
+  ─────────────────────────────────────────────────────────
+  Ads Search Terms:
+    What it is:    Real search queries that triggered your ads and got clicked.
+    Why valuable:  These are self-selected buyer/dealer queries — highest signal quality.
+                   Conversion evidence means confidence 88–100 in ranking.
+                   With evidence bonus +25, effective score = 113+. Always wins.
+    How to unlock: Launch a ₹300–500/day campaign with current keywords.
+                   After 7–14 days, Ads search term report populates ads_searchterm_rows.
+                   Even 10 converting search terms will shift expansion below 30%.
+
+  PROJECTED SOURCE CONTRIBUTION (after 14-day Ads campaign)
+  ─────────────────────────────────────────────────────────
+  Scenario: 14 days × ₹400/day = ₹5,600. Estimated 20–40 clicked search terms.
+  If 5 terms show dealer/OEM/GeM intent:
+
+  Current:                              Projected (with Ads ST):
+  ─────────────────────────────────────────────────────────
+  Expansion:   ${String(expCount).padStart(2)} (${String(expansionPct).padStart(2)}%)                     Expansion: ~20 (55–60%)
+  GSC:          ${String(gscCount).padStart(2)} (${String(Math.round(gscCount/total*100)).padStart(2)}%)                     Ads ST:    ~5  (14%)
+  AI Search:    ${String(aiCount).padStart(2)}  (${String(Math.round(aiCount/total*100)).padStart(2)}%)                     GSC:       ~7  (19%)
+  GeM demand:   ${String(gemCount2).padStart(2)}  (${String(Math.round(gemCount2/total*100)).padStart(2)}%)                     GeM:       ~2  (5%)
+                                          AI Search: ~2  (5%)
+
+  Net change: Expansion drops from ${expansionPct}% to ~55%. Still above 30%.
+  To cross the 30% threshold: need 15+ real search term signals.
+  Strategy: Run 30-day campaign, then add GSC data sync (Ads + GSC = 25+ signals).
+`)
+
+  // ── PRIORITY 4: CAMPAIGN READINESS REVIEW ─────────────────────────────────
+  const dealerKws   = byTheme.dealer ?? []
+  const oemKws      = byTheme.oem ?? []
+  const gemThemeKws = byTheme.gem ?? []
+  const highQKws    = flat.filter(k => k.expectedLeadQuality === "high")
+  const medQKws     = flat.filter(k => k.expectedLeadQuality === "medium")
+  const gemSourceKws = flat.filter(k => k.source === "gem_demand")
+  const gscSourceKws = flat.filter(k => k.source === "gsc")
+  const expSourceKws = flat.filter(k => k.source === "expansion")
+  const exactKws    = flat.filter(k => k.matchType === "EXACT")
+  const phraseKws   = flat.filter(k => k.matchType === "PHRASE")
+
+  // Negatives (from category rules — mirrors ads-negative-intelligence.ts)
+  const knownNegatives = [
+    "repair", "service center", "spare part", "maintenance", "warranty claim",
+    "price", "cost", "rate", "how much", "cheap", "affordable", "discount",
+    "buy", "purchase", "order", "amazon", "flipkart", "indiamart",
+    "rent", "rental", "hire", "lease",
+    "how to use", "manual", "tutorial", "video",
+    "pesticide", "chemical", "insecticide",
+    "mist fan", "nebulizer", "humidifier", "sanitizer machine",
+    "second hand", "used", "refurbished",
+    "home use", "domestic", "personal use",
+    "review", "comparison", "vs", "alternative",
+    // Anti-fogging false positives (should add)
+    "anti-fog", "anti-fogging", "fogging agent", "anti fog",
+  ]
+
+  console.log("\n" + "═".repeat(70))
+  console.log("  PRIORITY 4: CAMPAIGN READINESS REVIEW")
+  console.log("  If you launch Dealer Acquisition tomorrow with ₹300–500/day")
+  console.log("═".repeat(70))
+
+  console.log(`
+  A. WHAT WOULD HAPPEN
+  ─────────────────────────────────────────────────────────
+  You would launch with ${flat.length} keywords across 3 ad groups:
+    • Dealer theme:  ${dealerKws.length} keywords
+    • OEM theme:     ${oemKws.length} keywords
+    • GeM theme:     ${gemThemeKws.length} keywords
+
+  At ₹300–500/day with ~₹15–30 CPC estimate for these terms:
+    • Estimated 10–30 clicks per day
+    • Estimated 150–420 clicks over 14 days
+    • Enough data to evaluate 5–10 keyword groups meaningfully
+
+  Signal quality breakdown:
+    • EXACT match:  ${exactKws.length} keywords (highest precision, lowest waste)
+    • PHRASE match: ${phraseKws.length} keywords (balanced reach/precision)
+    • High lead quality keywords: ${highQKws.length}
+    • Medium lead quality:        ${medQKws.length}
+
+  Source mix at launch:
+    • GSC-validated:         ${gscSourceKws.length} keywords (evidence-backed)
+    • GeM-validated:         ${gemSourceKws.length} keywords (government procurement)
+    • Expansion-generated:   ${expSourceKws.length} keywords (unvalidated but plausible)
+
+  B. WHICH KEYWORDS WOULD BE USED (top 15 by effectiveScore)
+  ─────────────────────────────────────────────────────────`)
+
+  const top15 = [...flat].sort((a,b) => (b.effectiveScore??0)-(a.effectiveScore??0)).slice(0,15)
+  for (let i = 0; i < top15.length; i++) {
+    const k = top15[i]
+    const eff = k.effectiveScore ?? computeEffectiveScore(k)
+    const srcBadge = k.source === "expansion" ? "[expansion]" : k.source === "gsc" ? "[GSC ✓]" : k.source === "gem_demand" ? "[GeM ✓]" : `[${k.source}]`
+    console.log(`  ${String(i+1).padStart(2)}. "${k.text}"  ${srcBadge}  conf=${k.confidence}  eff=${eff}  ${k.matchType}`)
+  }
+
+  console.log(`
+  C. WHICH NEGATIVES WOULD BE USED
+  ─────────────────────────────────────────────────────────
+  Negative keyword count: ${knownNegatives.length} (from category rules + intent mismatch)
+
+  Key negative categories:
+  • Price/consumer intent: price, cost, rate, cheap, discount
+  • Purchase intent: buy, purchase, amazon, flipkart, order
+  • Maintenance intent: repair, service, spare part, manual
+  • Wrong product: nebulizer, mist fan, humidifier, sanitizer machine
+  • Consumer use: home use, domestic, personal use
+  • Rental intent: rent, hire, lease
+  • Research intent: review, comparison, vs
+
+  GAPS in current negative list:
+  • "anti-fog" / "anti-fogging" — currently causing false positives (URGENT)
+  • "fogging agent" — chemical context, not machine (URGENT)
+  • "fogging service" — service provider, not dealer/OEM prospect
+  • City-specific negatives for low-value markets (not yet built)
+
+  D. WHAT RISKS REMAIN
+  ─────────────────────────────────────────────────────────
+  RISK 1 — Expansion dominance (${expansionPct}%): Most keywords are algorithmic.
+    They're directionally correct but unvalidated. CTR may be low on
+    keywords like "ulv fogger oem authorized" if buyers search differently.
+    Mitigation: Use Search Term report after 7 days. Kill keywords <0.5% CTR.
+
+  RISK 2 — False positives in keyword set:
+    "advantages of thermal curing anti-fogging agent" and "fogging agent"
+    are included due to word "agent" matching dealer_acquisition signal.
+    These attract wrong traffic. Add "anti-fog" + "fogging agent" to negatives NOW.
+
+  RISK 3 — No conversion tracking yet:
+    Without a conversion event (form submit / phone click / WhatsApp click),
+    you cannot measure CPA or optimize. Set up conversion tracking before launch.
+
+  RISK 4 — Limited GeM keyword depth:
+    Only ${gemSourceKws.length} GeM keyword(s) in the selected set. Government dealer-
+    prospect queries are underrepresented. Accept the rejected GSC query
+    findings (government/municipal fogging queries) before launch.
+
+  RISK 5 — Landing page alignment:
+    Dealer acquisition ads should point to a dealer landing page with:
+    clear CTA ("Apply for Dealership"), territory map, margin information.
+    Sending dealer queries to the generic homepage wastes budget.
+
+  E. EXPECTED LEARNING VALUE AFTER 14 DAYS
+  ─────────────────────────────────────────────────────────
+  Budget: ₹300–500/day × 14 days = ₹4,200–7,000 total
+  Estimated clicks: 150–400 (assuming ₹15–30 CPC)
+
+  What you will learn:
+  ✓ Which keywords actually get clicked (real CTR by keyword/match type)
+  ✓ Which search terms trigger your ads (Ads Search Terms report) — NEW SIGNALS
+  ✓ Which ad copy resonates (RSA headline/description performance)
+  ✓ Time-of-day + device + geography performance
+  ✓ Whether "fogging machine dealer" converts better than "thermal fogger dealership"
+
+  What you will gain in the system:
+  ✓ ads_searchterm_rows will populate with real clicked queries
+  ✓ Next keyword intelligence run will have Ads ST source (+25 evidence bonus)
+  ✓ Expansion contribution should drop 10–20pp as real signals displace it
+  ✓ False positives will surface in Search Term report (will catch wrong-product clicks)
+
+  Decision gates at day 14:
+  • If CTR > 2%:  Scale. Add more ad groups. Increase budget.
+  • If CTR 0.5–2%: Optimize. Kill underperforming keywords. Fix ad copy.
+  • If CTR < 0.5%: Pause. Review keyword list. Check landing page. Fix negatives.
 `)
 
   console.log("═".repeat(70))

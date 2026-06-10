@@ -242,6 +242,121 @@ export function checkGeMUsability(phrase: string): GeMUsabilityResult {
     rejectReason: "No fogging/vector-control machine noun found in phrase" }
 }
 
+// ── GeM Phrase Normalization Engine ──────────────────────────────────────────
+// Converts procurement-style 6-word shortforms into 1–2 search-intent phrases.
+//
+// "abs portable disinfectant fogging machine power"
+//   → "portable fogging machine"      [modifier + canonical noun]
+//   → "disinfectant fogging machine"  [modifier + canonical noun]
+//
+// Traceability: each output keyword carries originalPhrase = raw product_name.
+// All output keywords retain source="gem_demand" and the full GeM evidence bonus.
+
+interface NormModifier {
+  pattern: RegExp
+  term:    string
+  weight:  number   // higher = shown first when multiple modifiers exist
+}
+
+const GEM_NORM_MODIFIERS: NormModifier[] = [
+  { pattern: /\bthermal\b/i,                   term: "thermal",          weight: 10 },
+  { pattern: /\bULV\b/,                        term: "ULV",              weight: 9  },
+  { pattern: /\bportable\b/i,                  term: "portable",         weight: 8  },
+  { pattern: /\bmosquito\b/i,                  term: "mosquito",         weight: 8  },
+  { pattern: /\bdisinfect/i,                   term: "disinfectant",     weight: 7  },
+  { pattern: /\bvector.?control\b/i,           term: "vector control",   weight: 7  },
+  { pattern: /\bcold.?fog\b/i,                 term: "cold fog",         weight: 7  },
+  { pattern: /\bIS\s*14855\b/i,                term: "IS 14855",         weight: 6  },
+  { pattern: /\bpublic.?health\b/i,            term: "public health",    weight: 6  },
+  { pattern: /\bbattery/i,                     term: "battery operated", weight: 6  },
+  { pattern: /\belectric\b/i,                  term: "electric",         weight: 5  },
+  { pattern: /\bvehicle.?mount/i,              term: "vehicle mounted",  weight: 5  },
+  { pattern: /\bpetrol\b/i,                    term: "petrol",           weight: 5  },
+  { pattern: /\bhandheld\b/i,                  term: "handheld",         weight: 5  },
+  { pattern: /\bbackpack\b/i,                  term: "backpack",         weight: 4  },
+]
+
+const GEM_NORM_MACHINE_NOUNS: Array<{ pattern: RegExp; canonical: string }> = [
+  { pattern: /\bthermal\s+fogging\s+machine\b/i, canonical: "thermal fogging machine" },
+  { pattern: /\bULV\s+fog(?:ger|ging)/i,          canonical: "ULV fogger"             },
+  { pattern: /\bfogging\s+machine\b/i,            canonical: "fogging machine"        },
+  { pattern: /\bfogger\b/i,                       canonical: "fogger"                 },
+  { pattern: /\bmist\s*blow(?:er)?\b/i,           canonical: "mist blower"            },
+  { pattern: /\bfogging\b/i,                      canonical: "fogging machine"        },
+]
+
+function normalizeGeMToSearchPhrases(
+  shortform:     string,
+  originalRaw:   string,
+  funnel:        Funnel,
+  gemCount:      number,
+  rawUsability:  number,
+): GeneratedKeyword[] {
+  // Find canonical machine noun (most specific match wins)
+  let canonicalNoun = "fogging machine"
+  for (const { pattern, canonical } of GEM_NORM_MACHINE_NOUNS) {
+    if (pattern.test(shortform)) { canonicalNoun = canonical; break }
+  }
+
+  // If canonical is already specific and informative, use it directly
+  const canonicalIsSpecific = canonicalNoun !== "fogging machine" && canonicalNoun !== "fogger"
+
+  // Collect applicable modifiers not already encoded in the canonical noun
+  const mods = GEM_NORM_MODIFIERS
+    .filter(m =>
+      m.pattern.test(shortform) &&
+      !canonicalNoun.toLowerCase().includes(m.term.toLowerCase().split(" ")[0]),
+    )
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 2)  // max 2 modifier-derived phrases per input
+
+  const candidates: Array<{ text: string; reason: string; conf: number }> = []
+
+  if (canonicalIsSpecific) {
+    candidates.push({
+      text:   canonicalNoun,
+      reason: `GeM: canonical machine type from "${shortform}"`,
+      conf:   gemCount >= 5 ? 74 : 70,
+    })
+  }
+
+  const baseNoun = canonicalIsSpecific ? canonicalNoun : "fogging machine"
+  for (const { term } of mods) {
+    candidates.push({
+      text:   `${term} ${baseNoun}`,
+      reason: `GeM: "${term}" modifier from "${shortform}"`,
+      conf:   gemCount >= 5 ? 72 : 68,
+    })
+  }
+
+  // Fallback: keep shortform if normalization produced nothing
+  if (candidates.length === 0) {
+    candidates.push({
+      text:   shortform,
+      reason: `GeM: shortform used directly — no normalizable modifiers in "${shortform}"`,
+      conf:   gemCount >= 5 ? 65 : 62,
+    })
+  }
+
+  return candidates.map(({ text, reason, conf }) => {
+    const normUsability = checkGeMUsability(text)
+    const effectiveUsability = normUsability.pass ? normUsability.score : rawUsability
+    const { matchType, reason: matchTypeReason } = assignMatchType(text, "dealer_acquisition", conf, "gem_demand")
+    return {
+      text, funnel,
+      intent:              "dealer_acquisition" as const,
+      matchType,           matchTypeReason, confidence: conf,
+      expectedLeadQuality: computeLeadQuality("dealer_acquisition", matchType, conf),
+      reason,
+      source:              "gem_demand" as const,
+      discoveryMethod:     "gem_normalized",
+      adGroupTheme:        "dealer" as const,
+      usabilityScore:      effectiveUsability,
+      originalPhrase:      originalRaw,
+    } satisfies GeneratedKeyword
+  })
+}
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export type KeywordIntent =
@@ -277,6 +392,7 @@ export interface GeneratedKeyword {
   impressions?:        number
   usabilityScore?:     number   // GeM only: 0–100 phrase quality score; must be ≥ USABILITY_THRESHOLD
   effectiveScore?:     number   // confidence + EVIDENCE_BONUS[source] + qualityBonus; drives ranking
+  originalPhrase?:     string   // GeM only: raw product_name before normalization (traceability)
 }
 
 export interface SourceContribution {
@@ -303,7 +419,7 @@ export interface KeywordIntelligenceRun {
 }
 
 export const KEYWORD_INTELLIGENCE_COLL = "ads_keyword_intelligence"
-const ENGINE_VERSION = "v2.2.0"  // Evidence Bonus ranking model
+const ENGINE_VERSION = "v2.3.0"  // GeM normalization engine + originalPhrase traceability
 const MAX_PER_GROUP  = 12
 
 // Source priority — kept for reference and tiebreaking outside ranking.
@@ -530,8 +646,8 @@ async function extractFromGeM(
     .limit(1000)
     .toArray()
 
-  // nameCount maps shortform → { count, usabilityScore }
-  const nameCount = new Map<string, { count: number; usabilityScore: number }>()
+  // nameCount maps shortform → { count, usabilityScore, originalRaw }
+  const nameCount = new Map<string, { count: number; usabilityScore: number; originalRaw: string }>()
 
   for (const c of contracts) {
     const raw = String(c.product_name ?? "").trim()
@@ -576,32 +692,21 @@ async function extractFromGeM(
 
     const existing = nameCount.get(shortform)
     if (!existing) {
-      nameCount.set(shortform, { count: 1, usabilityScore: usability.score })
+      nameCount.set(shortform, { count: 1, usabilityScore: usability.score, originalRaw: raw })
     } else {
-      nameCount.set(shortform, { count: existing.count + 1, usabilityScore: Math.max(existing.usabilityScore, usability.score) })
+      nameCount.set(shortform, {
+        count:         existing.count + 1,
+        usabilityScore: Math.max(existing.usabilityScore, usability.score),
+        originalRaw:   existing.originalRaw,  // keep first-seen raw name as the trace anchor
+      })
     }
   }
 
   const keywords: GeneratedKeyword[] = []
-  for (const [text, { count, usabilityScore }] of nameCount) {
-    const intent = classifyIntent(text)
-    const theme: AdGroupTheme = intentToTheme(intent) ?? "dealer"
-    const resolvedIntent: KeywordIntent = intentToTheme(intent) ? intent : "dealer_acquisition"
-
-    const confidence = count >= 20 ? 82 : count >= 5 ? 74 : 65
-    const { matchType, reason: matchTypeReason } = assignMatchType(text, resolvedIntent, confidence, "gem_demand")
-
-    keywords.push({
-      text, funnel,
-      intent:              resolvedIntent,
-      matchType,           matchTypeReason, confidence,
-      expectedLeadQuality: computeLeadQuality(resolvedIntent, matchType, confidence),
-      reason:              `GeM procurement signal: ${count} government contract${count !== 1 ? "s" : ""} — usability score ${usabilityScore}/100`,
-      source:              "gem_demand",
-      discoveryMethod:     "gem_product_name",
-      adGroupTheme:        theme,
-      usabilityScore,
-    })
+  for (const [shortform, { count, usabilityScore, originalRaw }] of nameCount) {
+    // Normalization converts "abs portable disinfectant fogging machine power"
+    // → ["portable fogging machine", "disinfectant fogging machine"]
+    keywords.push(...normalizeGeMToSearchPhrases(shortform, originalRaw, funnel, count, usabilityScore))
   }
 
   return keywords.sort((a, b) => b.confidence - a.confidence)
