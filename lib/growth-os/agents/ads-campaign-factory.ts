@@ -384,18 +384,38 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
         loginCustomerId:       loginId,
       })
 
-      // Phase 2A+2B keywords — one entry per generated keyword, not FUV config
+      // Phase 2A+2B keywords — carry source + theme for deployment audit
       const allKeywords = AD_GROUPS.flatMap((g, i) =>
         (finalByTheme[g.theme as AdGroupTheme] ?? []).map(kw => ({
           adGroupResourceName: adGroupRns[i],
           text:      kw.text,
           matchType: kw.matchType,
+          source:    kw.source,
+          theme:     kw.adGroupTheme,
         }))
       )
-      criteriaRns = await createKeywords(customerId, accessToken, {
+      const kwResult = await createKeywords(customerId, accessToken, {
         keywords:       allKeywords,
         loginCustomerId: loginId,
       })
+      criteriaRns = kwResult.resourceNames
+
+      // Log any deployment-gate rejections
+      if (kwResult.rejections.length > 0) {
+        const db2 = (await clientPromise).db()
+        await db2.collection("ads_deployment_audit").insertOne({
+          type:         "keyword_deployment_rejection",
+          campaignName,
+          rejectedCount: kwResult.rejections.length,
+          deployedCount: criteriaRns.length,
+          rejections:   kwResult.rejections,
+          loggedAt:     new Date().toISOString(),
+        })
+        console.warn(
+          `[campaign-factory] Deployment gate rejected ${kwResult.rejections.length} keywords.`,
+          kwResult.rejections.map(r => `"${r.keyword}" (${r.source}) → ${r.rejectionCategory}`).join(", "),
+        )
+      }
 
       // Phase 2C negatives — text-only for Google Ads API
       campaignCriteriaRns = await createCampaignCriteria(customerId, accessToken, {

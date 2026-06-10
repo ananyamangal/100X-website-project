@@ -193,6 +193,20 @@ export async function createAdGroups(
 // India B2B CPC floor for industrial equipment keywords is ~₹10-15.
 export const DEFAULT_KEYWORD_CPC_MICROS = 15_000_000  // ₹15
 
+export interface DeploymentAuditEntry {
+  keyword:             string
+  source?:             string
+  theme?:              string
+  deploymentEligible:  boolean
+  rejectionReason?:    string
+  rejectionCategory?:  string
+}
+
+// Last-resort deployment gate: validates every keyword immediately before the Google Ads
+// mutate call. This fires even if the upstream pipeline already ran the validator, because
+// the FUV config fallback path and older keyword runs can bypass the intelligence pipeline.
+// Any keyword that reaches here without passing the eligibility check is silently dropped
+// from this batch; the rejection is returned in `rejections` so callers can log it.
 export async function createKeywords(
   customerId: string,
   accessToken: string,
@@ -201,29 +215,58 @@ export async function createKeywords(
       adGroupResourceName: string
       text:                string
       matchType:           "EXACT" | "PHRASE" | "BROAD"
-      cpcBidMicros?:       number  // intent-specific bid; falls back to DEFAULT_KEYWORD_CPC_MICROS
+      cpcBidMicros?:       number
+      source?:             string  // for audit logging
+      theme?:              string  // for audit logging
     }>
     loginCustomerId?: string
+    skipValidation?:  boolean       // true only in tests — never in production
   },
-): Promise<string[]> {
-  if (opts.keywords.length === 0) return []
-  const ops = opts.keywords.map(kw => ({
+): Promise<{ resourceNames: string[]; rejections: DeploymentAuditEntry[] }> {
+  const rejections: DeploymentAuditEntry[] = []
+  let eligible = opts.keywords
+
+  // Hard deployment gate — runs unless caller explicitly opts out (test only)
+  if (!opts.skipValidation) {
+    const { validateKeyword } = await import("@/lib/growth-os/ads-keyword-validator")
+    const filtered: typeof opts.keywords = []
+    for (const kw of opts.keywords) {
+      const v = validateKeyword(kw.text)
+      if (v.eligible) {
+        filtered.push(kw)
+      } else {
+        rejections.push({
+          keyword:            kw.text,
+          source:             kw.source,
+          theme:              kw.theme,
+          deploymentEligible: false,
+          rejectionReason:    v.rejectionReason,
+          rejectionCategory:  v.rejectionCategory,
+        })
+      }
+    }
+    eligible = filtered
+  }
+
+  if (eligible.length === 0) return { resourceNames: [], rejections }
+
+  const ops = eligible.map(kw => ({
     adGroupCriterionOperation: {
       create: {
-        adGroup: kw.adGroupResourceName,
-        status:  "ENABLED",
-        // Set an explicit CPC bid — never let it default to the account minimum (₹0.01)
+        adGroup:     kw.adGroupResourceName,
+        status:      "ENABLED",
         cpcBidMicros: String(kw.cpcBidMicros ?? DEFAULT_KEYWORD_CPC_MICROS),
-        keyword: { text: kw.text, matchType: kw.matchType },
+        keyword:     { text: kw.text, matchType: kw.matchType },
       },
     },
   }))
   const resp = await mutate(customerId, ops, accessToken, opts.loginCustomerId)
-  return resp.mutateOperationResponses.map((r, i) => {
+  const resourceNames = resp.mutateOperationResponses.map((r, i) => {
     const rn = r.adGroupCriterionResult?.resourceName
     if (!rn) throw new Error(`Ads mutate: no criterion resourceName at index ${i}`)
     return rn
   })
+  return { resourceNames, rejections }
 }
 
 // ── Step 5: Create campaign-level criteria (geo + negative keywords) ────────
