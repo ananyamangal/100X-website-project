@@ -7,8 +7,9 @@ const GOV_PAGES = ["/nhm-fogging-machine", "/nvbdcp-fogging-machine", "/municipa
 const OEM_KEYWORDS = ["oem", "authorization", "authorisation", "dealer", "reseller", "distributor", "gem seller", "vendor"]
 const TENDER_KEYWORDS = ["tender", "bid", "l1", "reverse auction", "gem ra", "documentation", "is 14855"]
 const GOV_KEYWORDS = ["municipality", "nagar", "municipal", "nhm", "nvbdcp", "health department", "government", "panchayat", "corporation"]
+const FARMER_KEYWORDS = ["farm", "agriculture", "kisan", "agri", "crop", "pest control", "mosquito", "dengue", "malaria", "spray machine", "fog machine for farm"]
 
-type LeadType = "dealer_application" | "oem_authorization" | "tender_support" | "gem_inquiry" | "government_procurement" | "general"
+type LeadType = "dealer_application" | "oem_authorization" | "tender_support" | "gem_inquiry" | "government_procurement" | "farmer" | "end_customer" | "general"
 type LeadValue = "high" | "medium" | "low"
 type CollectionName = "rfq_popup_leads" | "submissions" | "gem_inquiries"
 
@@ -41,12 +42,26 @@ function classify(lead: Record<string, unknown>): { leadType: LeadType; leadValu
   const source = String(lead.source || lead.type || "")
 
   const sessionPageCount = parseInt(String(lead.sessionPageCount || getAttrField(lead, "sessionPageCount") || "1"), 10)
-  const utmCampaign = (lead.utmCampaign || getAttrField(lead, "utm_campaign") || "").toString().toLowerCase()
-  const utmSource = (lead.utmSource || getAttrField(lead, "utm_source") || "").toString().toLowerCase()
+  // UTM: rfq_popup_leads stores in lead.utm.{utm_campaign,utm_source}; submissions may use flat fields or attribution
+  const utmObj = (lead.utm as Record<string, string> | undefined) || {}
+  const utmCampaign = (lead.utmCampaign || utmObj.utm_campaign || utmObj.campaign || getAttrField(lead, "utm_campaign") || "").toString().toLowerCase()
+  const utmSource = (lead.utmSource || utmObj.utm_source || utmObj.source || getAttrField(lead, "utm_source") || "").toString().toLowerCase()
 
   const signals: string[] = []
   let score = 3
   let leadType: LeadType = "general"
+
+  // Explicit intent flags from the RFQ submission form (highest-confidence signals)
+  if (lead.dealerInquiry === true || lead.dealerInquiry === "true") {
+    score = Math.max(score, 9)
+    leadType = "dealer_application"
+    signals.push("Dealer inquiry checkbox")
+  }
+  if (lead.gemAuthRequired === true || lead.gemAuthRequired === "true") {
+    score = Math.max(score, 8)
+    if (leadType === "general") leadType = "oem_authorization"
+    signals.push("GeM auth required checkbox")
+  }
 
   // Score from submission page
   if (DEALER_PAGES.some(p => effectivePage.includes(p))) {
@@ -75,7 +90,7 @@ function classify(lead: Record<string, unknown>): { leadType: LeadType; leadValu
     }
   }
 
-  if (source === "gem_inquiry") {
+  if (source === "gem_inquiry" || source === "gem_popup_submit_only") {
     score = Math.max(score, 8)
     if (leadType === "general") leadType = "gem_inquiry"
     signals.push("GeM inquiry form")
@@ -118,6 +133,22 @@ function classify(lead: Record<string, unknown>): { leadType: LeadType; leadValu
   if (sessionPageCount >= 3) {
     score = Math.min(score + 1, 10)
     signals.push(`Engaged: ${sessionPageCount} pages visited`)
+  }
+
+  // Farmer / agri lead — detect from message/product keywords
+  if (leadType === "general") {
+    const farmerHits = FARMER_KEYWORDS.filter(k => allText.includes(k))
+    if (farmerHits.length > 0) {
+      score = Math.max(score, 5)
+      leadType = "farmer"
+      signals.push(`Agri keywords: ${farmerHits.slice(0, 2).join(", ")}`)
+    }
+  }
+
+  // End-customer fallback: any lead that submitted an RFQ/product form but has no specific intent signal
+  if (leadType === "general" && (product || source === "rfq" || source === "gem_popup_submit_only" || lead._collection === "rfq_popup_leads")) {
+    leadType = "end_customer"
+    signals.push("Product inquiry (no specific intent signal)")
   }
 
   const leadValue: LeadValue = score >= 7 ? "high" : score >= 5 ? "medium" : "low"
