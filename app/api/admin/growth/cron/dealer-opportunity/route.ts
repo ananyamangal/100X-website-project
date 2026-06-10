@@ -19,7 +19,7 @@ export async function GET(req: Request) {
   }
   try {
     const result = await runDealerOpportunityAgent()
-    return NextResponse.json({ ok: true, week: result.week, count: result.top20.length, summary: result.summary })
+    return NextResponse.json({ ok: true, week: result.week, count: result.count })
   } catch (err) {
     console.error("Dealer opportunity cron error:", err)
     return NextResponse.json({ ok: false, error: String(err) }, { status: 500 })
