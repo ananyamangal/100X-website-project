@@ -319,6 +319,44 @@ export async function createCampaignCriteria(
   return resp.mutateOperationResponses.map(r => r.campaignCriterionResult?.resourceName ?? "")
 }
 
+// ── Add campaign-level negative keywords (audience separation) ──────────────
+// Standalone: attaches negatives to an existing campaign. Does not touch
+// status, budget, or any serving entity — safe on PAUSED and ENABLED campaigns.
+
+export async function addCampaignNegatives(
+  customerId: string,
+  accessToken: string,
+  opts: {
+    campaignResourceName: string
+    negatives: Array<{ text: string; matchType: "EXACT" | "PHRASE" | "BROAD" }>
+    loginCustomerId?: string
+  },
+): Promise<{ resourceNames: string[]; skipped: string[] }> {
+  const skipped: string[] = []
+  const cleaned: Array<{ text: string; matchType: "EXACT" | "PHRASE" | "BROAD" }> = []
+  for (const n of opts.negatives) {
+    const t = sanitizeKwText(n.text)
+    if (t) cleaned.push({ text: t, matchType: n.matchType })
+    else skipped.push(n.text)
+  }
+  if (cleaned.length === 0) return { resourceNames: [], skipped }
+
+  const ops = cleaned.map(n => ({
+    campaignCriterionOperation: {
+      create: {
+        campaign: opts.campaignResourceName,
+        negative: true,
+        keyword: { text: n.text, matchType: n.matchType },
+      },
+    },
+  }))
+  const resp = await mutate(customerId, ops, accessToken, opts.loginCustomerId)
+  return {
+    resourceNames: resp.mutateOperationResponses.map(r => r.campaignCriterionResult?.resourceName ?? ""),
+    skipped,
+  }
+}
+
 // ── Step 6: Create RSA ads ──────────────────────────────────────────────────
 
 export async function createRSAAds(
