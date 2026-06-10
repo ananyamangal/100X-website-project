@@ -90,6 +90,158 @@ function isExcludedGeMProduct(normalized: string): boolean {
   return KI_GEM_EXCLUDE_PATTERNS.some(re => re.test(normalized))
 }
 
+// ── GeM phrase quality filter — 4-gate classification ────────────────────────
+//
+// Gate 0 (preprocessing): strip filler words + company suffix indicators.
+// Gate 1 (primary pass): phrase contains a STRONG machine noun → KEEP.
+// Gate 2 (chemical reject): no machine noun + chemical product term → REJECT.
+// Gate 3 (designation reject): no machine noun, no chemical + bare spec code
+//         or technology designation → REJECT.
+//
+// Design principle: IS 14855 / ISI / WHO / NVBDCP are NOT globally rejected.
+// They are compliance signals. "IS 14855 fogging machine" passes Gate 1.
+// "deltamethrin per IS 15227" fails Gate 1 (no machine noun), fails Gate 2
+// (deltamethrin = chemical) → correctly rejected.
+
+export const USABILITY_THRESHOLD = 50
+
+// ── Gate 0: Preprocessing ─────────────────────────────────────────────────────
+
+// Words with no keyword value — stripped before shortform extraction.
+const GEM_FILLER_RE = /\b(unbranded|branded)\b/gi
+
+// Company suffix words that indicate a supplier/company-name prefix in GeM
+// product names. When detected, the suffix word AND the immediately preceding
+// word (the company's proper name, e.g. "Radiant" in "Radiant Enterprise")
+// are both removed, then the remaining phrase is re-evaluated.
+//
+// "Radiant Enterprise ABS Portable Disinfectant Fogging Machine"
+//   → strip "enterprise" + "radiant" → "ABS Portable Disinfectant Fogging Machine"
+//   → Gate 1: "fogging machine" → PASS ✓
+const GEM_COMPANY_SUFFIXES = new Set([
+  "enterprise", "enterprises", "industries", "industry",
+  "corporation", "corp", "pvt", "ltd", "limited",
+  "traders", "trader", "suppliers", "supplier",
+  "agency", "agencies", "associates", "solutions",
+  "services", "company",
+])
+
+function stripCompanySuffixes(phrase: string): string {
+  const words = phrase.split(/\s+/).filter(Boolean)
+  const drop  = new Set<number>()
+  for (let i = 0; i < words.length; i++) {
+    if (GEM_COMPANY_SUFFIXES.has(words[i])) {
+      drop.add(i)
+      if (i > 0) drop.add(i - 1)   // also drop the preceding proper-name word
+    }
+  }
+  return words.filter((_, i) => !drop.has(i)).join(" ")
+}
+
+// ── Gate 1: Strong machine nouns (primary pass gate) ─────────────────────────
+// Bare "ULV" alone is NOT sufficient — ULV is also a chemical formulation type
+// (ULV concentrate). ULV must be followed by a machine noun to count.
+// Bare "fog" alone is NOT sufficient — it appears in product/brand names
+// ("Super White Fog", "King Fog") that are not fogging machines.
+const KI_STRONG_MACHINE_NOUNS: RegExp[] = [
+  /fogging\s+machine/i,
+  /fogging\s+equipment/i,
+  /\bfogger(s)?\b/i,
+  /fog\s+(machine|equipment|sanitizer|unit)/i,
+  /\bULV\s+(fogger|machine|equipment|unit)/i,
+  /mist\s*blow(er)?/i,
+  /aero\s*blast/i,
+  /\bfogging\b/i,                                    // fogging as standalone noun/gerund
+  /vector\s*control\s+(machine|equipment|device)/i,
+  /mosquito\s*control\s+(machine|equipment|device)/i,
+]
+
+// ── Gate 2: Chemical intent (reject if no machine noun) ───────────────────────
+// Specific chemical names first, then product-type terms, then formulation codes.
+const KI_CHEMICAL_TERMS: RegExp[] = [
+  /\bdeltamethrin\b/i, /\bcypermethrin\b/i, /\bmalathion\b/i,
+  /\btemephos\b/i,     /\bpermethrin\b/i,   /\bfenitrothion\b/i,
+  /\bpropoxur\b/i,     /\bpyrethr/i,
+  /\boils?\b/i,
+  /\bseeds?\b/i,
+  /\bchemical(s)?\b/i,
+  /\bliquid\b/i,
+  /\bpesticide(s)?\b/i,
+  /\binsecticide(s)?\b/i,
+  /\bformulation\b/i,
+  /\blarvicidal\b/i,
+  /\badulticidal\b/i,
+  /\bfungicide\b/i,
+  /\bherbicide\b/i,
+  /\bconcentrate\b/i,
+  /\bemulsifi/i,
+  /\b(wp|ec|sc|gr|wdg|sl|dp)\b/i,
+  /\d+(\.\d+)?\s*%/,
+  /\d+(\.\d+)?\s*(wp|ec|sc|gr)\b/i,
+]
+
+// ── Gate 3: Technology designation / spec code (reject if no machine noun) ────
+// Note: IS 14855, ISI, WHO, NVBDCP are NOT listed here — they are compliance
+// signals that are fine when paired with a machine noun (Gate 1 already passed
+// those phrases). These patterns only fire when Gate 1 has already failed.
+const KI_DESIGNATION_PATTERNS: RegExp[] = [
+  /\bdrdo\b/i,
+  /\bultrasonic\b/i,
+  /\bultrasound\b/i,
+  /\bnano\s*tech/i,
+  /per\s*\d{3,}/i,       // "per 15227" — chemical spec reference without machine context
+  /\b\d{4,}\b/,          // standalone 4+ digit cert numbers without machine context
+  /\d+(\.\d+)?\s*(ml|litre|ltr|kg|gm|lit)\b/i,  // weight/volume specs without machine
+]
+
+// ── Quality check entry point ─────────────────────────────────────────────────
+
+export type GeMRejectClass =
+  | "chemical_intent"
+  | "designation_intent"
+  | "no_machine_noun"
+
+export interface GeMUsabilityResult {
+  score:         number        // 0–100; all Gate-1-passing phrases score ≥ 50
+  pass:          boolean       // score >= USABILITY_THRESHOLD
+  rejectClass?:  GeMRejectClass
+  rejectReason?: string
+}
+
+export function checkGeMUsability(phrase: string): GeMUsabilityResult {
+  // Gate 1: machine noun check — primary pass gate
+  if (KI_STRONG_MACHINE_NOUNS.some(re => re.test(phrase))) {
+    let score = 50  // guaranteed pass
+    const words = phrase.split(/\s+/).filter(Boolean)
+    if (words.length >= 2 && words.length <= 4)  score += 25
+    else if (words.length === 5)                  score += 15
+    else if (words.length === 6)                  score += 5
+    if (!/\d/.test(phrase))                        score += 15
+    if (/fogging\s+machine|fogger/i.test(phrase))  score += 10
+    return { score: Math.min(100, score), pass: true }
+  }
+
+  // Gate 2: chemical term check (only reached if Gate 1 failed)
+  for (const re of KI_CHEMICAL_TERMS) {
+    if (re.test(phrase)) {
+      return { score: 0, pass: false, rejectClass: "chemical_intent",
+        rejectReason: "Chemical or consumable product — not a fogging machine keyword" }
+    }
+  }
+
+  // Gate 3: designation check (only reached if Gates 1+2 failed)
+  for (const re of KI_DESIGNATION_PATTERNS) {
+    if (re.test(phrase)) {
+      return { score: 0, pass: false, rejectClass: "designation_intent",
+        rejectReason: "Technology designation or spec code without machine noun context" }
+    }
+  }
+
+  // No machine noun, no chemical, no designation → insufficient signal
+  return { score: 20, pass: false, rejectClass: "no_machine_noun",
+    rejectReason: "No fogging/vector-control machine noun found in phrase" }
+}
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export type KeywordIntent =
@@ -123,6 +275,7 @@ export interface GeneratedKeyword {
   discoveryMethod:     string   // specific method within the source (e.g. "gsc_high_impression")
   adGroupTheme:        AdGroupTheme
   impressions?:        number
+  usabilityScore?:     number   // GeM only: 0–100 phrase quality score; must be ≥ USABILITY_THRESHOLD
 }
 
 export interface SourceContribution {
@@ -140,15 +293,16 @@ export interface KeywordIntelligenceRun {
   byTheme:       Record<AdGroupTheme, GeneratedKeyword[]>
   bySource:      Partial<Record<KeywordSource, number>>
   byIntent:      Partial<Record<KeywordIntent, number>>
-  // Phase 2A.5 additions
   sourceContribution:       SourceContribution[]
   expansionContributionPct: number
-  meetsSuccessCriterion:    boolean  // expansion < 30% of total
+  meetsSuccessCriterion:    boolean
+  // GeM quality filter audit trail
+  gemRejections: GeMRejection[]
   engineVersion: string
 }
 
 export const KEYWORD_INTELLIGENCE_COLL = "ads_keyword_intelligence"
-const ENGINE_VERSION = "v2.0.0"  // bumped for Phase 2A.5 demand signal intelligence
+const ENGINE_VERSION = "v2.1.0"  // GeM phrase quality filter (4-gate classification)
 const MAX_PER_GROUP  = 12
 
 // Source priority for tiebreaking when confidence is equal.
@@ -322,7 +476,18 @@ async function extractFromAdsSearchTerms(db: Db, funnel: Funnel): Promise<Genera
 // Product names in these contracts represent actual procurement terminology
 // that dealers and resellers need to understand and target.
 
-async function extractFromGeM(db: Db, funnel: Funnel): Promise<GeneratedKeyword[]> {
+export interface GeMRejection {
+  original:    string
+  normalized:  string
+  rejectClass: GeMRejectClass | "agricultural_filter"
+  rejectReason: string
+}
+
+async function extractFromGeM(
+  db:         Db,
+  funnel:     Funnel,
+  rejections: GeMRejection[],  // caller-provided array, populated in-place for run logging
+): Promise<GeneratedKeyword[]> {
   const contracts = await db
     .collection("gem_contracts")
     .find(
@@ -333,39 +498,63 @@ async function extractFromGeM(db: Db, funnel: Funnel): Promise<GeneratedKeyword[
     .limit(1000)
     .toArray()
 
-  // Count occurrences of each normalized product name.
-  // Apply secondary exclusion guard after normalization to catch false positives
-  // that slipped through the broad regex (e.g. agricultural equipment matching ULV/mist).
-  const nameCount = new Map<string, number>()
+  // nameCount maps shortform → { count, usabilityScore }
+  const nameCount = new Map<string, { count: number; usabilityScore: number }>()
+
   for (const c of contracts) {
     const raw = String(c.product_name ?? "").trim()
     if (!raw || raw.length < 5) continue
 
+    // Step 1: basic normalization (lowercase, punctuation, stop words)
     const normalized = raw
       .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, " ")   // punctuation → space
-      .replace(/\b(?:is|as|for|with|and|the|of|in|on|by|at)\b/g, " ")  // strip stop words
+      .replace(/[^a-z0-9\s]/g, " ")
+      .replace(/\b(?:is|as|for|with|and|the|of|in|on|by|at)\b/g, " ")
       .replace(/\s+/g, " ")
       .trim()
 
-    // Reject agricultural and off-target products at the normalized level
-    if (isExcludedGeMProduct(normalized)) continue
+    // Step 2: agricultural exclusion guard (TIER_B contamination prevention)
+    if (isExcludedGeMProduct(normalized)) {
+      rejections.push({ original: raw, normalized,
+        rejectClass: "agricultural_filter",
+        rejectReason: "Agricultural or off-target product (TIER_B exclusion)" })
+      continue
+    }
 
-    // Take first 6 words to produce keyword-sized phrases
-    const shortform = normalized.split(" ").filter(Boolean).slice(0, 6).join(" ")
+    // Step 3: strip filler words with no keyword value
+    const defilled = normalized.replace(GEM_FILLER_RE, " ").replace(/\s+/g, " ").trim()
+
+    // Step 4: strip company suffix + preceding proper-name word
+    //   "Radiant Enterprise ABS Portable Disinfectant Fogging Machine"
+    //   → strip "enterprise" + "radiant" → "ABS Portable Disinfectant Fogging Machine"
+    const decompanied = stripCompanySuffixes(defilled)
+
+    // Step 5: take first 6 meaningful words
+    const shortform = decompanied.split(" ").filter(Boolean).slice(0, 6).join(" ")
     if (shortform.split(" ").length < 2 || shortform.length < 6) continue
 
-    nameCount.set(shortform, (nameCount.get(shortform) || 0) + 1)
+    // Step 6: quality filter (4-gate classification)
+    const usability = checkGeMUsability(shortform)
+    if (!usability.pass) {
+      rejections.push({ original: raw, normalized: shortform,
+        rejectClass: usability.rejectClass!,
+        rejectReason: usability.rejectReason! })
+      continue
+    }
+
+    const existing = nameCount.get(shortform)
+    if (!existing) {
+      nameCount.set(shortform, { count: 1, usabilityScore: usability.score })
+    } else {
+      nameCount.set(shortform, { count: existing.count + 1, usabilityScore: Math.max(existing.usabilityScore, usability.score) })
+    }
   }
 
   const keywords: GeneratedKeyword[] = []
-  for (const [text, count] of nameCount) {
+  for (const [text, { count, usabilityScore }] of nameCount) {
     const intent = classifyIntent(text)
-    // Most GeM product names classify as commercial_general — assign to dealer theme
-    // because Funnel A targets dealers who supply to these government buyers
     const theme: AdGroupTheme = intentToTheme(intent) ?? "dealer"
-    const resolvedIntent: KeywordIntent =
-      intentToTheme(intent) ? intent : "dealer_acquisition"
+    const resolvedIntent: KeywordIntent = intentToTheme(intent) ? intent : "dealer_acquisition"
 
     const confidence = count >= 20 ? 82 : count >= 5 ? 74 : 65
     const { matchType, reason: matchTypeReason } = assignMatchType(text, resolvedIntent, confidence, "gem_demand")
@@ -375,10 +564,11 @@ async function extractFromGeM(db: Db, funnel: Funnel): Promise<GeneratedKeyword[
       intent:              resolvedIntent,
       matchType,           matchTypeReason, confidence,
       expectedLeadQuality: computeLeadQuality(resolvedIntent, matchType, confidence),
-      reason:  `GeM procurement signal: ${count} government contract${count !== 1 ? "s" : ""} use this product description`,
-      source:  "gem_demand",
-      discoveryMethod: "gem_product_name",
-      adGroupTheme: theme,
+      reason:              `GeM procurement signal: ${count} government contract${count !== 1 ? "s" : ""} — usability score ${usabilityScore}/100`,
+      source:              "gem_demand",
+      discoveryMethod:     "gem_product_name",
+      adGroupTheme:        theme,
+      usabilityScore,
     })
   }
 
@@ -586,11 +776,14 @@ export async function runKeywordIntelligence(opts: {
   const db = (await clientPromise).db() as Db
   const { funnel } = opts
 
-  // Run all signal sources in parallel
+  // GeM rejection log — populated by extractFromGeM, stored in run document
+  const gemRejections: GeMRejection[] = []
+
+  // Run all signal sources in parallel (GeM receives the mutable rejections array)
   const [gscKws, adsKws, gemKws, aiKws] = await Promise.all([
     extractFromGSC(db, funnel),
     extractFromAdsSearchTerms(db, funnel),
-    extractFromGeM(db, funnel),
+    extractFromGeM(db, funnel, gemRejections),
     extractFromAISearch(db, funnel),
   ])
 
@@ -645,6 +838,7 @@ export async function runKeywordIntelligence(opts: {
     sourceContribution,
     expansionContributionPct,
     meetsSuccessCriterion,
+    gemRejections,
     engineVersion: ENGINE_VERSION,
   }
 
