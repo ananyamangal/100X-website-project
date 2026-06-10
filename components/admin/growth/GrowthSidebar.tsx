@@ -7,7 +7,7 @@ import {
   Users, ShoppingBag, Megaphone, Settings2, ScrollText,
   BarChart2, TrendingUp, ArrowLeft, Zap, Plug,
   PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck, ClipboardList, Monitor,
-  Layout, PhoneCall,
+  Layout, PhoneCall, ClipboardCheck,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -38,10 +38,11 @@ const MODULES: Module[] = [
   { href: "/admin/growth/contact-this-week", label: "Contact This Week",     icon: PhoneCall,       permission: "dealer.view",       badge: "NEW" },
   { href: "/admin/growth/dealers",          label: "Dealer Intelligence",  icon: Users,           permission: "dealer.view" },
   { href: "/admin/growth/gem",              label: "GeM Intel (Legacy)",   icon: ShoppingBag,     permission: "procurement.view" },
-  { href: "/admin/growth/ads",              label: "Google Ads Intel",     icon: Megaphone,       permission: "ads.view" },
-  { href: "/admin/growth/ads/director",     label: "↳ Ads Director",       icon: Megaphone,       permission: "ads.view",          sub: true },
-  { href: "/admin/growth/ads/setup",        label: "↳ Ads Setup",          icon: Plug,            permission: "ads.view",          sub: true },
-  { href: "/admin/growth/ads/dashboard",    label: "↳ Ads Dashboard",      icon: BarChart2,       permission: "ads.view",          sub: true },
+  { href: "/admin/growth/ads",                   label: "Google Ads Intel",       icon: Megaphone,       permission: "ads.view" },
+  { href: "/admin/growth/ads/approval-queue",   label: "↳ Media Buyer Review",   icon: ClipboardCheck,  permission: "ads.view", sub: true, badge: "NEW" },
+  { href: "/admin/growth/ads/director",         label: "↳ Ads Director",         icon: Megaphone,       permission: "ads.view", sub: true },
+  { href: "/admin/growth/ads/setup",            label: "↳ Ads Setup",            icon: Plug,            permission: "ads.view", sub: true },
+  { href: "/admin/growth/ads/dashboard",        label: "↳ Ads Dashboard",        icon: BarChart2,       permission: "ads.view", sub: true },
   { href: "/admin/growth/automation",       label: "Automation Center",    icon: Settings2,       permission: "automation.view" },
   { href: "/admin/growth/logs",             label: "Activity Logs",        icon: ScrollText,      permission: "logs.view" },
   { href: "/admin/growth/reports",          label: "Reporting Center",     icon: BarChart2,       permission: "reports.view" },

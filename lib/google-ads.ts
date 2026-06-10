@@ -156,6 +156,24 @@ export async function saveAdsSettings(s: Omit<AdsSettings, "savedAt">): Promise<
 
 // ── Micros → currency ─────────────────────────────────────────────────────────
 
+export function hasAdsScope(scopeString: string): boolean {
+  return scopeString.includes("adwords")
+}
+
+export function checkAdsReadiness(scopeString: string): {
+  tokenConfigured: boolean
+  hasAdwordsScope: boolean
+  ready: boolean
+  missingSteps: string[]
+} {
+  const tokenConfigured = isDeveloperTokenConfigured()
+  const hasAdwords = hasAdsScope(scopeString)
+  const missingSteps: string[] = []
+  if (!tokenConfigured) missingSteps.push("Set GOOGLE_ADS_DEVELOPER_TOKEN in environment variables")
+  if (!hasAdwords) missingSteps.push("Re-consent OAuth with adwords scope (disconnect and reconnect Google account)")
+  return { tokenConfigured, hasAdwordsScope: hasAdwords, ready: tokenConfigured && hasAdwords, missingSteps }
+}
+
 export function fromMicros(v: unknown): number {
   return Math.round(Number(v ?? 0) / 1_000_000 * 100) / 100
 }
