@@ -21,8 +21,74 @@
 import type { Db } from "mongodb"
 import clientPromise from "@/lib/mongodb"
 import type { Funnel } from "@/lib/growth-os/ads-fuv-config"
-import { taxonomyMatchRegexSource } from "@/lib/growth-os/opportunity-core"
 import { TARGET_QUERIES } from "@/lib/growth-os/citation-constants"
+
+// ── GeM keyword intelligence filter (TIER_A fogging-only) ────────────────────
+// Deliberately excludes TIER_B (agricultural: reapers, tillers, seeders, brush
+// cutters, harvesters) and broad sprayer terms. A false-positive keyword is more
+// dangerous than a missed keyword. Broader categories remain available to the
+// Dealer Opportunity Engine via taxonomyMatchRegexSource() in opportunity-core.ts.
+//
+// Include: thermal foggers, ULV foggers, fogging machines, vector-control and
+// public-health fogging equipment, fogging-specific chemicals (larvicide/adulticide).
+// Exclude: anything agricultural, general sprayers, tillers, reapers, seeders.
+const KI_GEM_FOGGING_PATTERNS = [
+  "thermal\\s*fog",
+  "\\bfogger\\b",
+  "fogging\\s*machine",
+  "fogging\\s*equipment",
+  "fog\\s*sanitizer",
+  "cold\\s*fog",
+  "mist\\s*blow",          // mist blower — vector control use
+  "aero\\s*blast",         // brand type used for fogging
+  "vehicle\\s*mount\\w*\\s*fog",
+  "\\bULV\\b",             // Ultra Low Volume — strictly vector/public-health
+  "mosquito\\s*control",
+  "vector\\s*control",
+  "disease\\s*control\\s*(machine|equipment|spray|fogger)",
+  "public\\s*health.*fog",
+  "larvicid",              // mosquito larvicide — always fogging-operation-linked
+  "adulticid",             // mosquito adulticide — always fogging-operation-linked
+]
+
+const KI_GEM_FOGGING_RE = new RegExp(KI_GEM_FOGGING_PATTERNS.join("|"), "i")
+
+// Secondary exclusion: even if the regex matches, reject if the normalized
+// product name contains any of these agricultural / off-target patterns.
+const KI_GEM_EXCLUDE_PATTERNS = [
+  /\breaper\b/i,
+  /\btiller\b/i,
+  /\btilling\b/i,
+  /\bseeder\b/i,
+  /\bseeding\b/i,
+  /\bsower\b/i,
+  /\bplanter\b/i,
+  /\bharvest/i,
+  /\bthresher\b/i,
+  /\bchaff\b/i,
+  /\bbrush\s*cut/i,
+  /\bweeder\b/i,
+  /\bweeding\b/i,
+  /\brotavat/i,
+  /\brotovat/i,
+  /\bwinnow/i,
+  /\bdrip\s*irrigat/i,
+  /\bsprinkler\s*irrigat/i,
+  /\bpump\s*set\b/i,
+  /\bsubmersible\s*pump/i,
+  /\btractor\b/i,
+  /\bknapsack\s*sprayer\b/i,     // agricultural hand-sprayer (not fogger)
+  /\bhand\s*operated\s*sprayer/i,
+  /\bknapsack\s*pump\b/i,
+  /\bback\s*pack\s*sprayer/i,
+  /\bsanitary\s*napkin/i,        // unrelated false positive from "sanitizer" stem
+  /\bhand\s*sanitizer\b/i,       // consumer hygiene — not fogging machine
+  /\bface\s*mask\b/i,
+]
+
+function isExcludedGeMProduct(normalized: string): boolean {
+  return KI_GEM_EXCLUDE_PATTERNS.some(re => re.test(normalized))
+}
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -257,20 +323,19 @@ async function extractFromAdsSearchTerms(db: Db, funnel: Funnel): Promise<Genera
 // that dealers and resellers need to understand and target.
 
 async function extractFromGeM(db: Db, funnel: Funnel): Promise<GeneratedKeyword[]> {
-  const regexSrc = taxonomyMatchRegexSource()
-  const re = new RegExp(regexSrc, "i")
-
   const contracts = await db
     .collection("gem_contracts")
     .find(
-      { product_name: { $regex: re } },
+      { product_name: { $regex: KI_GEM_FOGGING_RE } },
       { projection: { product_name: 1, contract_date_dt: 1 } },
     )
     .sort({ contract_date_dt: -1 })
     .limit(1000)
     .toArray()
 
-  // Count occurrences of each normalized product name
+  // Count occurrences of each normalized product name.
+  // Apply secondary exclusion guard after normalization to catch false positives
+  // that slipped through the broad regex (e.g. agricultural equipment matching ULV/mist).
   const nameCount = new Map<string, number>()
   for (const c of contracts) {
     const raw = String(c.product_name ?? "").trim()
@@ -282,6 +347,9 @@ async function extractFromGeM(db: Db, funnel: Funnel): Promise<GeneratedKeyword[
       .replace(/\b(?:is|as|for|with|and|the|of|in|on|by|at)\b/g, " ")  // strip stop words
       .replace(/\s+/g, " ")
       .trim()
+
+    // Reject agricultural and off-target products at the normalized level
+    if (isExcludedGeMProduct(normalized)) continue
 
     // Take first 6 words to produce keyword-sized phrases
     const shortform = normalized.split(" ").filter(Boolean).slice(0, 6).join(" ")
