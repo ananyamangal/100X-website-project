@@ -3,18 +3,29 @@ import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import type { Opportunity } from "@/lib/growth-os/types"
 
+export const dynamic = "force-dynamic"
+
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const status = searchParams.get("status") || ""
-  const module = searchParams.get("module") || ""
+  try {
+    const { searchParams } = new URL(req.url)
+    const status = searchParams.get("status") || ""
+    const module = searchParams.get("module") || ""
 
-  const db = (await clientPromise).db()
-  const filter: Record<string, string> = {}
-  if (status) filter.status = status
-  if (module) filter.module = module
+    const db = (await clientPromise).db()
+    const filter: Record<string, string> = {}
+    if (status) filter.status = status
+    if (module) filter.module = module
 
-  const items = await db.collection("growth_os_opportunities").find(filter).sort({ createdAt: -1 }).toArray()
-  return NextResponse.json(JSON.parse(JSON.stringify(items)))
+    const items = await db.collection("growth_os_opportunities").find(filter).sort({ createdAt: -1 }).toArray()
+    const plain = items.map(d => ({ ...d, _id: String(d._id) }))
+    return NextResponse.json(plain)
+  } catch (err) {
+    console.error("GET /api/admin/growth/opportunities error:", err)
+    return NextResponse.json(
+      { error: "Failed to fetch opportunities", detail: String(err) },
+      { status: 500 }
+    )
+  }
 }
 
 export async function POST(req: NextRequest) {
