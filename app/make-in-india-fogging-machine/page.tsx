@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
+import RFQForm from "@/components/forms/RFQForm"
 
 export const metadata: Metadata = {
   title: "Make in India Fogging Machine — Atmanirbhar Bharat OEM Manufacturer | 100X Circle",
@@ -124,9 +125,9 @@ export default function MakeInIndiaFoggingMachinePage() {
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-semibold px-5 py-2.5 rounded-lg text-sm">
               WhatsApp: +91-7827229116
             </a>
-            <a href={`mailto:${BUSINESS.email}?subject=Make in India Fogging Machine`}
+            <a href={`tel:${BUSINESS.phonePrimary.replace(/\s+/g, "")}`}
               className="inline-flex items-center justify-center border border-brand-300 text-white font-medium px-5 py-2.5 rounded-lg text-sm">
-              Email for Quote
+              Call: {BUSINESS.phonePrimary}
             </a>
           </div>
         </div>
@@ -188,6 +189,28 @@ export default function MakeInIndiaFoggingMachinePage() {
             Factory visits for institutional buyers and dealers are available by appointment.
           </p>
         </article>
+
+        {/* RFQ Form */}
+        <section id="rfq" className="mt-12 mb-12">
+          <div className="rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-xl p-6 md:p-10">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                Enquire About Make in India Fogging Machines
+              </h2>
+              <p className="text-sm md:text-base text-gray-600">
+                For government buyers, GeM procurement, MSME compliance, and bulk orders.
+                MSME/UDYAM and Make in India documentation available for all orders.
+              </p>
+            </div>
+            <RFQForm
+              variant="card"
+              location="make-in-india-fogging-machine"
+              defaultProduct="Thermal Fogging Machine"
+              defaultOrganization=""
+              defaultDescription="Enquiring about Make in India / Atmanirbhar Bharat fogging machines for government procurement."
+            />
+          </div>
+        </section>
 
         <div className="border-t border-gray-200 pt-8">
           <div className="grid sm:grid-cols-2 gap-4">

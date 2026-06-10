@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
+import RFQForm from "@/components/forms/RFQForm"
 
 export const metadata: Metadata = {
   title: "Public Health Equipment India — Fogging Machines for Disease Vector Control | 100X Circle",
@@ -164,9 +165,9 @@ export default function PublicHealthEquipmentPage() {
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-brand-50 transition-colors">
               WhatsApp: +91-7827229116
             </a>
-            <a href={`mailto:${BUSINESS.email}?subject=Public Health Equipment Enquiry`}
+            <a href={`tel:${BUSINESS.phonePrimary.replace(/\s+/g, "")}`}
               className="inline-flex items-center justify-center border border-brand-300 text-white font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-brand-700 transition-colors">
-              Email for Quotation
+              Call: {BUSINESS.phonePrimary}
             </a>
           </div>
         </div>
@@ -272,6 +273,28 @@ export default function PublicHealthEquipmentPage() {
             <li><strong>Pan-India dispatch:</strong> Gurugram factory, 5–10 working day delivery</li>
           </ul>
         </article>
+
+        {/* RFQ Form */}
+        <section id="rfq" className="mt-12 mb-12">
+          <div className="rounded-2xl bg-gradient-to-b from-gray-50 to-white shadow-xl p-6 md:p-10">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                Request a Quote — Public Health Equipment
+              </h2>
+              <p className="text-sm md:text-base text-gray-600">
+                For health departments, municipalities, NGOs, and institutional buyers.
+                GeM, tender, and direct purchase enquiries — response within 48 hours.
+              </p>
+            </div>
+            <RFQForm
+              variant="card"
+              location="public-health-equipment"
+              defaultProduct="Mosquito Control Fogger"
+              defaultOrganization=""
+              defaultDescription="Enquiring about public health / vector control fogging equipment."
+            />
+          </div>
+        </section>
 
         {/* FAQ */}
         <div className="mb-8">
