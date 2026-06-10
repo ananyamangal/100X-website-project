@@ -308,10 +308,14 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
       throw new Error(`Budget creation failed: ${String(e)}`)
     }
 
+    // Suffix campaign name too — prevents DUPLICATE_CAMPAIGN_NAME if a prior run
+    // created the campaign but failed later (no deployment record to roll back from)
+    const deployedCampaignName = `${campaignName} — ${runSuffix}`
+
     let campaignRn = ""
     try {
       campaignRn = await createPausedSearchCampaign(customerId, accessToken, {
-        name:               campaignName,
+        name:               deployedCampaignName,
         budgetResourceName: budgetRn,
         loginCustomerId:    loginId,
       })
@@ -325,43 +329,63 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
       throw new Error(`Campaign creation failed: ${String(e)}`)
     }
 
-    const adGroupRns = await createAdGroups(customerId, accessToken, {
-      groups:                AD_GROUPS.map(g => ({ name: g.name })),
-      campaignResourceName:  campaignRn,
-      loginCustomerId:       loginId,
-    })
+    // Track partial resource names so any failure below can roll back everything
+    let adGroupRns: string[] = []
+    let criteriaRns: string[] = []
+    let campaignCriteriaRns: string[] = []
+    let adsRns: string[] = []
 
-    const allKeywords = AD_GROUPS.flatMap((g, i) =>
-      g.keywords.map(kw => ({
-        adGroupResourceName: adGroupRns[i],
-        text:      kw.text,
-        matchType: kw.matchType,
-      }))
-    )
-    const criteriaRns = await createKeywords(customerId, accessToken, {
-      keywords:       allKeywords,
-      loginCustomerId: loginId,
-    })
+    try {
+      adGroupRns = await createAdGroups(customerId, accessToken, {
+        groups:                AD_GROUPS.map(g => ({ name: g.name })),
+        campaignResourceName:  campaignRn,
+        loginCustomerId:       loginId,
+      })
 
-    const campaignCriteriaRns = await createCampaignCriteria(customerId, accessToken, {
-      campaignResourceName: campaignRn,
-      geoTargetConstant:    GEO_INDIA,
-      negativeKeywords:     CAMPAIGN_NEGATIVES,
-      loginCustomerId:      loginId,
-    })
-
-    const adsRns = await createRSAAds(customerId, accessToken, {
-      ads: AD_GROUPS.map((g, i) => {
-        const assets = RSA_ASSETS[g.theme]
-        return {
+      const allKeywords = AD_GROUPS.flatMap((g, i) =>
+        g.keywords.map(kw => ({
           adGroupResourceName: adGroupRns[i],
-          finalUrl:            g.landingPage,
-          headlines:           assets.headlines,
-          descriptions:        assets.descriptions,
-        }
-      }),
-      loginCustomerId: loginId,
-    })
+          text:      kw.text,
+          matchType: kw.matchType,
+        }))
+      )
+      criteriaRns = await createKeywords(customerId, accessToken, {
+        keywords:       allKeywords,
+        loginCustomerId: loginId,
+      })
+
+      campaignCriteriaRns = await createCampaignCriteria(customerId, accessToken, {
+        campaignResourceName: campaignRn,
+        geoTargetConstant:    GEO_INDIA,
+        negativeKeywords:     CAMPAIGN_NEGATIVES,
+        loginCustomerId:      loginId,
+      })
+
+      adsRns = await createRSAAds(customerId, accessToken, {
+        ads: AD_GROUPS.map((g, i) => {
+          const assets = RSA_ASSETS[g.theme]
+          return {
+            adGroupResourceName: adGroupRns[i],
+            finalUrl:            g.landingPage,
+            headlines:           assets.headlines,
+            descriptions:        assets.descriptions,
+          }
+        }),
+        loginCustomerId: loginId,
+      })
+    } catch (e) {
+      // Roll back everything created so far (budget + campaign + any partial entities)
+      const { removeDeployedEntities } = await import("@/lib/google-ads-mutate")
+      await removeDeployedEntities(customerId, accessToken, {
+        ads:              adsRns,
+        adGroupCriteria:  criteriaRns,
+        campaignCriteria: campaignCriteriaRns,
+        adGroups:         adGroupRns,
+        campaign:         campaignRn,
+        campaignBudget:   budgetRn,
+      }, loginId).catch(() => {})
+      throw new Error(`Entity creation failed: ${String(e)}`)
+    }
 
     resourceNames = {
       campaignBudget:   budgetRn,
