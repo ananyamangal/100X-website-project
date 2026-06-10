@@ -370,13 +370,16 @@ export type KeywordIntent =
 export type AdGroupTheme = "dealer" | "oem" | "gem" | "direct_buyer"
 
 export type KeywordSource =
-  | "gsc"              // Google Search Console impression/click data
-  | "ads_search_terms" // Google Ads search term report
-  | "gem_demand"       // GeM government procurement product names
-  | "ai_search"        // AI search visibility tracking queries
-  | "competitor"       // Competitor intelligence (pending data)
-  | "indiamart"        // IndiaMART marketplace signals (pending data)
-  | "expansion"        // Algorithmic PRODUCT_BASES × EXPANSION_SPECS combinations
+  | "ads_search_terms"    // P1: Google Ads search term report (clicked/converted)
+  | "rfq_conversion"      // P2: utm_term that attributed to an RFQ submission
+  | "whatsapp_conversion" // P3: utm_term that attributed to a WhatsApp click lead
+  | "phone_conversion"    // P4: utm_term that attributed to a phone click lead
+  | "gsc"                 // P5: Google Search Console impression/click data
+  | "ai_search"           // P6: AI search visibility tracking queries
+  | "gem_demand"          // P7: GeM government procurement product names (supporting signal)
+  | "competitor"          // P8: Competitor intelligence (pending data)
+  | "indiamart"           // pending: IndiaMART marketplace signals
+  | "expansion"           // P9: Algorithmic PRODUCT_BASES × EXPANSION_SPECS combinations
 
 export interface GeneratedKeyword {
   text:                string
@@ -424,29 +427,35 @@ export const KEYWORD_INTELLIGENCE_COLL = "ads_keyword_intelligence"
 const ENGINE_VERSION = "v2.4.0"  // FUNNEL_B_DIRECT_BUYER: machine_purchase intent + direct_buyer theme + observeOnly Bucket B
 const MAX_PER_GROUP  = 12
 
-// Source priority — kept for reference and tiebreaking outside ranking.
-// selectBest() now uses effectiveScore; SOURCE_PRIORITY is no longer the primary sort key.
+// Source priority — used for tiebreaking and source contribution reporting.
+// Mirrors the new priority order: conversion signals > GSC > AI > GeM > expansion.
 const SOURCE_PRIORITY: Record<KeywordSource, number> = {
-  gsc:              100,
-  ads_search_terms:  90,
-  gem_demand:        80,
-  ai_search:         70,
-  competitor:        60,
-  indiamart:         50,
-  expansion:         10,
+  ads_search_terms:    100,
+  rfq_conversion:       95,
+  whatsapp_conversion:  90,
+  phone_conversion:     85,
+  gsc:                  75,
+  ai_search:            60,
+  gem_demand:           40,   // demoted: supporting signal only, not primary driver
+  competitor:           30,
+  indiamart:            20,
+  expansion:            10,
 }
 
-// Evidence Bonus: additive reward for real demand signals over algorithmic expansion.
-// The objective: a GSC/GeM/Ads keyword with moderate confidence should outrank
-// an expansion keyword with slightly higher confidence.
+// Evidence Bonus: additive score reward for real demand signals.
+// Conversion signals receive the highest bonus — they are proven commercial intent.
+// GeM bonus reduced from 15 → 5: use as corroborating evidence only.
 export const EVIDENCE_BONUS: Record<KeywordSource, number> = {
-  ads_search_terms: 25,
-  gsc:              18,
-  gem_demand:       15,
-  ai_search:        10,
-  competitor:         8,
-  indiamart:          5,
-  expansion:          0,
+  ads_search_terms:    30,   // highest: real clicks from live campaigns
+  rfq_conversion:      28,   // keyword that generated a real RFQ lead
+  whatsapp_conversion: 24,   // keyword that drove WhatsApp contact
+  phone_conversion:    22,   // keyword that drove phone call
+  gsc:                 18,   // real search impressions on our domain
+  ai_search:           10,   // AI platform visibility signal
+  gem_demand:           5,   // government procurement terminology — supporting evidence only
+  competitor:           8,
+  indiamart:            3,
+  expansion:            0,
 }
 
 // Quality Bonus: applied only when usabilityScore is present (GeM keywords).
@@ -979,17 +988,27 @@ function selectBest(all: GeneratedKeyword[], theme: AdGroupTheme): GeneratedKeyw
 
 function buildSourceContribution(selected: GeneratedKeyword[]): SourceContribution[] {
   const total = selected.length
+  // In new priority order: conversion signals first, GeM demoted to 7th
   const allSources: KeywordSource[] = [
-    "gsc", "ads_search_terms", "gem_demand", "ai_search",
-    "competitor", "indiamart", "expansion",
+    "ads_search_terms",
+    "rfq_conversion",
+    "whatsapp_conversion",
+    "phone_conversion",
+    "gsc",
+    "ai_search",
+    "gem_demand",
+    "competitor",
+    "indiamart",
+    "expansion",
   ]
+  const pendingSources = new Set<KeywordSource>(["competitor", "indiamart", "rfq_conversion", "whatsapp_conversion", "phone_conversion"])
   return allSources.map(source => {
     const count = selected.filter(k => k.source === source).length
-    const isPending = source === "competitor" || source === "indiamart"
+    const isPending = pendingSources.has(source) && count === 0
     return {
       source,
       count,
-      pct: total > 0 ? Math.round((count / total) * 100) : 0,
+      pct:    total > 0 ? Math.round((count / total) * 100) : 0,
       status: isPending ? "pending_data" : count === 0 ? "no_data" : "active",
     }
   })
