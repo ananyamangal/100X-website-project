@@ -139,13 +139,11 @@ export async function createPausedSearchCampaign(
           status: "PAUSED",
           advertisingChannelType: "SEARCH",
           campaignBudget: opts.budgetResourceName,
-          biddingStrategyType: "MANUAL_CPC",
           manualCpc: { enhancedCpcEnabled: false },
           networkSettings: {
             targetGoogleSearch: true,
             targetSearchNetwork: false,
             targetContentNetwork: false,
-            targetPartnerSearchNetwork: false,
           },
         },
       },

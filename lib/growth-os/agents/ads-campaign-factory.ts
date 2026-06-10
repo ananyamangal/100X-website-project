@@ -294,18 +294,36 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
     const accessToken = await getValidAccessToken()
     const customerId  = adsSettings!.customerId
     const loginId     = adsSettings!.loginCustomerId
+    // Unique suffix prevents DUPLICATE_NAME errors if a prior run failed mid-way
+    const runSuffix   = Math.random().toString(36).slice(2, 8)
 
-    const budgetRn = await createCampaignBudget(customerId, accessToken, {
-      name:          `${campaignName} — Budget`,
-      amountMicros:  CAMPAIGN_DAILY_BUDGET_MICROS,
-      loginCustomerId: loginId,
-    })
+    let budgetRn = ""
+    try {
+      budgetRn = await createCampaignBudget(customerId, accessToken, {
+        name:            `${campaignName} — Budget — ${runSuffix}`,
+        amountMicros:    CAMPAIGN_DAILY_BUDGET_MICROS,
+        loginCustomerId: loginId,
+      })
+    } catch (e) {
+      throw new Error(`Budget creation failed: ${String(e)}`)
+    }
 
-    const campaignRn = await createPausedSearchCampaign(customerId, accessToken, {
-      name:               campaignName,
-      budgetResourceName: budgetRn,
-      loginCustomerId:    loginId,
-    })
+    let campaignRn = ""
+    try {
+      campaignRn = await createPausedSearchCampaign(customerId, accessToken, {
+        name:               campaignName,
+        budgetResourceName: budgetRn,
+        loginCustomerId:    loginId,
+      })
+    } catch (e) {
+      // Clean up orphaned budget before re-throwing
+      const { removeDeployedEntities } = await import("@/lib/google-ads-mutate")
+      await removeDeployedEntities(customerId, accessToken,
+        { ads: [], adGroupCriteria: [], campaignCriteria: [], adGroups: [], campaign: undefined, campaignBudget: budgetRn },
+        loginId,
+      ).catch(() => {})
+      throw new Error(`Campaign creation failed: ${String(e)}`)
+    }
 
     const adGroupRns = await createAdGroups(customerId, accessToken, {
       groups:                AD_GROUPS.map(g => ({ name: g.name })),
