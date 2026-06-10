@@ -135,6 +135,17 @@ function buildCategoryNegatives(): GeneratedNegative[] {
   )
 }
 
+// ── Negative keyword sanitizer ────────────────────────────────────────────────
+// Google Ads rejects keywords with: ? ! @ % ^ * ( ) = + , < > # & $ \ ; / | { } [ ] ~
+// GSC raw queries can contain these characters and must be cleaned before use.
+const INVALID_CHARS_RE = /[?!@%^*()+,<>#&$\\;/|{}[\]~=]/g
+
+function sanitizeNegative(text: string): string | null {
+  const cleaned = text.replace(INVALID_CHARS_RE, "").replace(/\s{2,}/g, " ").trim()
+  if (!cleaned || cleaned.length < 2 || cleaned.length > 80) return null
+  return cleaned
+}
+
 // ── GSC signal negatives ──────────────────────────────────────────────────────
 // GSC queries that triggered our pages but showed non-dealer intent.
 // These are real search signals, making them high-confidence negatives.
@@ -168,9 +179,12 @@ async function extractGSCNegatives(
     const hasNonDealerSignal = NON_DEALER_SIGNALS.some(sig => query.includes(sig))
     if (!hasNonDealerSignal) continue
 
+    const cleaned = sanitizeNegative(query)
+    if (!cleaned) continue
+
     const impressions = Number(row.impressions ?? 0)
     negatives.push({
-      text:       query,
+      text:       cleaned,
       matchType:  "PHRASE",
       reason:     `GSC signal: query appeared ${impressions} time${impressions !== 1 ? "s" : ""} but shows non-dealer intent`,
       source:     "gsc_signal",

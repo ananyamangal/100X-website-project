@@ -271,6 +271,14 @@ export async function createKeywords(
 
 // ── Step 5: Create campaign-level criteria (geo + negative keywords) ────────
 
+// Strip chars invalid in Google Ads keyword text before any mutate call.
+const INVALID_KW_CHARS_RE = /[?!@%^*()+,<>#&$\\;/|{}[\]~=]/g
+
+function sanitizeKwText(text: string): string | null {
+  const s = text.replace(INVALID_KW_CHARS_RE, "").replace(/\s{2,}/g, " ").trim()
+  return s.length >= 2 && s.length <= 80 ? s : null
+}
+
 export async function createCampaignCriteria(
   customerId: string,
   accessToken: string,
@@ -281,6 +289,11 @@ export async function createCampaignCriteria(
     loginCustomerId?: string
   },
 ): Promise<string[]> {
+  // Sanitize negative keyword texts — reject any that contain invalid API chars
+  const cleanedNegatives = opts.negativeKeywords
+    .map(sanitizeKwText)
+    .filter((t): t is string => t !== null)
+
   const ops: Record<string, unknown>[] = [
     {
       campaignCriterionOperation: {
@@ -290,7 +303,7 @@ export async function createCampaignCriteria(
         },
       },
     },
-    ...opts.negativeKeywords.map(text => ({
+    ...cleanedNegatives.map(text => ({
       campaignCriterionOperation: {
         create: {
           campaign: opts.campaignResourceName,
