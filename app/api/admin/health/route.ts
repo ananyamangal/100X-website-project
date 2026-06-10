@@ -22,69 +22,41 @@ export async function GET() {
     const client = await clientPromise
     const db = client.db()
     report.mongodb.connected = true
+    report.mongodb.databaseName = db.databaseName
 
-    const [popupLeads, submissions, rfqConfig, brochure] = await Promise.all([
-      db.collection("rfq_popup_leads").countDocuments(),
-      db.collection("submissions").countDocuments(),
-      db.collection("rfq_popup_config").findOne({ key: "config" }),
-      db.collection("brochure").findOne({ key: "main" }),
-    ])
+    // List every collection that exists in the database
+    const allCollections = await db.listCollections().toArray()
+    report.mongodb.allCollections = allCollections.map(c => c.name).sort()
 
-    const lastPopupLead = await db
-      .collection("rfq_popup_leads")
-      .find({})
-      .sort({ createdAt: -1 })
-      .limit(3)
-      .toArray()
+    // Count documents in every collection that matters
+    const COLLECTIONS = [
+      // CMS
+      "products", "categories", "reviews", "blogs", "pages",
+      // Leads / submissions
+      "rfq_popup_leads", "submissions", "gem_inquiries", "brochure_leads",
+      // Growth OS
+      "growth_os_logs", "growth_os_automations", "growth_os_opportunities", "growth_os_drafts",
+      // Config / misc
+      "rfq_popup_config", "ads_settings", "ads_searchterm_rows",
+      "growth_os_sessions", "rbac_users", "rbac_sessions",
+    ]
 
-    const lastSubmission = await db
-      .collection("submissions")
-      .find({})
-      .sort({ createdAt: -1 })
-      .limit(3)
-      .toArray()
+    const counts = await Promise.all(
+      COLLECTIONS.map(name => db.collection(name).countDocuments().then(n => ({ name, count: n })))
+    )
+    report.mongodb.counts = Object.fromEntries(counts.map(({ name, count }) => [name, count]))
 
-    report.mongodb.collections = {
-      rfq_popup_leads: {
-        count: popupLeads,
-        last3: lastPopupLead.map((l) => ({
-          _id: String(l._id),
-          createdAt: l.createdAt,
-          pagePath: l.pagePath,
-          hasAttachment: !!l.attachmentUrl,
-          answerKeys: Object.keys(l.answers || {}),
-        })),
-      },
-      submissions: {
-        count: submissions,
-        last3: lastSubmission.map((s) => ({
-          _id: String(s._id),
-          createdAt: s.createdAt,
-          type: s.type,
-          name: s.name,
-          product: s.product,
-        })),
-      },
-    }
+    // MONGODB_URI masked — show only the database name portion and host
+    const uri = process.env.MONGODB_URI || ""
+    const uriDbMatch = uri.match(/\/([^/?]+)\?/)
+    report.mongodb.uriDbName = uriDbMatch?.[1] ?? "(not parseable)"
+    report.mongodb.uriHost = uri.match(/@([^/]+)\//)?.[1]?.slice(0, 40) ?? "(not parseable)"
 
-    report.rfq_popup_config = {
-      found: !!rfqConfig,
-      enabled: rfqConfig?.enabled ?? false,
-      recipientEmail: rfqConfig?.recipientEmail || "(empty)",
-      notificationWhatsapp: rfqConfig?.notificationWhatsapp || "(empty)",
-      notificationWebhook: rfqConfig?.notificationWebhook ? "set" : "(empty)",
-      allowFileUpload: rfqConfig?.allowFileUpload ?? false,
-    }
-
-    report.brochure = {
-      found: !!brochure,
-      mainBrochureUrl: brochure?.mainBrochureUrl || "(not set)",
-    }
   } catch (err) {
     report.mongodb.error = String(err)
   }
 
   return NextResponse.json(report, {
-    headers: { "Cache-Control": "no-store" },
+    headers: { "Cache-Control": "no-store, no-cache" },
   })
 }
