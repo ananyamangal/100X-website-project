@@ -374,12 +374,14 @@ export type KeywordSource =
   | "rfq_conversion"      // P2: utm_term that attributed to an RFQ submission
   | "whatsapp_conversion" // P3: utm_term that attributed to a WhatsApp click lead
   | "phone_conversion"    // P4: utm_term that attributed to a phone click lead
-  | "gsc"                 // P5: Google Search Console impression/click data
-  | "ai_search"           // P6: AI search visibility tracking queries
-  | "gem_demand"          // P7: GeM government procurement product names (supporting signal)
-  | "competitor"          // P8: Competitor intelligence (pending data)
+  | "dealer_conversion"   // P5: utm_term attributed to a dealer application
+  | "oem_conversion"      // P6: utm_term attributed to an OEM authorization enquiry
+  | "gsc"                 // P7: Google Search Console impression/click data
+  | "ai_search"           // P8: AI search visibility tracking queries
+  | "gem_demand"          // P9: GeM government procurement product names (supporting signal)
+  | "competitor"          // P10: Competitor intelligence (pending data)
   | "indiamart"           // pending: IndiaMART marketplace signals
-  | "expansion"           // P9: Algorithmic PRODUCT_BASES × EXPANSION_SPECS combinations
+  | "expansion"           // P11: Algorithmic PRODUCT_BASES × EXPANSION_SPECS combinations
 
 export interface GeneratedKeyword {
   text:                string
@@ -428,12 +430,14 @@ const ENGINE_VERSION = "v2.4.0"  // FUNNEL_B_DIRECT_BUYER: machine_purchase inte
 const MAX_PER_GROUP  = 12
 
 // Source priority — used for tiebreaking and source contribution reporting.
-// Mirrors the new priority order: conversion signals > GSC > AI > GeM > expansion.
+// Mirrors the priority order: conversion signals > GSC > AI > GeM > expansion.
 const SOURCE_PRIORITY: Record<KeywordSource, number> = {
   ads_search_terms:    100,
   rfq_conversion:       95,
   whatsapp_conversion:  90,
   phone_conversion:     85,
+  dealer_conversion:    82,
+  oem_conversion:       80,
   gsc:                  75,
   ai_search:            60,
   gem_demand:           40,   // demoted: supporting signal only, not primary driver
@@ -450,6 +454,8 @@ export const EVIDENCE_BONUS: Record<KeywordSource, number> = {
   rfq_conversion:      28,   // keyword that generated a real RFQ lead
   whatsapp_conversion: 24,   // keyword that drove WhatsApp contact
   phone_conversion:    22,   // keyword that drove phone call
+  dealer_conversion:   22,   // keyword that drove dealer application
+  oem_conversion:      20,   // keyword that drove OEM authorization enquiry
   gsc:                 18,   // real search impressions on our domain
   ai_search:           10,   // AI platform visibility signal
   gem_demand:           5,   // government procurement terminology — supporting evidence only
@@ -536,6 +542,16 @@ function assignMatchType(
 ): { matchType: "EXACT" | "PHRASE" | "BROAD"; reason: string } {
   const wordCount = query.trim().split(/\s+/).length
   const isSpecific = ["dealer_acquisition", "oem_authorization", "gem_reseller", "machine_purchase"].includes(intent)
+
+  // Conversion-backed sources → EXACT always: these are proven commercial queries
+  const CONVERSION_SOURCES: KeywordSource[] = [
+    "rfq_conversion", "whatsapp_conversion", "phone_conversion",
+    "dealer_conversion", "oem_conversion",
+  ]
+  if (CONVERSION_SOURCES.includes(source)) {
+    const label = source.replace(/_/g, " ")
+    return { matchType: "EXACT", reason: `${label} — proven conversion signal, EXACT protects spend on a known winner` }
+  }
 
   if (confidence >= 80 && isSpecific) {
     return { matchType: "EXACT", reason: "High-confidence specific intent — Exact protects budget efficiency" }
@@ -635,6 +651,151 @@ const OBSERVE_ONLY_RE = /^(fogger\s+machine|fogging\s+machine|fogger|thermal\s+f
 
 // Guards informational / consumer queries from entering Funnel B even when they match product patterns.
 const DIRECT_BUYER_GUARD_RE = /\b(price|cost|how\s+much|rate\b|review|compare|how\s+to|what\s+is|what\s+is\s+a|manual|tutorial|video|buy\b|purchase|amazon|flipkart|near\s+me|for\s+home|home\s+use|meaning|definition|near(?:by)?)\b/i
+
+// ── Source 0: Conversion Signals ─────────────────────────────────────────────
+// Reads MongoDB lead collections and extracts search terms that drove real conversions.
+// These are the highest-priority signals: proven commercial queries that generated
+// RFQ leads, dealer applications, or OEM authorization enquiries.
+//
+// Data sources:
+//   rfq_popup_leads   → utmTerm field; leadType field classifies dealer/oem/rfq
+//   brochure_leads    → productName (research signal preceding purchase)
+//   gem_inquiries     → government buyer intent (dealer_conversion or oem_conversion)
+//
+// whatsapp_conversion and phone_conversion will populate once GTM conversion
+// tracking is live and Google Ads starts returning conversion-level data in
+// ads_searchterm_rows. Until then they remain pending_data.
+
+export async function extractFromConversions(db: Db, funnel: Funnel): Promise<GeneratedKeyword[]> {
+  const [rfqLeads, brochureLeads, gemInquiries] = await Promise.all([
+    db.collection("rfq_popup_leads")
+      .find({ utmTerm: { $exists: true, $ne: "" } })
+      .sort({ createdAt: -1 })
+      .limit(2000)
+      .toArray(),
+    db.collection("brochure_leads")
+      .find({ productName: { $exists: true, $ne: "" } })
+      .sort({ createdAt: -1 })
+      .limit(1000)
+      .toArray(),
+    db.collection("gem_inquiries")
+      .find({})
+      .sort({ createdAt: -1 })
+      .limit(500)
+      .toArray(),
+  ])
+
+  // ── Aggregate RFQ lead conversions by utmTerm ───────────────────────────────
+  const termMap = new Map<string, { rfqCount: number; dealerCount: number; oemCount: number }>()
+
+  for (const lead of rfqLeads) {
+    const term = String(lead.utmTerm ?? "").trim().toLowerCase()
+    if (!term || term.length < 3) continue
+    const leadType = String(lead.leadType ?? "")
+    const ex = termMap.get(term) ?? { rfqCount: 0, dealerCount: 0, oemCount: 0 }
+    if (leadType === "dealer_application")  ex.dealerCount++
+    else if (leadType === "oem_authorization") ex.oemCount++
+    else ex.rfqCount++
+    termMap.set(term, ex)
+  }
+
+  const keywords: GeneratedKeyword[] = []
+  const seen = new Set<string>()
+
+  for (const [term, { rfqCount, dealerCount, oemCount }] of termMap) {
+    const total = rfqCount + dealerCount + oemCount
+
+    // Primary source: whichever lead type dominates
+    const source: KeywordSource =
+      dealerCount >= oemCount && dealerCount > 0 ? "dealer_conversion" :
+      oemCount > 0 ? "oem_conversion" : "rfq_conversion"
+
+    const intent = classifyIntent(term)
+    const resolvedIntent: KeywordIntent = intent ?? "dealer_acquisition"
+    const resolvedTheme: AdGroupTheme =
+      intentToTheme(intent) ??
+      (source === "oem_conversion" ? "oem" : source === "dealer_conversion" ? "dealer" : "dealer")
+
+    // Confidence scales with conversion count — more conversions = stronger signal
+    const confidence = Math.min(95, 70 + total * 5)
+    const { matchType, reason: matchTypeReason } = assignMatchType(term, resolvedIntent, confidence, source)
+
+    const parts: string[] = []
+    if (rfqCount > 0)    parts.push(`${rfqCount} RFQ${rfqCount > 1 ? "s" : ""}`)
+    if (dealerCount > 0) parts.push(`${dealerCount} dealer application${dealerCount > 1 ? "s" : ""}`)
+    if (oemCount > 0)    parts.push(`${oemCount} OEM enquir${oemCount > 1 ? "ies" : "y"}`)
+
+    keywords.push({
+      text: term, funnel,
+      intent: resolvedIntent, matchType, matchTypeReason, confidence,
+      expectedLeadQuality: "high",
+      reason: `Conversion signal: "${term}" directly attributed to ${parts.join(", ")} via UTM tracking. Proven commercial intent — highest priority keyword.`,
+      source,
+      discoveryMethod: "utm_term_attribution",
+      adGroupTheme: resolvedTheme,
+    })
+    seen.add(`${term}::${source}`)
+  }
+
+  // ── Brochure downloads — high-intent research signal ───────────────────────
+  const brochureMap = new Map<string, number>()
+  for (const lead of brochureLeads) {
+    const raw = String(lead.productName ?? "").trim().toLowerCase()
+    if (!raw || raw.length < 3 || !KI_GEM_FOGGING_RE.test(raw)) continue
+    brochureMap.set(raw, (brochureMap.get(raw) ?? 0) + 1)
+  }
+
+  for (const [term, count] of brochureMap) {
+    const key = `${term}::rfq_conversion`
+    if (seen.has(key)) continue
+    const confidence = Math.min(80, 55 + count * 3)
+    const intent = classifyIntent(term)
+    const resolvedIntent: KeywordIntent = intent ?? "dealer_acquisition"
+    const resolvedTheme: AdGroupTheme = intentToTheme(intent) ?? "dealer"
+    const { matchType, reason: matchTypeReason } = assignMatchType(term, resolvedIntent, confidence, "rfq_conversion")
+    keywords.push({
+      text: term, funnel,
+      intent: resolvedIntent, matchType, matchTypeReason, confidence,
+      expectedLeadQuality: "medium",
+      reason: `Brochure download: ${count} prospect${count > 1 ? "s" : ""} downloaded brochure for "${term}" — high-intent research signal preceding a purchase decision.`,
+      source: "rfq_conversion" as const,
+      discoveryMethod: "brochure_product_name",
+      adGroupTheme: resolvedTheme,
+    })
+    seen.add(key)
+  }
+
+  // ── GeM inquiries — government buyer intent ────────────────────────────────
+  const gemInqMap = new Map<string, number>()
+  for (const inq of gemInquiries) {
+    const raw = String(inq.product ?? inq.productName ?? inq.requirement ?? inq.message ?? "").trim().toLowerCase()
+    if (!raw || raw.length < 3 || !KI_GEM_FOGGING_RE.test(raw)) continue
+    gemInqMap.set(raw, (gemInqMap.get(raw) ?? 0) + 1)
+  }
+
+  for (const [term, count] of gemInqMap) {
+    const intent = classifyIntent(term)
+    const resolvedIntent: KeywordIntent = intent ?? "dealer_acquisition"
+    const resolvedTheme: AdGroupTheme = intentToTheme(intent) ?? "gem"
+    const source: KeywordSource = intent === "oem_authorization" ? "oem_conversion" : "dealer_conversion"
+    const key = `${term}::${source}`
+    if (seen.has(key)) continue
+    const confidence = Math.min(82, 62 + count * 4)
+    const { matchType, reason: matchTypeReason } = assignMatchType(term, resolvedIntent, confidence, source)
+    keywords.push({
+      text: term, funnel,
+      intent: resolvedIntent, matchType, matchTypeReason, confidence,
+      expectedLeadQuality: "high",
+      reason: `GeM inquiry: ${count} government buyer${count > 1 ? "s" : ""} expressed interest in "${term}" via GeM inquiry form.`,
+      source,
+      discoveryMethod: "gem_inquiry_form",
+      adGroupTheme: resolvedTheme,
+    })
+    seen.add(key)
+  }
+
+  return keywords.sort((a, b) => computeEffectiveScore(b) - computeEffectiveScore(a))
+}
 
 // ── Source 1: Google Search Console ──────────────────────────────────────────
 
@@ -988,12 +1149,13 @@ function selectBest(all: GeneratedKeyword[], theme: AdGroupTheme): GeneratedKeyw
 
 function buildSourceContribution(selected: GeneratedKeyword[]): SourceContribution[] {
   const total = selected.length
-  // In new priority order: conversion signals first, GeM demoted to 7th
   const allSources: KeywordSource[] = [
     "ads_search_terms",
     "rfq_conversion",
     "whatsapp_conversion",
     "phone_conversion",
+    "dealer_conversion",
+    "oem_conversion",
     "gsc",
     "ai_search",
     "gem_demand",
@@ -1001,7 +1163,10 @@ function buildSourceContribution(selected: GeneratedKeyword[]): SourceContributi
     "indiamart",
     "expansion",
   ]
-  const pendingSources = new Set<KeywordSource>(["competitor", "indiamart", "rfq_conversion", "whatsapp_conversion", "phone_conversion"])
+  // Sources that are expected to eventually have data — shown as pending_data when empty
+  const pendingSources = new Set<KeywordSource>([
+    "competitor", "indiamart", "whatsapp_conversion", "phone_conversion",
+  ])
   return allSources.map(source => {
     const count = selected.filter(k => k.source === source).length
     const isPending = pendingSources.has(source) && count === 0
@@ -1025,8 +1190,9 @@ export async function runKeywordIntelligence(opts: {
   // GeM rejection log — populated by extractFromGeM, stored in run document
   const gemRejections: GeMRejection[] = []
 
-  // Run all signal sources in parallel (GeM receives the mutable rejections array)
-  const [gscKws, adsKws, gemKws, aiKws] = await Promise.all([
+  // Run all signal sources in parallel — conversion signals run alongside GSC/Ads/GeM
+  const [convKws, gscKws, adsKws, gemKws, aiKws] = await Promise.all([
+    extractFromConversions(db, funnel),
     extractFromGSC(db, funnel),
     extractFromAdsSearchTerms(db, funnel),
     extractFromGeM(db, funnel, gemRejections),
@@ -1041,6 +1207,7 @@ export async function runKeywordIntelligence(opts: {
   const expKws = generateExpansions(funnel)
 
   const all = deduplicate(withEffectiveScores([
+    ...convKws,    // highest priority: proven conversion-backed keywords
     ...gscKws,
     ...adsKws,
     ...gemKws,

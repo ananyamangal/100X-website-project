@@ -33,6 +33,7 @@ export type RecommendationType =
   | "create_ad_group"          // create a new ad group for a demand cluster
   | "change_landing_page"      // route a keyword to a higher-converting landing page
   | "rsa_headline_swap"        // swap underperforming RSA headline
+  | "create_campaign"          // create a new campaign from conversion + demand signals
 
 export type RecommendationStatus = "pending" | "approved" | "rejected" | "applied" | "expired"
 
