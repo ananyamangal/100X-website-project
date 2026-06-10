@@ -188,11 +188,21 @@ export async function createAdGroups(
 
 // ── Step 4: Create keywords (positive) ─────────────────────────────────────
 
+// DEFAULT_KEYWORD_CPC_MICROS: ₹15 starting bid for India B2B niche keywords.
+// The prior ₹0.01 (10,000 micros) was a placeholder that caused zero impressions —
+// India B2B CPC floor for industrial equipment keywords is ~₹10-15.
+export const DEFAULT_KEYWORD_CPC_MICROS = 15_000_000  // ₹15
+
 export async function createKeywords(
   customerId: string,
   accessToken: string,
   opts: {
-    keywords: Array<{ adGroupResourceName: string; text: string; matchType: "EXACT" | "PHRASE" | "BROAD" }>
+    keywords: Array<{
+      adGroupResourceName: string
+      text:                string
+      matchType:           "EXACT" | "PHRASE" | "BROAD"
+      cpcBidMicros?:       number  // intent-specific bid; falls back to DEFAULT_KEYWORD_CPC_MICROS
+    }>
     loginCustomerId?: string
   },
 ): Promise<string[]> {
@@ -201,7 +211,9 @@ export async function createKeywords(
     adGroupCriterionOperation: {
       create: {
         adGroup: kw.adGroupResourceName,
-        status: "ENABLED",
+        status:  "ENABLED",
+        // Set an explicit CPC bid — never let it default to the account minimum (₹0.01)
+        cpcBidMicros: String(kw.cpcBidMicros ?? DEFAULT_KEYWORD_CPC_MICROS),
         keyword: { text: kw.text, matchType: kw.matchType },
       },
     },

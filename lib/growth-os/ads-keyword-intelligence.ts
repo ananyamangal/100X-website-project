@@ -414,14 +414,17 @@ export interface KeywordIntelligenceRun {
   funnel:        Funnel
   generatedAt:   string
   totalCount:    number
+  rawCount:      number  // keywords before validator — totalCount is post-validator
+  validatorRejectionCount: number
   byTheme:       Record<AdGroupTheme, GeneratedKeyword[]>
   bySource:      Partial<Record<KeywordSource, number>>
   byIntent:      Partial<Record<KeywordIntent, number>>
   sourceContribution:       SourceContribution[]
   expansionContributionPct: number
   meetsSuccessCriterion:    boolean
-  // GeM quality filter audit trail
-  gemRejections: GeMRejection[]
+  // Audit trails
+  gemRejections:       GeMRejection[]
+  validatorRejections: Array<{ text: string; source: string; reason: string }>
   engineVersion: string
 }
 
@@ -1206,16 +1209,27 @@ export async function runKeywordIntelligence(opts: {
   // Expansion fills any gaps — should become < 30% as real signals accumulate
   const expKws = generateExpansions(funnel)
 
-  const all = deduplicate(withEffectiveScores([
-    ...convKws,    // highest priority: proven conversion-backed keywords
-    ...gscKws,
-    ...adsKws,
-    ...gemKws,
-    ...aiKws,
-    ...competitorKws,
-    ...indiamartKws,
-    ...expKws,
-  ]))
+  // ── Keyword Eligibility Layer ─────────────────────────────────────────────
+  // Run before dedup/selection: strips questions, sentences, FAQ phrases,
+  // event/party content, consumer/home-use content.
+  // Only eligible keywords advance to dedup → selectBest → deployment.
+  const { validateKeyword } = await import("@/lib/growth-os/ads-keyword-validator")
+
+  const rawAll = [
+    ...convKws, ...gscKws, ...adsKws, ...gemKws, ...aiKws,
+    ...competitorKws, ...indiamartKws, ...expKws,
+  ]
+  const validatorRejections: Array<{ text: string; source: string; reason: string }> = []
+  const validatedAll = rawAll.filter(kw => {
+    const result = validateKeyword(kw.text)
+    if (!result.eligible) {
+      validatorRejections.push({ text: kw.text, source: kw.source, reason: result.rejectionReason ?? "unknown" })
+      return false
+    }
+    return true
+  })
+
+  const all = deduplicate(withEffectiveScores(validatedAll))
 
   const byTheme: Record<AdGroupTheme, GeneratedKeyword[]> = {
     dealer:       selectBest(all, "dealer"),
@@ -1250,12 +1264,15 @@ export async function runKeywordIntelligence(opts: {
   const run: KeywordIntelligenceRun = {
     runId, funnel,
     generatedAt:  new Date().toISOString(),
+    rawCount:     rawAll.length,
     totalCount:   flat.length,
+    validatorRejectionCount: validatorRejections.length,
     byTheme, bySource, byIntent,
     sourceContribution,
     expansionContributionPct,
     meetsSuccessCriterion,
     gemRejections,
+    validatorRejections,
     engineVersion: ENGINE_VERSION,
   }
 
