@@ -47,10 +47,14 @@ export async function POST() {
           oem:    kwRun.byTheme.oem.length,
           gem:    kwRun.byTheme.gem.length,
         },
-        bySource:        kwRun.bySource,
-        byIntent:        kwRun.byIntent,
-        totalNegatives:  negRun.totalCount,
-        negativesBySource: negRun.bySource,
+        bySource:                  kwRun.bySource,
+        byIntent:                  kwRun.byIntent,
+        sourceContribution:        kwRun.sourceContribution,
+        expansionContributionPct:  kwRun.expansionContributionPct,
+        meetsSuccessCriterion:     kwRun.meetsSuccessCriterion,
+        successCriterion:          "Expansion Engine < 30% of selected keywords",
+        totalNegatives:            negRun.totalCount,
+        negativesBySource:         negRun.bySource,
       },
     })
   } catch (err) {

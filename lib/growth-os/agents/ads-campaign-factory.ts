@@ -275,6 +275,7 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
         expectedLeadQuality: "medium" as const,
         reason:              "FUV config fallback — Phase 2A returned 0 keywords for this theme",
         source:              "expansion" as const,
+        discoveryMethod:     "fuv_config_fallback",
         adGroupTheme:        theme,
       }))
     }
