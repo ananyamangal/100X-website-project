@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { CheckCircle2, XCircle, Circle, RefreshCw, ExternalLink, Rocket } from "lucide-react"
+import { CheckCircle2, Circle, RefreshCw, ExternalLink, Rocket, ChevronDown, ChevronRight } from "lucide-react"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -12,6 +12,22 @@ interface ChecklistItem {
   detail?:   string
   link?:     string
   linkLabel?:string
+}
+
+interface RawCampaign {
+  campaign_id:   string
+  campaign_name: string
+  status:        string
+  customer_id:   string
+}
+
+interface RawApi {
+  usedCustomerId:   string
+  usedLoginId:      string | null
+  hardcodedId:      string
+  campaigns:        RawCampaign[]
+  targetedCampaign: RawCampaign | null
+  error:            string | null
 }
 
 interface LaunchStatus {
@@ -33,6 +49,7 @@ interface LaunchStatus {
     firstDealerLead:     boolean
     firstOEMLead:        boolean
   }
+  rawApi?: RawApi
   checkedAt: string
 }
 
@@ -104,6 +121,128 @@ function CheckRow({
           </button>
         )}
       </div>
+    </div>
+  )
+}
+
+// ── Raw API diagnostic panel ──────────────────────────────────────────────────
+
+function RawApiPanel({ raw }: { raw: RawApi }) {
+  const [open, setOpen] = useState(true)   // expanded by default so user sees it immediately
+
+  const statusColor = (s: string) =>
+    s === "ENABLED"  ? "text-green-700 bg-green-50 border-green-200" :
+    s === "PAUSED"   ? "text-amber-700 bg-amber-50 border-amber-200" :
+    s === "REMOVED"  ? "text-red-700 bg-red-50 border-red-200" :
+                       "text-gray-500 bg-gray-50 border-gray-200"
+
+  return (
+    <div className="rounded-xl border border-gray-200 overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between px-5 py-3.5 bg-gray-900 text-left"
+      >
+        <span className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+          Raw Google Ads API — diagnostic
+        </span>
+        {open
+          ? <ChevronDown  size={14} className="text-gray-500" />
+          : <ChevronRight size={14} className="text-gray-500" />}
+      </button>
+
+      {open && (
+        <div className="bg-gray-950 px-5 py-4 space-y-4 font-mono text-xs">
+
+          {/* Account IDs */}
+          <div className="space-y-1">
+            <p className="text-gray-500 text-[10px] uppercase tracking-wider">Account identifiers</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-gray-900 border border-gray-800 rounded-lg px-3 py-2">
+                <p className="text-gray-500 text-[10px] mb-0.5">customer_id used in GAQL</p>
+                <p className="text-green-400">{raw.usedCustomerId}</p>
+              </div>
+              <div className="bg-gray-900 border border-gray-800 rounded-lg px-3 py-2">
+                <p className="text-gray-500 text-[10px] mb-0.5">login-customer-id header</p>
+                <p className="text-green-400">{raw.usedLoginId ?? "(not set)"}</p>
+              </div>
+            </div>
+            <div className="bg-gray-900 border border-gray-800 rounded-lg px-3 py-2">
+              <p className="text-gray-500 text-[10px] mb-0.5">hardcoded CAMPAIGN_ID in code</p>
+              <p className="text-yellow-400">{raw.hardcodedId}</p>
+            </div>
+          </div>
+
+          {/* Error */}
+          {raw.error && (
+            <div className="bg-red-950 border border-red-800 rounded-lg px-3 py-2">
+              <p className="text-red-400 text-[10px] mb-0.5">API error</p>
+              <p className="text-red-300 break-all">{raw.error}</p>
+            </div>
+          )}
+
+          {/* All campaigns returned */}
+          <div>
+            <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1.5">
+              All campaigns in account ({raw.campaigns.length} returned)
+            </p>
+            {raw.campaigns.length === 0 && !raw.error && (
+              <p className="text-gray-600 italic">No campaigns found</p>
+            )}
+            <div className="space-y-1.5">
+              {raw.campaigns.map(c => (
+                <div
+                  key={c.campaign_id}
+                  className={`rounded-lg border px-3 py-2 ${
+                    c.campaign_id === raw.hardcodedId
+                      ? "border-yellow-600 bg-yellow-950/50"
+                      : "border-gray-800 bg-gray-900"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-white truncate">{c.campaign_name}</p>
+                      <p className="text-gray-500 text-[10px]">campaign_id: {c.campaign_id}</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${statusColor(c.status)}`}>
+                        {c.status}
+                      </span>
+                      {c.campaign_id === raw.hardcodedId && (
+                        <span className="text-[9px] bg-yellow-500 text-black px-1.5 py-0.5 rounded font-bold">
+                          HARDCODED ID
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Match result */}
+          <div className={`rounded-lg border px-3 py-2 ${
+            raw.targetedCampaign
+              ? "border-gray-700 bg-gray-900"
+              : "border-red-800 bg-red-950/30"
+          }`}>
+            <p className="text-gray-500 text-[10px] mb-0.5">
+              Target campaign ({raw.hardcodedId}) found in API response?
+            </p>
+            {raw.targetedCampaign ? (
+              <div>
+                <p className="text-green-400">YES — matched</p>
+                <p className="text-gray-400 text-[10px]">
+                  name=&quot;{raw.targetedCampaign.campaign_name}&quot;
+                  &nbsp;status={raw.targetedCampaign.status}
+                </p>
+              </div>
+            ) : (
+              <p className="text-red-400">NO — hardcoded ID not found in API response</p>
+            )}
+          </div>
+
+        </div>
+      )}
     </div>
   )
 }
@@ -338,6 +477,13 @@ export default function LaunchStatusPage() {
             <p className="text-xs text-green-700">
               All 4 milestones achieved. Growth OS Phase 3 unlocked — review budget recommendations and expand to Tier 1 states.
             </p>
+          </section>
+        )}
+
+        {/* Raw API diagnostic — always visible for debugging */}
+        {data?.rawApi && (
+          <section>
+            <RawApiPanel raw={data.rawApi} />
           </section>
         )}
 

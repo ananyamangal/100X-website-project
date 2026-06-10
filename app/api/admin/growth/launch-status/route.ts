@@ -5,20 +5,74 @@ import { getValidAccessToken } from "@/lib/google-oauth"
 
 export const dynamic = "force-dynamic"
 
-const CAMPAIGN_ID    = "23926990781"
-const DEALER_PAGES   = /dealer|oem|gem-oem|government/i
-const OEM_PAGES      = /gem-oem|oem-auth/i
+const CAMPAIGN_ID  = "23926990781"
+const DEALER_PAGES = /dealer|oem|gem-oem|government/i
+const OEM_PAGES    = /gem-oem|oem-auth/i
+
+// ── Raw diagnostic: list ALL campaigns from the account ───────────────────────
+
+interface RawCampaign {
+  campaign_id:   string
+  campaign_name: string
+  status:        string
+  customer_id:   string
+}
+
+async function fetchAllCampaigns(customerId: string, loginCustomerId?: string): Promise<{
+  usedCustomerId:   string
+  usedLoginId:      string | null
+  hardcodedId:      string
+  campaigns:        RawCampaign[]
+  targetedCampaign: RawCampaign | null
+  error:            string | null
+}> {
+  const cid = customerId.replace(/-/g, "")
+  const out = {
+    usedCustomerId:   cid,
+    usedLoginId:      loginCustomerId ?? null,
+    hardcodedId:      CAMPAIGN_ID,
+    campaigns:        [] as RawCampaign[],
+    targetedCampaign: null as RawCampaign | null,
+    error:            null as string | null,
+  }
+  try {
+    const token = await getValidAccessToken()
+    const rows  = await searchAds(
+      cid,
+      `SELECT campaign.id, campaign.name, campaign.status FROM campaign ORDER BY campaign.id ASC`,
+      token,
+      loginCustomerId,
+    )
+    out.campaigns = rows.map(r => {
+      const c = r.campaign as Record<string, unknown>
+      return {
+        campaign_id:   String(c?.id   ?? ""),
+        campaign_name: String(c?.name ?? ""),
+        status:        String(c?.status ?? ""),
+        customer_id:   cid,
+      }
+    })
+    out.targetedCampaign = out.campaigns.find(c => c.campaign_id === CAMPAIGN_ID) ?? null
+  } catch (e) {
+    out.error = String(e)
+  }
+  return out
+}
 
 // ── Live Google Ads metrics for today ────────────────────────────────────────
 
-async function fetchTodayMetrics(customerId: string, loginCustomerId?: string) {
+async function fetchTodayMetrics(
+  customerId: string,
+  campaignId: string,          // use the real campaign ID, not the hardcoded constant
+  loginCustomerId?: string,
+) {
   try {
     const token = await getValidAccessToken()
     const rows = await searchAds(
       customerId.replace(/-/g, ""),
       `SELECT metrics.impressions, metrics.clicks, metrics.cost_micros
        FROM campaign
-       WHERE campaign.id = '${CAMPAIGN_ID}'
+       WHERE campaign.id = '${campaignId}'
        AND segments.date DURING TODAY`,
       token,
       loginCustomerId,
@@ -36,24 +90,6 @@ async function fetchTodayMetrics(customerId: string, loginCustomerId?: string) {
   }
 }
 
-// ── Campaign status from Google Ads ──────────────────────────────────────────
-
-async function fetchCampaignStatus(customerId: string, loginCustomerId?: string) {
-  try {
-    const token = await getValidAccessToken()
-    const rows = await searchAds(
-      customerId.replace(/-/g, ""),
-      `SELECT campaign.status FROM campaign WHERE campaign.id = '${CAMPAIGN_ID}'`,
-      token,
-      loginCustomerId,
-    )
-    const status = (rows[0]?.campaign as Record<string, unknown> | undefined)?.status
-    return typeof status === "string" ? status : "UNKNOWN"
-  } catch {
-    return "UNKNOWN"
-  }
-}
-
 // ── GET: full launch status ───────────────────────────────────────────────────
 
 export async function GET() {
@@ -63,7 +99,6 @@ export async function GET() {
   const settings = await db.collection("ads_settings").findOne({})
   const lc       = (settings?.launchChecklist ?? {}) as Record<string, boolean>
 
-  // Today's lead count
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
@@ -80,16 +115,33 @@ export async function GET() {
     }),
   ])
 
-  // Google Ads live data
+  // Fetch all campaigns (raw, unfiltered) — surfaces real campaign IDs & names
   const adsSettings = await getAdsSettings()
-  const [todayMetrics, campaignStatusRaw] = await Promise.all([
-    adsSettings ? fetchTodayMetrics(adsSettings.customerId, adsSettings.loginCustomerId) : Promise.resolve({ impressions: 0, clicks: 0, spendINR: 0 }),
-    adsSettings ? fetchCampaignStatus(adsSettings.customerId, adsSettings.loginCustomerId) : Promise.resolve("UNKNOWN"),
-  ])
+  const rawApi = adsSettings
+    ? await fetchAllCampaigns(adsSettings.customerId, adsSettings.loginCustomerId)
+    : {
+        usedCustomerId:   "(no ads settings saved)",
+        usedLoginId:      null,
+        hardcodedId:      CAMPAIGN_ID,
+        campaigns:        [],
+        targetedCampaign: null,
+        error:            "Ads settings not configured",
+      }
 
-  const campaignLive = campaignStatusRaw === "ENABLED"
+  // Use the live campaign that matches the hardcoded ID, or fall back to first ENABLED campaign
+  const activeCampaign = rawApi.targetedCampaign
+    ?? rawApi.campaigns.find(c => c.status === "ENABLED")
+    ?? null
 
-  // All-time click check (from synced search term data)
+  const campaignStatusRaw = rawApi.targetedCampaign?.status ?? "NOT_FOUND"
+  const campaignLive      = campaignStatusRaw === "ENABLED"
+
+  // Metrics: use whichever campaign ID actually exists in Google Ads
+  const metricsId     = activeCampaign?.campaign_id ?? CAMPAIGN_ID
+  const todayMetrics  = adsSettings
+    ? await fetchTodayMetrics(adsSettings.customerId, metricsId, adsSettings.loginCustomerId)
+    : { impressions: 0, clicks: 0, spendINR: 0 }
+
   const everHadClick = await db.collection("ads_searchterm_rows")
     .countDocuments({ clicks: { $gt: 0 } })
     .then(n => n > 0)
@@ -118,12 +170,14 @@ export async function GET() {
         linkLabel: "Open GTM",
       },
       campaignEnabled: {
-        confirmed: campaignLive,
-        manual:    false,
-        label:     "Campaign 23926990781 enabled",
-        detail:    campaignStatusRaw,
-        link:      "https://ads.google.com/aw/campaigns",
-        linkLabel: "Open Campaigns",
+        confirmed:  campaignLive,
+        manual:     false,
+        label:      activeCampaign
+          ? `${activeCampaign.campaign_name} (${activeCampaign.campaign_id})`
+          : `Campaign ${CAMPAIGN_ID}`,
+        detail:     campaignStatusRaw,
+        link:       "https://ads.google.com/aw/campaigns",
+        linkLabel:  "Open Campaigns",
       },
     },
     metrics: {
@@ -138,6 +192,7 @@ export async function GET() {
       firstDealerLead:     dealerTotal > 0,
       firstOEMLead:        oemTotal > 0,
     },
+    rawApi,          // ← full diagnostic: customer_id, all campaigns, error if any
     checkedAt: new Date().toISOString(),
   })
 }
@@ -149,9 +204,9 @@ export async function PATCH(req: Request) {
   const { field, value } = body
 
   const allowed: Record<string, string> = {
-    accountFunded:           "launchChecklist.accountFunded",
-    conversionActionsCreated:"launchChecklist.conversionActionsCreated",
-    gtmTagsPublished:        "launchChecklist.gtmTagsPublished",
+    accountFunded:            "launchChecklist.accountFunded",
+    conversionActionsCreated: "launchChecklist.conversionActionsCreated",
+    gtmTagsPublished:         "launchChecklist.gtmTagsPublished",
   }
   if (!allowed[field]) {
     return NextResponse.json({ error: "Invalid field" }, { status: 400 })
