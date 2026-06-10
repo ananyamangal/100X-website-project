@@ -145,6 +145,7 @@ export async function createPausedSearchCampaign(
             targetSearchNetwork: false,
             targetContentNetwork: false,
           },
+          containsEuPoliticalAdvertising: false,
         },
       },
     }],
