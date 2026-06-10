@@ -550,6 +550,25 @@ function computeLeadQuality(
   return "low"
 }
 
+// ── Anti-fog false positive guard ─────────────────────────────────────────────
+// Rejects GSC queries that contain anti-fog / fogging-agent product intent
+// without any fogging-machine context. These bypass classifyIntent() via the
+// "agent" signal (dealer_acquisition) but are wrong product category:
+//   "fogging agent" → chemical agent for anti-fogging coatings
+//   "advantages of thermal curing anti-fog agent" → anti-fog surface treatment
+//
+// Rule (user-approved): reject if anti-fog intent present AND none of:
+//   machine / fogger / thermal / ULV / mosquito / vector control / municipal /
+//   GeM / OEM / distributor / dealer / manufacturer
+
+const ANTI_FOG_INTENT_RE = /\banti[\s-]?fog(?:ging)?\b|\bde[\s-]?fog(?:ging)?\b|\banti[\s-]?mist\b|\banti[\s-]?condensation\b|\bfogging\s+agent\b/i
+
+const ANTI_FOG_MACHINE_CONTEXT_RE = /\b(machine|fogger|foggers|thermal|ulv|mosquito|vector\s*control|municipal|gem|oem|distributor|dealer|manufacturer)\b/i
+
+function isAntiFogFalsePositive(query: string): boolean {
+  return ANTI_FOG_INTENT_RE.test(query) && !ANTI_FOG_MACHINE_CONTEXT_RE.test(query)
+}
+
 // ── Source 1: Google Search Console ──────────────────────────────────────────
 
 async function extractFromGSC(db: Db, funnel: Funnel): Promise<GeneratedKeyword[]> {
@@ -563,6 +582,7 @@ async function extractFromGSC(db: Db, funnel: Funnel): Promise<GeneratedKeyword[
   return rows.flatMap(row => {
     const query = String(row.query ?? "").trim().toLowerCase()
     if (!query || query.length < 3) return []
+    if (isAntiFogFalsePositive(query)) return []  // anti-fog coating/film, not a fogging machine
 
     const intent = classifyIntent(query)
     const theme  = intentToTheme(intent)

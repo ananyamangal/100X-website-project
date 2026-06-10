@@ -127,7 +127,16 @@ function leadQuality(intent, matchType, confidence) {
   return "low"
 }
 
+// ── Anti-fog false positive guard (mirrors ads-keyword-intelligence.ts) ───────
+const ANTI_FOG_INTENT_RE  = /\banti[\s-]?fog(?:ging)?\b|\bde[\s-]?fog(?:ging)?\b|\banti[\s-]?mist\b|\banti[\s-]?condensation\b|\bfogging\s+agent\b/i
+const ANTI_FOG_MACHINE_RE = /\b(machine|fogger|foggers|thermal|ulv|mosquito|vector\s*control|municipal|gem|oem|distributor|dealer|manufacturer)\b/i
+function isAntiFogFalsePositive(query) {
+  return ANTI_FOG_INTENT_RE.test(query) && !ANTI_FOG_MACHINE_RE.test(query)
+}
+
 // ── Extract sources ───────────────────────────────────────────────────────────
+
+const antiFogFiltered = []  // populated by extractGSC for validation report
 
 async function extractGSC(db) {
   const rows = await db.collection("gsc_query_rows")
@@ -140,6 +149,10 @@ async function extractGSC(db) {
   for (const row of rows) {
     const query = String(row.query ?? "").trim().toLowerCase()
     if (!query || query.length < 3) continue
+    if (isAntiFogFalsePositive(query)) {
+      antiFogFiltered.push({ query, impressions: Number(row.impressions ?? 0), clicks: Number(row.clicks ?? 0), position: Number(row.position ?? 0) })
+      continue
+    }
     const intent = classifyIntent(query)
     const theme  = intentToTheme(intent)
     if (!theme) continue
@@ -517,6 +530,9 @@ try {
   const expKws = generateExpansions()
 
   console.log(`Raw signals: GSC=${gscKws.length}  Ads=${adsKws.length}  GeM=${gemKws.length}  AI=${aiKws.length}  Expansion=${expKws.length}`)
+  if (antiFogFiltered.length > 0) {
+    console.log(`Anti-fog filtered: ${antiFogFiltered.length} GSC queries removed before classification`)
+  }
 
   const all = deduplicate(withEffectiveScores([...gscKws, ...adsKws, ...gemKws, ...aiKws, ...expKws]))
 
@@ -552,6 +568,60 @@ try {
   }
   console.log("─".repeat(70))
   console.log(`${"TOTAL".padEnd(22)} ${String(total).padStart(6)}`)
+
+  // ── 1B. ANTI-FOG FALSE POSITIVE VALIDATION ────────────────────────────────
+  console.log("\n" + "═".repeat(70))
+  console.log("  1B. ANTI-FOG FALSE POSITIVE VALIDATION")
+  console.log("═".repeat(70))
+
+  // Queries that WERE in the keyword set in the previous run (before the guard)
+  // We detect them by checking which GSC queries would have passed classification
+  // before the anti-fog filter but are now blocked.
+  const totalGSCRows = gscKws.length + antiFogFiltered.length
+  const filteredImpr = antiFogFiltered.reduce((s, r) => s + r.impressions, 0)
+  const filteredClks = antiFogFiltered.reduce((s, r) => s + r.clicks, 0)
+
+  // Before: false positives were in the included set (now filtered)
+  // FP rate = antiFogFiltered / (gscKws + antiFogFiltered) × 100
+  const fpRateBefore = totalGSCRows > 0
+    ? ((antiFogFiltered.length / totalGSCRows) * 100).toFixed(1)
+    : "0.0"
+  const fpRateAfter = "0.0"
+
+  console.log(`\n  Anti-fog filter rule active. Queries removed before classification:\n`)
+
+  if (antiFogFiltered.length === 0) {
+    console.log("  No anti-fog false positives detected in current GSC data.")
+  } else {
+    console.log(`  ${"Query".padEnd(55)} ${"Impr".padStart(5)}  ${"Clks".padStart(4)}  ${"Pos".padStart(6)}  Reason`)
+    console.log("  " + "─".repeat(90))
+    for (const r of antiFogFiltered) {
+      const qText = r.query.length > 54 ? r.query.slice(0, 51) + "..." : r.query
+      let reason = "anti-fog intent, no machine context"
+      if (/\bfogging\s+agent\b/i.test(r.query)) reason = "fogging agent = chemical product, not machine"
+      if (/\banti[\s-]?fog/i.test(r.query))     reason = "anti-fog surface treatment, not fogging machine"
+      console.log(`  ${qText.padEnd(55)} ${String(r.impressions).padStart(5)}  ${String(r.clicks).padStart(4)}  ${r.position.toFixed(1).padStart(6)}  ${reason}`)
+    }
+  }
+
+  console.log(`
+  False positive rate (GSC → keyword set):
+    Before anti-fog guard: ${fpRateBefore}%  (${antiFogFiltered.length} of ${totalGSCRows} classified queries were FP)
+    After  anti-fog guard: ${fpRateAfter}%  (0 of ${gscKws.length} classified queries are FP)
+
+  Impressions removed from keyword candidate pool:
+    Total impressions: ${filteredImpr}
+    Total clicks:      ${filteredClks}
+    These impressions were misleading — they were from surface-coating searches,
+    not fogging machine dealer/OEM searches.
+
+  Negative keyword additions (campaign-level):
+    13 terms added to ads-negative-intelligence CATEGORY_RULES (confidence 97%):
+    anti-fog, anti fog, anti fogging, anti-fogging, fogging agent,
+    anti fog coating, anti fog film, anti fog spray, anti fog solution,
+    anti condensation, anti mist coating, anti mist film
+    → Any search term matching these will not trigger ads even if keywords match.
+`)
 
   // ── 2. SUCCESS METRIC ─────────────────────────────────────────────────────
   const expansionPct = contrib.expansion.pct

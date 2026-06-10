@@ -12,6 +12,13 @@ import { MongoClient } from "mongodb"
 const MONGODB_URI = process.env.MONGODB_URI
 if (!MONGODB_URI) { console.error("MONGODB_URI not set"); process.exit(1) }
 
+// ── Anti-fog false positive guard (mirrors ads-keyword-intelligence.ts) ───────
+const ANTI_FOG_INTENT_RE  = /\banti[\s-]?fog(?:ging)?\b|\bde[\s-]?fog(?:ging)?\b|\banti[\s-]?mist\b|\banti[\s-]?condensation\b|\bfogging\s+agent\b/i
+const ANTI_FOG_MACHINE_RE = /\b(machine|fogger|foggers|thermal|ulv|mosquito|vector\s*control|municipal|gem|oem|distributor|dealer|manufacturer)\b/i
+function isAntiFogFalsePositive(query) {
+  return ANTI_FOG_INTENT_RE.test(query) && !ANTI_FOG_MACHINE_RE.test(query)
+}
+
 // ── Current classifier (mirrors ads-keyword-intelligence.ts) ─────────────────
 
 const INTENT_SIGNALS = {
@@ -192,7 +199,13 @@ try {
 
     const entry = { query, impressions, clicks, position, intent, theme, ...enhanced }
 
-    if (enhanced.action === "REMOVE_FALSE_POSITIVE") {
+    // Anti-fog guard fires before classification — these never reach classifyIntent()
+    if (isAntiFogFalsePositive(query)) {
+      falsePosInc.push({ ...entry, action: "REMOVE_FALSE_POSITIVE",
+        rationale: isAntiFogFalsePositive(query)
+          ? "Removed by anti-fog guard: anti-fog intent without fogging machine context"
+          : enhanced.rationale })
+    } else if (enhanced.action === "REMOVE_FALSE_POSITIVE") {
       falsePosInc.push(entry)
     } else if (theme !== null) {
       included.push(entry)

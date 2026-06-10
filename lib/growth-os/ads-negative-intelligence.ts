@@ -110,6 +110,17 @@ const CATEGORY_RULES: Array<{
     reason:     "Evaluation/review intent — research, not dealer acquisition",
     confidence: 85,
   },
+  {
+    terms: [
+      "anti-fog", "anti fog", "anti fogging", "anti-fogging",
+      "fogging agent",
+      "anti fog coating", "anti fog film", "anti fog spray", "anti fog solution",
+      "anti condensation", "anti mist coating", "anti mist film",
+    ],
+    matchType:  "PHRASE",
+    reason:     "Anti-fog surface coating / film / spray — wrong product category. These are windshield/glass treatments, not fogging machines.",
+    confidence: 97,
+  },
 ]
 
 function buildCategoryNegatives(): GeneratedNegative[] {
