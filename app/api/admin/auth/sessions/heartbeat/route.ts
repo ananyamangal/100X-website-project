@@ -2,9 +2,10 @@
 // Called by the client every 5 minutes to:
 // 1. Update lastActivity on the current session
 // 2. Return 401 if the session has been revoked (triggers client-side logout)
+// 3. Rotate the JWT when it has less than half its original lifetime remaining
 
 import { type NextRequest, NextResponse } from "next/server"
-import { SESSION_COOKIE, verifyJWT } from "@/lib/rbac/jwt"
+import { SESSION_COOKIE, SESSION_MAX_AGE, verifyJWT, signJWT, getRoleTimeout } from "@/lib/rbac/jwt"
 import { isSessionRevoked, updateLastActivity } from "@/lib/rbac/sessions"
 
 export async function POST(request: NextRequest) {
@@ -32,5 +33,25 @@ export async function POST(request: NextRequest) {
   }
 
   await updateLastActivity(sessionId)
-  return NextResponse.json({ ok: true, sessionId })
+
+  // Rotate the JWT when less than half its lifetime remains so active users
+  // never get logged out mid-session. Full lifetime restarted on each heartbeat.
+  const now = Math.floor(Date.now() / 1000)
+  const totalTtl = getRoleTimeout(payload.role)
+  const remaining = payload.exp - now
+  const response = NextResponse.json({ ok: true, sessionId, rotated: remaining < totalTtl / 2 })
+
+  if (remaining < totalTtl / 2) {
+    const { iat: _iat, exp: _exp, ...rest } = payload
+    const newToken = await signJWT(rest)
+    response.cookies.set(SESSION_COOKIE, newToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: SESSION_MAX_AGE,
+      path: "/",
+    })
+  }
+
+  return response
 }
