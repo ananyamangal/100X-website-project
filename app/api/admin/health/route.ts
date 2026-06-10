@@ -38,7 +38,7 @@ export async function GET() {
       "growth_os_logs", "growth_os_automations", "growth_os_opportunities", "growth_os_drafts",
       // Config / misc
       "rfq_popup_config", "ads_settings", "ads_searchterm_rows",
-      "growth_os_sessions", "rbac_users", "rbac_sessions",
+      "active_sessions", "rbac_users",
     ]
 
     const counts = await Promise.all(
