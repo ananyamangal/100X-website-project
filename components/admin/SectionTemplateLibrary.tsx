@@ -39,10 +39,6 @@ export function SectionTemplateLibrary({ open, onClose, onUseTemplate }: Props) 
   const [activeCategory, setActiveCategory] = useState('all')
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    if (open) load()
-  }, [open])
-
   const load = async () => {
     setLoading(true)
     try {
@@ -52,6 +48,10 @@ export function SectionTemplateLibrary({ open, onClose, onUseTemplate }: Props) 
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (open) load()
+  }, [open])
 
   const seed = async () => {
     setSeeding(true)
@@ -67,7 +67,7 @@ export function SectionTemplateLibrary({ open, onClose, onUseTemplate }: Props) 
     }
   }
 
-  const useTemplate = (t: Template) => {
+  const applyTemplate = (t: Template) => {
     const section: ProductSection = {
       id: genId(),
       type: t.type,
@@ -151,7 +151,7 @@ export function SectionTemplateLibrary({ open, onClose, onUseTemplate }: Props) 
               {filtered.map(t => (
                 <div key={t._id}
                   className="border border-gray-200 rounded-lg p-3 hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group"
-                  onClick={() => useTemplate(t)}
+                  onClick={() => applyTemplate(t)}
                 >
                   <div className="flex items-start gap-2">
                     <span className="text-xl flex-shrink-0">{t.icon}</span>

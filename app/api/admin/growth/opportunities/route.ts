@@ -9,12 +9,12 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const status = searchParams.get("status") || ""
-    const module = searchParams.get("module") || ""
+    const moduleName = searchParams.get("module") || ""
 
     const db = (await clientPromise).db()
     const filter: Record<string, string> = {}
     if (status) filter.status = status
-    if (module) filter.module = module
+    if (moduleName) filter.module = moduleName
 
     const items = await db.collection("growth_os_opportunities").find(filter).sort({ createdAt: -1 }).toArray()
     const plain = items.map(d => ({ ...d, _id: String(d._id) }))

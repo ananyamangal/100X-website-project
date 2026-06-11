@@ -433,9 +433,8 @@ export default function HomePageClient({
   )
 }
 
-// Legacy component removed — product detail pages use app/products/[id]/ProductDetailClient.tsx
-// Kept as type-only placeholder to avoid import errors during removal
-function _unused_ProductDetailPage({
+// Legacy ProductDetailPage removed — product detail pages use app/products/[id]/ProductDetailClient.tsx
+function LegacyProductDetailPage({
   product,
   setCurrentPage,
   setSelectedProduct,

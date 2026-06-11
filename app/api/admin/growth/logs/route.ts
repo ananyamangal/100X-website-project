@@ -5,14 +5,14 @@ import type { GrowthLog } from "@/lib/growth-os/types"
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const module = searchParams.get("module") || ""
+  const moduleName = searchParams.get("module") || ""
   const level = searchParams.get("level") || ""
   const limit = parseInt(searchParams.get("limit") || "100")
   const offset = parseInt(searchParams.get("offset") || "0")
 
   const db = (await clientPromise).db()
   const filter: Record<string, string> = {}
-  if (module) filter.module = module
+  if (moduleName) filter.module = moduleName
   if (level) filter.level = level
 
   const [logs, total] = await Promise.all([

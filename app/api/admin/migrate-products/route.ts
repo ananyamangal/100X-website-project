@@ -88,9 +88,8 @@ export async function POST(request: NextRequest) {
 
 /** GET — dry-run: shows what would be migrated without writing anything. */
 export async function GET(request: NextRequest) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+  const auth = await requireAuth(request)
+  if (!("user" in auth)) return auth
 
   try {
     const client = await clientPromise

@@ -67,6 +67,17 @@ const FOCUS_STATES = [
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
+function Legend() {
+  return (
+    <div className="flex items-center gap-3 text-[10px] text-gray-400">
+      <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />Auto-extracted</span>
+      <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />Verify</span>
+      <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />Fill manually</span>
+      <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block" />Manual only</span>
+    </div>
+  )
+}
+
 export function CollectTab({ onSaved }: { onSaved: () => void }) {
   const [input, setInput] = useState("")
   const [fetching, setFetching] = useState(false)
@@ -193,17 +204,6 @@ export function CollectTab({ onSaved }: { onSaved: () => void }) {
     setFetchFailed(false)
     setSaveError("")
   }
-
-  // ── Legend ────────────────────────────────────────────────────────────────
-
-  const Legend = () => (
-    <div className="flex items-center gap-3 text-[10px] text-gray-400">
-      <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />Auto-extracted</span>
-      <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />Verify</span>
-      <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />Fill manually</span>
-      <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block" />Manual only</span>
-    </div>
-  )
 
   // ─── Input mode ───────────────────────────────────────────────────────────
 

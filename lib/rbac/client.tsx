@@ -51,7 +51,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- refresh() is async; setState is called inside a fetch callback, not synchronously
   useEffect(() => { refresh() }, [refresh])
 
   return (
