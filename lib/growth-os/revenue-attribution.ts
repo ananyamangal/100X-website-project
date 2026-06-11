@@ -89,11 +89,14 @@ export interface AttributionDiagnostics {
   withKeyword: number
   withCampaign: number
   withPaidSource: number  // utm.source = google/cpc
+  withState: number
+  withoutState: number
+  stateBreakdown: Record<string, number>  // top states by lead count
   stageBreakdown: FunnelCounts
-  pendingInRFQ: number      // rfq_popup_leads not yet imported
+  pendingInRFQ: number
   pendingInBrochure: number
   pendingInSubmissions: number
-  orphaned: number          // in revenue_attribution but source no longer exists
+  orphaned: number
   sampleUnmatched: Array<{ leadId: string; name?: string; phone?: string; reason: string }>
 }
 
@@ -453,6 +456,8 @@ export async function getAttributionDiagnostics(): Promise<AttributionDiagnostic
     oem_request: 0, tender_request: 0, proposal_sent: 0, won: 0, lost: 0,
   }
   let withUTM = 0, withoutUTM = 0, withKeyword = 0, withCampaign = 0, withPaidSource = 0
+  let withState = 0, withoutState = 0
+  const stateCounts: Record<string, number> = {}
 
   const sampleUnmatched: AttributionDiagnostics["sampleUnmatched"] = []
 
@@ -478,7 +483,21 @@ export async function getAttributionDiagnostics(): Promise<AttributionDiagnostic
     }
     if (l.keyword)  withKeyword++
     if (l.campaign) withCampaign++
+
+    // State coverage
+    if (l.state && String(l.state).trim().length > 0) {
+      withState++
+      const s = String(l.state).trim().toLowerCase()
+      stateCounts[s] = (stateCounts[s] ?? 0) + 1
+    } else {
+      withoutState++
+    }
   }
+
+  // Top states (max 15)
+  const stateBreakdown = Object.fromEntries(
+    Object.entries(stateCounts).sort((a, b) => b[1] - a[1]).slice(0, 15)
+  )
 
   const importedRfqIds   = new Set(leads.filter(l => l.sourceType === "rfq_popup").map(l => l.leadId.replace("rfq_", "")))
   const importedBroIds   = new Set(leads.filter(l => l.sourceType === "brochure").map(l => l.leadId.replace("brochure_", "")))
@@ -492,11 +511,14 @@ export async function getAttributionDiagnostics(): Promise<AttributionDiagnostic
     withKeyword,
     withCampaign,
     withPaidSource,
+    withState,
+    withoutState,
+    stateBreakdown,
     stageBreakdown,
     pendingInRFQ:         Math.max(0, rfqCount - importedRfqIds.size),
     pendingInBrochure:    Math.max(0, brochureCount - importedBroIds.size),
     pendingInSubmissions: Math.max(0, subCount - importedSubIds.size),
-    orphaned:             0,  // expensive to compute, skip for now
+    orphaned:             0,
     sampleUnmatched,
   }
 }

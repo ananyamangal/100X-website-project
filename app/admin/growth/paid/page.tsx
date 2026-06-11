@@ -28,6 +28,12 @@ const LIVE_MODULES = [
     status: "live",
   },
   {
+    title: "Market Intelligence Director",
+    desc: "What to sell, where to sell, who to target, which campaign needs budget — Claude-powered analysis of leads + ads + search",
+    href: "/admin/growth/market-intelligence",
+    status: "live",
+  },
+  {
     title: "Creative Director",
     desc: "AI-generated RSA headlines, descriptions, callouts, sitelinks, image concepts — scored across 8 frameworks",
     href: "/admin/growth/ads/creative-director",

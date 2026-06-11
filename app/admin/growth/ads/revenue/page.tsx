@@ -187,6 +187,8 @@ interface Diagnostics {
   bySource: Record<string, number>
   withUTM: number; withoutUTM: number
   withKeyword: number; withCampaign: number; withPaidSource: number
+  withState: number; withoutState: number
+  stateBreakdown: Record<string, number>
   pendingInRFQ: number; pendingInBrochure: number; pendingInSubmissions: number
   sampleUnmatched: Array<{ leadId: string; name?: string; phone?: string; reason: string }>
 }
@@ -416,6 +418,39 @@ export default function RevenueAttributionPage() {
                       </div>
                     ) : (
                       <>
+                        {/* Completeness summary row */}
+                        {diagnostics.totalInAttribution > 0 && (
+                          <div className="grid grid-cols-4 gap-3 pb-2 border-b border-gray-100">
+                            {[
+                              {
+                                label: "UTM Coverage",
+                                pct: Math.round((diagnostics.withUTM / diagnostics.totalInAttribution) * 100),
+                                ok: true,
+                              },
+                              {
+                                label: "Campaign Coverage",
+                                pct: Math.round((diagnostics.withCampaign / diagnostics.totalInAttribution) * 100),
+                                ok: true,
+                              },
+                              {
+                                label: "State Coverage",
+                                pct: Math.round(((diagnostics.withState ?? 0) / diagnostics.totalInAttribution) * 100),
+                                ok: true,
+                              },
+                              {
+                                label: "Keyword Coverage",
+                                pct: Math.round((diagnostics.withKeyword / diagnostics.totalInAttribution) * 100),
+                                ok: true,
+                              },
+                            ].map(({ label, pct }) => (
+                              <div key={label} className="bg-gray-50 rounded-xl border border-gray-100 p-3 text-center">
+                                <p className={`text-2xl font-bold ${pct >= 60 ? "text-green-600" : pct >= 30 ? "text-amber-600" : "text-red-500"}`}>{pct}%</p>
+                                <p className="text-[10px] text-gray-400 mt-0.5">{label}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
                         <div className="grid grid-cols-3 gap-4">
                           {[
                             { label: "In Attribution DB",  value: diagnostics.totalInAttribution, color: "text-gray-800" },
@@ -426,7 +461,7 @@ export default function RevenueAttributionPage() {
                             { label: "Without UTM",        value: diagnostics.withoutUTM,          color: "text-red-500" },
                             { label: "With Keyword",       value: diagnostics.withKeyword,         color: "text-brand-600" },
                             { label: "With Campaign",      value: diagnostics.withCampaign,        color: "text-brand-600" },
-                            { label: "Paid Traffic",       value: diagnostics.withPaidSource,      color: "text-purple-600" },
+                            { label: "With State",         value: diagnostics.withState ?? 0,      color: "text-green-600" },
                           ].map(({ label, value, color }) => (
                             <div key={label} className="bg-gray-50 rounded-xl border border-gray-100 p-3 text-center">
                               <p className={`text-2xl font-bold ${color}`}>{value}</p>
@@ -434,6 +469,22 @@ export default function RevenueAttributionPage() {
                             </div>
                           ))}
                         </div>
+
+                        {/* State breakdown */}
+                        {diagnostics.stateBreakdown && Object.keys(diagnostics.stateBreakdown).length > 0 && (
+                          <div className="bg-white rounded-xl border border-gray-200">
+                            <div className="px-4 py-3 border-b border-gray-100">
+                              <h4 className="text-xs font-semibold text-gray-700">Leads by State (top 15)</h4>
+                            </div>
+                            <div className="p-4 flex flex-wrap gap-1.5">
+                              {Object.entries(diagnostics.stateBreakdown).map(([state, count]) => (
+                                <span key={state} className="text-[10px] bg-gray-50 border border-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                                  {state.replace(/\b\w/g, c => c.toUpperCase())}: <strong>{count as number}</strong>
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
 
                         <div className="bg-white rounded-xl border border-gray-200">
                           <div className="px-4 py-3 border-b border-gray-100">
