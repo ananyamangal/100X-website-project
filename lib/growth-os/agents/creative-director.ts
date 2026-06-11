@@ -24,6 +24,8 @@ export type AudienceType =
   | "government_buyers" | "dealers" | "pest_control"
   | "agriculture" | "industrial" | "mixed"
 
+export type ModelTier = "haiku" | "sonnet" | "opus"
+
 export interface CreativeDirectorInput {
   product:        string
   landingPage:    string
@@ -31,6 +33,7 @@ export interface CreativeDirectorInput {
   audience:       AudienceType
   keywordCluster: string[]
   notes?:         string
+  model?:         ModelTier  // default: "sonnet"
 }
 
 export interface AssetScore {
@@ -75,22 +78,33 @@ export interface ImageConcept {
   framework:   PersuasionFramework
 }
 
+export interface CostEstimate {
+  inputTokens:    number
+  outputTokens:   number
+  totalTokens:    number
+  costUSD:        number   // estimated USD
+  costINR:        number   // estimated INR (approx ₹83/USD)
+  model:          string
+}
+
 export interface CreativeDirectorRun {
-  runId:            string
-  input:            CreativeDirectorInput
-  headlines:        ScoredAsset[]
-  descriptions:     ScoredAsset[]
-  callouts:         ScoredAsset[]
-  snippets:         StructuredSnippet[]
-  sitelinks:        SiteLink[]
-  imageConcepts:    ImageConcept[]
-  topHeadlines:     ScoredAsset[]    // top 15 by composite
-  topDescriptions:  ScoredAsset[]    // top 5 by composite
-  frameworkCounts:  Record<PersuasionFramework, number>
-  generatedAt:      string
-  modelUsed:        string
-  totalTokens:      number
-  learningsApplied: string[]
+  runId:                string
+  input:                CreativeDirectorInput
+  headlines:            ScoredAsset[]
+  descriptions:         ScoredAsset[]
+  callouts:             ScoredAsset[]
+  snippets:             StructuredSnippet[]
+  sitelinks:            SiteLink[]
+  imageConcepts:        ImageConcept[]
+  topHeadlines:         ScoredAsset[]    // top 15 by composite
+  topDescriptions:      ScoredAsset[]    // top 5 by composite
+  frameworkCounts:      Record<PersuasionFramework, number>
+  creativeQualityScore: number           // 0-10 CQS
+  generatedAt:          string
+  modelUsed:            string
+  totalTokens:          number
+  cost:                 CostEstimate
+  learningsApplied:     string[]
 }
 
 // ── Character limits ──────────────────────────────────────────────────────────
@@ -352,7 +366,7 @@ function validFramework(f: string): PersuasionFramework {
   return VALID.includes(f as PersuasionFramework) ? (f as PersuasionFramework) : "trust"
 }
 
-function parseResponse(raw: RawResponse, input: CreativeDirectorInput): Omit<CreativeDirectorRun, "runId" | "generatedAt" | "modelUsed" | "totalTokens" | "learningsApplied"> {
+function parseResponse(raw: RawResponse, input: CreativeDirectorInput): Omit<CreativeDirectorRun, "runId" | "generatedAt" | "modelUsed" | "totalTokens" | "learningsApplied" | "creativeQualityScore" | "cost"> {
   const kw = input.keywordCluster
 
   const headlines: ScoredAsset[] = (raw.headlines ?? []).map(h =>
@@ -413,59 +427,173 @@ function parseResponse(raw: RawResponse, input: CreativeDirectorInput): Omit<Cre
   }
 }
 
+// ── Model registry ────────────────────────────────────────────────────────────
+
+const MODEL_IDS: Record<ModelTier, string> = {
+  haiku:  "claude-haiku-4-5-20251001",
+  sonnet: "claude-sonnet-4-6",
+  opus:   "claude-opus-4-8-20251101",
+}
+
+// Cost per 1M tokens (USD, approximate — update when Anthropic publishes new pricing)
+const MODEL_COST_PER_M: Record<ModelTier, { input: number; output: number }> = {
+  haiku:  { input: 0.80,  output: 4.00  },
+  sonnet: { input: 3.00,  output: 15.00 },
+  opus:   { input: 15.00, output: 75.00 },
+}
+
+const INR_PER_USD = 83
+
+function calcCost(tier: ModelTier, inputTok: number, outputTok: number): CostEstimate {
+  const rates    = MODEL_COST_PER_M[tier]
+  const costUSD  = (inputTok / 1_000_000) * rates.input + (outputTok / 1_000_000) * rates.output
+  const costINR  = costUSD * INR_PER_USD
+  return {
+    inputTokens:  inputTok,
+    outputTokens: outputTok,
+    totalTokens:  inputTok + outputTok,
+    costUSD:      Math.round(costUSD * 10000) / 10000,
+    costINR:      Math.round(costINR * 100) / 100,
+    model:        MODEL_IDS[tier],
+  }
+}
+
+// ── Creative Quality Score ────────────────────────────────────────────────────
+// CQS: 0-10 holistic quality indicator for a generation run.
+
+function computeCQS(
+  headlines:     ScoredAsset[],
+  descriptions:  ScoredAsset[],
+  callouts:      ScoredAsset[],
+  keywords:      string[],
+  frameworkCounts: Record<PersuasionFramework, number>,
+): number {
+  if (!headlines.length) return 0
+
+  // 1. Average composite of top 10 headlines (50%)
+  const topH = [...headlines].sort((a, b) => b.scores.composite - a.scores.composite).slice(0, 10)
+  const avgComposite = topH.reduce((s, h) => s + h.scores.composite, 0) / topH.length
+
+  // 2. Within-limit rate across all assets (25%)
+  const allAssets    = [...headlines, ...descriptions, ...callouts]
+  const withinLimit  = allAssets.filter(a => a.withinLimit).length / allAssets.length
+
+  // 3. Framework coverage: how many of 8 frameworks appear (15%)
+  const framesUsed   = Object.values(frameworkCounts).filter(c => c > 0).length
+  const frameCoverage = framesUsed / 8
+
+  // 4. Keyword match rate in top 10 headlines (10%)
+  const kwMatchRate  = keywords.length > 0
+    ? topH.filter(h => h.keywordsMatched.length > 0).length / topH.length
+    : 0.5  // neutral if no keywords provided
+
+  const cqs = (avgComposite * 0.50) + (withinLimit * 10 * 0.25) + (frameCoverage * 10 * 0.15) + (kwMatchRate * 10 * 0.10)
+  return Math.round(Math.min(Math.max(cqs, 0), 10) * 10) / 10
+}
+
+// ── Retry helper ──────────────────────────────────────────────────────────────
+
+async function withRetry<T>(fn: () => Promise<T>, maxAttempts = 2, delayMs = 3000): Promise<T> {
+  let lastError: Error = new Error("Unknown error")
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await fn()
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err))
+      // Don't retry on auth errors, only on transient failures
+      const msg = lastError.message.toLowerCase()
+      if (msg.includes("authentication") || msg.includes("401") || msg.includes("403")) break
+      if (attempt < maxAttempts - 1) await new Promise(r => setTimeout(r, delayMs * (attempt + 1)))
+    }
+  }
+  throw lastError
+}
+
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export async function runCreativeDirector(input: CreativeDirectorInput): Promise<CreativeDirectorRun> {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured")
 
-  const db = (await clientPromise).db()
+  const tier      = input.model ?? "sonnet"
+  const modelId   = MODEL_IDS[tier]
+  const db        = (await clientPromise).db()
   const learnings = await loadLearnings()
   const prompt    = buildPrompt(input, learnings)
+  const anthropic = new Anthropic({ apiKey })
+  const runId     = `cr_${Date.now()}`
+  const startedAt = new Date().toISOString()
 
-  const anthropic  = new Anthropic({ apiKey })
-  const runId      = `cr_${Date.now()}`
-  const generatedAt = new Date().toISOString()
+  let message: Awaited<ReturnType<typeof anthropic.messages.create>>
 
-  const message = await anthropic.messages.create({
-    model:      "claude-opus-4-8-20251101",
-    max_tokens: 8000,
-    messages:   [{ role: "user", content: prompt }],
-  })
+  try {
+    message = await withRetry(() =>
+      anthropic.messages.create({
+        model:      modelId,
+        max_tokens: 8000,
+        messages:   [{ role: "user", content: prompt }],
+      })
+    )
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err)
+    await logAgentRun(db, {
+      agent:          "Creative Director",
+      action:         `FAILED generation for "${input.product}"`,
+      reason:         `Objective: ${input.objective}, Model: ${modelId}`,
+      expectedImpact: "n/a",
+      actualImpact:   `Error: ${errMsg.slice(0, 200)}`,
+      level:          "error",
+      module:         "ads",
+    })
+    throw new Error(`Claude API error: ${errMsg}`)
+  }
 
   const rawText = message.content.find(b => b.type === "text")?.text ?? ""
-
-  // Strip any markdown fences
   const jsonStr = rawText.replace(/^```[a-z]*\n?/m, "").replace(/\n?```$/m, "").trim()
 
   let parsed: RawResponse
   try {
     parsed = JSON.parse(jsonStr)
   } catch {
-    // Try extracting JSON from the middle of the response
     const match = jsonStr.match(/\{[\s\S]+\}/)
-    if (!match) throw new Error("Could not parse JSON from Creative Director response")
+    if (!match) {
+      await logAgentRun(db, {
+        agent:          "Creative Director",
+        action:         `JSON parse failed for "${input.product}"`,
+        reason:         `Model: ${modelId}, raw response length: ${rawText.length}`,
+        expectedImpact: "n/a",
+        actualImpact:   "Could not parse JSON from model response",
+        level:          "error",
+        module:         "ads",
+      })
+      throw new Error("Could not parse JSON from Creative Director response")
+    }
     parsed = JSON.parse(match[0])
   }
 
+  const parsed_ = parseResponse(parsed, input)
+  const cqs     = computeCQS(parsed_.headlines, parsed_.descriptions, parsed_.callouts, input.keywordCluster, parsed_.frameworkCounts)
+  const cost    = calcCost(tier, message.usage?.input_tokens ?? 0, message.usage?.output_tokens ?? 0)
+
   const run: CreativeDirectorRun = {
     runId,
-    ...parseResponse(parsed, input),
-    generatedAt,
-    modelUsed:        "claude-opus-4-8-20251101",
-    totalTokens:      (message.usage?.input_tokens ?? 0) + (message.usage?.output_tokens ?? 0),
-    learningsApplied: learnings,
+    ...parsed_,
+    creativeQualityScore: cqs,
+    generatedAt:          startedAt,
+    modelUsed:            modelId,
+    totalTokens:          cost.totalTokens,
+    cost,
+    learningsApplied:     learnings,
   }
 
-  // Persist to MongoDB
   await db.collection("creative_director_runs").insertOne({ ...run })
 
   await logAgentRun(db, {
     agent:          "Creative Director",
-    action:         `Generated ${run.headlines.length} headlines, ${run.descriptions.length} descriptions for "${input.product}"`,
-    reason:         `Objective: ${input.objective}, Audience: ${input.audience}`,
+    action:         `Generated ${run.headlines.length}H + ${run.descriptions.length}D + ${run.callouts.length}C for "${input.product}" [CQS: ${cqs}/10]`,
+    reason:         `Objective: ${input.objective}, Audience: ${input.audience}, Model: ${tier}`,
     expectedImpact: "Higher CTR and conversion rate for campaigns",
-    actualImpact:   `Top headline score: ${run.topHeadlines[0]?.scores.composite.toFixed(1) ?? "—"}/10`,
+    actualImpact:   `CQS: ${cqs}/10 · Top headline: ${run.topHeadlines[0]?.scores.composite.toFixed(1) ?? "—"}/10 · Cost: $${cost.costUSD} (₹${cost.costINR})`,
     level:          "success",
     module:         "ads",
   })

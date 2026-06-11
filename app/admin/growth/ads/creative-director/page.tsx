@@ -141,6 +141,7 @@ export default function CreativeDirectorPage() {
   const [audience,     setAudience]     = useState<AudienceType>("dealers")
   const [keywords,     setKeywords]     = useState("thermal fogging machine, fogging machine for sale, best fogging machine india")
   const [notes,        setNotes]        = useState("")
+  const [model,        setModel]        = useState<"haiku" | "sonnet" | "opus">("sonnet")
 
   useEffect(() => {
     fetch("/api/admin/growth/agents/creative-director")
@@ -163,6 +164,7 @@ export default function CreativeDirectorPage() {
           audience,
           keywordCluster: keywords.split(",").map(k => k.trim()).filter(Boolean),
           notes,
+          model,
         }),
       })
       const d = await res.json()
@@ -264,6 +266,23 @@ export default function CreativeDirectorPage() {
                   placeholder="e.g. Focus on pre-monsoon urgency, emphasize IS 14855 compliance" />
               </div>
 
+              <div>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">Model Quality</label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {([
+                    { value: "haiku",  label: "Haiku",  desc: "Fast · ~₹0.03",  color: "border-gray-300" },
+                    { value: "sonnet", label: "Sonnet", desc: "Balanced · ~₹0.30", color: "border-brand-400 text-brand-700 bg-brand-50" },
+                    { value: "opus",   label: "Opus",   desc: "Best · ~₹1.50",  color: "border-gray-300" },
+                  ] as const).map(m => (
+                    <button key={m.value} onClick={() => setModel(m.value)}
+                      className={`text-center rounded-lg border py-2 px-1 transition-colors ${model === m.value ? "border-brand-500 bg-brand-50 text-brand-700" : "border-gray-200 text-gray-500 hover:border-gray-300"}`}>
+                      <p className="text-[11px] font-bold">{m.label}</p>
+                      <p className="text-[9px] text-gray-400">{m.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex gap-2 text-xs text-red-700">
                   <AlertCircle size={12} className="shrink-0 mt-0.5" />
@@ -277,7 +296,7 @@ export default function CreativeDirectorPage() {
                 {loading ? "Generating assets…" : "Generate Creative Assets"}
               </button>
 
-              <p className="text-[10px] text-gray-400 text-center">Uses Claude Opus · ~30–60 sec · ₹0.15 est. cost</p>
+              <p className="text-[10px] text-gray-400 text-center">~30–60 sec · cost estimated above</p>
             </div>
 
             {/* History */}
@@ -310,8 +329,18 @@ export default function CreativeDirectorPage() {
                 {/* Run summary */}
                 <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-semibold text-gray-800">Generated: {run.input.product}</h3>
-                    <span className="text-[10px] text-gray-400">{new Date(run.generatedAt).toLocaleString("en-IN")}</span>
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-sm font-semibold text-gray-800">Generated: {run.input.product}</h3>
+                      {run.creativeQualityScore !== undefined && (
+                        <div className={`px-2.5 py-1 rounded-lg text-xs font-bold ${run.creativeQualityScore >= 7 ? "bg-green-100 text-green-700" : run.creativeQualityScore >= 5 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-600"}`}>
+                          CQS {run.creativeQualityScore}/10
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] text-gray-400">{new Date(run.generatedAt).toLocaleString("en-IN")}</p>
+                      {run.cost && <p className="text-[10px] text-gray-400">Cost: ₹{run.cost.costINR} · {run.cost.totalTokens.toLocaleString()} tokens</p>}
+                    </div>
                   </div>
                   <div className="grid grid-cols-5 gap-3">
                     {[

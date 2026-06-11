@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       audience:       body.audience,
       keywordCluster: body.keywordCluster ?? [],
       notes:          body.notes,
+      model:          body.model,  // "haiku" | "sonnet" | "opus"
     }
 
     try {
