@@ -151,7 +151,7 @@ export default function AdminLogin() {
               <div className="mt-4 text-center">
                 <button
                   type="button"
-                  className="text-sm text-gray-500 hover:text-green-400 transition-colors"
+                  className="text-sm text-green-400 hover:text-green-300 transition-colors underline"
                   onClick={() => {
                     setForgotEmail(email)
                     setForgotError("")

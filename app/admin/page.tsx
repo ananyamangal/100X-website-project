@@ -233,6 +233,11 @@ function AdminAuthGate({ children }: { children: React.ReactNode }) {
           />
           {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
           <button type="submit" className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Login</button>
+          <div className="mt-4 text-center">
+            <a href="/admin/login" className="text-sm text-blue-600 hover:text-blue-800 underline">
+              Forgot Password? Use Growth OS login
+            </a>
+          </div>
         </form>
       </div>
     );
