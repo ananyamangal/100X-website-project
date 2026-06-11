@@ -29,7 +29,7 @@ export async function GET() {
   }
 
   // Upsert agents added to DEFAULT_AGENTS after initial seed
-  const existingIds = new Set(existing.map((a: { id: string }) => a.id))
+  const existingIds = new Set(existing.map((a) => String((a as { id?: unknown }).id ?? "")))
   const missing = DEFAULT_AGENTS.filter(a => !existingIds.has(a.id))
   if (missing.length > 0) {
     await db.collection("growth_os_automations").insertMany(missing)
@@ -44,15 +44,16 @@ export async function GET() {
     "dealer-lead-agent", "schema-audit", "internal-link-agent",
     "ai-citation-agent", "seo-opportunity-agent", "gsc-sync",
   ])
-  const needsReset = existing.filter(
-    (a: { id: string; runCount?: number; _fakeSeedCleaned?: boolean }) =>
-      !realAgentIds.has(a.id) && (a.runCount ?? 0) > 0 && !a._fakeSeedCleaned
-  )
+  type AutomationDoc = { id?: unknown; runCount?: unknown; _fakeSeedCleaned?: unknown }
+  const needsReset = existing.filter((a) => {
+    const doc = a as AutomationDoc
+    return !realAgentIds.has(String(doc.id ?? "")) && Number(doc.runCount ?? 0) > 0 && !doc._fakeSeedCleaned
+  })
   if (needsReset.length > 0) {
-    for (const a of needsReset as Array<{ _id: unknown }>) {
+    for (const a of needsReset) {
       await db.collection("growth_os_automations").updateOne(
         { _id: a._id },
-        { $set: { runCount: 0, successRate: undefined, lastRun: undefined, lastResult: undefined, _fakeSeedCleaned: true } }
+        { $set: { runCount: 0, successRate: null, lastRun: null, lastResult: null, _fakeSeedCleaned: true } }
       )
     }
     const cleaned = await db.collection("growth_os_automations").find({}).toArray()
