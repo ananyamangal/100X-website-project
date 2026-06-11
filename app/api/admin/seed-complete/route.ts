@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
+import { requireAuth } from "@/lib/rbac/server";
 
 // Complete catalog seeder — products + spare parts
 // POST /api/admin/seed-complete  { "token": "100x_complete_2026" }
@@ -1166,6 +1167,11 @@ const SPARE_PARTS = [
 // ─── Main handler ─────────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request)
+  if (!("user" in auth)) return auth
+  if (!["super_admin", "admin"].includes(auth.user.role)) {
+    return NextResponse.json({ error: "Forbidden", required: "admin or super_admin" }, { status: 403 })
+  }
   try {
     const body = await request.json().catch(() => ({}));
     if (body.token !== TOKEN) {

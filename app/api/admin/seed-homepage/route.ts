@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
+import { requireAuth } from "@/lib/rbac/server";
 
 // Nuuk-style cinematic homepage sections seed
 // POST /api/admin/seed-homepage  { "token": "100x_homepage_2026" }
@@ -299,6 +300,11 @@ const SECTIONS = [
 ];
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request)
+  if (!("user" in auth)) return auth
+  if (!["super_admin", "admin"].includes(auth.user.role)) {
+    return NextResponse.json({ error: "Forbidden", required: "admin or super_admin" }, { status: 403 })
+  }
   try {
     const body = await request.json().catch(() => ({}));
     if (body.token !== TOKEN) {

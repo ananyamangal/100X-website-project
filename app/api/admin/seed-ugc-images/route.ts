@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
+import { requireAuth } from "@/lib/rbac/server";
 
 // One-shot seeder: adds curated UGC deployment images to all products.
 // POST /api/admin/seed-ugc-images  { "token": "100x_ugc_2026" }
@@ -68,6 +69,11 @@ function pickImages(category: string): string[] {
 // ─── Route ────────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req)
+  if (!("user" in auth)) return auth
+  if (!["super_admin", "admin"].includes(auth.user.role)) {
+    return NextResponse.json({ error: "Forbidden", required: "admin or super_admin" }, { status: 403 })
+  }
   const { token } = await req.json().catch(() => ({}));
   if (token !== TOKEN) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
