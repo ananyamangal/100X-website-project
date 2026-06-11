@@ -53,7 +53,11 @@ export default function AutomationCenter() {
     try {
       const r = await fetch("/api/admin/growth/automation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) })
       const d = await r.json()
-      setLastRunResult({ id, result: d.result || "Run completed" })
+      if (d.notImplemented) {
+        setLastRunResult({ id, result: `⚠️ ${d.result}` })
+      } else {
+        setLastRunResult({ id, result: d.result || "Run completed" })
+      }
       load()
     } finally {
       setRunning(null)

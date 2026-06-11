@@ -127,8 +127,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (!legacyMatch) {
-      const envPassword = process.env.ADMIN_PASSWORD || "dtu@ananya"
-      legacyMatch = password === envPassword
+      const envPassword = process.env.ADMIN_PASSWORD
+      if (envPassword) legacyMatch = password === envPassword
     }
 
     if (!legacyMatch) {

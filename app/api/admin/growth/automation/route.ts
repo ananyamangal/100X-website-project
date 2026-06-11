@@ -7,10 +7,10 @@ const DEFAULT_AGENTS: Omit<Automation, "_id">[] = [
   { id: "keyword-discovery", name: "Keyword Discovery Agent", description: "Scans GSC search queries and competitor pages to surface new keyword opportunities", module: "seo", riskLevel: "low", status: "paused", schedule: "Weekly — Monday 09:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
   { id: "competitor-monitor", name: "Competitor Monitor Agent", description: "Checks competitor sites for new pages, keywords, and content changes", module: "competitors", riskLevel: "low", status: "paused", schedule: "Daily — 08:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
   { id: "ai-citation-agent", name: "AI Citation Agent", description: "Tests whether 100X Circle appears in ChatGPT/Perplexity/Gemini answers for target queries", module: "geo", riskLevel: "low", status: "paused", schedule: "Weekly — Wednesday 10:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "schema-audit", name: "Schema Audit Agent", description: "Verifies structured data on all pages, flags missing or broken schemas", module: "seo", riskLevel: "low", status: "active", schedule: "Weekly — Friday 10:00", lastRun: new Date(Date.now() - 3 * 86400000).toISOString(), successRate: 100, runCount: 4, lastResult: "All 42 pages have valid structured data", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "internal-link-agent", name: "Internal Link Agent", description: "Identifies pages with low internal link density and suggests additions", module: "seo", riskLevel: "low", status: "active", schedule: "Monthly — 1st Monday", lastRun: new Date(Date.now() - 7 * 86400000).toISOString(), successRate: 100, runCount: 2, lastResult: "Identified 3 pages with < 2 inbound links", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "schema-audit", name: "Schema Audit Agent", description: "Verifies structured data on all pages, flags missing or broken schemas", module: "seo", riskLevel: "low", status: "active", schedule: "Weekly — Friday 10:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "internal-link-agent", name: "Internal Link Agent", description: "Identifies pages with low internal link density and suggests additions", module: "seo", riskLevel: "low", status: "active", schedule: "Monthly — 1st Monday", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
   { id: "gem-opportunity-agent", name: "GeM Opportunity Agent", description: "Monitors GeM for new tender listings, category changes, and OEM demand signals", module: "gem", riskLevel: "low", status: "paused", schedule: "Daily — 07:00", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "dealer-lead-agent", name: "Dealer Lead Agent", description: "Classifies incoming leads by dealer type, scores them, and flags high-potential applications", module: "dealers", riskLevel: "low", status: "active", schedule: "Continuous — on new lead", lastRun: new Date(Date.now() - 2 * 3600000).toISOString(), successRate: 95, runCount: 147, lastResult: "3 new leads classified today", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "dealer-lead-agent", name: "Dealer Lead Agent", description: "Classifies incoming leads by dealer type, scores them, and flags high-potential applications", module: "dealers", riskLevel: "low", status: "active", schedule: "Continuous — on new lead", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
   { id: "content-brief-agent", name: "Content Brief Agent", description: "Generates content briefs for approved opportunities and queues them in Content Factory", module: "content", riskLevel: "medium", status: "paused", schedule: "On opportunity approval", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
   { id: "ads-keyword-agent", name: "Ads Keyword Agent", description: "Analyzes Search Console data to surface high-converting terms for Google Ads campaigns", module: "ads", riskLevel: "low", status: "paused", schedule: "Monthly — 1st", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
   { id: "metadata-optimizer", name: "Metadata Optimizer Agent", description: "Reviews title/description CTR in GSC and recommends improvements for low-CTR pages", module: "seo", riskLevel: "low", status: "paused", schedule: "Monthly — 15th", lastRun: undefined, successRate: undefined, runCount: 0, lastResult: undefined, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
@@ -35,6 +35,28 @@ export async function GET() {
     await db.collection("growth_os_automations").insertMany(missing)
     const updated = await db.collection("growth_os_automations").find({}).toArray()
     return NextResponse.json(JSON.parse(JSON.stringify(updated)))
+  }
+
+  // One-time migration: clear fake seed metrics (runCount > 0, no real lastRun evidence)
+  // Agents that have never been truly dispatched had their counts set as demo values.
+  // We reset any agent whose id is NOT in AGENT_DISPATCH keys.
+  const realAgentIds = new Set([
+    "dealer-lead-agent", "schema-audit", "internal-link-agent",
+    "ai-citation-agent", "seo-opportunity-agent", "gsc-sync",
+  ])
+  const needsReset = existing.filter(
+    (a: { id: string; runCount?: number; _fakeSeedCleaned?: boolean }) =>
+      !realAgentIds.has(a.id) && (a.runCount ?? 0) > 0 && !a._fakeSeedCleaned
+  )
+  if (needsReset.length > 0) {
+    for (const a of needsReset as Array<{ _id: unknown }>) {
+      await db.collection("growth_os_automations").updateOne(
+        { _id: a._id },
+        { $set: { runCount: 0, successRate: undefined, lastRun: undefined, lastResult: undefined, _fakeSeedCleaned: true } }
+      )
+    }
+    const cleaned = await db.collection("growth_os_automations").find({}).toArray()
+    return NextResponse.json(JSON.parse(JSON.stringify(cleaned)))
   }
 
   return NextResponse.json(JSON.parse(JSON.stringify(existing)))
@@ -116,7 +138,11 @@ export async function POST(req: NextRequest) {
       const result = await fn()
       runResult = result.summary
     } else {
-      runResult = `${agent.name} ran at ${new Date().toLocaleString("en-IN")} — agent not yet implemented`
+      return NextResponse.json({
+        ok: false,
+        result: `${agent.name} is not yet implemented. This agent is on the roadmap — check back in a future update.`,
+        notImplemented: true,
+      }, { status: 501 })
     }
   } catch (err) {
     runResult = `Error: ${err instanceof Error ? err.message : String(err)}`

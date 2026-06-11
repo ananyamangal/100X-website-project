@@ -79,7 +79,10 @@ export async function POST(request: NextRequest) {
 
   // ── 4. Seed super admin user ───────────────────────────────────────────────
   const superAdminEmail    = (body.email as string | undefined)    ?? "sulabh.mangal@gmail.com"
-  const superAdminPassword = (body.password as string | undefined) ?? process.env.ADMIN_PASSWORD ?? "dtu@ananya"
+  const superAdminPassword = (body.password as string | undefined) ?? process.env.ADMIN_PASSWORD ?? ""
+  if (!superAdminPassword) {
+    return NextResponse.json({ error: "password required in body or ADMIN_PASSWORD env var" }, { status: 400 })
+  }
   const superAdminName     = (body.name as string | undefined)     ?? "Sulabh Mangal"
 
   const existingSuperAdmin = await db.collection<DBUser>("rbac_users").findOne({ email: superAdminEmail })

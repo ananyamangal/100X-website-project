@@ -1,5 +1,5 @@
 "use client"
-import { ShoppingBag, TrendingUp, AlertCircle, CheckCircle2, ExternalLink } from "lucide-react"
+import { ShoppingBag, TrendingUp, AlertCircle, AlertTriangle, CheckCircle2, ExternalLink } from "lucide-react"
 
 const GEM_SEASONS = [
   { month: "Jan", demand: 40 }, { month: "Feb", demand: 45 }, { month: "Mar", demand: 60 },
@@ -41,6 +41,11 @@ export default function GeMIntelligence() {
       </div>
 
       <div className="px-8 py-6 max-w-[1400px] space-y-6">
+        {/* Static data notice */}
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3 text-xs text-amber-700">
+          <AlertTriangle size={14} className="text-amber-500 flex-shrink-0 mt-0.5" />
+          <p><strong>Static intelligence.</strong> Data below is from manual research (last updated 2026-06-04). Live GeM monitoring via the GeM Opportunity Agent is on the roadmap — not yet connected.</p>
+        </div>
         {/* Key facts */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
