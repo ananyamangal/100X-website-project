@@ -192,21 +192,32 @@ Return JSON only (no preamble):
   "follow_up_2": "..."
 }`
 
-  const message = await anthropic.messages.create({
-    model:      "claude-haiku-4-5-20251001",
-    max_tokens: 1000,
-    messages:   [{ role: "user", content: prompt }],
-  })
+  let message: Awaited<ReturnType<typeof anthropic.messages.create>>
+  try {
+    message = await anthropic.messages.create({
+      model:      "claude-haiku-4-5-20251001",
+      max_tokens: 1000,
+      messages:   [{ role: "user", content: prompt }],
+    })
+  } catch (err) {
+    throw new Error(`Claude API error generating outreach for ${opp.domain}: ${err instanceof Error ? err.message : String(err)}`)
+  }
 
   const raw  = message.content.find(b => b.type === "text")?.text ?? "{}"
   const json = raw.replace(/^```[a-z]*\n?/m, "").replace(/\n?```$/m, "").trim()
 
   let parsed: { subject?: string; body?: string; follow_up_1?: string; follow_up_2?: string } = {}
-  try { parsed = JSON.parse(json) } catch { /* best-effort */ }
+  try {
+    parsed = JSON.parse(json)
+  } catch {
+    // Extract JSON if wrapped in prose
+    const match = json.match(/\{[\s\S]+\}/)
+    if (match) { try { parsed = JSON.parse(match[0]) } catch { /* use defaults */ } }
+  }
 
   return {
     subject:   parsed.subject  ?? `Partnership inquiry — ${opp.domain}`,
-    body:      parsed.body     ?? "",
+    body:      parsed.body     ?? "(Email body generation failed — please regenerate)",
     followUps: [parsed.follow_up_1 ?? "", parsed.follow_up_2 ?? ""].filter(Boolean),
   }
 }
@@ -248,33 +259,78 @@ Return JSON array (no preamble):
   "suggested_topic": "..."
 }]`
 
-  const message = await anthropic.messages.create({
-    model:      "claude-haiku-4-5-20251001",
-    max_tokens: 2000,
-    messages:   [{ role: "user", content: prompt }],
-  })
+  let message: Awaited<ReturnType<typeof anthropic.messages.create>>
+  try {
+    message = await anthropic.messages.create({
+      model:      "claude-haiku-4-5-20251001",
+      max_tokens: 2000,
+      messages:   [{ role: "user", content: prompt }],
+    })
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err)
+    const db2 = (await clientPromise).db()
+    await logAgentRun(db2, {
+      agent:          "Off-Page SEO Director",
+      action:         `FAILED discovery for vertical: ${vertical}`,
+      reason:         "Claude API call failed",
+      expectedImpact: "n/a",
+      actualImpact:   `Error: ${errMsg.slice(0, 200)}`,
+      level:          "error",
+      module:         "seo",
+    })
+    throw new Error(`Claude API error during discovery: ${errMsg}`)
+  }
 
   const raw  = message.content.find(b => b.type === "text")?.text ?? "[]"
   const json = raw.replace(/^```[a-z]*\n?/m, "").replace(/\n?```$/m, "").trim()
 
   let items: Array<Record<string, unknown>> = []
-  try { items = JSON.parse(json) } catch { return [] }
+  try {
+    items = JSON.parse(json)
+    if (!Array.isArray(items)) items = []
+  } catch {
+    // Try extracting array from prose
+    const match = json.match(/\[[\s\S]+\]/)
+    if (match) { try { items = JSON.parse(match[0]) } catch { items = [] } }
+  }
 
   const db = (await clientPromise).db()
   const results: BacklinkOpportunity[] = []
+  let duplicatesSkipped = 0
+
+  // Build set of existing domains to prevent duplicates
+  const existingDomains = new Set(
+    (await db.collection("offpage_opportunities")
+      .find({}, { projection: { domain: 1 } })
+      .toArray()
+    ).map(d => String(d.domain ?? "").toLowerCase())
+  )
 
   for (const item of items) {
+    const domain = String(item.domain ?? "").toLowerCase().trim()
+    if (!domain) continue
+
+    // Skip duplicate domains
+    if (existingDomains.has(domain)) { duplicatesSkipped++; continue }
+
+    // Spam risk gate: skip if Claude rates spam risk > 6
+    const spamRisk = Number(item.spam_risk ?? 3)
+    if (spamRisk > 6) continue
+
+    existingDomains.add(domain)  // prevent intra-batch duplicates too
+
     const scores: Omit<BacklinkScore, "priorityScore"> = {
-      relevance:             Number(item.relevance ?? 5),
-      domainAuthority:       Number(item.domain_authority ?? 5),
-      trafficValue:          Number(item.traffic_value ?? 5),
-      spamRisk:              Number(item.spam_risk ?? 3),
-      acquisitionDifficulty: Number(item.acquisition_difficulty ?? 5),
+      relevance:             Math.min(10, Math.max(0, Number(item.relevance ?? 5))),
+      domainAuthority:       Math.min(10, Math.max(0, Number(item.domain_authority ?? 5))),
+      trafficValue:          Math.min(10, Math.max(0, Number(item.traffic_value ?? 5))),
+      spamRisk:              Math.min(10, Math.max(0, spamRisk)),
+      acquisitionDifficulty: Math.min(10, Math.max(0, Number(item.acquisition_difficulty ?? 5))),
     }
+
     const opp: BacklinkOpportunity = {
       id:           `opp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       type:         (item.type as OpportunityType) ?? "directory",
-      domain:       String(item.domain ?? ""),
+      domain,
       url:          String(item.url ?? ""),
       pageTitle:    String(item.page_title ?? ""),
       contactEmail: String(item.contact_email ?? ""),
@@ -298,10 +354,10 @@ Return JSON array (no preamble):
 
   await logAgentRun(db, {
     agent:          "Off-Page SEO Director",
-    action:         `Discovered ${results.length} new backlink opportunities for vertical: ${vertical}`,
+    action:         `Discovered ${results.length} new opportunities for "${vertical}" (${duplicatesSkipped} duplicates skipped)`,
     reason:         "Automated opportunity discovery",
     expectedImpact: "Domain authority growth, rank improvement for government/dealer keywords",
-    actualImpact:   `${results.length} new opportunities queued for founder review`,
+    actualImpact:   `${results.length} new · ${duplicatesSkipped} skipped · ${items.length - results.length - duplicatesSkipped} filtered (spam/invalid)`,
     level:          "success",
     module:         "seo",
   })
@@ -309,14 +365,24 @@ Return JSON array (no preamble):
   return results
 }
 
-// ── Seed initial opportunities ─────────────────────────────────────────────────
+// ── Seed initial opportunities (idempotent — checks per domain) ───────────────
 
 export async function seedOpportunities() {
   const db = (await clientPromise).db()
-  const existing = await db.collection("offpage_opportunities").countDocuments()
-  if (existing > 0) return { seeded: 0, existing }
 
-  const docs = SEED_OPPORTUNITIES.map(o => ({
+  // Check by domain — not by count — so partial seeds can be completed
+  const seedDomains = SEED_OPPORTUNITIES.map(o => o.domain.toLowerCase())
+  const alreadySeeded = new Set(
+    (await db.collection("offpage_opportunities")
+      .find({ domain: { $in: seedDomains } }, { projection: { domain: 1 } })
+      .toArray()
+    ).map(d => String(d.domain ?? "").toLowerCase())
+  )
+
+  const missing = SEED_OPPORTUNITIES.filter(o => !alreadySeeded.has(o.domain.toLowerCase()))
+  if (missing.length === 0) return { seeded: 0, existing: alreadySeeded.size }
+
+  const docs = missing.map(o => ({
     ...o,
     id:        `seed_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     scores:    { ...o.scores },
@@ -325,5 +391,5 @@ export async function seedOpportunities() {
   }))
 
   await db.collection("offpage_opportunities").insertMany(docs)
-  return { seeded: docs.length, existing: 0 }
+  return { seeded: docs.length, existing: alreadySeeded.size }
 }
