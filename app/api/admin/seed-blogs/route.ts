@@ -9,14 +9,9 @@
  *   fetch('/api/admin/seed-blogs', { method: 'POST', credentials: 'include' })
  */
 
-import { NextResponse } from "next/server"
-import { cookies } from "next/headers"
+import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
-
-async function isAuthenticated(): Promise<boolean> {
-  const cookieStore = await cookies()
-  return cookieStore.get("admin-token")?.value === "authenticated"
-}
+import { requireAuth } from "@/lib/rbac/server"
 
 const SEED_POSTS = [
   {
@@ -343,10 +338,10 @@ const SEED_POSTS = [
   },
 ]
 
-export async function POST() {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request)
+  if (!("user" in auth)) return auth
+
 
   try {
     const client = await clientPromise

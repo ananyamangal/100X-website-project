@@ -19,11 +19,6 @@ const AUTH_WHITELIST = new Set([
 async function isAuthenticated(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get(SESSION_COOKIE)?.value
   if (!token) return false
-
-  // Legacy session cookie — kept for zero-downtime migration
-  if (token === "authenticated") return true
-
-  // JWT session — verify signature and expiry
   const payload = await verifyJWT(token)
   return payload !== null
 }
@@ -58,9 +53,6 @@ export async function middleware(request: NextRequest) {
 
       // ── 401: no session ────────────────────────────────────────────────────
       if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-
-      // Legacy super-admin cookie — full access, skip permission checks
-      if (token === "authenticated") return NextResponse.next()
 
       // Verify JWT — 401 if invalid/expired
       const payload = await verifyJWT(token)

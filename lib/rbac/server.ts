@@ -14,20 +14,6 @@ export async function getCurrentUser(request: NextRequest): Promise<JWTPayload |
   const token = request.cookies.get(SESSION_COOKIE)?.value
   if (!token) return null
 
-  // Legacy session: old single-password system
-  if (token === "authenticated") {
-    // Treat as super admin for backward compatibility during migration
-    return {
-      sub: "legacy-super-admin",
-      email: "sulabh.mangal@gmail.com",
-      name: "Sulabh (Legacy)",
-      role: "super_admin",
-      permissions: (await import("./roles")).ROLE_PERMISSIONS.super_admin,
-      iat: 0,
-      exp: Infinity,
-    }
-  }
-
   return verifyJWT(token)
 }
 

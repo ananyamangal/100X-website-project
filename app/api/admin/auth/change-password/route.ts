@@ -23,7 +23,10 @@ export async function POST(request: NextRequest) {
 
     // Determine what the valid current password is
     const storedHash = settings?.hash as string | undefined
-    const envPassword = process.env.ADMIN_PASSWORD || "dtu@ananya"
+    const envPassword = process.env.ADMIN_PASSWORD
+    if (!storedHash && !envPassword) {
+      return NextResponse.json({ error: "No admin password configured" }, { status: 500 })
+    }
     const currentIsValid = storedHash
       ? hashPw(currentPassword) === storedHash
       : currentPassword === envPassword

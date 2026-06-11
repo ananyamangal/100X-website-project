@@ -3,7 +3,17 @@
 
 import type { JWTPayload } from "./types"
 
-const SECRET_ENV = () => process.env.JWT_SECRET ?? "100x-rbac-dev-secret-CHANGE-IN-PROD"
+const SECRET_ENV = (): string => {
+  const s = process.env.JWT_SECRET
+  if (!s) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("JWT_SECRET environment variable is not set. Set it in Vercel environment variables.")
+    }
+    console.warn("[RBAC] JWT_SECRET not set — using insecure dev default. Set JWT_SECRET before going to production.")
+    return "100x-rbac-dev-secret-CHANGE-IN-PROD"
+  }
+  return s
+}
 
 function b64url(buf: ArrayBuffer): string {
   return btoa(String.fromCharCode(...new Uint8Array(buf)))

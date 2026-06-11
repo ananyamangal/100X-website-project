@@ -1,10 +1,14 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { isEmailConfigured } from "@/lib/email"
+import { requireAuth } from "@/lib/rbac/server"
 
 export const dynamic = "force-dynamic"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await requireAuth(request)
+  if (!("user" in auth)) return auth
+
   const report: Record<string, any> = {
     timestamp: new Date().toISOString(),
     email: {

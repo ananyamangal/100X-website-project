@@ -9,19 +9,14 @@
  */
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
-import { cookies } from "next/headers"
 import { toStringArray, toObjectArray } from "@/lib/normalizeProduct"
 import { generateProductSlug } from "@/lib/productSlug"
-
-async function isAuthenticated(): Promise<boolean> {
-  const cookieStore = await cookies()
-  return cookieStore.get("admin-token")?.value === "authenticated"
-}
+import { requireAuth } from "@/lib/rbac/server"
 
 export async function POST(request: NextRequest) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+  const auth = await requireAuth(request)
+  if (!("user" in auth)) return auth
+
 
   try {
     const client = await clientPromise
