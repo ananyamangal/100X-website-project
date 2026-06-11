@@ -3,12 +3,13 @@
 import React, { useState, useEffect, useCallback } from "react"
 import {
   UserPlus, RefreshCw, Shield, Check, X, Key, Trash2,
-  ChevronDown, Clock, Activity, Eye, EyeOff, Copy, CheckCheck, ShieldCheck, Mail,
+  Activity, Eye, EyeOff, Copy, CheckCheck, ShieldCheck, Mail, Link,
 } from "lucide-react"
 import { useAuth, PermissionGate } from "@/lib/rbac/client"
 import { ROLE_DEFINITIONS } from "@/lib/rbac/roles"
 import type { RoleSlug } from "@/lib/rbac/types"
 import { UserPermissionOverride } from "@/components/admin/growth/UserPermissionOverride"
+import { checkPasswordStrength } from "@/lib/passwordPolicy"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -68,8 +69,11 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState("")
 
+  const strength = checkPasswordStrength(password)
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!strength.valid) { setError("Password does not meet requirements"); return }
     setLoading(true)
     setError("")
     try {
@@ -124,17 +128,39 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
             </p>
           </div>
           <div>
-            <label className="text-gray-400 text-xs mb-1.5 block">Temporary Password</label>
+            <label className="text-gray-400 text-xs mb-1.5 block">Password</label>
             <div className="relative">
               <input
-                type={showPw ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required minLength={8}
-                placeholder="Min 8 characters"
+                type={showPw ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required
+                placeholder="Min 10 chars, upper, number, special"
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 pr-10 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-green-500"
               />
               <button type="button" onClick={() => setShowPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
                 {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
+            {password.length > 0 && (
+              <div className="mt-2 space-y-1">
+                <div className="flex gap-1">
+                  {[1,2,3,4,5].map(i => (
+                    <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i <= strength.score ? strength.color : "bg-gray-700"}`} />
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px]">
+                  {[
+                    { ok: strength.checks.minLength,    label: "10+ chars" },
+                    { ok: strength.checks.hasUppercase, label: "Uppercase" },
+                    { ok: strength.checks.hasLowercase, label: "Lowercase" },
+                    { ok: strength.checks.hasNumber,    label: "Number" },
+                    { ok: strength.checks.hasSpecial,   label: "Special" },
+                  ].map(c => (
+                    <span key={c.label} className={c.ok ? "text-green-400" : "text-gray-600"}>
+                      {c.ok ? "✓" : "·"} {c.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {error && <p className="text-red-400 text-xs">{error}</p>}
@@ -143,7 +169,7 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
             <button type="button" onClick={onClose} className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg py-2 text-sm transition-colors">
               Cancel
             </button>
-            <button type="submit" disabled={loading} className="flex-1 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white rounded-lg py-2 text-sm font-medium transition-colors">
+            <button type="submit" disabled={loading || !strength.valid} className="flex-1 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white rounded-lg py-2 text-sm font-medium transition-colors">
               {loading ? "Creating…" : "Create User"}
             </button>
           </div>
@@ -166,12 +192,16 @@ function UserRow({
   onRefresh: () => void
   onOpenPermissions: (u: User) => void
 }) {
+  const { user: self } = useAuth()
+  const isSuperAdmin = self?.role === "super_admin"
   const [expanded,      setExpanded]      = useState(false)
   const [loading,       setLoading]       = useState(false)
   const [tempPw,        setTempPw]        = useState<string | null>(null)
   const [copied,        setCopied]        = useState(false)
   const [resetSent,     setResetSent]     = useState(false)
   const [resetSending,  setResetSending]  = useState(false)
+  const [resetLink,     setResetLink]     = useState<string | null>(null)
+  const [resetLinkLoading, setResetLinkLoading] = useState(false)
 
   const toggle = async (field: "isActive", value: boolean) => {
     setLoading(true)
@@ -205,6 +235,14 @@ function UserRow({
     setResetSending(false)
     setResetSent(true)
     setTimeout(() => setResetSent(false), 5000)
+  }
+
+  const getResetLink = async () => {
+    setResetLinkLoading(true)
+    const res  = await fetch(`/api/admin/users/${u.id}/get-reset-link`, { method: "POST" })
+    const data = await res.json()
+    if (data.resetUrl) setResetLink(data.resetUrl)
+    setResetLinkLoading(false)
   }
 
   const softDelete = async () => {
@@ -305,6 +343,16 @@ function UserRow({
                 <ShieldCheck size={13} />
               </button>
             </PermissionGate>
+            {isSuperAdmin && !isSelf && u.isActive && (
+              <button
+                onClick={getResetLink}
+                disabled={resetLinkLoading}
+                title="Get reset link (manual delivery)"
+                className="p-1.5 rounded text-gray-500 hover:text-purple-400 hover:bg-purple-900/20 transition-colors disabled:opacity-30"
+              >
+                {resetLinkLoading ? <RefreshCw size={13} className="animate-spin" /> : <Link size={13} />}
+              </button>
+            )}
             <PermissionGate permission="users.delete">
               <button
                 onClick={softDelete}
@@ -330,6 +378,26 @@ function UserRow({
                 {copied ? <CheckCheck size={14} className="text-green-400" /> : <Copy size={14} />}
               </button>
               <button onClick={() => setTempPw(null)} className="text-gray-500 hover:text-white ml-auto"><X size={14} /></button>
+            </div>
+          </td>
+        </tr>
+      )}
+
+      {/* Manual reset link reveal */}
+      {resetLink && (
+        <tr>
+          <td colSpan={5} className="px-4 py-2 bg-purple-950/20">
+            <div className="flex items-start gap-3">
+              <span className="text-purple-400 text-xs font-medium pt-0.5 shrink-0">Reset link (30 min, one-time):</span>
+              <code className="bg-gray-900 text-purple-300 text-[10px] px-3 py-1 rounded font-mono border border-purple-800 break-all flex-1">{resetLink}</code>
+              <button
+                onClick={() => { navigator.clipboard.writeText(resetLink); }}
+                className="text-gray-400 hover:text-white transition-colors shrink-0"
+                title="Copy link"
+              >
+                <Copy size={14} />
+              </button>
+              <button onClick={() => setResetLink(null)} className="text-gray-500 hover:text-white shrink-0"><X size={14} /></button>
             </div>
           </td>
         </tr>

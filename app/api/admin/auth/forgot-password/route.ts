@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createPasswordResetToken } from "@/lib/rbac/passwordReset"
 import { renderAndSend } from "@/lib/emailTemplates"
+import { isEmailConfigured } from "@/lib/email"
 import { writeAuthAuditLog } from "@/lib/authAuditLog"
 import clientPromise from "@/lib/mongodb"
 
@@ -56,7 +57,27 @@ export async function POST(request: NextRequest) {
   const baseUrl  = process.env.NEXT_PUBLIC_APP_URL ?? "https://100xcircle.in"
   const resetUrl = `${baseUrl}/admin/reset-password?token=${result.token}`
 
-  await renderAndSend(
+  // Check if email is configured before attempting send
+  if (!isEmailConfigured()) {
+    await writeAuthAuditLog(
+      "password_reset_requested",
+      email,
+      ip,
+      userAgent,
+      { userId: user ? String(user._id) : null, emailSent: false, reason: "email_not_configured" },
+      user ? String(user._id) : null,
+    )
+    // Email not configured — tell the user instead of showing fake success
+    return NextResponse.json(
+      {
+        error: "Email delivery is not configured on this server. Ask your Super Admin to generate a reset link manually from the User Management panel.",
+        code: "email_not_configured",
+      },
+      { status: 503 },
+    )
+  }
+
+  const emailResult = await renderAndSend(
     "forgot_password",
     {
       NAME:      name,
@@ -66,12 +87,28 @@ export async function POST(request: NextRequest) {
     email,
   )
 
+  if (!emailResult.ok) {
+    console.error(`Password reset email failed for ${email}:`, emailResult.error)
+    await writeAuthAuditLog(
+      "password_reset_requested",
+      email,
+      ip,
+      userAgent,
+      { userId: user ? String(user._id) : null, emailSent: false, reason: emailResult.error },
+      user ? String(user._id) : null,
+    )
+    return NextResponse.json(
+      { error: "Failed to send reset email. Please contact your Super Admin.", code: "email_send_failed" },
+      { status: 503 },
+    )
+  }
+
   await writeAuthAuditLog(
     "password_reset_requested",
     email,
     ip,
     userAgent,
-    { userId: user ? String(user._id) : null },
+    { userId: user ? String(user._id) : null, emailSent: true },
     user ? String(user._id) : null,
   )
 

@@ -1,9 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { ObjectId } from "mongodb"
 import clientPromise from "@/lib/mongodb"
 import { requirePermission, writeAuditLog } from "@/lib/rbac/server"
 import { hashPassword } from "@/lib/rbac/password"
-import { resolvePermissions } from "@/lib/rbac/roles"
+import { validatePassword } from "@/lib/passwordPolicy"
+import { renderAndSend } from "@/lib/emailTemplates"
 import type { DBUser } from "@/lib/rbac/types"
 
 // GET /api/admin/users — list all users
@@ -53,16 +53,38 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "email, name, role, and password are required" }, { status: 400 })
   }
 
+  // Enforce password policy on server side
+  const policyError = validatePassword(password)
+  if (policyError) {
+    return NextResponse.json({ error: policyError }, { status: 422 })
+  }
+
   const client = await clientPromise
   const db     = client.db()
 
-  const existing = await db.collection("rbac_users").findOne({ email: email.toLowerCase() })
+  const normalizedEmail = email.toLowerCase().trim()
+
+  // Check for existing user with this email (active OR inactive)
+  const existing = await db.collection("rbac_users").findOne({ email: normalizedEmail })
+
   if (existing) {
-    return NextResponse.json({ error: "Email already registered" }, { status: 409 })
+    if (existing.isActive) {
+      return NextResponse.json({ error: "Email already registered" }, { status: 409 })
+    }
+    // Soft-deleted record — hard-delete it and all orphaned data so we can recreate cleanly
+    const oldId = String(existing._id)
+    await db.collection("rbac_users").deleteOne({ email: normalizedEmail })
+    await db.collection("rbac_user_permissions").deleteOne({ userId: oldId })
+    await db.collection("active_sessions").updateMany(
+      { userId: oldId, isRevoked: false },
+      { $set: { isRevoked: true, revokedAt: new Date(), revokedReason: "user_recreated" } }
+    )
+    await db.collection("password_reset_tokens").deleteMany({ email: normalizedEmail })
+    await writeAuditLog(actor, "delete", "user", { id: oldId, email: normalizedEmail, reason: "purged_before_recreate" }, request)
   }
 
   const now: Omit<DBUser, "_id"> = {
-    email:            email.toLowerCase().trim(),
+    email:            normalizedEmail,
     name:             name.trim(),
     passwordHash:     hashPassword(password),
     role,
@@ -79,7 +101,19 @@ export async function POST(request: NextRequest) {
   const result = await db.collection("rbac_users").insertOne(now)
   const newId  = String(result.insertedId)
 
-  await writeAuditLog(actor, "create", "user", { id: newId, email, role }, request)
+  await writeAuditLog(actor, "create", "user", { id: newId, email: normalizedEmail, role }, request)
+
+  // Send welcome email (non-blocking — failure is logged, not surfaced)
+  renderAndSend(
+    "welcome",
+    {
+      NAME:  name.trim(),
+      EMAIL: normalizedEmail,
+      ROLE:  role,
+      TEMP_PASSWORD: password,
+    },
+    normalizedEmail,
+  ).catch(err => console.error("Welcome email failed:", err))
 
   return NextResponse.json({ success: true, id: newId }, { status: 201 })
 }

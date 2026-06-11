@@ -65,8 +65,10 @@ const ADVANCED_MODULES: Module[] = [
   { href: "/admin/growth/users",              label: "User Management",      icon: UserCog,         permission: "users.view",       advanced: true },
   { href: "/admin/growth/permissions",        label: "Permission Matrix",    icon: ShieldCheck,     permission: "permissions.view", advanced: true },
   { href: "/admin/growth/audit/permissions",  label: "Permission Audit",     icon: ClipboardList,   permission: "users.view",       advanced: true, sub: true },
-  { href: "/admin/growth/security",           label: "Security",             icon: ShieldCheck,     permission: "dashboard.view",   advanced: true },
-  { href: "/admin/growth/security/sessions",  label: "↳ Active Sessions",    icon: Monitor,         permission: "dashboard.view",   advanced: true, sub: true },
+  { href: "/admin/growth/security",                       label: "Security",             icon: ShieldCheck,     permission: "dashboard.view",   advanced: true },
+  { href: "/admin/growth/security/sessions",            label: "↳ Active Sessions",    icon: Monitor,         permission: "dashboard.view",   advanced: true, sub: true },
+  { href: "/admin/growth/security/auth-diagnostics",   label: "↳ Auth Diagnostics",   icon: Activity,        permission: "users.view",       advanced: true, sub: true, badge: "DIAG" },
+  { href: "/admin/growth/security/orphans",             label: "↳ Orphan Cleanup",     icon: ClipboardList,   permission: "users.view",       advanced: true, sub: true },
 ]
 
 // Combined for active-route detection

@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb"
 import clientPromise from "@/lib/mongodb"
 import { requirePermission, writeAuditLog } from "@/lib/rbac/server"
 import { hashPassword, generateTemporaryPassword } from "@/lib/rbac/password"
+import { revokeAllUserSessions } from "@/lib/rbac/sessions"
 import type { DBUser } from "@/lib/rbac/types"
 
 type Params = { params: Promise<{ id: string }> }
@@ -91,6 +92,11 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
   await db.collection("rbac_users").updateOne(query, { $set: update })
 
+  // Revoke all active sessions immediately when disabling a user
+  if (body.isActive === false) {
+    await revokeAllUserSessions(id, actor.sub, "user_disabled").catch(console.error)
+  }
+
   const action = body.isActive === false ? "user_disabled"
     : body.isActive === true  ? "user_enabled"
     : body.role !== undefined ? "role_change"
@@ -133,6 +139,17 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   await db.collection("rbac_users").updateOne(query, {
     $set: { isActive: false, updatedAt: new Date() },
   })
+
+  // Revoke all active sessions so deleted users lose access immediately
+  await revokeAllUserSessions(id, actor.sub, "user_deleted").catch(console.error)
+
+  // Remove permission overrides for this user
+  await db.collection("rbac_user_permissions").deleteOne({ userId: id }).catch(console.error)
+
+  // Invalidate any pending password reset tokens
+  await db.collection("password_reset_tokens")
+    .updateMany({ email: existing.email }, { $set: { usedAt: new Date() } })
+    .catch(console.error)
 
   await writeAuditLog(actor, "delete", "user", { id, email: existing.email }, request)
 

@@ -3,6 +3,7 @@
 // User overrides: rbac_user_permissions (DB) merged over role base.
 // Result is embedded in the JWT at login — no DB hit per request.
 
+import { ObjectId } from "mongodb"
 import clientPromise from "@/lib/mongodb"
 import { ROLE_PERMISSIONS } from "./roles"
 import type { RoleSlug, PermissionResolution, DBRolePermissions, DBUserPermissions } from "./types"
@@ -33,10 +34,13 @@ export async function resolveEffectivePermissions(
       .findOne({ userId })
 
     // Also read legacy fields from rbac_users for backward compat
-    const userDoc = await db.collection("rbac_users").findOne(
-      { _id: { $exists: true }, email: { $exists: true } },
-      { projection: { customPermissions: 1, deniedPermissions: 1 } }
-    )
+    let userDoc: { customPermissions?: string[]; deniedPermissions?: string[] } | null = null
+    try {
+      userDoc = await db.collection("rbac_users").findOne(
+        { _id: new ObjectId(userId) },
+        { projection: { customPermissions: 1, deniedPermissions: 1 } }
+      )
+    } catch { /* invalid ObjectId — skip legacy lookup */ }
 
     granted = [
       ...(dbUserPerms?.grantedPermissions ?? []),
