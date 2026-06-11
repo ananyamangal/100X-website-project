@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
-import { buildAttributionReport, createAttributionLead, updateLeadStage, syncFromRFQLeads, type FunnelStage } from "@/lib/growth-os/revenue-attribution"
+import {
+  buildAttributionReport,
+  createAttributionLead,
+  updateLeadStage,
+  syncAllLeads,
+  syncFromRFQLeads,
+  syncFromBrochureLeads,
+  syncFromSubmissions,
+  getAttributionDiagnostics,
+  type FunnelStage,
+} from "@/lib/growth-os/revenue-attribution"
 import clientPromise from "@/lib/mongodb"
 
 export async function GET(req: NextRequest) {
@@ -7,18 +17,26 @@ export async function GET(req: NextRequest) {
   const view = url.searchParams.get("view")
 
   if (view === "leads") {
-    const db = (await clientPromise).db()
+    const page  = Math.max(0, parseInt(url.searchParams.get("page") ?? "0"))
+    const limit = Math.min(parseInt(url.searchParams.get("limit") ?? "100"), 500)
+    const db    = (await clientPromise).db()
     const leads = await db.collection("revenue_attribution")
       .find({})
       .sort({ createdAt: -1 })
-      .limit(100)
+      .skip(page * limit)
+      .limit(limit)
       .toArray()
-    return NextResponse.json(JSON.parse(JSON.stringify(leads)))
+    const total = await db.collection("revenue_attribution").countDocuments()
+    return NextResponse.json({ leads: JSON.parse(JSON.stringify(leads)), total, page, limit })
   }
 
-  if (view === "sync") {
-    const result = await syncFromRFQLeads()
-    return NextResponse.json(result)
+  if (view === "diagnostics") {
+    try {
+      const diag = await getAttributionDiagnostics()
+      return NextResponse.json(diag)
+    } catch (err) {
+      return NextResponse.json({ error: err instanceof Error ? err.message : "Error" }, { status: 500 })
+    }
   }
 
   // Default: full attribution report
@@ -34,8 +52,18 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
 
   if (body.action === "sync") {
-    const result = await syncFromRFQLeads()
-    return NextResponse.json(result)
+    // Full sync across all sources
+    const source = body.source as string | undefined
+    try {
+      if (source === "rfq")      return NextResponse.json(await syncFromRFQLeads())
+      if (source === "brochure") return NextResponse.json(await syncFromBrochureLeads())
+      if (source === "contact")  return NextResponse.json(await syncFromSubmissions())
+      // default: all sources
+      const result = await syncAllLeads()
+      return NextResponse.json(result)
+    } catch (err) {
+      return NextResponse.json({ error: err instanceof Error ? err.message : "Sync failed" }, { status: 500 })
+    }
   }
 
   if (body.action === "update_stage") {
@@ -50,5 +78,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, leadId: id })
   }
 
-  return NextResponse.json({ error: "action required: sync | update_stage | create" }, { status: 400 })
+  return NextResponse.json({
+    error: "action required: sync | sync (with source: rfq|brochure|contact) | update_stage | create"
+  }, { status: 400 })
 }
