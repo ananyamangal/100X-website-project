@@ -32,6 +32,7 @@ export interface DBUser {
   passwordChangedAt: Date | null
   failedLoginCount: number
   lockedAt: Date | null
+  lockUntil: Date | null    // lockout expiry (null = not locked)
   lockedBy: string | null   // userId or "system"
 }
 

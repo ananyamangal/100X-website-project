@@ -31,19 +31,23 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname, origin } = request.nextUrl
 
-  // ── Admin page routes: inject x-is-admin + protect Growth OS ────────────────
+  // ── Admin page routes: inject x-is-admin + enforce unified auth ─────────────
   if (pathname.startsWith("/admin")) {
-    if (
-      (pathname.startsWith("/admin/growth") || pathname === "/admin/growth") &&
-      !(await isAuthenticated(request))
-    ) {
+    const cloned = new Headers(request.headers)
+    cloned.set("x-is-admin", "1")
+
+    // Public admin pages — no authentication required
+    if (pathname === "/admin/login" || pathname.startsWith("/admin/reset-password")) {
+      return NextResponse.next({ request: { headers: cloned } })
+    }
+
+    // All other admin pages require authentication
+    if (!(await isAuthenticated(request))) {
       const loginUrl = request.nextUrl.clone()
       loginUrl.pathname = "/admin/login"
       return NextResponse.redirect(loginUrl)
     }
 
-    const cloned = new Headers(request.headers)
-    cloned.set("x-is-admin", "1")
     return NextResponse.next({ request: { headers: cloned } })
   }
 

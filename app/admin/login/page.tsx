@@ -27,13 +27,10 @@ export default function AdminLogin() {
     setError("")
 
     try {
-      const body: Record<string, string> = { password }
-      if (email.trim()) body.email = email.trim().toLowerCase()
-
       const res = await fetch("/api/admin/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       })
 
       const data = await res.json()
@@ -66,7 +63,11 @@ export default function AdminLogin() {
       const data = await res.json()
 
       if (!res.ok) {
-        setForgotError(data.error ?? "Request failed. Please try again.")
+        if (data.code === "email_not_configured" || data.code === "email_send_failed") {
+          setForgotError("Email delivery unavailable. Ask your Super Admin to generate a reset link from the User Management panel.")
+        } else {
+          setForgotError(data.error ?? "Request failed. Please try again.")
+        }
         return
       }
 
@@ -98,7 +99,6 @@ export default function AdminLogin() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleLogin} className="space-y-4">
-                {/* Email — optional for legacy password-only login */}
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                   <Input
@@ -108,6 +108,7 @@ export default function AdminLogin() {
                     onChange={e => setEmail(e.target.value)}
                     className="pl-9 bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:border-green-500 focus:ring-green-500/20"
                     autoComplete="email"
+                    required
                   />
                 </div>
 
@@ -142,7 +143,7 @@ export default function AdminLogin() {
                 <Button
                   type="submit"
                   className="w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-2.5 transition-colors"
-                  disabled={isLoading || !password}
+                  disabled={isLoading || !password || !email.trim()}
                 >
                   {isLoading ? "Signing in…" : "Sign In"}
                 </Button>

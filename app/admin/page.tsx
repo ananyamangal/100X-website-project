@@ -61,7 +61,6 @@ import { ProductForm } from "@/components/admin/ProductForm"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import Cookies from 'js-cookie';
 
 interface Product {
   _id?: string;
@@ -181,72 +180,8 @@ interface BlogPost {
   updatedAt?: string;
 }
 
-function AdminAuthGate({ children }: { children: React.ReactNode }) {
-  const [isAuthed, setIsAuthed] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (Cookies.get('admin-token') === 'authenticated') {
-      setIsAuthed(true);
-    }
-    setLoading(false);
-  }, []);
-
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    try {
-      const res = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: passwordInput }),
-      });
-      if (res.ok) {
-        Cookies.set('admin-token', 'authenticated', { path: '/admin' });
-        setIsAuthed(true);
-      } else {
-        setError('Invalid password');
-      }
-    } catch {
-      setError('Login failed. Please try again.');
-    }
-  };
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-50">Loading...</div>;
-  }
-
-  if (!isAuthed) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <form onSubmit={handlePasswordSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-xs">
-          <h2 className="text-xl font-bold mb-4">Admin Login</h2>
-          <input
-            type="password"
-            placeholder="Enter admin password"
-            value={passwordInput}
-            onChange={e => setPasswordInput(e.target.value)}
-            className="w-full border px-3 py-2 rounded mb-4"
-            required
-          />
-          {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
-          <button type="submit" className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Login</button>
-          <div className="mt-4 text-center">
-            <a href="/admin/login" className="text-sm text-blue-600 hover:text-blue-800 underline">
-              Forgot Password? Use Growth OS login
-            </a>
-          </div>
-        </form>
-      </div>
-    );
-  }
-  return <>{children}</>;
-}
-
 export default function AdminDashboard() {
-  return <AdminAuthGate><AdminDashboardContent /></AdminAuthGate>;
+  return <AdminDashboardContent />
 }
 
 function AdminDashboardContent() {

@@ -99,9 +99,14 @@ export async function POST(request: NextRequest) {
       isActive:          true,
       createdAt:         new Date(),
       updatedAt:         new Date(),
-      lastLoginAt:       null,
-      createdBy:         null,
-      loginHistory:      [],
+      lastLoginAt:        null,
+      createdBy:          null,
+      loginHistory:       [],
+      passwordChangedAt:  null,
+      failedLoginCount:   0,
+      lockedAt:           null,
+      lockUntil:          null,
+      lockedBy:           null,
     }
     await db.collection("rbac_users").insertOne(superAdmin)
     superAdminSeeded = true

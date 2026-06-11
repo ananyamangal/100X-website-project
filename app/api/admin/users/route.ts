@@ -93,9 +93,14 @@ export async function POST(request: NextRequest) {
     isActive:         true,
     createdAt:        new Date(),
     updatedAt:        new Date(),
-    lastLoginAt:      null,
-    createdBy:        actor.sub,
-    loginHistory:     [],
+    lastLoginAt:       null,
+    createdBy:         actor.sub,
+    loginHistory:      [],
+    passwordChangedAt: null,
+    failedLoginCount:  0,
+    lockedAt:          null,
+    lockUntil:         null,
+    lockedBy:          null,
   }
 
   const result = await db.collection("rbac_users").insertOne(now)

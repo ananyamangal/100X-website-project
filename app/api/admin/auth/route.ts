@@ -46,12 +46,27 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
       }
 
+      // Check lockout
+      if (dbUser.lockUntil && new Date(dbUser.lockUntil) > new Date()) {
+        const mins = Math.ceil((new Date(dbUser.lockUntil).getTime() - Date.now()) / 60000)
+        return NextResponse.json(
+          { error: `Account locked due to too many failed attempts. Try again in ${mins} minute${mins !== 1 ? "s" : ""}.` },
+          { status: 423 }
+        )
+      }
+
       const valid = verifyPassword(password, dbUser.passwordHash)
       if (!valid) {
-        // Log failed attempt
+        const newFailCount = (dbUser.failedLoginCount ?? 0) + 1
+        const lockUpdate: Record<string, unknown> = { failedLoginCount: newFailCount }
+        if (newFailCount >= 5) {
+          lockUpdate.lockUntil = new Date(Date.now() + 30 * 60 * 1000) // 30 min
+          lockUpdate.lockedAt  = new Date()
+        }
         await db.collection("rbac_users").updateOne(
           { email },
           {
+            $set: lockUpdate,
             $push: {
               loginHistory: {
                 $each: [{ ip: request.headers.get("x-forwarded-for") ?? "unknown", userAgent: request.headers.get("user-agent") ?? "", timestamp: new Date(), success: false }],
@@ -60,7 +75,13 @@ export async function POST(request: NextRequest) {
             },
           }
         )
-        await writeAuditLog(null, "login_failed", "auth", { email }, request)
+        await writeAuditLog(null, "login_failed", "auth", { email, failedCount: newFailCount }, request)
+        if (newFailCount >= 5) {
+          return NextResponse.json(
+            { error: "Account locked for 30 minutes after 5 failed attempts." },
+            { status: 423 }
+          )
+        }
         return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
       }
 
@@ -86,11 +107,11 @@ export async function POST(request: NextRequest) {
         sessionId,
       }, ttl)
 
-      // Update last login + history
+      // Update last login + history, reset lockout
       await db.collection("rbac_users").updateOne(
         { email },
         {
-          $set: { lastLoginAt: new Date() },
+          $set: { lastLoginAt: new Date(), failedLoginCount: 0, lockUntil: null, lockedAt: null },
           $push: {
             loginHistory: {
               $each: [{ ip: request.headers.get("x-forwarded-for") ?? "unknown", userAgent: request.headers.get("user-agent") ?? "", timestamp: new Date(), success: true }],
