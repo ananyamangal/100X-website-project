@@ -7,7 +7,7 @@ import {
   Users, ShoppingBag, Megaphone, Settings2, ScrollText,
   BarChart2, TrendingUp, ArrowLeft, Zap, Plug,
   PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck, ClipboardList, Monitor,
-  Layout, PhoneCall, ClipboardCheck, Rocket, Wand2, DollarSign, Link2, Brain, FlaskConical,
+  Layout, PhoneCall, ClipboardCheck, Rocket, Wand2, DollarSign, Link2, Brain, FlaskConical, Activity,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -58,7 +58,8 @@ const ADVANCED_MODULES: Module[] = [
   { href: "/admin/growth/ads/creative-director",          label: "↳ Creative Director",   icon: Wand2,        permission: "ads.view", advanced: true, sub: true, badge: "NEW" },
   { href: "/admin/growth/ads/creative-director/validate", label: "↳ CD Validation",       icon: FlaskConical, permission: "ads.view", advanced: true, sub: true },
   { href: "/admin/growth/ads/revenue",                    label: "↳ Revenue Attribution", icon: DollarSign,   permission: "ads.view", advanced: true, sub: true, badge: "NEW" },
-  { href: "/admin/growth/automation",         label: "Automation Center",    icon: Settings2,       permission: "automation.view",  advanced: true },
+  { href: "/admin/growth/agents/health-check",  label: "AI Health Check",      icon: Activity,        permission: "dashboard.view",   advanced: true, badge: "DIAG" },
+  { href: "/admin/growth/automation",          label: "Automation Center",    icon: Settings2,       permission: "automation.view",  advanced: true },
   { href: "/admin/growth/logs",               label: "Activity Logs",        icon: ScrollText,      permission: "logs.view",        advanced: true },
   { href: "/admin/growth/reports",            label: "Reporting Center",     icon: BarChart2,       permission: "reports.view",     advanced: true },
   { href: "/admin/growth/users",              label: "User Management",      icon: UserCog,         permission: "users.view",       advanced: true },
