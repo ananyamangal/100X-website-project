@@ -28,6 +28,24 @@ const LIVE_MODULES = [
     status: "live",
   },
   {
+    title: "Creative Director",
+    desc: "AI-generated RSA headlines, descriptions, callouts, sitelinks, image concepts — scored across 8 frameworks",
+    href: "/admin/growth/ads/creative-director",
+    status: "live",
+  },
+  {
+    title: "Revenue Attribution",
+    desc: "Keyword → Campaign → Lead → Deal → Revenue. ROI, ROAS, payback period per keyword",
+    href: "/admin/growth/ads/revenue",
+    status: "live",
+  },
+  {
+    title: "Off-Page SEO Director",
+    desc: "Backlink opportunities, outreach emails, citation building — GeM, government, MSME verticals",
+    href: "/admin/growth/seo/offpage",
+    status: "live",
+  },
+  {
     title: "Launch Checklist",
     desc: "Step-by-step readiness check before enabling live campaigns",
     href: "/admin/growth/launch",

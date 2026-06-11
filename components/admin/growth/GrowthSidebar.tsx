@@ -7,7 +7,7 @@ import {
   Users, ShoppingBag, Megaphone, Settings2, ScrollText,
   BarChart2, TrendingUp, ArrowLeft, Zap, Plug,
   PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck, ClipboardList, Monitor,
-  Layout, PhoneCall, ClipboardCheck, Rocket,
+  Layout, PhoneCall, ClipboardCheck, Rocket, Wand2, DollarSign, Link2,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -38,6 +38,7 @@ const ADVANCED_MODULES: Module[] = [
   { href: "/admin/growth/dashboard",          label: "Executive Dashboard",  icon: LayoutDashboard, permission: "dashboard.view",   advanced: true },
   { href: "/admin/growth/seo",                label: "SEO Command Center",   icon: Search,          permission: "seo.view",         advanced: true },
   { href: "/admin/growth/seo/setup",          label: "↳ Search Console",     icon: Plug,            permission: "seo.view",         advanced: true, sub: true },
+  { href: "/admin/growth/seo/offpage",        label: "↳ Off-Page SEO",       icon: Link2,           permission: "seo.view",         advanced: true, sub: true, badge: "NEW" },
   { href: "/admin/growth/analytics",          label: "GA4 Analytics",        icon: BarChart2,       permission: "analytics.view",   advanced: true },
   { href: "/admin/growth/analytics/setup",    label: "↳ Analytics Setup",    icon: Plug,            permission: "analytics.view",   advanced: true, sub: true },
   { href: "/admin/growth/geo",                label: "GEO / AI Search",      icon: Bot,             permission: "geo.view",         advanced: true },
@@ -48,10 +49,12 @@ const ADVANCED_MODULES: Module[] = [
   { href: "/admin/growth/procurement",        label: "Procurement Intel",    icon: ShoppingBag,     permission: "procurement.view", advanced: true, badge: "NEW" },
   { href: "/admin/growth/dealers",            label: "Dealer Intelligence",  icon: Users,           permission: "dealer.view",      advanced: true },
   { href: "/admin/growth/gem",                label: "GeM Intel (Legacy)",   icon: ShoppingBag,     permission: "procurement.view", advanced: true },
-  { href: "/admin/growth/ads",                label: "Google Ads Intel",     icon: Megaphone,       permission: "ads.view",         advanced: true },
-  { href: "/admin/growth/ads/director",       label: "↳ Ads Director",       icon: Megaphone,       permission: "ads.view",         advanced: true, sub: true },
-  { href: "/admin/growth/ads/setup",          label: "↳ Ads Setup",          icon: Plug,            permission: "ads.view",         advanced: true, sub: true },
-  { href: "/admin/growth/ads/dashboard",      label: "↳ Ads Dashboard",      icon: BarChart2,       permission: "ads.view",         advanced: true, sub: true },
+  { href: "/admin/growth/ads",                    label: "Google Ads Intel",     icon: Megaphone,    permission: "ads.view",         advanced: true },
+  { href: "/admin/growth/ads/director",           label: "↳ Ads Director",       icon: Megaphone,    permission: "ads.view",         advanced: true, sub: true },
+  { href: "/admin/growth/ads/setup",              label: "↳ Ads Setup",          icon: Plug,         permission: "ads.view",         advanced: true, sub: true },
+  { href: "/admin/growth/ads/dashboard",          label: "↳ Ads Dashboard",      icon: BarChart2,    permission: "ads.view",         advanced: true, sub: true },
+  { href: "/admin/growth/ads/creative-director",  label: "↳ Creative Director",  icon: Wand2,        permission: "ads.view",         advanced: true, sub: true, badge: "NEW" },
+  { href: "/admin/growth/ads/revenue",            label: "↳ Revenue Attribution", icon: DollarSign,  permission: "ads.view",         advanced: true, sub: true, badge: "NEW" },
   { href: "/admin/growth/automation",         label: "Automation Center",    icon: Settings2,       permission: "automation.view",  advanced: true },
   { href: "/admin/growth/logs",               label: "Activity Logs",        icon: ScrollText,      permission: "logs.view",        advanced: true },
   { href: "/admin/growth/reports",            label: "Reporting Center",     icon: BarChart2,       permission: "reports.view",     advanced: true },
