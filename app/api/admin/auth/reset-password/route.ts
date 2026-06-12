@@ -84,6 +84,7 @@ export async function POST(request: NextRequest) {
       passwordHash:      hashPassword(password),
       passwordChangedAt: now,
       failedLoginCount:  0,
+      lockUntil:         null,
       lockedAt:          null,
       lockedBy:          null,
       updatedAt:         now,

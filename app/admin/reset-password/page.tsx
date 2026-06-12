@@ -64,6 +64,7 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     if (!token) setTokenError("No reset token found. Please use the link from your email.")
+    else setTokenError("")
   }, [token])
 
   const handleSubmit = async (e: React.FormEvent) => {
