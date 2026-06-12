@@ -277,6 +277,7 @@ export const MODULE_PERMISSIONS: Record<string, string> = {
   "/admin/growth/competitors":      "competitors.view",
   "/admin/growth/opportunities":    "opportunities.view",
   "/admin/growth/content":          "content.view",
+  "/admin/growth/landing-pages":    "landing_pages.view",
   "/admin/growth/procurement":      "procurement.view",
   "/admin/growth/dealers":          "dealer.view",
   "/admin/growth/gem":              "procurement.view",

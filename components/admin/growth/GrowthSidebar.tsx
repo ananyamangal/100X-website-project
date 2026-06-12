@@ -8,6 +8,7 @@ import {
   BarChart2, TrendingUp, ArrowLeft, Zap, Plug,
   PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck, ClipboardList, Monitor,
   Layout, PhoneCall, ClipboardCheck, Rocket, Wand2, DollarSign, Link2, Brain, FlaskConical, Activity,
+  Globe,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -26,9 +27,10 @@ interface Module {
 
 // Primary modules — shown by default (founder-facing)
 const PRIMARY_MODULES: Module[] = [
-  { href: "/admin/growth/launch",              label: "Launch Status",        icon: Rocket,         permission: "ads.view",       badge: "LIVE" },
+  { href: "/admin/growth/launch",              label: "Launch Status",        icon: Rocket,         permission: "ads.view",             badge: "LIVE" },
   { href: "/admin/growth/founder",             label: "Founder Mode",         icon: Zap,            permission: "dashboard.view" },
-  { href: "/admin/growth/market-intelligence", label: "Market Intel",         icon: Brain,          permission: "ads.view",       badge: "NEW" },
+  { href: "/admin/growth/landing-pages",       label: "Landing Pages",        icon: Globe,          permission: "landing_pages.view" },
+  { href: "/admin/growth/market-intelligence", label: "Market Intel",         icon: Brain,          permission: "ads.view",             badge: "NEW" },
   { href: "/admin/growth/ads/approval-queue",  label: "Review Queue",         icon: ClipboardCheck, permission: "ads.view" },
   { href: "/admin/growth/contact-this-week",   label: "Contact This Week",    icon: PhoneCall,      permission: "dealer.view" },
   { href: "/admin/growth/paid",                label: "Paid Growth",          icon: TrendingUp,     permission: "ads.view" },
