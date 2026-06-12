@@ -114,9 +114,9 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
     slug: "gem-approved-fogging-machine-oem",
     type: "gem",
     metadata: {
-      title: "Fogging Machines on GeM Portal | OEM Code & Supply | 100x Circle",
+      title: "Fogging Machine on GeM Portal | Certified OEM | 100x Circle",
       description:
-        "Buy fogging machines on GeM (Q2 category) or register as OEM reseller. Spec-compliant, factory pricing, Pan-India delivery. Get OEM code in 24 hrs.",
+        "Buy fogging machines on GeM portal — certified OEM manufacturer, factory pricing, ISI-marked. Municipalities & health depts across India. Get quote today.",
       keywords:
         "gem approved fogging machine oem, gem oem reseller code fogging machine, gem q2 category fogging machine, government fogging machine supplier, oem authorization fogging machine india",
     },
