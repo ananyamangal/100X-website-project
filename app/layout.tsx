@@ -45,9 +45,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(SITE_URL),
-    title: 'Best Thermal Fogging Machine Manufacturer | 100x Circle',
+    title: 'Thermal Fogging Machine Manufacturer in India | 100x Circle',
     description:
-      'Discover 100x Circle — thermal fogging machine manufacturer serving Delhi, Uttar Pradesh, Bihar, Mumbai, Pune, and across India. Industrial mosquito foggers, vehicle-mounted systems, and agricultural equipment.',
+      '100x Circle manufactures thermal & cold fogging machines for mosquito control, public health & agriculture. GeM approved. Get a quote today.',
     applicationName: SITE_NAME,
     authors: [{ name: SITE_NAME, url: SITE_URL }],
     creator: SITE_NAME,

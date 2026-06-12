@@ -114,9 +114,9 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
     slug: "gem-approved-fogging-machine-oem",
     type: "gem",
     metadata: {
-      title: "GeM Approved OEM for Fogging Machines | 100x Circle",
+      title: "Fogging Machines on GeM Portal | OEM Code & Supply | 100x Circle",
       description:
-        "100x Circle is a GeM-approved OEM manufacturer for fogging machines (Q2 category). OEM reseller code, spec-compliant machines, factory pricing, Pan-India supply.",
+        "Buy fogging machines on GeM (Q2 category) or register as OEM reseller. Spec-compliant, factory pricing, Pan-India delivery. Get OEM code in 24 hrs.",
       keywords:
         "gem approved fogging machine oem, gem oem reseller code fogging machine, gem q2 category fogging machine, government fogging machine supplier, oem authorization fogging machine india",
     },
@@ -417,9 +417,9 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
     slug: "dengue-control-fogging-machine",
     type: "use-case",
     metadata: {
-      title: "Dengue Control Fogging Machine | 100x Circle",
+      title: "Dengue Control Fogging Machine | Municipal & Society Use | 100x Circle",
       description:
-        "Thermal & cold fogging machines proven for dengue mosquito control — Aedes aegypti suppression for municipal corporations, housing societies, and public health teams across India.",
+        "Fogging machines for dengue Aedes aegypti control. Used by municipal corporations and housing societies across India. Get a model recommendation in 24 hrs.",
       keywords:
         "dengue control fogging machine, aedes aegypti control fogger, dengue mosquito fogging machine india, public health fogging machine, vector control fogging equipment",
     },
@@ -526,7 +526,7 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
     metadata: {
       title: "Thermal vs Cold Fogging Machine — Which to Buy | 100x Circle",
       description:
-        "Compare thermal and cold (ULV) fogging machines side-by-side: droplet size, coverage, indoor vs outdoor use, insecticide compatibility, ideal buyer. Buyer's guide from 100x Circle.",
+        "Thermal vs cold (ULV) fogging: 8-point comparison. Coverage, droplet size, indoor vs outdoor use, insecticide compatibility. Expert buyer's guide.",
       keywords:
         "thermal vs cold fogging machine, thermal vs ulv fogger, which fogging machine to buy, cold fogger vs thermal fogger, fogging machine comparison india",
     },
