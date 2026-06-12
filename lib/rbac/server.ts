@@ -4,6 +4,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { verifyJWT, SESSION_COOKIE } from "./jwt"
 import { hasPermission } from "./roles"
+import { isSessionRevoked } from "./sessions"
 import type { JWTPayload, AuditAction, DBAuditLog } from "./types"
 import type { Permission } from "./permissions"
 import clientPromise from "@/lib/mongodb"
@@ -14,7 +15,14 @@ export async function getCurrentUser(request: NextRequest): Promise<JWTPayload |
   const token = request.cookies.get(SESSION_COOKIE)?.value
   if (!token) return null
 
-  return verifyJWT(token)
+  const payload = await verifyJWT(token)
+  if (!payload) return null
+
+  // Enforce session revocation: a session revoked in DB must be rejected
+  // even if the JWT signature is still valid (JWT TTL up to 24h).
+  if (payload.sessionId && await isSessionRevoked(payload.sessionId)) return null
+
+  return payload
 }
 
 // ── Permission checking ───────────────────────────────────────────────────────

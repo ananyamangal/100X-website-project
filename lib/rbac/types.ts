@@ -106,7 +106,7 @@ export interface DBAuditLog {
 }
 
 export type AuditAction =
-  | "login" | "logout" | "login_failed"
+  | "login" | "logout" | "login_failed" | "google_login" | "google_login_failed"
   | "export" | "delete" | "create" | "edit"
   | "permission_change" | "role_change"
   | "user_disabled" | "user_enabled"

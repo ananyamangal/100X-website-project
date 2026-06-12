@@ -13,6 +13,9 @@ export type AuthAuditAction =
   | "account_unlocked"
   | "reset_token_expired"
   | "reset_token_used"
+  | "google_login"
+  | "google_login_failed"
+  | "oauth_state_invalid"
 
 export interface AuthAuditEntry {
   _id?:      string

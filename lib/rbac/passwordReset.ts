@@ -5,7 +5,7 @@
 import { createHash, randomBytes } from "crypto"
 import clientPromise from "@/lib/mongodb"
 
-const TOKEN_EXPIRY_MS         = 30 * 60 * 1000   // 30 minutes
+const TOKEN_EXPIRY_MS         = 60 * 60 * 1000   // 60 minutes
 const MAX_PER_EMAIL_PER_HOUR  = 5
 const MAX_PER_IP_PER_HOUR     = 20
 

@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { Shield, Monitor, Key, Clock, Users, AlertTriangle, FileText, Mail, Search, Trash2 } from "lucide-react"
+import { Shield, Monitor, Key, Clock, Users, AlertTriangle, FileText, Mail, Search, Trash2, Activity, Wifi, Layers } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 
 export default function SecurityPage() {
@@ -48,11 +48,25 @@ export default function SecurityPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[
             {
+              href:  "/admin/growth/security/auth-health",
+              icon:  Activity,
+              label: "Auth Health",
+              desc:  "Live traffic-light dashboard: users, sessions, failed logins, email delivery.",
+              color: "text-green-600 bg-green-50",
+            },
+            {
+              href:  "/admin/growth/security/session-center",
+              icon:  Layers,
+              label: "Session Center",
+              desc:  "View all sessions, terminate individual sessions, emergency kill switch.",
+              color: "text-blue-600 bg-blue-50",
+            },
+            {
               href:  "/admin/growth/security/sessions",
               icon:  Monitor,
               label: "Active Sessions",
-              desc:  "View devices, IPs, and login times. Sign out individual sessions.",
-              color: "text-blue-600 bg-blue-50",
+              desc:  "My sessions — view devices, IPs, login times, sign out.",
+              color: "text-sky-600 bg-sky-50",
             },
             {
               href:  "/admin/growth/security/sessions",
@@ -66,7 +80,7 @@ export default function SecurityPage() {
               icon:  Users,
               label: "User Management",
               desc:  "Manage team members and their roles.",
-              color: "text-green-600 bg-green-50",
+              color: "text-teal-600 bg-teal-50",
             },
             {
               href:  "/admin/growth/audit/permissions",
@@ -81,6 +95,13 @@ export default function SecurityPage() {
               label: "Auth Audit Log",
               desc:  "Login history, failed attempts, and password change events.",
               color: "text-indigo-600 bg-indigo-50",
+            },
+            {
+              href:  "/admin/growth/security/email-diagnostics",
+              icon:  Wifi,
+              label: "Email Diagnostics",
+              desc:  "SMTP connection status, last email sent/failed, delivery success rate.",
+              color: "text-cyan-600 bg-cyan-50",
             },
             {
               href:  "/admin/growth/security/email-templates",
