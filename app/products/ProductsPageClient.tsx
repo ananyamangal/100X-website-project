@@ -5,6 +5,7 @@ import { ArrowRight, Download, MessageCircle, Star } from 'lucide-react'
 import ScrollReveal from '@/components/cinematic/ScrollReveal'
 import BrochureLeadModal from '@/components/BrochureLeadModal'
 import { BUSINESS } from '@/lib/seo/site-config'
+import { getProductCanonicalUrl } from '@/lib/seo/product-landing-map'
 
 const badgeLogoMap: Record<string, string> = {
   'German Technology':  '/Logos clipart 2/german technology.png',
@@ -42,6 +43,7 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
   const images: string[] = product.imageUrls?.length ? product.imageUrls : ['/placeholder.svg']
   const id = product._id
   const productPath = product.slug || id
+  const productUrl = getProductCanonicalUrl(productPath)
 
   const wa = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(
     product.whatsappMessageText || `Hi, I'm interested in ${product.name}. Please share pricing and availability.`
@@ -50,7 +52,7 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
   return (
     <div className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg hover:border-brand-200 transition-all duration-300 hover:-translate-y-1 flex flex-col">
       {/* Image area */}
-      <Link href={`/products/${productPath}`} className="block relative overflow-hidden bg-gray-50 aspect-[4/3]">
+      <Link href={{productUrl}} className="block relative overflow-hidden bg-gray-50 aspect-[4/3]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={images[imgIdx]}
@@ -98,7 +100,7 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
         {product.category && (
           <p className="eyebrow text-brand-600 mb-1.5">{product.category}</p>
         )}
-        <Link href={`/products/${productPath}`}>
+        <Link href={{productUrl}}>
           <h3 className="font-700 text-gray-900 text-base leading-snug mb-2 group-hover:text-brand-700 transition-colors line-clamp-2">{product.name}</h3>
         </Link>
         {product.tagline && (
@@ -123,7 +125,7 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
         )}
         <div className="flex gap-2 mt-auto pt-3 border-t border-gray-50">
           <Link
-            href={`/products/${productPath}`}
+            href={{productUrl}}
             className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-600 rounded-xl text-sm transition-all"
           >
             View Details <ArrowRight size={13} />

@@ -5,6 +5,7 @@ import { getAllProductsForSitemap } from "@/lib/productsQuery"
 import { getAllLandingPages } from "@/lib/seo/landing-pages"
 import { DEFAULT_SITEMAP_BY_TYPE } from "@/lib/seo/landing-types"
 import { blogPostSlug } from "@/lib/blogSlug"
+import { PRODUCT_LANDING_MAP } from "@/lib/seo/product-landing-map"
 
 /**
  * Static, hand-curated routes that are always present in the sitemap.
@@ -154,6 +155,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const lastModified = toDate(product.updatedAt) ?? now
     // Use SEO slug if available; fall back to ObjectId for products not yet migrated
     const productPath = product.slug || product.id
+    // Skip products that have a canonical SEO landing page — the landing page
+    // URL is already included above via getAllLandingPages(). Including the
+    // /products/ URL here would create a duplicate sitemap entry that search
+    // engines would treat as a second indexable URL for the same content.
+    if (PRODUCT_LANDING_MAP[productPath] || PRODUCT_LANDING_MAP[product.id]) continue
     entries.push({
       url: `${SITE_URL}/products/${productPath}`,
       lastModified,

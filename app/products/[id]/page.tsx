@@ -8,6 +8,7 @@ import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import RelatedProductsSection from "@/components/RelatedProductsSection"
 import { getProductBySlugOrId } from "@/lib/productsQuery"
+import { PRODUCT_LANDING_MAP } from "@/lib/seo/product-landing-map"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import ProductAiSummary from "@/components/seo/ProductAiSummary"
@@ -106,13 +107,24 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
     if (!adminToken) notFound()
   }
 
-  // Legacy ObjectId URL → 308 permanent redirect to slug URL
+  // Legacy ObjectId URL → redirect. If the product has a canonical SEO
+  // landing page, go there directly (single hop). Otherwise fall through
+  // to the slug-based URL.
   if (result?.resolvedBy === "id") {
     const product = result.product
     const slug = typeof product.slug === "string" ? product.slug : null
     if (slug) {
-      permanentRedirect(`/products/${slug}`)
+      const landingSlug = PRODUCT_LANDING_MAP[slug]
+      permanentRedirect(landingSlug ? `/${landingSlug}` : `/products/${slug}`)
     }
+  }
+
+  // Slug-based URL that has a canonical SEO landing page → redirect there.
+  // next.config.mjs static redirects handle this at the edge layer, but this
+  // is a runtime safety net for any slug that slips through (e.g. new aliases).
+  if (result?.resolvedBy === "slug") {
+    const landingSlug = PRODUCT_LANDING_MAP[id]
+    if (landingSlug) permanentRedirect(`/${landingSlug}`)
   }
 
   const product = result?.product ?? null

@@ -23,6 +23,28 @@ const nextConfig = {
         destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400',
         permanent: true,
       },
+
+      // ── Product canonical redirects ──────────────────────────────────────
+      // These 3 products have SEO landing pages at their canonical URLs.
+      // Every /products/<slug-or-id> variant must 301 to the SEO URL so no
+      // two URLs both return 200 for the same product.
+      // Evaluated at the edge layer — no route handler is invoked.
+
+      // Thermal & Cold Fogging Machine 100XTFS50
+      { source: '/products/thermal-cold-fogging-machine-100xtfs50-90602f',  destination: '/thermal-and-cold-fogging-machine-100xtfs50', permanent: true },
+      { source: '/products/thermal-cold-fogging-machine-100xtfs50-290275',  destination: '/thermal-and-cold-fogging-machine-100xtfs50', permanent: true },
+      { source: '/products/68e5217a0bab18231190602f',                       destination: '/thermal-and-cold-fogging-machine-100xtfs50', permanent: true },
+      { source: '/products/6a1fccbf04cb8e079f290275',                       destination: '/thermal-and-cold-fogging-machine-100xtfs50', permanent: true },
+
+      // Stainless Steel Thermal Fogger 100XSSMA20
+      { source: '/products/thermal-fogging-machine-with-stainless-steel-tank-100xssma20-1b5dd8', destination: '/thermal-fogging-machine-with-stainless-steel-tank-100xssma20', permanent: true },
+      { source: '/products/68e523cd8d624609ac1b5dd8',                                           destination: '/thermal-fogging-machine-with-stainless-steel-tank-100xssma20', permanent: true },
+
+      // Double Barrel Vehicle-Mountable Fogger 100XDB400
+      { source: '/products/100xdb400-double-barrel-thermal-fogging-machine-vehicle-moun-f377e0', destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
+      { source: '/products/double-barrel-thermal-fogging-machine-vehicle-mounted',               destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
+      { source: '/products/68e52538f84599d156f377e0',                                            destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
+      { source: '/products/6a1e6c08ef20ab52efaa3d69',                                            destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
     ]
   },
 

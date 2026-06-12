@@ -1,6 +1,7 @@
 ﻿import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { getRelatedProducts } from "@/lib/productsQuery"
+import { getProductCanonicalUrl } from "@/lib/seo/product-landing-map"
 
 type Props = {
   category: string | undefined
@@ -56,7 +57,7 @@ export default async function RelatedProductsSection({
             return (
               <li key={p.id}>
                 <Link
-                  href={`/products/${p.slug || p.id}`}
+                  href={getProductCanonicalUrl(p.slug || p.id)}
                   className="group block bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                 >
                   <div className="aspect-[4/3] bg-gray-100 overflow-hidden">

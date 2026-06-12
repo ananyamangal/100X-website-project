@@ -4,6 +4,7 @@ import React from "react"
 import Link from "next/link"
 import { ArrowRight, MessageCircle } from "lucide-react"
 import { BUSINESS } from "@/lib/seo/site-config"
+import { getProductCanonicalUrl } from "@/lib/seo/product-landing-map"
 
 interface Product {
   _id?: string
@@ -30,6 +31,7 @@ interface Props {
 export default function CinematicProductCard({ product, index = 0, onBrochureDownload }: Props) {
   const id = product._id || product.id || ""
   const productPath = product.slug || id
+  const productUrl = getProductCanonicalUrl(productPath)
   const img = product.imageUrls?.[0] || "/placeholder.svg"
   const waText = product.whatsappMessageText || `Hi, I'm interested in ${product.name}. Please share pricing.`
   const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waText)}`
@@ -40,7 +42,7 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
       style={{ animationDelay: `${index * 80}ms` }}
     >
       {/* Image — no overlapping overlays, clean aspect ratio */}
-      <Link href={`/products/${productPath}`} className="block relative overflow-hidden bg-gray-50/60 aspect-[4/3]">
+      <Link href={{productUrl}} className="block relative overflow-hidden bg-gray-50/60 aspect-[4/3]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={img}
@@ -79,7 +81,7 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
         </div>
 
         <h3 className="font-700 text-gray-900 text-[1.0625rem] leading-snug mb-2 group-hover:text-brand-700 transition-colors line-clamp-2">
-          <Link href={`/products/${productPath}`}>
+          <Link href={{productUrl}}>
             {product.name}
           </Link>
         </h3>
@@ -92,7 +94,7 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
         {/* CTA row */}
         <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
           <Link
-            href={`/products/${productPath}`}
+            href={{productUrl}}
             className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-600 text-brand-700 bg-brand-50 hover:bg-brand-100 px-3 py-2.5 rounded-full transition-colors"
           >
             Details <ArrowRight size={12} />

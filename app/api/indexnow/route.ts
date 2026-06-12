@@ -14,12 +14,10 @@ const STATIC_URLS = [
   "/videos",
   "/deployments",
 
-  // Products
+  // Products — only canonical URLs.
+  // /products/ variants that have SEO landing pages are omitted; they 301
+  // to the landing page URL which is listed under "Landing pages" below.
   "/products",
-  "/products/100xdb400-double-barrel-thermal-fogging-machine-vehicle-moun-aa3d69",
-  "/products/100xdb400-double-barrel-thermal-fogging-machine-vehicle-moun-f377e0",
-  "/products/thermal-cold-fogging-machine-100xtfs50-90602f",
-  "/products/thermal-fogging-machine-with-stainless-steel-tank-100xssma20-1b5dd8",
   "/products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde",
   "/products/small-mini-fogger-100xkb200-f377e1",
   "/products/passenger-baggage-trolleys-stainless-steel-with-brakes-100xa-00664d",
