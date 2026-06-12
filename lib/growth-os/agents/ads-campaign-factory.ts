@@ -48,6 +48,7 @@ import {
 import { runKeywordIntelligence, type GeneratedKeyword, type AdGroupTheme } from "@/lib/growth-os/ads-keyword-intelligence"
 import { runNegativeIntelligence }                       from "@/lib/growth-os/ads-negative-intelligence"
 import { runAdCopyFactory }                              from "@/lib/growth-os/ads-copy-factory"
+import type { NegativeDraftV2 }                          from "@/lib/growth-os/types"
 
 const AGENT = "ads-campaign-factory"
 
@@ -123,7 +124,7 @@ async function persistCampaignPlan(opts: {
     negRunId:     string
     copyRunId:    string
     byTheme:      Record<string, GeneratedKeyword[]>
-    negatives:    unknown[]
+    negatives:    NegativeDraftV2[]
     adCopyVariants: unknown[]
   }
 }): Promise<string> {
@@ -486,7 +487,13 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
       negRunId:       negRun.runId,
       copyRunId:      copyRun.runId,
       byTheme:        finalByTheme,
-      negatives:      negRun.negatives,
+      negatives:      negRun.negatives.map(n => ({
+        text:       n.text,
+        matchType:  n.matchType === "BROAD" ? "PHRASE" : n.matchType,
+        reason:     n.reason,
+        confidence: n.confidence,
+        category:   n.source,
+      })),
       adCopyVariants: copyRun.variants,
     },
   })

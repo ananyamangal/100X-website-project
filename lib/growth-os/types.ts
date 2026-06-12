@@ -1,3 +1,15 @@
+// ── Campaign / Negative keyword shared types ──────────────────────────────────
+// Single definition consumed by campaign-factory-v2 (server) and UI pages (client).
+
+export interface NegativeDraftV2 {
+  text:       string
+  matchType:  "EXACT" | "PHRASE"
+  reason:     string
+  confidence: number
+  category:   string
+}
+
+// ── Growth OS primitives ───────────────────────────────────────────────────────
 export type LogLevel = "info" | "warning" | "error" | "success"
 export type RiskLevel = "low" | "medium" | "high"
 export type Status = "active" | "paused" | "disabled" | "pending"

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import type { NegativeDraftV2 } from "@/lib/growth-os/types"
 import {
   CheckCircle, XCircle, Edit3, RefreshCw, PlayCircle,
   AlertTriangle, Info, ChevronDown, ChevronUp, Zap,
@@ -46,7 +47,7 @@ interface CampaignPlan {
   status:         string
   simulated:      boolean
   adGroups:       AdGroup[]
-  campaignNegatives: Array<string | { text: string }>
+  campaignNegatives: NegativeDraftV2[]
   landingPageRecs: LandingRec[]
   qualityScores:  QualityScores
   execHeader:     { confidence: number; roi: string; risk: string; priority: string; recommendation: string }
@@ -257,7 +258,7 @@ function PlanCard({ plan, onAction }: { plan: CampaignPlan; onAction: () => void
             <div className="flex flex-wrap gap-1.5">
               {plan.campaignNegatives.map((neg, i) => (
                 <span key={i} className="text-[11px] bg-red-950/40 text-red-400 border border-red-900/40 px-2 py-0.5 rounded">
-                  -{typeof neg === "string" ? neg : neg.text}
+                  -{neg.text}
                 </span>
               ))}
             </div>

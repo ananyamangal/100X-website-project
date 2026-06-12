@@ -220,6 +220,7 @@ Non-negotiable, reinforced from existing governance rules:
 - **No** automatic publishing · spending · budget increases · campaign launches.
 - The system **may** create: drafts, recommendations, draft campaigns, content drafts.
 - **Every executing action requires admin approval** (APPROVE / REJECT / MODIFY).
+
 - Every recommendation carries: **Confidence (0–100) · Expected ROI (L/M/H) · Risk (L/M/H) · Priority (Critical/Important/Optional)** + business rationale.
 
 ---

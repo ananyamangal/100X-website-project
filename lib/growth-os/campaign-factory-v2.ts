@@ -88,13 +88,8 @@ export interface KeywordDraftV2 {
   rationale:       string
 }
 
-export interface NegativeDraftV2 {
-  text:       string
-  matchType:  "EXACT" | "PHRASE"
-  reason:     string
-  confidence: number
-  category:   string
-}
+import type { NegativeDraftV2 } from "./types"
+export type { NegativeDraftV2 }
 
 export interface AdGroupDraftV2 {
   name:                 string

@@ -7,6 +7,8 @@ import {
   Shield, Layers, Key, BarChart3, ArrowRight, Rocket, Eye, Edit3,
 } from "lucide-react"
 
+import type { NegativeDraftV2 } from "@/lib/growth-os/types"
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface QualityScores {
@@ -55,7 +57,7 @@ interface CampaignPlan {
   status:              string
   simulated:           boolean
   adGroups:            AdGroup[]
-  campaignNegatives:   string[] | Array<{ text: string; confidence?: number; source?: string }>
+  campaignNegatives:   NegativeDraftV2[]
   landingPageRecs:     LandingRec[]
   qualityScores:       QualityScores
   execHeader:          { confidence: number; roi: string; risk: string; priority: string; recommendation: string }
@@ -154,8 +156,8 @@ function ReadinessChip({ ok, label }: { ok: boolean; label: string }) {
   )
 }
 
-function negText(n: string | { text: string }): string {
-  return typeof n === "string" ? n : n.text
+function negText(n: NegativeDraftV2): string {
+  return n.text
 }
 
 // ── Tab content components ────────────────────────────────────────────────────
