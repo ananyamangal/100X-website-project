@@ -152,6 +152,7 @@ export type LandingSection =
   /** Headline + paragraphs — back-compat shape for the existing 3 entries. */
   | { kind: "rich-text"; h2: string; paragraphs: string[] }
   | { kind: "trust-strip"; metrics: TrustMetric[] }
+  | { kind: "video"; url: string; title?: string; description?: string }
   | {
       kind: "benefits-grid"
       eyebrow?: string

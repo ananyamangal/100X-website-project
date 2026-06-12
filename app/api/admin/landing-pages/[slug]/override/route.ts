@@ -113,7 +113,7 @@ export async function PUT(
     const prevOverrides = (existing?.overrides ?? {}) as Record<string, unknown>
 
     const fieldsChanged: string[] = []
-    for (const section of ["metadata", "hero", "faqs", "relatedLandingSlugs"] as const) {
+    for (const section of ["metadata", "hero", "faqs", "relatedLandingSlugs", "sections"] as const) {
       if (overrides[section] !== undefined) {
         if (JSON.stringify(prevOverrides[section] ?? null) !== JSON.stringify(overrides[section])) {
           fieldsChanged.push(section)

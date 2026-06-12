@@ -1,15 +1,16 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useState, useEffect, useCallback } from "react"
+import { useParams } from "next/navigation"
 import Link from "next/link"
 import {
   ArrowLeft, Save, Eye, AlertCircle, CheckCircle2, Plus, Trash2,
   ChevronUp, ChevronDown, X, Clock, User, GitCompare, Info,
-  ExternalLink, GripVertical, RotateCcw, History,
+  ExternalLink, RotateCcw, History,
 } from "lucide-react"
 import { getAllLandingPages, getLandingPage } from "@/lib/seo/landing-pages"
-import type { LandingPageDef, FaqEntry } from "@/lib/seo/landing-pages"
+import type { LandingPageDef, FaqEntry, LandingSection } from "@/lib/seo/landing-types"
+import { SectionsTab } from "./SectionsTab"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -21,6 +22,7 @@ type FormState = {
     description: string
     ogTitle: string
     ogDescription: string
+    ogImage: string
   }
   hero: {
     headline: string
@@ -30,15 +32,17 @@ type FormState = {
   }
   faqs: FaqRow[]
   relatedLandingSlugs: string[]
+  sections: LandingSection[]
 }
 
 type OverrideDoc = {
   slug: string
   overrides: {
-    metadata?: { title?: string; description?: string; ogTitle?: string; ogDescription?: string }
+    metadata?: { title?: string; description?: string; ogTitle?: string; ogDescription?: string; ogImage?: string }
     hero?: { headline?: string; sub?: string; primary?: { label?: string; href?: string } }
     faqs?: FaqEntry[]
     relatedLandingSlugs?: string[]
+    sections?: LandingSection[]
   }
   modifiedBy: string
   modifiedByName: string
@@ -54,7 +58,7 @@ type AuditEntry = {
   snapshot?: Record<string, unknown>
 }
 
-type Tab = "seo" | "hero" | "faqs" | "related"
+type Tab = "seo" | "hero" | "sections" | "faqs" | "related"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -76,6 +80,7 @@ function buildForm(def: LandingPageDef, override: OverrideDoc | null): FormState
       description:   ov.metadata?.description   ?? def.metadata.description,
       ogTitle:       ov.metadata?.ogTitle        ?? "",
       ogDescription: ov.metadata?.ogDescription  ?? "",
+      ogImage:       ov.metadata?.ogImage        ?? def.metadata.ogImage ?? "",
     },
     hero: {
       headline:     ov.hero?.headline     ?? headlineText(def.hero?.headline),
@@ -85,6 +90,7 @@ function buildForm(def: LandingPageDef, override: OverrideDoc | null): FormState
     },
     faqs: (ov.faqs ?? def.faqs ?? []).map(f => ({ ...f, id: uid() })),
     relatedLandingSlugs: ov.relatedLandingSlugs ?? def.relatedLandingSlugs ?? [],
+    sections: (ov.sections as LandingSection[] | undefined) ?? def.sections ?? [],
   }
 }
 
@@ -95,6 +101,7 @@ function buildStatic(def: LandingPageDef): FormState {
       description:   def.metadata.description,
       ogTitle:       "",
       ogDescription: "",
+      ogImage:       def.metadata.ogImage ?? "",
     },
     hero: {
       headline:     headlineText(def.hero?.headline),
@@ -104,6 +111,7 @@ function buildStatic(def: LandingPageDef): FormState {
     },
     faqs: (def.faqs ?? []).map(f => ({ ...f, id: uid() })),
     relatedLandingSlugs: def.relatedLandingSlugs ?? [],
+    sections: def.sections ?? [],
   }
 }
 
@@ -114,6 +122,7 @@ function buildOverridesPayload(form: FormState): Record<string, unknown> {
       description:   form.metadata.description,
       ogTitle:       form.metadata.ogTitle,
       ogDescription: form.metadata.ogDescription,
+      ogImage:       form.metadata.ogImage,
     },
     hero: {
       headline:     form.hero.headline,
@@ -125,7 +134,57 @@ function buildOverridesPayload(form: FormState): Record<string, unknown> {
     },
     faqs: form.faqs.map(({ id: _id, ...f }) => f),
     relatedLandingSlugs: form.relatedLandingSlugs,
+    sections: form.sections,
   }
+}
+
+// ─── Health score ─────────────────────────────────────────────────────────────
+
+type HealthCheck = { label: string; pass: boolean; weight: number; tip?: string }
+
+function computeHealth(form: FormState, pageType: string): HealthCheck[] {
+  const isLegacy = pageType === "product"
+  return [
+    { label: "Meta title present",           pass: !!form.metadata.title.trim(),                                  weight: 20 },
+    { label: "Meta description ≥ 50 chars",  pass: form.metadata.description.trim().length >= 50,                 weight: 15 },
+    { label: "Meta description ≤ 160 chars", pass: form.metadata.description.trim().length <= 160,                weight: 10, tip: "Over 160 chars gets truncated in SERPs" },
+    { label: "Hero headline (H1) present",   pass: !isLegacy && !!form.hero.headline.trim(),                      weight: 20 },
+    { label: "Primary CTA configured",       pass: !isLegacy && !!form.hero.primaryLabel.trim() && !!form.hero.primaryHref.trim(), weight: 15 },
+    { label: "At least 1 FAQ",               pass: form.faqs.length > 0,                                         weight: 10 },
+    { label: "OG Image set",                 pass: !!form.metadata.ogImage.trim(),                                weight: 5,  tip: "Improves social share appearance" },
+    { label: "Has body sections",            pass: isLegacy || form.sections.length > 0,                          weight: 5 },
+  ]
+}
+
+function HealthScore({ form, pageType }: { form: FormState; pageType: string }) {
+  const checks = computeHealth(form, pageType)
+  const score = checks.filter(c => c.pass).reduce((sum, c) => sum + c.weight, 0)
+  const color = score >= 85 ? "green" : score >= 60 ? "amber" : "red"
+  const colorMap = { green: "text-green-700 bg-green-50 border-green-200", amber: "text-amber-700 bg-amber-50 border-amber-200", red: "text-red-700 bg-red-50 border-red-200" }
+  const barMap  = { green: "bg-green-500", amber: "bg-amber-500", red: "bg-red-500" }
+  const failing = checks.filter(c => !c.pass)
+  return (
+    <div className={`border rounded-xl p-4 ${colorMap[color]}`}>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs font-bold">Content Health Score</p>
+        <span className="text-lg font-black">{score}<span className="text-xs font-normal opacity-60">/100</span></span>
+      </div>
+      <div className="h-2 bg-white/60 rounded-full overflow-hidden mb-3">
+        <div className={`h-full rounded-full transition-all ${barMap[color]}`} style={{ width: `${score}%` }} />
+      </div>
+      {failing.length > 0 && (
+        <div className="space-y-1">
+          {failing.map(c => (
+            <p key={c.label} className="text-[11px] flex items-start gap-1.5 opacity-80">
+              <span className="shrink-0 mt-0.5">✗</span>
+              <span>{c.label}{c.tip ? <em className="opacity-70 ml-1">— {c.tip}</em> : null}</span>
+            </p>
+          ))}
+        </div>
+      )}
+      {failing.length === 0 && <p className="text-xs font-medium opacity-80">All checks pass — excellent SEO health!</p>}
+    </div>
+  )
 }
 
 // ─── Diff computation ─────────────────────────────────────────────────────────
@@ -138,6 +197,7 @@ function computeDiff(form: FormState, base: FormState): FieldDiff[] {
     { label: "Meta description",  staticVal: base.metadata.description,   currentVal: form.metadata.description,   changed: form.metadata.description   !== base.metadata.description },
     { label: "OG title",          staticVal: base.metadata.ogTitle,       currentVal: form.metadata.ogTitle,       changed: form.metadata.ogTitle       !== base.metadata.ogTitle },
     { label: "OG description",    staticVal: base.metadata.ogDescription, currentVal: form.metadata.ogDescription, changed: form.metadata.ogDescription !== base.metadata.ogDescription },
+    { label: "OG image",          staticVal: base.metadata.ogImage,       currentVal: form.metadata.ogImage,       changed: form.metadata.ogImage       !== base.metadata.ogImage },
     { label: "Hero headline",     staticVal: base.hero.headline,          currentVal: form.hero.headline,          changed: form.hero.headline          !== base.hero.headline },
     { label: "Hero subheadline",  staticVal: base.hero.sub,               currentVal: form.hero.sub,               changed: form.hero.sub               !== base.hero.sub },
     { label: "CTA label",         staticVal: base.hero.primaryLabel,      currentVal: form.hero.primaryLabel,      changed: form.hero.primaryLabel      !== base.hero.primaryLabel },
@@ -162,6 +222,16 @@ function computeDiff(form: FormState, base: FormState): FieldDiff[] {
     staticVal:  base.relatedLandingSlugs.join(", ") || "none",
     currentVal: form.relatedLandingSlugs.join(", ") || "none",
     changed:    staticRel !== formRel,
+  })
+
+  // Sections diff
+  const staticSec = JSON.stringify(base.sections)
+  const formSec   = JSON.stringify(form.sections)
+  diffs.push({
+    label:      "Sections",
+    staticVal:  `${base.sections.length} section${base.sections.length !== 1 ? "s" : ""}`,
+    currentVal: `${form.sections.length} section${form.sections.length !== 1 ? "s" : ""}`,
+    changed:    staticSec !== formSec,
   })
 
   return diffs
@@ -306,12 +376,19 @@ function SeoTab({ form, errors, set }: {
           placeholder="Leave blank to inherit Meta Title" />
         <Field label="OG Description" value={form.ogDescription} onChange={v => set("ogDescription", v)}
           placeholder="Leave blank to inherit Meta Description" as="textarea" rows={3} />
+        <Field label="OG Image URL" value={form.ogImage} onChange={v => set("ogImage", v)}
+          placeholder="https://res.cloudinary.com/... or /images/..." />
         <div className="mt-2 bg-gray-50 border border-gray-200 rounded-lg p-3.5">
           <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider mb-1.5">Social Preview (approx)</p>
           <div className="bg-white border border-gray-200 rounded p-3">
-            <div className="w-full h-16 bg-gradient-to-r from-gray-100 to-gray-200 rounded mb-2 flex items-center justify-center">
-              <span className="text-[10px] text-gray-400">OG Image from metadata.ogImage</span>
-            </div>
+            {form.ogImage
+              ? <img src={form.ogImage} alt="OG preview" className="w-full h-20 object-cover rounded mb-2" />
+              : (
+                <div className="w-full h-16 bg-gradient-to-r from-gray-100 to-gray-200 rounded mb-2 flex items-center justify-center">
+                  <span className="text-[10px] text-gray-400">Paste an OG Image URL above to preview</span>
+                </div>
+              )
+            }
             <p className="text-xs font-bold text-gray-900 line-clamp-1">{form.ogTitle || form.title || "—"}</p>
             <p className="text-[11px] text-gray-600 line-clamp-2 mt-0.5">{form.ogDescription || form.description || "—"}</p>
             <p className="text-[10px] text-gray-400 mt-1">100xcircle.com</p>
@@ -631,7 +708,6 @@ function AuditHistory({
 
 export default function LandingPageEditPage() {
   const { slug } = useParams<{ slug: string }>()
-  const router = useRouter()
 
   const def = getLandingPage(slug)
 
@@ -801,6 +877,10 @@ export default function LandingPageEditPage() {
     setForm(f => f ? { ...f, relatedLandingSlugs: slugs } : f)
   }
 
+  function setSections(sections: LandingSection[]) {
+    setForm(f => f ? { ...f, sections } : f)
+  }
+
   // ─── Guard: page not in registry ─────────────────────────────────────────
 
   if (!def) {
@@ -833,11 +913,13 @@ export default function LandingPageEditPage() {
 
   const diffs        = computeDiff(form, staticBase)
   const changedCount = diffs.filter(d => d.changed).length
+  const sectionsChanged = diffs.find(d => d.label === "Sections")?.changed ?? false
   const TABS: { id: Tab; label: string; badge?: number }[] = [
-    { id: "seo",     label: "SEO",          badge: ["title","description","ogTitle","ogDescription"].filter(k => diffs.find(d => d.label.toLowerCase().includes(k.split(/(?=[A-Z])/).join(" ").toLowerCase()) && d.changed)).length || undefined },
-    { id: "hero",    label: "Hero" },
-    { id: "faqs",    label: `FAQs (${form.faqs.length})` },
-    { id: "related", label: "Related Pages" },
+    { id: "seo",      label: "SEO",                    badge: ["Meta title","Meta description","OG title","OG description","OG image"].filter(label => diffs.find(d => d.label === label && d.changed)).length || undefined },
+    { id: "hero",     label: "Hero" },
+    { id: "sections", label: `Sections (${form.sections.length})`, badge: sectionsChanged ? 1 : undefined },
+    { id: "faqs",     label: `FAQs (${form.faqs.length})` },
+    { id: "related",  label: "Related Pages" },
   ]
 
   const titleDisplay = def.metadata.title.split(" | ")[0]
@@ -922,10 +1004,11 @@ export default function LandingPageEditPage() {
             ))}
           </div>
           <div className="p-5">
-            {tab === "seo"     && <SeoTab     form={form.metadata} errors={fieldErrors} set={setMeta} />}
-            {tab === "hero"    && <HeroTab    form={form.hero}     errors={fieldErrors} set={setHero} />}
-            {tab === "faqs"    && <FaqsTab    faqs={form.faqs}    setFaqs={setFaqs} />}
-            {tab === "related" && <RelatedTab slugs={form.relatedLandingSlugs} setSlugs={setRelated} currentSlug={slug} />}
+            {tab === "seo"      && <SeoTab      form={form.metadata} errors={fieldErrors} set={setMeta} />}
+            {tab === "hero"     && <HeroTab     form={form.hero}     errors={fieldErrors} set={setHero} />}
+            {tab === "sections" && <SectionsTab sections={form.sections} setSections={setSections} pageType={def.type} />}
+            {tab === "faqs"     && <FaqsTab     faqs={form.faqs}     setFaqs={setFaqs} />}
+            {tab === "related"  && <RelatedTab  slugs={form.relatedLandingSlugs} setSlugs={setRelated} currentSlug={slug} />}
           </div>
         </div>
 
@@ -942,6 +1025,9 @@ export default function LandingPageEditPage() {
             </ul>
           </div>
         )}
+
+        {/* Health score */}
+        <HealthScore form={form} pageType={def.type} />
 
         {/* Save bar */}
         <div className="bg-white border border-gray-200 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
@@ -977,8 +1063,7 @@ export default function LandingPageEditPage() {
 
         {/* Stage note */}
         <p className="text-[10px] text-gray-400 text-center pb-2">
-          Stage C active · Overrides merge at render time via <code>getMergedLandingPage</code> ·
-          Save and Revert trigger <code>revalidatePath</code> on the live page
+          Finalization Phase D1–D5 active · Sections, health score, OG image, video embed · Overrides merge via <code>getMergedLandingPage</code> · Save triggers <code>revalidatePath</code>
         </p>
       </div>
 

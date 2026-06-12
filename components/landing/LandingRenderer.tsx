@@ -23,6 +23,7 @@ import FaqBlock from "./FaqBlock"
 import CtaBandBlock from "./CtaBandBlock"
 import RichTextBlock from "./RichTextBlock"
 import LandingFormBlock from "./LandingFormBlock"
+import VideoBlock from "./VideoBlock"
 
 type Props = { slug: string }
 
@@ -139,6 +140,8 @@ function renderSection(section: LandingSection, def: LandingPageDef, idx: number
       return <LandingFormBlock key={idx} block={section} landingSlug={def.slug} />
     case "cta-band":
       return <CtaBandBlock key={idx} band={section.band} />
+    case "video":
+      return <VideoBlock key={idx} url={section.url} title={section.title} description={section.description} />
     default:
       // Exhaustiveness guard — unreachable.
       return null

@@ -20,6 +20,7 @@ const OverridesSchema = z.object({
       description:   z.string().optional(),
       ogTitle:       z.string().optional(),
       ogDescription: z.string().optional(),
+      ogImage:       z.string().optional(),
     })
     .optional(),
   hero: z
@@ -36,6 +37,9 @@ const OverridesSchema = z.object({
     .optional(),
   faqs:                z.array(FaqSchema).optional(),
   relatedLandingSlugs: z.array(z.string()).optional(),
+  // sections: loosely typed so any section shape is accepted; the renderer
+  // does its own runtime discrimination, and Zod .strip() already drops unknowns.
+  sections: z.array(z.object({ kind: z.string() }).passthrough()).optional(),
 })
 
 type Overrides = z.infer<typeof OverridesSchema>
@@ -76,6 +80,9 @@ function applyOverride(def: LandingPageDef, ov: Overrides): LandingPageDef {
 
   if (ov.faqs               !== undefined) merged.faqs               = ov.faqs
   if (ov.relatedLandingSlugs !== undefined) merged.relatedLandingSlugs = ov.relatedLandingSlugs
+  // Sections override replaces the static array entirely (not deep-merged),
+  // so the editor has full authoring control over page structure.
+  if (ov.sections !== undefined) merged.sections = ov.sections as import("./landing-types").LandingSection[]
 
   return merged
 }

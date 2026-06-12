@@ -75,7 +75,7 @@ export default function SiteFooter({
   logoAlt = "100X Circle — Thermal Fogging Machine Manufacturer",
   trustBadges,
 }: SiteFooterProps) {
-  const landingPages = getAllLandingPages().slice(0, 7)
+  const landingPages = getAllLandingPages()
   const badges = trustBadges && trustBadges.length > 0 ? trustBadges : DEFAULT_TRUST_BADGES
 
   return (
