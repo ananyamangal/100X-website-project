@@ -72,9 +72,9 @@ export async function GET(request: NextRequest) {
     return loginRedirect(request, "google_state_expired")
   }
 
-  const clientId     = process.env.GOOGLE_OAUTH_CLIENT_ID ?? ""
-  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET ?? ""
-  const redirectUri  = process.env.GOOGLE_OAUTH_REDIRECT_URI ?? ""
+  const clientId     = (process.env.GOOGLE_LOGIN_CLIENT_ID ?? "").trim()
+  const clientSecret = (process.env.GOOGLE_LOGIN_CLIENT_SECRET ?? "").trim()
+  const redirectUri  = (process.env.GOOGLE_LOGIN_REDIRECT_URI ?? "").trim()
 
   // ── Exchange authorization code + PKCE verifier for access token ───────────
   const tokens = await exchangeCodeForTokens({

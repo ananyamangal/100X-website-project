@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { Shield, Monitor, Key, Clock, Users, AlertTriangle, FileText, Mail, Search, Trash2, Activity, Wifi, Layers } from "lucide-react"
+import { Shield, Monitor, Key, Clock, Users, AlertTriangle, FileText, Mail, Search, Trash2, Activity, Wifi, Layers, Globe } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 
 export default function SecurityPage() {
@@ -53,6 +53,13 @@ export default function SecurityPage() {
               label: "Auth Health",
               desc:  "Live traffic-light dashboard: users, sessions, failed logins, email delivery.",
               color: "text-green-600 bg-green-50",
+            },
+            {
+              href:  "/admin/growth/security/google-auth-diagnostics",
+              icon:  Globe,
+              label: "Google Auth Diagnostics",
+              desc:  "OAuth config health, SMTP test, reset URL verification, test email send.",
+              color: "text-blue-600 bg-blue-50",
             },
             {
               href:  "/admin/growth/security/session-center",

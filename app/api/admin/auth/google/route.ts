@@ -12,8 +12,8 @@ import {
 } from "@/lib/rbac/googleOAuth"
 
 export async function GET(request: NextRequest) {
-  const clientId   = process.env.GOOGLE_OAUTH_CLIENT_ID
-  const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI
+  const clientId    = (process.env.GOOGLE_LOGIN_CLIENT_ID ?? "").trim()
+  const redirectUri = (process.env.GOOGLE_LOGIN_REDIRECT_URI ?? "").trim()
 
   if (!clientId || !redirectUri) {
     const url = request.nextUrl.clone()
