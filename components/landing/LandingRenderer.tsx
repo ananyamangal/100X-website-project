@@ -185,7 +185,9 @@ export default async function LandingRenderer({ slug }: Props) {
       <LandingThemeProvider theme={theme}>
         <BreadcrumbNav items={breadcrumb} />
         {def.hero ? <HeroBlock hero={def.hero} theme={theme} /> : null}
-        {sections.map((s, i) => renderSection(s, def, i))}
+        {sections.map((s, i) => {
+          try { return renderSection(s, def, i) } catch { return null }
+        })}
 
         {/* Auto-append an FAQ section when faqs are declared but the
             author didn't explicitly place a {kind:'faq'} section.

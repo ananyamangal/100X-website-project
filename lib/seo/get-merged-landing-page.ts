@@ -54,10 +54,11 @@ function applyOverride(def: LandingPageDef, ov: Overrides): LandingPageDef {
 
   if (ov.metadata !== undefined) {
     merged.metadata = { ...def.metadata }
-    if (ov.metadata.title       !== undefined) merged.metadata.title       = ov.metadata.title
-    if (ov.metadata.description !== undefined) merged.metadata.description = ov.metadata.description
-    if (ov.metadata.ogTitle     !== undefined) merged.metadata.ogTitle     = ov.metadata.ogTitle
+    if (ov.metadata.title         !== undefined) merged.metadata.title         = ov.metadata.title
+    if (ov.metadata.description   !== undefined) merged.metadata.description   = ov.metadata.description
+    if (ov.metadata.ogTitle       !== undefined) merged.metadata.ogTitle       = ov.metadata.ogTitle
     if (ov.metadata.ogDescription !== undefined) merged.metadata.ogDescription = ov.metadata.ogDescription
+    if (ov.metadata.ogImage       !== undefined) merged.metadata.ogImage       = ov.metadata.ogImage
   }
 
   if (ov.hero !== undefined && def.hero !== undefined) {
