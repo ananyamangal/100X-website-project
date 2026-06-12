@@ -1,11 +1,11 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import {
   RefreshCw, ExternalLink, TrendingUp, AlertCircle,
   ChevronDown, ChevronRight, CheckCircle2, Circle,
-  Clock, Lock, ArrowRight,
+  Clock, Lock, ArrowRight, Info,
 } from "lucide-react"
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -13,13 +13,19 @@ import {
 // ══════════════════════════════════════════════════════════════════════════════
 
 interface NextAction {
-  id:          string
-  title:       string
-  description: string
-  cta:         string
-  ctaUrl:      string
-  urgency:     "critical" | "high" | "normal"
-  external:    boolean
+  id:             string
+  title:          string
+  description:    string
+  cta:            string
+  ctaUrl:         string
+  urgency:        "critical" | "high" | "normal"
+  external:       boolean
+  expectedResult: string
+  explain: {
+    dataUsed:        string
+    assumptions:     string
+    confidenceScore: number
+  }
 }
 
 interface FounderV2 {
@@ -287,57 +293,104 @@ const FIX_TIMES: Record<string, string> = {
 }
 
 function GuidedActionCard({ action }: { action: NextAction }) {
+  const [explainOpen, setExplainOpen] = useState(false)
   const isHealthy = action.id === "monitor"
   const fixTime   = FIX_TIMES[action.id] ?? "15 minutes"
 
   const s = action.urgency === "critical"
-    ? { wrap: "border-red-300 bg-red-50",    badge: "bg-red-100 text-red-700",    label: "CRITICAL BLOCKER", btn: "bg-red-600 hover:bg-red-700 text-white",    tag: "text-red-600" }
+    ? { wrap: "border-red-300 bg-red-50",    badge: "bg-red-100 text-red-700",    label: "CRITICAL BLOCKER", btn: "bg-red-600 hover:bg-red-700 text-white",    tag: "text-red-600",   explainBg: "bg-red-100/60",   explainBorder: "border-red-200"   }
     : action.urgency === "high"
-    ? { wrap: "border-amber-300 bg-amber-50", badge: "bg-amber-100 text-amber-700", label: "ACTION NEEDED",    btn: "bg-amber-600 hover:bg-amber-700 text-white", tag: "text-amber-600" }
-    : { wrap: "border-green-200 bg-green-50", badge: "bg-green-100 text-green-700", label: "SYSTEM HEALTHY",   btn: "bg-brand-600 hover:bg-brand-700 text-white", tag: "text-green-600" }
+    ? { wrap: "border-amber-300 bg-amber-50", badge: "bg-amber-100 text-amber-700", label: "ACTION NEEDED",    btn: "bg-amber-600 hover:bg-amber-700 text-white", tag: "text-amber-600", explainBg: "bg-amber-100/60", explainBorder: "border-amber-200" }
+    : { wrap: "border-green-200 bg-green-50", badge: "bg-green-100 text-green-700", label: "SYSTEM HEALTHY",   btn: "bg-brand-600 hover:bg-brand-700 text-white", tag: "text-green-600", explainBg: "bg-green-100/60", explainBorder: "border-green-200" }
 
   return (
-    <div className={`rounded-2xl border-2 p-6 ${s.wrap}`}>
-      <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mb-4 ${s.badge}`}>
-        {s.label}
-      </span>
+    <div className={`rounded-2xl border-2 ${s.wrap}`}>
+      <div className="p-6">
+        <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mb-4 ${s.badge}`}>
+          {s.label}
+        </span>
 
-      <div className="space-y-3">
-        <div>
-          <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">
-            {isHealthy ? "Status" : "Current Blocker"}
-          </p>
-          <h2 className="text-lg font-bold text-gray-900 leading-snug">{action.title}</h2>
-        </div>
+        <div className="space-y-3">
+          <div>
+            <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">
+              {isHealthy ? "Status" : "Current Blocker"}
+            </p>
+            <h2 className="text-lg font-bold text-gray-900 leading-snug">{action.title}</h2>
+          </div>
 
-        <div>
-          <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Why It Matters</p>
-          <p className="text-sm text-gray-700">{action.description}</p>
-        </div>
+          <div>
+            <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Why It Matters</p>
+            <p className="text-sm text-gray-700">{action.description}</p>
+          </div>
 
-        <div className="flex items-end justify-between gap-4">
-          {!isHealthy && (
+          {action.expectedResult && (
             <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Estimated Fix Time</p>
-              <p className={`text-sm font-semibold flex items-center gap-1.5 ${s.tag}`}>
-                <Clock size={13} />{fixTime}
-              </p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Expected Result</p>
+              <p className="text-sm text-gray-700">{action.expectedResult}</p>
             </div>
           )}
-          <div className={isHealthy ? "" : "ml-auto"}>
-            {action.external ? (
-              <a href={action.ctaUrl} target="_blank" rel="noopener noreferrer"
-                className={`inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${s.btn}`}>
-                {isHealthy ? action.cta : "Open Fix Guide"} <ExternalLink size={13} />
-              </a>
-            ) : (
-              <Link href={action.ctaUrl}
-                className={`inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${s.btn}`}>
-                {isHealthy ? action.cta : "Open Fix Guide"} <ChevronRight size={13} />
-              </Link>
+
+          <div className="flex items-end justify-between gap-4 pt-1">
+            {!isHealthy && (
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Estimated Fix Time</p>
+                <p className={`text-sm font-semibold flex items-center gap-1.5 ${s.tag}`}>
+                  <Clock size={13} />{fixTime}
+                </p>
+              </div>
             )}
+            <div className={isHealthy ? "" : "ml-auto"}>
+              {action.external ? (
+                <a href={action.ctaUrl} target="_blank" rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${s.btn}`}>
+                  {isHealthy ? action.cta : "Open Fix Guide"} <ExternalLink size={13} />
+                </a>
+              ) : (
+                <Link href={action.ctaUrl}
+                  className={`inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${s.btn}`}>
+                  {isHealthy ? action.cta : "Open Fix Guide"} <ChevronRight size={13} />
+                </Link>
+              )}
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Explain This */}
+      <div className={`border-t ${s.explainBorder}`}>
+        <button onClick={() => setExplainOpen(v => !v)}
+          className="w-full flex items-center gap-2 px-6 py-2.5 text-left hover:opacity-80 transition-opacity">
+          <Info size={12} className="text-gray-400 flex-shrink-0" />
+          <span className="text-[11px] text-gray-500 font-medium">Explain this recommendation</span>
+          {explainOpen
+            ? <ChevronDown  size={12} className="ml-auto text-gray-400" />
+            : <ChevronRight size={12} className="ml-auto text-gray-400" />}
+        </button>
+
+        {explainOpen && action.explain && (
+          <div className={`px-6 pb-5 space-y-3 ${s.explainBg} ${s.explainBorder}`}>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Data Used</p>
+              <p className="text-xs text-gray-600">{action.explain.dataUsed}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Assumptions</p>
+              <p className="text-xs text-gray-600">{action.explain.assumptions}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Confidence</p>
+              <div className="flex items-center gap-2">
+                <div className="w-24 h-1.5 bg-white/60 rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full ${
+                    (action.explain.confidenceScore ?? 0) >= 80 ? "bg-green-500" :
+                    (action.explain.confidenceScore ?? 0) >= 60 ? "bg-amber-400" : "bg-red-400"
+                  }`} style={{ width: `${action.explain.confidenceScore ?? 0}%` }} />
+                </div>
+                <span className="text-xs font-bold text-gray-700">{action.explain.confidenceScore ?? 0}/100</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -928,9 +981,11 @@ function PlaybookSection({ r }: { r: ReadinessResult }) {
 function AdvancedSection({
   milestones,
   readiness,
+  funnel,
 }: {
   milestones: FounderV2["milestones"]
   readiness:  ReadinessResult | null
+  funnel?:    FounderV2["funnel"]
 }) {
   const [open, setOpen] = useState(false)
   const [local, setLocal] = useState<ReadinessResult | null>(readiness)
@@ -967,13 +1022,14 @@ function AdvancedSection({
     <div className="rounded-xl border border-gray-200 overflow-hidden">
       <button onClick={toggle}
         className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-gray-50 transition-colors">
-        <span className="text-sm font-semibold text-gray-400">Advanced — technical systems</span>
+        <span className="text-sm font-semibold text-gray-400">Advanced — technical systems & journey</span>
         {open ? <ChevronDown size={15} className="text-gray-400" /> : <ChevronRight size={15} className="text-gray-400" />}
       </button>
 
       {open && (
-        <div className="border-t border-gray-100 px-5 py-4 space-y-4 bg-gray-50/50">
+        <div className="border-t border-gray-100 px-5 py-4 space-y-6 bg-gray-50/50">
 
+          {/* Milestones */}
           <div>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Milestones</p>
             <div className="grid grid-cols-2 gap-1.5">
@@ -1003,10 +1059,11 @@ function AdvancedSection({
             </div>
           )}
 
+          {/* Readiness scores */}
           {local && (
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Readiness</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">System Readiness</p>
                 <span className="text-xs font-bold text-gray-600">{local.overallScore}%</span>
               </div>
               <div className="w-full h-1.5 bg-gray-100 rounded-full mb-3">
@@ -1046,15 +1103,63 @@ function AdvancedSection({
             </div>
           )}
 
+          {/* Founder Journey */}
+          {local && (
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Founder Journey</p>
+              <JourneySection r={local} />
+            </div>
+          )}
+
+          {/* Revenue Funnel */}
+          {funnel && (
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Revenue Funnel</p>
+              <FunnelChart funnel={funnel} />
+            </div>
+          )}
+
+          {/* System Transparency */}
+          {local && (
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">System Transparency</p>
+              <TransparencySection r={local} />
+            </div>
+          )}
+
+          {/* Remarketing Readiness */}
+          {local && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Remarketing Readiness</p>
+                <Link href="/admin/growth/ads/remarketing-readiness"
+                  className="text-[11px] text-brand-600 hover:text-brand-700 font-semibold flex items-center gap-0.5">
+                  Full audit <ChevronRight size={10} />
+                </Link>
+              </div>
+              <RemarketingSection r={local} />
+            </div>
+          )}
+
+          {/* Trust Center */}
+          {local && (
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Trust Center</p>
+              <TrustCenterSection r={local} />
+            </div>
+          )}
+
+          {/* Technical pages */}
           <div>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Technical pages</p>
             <div className="flex flex-wrap gap-2">
               {[
-                { label: "Launch Status",  href: "/admin/growth/launch" },
-                { label: "Paid Growth",    href: "/admin/growth/paid" },
-                { label: "Ads Dashboard",  href: "/admin/growth/ads/dashboard" },
-                { label: "Ads Director",   href: "/admin/growth/ads/director" },
-                { label: "Activity Logs",  href: "/admin/growth/logs" },
+                { label: "Launch Status",           href: "/admin/growth/launch" },
+                { label: "Paid Growth",             href: "/admin/growth/paid" },
+                { label: "Ads Dashboard",           href: "/admin/growth/ads/dashboard" },
+                { label: "Ads Director",            href: "/admin/growth/ads/director" },
+                { label: "Remarketing Readiness",   href: "/admin/growth/ads/remarketing-readiness" },
+                { label: "Activity Logs",           href: "/admin/growth/logs" },
               ].map(l => (
                 <Link key={l.href} href={l.href}
                   className="text-[11px] text-gray-500 hover:text-brand-600 border border-gray-200 hover:border-brand-300 px-2.5 py-1 rounded-lg transition-colors bg-white">
@@ -1152,13 +1257,7 @@ export default function FounderModePage() {
           </div>
         )}
 
-        {/* A — Founder Journey */}
-        {readiness
-          ? <JourneySection r={readiness} />
-          : loading && <div className="h-64 bg-gray-100 rounded-xl animate-pulse" />
-        }
-
-        {/* B — Guided Next Action */}
+        {/* 1 — Guided Next Action (always first) */}
         {loading && !data
           ? <div className="h-40 bg-gray-100 rounded-2xl animate-pulse" />
           : data
@@ -1166,49 +1265,38 @@ export default function FounderModePage() {
           : null
         }
 
-        {/* Revenue Metrics */}
+        {/* 2 — 4 Revenue Tiles */}
         <section>
           {loading && !data ? (
-            <div className="grid grid-cols-3 gap-3">
-              {[...Array(6)].map((_, i) => (
+            <div className="grid grid-cols-2 gap-3">
+              {[...Array(4)].map((_, i) => (
                 <div key={i} className="h-20 bg-gray-100 rounded-xl animate-pulse" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-3">
-              <Tile label="Revenue today"                  value="—" />
+            <div className="grid grid-cols-2 gap-3">
               <Tile label="Leads today"                    value={rev?.leadsToday ?? 0}             highlight={(rev?.leadsToday ?? 0) > 0} />
               <Tile label="Dealer leads" sub="this month"  value={rev?.dealerLeadsThisMonth ?? 0}   highlight={(rev?.dealerLeadsThisMonth ?? 0) > 0} />
-              <Tile label="OEM leads"    sub="this month"  value={rev?.oemLeadsThisMonth ?? 0}      highlight={(rev?.oemLeadsThisMonth ?? 0) > 0} />
               <Tile label="Ad spend"     sub="today"       value={rev?.adSpendToday ? fmtINR(rev.adSpendToday) : "—"} />
               <Tile label="Cost per lead"                  value={rev?.costPerLead ? fmtINR(rev.costPerLead) : "—"} />
             </div>
           )}
         </section>
 
-        {/* Revenue Funnel */}
-        {data && <FunnelChart funnel={data.funnel} />}
-
-        {/* C — System Transparency */}
-        {readiness
-          ? <TransparencySection r={readiness} />
-          : loading && <div className="h-32 bg-gray-100 rounded-xl animate-pulse" />
-        }
-
-        {/* D — Remarketing Audit */}
-        {readiness && <RemarketingSection r={readiness} />}
-
-        {/* E — Trust Center */}
-        {readiness && <TrustCenterSection r={readiness} />}
-
-        {/* F — Founder Playbook */}
+        {/* 3 — Founder Playbook */}
         {readiness
           ? <PlaybookSection r={readiness} />
           : loading && <div className="h-48 bg-gray-100 rounded-xl animate-pulse" />
         }
 
-        {/* Advanced */}
-        {data && <AdvancedSection milestones={data.milestones} readiness={readiness} />}
+        {/* 4 — Advanced (journey, funnel, transparency, remarketing, readiness) */}
+        {data && (
+          <AdvancedSection
+            milestones={data.milestones}
+            readiness={readiness}
+            funnel={data.funnel}
+          />
+        )}
 
       </div>
     </div>
