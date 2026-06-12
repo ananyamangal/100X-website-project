@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import clientPromise from "@/lib/mongodb"
 import { requirePermission, writeAuditLog } from "@/lib/rbac/server"
 import { getLandingPage } from "@/lib/seo/landing-pages"
@@ -148,6 +149,8 @@ export async function PUT(
 
     await writeAuditLog(user, "edit", `landing_page:${slug}`, { slug, fieldsChanged }, request)
 
+    revalidatePath(`/${slug}`)
+
     return NextResponse.json({
       ok: true,
       modifiedAt: now.toISOString(),
@@ -158,5 +161,58 @@ export async function PUT(
   } catch (err) {
     console.error("PUT landing-pages/override error:", err)
     return NextResponse.json({ error: "Failed to save override" }, { status: 500 })
+  }
+}
+
+// DELETE /api/admin/landing-pages/[slug]/override
+// Removes the override doc, writes a revert audit entry, and revalidates the live page.
+// Requires landing_pages.edit.
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { slug: string } }
+) {
+  const auth = await requirePermission(request, "landing_pages.edit")
+  if (auth instanceof NextResponse) return auth
+  const { user } = auth
+
+  const { slug } = params
+
+  if (!getLandingPage(slug)) {
+    return NextResponse.json({ error: "Page not found in registry" }, { status: 404 })
+  }
+
+  try {
+    const client = await clientPromise
+    const db = client.db()
+
+    // Snapshot existing overrides before deletion for the audit trail
+    const existing = await db
+      .collection("landing_page_overrides")
+      .findOne({ slug }, { projection: { overrides: 1, _id: 0 } })
+
+    const result = await db
+      .collection("landing_page_overrides")
+      .deleteOne({ slug })
+
+    const now = new Date()
+
+    await db.collection("landing_page_audit").insertOne({
+      slug,
+      userId:   user.sub,
+      userEmail: user.email,
+      userName:  user.name,
+      timestamp: now,
+      fieldsChanged: ["revert"],
+      snapshot: existing?.overrides ?? {},
+    })
+
+    await writeAuditLog(user, "delete", `landing_page:${slug}`, { slug, action: "revert_to_registry" }, request)
+
+    revalidatePath(`/${slug}`)
+
+    return NextResponse.json({ ok: true, deleted: result.deletedCount > 0 })
+  } catch (err) {
+    console.error("DELETE landing-pages/override error:", err)
+    return NextResponse.json({ error: "Failed to revert override" }, { status: 500 })
   }
 }

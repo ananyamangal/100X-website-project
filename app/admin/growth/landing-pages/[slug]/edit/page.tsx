@@ -6,7 +6,7 @@ import Link from "next/link"
 import {
   ArrowLeft, Save, Eye, AlertCircle, CheckCircle2, Plus, Trash2,
   ChevronUp, ChevronDown, X, Clock, User, GitCompare, Info,
-  ExternalLink, GripVertical,
+  ExternalLink, GripVertical, RotateCcw, History,
 } from "lucide-react"
 import { getAllLandingPages, getLandingPage } from "@/lib/seo/landing-pages"
 import type { LandingPageDef, FaqEntry } from "@/lib/seo/landing-pages"
@@ -51,6 +51,7 @@ type AuditEntry = {
   userName: string
   timestamp: string
   fieldsChanged: string[]
+  snapshot?: Record<string, unknown>
 }
 
 type Tab = "seo" | "hero" | "faqs" | "related"
@@ -566,7 +567,13 @@ function RelatedTab({ slugs, setSlugs, currentSlug }: {
 
 // ─── Audit History ────────────────────────────────────────────────────────────
 
-function AuditHistory({ history }: { history: AuditEntry[] }) {
+function AuditHistory({
+  history,
+  onRestore,
+}: {
+  history: AuditEntry[]
+  onRestore?: (entry: AuditEntry) => void
+}) {
   const [open, setOpen] = useState(false)
   if (history.length === 0) return null
   return (
@@ -582,21 +589,36 @@ function AuditHistory({ history }: { history: AuditEntry[] }) {
         <div className="divide-y divide-gray-100">
           {history.map((h, i) => (
             <div key={i} className="px-5 py-3 flex items-start gap-3">
-              <div className="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center shrink-0 mt-0.5">
-                <User size={12} className="text-brand-600" />
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                h.fieldsChanged.includes("revert") ? "bg-red-100" : "bg-brand-100"
+              }`}>
+                {h.fieldsChanged.includes("revert")
+                  ? <RotateCcw size={12} className="text-red-600" />
+                  : <User size={12} className="text-brand-600" />
+                }
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-gray-800">{h.userName}</p>
                 <p className="text-[11px] text-gray-500">{h.userEmail}</p>
                 <div className="flex flex-wrap gap-1 mt-1.5">
                   {h.fieldsChanged.map(f => (
-                    <span key={f} className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-mono">{f}</span>
+                    <span key={f} className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                      f === "revert" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-600"
+                    }`}>{f}</span>
                   ))}
                 </div>
               </div>
-              <span className="text-[10px] text-gray-400 shrink-0 whitespace-nowrap">
-                {new Date(h.timestamp).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
-              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                {onRestore && h.snapshot && !h.fieldsChanged.includes("revert") && (
+                  <button onClick={() => onRestore(h)}
+                    className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:border-brand-300 hover:text-brand-700 transition-colors">
+                    <History size={10} />Restore
+                  </button>
+                )}
+                <span className="text-[10px] text-gray-400 whitespace-nowrap">
+                  {new Date(h.timestamp).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -692,6 +714,65 @@ export default function LandingPageEditPage() {
         .then(d => d.ok && setHistory(d.history ?? []))
         .catch(() => {})
       setToast({ type: "success", message: `Saved — ${(data.fieldsChanged as string[]).join(", ")} updated` })
+    } catch {
+      setToast({ type: "error", message: "Network error — please try again" })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Revert to static registry — deletes the override doc
+  async function handleRevert() {
+    if (!window.confirm(
+      "Revert to static registry?\n\nThis removes all saved overrides. The live page will immediately reflect the static registry values.\n\nThis action cannot be undone.",
+    )) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/admin/landing-pages/${slug}/override`, { method: "DELETE" })
+      const data = await res.json()
+      if (!res.ok) { setToast({ type: "error", message: data.error ?? "Revert failed" }); return }
+      setForm(buildStatic(def!))
+      setOverrideMeta(null)
+      fetch(`/api/admin/landing-pages/${slug}/override`)
+        .then(r => r.json())
+        .then(d => d.ok && setHistory(d.history ?? []))
+        .catch(() => {})
+      setToast({ type: "success", message: "Reverted to static registry — live page revalidated" })
+    } catch {
+      setToast({ type: "error", message: "Network error — please try again" })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Restore a previous version from audit history
+  async function handleRestore(entry: AuditEntry) {
+    if (!entry.snapshot) return
+    const dateStr = new Date(entry.timestamp).toLocaleString("en-IN", {
+      day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+    })
+    if (!window.confirm(`Restore version saved by ${entry.userName} on ${dateStr}?\n\nThis will overwrite the current override.`)) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/admin/landing-pages/${slug}/override`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ overrides: entry.snapshot }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setToast({ type: "error", message: data.error ?? "Restore failed" }); return }
+      // Reload full state
+      const refreshed = await fetch(`/api/admin/landing-pages/${slug}/override`).then(r => r.json())
+      if (refreshed.ok) {
+        setForm(buildForm(def!, refreshed.override))
+        setOverrideMeta(refreshed.override ? {
+          modifiedBy:     refreshed.override.modifiedBy,
+          modifiedByName: refreshed.override.modifiedByName,
+          modifiedAt:     refreshed.override.modifiedAt,
+        } : null)
+        setHistory(refreshed.history ?? [])
+      }
+      setToast({ type: "success", message: `Version from ${dateStr} restored — live page revalidated` })
     } catch {
       setToast({ type: "error", message: "Network error — please try again" })
     } finally {
@@ -873,6 +954,12 @@ export default function LandingPageEditPage() {
             }
           </div>
           <div className="flex items-center gap-2">
+            {overrideMeta && (
+              <button onClick={handleRevert} disabled={saving}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                <RotateCcw size={12} />Revert to Registry
+              </button>
+            )}
             <button onClick={() => setShowDiff(true)}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
               <Eye size={12} />Diff View
@@ -886,12 +973,12 @@ export default function LandingPageEditPage() {
         </div>
 
         {/* Audit history */}
-        <AuditHistory history={history} />
+        <AuditHistory history={history} onRestore={handleRestore} />
 
         {/* Stage note */}
         <p className="text-[10px] text-gray-400 text-center pb-2">
-          Stage B · Overrides stored in <code>landing_page_overrides</code> collection ·
-          Live site rendering unchanged until Stage C
+          Stage C active · Overrides merge at render time via <code>getMergedLandingPage</code> ·
+          Save and Revert trigger <code>revalidatePath</code> on the live page
         </p>
       </div>
 

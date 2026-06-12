@@ -214,6 +214,10 @@ export type LandingMetadata = {
   keywords?: string
   /** Absolute URL or site-relative path. */
   ogImage?: string
+  /** Override Open Graph title separately from meta title. Set by CMS overrides. */
+  ogTitle?: string
+  /** Override Open Graph description separately from meta description. Set by CMS overrides. */
+  ogDescription?: string
 }
 
 export type LandingPageDef = {

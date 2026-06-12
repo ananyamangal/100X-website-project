@@ -2,9 +2,9 @@ import type { Metadata } from "next"
 import { SITE_URL } from "@/lib/seo/site-config"
 import {
   LANDING_PAGES,
-  getLandingPage,
   type LandingPageDef,
 } from "./landing-pages"
+import { getMergedLandingPage } from "./get-merged-landing-page"
 
 /**
  * @deprecated Read from `LANDING_PAGES[slug].metadata` directly.
@@ -33,15 +33,16 @@ function resolveOgImage(def: LandingPageDef | undefined): string {
   return `${SITE_URL}${raw.startsWith("/") ? "" : "/"}${raw}`
 }
 
-export function productLandingMetadata(slug: string): Metadata {
-  const def = getLandingPage(slug)
-  const title = def?.metadata.title ?? "Product | 100x Circle"
-  const description =
-    def?.metadata.description ??
+export async function productLandingMetadata(slug: string): Promise<Metadata> {
+  const def = await getMergedLandingPage(slug) ?? undefined
+  const title       = def?.metadata.title       ?? "Product | 100x Circle"
+  const description = def?.metadata.description ??
     "Thermal fogging machines and agricultural equipment from 100x Circle, India."
+  const ogTitle       = def?.metadata.ogTitle       || title
+  const ogDescription = def?.metadata.ogDescription || description
   const keywords = def?.metadata.keywords
-  const url = `${SITE_URL}/${slug}`
-  const ogImage = resolveOgImage(def)
+  const url      = `${SITE_URL}/${slug}`
+  const ogImage  = resolveOgImage(def)
   return {
     title,
     description,
@@ -50,18 +51,18 @@ export function productLandingMetadata(slug: string): Metadata {
       canonical: `/${slug}`,
     },
     openGraph: {
-      title,
-      description,
+      title:       ogTitle,
+      description: ogDescription,
       url,
       siteName: "100x Circle",
-      locale: "en_IN",
-      type: "website",
-      images: [{ url: ogImage }],
+      locale:   "en_IN",
+      type:     "website",
+      images:   [{ url: ogImage }],
     },
     twitter: {
-      card: "summary_large_image",
-      title,
-      description,
+      card:        "summary_large_image",
+      title:       ogTitle,
+      description: ogDescription,
     },
   }
 }

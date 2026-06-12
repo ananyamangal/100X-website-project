@@ -4,9 +4,9 @@ import { MobileCtaOverride } from "@/components/cta/MobileCtaContext"
 import ProductPage from "@/app/[slug]/ProductPage"
 import {
   getLandingDisplayName,
-  getLandingPage,
   getLandingTheme,
 } from "@/lib/seo/landing-pages"
+import { getMergedLandingPage } from "@/lib/seo/get-merged-landing-page"
 import type { FaqEntry, LandingPageDef, LandingSection } from "@/lib/seo/landing-types"
 
 import LandingThemeProvider from "./LandingThemeProvider"
@@ -151,7 +151,7 @@ function sectionsIncludeFaq(sections: LandingSection[] | undefined): boolean {
 }
 
 export default async function LandingRenderer({ slug }: Props) {
-  const def = getLandingPage(slug)
+  const def = await getMergedLandingPage(slug)
   if (!def) return null
 
   const theme = getLandingTheme(def)
