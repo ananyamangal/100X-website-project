@@ -1,13 +1,17 @@
 import { BreadcrumbJsonLd, type BreadcrumbItem } from "@/components/seo/BreadcrumbJsonLd"
-import { ProductLandingJsonLd } from "@/components/seo/ProductLandingJsonLd"
+import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
+import ProductAiSummary from "@/components/seo/ProductAiSummary"
 import { MobileCtaOverride } from "@/components/cta/MobileCtaContext"
-import ProductPage from "@/app/[slug]/ProductPage"
+import ProductDetailV2 from "@/components/product/ProductDetailV2"
+import RelatedProductsSection from "@/components/RelatedProductsSection"
 import {
   getLandingDisplayName,
   getLandingTheme,
 } from "@/lib/seo/landing-pages"
 import { getMergedLandingPage } from "@/lib/seo/get-merged-landing-page"
 import { getProductBySlug } from "@/lib/productsQuery"
+import { SITE_URL } from "@/lib/seo/site-config"
+import { plainTextFromHtml } from "@/lib/rich-text"
 import type { FaqEntry, LandingPageDef, LandingSection } from "@/lib/seo/landing-types"
 
 import LandingThemeProvider from "./LandingThemeProvider"
@@ -161,21 +165,88 @@ export default async function LandingRenderer({ slug }: Props) {
   const theme = getLandingTheme(def)
   const breadcrumb = defaultBreadcrumb(def)
 
-  // ─── Back-compat path: existing product landings render the legacy
-  // ProductPage UI with their content1/2/3 narrative blocks. No new
-  // sections needed — this keeps the 3 existing landings byte-stable.
-  //
-  // Product data is fetched server-side here (name-fuzzy match covers the
-  // canonical SEO slug even when it differs from the DB slug field).
-  // Passing it as a prop prevents ProductPage from making a client-side
-  // /api/admin/ fetch that fails with 401 for unauthenticated visitors.
+  // ─── Product landing pages: render the same V2 component tree as
+  // app/products/[id]/page.tsx, keeping the canonical SEO URL.
+  // Product data is fetched server-side (name-fuzzy match resolves the
+  // canonical slug to the DB record even when the slug fields differ).
   if (def.type === "product") {
     const product = await getProductBySlug(slug)
+    if (!product) return null
+
+    const rawId            = String(product._id ?? slug)
+    const productName      = String(product.name ?? "")
+    const category         = typeof product.category === "string" ? product.category : undefined
+    const rating           = typeof product.rating === "number" ? product.rating : undefined
+    const reviewsCount     = typeof product.reviewsCount === "number" ? product.reviewsCount : undefined
+    const priceRange       = typeof product.priceRange === "string" ? product.priceRange : undefined
+    const inStock          = product.inStock !== false
+    const features         = Array.isArray(product.features) ? (product.features as string[]) : []
+    const badges           = Array.isArray(product.badges) ? (product.badges as string[]) : []
+    const shortDescription = plainTextFromHtml(
+      String(product.shortDescription || product.detailedDescription || "")
+    )
+
+    // Canonical URL stays at /[slug], not /products/[id]
+    const canonicalUrl = `${SITE_URL}/${slug}`
+    const rawImages    = (product.imageUrls as string[]) || []
+    const imgs         = rawImages.filter(Boolean).slice(0, 10).map((src) =>
+      src.startsWith("http") ? src : `${SITE_URL}${src.startsWith("/") ? "" : "/"}${src}`
+    )
+
+    // VideoObject JSON-LD when the product has a YouTube link
+    const youtubeLink = typeof product.youtubeLink === "string" ? product.youtubeLink : null
+    const videoId = youtubeLink
+      ? (youtubeLink.match(
+          /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/
+        ) || [])[1] ?? null
+      : null
+    const videoJsonLd = videoId
+      ? {
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          name: `${productName} — Product Video`,
+          description: shortDescription || `Product video for ${productName} by 100X Circle`,
+          thumbnailUrl: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+          embedUrl: `https://www.youtube.com/embed/${videoId}`,
+          contentUrl: `https://www.youtube.com/watch?v=${videoId}`,
+          uploadDate: "2024-01-01",
+          publisher: { "@id": `${SITE_URL}/#organization` },
+        }
+      : null
+
     return (
       <>
-        <ProductLandingJsonLd slug={slug} />
+        <ProductAiSummary
+          id={rawId}
+          name={productName}
+          category={category ?? ""}
+          shortDescription={shortDescription}
+          priceRange={priceRange}
+          inStock={inStock}
+          features={features}
+          badges={badges}
+        />
+        <ProductJsonLd
+          name={productName}
+          description={shortDescription}
+          images={imgs.length ? imgs : [`${SITE_URL}/logo-main.png`]}
+          url={canonicalUrl}
+          sku={rawId}
+          inStock={inStock}
+          rating={rating}
+          reviewsCount={reviewsCount}
+          priceRange={priceRange}
+          category={category}
+        />
+        {videoJsonLd && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }}
+          />
+        )}
         <BreadcrumbJsonLd items={breadcrumb} />
-        <ProductPage product={product ?? undefined} slug={slug} />
+        <ProductDetailV2 product={JSON.parse(JSON.stringify(product))} />
+        <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
       </>
     )
   }
