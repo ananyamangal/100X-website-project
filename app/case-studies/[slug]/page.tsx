@@ -6,6 +6,7 @@ import type { Metadata } from "next"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
+import { getProductCanonicalUrl } from "@/lib/seo/product-landing-map"
 import { ArrowRight } from "lucide-react"
 
 async function getCaseStudy(slug: string) {
@@ -182,7 +183,7 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
               return (
                 <Link
                   key={p._id}
-                  href={`/products/${p._id}`}
+                  href={getProductCanonicalUrl(String(p.slug || p._id))}
                   className="group flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-xl hover:border-brand-200 hover:shadow-sm transition-all"
                 >
                   {img && (

@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
+import { getProductCanonicalUrl } from "@/lib/seo/product-landing-map"
 import { Plus, Save, X, ExternalLink, RotateCcw, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -378,7 +379,7 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
               variant="outline"
               size="sm"
               className="text-xs bg-transparent"
-              onClick={() => window.open(`/products/${formData.slug || productId}`, "_blank")}
+              onClick={() => window.open(getProductCanonicalUrl(formData.slug || productId), "_blank")}
             >
               <ExternalLink size={13} className="mr-1.5" />
               Preview

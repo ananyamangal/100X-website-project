@@ -2,6 +2,7 @@
 import Link from "next/link"
 import clientPromise from "@/lib/mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
+import { getProductCanonicalUrl } from "@/lib/seo/product-landing-map"
 import AiSummaryBlock from "@/components/seo/AiSummaryBlock"
 import { AI_PRODUCT_CATEGORIES } from "@/lib/ai/knowledge"
 import { plainTextFromHtml } from "@/lib/rich-text"
@@ -57,7 +58,7 @@ export default async function AiProductCatalogPage() {
       "@type": "Product",
       name: p.name,
       description: p.shortDescription,
-      url: `${SITE_URL}/products/${p.id}`,
+      url: `${SITE_URL}${getProductCanonicalUrl(p.id)}`,
       offers: {
         "@type": "Offer",
         availability: p.inStock
@@ -154,7 +155,7 @@ export default async function AiProductCatalogPage() {
                   </div>
                   <div className="mt-2">
                     <Link
-                      href={`/products/${p.id}`}
+                      href={getProductCanonicalUrl(p.id)}
                       className="text-xs text-brand-600 hover:underline"
                     >
                       View product details →

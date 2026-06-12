@@ -4,6 +4,7 @@ import { SITE_URL, SITE_NAME, defaultOgImage } from "@/lib/seo/site-config"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import { ItemListJsonLd } from "@/components/seo/ItemListJsonLd"
 import { getAllProductsForSitemap } from "@/lib/productsQuery"
+import { getProductCanonicalUrl } from "@/lib/seo/product-landing-map"
 
 export const metadata: Metadata = {
   title: "Industrial & Agricultural Equipment Catalog | 100x Circle",
@@ -45,7 +46,7 @@ export default async function ProductsLayout({ children }: { children: ReactNode
         url="/products"
         items={top.map((p) => ({
           name: p.name ?? "Product",
-          url: `/products/${p.slug || p.id}`,
+          url: getProductCanonicalUrl(p.slug || p.id),
         }))}
       />
       {children}
