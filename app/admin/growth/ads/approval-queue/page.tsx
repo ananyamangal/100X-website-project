@@ -46,7 +46,7 @@ interface CampaignPlan {
   status:         string
   simulated:      boolean
   adGroups:       AdGroup[]
-  campaignNegatives: string[]
+  campaignNegatives: Array<string | { text: string }>
   landingPageRecs: LandingRec[]
   qualityScores:  QualityScores
   execHeader:     { confidence: number; roi: string; risk: string; priority: string; recommendation: string }
@@ -257,7 +257,7 @@ function PlanCard({ plan, onAction }: { plan: CampaignPlan; onAction: () => void
             <div className="flex flex-wrap gap-1.5">
               {plan.campaignNegatives.map((neg, i) => (
                 <span key={i} className="text-[11px] bg-red-950/40 text-red-400 border border-red-900/40 px-2 py-0.5 rounded">
-                  -{neg}
+                  -{typeof neg === "string" ? neg : neg.text}
                 </span>
               ))}
             </div>
