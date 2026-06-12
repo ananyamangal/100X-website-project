@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useCallback } from "react"
-import { DollarSign, RotateCw, TrendingUp, Users, Target, AlertCircle, ChevronDown, ChevronUp, CheckCircle2 } from "lucide-react"
+import { DollarSign, RotateCw, TrendingUp, Users, Target, AlertCircle, ChevronDown, ChevronUp, CheckCircle2, Lock, ArrowRight } from "lucide-react"
 import type { AttributionReport, AttributionRow, FunnelStage } from "@/lib/growth-os/revenue-attribution"
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -172,6 +172,127 @@ function LeadRow({ lead, onUpdate }: { lead: Lead; onUpdate: () => void }) {
   )
 }
 
+// ── Attribution Maturity Card ──────────────────────────────────────────────────
+
+const LEVELS = [
+  {
+    n: 1,
+    title: "Lead Collection",
+    desc: "Leads are being captured from RFQ, brochure, and contact forms.",
+    nextAction: "Update lead stages as deals progress. Mark Qualified Leads, Proposals Sent, and Won deals manually or via CRM export.",
+  },
+  {
+    n: 2,
+    title: "Lead Qualification",
+    desc: "Leads are moving through the funnel — qualified, proposed, won, or lost.",
+    nextAction: "Connect Google Ads: set GOOGLE_ADS_DEVELOPER_TOKEN in Vercel, then run Ads Sync from the Setup page to import cost data.",
+  },
+  {
+    n: 3,
+    title: "Revenue Attribution",
+    desc: "Ad spend is joined to leads. ROI, ROAS, and CPL are calculated per keyword and campaign.",
+    nextAction: "Ensure UTM templates are set on all Google Ads destination URLs (utm_source=google&utm_medium=cpc&utm_campaign={campaignid}&utm_term={keyword}). Re-sync leads after adding UTMs.",
+  },
+  {
+    n: 4,
+    title: "Closed-loop Optimization",
+    desc: "Attribution data feeds back into budget and bid decisions. High-ROI keywords get more budget; low-performers are paused.",
+    nextAction: "Attribution is complete. Run Market Intelligence Director for weekly product/state/campaign scoring.",
+  },
+] as const
+
+function maturityLevel(
+  funnel: AttributionReport["funnel"] | undefined,
+  diagnostics: { withUTM: number; totalInAttribution: number } | null,
+): number {
+  if (!funnel || funnel.lead === 0) return 0
+  const progressed =
+    (funnel.qualified_lead  ?? 0) + (funnel.dealer_application ?? 0) +
+    (funnel.oem_request     ?? 0) + (funnel.tender_request     ?? 0) +
+    (funnel.proposal_sent   ?? 0) + (funnel.won                ?? 0)
+  if (progressed === 0) return 1
+  const hasAdSpend = funnel.totalCost > 0
+  const hasRevenue = funnel.won > 0
+  if (!hasAdSpend || !hasRevenue) return 2
+  if (funnel.blendedROI === 0 || (diagnostics?.withUTM ?? 0) < 5) return 2
+  if (funnel.won < 5) return 3
+  return 4
+}
+
+function AttributionMaturityCard({
+  funnel,
+  diagnostics,
+}: {
+  funnel: AttributionReport["funnel"] | undefined
+  diagnostics: { withUTM: number; totalInAttribution: number } | null
+}) {
+  const current = maturityLevel(funnel, diagnostics)
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div>
+          <p className="text-xs font-semibold text-gray-700">Attribution Maturity</p>
+          <p className="text-[11px] text-gray-400 mt-0.5">Current level and next action required</p>
+        </div>
+        <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+          current >= 4 ? "bg-green-100 text-green-700" :
+          current >= 3 ? "bg-blue-100 text-blue-700" :
+          current >= 2 ? "bg-amber-100 text-amber-700" :
+          current >= 1 ? "bg-orange-100 text-orange-700" :
+          "bg-gray-100 text-gray-500"
+        }`}>
+          Level {current} of 4
+        </span>
+      </div>
+
+      <div className="p-5 space-y-3">
+        {LEVELS.map(lvl => {
+          const done    = current >= lvl.n
+          const active  = current === lvl.n - 1 || (current === 0 && lvl.n === 1)
+          const isNext  = lvl.n === current + 1
+
+          return (
+            <div key={lvl.n} className={`rounded-lg border p-3.5 transition-colors ${
+              done   ? "border-green-200 bg-green-50/60" :
+              isNext ? "border-amber-300 bg-amber-50/60" :
+                       "border-gray-100 bg-gray-50/40"
+            }`}>
+              <div className="flex items-start gap-3">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                  done   ? "bg-green-500" :
+                  isNext ? "bg-amber-400" :
+                           "bg-gray-200"
+                }`}>
+                  {done
+                    ? <CheckCircle2 size={13} className="text-white" />
+                    : isNext
+                    ? <ArrowRight size={13} className="text-white" />
+                    : <Lock size={11} className="text-gray-400" />
+                  }
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-xs font-semibold ${done ? "text-green-700" : isNext ? "text-amber-700" : "text-gray-400"}`}>
+                    Level {lvl.n} — {lvl.title}
+                  </p>
+                  <p className={`text-[11px] mt-0.5 ${done ? "text-green-600" : isNext ? "text-amber-600" : "text-gray-400"}`}>
+                    {lvl.desc}
+                  </p>
+                  {isNext && (
+                    <p className="text-[11px] mt-1.5 font-medium text-amber-700 bg-amber-100/60 rounded px-2 py-1">
+                      Next: {lvl.nextAction}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 interface SyncResult {
@@ -227,6 +348,7 @@ export default function RevenueAttributionPage() {
   }, [])
 
   useEffect(() => { loadReport() }, [loadReport])
+  useEffect(() => { loadDiagnostics() }, [loadDiagnostics])          // load upfront for maturity card
   useEffect(() => { if (tab === "diagnostics") loadDiagnostics() }, [tab, loadDiagnostics])
 
   const sync = async (source?: string) => {
@@ -274,6 +396,9 @@ export default function RevenueAttributionPage() {
           </div>
         ) : (
           <>
+            {/* Attribution Maturity */}
+            <AttributionMaturityCard funnel={funnel} diagnostics={diagnostics} />
+
             {/* KPI row */}
             {funnel && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

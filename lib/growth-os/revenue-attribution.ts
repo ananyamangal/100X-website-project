@@ -175,8 +175,9 @@ export async function buildAttributionReport(): Promise<AttributionReport> {
   const leads    = rawLeads as unknown as LeadAttribution[]
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString().slice(0, 10)
+  // ads_keyword_rows uses `syncDate` (YYYY-MM-DD string) and `spend` (already in INR).
   const kwRows = await db.collection("ads_keyword_rows")
-    .find({ date: { $gte: thirtyDaysAgo } })
+    .find({ syncDate: { $gte: thirtyDaysAgo } })
     .toArray()
 
   const kwCostMap: Record<string, number>   = {}
@@ -184,7 +185,7 @@ export async function buildAttributionReport(): Promise<AttributionReport> {
   for (const row of kwRows) {
     const kw   = String(row.keyword  ?? "").toLowerCase()
     const camp = String(row.campaign ?? "").toLowerCase()
-    const cost = Number(row.costMicros ?? 0) / 1_000_000
+    const cost = Number(row.spend ?? 0)   // `spend` is already in INR (fromMicros applied at sync)
     if (kw)   kwCostMap[kw]     = (kwCostMap[kw] ?? 0) + cost
     if (camp) campCostMap[camp] = (campCostMap[camp] ?? 0) + cost
   }

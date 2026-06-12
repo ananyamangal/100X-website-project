@@ -145,7 +145,7 @@ async function analyzeCostMatch(): Promise<{
 
   const [adsRows, attrLeads] = await Promise.all([
     db.collection("ads_keyword_rows")
-      .find({ date: { $gte: thirtyDaysAgo } })
+      .find({ syncDate: { $gte: thirtyDaysAgo } })   // field is syncDate, not date
       .toArray(),
     db.collection("revenue_attribution")
       .find({ keyword: { $exists: true, $nin: [null, ""] } })
@@ -153,7 +153,7 @@ async function analyzeCostMatch(): Promise<{
       .toArray(),
   ])
 
-  const adsRowsWithSpend = adsRows.filter(r => Number(r.costMicros ?? 0) > 0)
+  const adsRowsWithSpend = adsRows.filter(r => Number(r.spend ?? 0) > 0)  // field is `spend` (INR), not costMicros
 
   const campaignsWithSpend = [...new Set(
     adsRowsWithSpend.map(r => String(r.campaign ?? "")).filter(Boolean)
