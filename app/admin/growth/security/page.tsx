@@ -76,10 +76,10 @@ export default function SecurityPage() {
               color: "text-sky-600 bg-sky-50",
             },
             {
-              href:  "/admin/growth/security/sessions",
+              href:  "/admin/change-password",
               icon:  Key,
               label: "Change Password",
-              desc:  "Update your admin password.",
+              desc:  "Update your admin password. Other sessions are signed out automatically.",
               color: "text-purple-600 bg-purple-50",
             },
             {

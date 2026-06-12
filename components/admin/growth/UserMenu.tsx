@@ -124,7 +124,7 @@ export function UserMenu() {
               <Monitor size={13} className="text-gray-400" />Active Sessions
             </Link>
             <Link
-              href="/admin/growth/security/sessions"
+              href="/admin/change-password"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
             >
