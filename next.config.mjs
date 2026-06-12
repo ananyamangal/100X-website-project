@@ -45,6 +45,29 @@ const nextConfig = {
       { source: '/products/double-barrel-thermal-fogging-machine-vehicle-mounted',               destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
       { source: '/products/68e52538f84599d156f377e0',                                            destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
       { source: '/products/6a1e6c08ef20ab52efaa3d69',                                            destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
+
+      // ── Soft-404 recovery: historical backlink slugs not in DB ────────────
+      // These slugs were referenced in backlinks / SEO agency reports but never
+      // had a DB entry (no-hash versions, dead slugs, short model codes).
+      // Without these, the /products/[id] route returns HTTP 200 with empty
+      // product content — a soft 404 that destroys backlink equity.
+
+      // TFS50 — slug variants
+      { source: '/products/thermal-and-cold-fogging-machine-100xtfs50',   destination: '/thermal-and-cold-fogging-machine-100xtfs50',                               permanent: true },
+      { source: '/products/thermal-cold-fogging-machine-100xtfs50',       destination: '/thermal-and-cold-fogging-machine-100xtfs50',                               permanent: true },
+      { source: '/products/100xtfs50',                                     destination: '/thermal-and-cold-fogging-machine-100xtfs50',                               permanent: true },
+      { source: '/products/tfs50',                                         destination: '/thermal-and-cold-fogging-machine-100xtfs50',                               permanent: true },
+
+      // SSMA20 — slug variants
+      { source: '/products/thermal-fogging-machine-with-stainless-steel-tank-100xssma20', destination: '/thermal-fogging-machine-with-stainless-steel-tank-100xssma20', permanent: true },
+      { source: '/products/100xssma20',                                    destination: '/thermal-fogging-machine-with-stainless-steel-tank-100xssma20',             permanent: true },
+      { source: '/products/ssma20',                                        destination: '/thermal-fogging-machine-with-stainless-steel-tank-100xssma20',             permanent: true },
+
+      // DB400 — slug variants (includes the previously dead -aa3d69 slug)
+      { source: '/products/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400',    destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
+      { source: '/products/100xdb400-double-barrel-thermal-fogging-machine-vehicle-moun-aa3d69',  destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
+      { source: '/products/100xdb400',                                     destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400',        permanent: true },
+      { source: '/products/db400',                                         destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400',        permanent: true },
     ]
   },
 
