@@ -65,7 +65,7 @@ interface BannerInput {
 // desktopBannerImage when the latter is absent, and defaults the per-device
 // enable flags to the slide-level isActive.
 function normalizeBanner(raw: any) {
-  const desktopBannerImage = raw?.desktopBannerImage ?? raw?.image ?? '';
+  const desktopBannerImage = raw?.desktopBannerImage || raw?.image || '';
   const tabletBannerImage = raw?.tabletBannerImage ?? '';
   const mobileBannerImage = raw?.mobileBannerImage ?? '';
   return {
@@ -95,7 +95,7 @@ function normalizeBanner(raw: any) {
 // Write shim — when admin saves only the new fields, mirror desktopBannerImage
 // into the legacy `image` field so any other reader sees a coherent record.
 function applyWriteDefaults(input: BannerInput) {
-  const desktopBannerImage = input.desktopBannerImage ?? input.image ?? '';
+  const desktopBannerImage = input.desktopBannerImage || input.image || '';
   return {
     ...input,
     image: desktopBannerImage,

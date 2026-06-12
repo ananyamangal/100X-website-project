@@ -427,11 +427,8 @@ function AdminDashboardContent() {
       credentials: "include",
       body: JSON.stringify(updatedBanner),
     })
-    const updated = await res.json()
-    setBanners(banners.map(b => b.id === updated._id ? {
-      ...updated,
-      id: updated._id,
-    } : b))
+    await res.json()
+    setBanners(banners.map(b => b.id === updatedBanner.id ? { ...b, ...updatedBanner } : b))
     setEditingBanner(null)
   }
 
@@ -4234,7 +4231,7 @@ function BannerForm({
 }) {
   // Initial state migrates the legacy single `image` into desktopBannerImage.
   const [formData, setFormData] = useState({
-    desktopBannerImage: banner?.desktopBannerImage ?? banner?.image ?? "",
+    desktopBannerImage: banner?.desktopBannerImage || banner?.image || "",
     tabletBannerImage: banner?.tabletBannerImage ?? "",
     mobileBannerImage: banner?.mobileBannerImage ?? "",
     desktopBannerAlt: banner?.desktopBannerAlt ?? "",
@@ -4271,7 +4268,7 @@ function BannerForm({
       setToast({ kind: "err", text: "Desktop banner image is required." })
       return
     }
-    const payload = { ...formData }
+    const payload = { ...formData, id: banner?.id, _id: banner?._id }
     if (isDefault) payload.order = 0
     onSave(payload)
     setToast({ kind: "ok", text: banner ? "Banner updated." : "Banner created." })
