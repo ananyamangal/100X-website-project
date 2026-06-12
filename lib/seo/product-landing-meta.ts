@@ -47,6 +47,9 @@ export async function productLandingMetadata(slug: string): Promise<Metadata> {
     title,
     description,
     keywords,
+    // Slug not in the landing-page registry → page calls notFound(), but ISR may
+    // serve a stale 200. Noindex the fallback so Google ignores any such ghost response.
+    ...(!def && { robots: { index: false, follow: true } }),
     alternates: {
       canonical: `/${slug}`,
     },

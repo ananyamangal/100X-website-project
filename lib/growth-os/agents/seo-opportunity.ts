@@ -9,6 +9,19 @@ import { logAgentRun } from "@/lib/growth-os/log-agent"
 
 const MIN_IMPRESSIONS_FOR_OPPORTUNITY = 50
 
+/**
+ * Returns true for programmatic/bot-generated queries that should never become
+ * content opportunities. Catches: quoted exact-match rank-checking searches,
+ * competitor brand pings, and URL-slug-shaped strings.
+ */
+function isJunkQuery(query: unknown): boolean {
+  const q = String(query ?? "")
+  if (q.includes('"') || q.includes("'")) return true              // quoted rank-check
+  if (/\baerosoldi?y\b/i.test(q)) return true                      // competitor brand
+  if (/^[a-z0-9]+(-[a-z0-9]+){3,}$/.test(q)) return true          // pure URL slug
+  return false
+}
+
 function expectedCtr(position: number): number {
   if (position <= 3) return 0.11
   if (position <= 5) return 0.08
@@ -67,7 +80,7 @@ export async function runSEOOpportunityAgent(): Promise<SEOOpportunityResult> {
     const pos = r.position as number
     const imp = r.impressions as number
     const ctr = r.ctr as number
-    return pos >= 4 && pos <= 20 && imp >= MIN_IMPRESSIONS_FOR_OPPORTUNITY && ctr < expectedCtr(pos) * 0.75
+    return pos >= 4 && pos <= 20 && imp >= MIN_IMPRESSIONS_FOR_OPPORTUNITY && ctr < expectedCtr(pos) * 0.75 && !isJunkQuery(r.query)
   }).sort((a, b) => (b.impressions as number) - (a.impressions as number)).slice(0, 10)
 
   for (const nw of nearWins) {
@@ -89,6 +102,7 @@ export async function runSEOOpportunityAgent(): Promise<SEOOpportunityResult> {
 
   // 2. Rank drops — position worsened >= 5 on high-impression queries
   for (const curr of currQ) {
+    if (isJunkQuery(curr.query)) continue
     const prev = prevQMap.get(String(curr.query))
     if (!prev) continue
     const posChange = (curr.position as number) - (prev.position as number)
@@ -124,7 +138,7 @@ export async function runSEOOpportunityAgent(): Promise<SEOOpportunityResult> {
 
   // 4. New high-impression keywords — in current but not in previous
   const newKeywords = currQ
-    .filter(r => !prevQMap.has(String(r.query)) && (r.impressions as number) >= 100)
+    .filter(r => !prevQMap.has(String(r.query)) && (r.impressions as number) >= 100 && !isJunkQuery(r.query))
     .sort((a, b) => (b.impressions as number) - (a.impressions as number))
     .slice(0, 5)
 
