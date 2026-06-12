@@ -427,9 +427,13 @@ function AdminDashboardContent() {
       credentials: "include",
       body: JSON.stringify(updatedBanner),
     })
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error || "Banner update failed")
+    }
     await res.json()
     setBanners(banners.map(b => b.id === updatedBanner.id ? { ...b, ...updatedBanner } : b))
-    setEditingBanner(null)
+    // Form closure is handled by BannerForm after showing the success toast.
   }
 
   // Delete banner
@@ -3201,6 +3205,7 @@ function BannersTab({
         <div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Banner Management</h2>
           <p className="text-gray-600">Manage homepage banner images and their content</p>
+          <p className="text-xs text-amber-600 mt-1">Homepage changes may take up to 60 seconds to appear due to caching.</p>
         </div>
         <Button
           onClick={() => setIsAddingBanner(true)}
@@ -4225,7 +4230,7 @@ function BannerForm({
   isDefault = false,
 }: {
   banner?: Banner | null
-  onSave: (banner: any) => void
+  onSave: (banner: any) => Promise<void> | void
   onCancel: () => void
   isDefault?: boolean
 }) {
@@ -4254,6 +4259,7 @@ function BannerForm({
     slideshowInterval: banner?.slideshowInterval || 4000,
   })
   const [toast, setToast] = useState<{ kind: "ok" | "err"; text: string } | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
   // Auto-dismiss success toasts after 3s; keep error toasts sticky so admin
   // doesn't miss them.
   useEffect(() => {
@@ -4262,16 +4268,27 @@ function BannerForm({
     return () => window.clearTimeout(t)
   }, [toast])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.desktopBannerImage) {
       setToast({ kind: "err", text: "Desktop banner image is required." })
       return
     }
+    setIsSaving(true)
     const payload = { ...formData, id: banner?.id, _id: banner?._id }
     if (isDefault) payload.order = 0
-    onSave(payload)
-    setToast({ kind: "ok", text: banner ? "Banner updated." : "Banner created." })
+    try {
+      await onSave(payload)
+      if (banner) {
+        // Edit mode: parent does not close the form, so show success then close.
+        setToast({ kind: "ok", text: "Banner updated successfully." })
+        window.setTimeout(() => onCancel(), 1500)
+      }
+    } catch (err) {
+      setToast({ kind: "err", text: err instanceof Error ? err.message : "Banner save failed." })
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -4486,10 +4503,10 @@ function BannerForm({
             <Button
               type="submit"
               className="bg-green-600 hover:bg-green-700"
-              disabled={!formData.desktopBannerImage}
+              disabled={!formData.desktopBannerImage || isSaving}
             >
               <Save className="mr-2" size={16} />
-              {banner ? "Update Banner" : "Add Banner"}
+              {isSaving ? "Saving…" : banner ? "Update Banner" : "Add Banner"}
             </Button>
             <Button type="button" variant="outline" onClick={onCancel}>
               <X className="mr-2" size={16} />

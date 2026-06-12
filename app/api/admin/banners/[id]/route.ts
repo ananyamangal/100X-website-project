@@ -42,11 +42,17 @@ export async function PUT(
     const bannerData: BannerUpdate = await request.json();
     const updatedAt = new Date();
 
-    // Mirror desktopBannerImage into the legacy `image` field on writes so
-    // any reader that still references `image` stays in sync.
-    const writePayload: Record<string, any> = { ...bannerData, updatedAt };
-    if (bannerData.desktopBannerImage !== undefined) {
-      writePayload.image = bannerData.desktopBannerImage;
+    // Strip client-sent fields that must never enter a MongoDB $set:
+    //   _id  — immutable; MongoDB throws ImmutableField if included
+    //   id   — client-side alias, not a real document field
+    //   createdAt — set once at creation; never overwrite
+    const { _id: _1, id: _2, createdAt: _3, ...safeBannerData } = bannerData as any;
+
+    // Mirror desktopBannerImage into the legacy `image` field so any reader
+    // that still references `image` stays in sync.
+    const writePayload: Record<string, any> = { ...safeBannerData, updatedAt };
+    if (safeBannerData.desktopBannerImage !== undefined) {
+      writePayload.image = safeBannerData.desktopBannerImage;
     }
 
     const client = await clientPromise;
@@ -60,7 +66,19 @@ export async function PUT(
       return NextResponse.json({ error: "Banner not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true });
+    // Read-back verification: prove the write actually persisted in Mongo.
+    const verified = await db.collection("banners").findOne({ _id: new ObjectId(id) });
+
+    return NextResponse.json({
+      success: true,
+      modifiedCount: result.modifiedCount,
+      banner: {
+        _id:                verified?._id?.toString(),
+        desktopBannerImage: verified?.desktopBannerImage ?? "",
+        image:              verified?.image ?? "",
+        updatedAt:          verified?.updatedAt,
+      },
+    });
   } catch (error) {
     console.error("❌ Error in PUT /api/admin/banners/[id]:", error);
     return NextResponse.json({ error: "Failed to update banner" }, { status: 500 });
