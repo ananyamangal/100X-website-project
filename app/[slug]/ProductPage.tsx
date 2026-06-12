@@ -10,6 +10,7 @@ import { getLandingPage } from '@/lib/seo/landing-pages';
 import RFQForm from '@/components/forms/RFQForm';
 import PremiumAccordion from '@/components/cinematic/PremiumAccordion';
 import { plainTextFromHtml } from '@/lib/rich-text';
+import { decodeHtmlEntities } from '@/lib/utils';
 
 // ── Utilities ────────────────────────────────────────────────────────────
 

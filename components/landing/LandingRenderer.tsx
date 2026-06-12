@@ -7,6 +7,7 @@ import {
   getLandingTheme,
 } from "@/lib/seo/landing-pages"
 import { getMergedLandingPage } from "@/lib/seo/get-merged-landing-page"
+import { getProductBySlug } from "@/lib/productsQuery"
 import type { FaqEntry, LandingPageDef, LandingSection } from "@/lib/seo/landing-types"
 
 import LandingThemeProvider from "./LandingThemeProvider"
@@ -163,12 +164,18 @@ export default async function LandingRenderer({ slug }: Props) {
   // ─── Back-compat path: existing product landings render the legacy
   // ProductPage UI with their content1/2/3 narrative blocks. No new
   // sections needed — this keeps the 3 existing landings byte-stable.
+  //
+  // Product data is fetched server-side here (name-fuzzy match covers the
+  // canonical SEO slug even when it differs from the DB slug field).
+  // Passing it as a prop prevents ProductPage from making a client-side
+  // /api/admin/ fetch that fails with 401 for unauthenticated visitors.
   if (def.type === "product") {
+    const product = await getProductBySlug(slug)
     return (
       <>
         <ProductLandingJsonLd slug={slug} />
         <BreadcrumbJsonLd items={breadcrumb} />
-        <ProductPage />
+        <ProductPage product={product ?? undefined} slug={slug} />
       </>
     )
   }
