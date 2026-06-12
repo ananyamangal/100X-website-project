@@ -334,7 +334,7 @@ function SpecsTable({ specs, youtubeLink }: { specs: string[]; youtubeLink?: str
 
 function FeaturedVideoSection({ videoId, productName }: { videoId: string; productName: string }) {
   const [playing, setPlaying] = useState(false)
-  const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+  const thumb = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
   return (
     <section className="bg-gray-950 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
