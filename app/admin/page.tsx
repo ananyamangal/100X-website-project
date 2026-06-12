@@ -57,6 +57,7 @@ import { ProductBadgesTab } from "@/components/admin/ProductBadgesTab"
 import { CertificationsManagerTab } from "@/components/admin/CertificationsManagerTab"
 import { MediaLibraryTab } from "@/components/admin/MediaLibraryTab"
 import { SeoHealthTab } from "@/components/admin/SeoHealthTab"
+import { SchemaHealthTab } from "@/components/admin/SchemaHealthTab"
 import { ProductForm } from "@/components/admin/ProductForm"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
@@ -1283,6 +1284,17 @@ function AdminDashboardContent() {
                   <Search className="mr-3" size={20} />
                   SEO Health
                 </button>
+                <button
+                  onClick={() => setActiveTab("schemaHealth")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "schemaHealth"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <ClipboardCheck className="mr-3" size={20} />
+                  Schema Health
+                </button>
                 <a
                   href="/admin/system-health"
                   className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
@@ -1423,6 +1435,7 @@ function AdminDashboardContent() {
             {activeTab === "certifications" && <CertificationsManagerTab />}
             {activeTab === "mediaLibrary" && <MediaLibraryTab />}
             {activeTab === "seoHealth" && <SeoHealthTab />}
+            {activeTab === "schemaHealth" && <SchemaHealthTab />}
             {activeTab === "migration" && <MigrationTab />}
           </div>
         </div>

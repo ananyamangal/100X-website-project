@@ -1,6 +1,7 @@
 import clientPromise from "@/lib/mongodb"
 import { getGSCSiteUrl, fetchAllGSCRows, dateRange } from "@/lib/gsc"
 import { getValidAccessToken } from "@/lib/google-oauth"
+import { runSchemaHealthAudit } from "@/lib/seo/schemaHealthAuditor"
 
 export interface GSCSyncResult {
   ok: boolean
@@ -74,6 +75,9 @@ export async function runGSCSync(): Promise<GSCSyncResult> {
     const oldest = await db.collection("gsc_syncs").find({}).sort({ syncedAt: 1 }).limit(count - 30).project({ _id: 1 }).toArray()
     if (oldest.length) await db.collection("gsc_syncs").deleteMany({ _id: { $in: oldest.map((d) => d._id) } })
   }
+
+  // Run schema health audit after each GSC sync (non-blocking — failure does not fail the sync)
+  runSchemaHealthAudit("daily_sync").catch(() => {})
 
   return { ok: errors.length === 0, queryCount, pageCount, syncedAt, currentPeriod: current, errors }
 }
