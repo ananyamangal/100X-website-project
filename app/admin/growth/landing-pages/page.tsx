@@ -6,7 +6,7 @@ import {
   Globe, FileText, X, CheckCircle2, XCircle, Layout,
   List, Eye, BookOpen, Search, ChevronRight, Shield,
   ClipboardCheck, BarChart2, AlertCircle, TrendingUp,
-  Lock, Unlock, UserCheck, UserX,
+  Lock, Unlock, UserCheck, UserX, Pencil,
 } from "lucide-react"
 import Link from "next/link"
 import { getAllLandingPages, getLandingTheme, type LandingPageDef } from "@/lib/seo/landing-pages"
@@ -654,7 +654,7 @@ function SourceModal({
 
         {/* Footer */}
         <div className="px-5 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between gap-3">
-          <p className="text-[10px] text-gray-400">Stage A.5 · Read-only · No edits until Stage B is approved</p>
+          <p className="text-[10px] text-gray-400">Stage B · Use Edit to save overrides · Live rendering unchanged until Stage C</p>
           <div className="flex gap-2">
             <a href={fullUrl} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
@@ -1125,11 +1125,10 @@ export default function LandingPagesInventory() {
 
         {/* Read-only notice */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-3.5 flex items-center gap-3">
-          <Lock size={14} className="text-blue-500 shrink-0" />
+          <Pencil size={14} className="text-blue-500 shrink-0" />
           <p className="text-xs text-blue-800">
-            <strong>Stage A.5 — read-only.</strong> This page loads data from the static TypeScript registry only.
-            Health scores are computed from schema analysis. Impact data is fetched from synced GSC MongoDB data (read-only).
-            No database writes. No routing changes.
+            <strong>Stage B active.</strong> Click <strong>Edit</strong> on any page to edit SEO, hero copy, FAQs, and related pages.
+            Overrides are stored in <code className="bg-blue-100 px-1 rounded">landing_page_overrides</code> — live site rendering is unchanged until Stage C.
           </p>
         </div>
 
@@ -1258,6 +1257,10 @@ export default function LandingPagesInventory() {
                             className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
                             <Eye size={11} />Preview
                           </a>
+                          <Link href={`/admin/growth/landing-pages/${def.slug}/edit`}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">
+                            <Pencil size={11} />Edit
+                          </Link>
                           <button onClick={() => setDetailPage(def)}
                             className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors">
                             <Info size={11} />Details
@@ -1326,6 +1329,10 @@ export default function LandingPagesInventory() {
                     <span className="text-[10px] text-gray-400">
                       {sectionTypes.length > 0 ? `${sectionTypes.length} sections` : "legacy"}
                     </span>
+                    <Link href={`/admin/growth/landing-pages/${def.slug}/edit`}
+                      className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-amber-600 border border-amber-200 rounded-lg hover:bg-amber-50 transition-colors">
+                      <Pencil size={10} />Edit
+                    </Link>
                     <button onClick={() => setDetailPage(def)}
                       className="text-gray-400 hover:text-gray-700 transition-colors" title="View details">
                       <ChevronRight size={14} />
