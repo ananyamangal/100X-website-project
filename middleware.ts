@@ -13,7 +13,6 @@ const AUTH_WHITELIST = new Set([
   "/api/admin/auth/reset-password",
   "/api/admin/auth/google",
   "/api/admin/auth/google/callback",
-  "/api/admin/auth/user-audit-probe",
   "/api/admin/health",
   "/api/admin/gsc/oauth/callback",
   "/api/admin/rbac/seed",
