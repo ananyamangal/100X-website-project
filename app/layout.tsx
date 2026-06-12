@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(SITE_URL),
     title: 'Thermal Fogging Machine Manufacturer in India | 100x Circle',
     description:
-      '100x Circle manufactures thermal & cold fogging machines for mosquito control, public health & agriculture. GeM approved. Get a quote today.',
+      'Factory-direct thermal foggers — vehicle-mounted, portable, SS-tank. GeM-approved OEM. Municipalities, pest control firms & farms across India. Get a quote.',
     applicationName: SITE_NAME,
     authors: [{ name: SITE_NAME, url: SITE_URL }],
     creator: SITE_NAME,
