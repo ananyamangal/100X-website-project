@@ -629,7 +629,8 @@ export default function ProductDetailV2({ product }: Props) {
 
   // Data extraction
   const name         = s(product.name)
-  const h1           = s(product.h1Title) || name
+  const rawH1        = s(product.h1Title)
+  const h1           = rawH1.includes(' ') ? rawH1 : name
   const tagline      = s(product.tagline)
   const price        = s(product.priceRange)
   const shortDesc    = plainTextFromHtml(product.shortDescription || product.detailedDescription)
