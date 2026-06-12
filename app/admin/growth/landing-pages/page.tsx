@@ -6,7 +6,7 @@ import {
   Globe, FileText, X, CheckCircle2, XCircle, Layout,
   List, Eye, BookOpen, Search, ChevronRight, Shield,
   ClipboardCheck, BarChart2, AlertCircle, TrendingUp,
-  Lock, Unlock, UserCheck, UserX, Pencil,
+  Lock, Unlock, UserCheck, UserX, Pencil, History,
 } from "lucide-react"
 import Link from "next/link"
 import { getAllLandingPages, getLandingTheme, type LandingPageDef } from "@/lib/seo/landing-pages"
@@ -654,17 +654,130 @@ function SourceModal({
 
         {/* Footer */}
         <div className="px-5 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between gap-3">
-          <p className="text-[10px] text-gray-400">Stage B · Use Edit to save overrides · Live rendering unchanged until Stage C</p>
+          <p className="text-[10px] text-gray-400">Overrides in landing_page_overrides · Live rendering unchanged until Stage C</p>
           <div className="flex gap-2">
+            <Link href={`/admin/growth/landing-pages/${def.slug}/edit`}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              <Pencil size={12} />Edit Page
+            </Link>
             <a href={fullUrl} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
-              <Eye size={12} />Preview live page
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+              <Eye size={12} />Preview
             </a>
             <button onClick={onClose}
               className="px-3 py-1.5 text-xs text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
               Close
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── History Modal ────────────────────────────────────────────────────────────
+
+function HistoryModal({
+  def,
+  onClose,
+}: {
+  def: LandingPageDef
+  onClose: () => void
+}) {
+  const [loading, setLoading] = useState(true)
+  const [history, setHistory] = useState<Array<{
+    timestamp: string
+    userEmail: string
+    userName: string
+    fieldsChanged: string[]
+  }>>([])
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch(`/api/admin/landing-pages/${def.slug}/override`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) setHistory(d.history ?? [])
+        else setError("Failed to load history")
+      })
+      .catch(() => setError("Network error"))
+      .finally(() => setLoading(false))
+  }, [def.slug])
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div>
+            <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
+              <History size={14} className="text-gray-500" />
+              Edit History
+            </h2>
+            <p className="text-[11px] text-gray-500 mt-0.5 font-mono">/{def.slug}</p>
+          </div>
+          <button onClick={onClose}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          {loading && (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          )}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-xs text-red-700">{error}</div>
+          )}
+          {!loading && !error && history.length === 0 && (
+            <div className="text-center py-12">
+              <History size={24} className="text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-500">No edit history yet.</p>
+              <p className="text-xs text-gray-400 mt-1">Changes will appear here after the first edit.</p>
+            </div>
+          )}
+          {!loading && !error && history.length > 0 && (
+            <div className="space-y-2">
+              {history.map((entry, i) => (
+                <div key={i} className="border border-gray-200 rounded-xl p-3.5">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div>
+                      <p className="text-xs font-medium text-gray-900">{entry.userName || entry.userEmail}</p>
+                      <p className="text-[10px] text-gray-500">{entry.userEmail}</p>
+                    </div>
+                    <p className="text-[10px] text-gray-400 shrink-0">
+                      {new Date(entry.timestamp).toLocaleString("en-IN", {
+                        day: "numeric", month: "short", year: "numeric",
+                        hour: "2-digit", minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  {entry.fieldsChanged.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {entry.fieldsChanged.map(f => (
+                        <span key={f} className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-mono">{f}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="px-5 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+          <Link href={`/admin/growth/landing-pages/${def.slug}/edit`}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            <Pencil size={12} />Edit This Page
+          </Link>
+          <button onClick={onClose}
+            className="px-3 py-1.5 text-xs text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
+            Close
+          </button>
         </div>
       </div>
     </div>
@@ -811,11 +924,9 @@ function PermissionsAudit() {
 
       <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
         <p className="text-[10px] text-gray-500">
-          Stage A.5 — No edit permissions granted to any role in this phase.
-          <code className="bg-gray-100 px-1 rounded ml-1">landing_pages.edit</code> exists in the schema
-          but no CMS edit UI exists yet.
-          <code className="bg-gray-100 px-1 rounded mx-1">landing_pages.publish</code> is schema-only — no publish route exists.
-          Edit and publish capabilities are Stage B scope.
+          Stage B active — Edit permissions granted to super_admin, growth_admin, seo_team, and content_team.
+          <code className="bg-gray-100 px-1 rounded mx-1">landing_pages.publish</code> is schema-only — no publish route exists yet.
+          Live rendering unchanged until Stage C.
         </p>
       </div>
     </div>
@@ -869,9 +980,11 @@ function AcceptanceTestReport() {
       status: "pass",
     },
     {
-      test: "growth_admin access gap",
-      result: `growth_admin missing landing_pages.view — gap in lib/rbac/roles.ts:63`,
-      status: "warn",
+      test: "growth_admin access",
+      result: roleAccess.find(r => r.role === "growth_admin")?.canView
+        ? "growth_admin has landing_pages.view + landing_pages.edit ✓"
+        : "growth_admin missing landing_pages.view — gap in lib/rbac/roles.ts",
+      status: roleAccess.find(r => r.role === "growth_admin")?.canView ? "pass" : "warn",
     },
     {
       test: "Pages previewable",
@@ -894,8 +1007,8 @@ function AcceptanceTestReport() {
       status: "warn",
     },
     {
-      test: "No database writes",
-      result: "Confirmed — page reads only from static TypeScript registry",
+      test: "DB write scope",
+      result: "Overrides written to landing_page_overrides — main LANDING_PAGES registry is immutable",
       status: "pass",
     },
     {
@@ -948,10 +1061,10 @@ function AcceptanceTestReport() {
               "text-green-800"
             }`}>
               {fails > 0
-                ? `Stage A.5 has ${fails} failing test${fails > 1 ? "s" : ""} — do not proceed to Stage B until resolved`
+                ? `${fails} failing test${fails > 1 ? "s" : ""} — review and resolve before proceeding`
                 : warns > 0
-                ? `Stage A.5 passes with ${warns} warning${warns > 1 ? "s" : ""} — address before Stage B or document as known`
-                : "Stage A.5 passes all acceptance criteria — Stage B can proceed upon approval"
+                ? `CMS passes with ${warns} known warning${warns > 1 ? "s" : ""} — documented below`
+                : "All acceptance criteria pass — CMS fully operational"
               }
             </p>
           </div>
@@ -984,7 +1097,7 @@ function AcceptanceTestReport() {
           <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
             <p className="text-[10px] text-gray-500">
               Acceptance test run: {new Date().toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })} IST ·
-              Stage A.5 · Read-only · No DB writes · No routing changes
+              Landing Page CMS · Stage B active · No routing changes
             </p>
           </div>
         </>
@@ -999,8 +1112,10 @@ export default function LandingPagesInventory() {
   const [search, setSearch]         = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
   const [detailPage, setDetailPage] = useState<LandingPageDef | null>(null)
+  const [historyTarget, setHistoryTarget] = useState<LandingPageDef | null>(null)
   const [metrics, setMetrics]       = useState<MetricsMap>({})
   const [metricsLoading, setMetricsLoading] = useState(true)
+  const [cmsStatus, setCmsStatus]   = useState<{ withOverrides: number } | null>(null)
 
   // Fetch GSC metrics on mount — read-only, no writes
   useEffect(() => {
@@ -1009,6 +1124,14 @@ export default function LandingPagesInventory() {
       .then(d => { if (d.ok) setMetrics(d.metrics ?? {}) })
       .catch(() => {})
       .finally(() => setMetricsLoading(false))
+  }, [])
+
+  // Fetch CMS status (override count)
+  useEffect(() => {
+    fetch("/api/admin/landing-pages/cms-status")
+      .then(r => r.json())
+      .then(d => { if (d.ok) setCmsStatus({ withOverrides: d.withOverrides }) })
+      .catch(() => {})
   }, [])
 
   const pages = ALL_PAGES
@@ -1039,11 +1162,10 @@ export default function LandingPagesInventory() {
           <div>
             <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
               <Layout size={20} className="text-brand-600" />
-              Landing Pages
+              Landing Page CMS
             </h1>
             <p className="text-sm text-gray-500 mt-1">
-              Stage A.5 · Read-only visibility ·
-              Source: <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded">lib/seo/landing-pages.ts</code>
+              Manage SEO metadata, hero copy, FAQs, and related pages across all {ALL_PAGES.length} product landing pages.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -1089,6 +1211,30 @@ export default function LandingPagesInventory() {
           ))}
         </div>
 
+        {/* CMS Status card */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <Pencil size={12} className="text-gray-500" />CMS Status
+          </p>
+          <div className="grid grid-cols-3 gap-4 divide-x divide-gray-100">
+            <div>
+              <p className="text-2xl font-bold text-gray-900 leading-none">{pages.length}</p>
+              <p className="text-[11px] text-gray-500 mt-1">Pages Editable</p>
+            </div>
+            <div className="pl-4">
+              <p className="text-2xl font-bold text-gray-900 leading-none">
+                {cmsStatus !== null ? cmsStatus.withOverrides : <span className="text-gray-300">—</span>}
+              </p>
+              <p className="text-[11px] text-gray-500 mt-1">With Overrides</p>
+            </div>
+            <div className="pl-4">
+              <p className="text-2xl font-bold text-gray-300 leading-none">—</p>
+              <p className="text-[11px] text-gray-500 mt-1">Published</p>
+              <p className="text-[10px] text-gray-400">Stage C</p>
+            </div>
+          </div>
+        </div>
+
         {/* Footer gap alert */}
         {footerMissingPages.length > 0 && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
@@ -1123,17 +1269,35 @@ export default function LandingPagesInventory() {
           </div>
         )}
 
-        {/* Read-only notice */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3.5 flex items-center gap-3">
-          <Pencil size={14} className="text-blue-500 shrink-0" />
-          <p className="text-xs text-blue-800">
-            <strong>Stage B active.</strong> Click <strong>Edit</strong> on any page to edit SEO, hero copy, FAQs, and related pages.
-            Overrides are stored in <code className="bg-blue-100 px-1 rounded">landing_page_overrides</code> — live site rendering is unchanged until Stage C.
-          </p>
+        {/* CMS Capabilities banner */}
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 size={16} className="text-green-600 mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-green-900 mb-2">Landing Page CMS — Active</p>
+              <div className="flex flex-wrap gap-x-6 gap-y-1 mb-2">
+                {[
+                  "SEO metadata (title, description, OG image)",
+                  "Hero content (headline, subheadline, CTA)",
+                  "FAQs (add, edit, reorder, delete)",
+                  "Related pages",
+                ].map(cap => (
+                  <span key={cap} className="flex items-center gap-1.5 text-xs text-green-800">
+                    <Check size={11} className="text-green-600 shrink-0" />
+                    {cap}
+                  </span>
+                ))}
+              </div>
+              <p className="text-[11px] text-green-700">
+                Click <strong>Edit</strong> on any row to open the editor. Overrides are stored in{" "}
+                <code className="bg-green-100 px-1 rounded">landing_page_overrides</code> — live site rendering is unchanged until Stage C.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div id="landing-page-inventory" className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-200 flex items-center gap-3 flex-wrap">
             <div className="relative flex-1 min-w-48">
               <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -1253,14 +1417,18 @@ export default function LandingPagesInventory() {
                       {/* Actions */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
-                          <a href={fullUrl} target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
-                            <Eye size={11} />Preview
-                          </a>
                           <Link href={`/admin/growth/landing-pages/${def.slug}/edit`}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
                             <Pencil size={11} />Edit
                           </Link>
+                          <a href={fullUrl} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                            <Eye size={11} />Preview
+                          </a>
+                          <button onClick={() => setHistoryTarget(def)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                            <History size={11} />History
+                          </button>
                           <button onClick={() => setDetailPage(def)}
                             className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors">
                             <Info size={11} />Details
@@ -1330,7 +1498,7 @@ export default function LandingPagesInventory() {
                       {sectionTypes.length > 0 ? `${sectionTypes.length} sections` : "legacy"}
                     </span>
                     <Link href={`/admin/growth/landing-pages/${def.slug}/edit`}
-                      className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-amber-600 border border-amber-200 rounded-lg hover:bg-amber-50 transition-colors">
+                      className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
                       <Pencil size={10} />Edit
                     </Link>
                     <button onClick={() => setDetailPage(def)}
@@ -1360,7 +1528,7 @@ export default function LandingPagesInventory() {
             <a href="/admin/seo-pages" className="text-brand-600 hover:underline">/admin/seo-pages</a>.
           </p>
           <p className="text-gray-500">
-            Stage A.5 · Read-only · No DB writes · No routing changes · Source: static TypeScript registry
+            Landing Page CMS · Edit overrides stored in <code className="bg-gray-200 px-1 rounded">landing_page_overrides</code> · Live rendering unchanged until Stage C · Source: static TypeScript registry
           </p>
         </div>
       </div>
@@ -1374,6 +1542,23 @@ export default function LandingPagesInventory() {
           onClose={() => setDetailPage(null)}
         />
       )}
+
+      {/* History modal */}
+      {historyTarget && (
+        <HistoryModal
+          def={historyTarget}
+          onClose={() => setHistoryTarget(null)}
+        />
+      )}
+
+      {/* Floating CTA */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <a href="#landing-page-inventory"
+          className="flex items-center gap-2 px-4 py-3 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all hover:shadow-xl text-sm font-medium">
+          <Pencil size={15} />
+          Open Landing Page Editor
+        </a>
+      </div>
     </div>
   )
 }
