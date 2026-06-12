@@ -169,11 +169,16 @@ function validateArticle(schema: Record<string, unknown>): ValidationIssue[] {
   if (!schema.datePublished) {
     issues.push({ field: "datePublished", message: "Required: datePublished", severity: "critical" })
   }
-  const author = schema.author as Record<string, unknown> | undefined
+  const author = schema.author as Record<string, unknown> | undefined | unknown[]
   if (!author) {
     issues.push({ field: "author", message: "Required: author (Person or Organization with name)", severity: "critical" })
-  } else if (!author.name) {
-    issues.push({ field: "author.name", message: "author present but missing name", severity: "critical" })
+  } else {
+    // @id-only reference to a named entity (e.g. /#organization) is valid — skip name check
+    const authorObj = Array.isArray(author) ? author[0] as Record<string, unknown> : author as Record<string, unknown>
+    const isRef = authorObj?.["@id"]
+    if (!isRef && !authorObj?.name) {
+      issues.push({ field: "author.name", message: "author present but missing name", severity: "critical" })
+    }
   }
   if (!schema.image) {
     issues.push({ field: "image", message: "Recommended: article image for Google Discover eligibility", severity: "warning" })
@@ -186,11 +191,15 @@ function validateOrganization(schema: Record<string, unknown>): ValidationIssue[
   if (!schema.name) {
     issues.push({ field: "name", message: "Required: name", severity: "critical" })
   }
-  if (!schema.url) {
-    issues.push({ field: "url", message: "Recommended: url for identity disambiguation", severity: "warning" })
-  }
-  if (!schema.logo) {
-    issues.push({ field: "logo", message: "Recommended: logo (ImageObject)", severity: "warning" })
+  // Skip url/logo warnings on @id supplement nodes (inherit from primary entity via graph merge)
+  const isSupplementNode = schema["@id"] && !schema.url && !schema.logo && (schema.aggregateRating || schema.review)
+  if (!isSupplementNode) {
+    if (!schema.url) {
+      issues.push({ field: "url", message: "Recommended: url for identity disambiguation", severity: "warning" })
+    }
+    if (!schema.logo) {
+      issues.push({ field: "logo", message: "Recommended: logo (ImageObject)", severity: "warning" })
+    }
   }
   return issues
 }
