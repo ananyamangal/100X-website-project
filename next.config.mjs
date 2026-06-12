@@ -68,6 +68,15 @@ const nextConfig = {
       { source: '/products/100xdb400-double-barrel-thermal-fogging-machine-vehicle-moun-aa3d69',  destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
       { source: '/products/100xdb400',                                     destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400',        permanent: true },
       { source: '/products/db400',                                         destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400',        permanent: true },
+
+      // ── Catch-all: model-code regex — future legacy URL variations ────────
+      // Any /products/<slug> that contains a canonical model identifier is
+      // redirected to that product's SEO landing page. Specific redirects
+      // above take priority; these catch every other variation automatically.
+      // Pattern ssma.?20 matches: ssma20, ssma-20, ssma_20, 100x-ssma20, etc.
+      { source: '/products/:slug(.*ssma.?20.*)', destination: '/thermal-fogging-machine-with-stainless-steel-tank-100xssma20',             permanent: true },
+      { source: '/products/:slug(.*tfs.?50.*)',  destination: '/thermal-and-cold-fogging-machine-100xtfs50',                               permanent: true },
+      { source: '/products/:slug(.*db.?400.*)',  destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400',        permanent: true },
     ]
   },
 
