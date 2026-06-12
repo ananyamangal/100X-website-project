@@ -16,7 +16,6 @@ const AUTH_WHITELIST = new Set([
   "/api/admin/health",
   "/api/admin/gsc/oauth/callback",
   "/api/admin/rbac/seed",
-  "/api/admin/gsc/submit-sitemap",  // one-shot — delete after use
 ])
 
 async function isAuthenticated(request: NextRequest): Promise<boolean> {

@@ -1,0 +1,83 @@
+[
+  {
+    "url": "https://www.100xcircle.com/thermal-and-cold-fogging-machine-100xtfs50",
+    "slug": "thermal-and-cold-fogging-machine-100xtfs50",
+    "pass": true,
+    "finalUrl": "https://www.100xcircle.com/thermal-and-cold-fogging-machine-100xtfs50",
+    "pageTitle": "Buy Thermal and Cold Fogging Machine | 100x Circle",
+    "h1Text": "Thermal & Cold Fogging Machine-100XTFS50",
+    "productImageSrc": "https://www.100xcircle.com/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fdhbvzugv6%2Fimage%2Fupload%2Fv1780914923%2Frbgq25g8wiaxturtwajf.png&w=390&q=75",
+    "specsFound": [
+      "https://www.100xcircle.com/products/68e5217a0bab18231190602f",
+      "https://www.100xcircle.com/api/ai/products",
+      "position: relative;",
+      "display: inline-block;",
+      "content: \"\";"
+    ],
+    "checks": {
+      "Product title in H1": true,
+      "Product image visible": true,
+      "Specifications visible": true,
+      "No \"Product Not Found\"": true,
+      "No \"Oops / Something went wrong\"": true,
+      "No console errors": true,
+      "No failed API requests": true
+    },
+    "consoleErrors": [],
+    "apiErrors": []
+  },
+  {
+    "url": "https://www.100xcircle.com/thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
+    "slug": "thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
+    "pass": true,
+    "finalUrl": "https://www.100xcircle.com/thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
+    "pageTitle": "Buy Stainless Steel Tank Thermal Fogger | 100x Circle",
+    "h1Text": "Thermal Fogging Machine with Stainless steel tank -100XSSMA20",
+    "productImageSrc": "https://www.100xcircle.com/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fdhbvzugv6%2Fimage%2Fupload%2Fv1780914923%2Frbgq25g8wiaxturtwajf.png&w=390&q=75",
+    "specsFound": [
+      "https://www.100xcircle.com/products/68e523cd8d624609ac1b5dd8",
+      "https://www.100xcircle.com/api/ai/products",
+      "position: relative;",
+      "display: inline-block;",
+      "content: \"\";"
+    ],
+    "checks": {
+      "Product title in H1": true,
+      "Product image visible": true,
+      "Specifications visible": true,
+      "No \"Product Not Found\"": true,
+      "No \"Oops / Something went wrong\"": true,
+      "No console errors": true,
+      "No failed API requests": true
+    },
+    "consoleErrors": [],
+    "apiErrors": []
+  },
+  {
+    "url": "https://www.100xcircle.com/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+    "slug": "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+    "pass": true,
+    "finalUrl": "https://www.100xcircle.com/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+    "pageTitle": "Buy Double Barrel Thermal Fogging Machine | 100x Circle",
+    "h1Text": "double-barrel-thermal-fogging-machine-vehicle-mounted",
+    "productImageSrc": "https://www.100xcircle.com/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fdhbvzugv6%2Fimage%2Fupload%2Fv1780914923%2Frbgq25g8wiaxturtwajf.png&w=390&q=75",
+    "specsFound": [
+      "https://www.100xcircle.com/products/68e52538f84599d156f377e0",
+      "https://www.100xcircle.com/api/ai/products",
+      "position: relative;",
+      "display: inline-block;",
+      "content: \"\";"
+    ],
+    "checks": {
+      "Product title in H1": true,
+      "Product image visible": true,
+      "Specifications visible": true,
+      "No \"Product Not Found\"": true,
+      "No \"Oops / Something went wrong\"": true,
+      "No console errors": true,
+      "No failed API requests": true
+    },
+    "consoleErrors": [],
+    "apiErrors": []
+  }
+]
