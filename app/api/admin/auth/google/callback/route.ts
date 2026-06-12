@@ -16,6 +16,7 @@ import { getEffectivePermissions } from "@/lib/rbac/engine"
 import { writeAuditLog } from "@/lib/rbac/server"
 import { createSession, ensureSessionIndexes } from "@/lib/rbac/sessions"
 import { writeAuthAuditLog } from "@/lib/authAuditLog"
+import { getDefaultLandingPage } from "@/lib/rbac/landing"
 import type { DBUser } from "@/lib/rbac/types"
 
 function getBaseUrl(request: NextRequest): string {
@@ -188,10 +189,11 @@ export async function GET(request: NextRequest) {
     request
   )
 
-  await writeAuthAuditLog("google_login", email, ip, ua, { sessionId }, String(dbUser._id))
+  const destinationPage = getDefaultLandingPage(dbUser.role)
+  await writeAuthAuditLog("google_login", email, ip, ua, { sessionId, destination_page: destinationPage }, String(dbUser._id))
 
-  // ── Set session cookie and redirect to dashboard ───────────────────────────
-  const dashboardUrl = new URL("/admin/growth/dashboard", getBaseUrl(request))
+  // ── Set session cookie and redirect to role-specific landing page ──────────
+  const dashboardUrl = new URL(destinationPage, getBaseUrl(request))
   const response     = NextResponse.redirect(dashboardUrl)
 
   response.cookies.set(SESSION_COOKIE, token, {

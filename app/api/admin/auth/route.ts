@@ -5,6 +5,7 @@ import { verifyPassword } from "@/lib/rbac/password"
 import { getEffectivePermissions } from "@/lib/rbac/engine"
 import { writeAuditLog } from "@/lib/rbac/server"
 import { createSession, ensureSessionIndexes } from "@/lib/rbac/sessions"
+import { getDefaultLandingPage } from "@/lib/rbac/landing"
 import type { DBUser } from "@/lib/rbac/types"
 
 function setCookie(response: NextResponse, token: string) {
@@ -116,15 +117,16 @@ export async function POST(request: NextRequest) {
         }
       )
 
+      const destinationPage = getDefaultLandingPage(dbUser.role)
       await writeAuditLog(
         { sub: String(dbUser._id), email: dbUser.email, name: dbUser.name, role: dbUser.role, permissions, sessionId, iat: 0, exp: 0 },
         "login",
         "auth",
-        { email, sessionId },
+        { email, sessionId, destination_page: destinationPage },
         request
       )
 
-      const response = NextResponse.json({ success: true, role: dbUser.role })
+      const response = NextResponse.json({ success: true, role: dbUser.role, destination: destinationPage })
       setCookie(response, token)
       return response
     }

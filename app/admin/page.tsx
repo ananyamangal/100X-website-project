@@ -61,6 +61,7 @@ import { ProductForm } from "@/components/admin/ProductForm"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 interface Product {
   _id?: string;
@@ -850,6 +851,12 @@ function AdminDashboardContent() {
                 <Eye className="mr-2" size={16} />
                 View Website
               </Button>
+              <Link href="/admin/growth">
+                <Button className="bg-green-600 hover:bg-green-700 text-white gap-2">
+                  <Activity size={15} />
+                  Open Growth OS
+                </Button>
+              </Link>
               <AdminUserMenu />
             </div>
           </div>

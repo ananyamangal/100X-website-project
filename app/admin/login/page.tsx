@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input }     from "@/components/ui/input"
 import { Lock, Mail, Shield, Eye, EyeOff, ArrowLeft, CheckCircle } from "lucide-react"
 import { Suspense } from "react"
+import { getDefaultLandingPage } from "@/lib/rbac/landing"
 
 const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
   google_not_configured:       "Google login is not configured on this server.",
@@ -63,7 +64,7 @@ function LoginPageInner() {
         return
       }
 
-      router.push("/admin/growth/dashboard")
+      router.push(getDefaultLandingPage(data.role ?? ""))
     } catch {
       setError("Login failed. Please try again.")
     } finally {
