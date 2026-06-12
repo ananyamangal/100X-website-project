@@ -91,6 +91,7 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     "paid.view",
     "blog.view", "blog.create", "blog.edit", "blog.publish",
     "products.view", "products.edit",
+    "landing_pages.view", "landing_pages.edit",
     "dealers.view_all", "dealers.edit",
     "leads.view_all",
     "data.export_unlimited", "data.all_leads",
