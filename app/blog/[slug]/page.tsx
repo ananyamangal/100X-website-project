@@ -65,29 +65,33 @@ export async function generateMetadata({
       robots: { index: false, follow: true },
     }
   }
-  const title = blogStr(blog.title, "Blog post")
-  const desc = plainTextFromHtml(blogStr(blog.excerpt)).slice(0, 155)
+  const rawTitle    = blogStr(blog.title, "Blog post")
+  const metaTitle   = blogOptStr((blog as { metaTitle?: unknown }).metaTitle)
+  const metaDesc    = blogOptStr((blog as { metaDescription?: unknown }).metaDescription)
+  const seoTitle    = metaTitle || rawTitle
+  const fallbackDesc = plainTextFromHtml(blogStr(blog.excerpt)).slice(0, 155)
+  const desc        = metaDesc || fallbackDesc || "Industry insights from 100x Circle."
   const slug = blogPostSlug(blog) || rawSlug
   const url = `${SITE_URL}/blog/${slug}`
   const img = resolveCoverImage(blog.topImage)
 
   return {
-    title: `${title} | 100x Circle`,
-    description: desc || "Industry insights from 100x Circle.",
+    title: metaTitle ? metaTitle : `${rawTitle} | 100x Circle`,
+    description: desc,
     alternates: { canonical: `/blog/${slug}` },
     openGraph: {
-      title,
+      title: seoTitle,
       description: desc,
       url,
       siteName: "100x Circle",
       locale: "en_IN",
       type: "article",
-      images: [{ url: img, alt: title }],
+      images: [{ url: img, alt: seoTitle }],
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description: desc || undefined,
+      title: seoTitle,
+      description: desc,
       images: [img],
     },
   }
