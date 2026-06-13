@@ -26,6 +26,7 @@ const VALID_OPERATIONS: ApprovalOperation[] = [
   "batch_fetch",
   "batch_parse_save",
   "enrich_pending",
+  "archive_write",
 ]
 
 export async function POST(req: NextRequest) {

@@ -24,6 +24,7 @@ export type ApprovalOperation =
   | "batch_fetch"
   | "batch_parse_save"
   | "enrich_pending"
+  | "archive_write"
 
 export interface ApprovalRecord {
   token_id:               string

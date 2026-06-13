@@ -47,3 +47,6 @@ public/rfq-uploads/
 
 # OneDrive local archive
 OneDriveDataSULABH2018E*/audit/gsc-exports/
+
+# Local PDF archive (development only — production uses Vercel Blob)
+/archive-local/

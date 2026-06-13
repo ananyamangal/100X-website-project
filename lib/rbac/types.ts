@@ -116,6 +116,9 @@ export type AuditAction =
   | "enrichment_approved" | "enrichment_approval_rejected"
   | "enrichment_start" | "enrichment_stop" | "enrichment_complete" | "enrichment_failed"
   | "enrichment_unauthenticated"
+  | "archive_write_start" | "archive_write_complete" | "archive_write_failed"
+  | "archive_integrity_pass" | "archive_integrity_fail"
+  | "archive_write_version_conflict"
 
 // ── Active session document ───────────────────────────────────────────────────
 

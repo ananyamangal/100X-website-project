@@ -4,7 +4,7 @@ import {
   FileSearch, Users, Map, RefreshCw,
   TrendingUp, Building2, Search, X,
   BarChart3, PlusCircle, Download, Sparkles, Zap,
-  Network, Star, Package, SlidersHorizontal,
+  Network, Star, Package, SlidersHorizontal, Archive,
 } from "lucide-react"
 import { DealerPanel }          from "./DealerPanel"
 import { BidPanel }             from "./BidPanel"
@@ -23,6 +23,7 @@ import { CopilotTab }           from "./CopilotTab"
 import { CollectionHealthTab }  from "./CollectionHealthTab"
 import { BuyerIntelTab }        from "./BuyerIntelTab"
 import { CollectDataTab }       from "./CollectDataTab"
+import { ArchiveTab }           from "./ArchiveTab"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -132,6 +133,7 @@ type Tab =
   | "dealer-acq" | "product-disc" | "buyer-intel"
   | "contracts" | "dealers" | "heatmap"
   | "health" | "collect-data" | "report"
+  | "archive"
 
 // ─── 2-level navigation groups (simplified: 17 → 14 tabs) ────────────────────
 
@@ -171,6 +173,12 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "health",       label: "System Health", icon: BarChart3  },
       { id: "collect-data", label: "Collect Data",  icon: PlusCircle },
       { id: "report",       label: "Sales Report",  icon: Download   },
+    ],
+  },
+  {
+    id: "archive", label: "Archive", icon: Archive,
+    tabs: [
+      { id: "archive", label: "Contract Archive", icon: Archive },
     ],
   },
 ]
@@ -995,6 +1003,7 @@ export default function ProcurementIntelligence() {
         {activeTab === "health"        && <CollectionHealthTab />}
         {activeTab === "collect-data"  && <CollectDataTab onSaved={loadStats} />}
         {activeTab === "report"        && <ReportTab onDealerClick={handleDealerClick} />}
+        {activeTab === "archive"       && <ArchiveTab />}
       </div>
 
       {/* Dealer detail panel (slide-over) */}
