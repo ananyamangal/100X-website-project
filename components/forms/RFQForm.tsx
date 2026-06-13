@@ -110,7 +110,18 @@ export default function RFQForm({
   const [gemAuth, setGemAuth] = useState(false)
   const [dealerInquiry, setDealerInquiry] = useState(false)
   const [showOptional, setShowOptional] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef   = useRef<HTMLInputElement>(null)
+  const startFiredRef  = useRef(false)
+
+  const handleFormFocus = useCallback(() => {
+    if (startFiredRef.current) return
+    startFiredRef.current = true
+    fetch('/api/analytics/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: 'rfq_start', page: typeof window !== 'undefined' ? window.location.pathname : '', source: location }),
+    }).catch(() => {})
+  }, [location])
 
   // Stage 2 (contact + extras) appears once a product is selected.
   const stage2Visible = Boolean(product)
@@ -253,6 +264,7 @@ export default function RFQForm({
   return (
     <form
       onSubmit={handleSubmit}
+      onFocus={handleFormFocus}
       className={
         isPanel
           ? "space-y-3 rounded-2xl bg-white/95 backdrop-blur p-5 md:p-6 shadow-xl ring-1 ring-black/5"

@@ -60,6 +60,11 @@ export default function WhatsAppFloatingButton({
       phone_number: phoneDigitsForEvents,
       whatsapp_url: waUrl,
     })
+    fetch('/api/analytics/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: 'whatsapp_click', page: window.location.pathname, source: 'floating_button' }),
+    }).catch(() => {})
     window.open(waUrl, "_blank", "noopener,noreferrer")
   }, [waUrl, phoneDigitsForEvents])
 

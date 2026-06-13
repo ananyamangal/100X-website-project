@@ -7,6 +7,7 @@ import {
   ChevronDown, ChevronRight, CheckCircle2, Circle,
   Clock, Lock, ArrowRight, Info,
 } from "lucide-react"
+import ConversionDashboard from "./ConversionDashboard"
 
 // ══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -1283,13 +1284,16 @@ export default function FounderModePage() {
           )}
         </section>
 
-        {/* 3 — Founder Playbook */}
+        {/* 3 — Conversion Dashboard */}
+        <ConversionDashboard />
+
+        {/* 4 — Founder Playbook */}
         {readiness
           ? <PlaybookSection r={readiness} />
           : loading && <div className="h-48 bg-gray-100 rounded-xl animate-pulse" />
         }
 
-        {/* 4 — Advanced (journey, funnel, transparency, remarketing, readiness) */}
+        {/* 5 — Advanced (journey, funnel, transparency, remarketing, readiness) */}
         {data && (
           <AdvancedSection
             milestones={data.milestones}

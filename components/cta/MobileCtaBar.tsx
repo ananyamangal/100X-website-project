@@ -81,6 +81,7 @@ export default function MobileCtaBar() {
             href={telHref}
             aria-label={`Call ${BUSINESS.phonePrimary}`}
             data-gtm="cta_call"
+            onClick={() => fetch('/api/analytics/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'call_click', page: typeof window !== 'undefined' ? window.location.pathname : '', source: 'mobile_cta_bar' }) }).catch(() => {})}
             className="inline-flex min-h-[50px] flex-col items-center justify-center gap-0.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-600 text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
           >
             <Phone size={18} aria-hidden="true" />
@@ -93,6 +94,7 @@ export default function MobileCtaBar() {
             rel="noopener noreferrer"
             aria-label="Chat on WhatsApp"
             data-gtm="cta_whatsapp"
+            onClick={() => fetch('/api/analytics/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'whatsapp_click', page: typeof window !== 'undefined' ? window.location.pathname : '', source: 'mobile_cta_bar' }) }).catch(() => {})}
             className="inline-flex min-h-[50px] flex-col items-center justify-center gap-0.5 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-600 text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
           >
             <MessageCircle size={18} aria-hidden="true" />
