@@ -5,7 +5,8 @@
 
 import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
-import { requirePermission } from "@/lib/rbac/server"
+import { requirePermission, writeAuditLog } from "@/lib/rbac/server"
+import { verifyAndConsumeToken } from "@/lib/gem/approval"
 
 export const maxDuration = 120
 
@@ -102,8 +103,45 @@ export async function POST(request: NextRequest) {
   const auth = await requirePermission(request, "procurement.batch_collect.run")
   if (!("user" in auth)) return auth
 
-  const db      = (await clientPromise).db()
-  const { dryRun = false, maxItems = BATCH_SIZE * MAX_BATCHES } = await request.json().catch(() => ({}))
+  const body = await request.json().catch(() => ({}))
+  const { dryRun = false, maxItems = BATCH_SIZE * MAX_BATCHES, approval_token } = body
+
+  // Approval gate: dryRun is read-only, execution requires a valid approval token
+  if (!dryRun) {
+    if (!approval_token) {
+      await writeAuditLog(auth.user, "enrichment_unauthenticated", "enrich_pending", {
+        reason: "missing_approval_token",
+      }, request)
+      return NextResponse.json(
+        { error: "Approval required. Issue an approval token before running enrichment.", code: "APPROVAL_REQUIRED" },
+        { status: 403 }
+      )
+    }
+
+    const approval = await verifyAndConsumeToken(
+      approval_token,
+      auth.user.sub,
+      "enrich_pending",
+      "/api/admin/procurement/enrich-pending"
+    )
+    if (!approval) {
+      await writeAuditLog(auth.user, "enrichment_unauthenticated", "enrich_pending", {
+        reason: "invalid_expired_or_consumed_token",
+        token_id: approval_token,
+      }, request)
+      return NextResponse.json(
+        { error: "Approval token invalid, expired, or already used.", code: "APPROVAL_INVALID" },
+        { status: 403 }
+      )
+    }
+
+    await writeAuditLog(auth.user, "enrichment_start", "enrich_pending", {
+      approval_token_id: approval.token_id,
+      maxItems,
+    }, request)
+  }
+
+  const db = (await clientPromise).db()
 
   // Find pending contracts with page_id
   const pending = await db.collection("gem_contracts")
@@ -153,6 +191,12 @@ export async function POST(request: NextRequest) {
     )
     enriched++
   }
+
+  await writeAuditLog(auth.user, "enrichment_complete", "enrich_pending", {
+    total: pending.length,
+    enriched,
+    failed,
+  }, request)
 
   return NextResponse.json({
     ok:       true,

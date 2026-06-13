@@ -1,9 +1,9 @@
 "use client"
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import {
   Link2, ClipboardPaste, Loader2, CheckCircle2, AlertCircle,
-  Terminal, ChevronDown, ChevronUp, Zap, Users, Tag,
-  Bot, Play, RefreshCw, Clock, Database,
+  Terminal, ChevronDown, ChevronUp, Zap, Users,
+  Bot, RefreshCw, Clock, Database, ShieldAlert, ShieldCheck, X,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -104,20 +104,250 @@ function ConsoleHelper() {
   )
 }
 
+// ─── Enrichment Approval ──────────────────────────────────────────────────────
+
+type ApprovalOperation = "harvest_scan" | "batch_fetch" | "batch_parse_save" | "enrich_pending"
+
+const APPROVAL_PHRASE = "I APPROVE THIS ENRICHMENT RUN"
+
+const OP_LABELS: Record<ApprovalOperation, string> = {
+  harvest_scan:      "GeM Harvest Scan",
+  batch_fetch:       "Batch URL Fetch",
+  batch_parse_save:  "Batch Paste Save",
+  enrich_pending:    "Enrich Pending Contracts",
+}
+
+function useEnrichmentApproval(operation: ApprovalOperation) {
+  const [tokenId, setTokenId]       = useState<string | null>(null)
+  const [expiresAt, setExpiresAt]   = useState<string | null>(null)
+  const [secondsLeft, setSecondsLeft] = useState(0)
+  const [requesting, setRequesting] = useState(false)
+  const [error, setError]           = useState("")
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const clearTimer = () => {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
+  }
+
+  useEffect(() => () => clearTimer(), [])
+
+  const startCountdown = (expires: string) => {
+    clearTimer()
+    timerRef.current = setInterval(() => {
+      const left = Math.max(0, Math.floor((new Date(expires).getTime() - Date.now()) / 1000))
+      setSecondsLeft(left)
+      if (left === 0) clearTimer()
+    }, 1000)
+  }
+
+  const requestApproval = async (phrase: string): Promise<boolean> => {
+    setRequesting(true)
+    setError("")
+    try {
+      const res = await fetch("/api/admin/procurement/enrichment/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ operation, phrase }),
+      }).then(r => r.json())
+
+      if (res.error) {
+        setError(res.error)
+        return false
+      }
+      const left = Math.max(0, Math.floor((new Date(res.expires_at).getTime() - Date.now()) / 1000))
+      setTokenId(res.token_id)
+      setExpiresAt(res.expires_at)
+      setSecondsLeft(left)
+      startCountdown(res.expires_at)
+      return true
+    } catch {
+      setError("Network error — approval not issued")
+      return false
+    } finally {
+      setRequesting(false)
+    }
+  }
+
+  const clearToken = useCallback(() => {
+    clearTimer()
+    setTokenId(null)
+    setExpiresAt(null)
+    setSecondsLeft(0)
+    setError("")
+  }, [])
+
+  const isValid = Boolean(tokenId && secondsLeft > 0)
+
+  return { tokenId, expiresAt, secondsLeft, isValid, requesting, error, requestApproval, clearToken }
+}
+
+// ─── ApprovalModal ────────────────────────────────────────────────────────────
+
+function ApprovalModal({
+  operation,
+  onRequest,
+  requesting,
+  apiError,
+  onClose,
+}: {
+  operation: ApprovalOperation
+  onRequest: (phrase: string) => Promise<boolean>
+  requesting: boolean
+  apiError: string
+  onClose: () => void
+}) {
+  const [phrase, setPhrase] = useState("")
+  const phraseMatch = phrase.trim() === APPROVAL_PHRASE
+
+  const handleApprove = async () => {
+    if (!phraseMatch || requesting) return
+    await onRequest(phrase.trim())
+    // parent watches isValid and closes the modal
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldAlert size={16} className="text-amber-600" />
+            <span className="font-semibold text-gray-800 text-sm">Enrichment Approval Required</span>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="px-6 py-5 space-y-4">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 space-y-1">
+            <p className="font-semibold">Operation: {OP_LABELS[operation]}</p>
+            <p>This operation writes data to the database. Your approval is recorded and linked to your session. The token is valid for 15 minutes and can only be used once.</p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-gray-700 block">
+              Type the exact phrase to confirm approval:
+            </label>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs font-mono text-gray-600 select-none tracking-wide">
+              {APPROVAL_PHRASE}
+            </div>
+            <input
+              type="text"
+              value={phrase}
+              onChange={e => setPhrase(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && phraseMatch && handleApprove()}
+              placeholder="Type the phrase exactly as shown above"
+              className={`w-full text-sm border rounded-lg px-3 py-2 focus:outline-none font-mono ${
+                phrase && !phraseMatch
+                  ? "border-red-300 bg-red-50 text-red-700"
+                  : phraseMatch
+                  ? "border-green-400 bg-green-50 text-green-800"
+                  : "border-gray-200"
+              }`}
+              autoFocus
+            />
+            {phrase && !phraseMatch && (
+              <p className="text-[10px] text-red-500">Phrase must match exactly — check capitalisation and spacing</p>
+            )}
+          </div>
+
+          {apiError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-700 flex gap-2">
+              <AlertCircle size={12} className="shrink-0 mt-0.5" />
+              {apiError}
+            </div>
+          )}
+        </div>
+
+        <div className="px-6 pb-5 flex gap-3">
+          <button
+            onClick={handleApprove}
+            disabled={!phraseMatch || requesting}
+            className="flex-1 flex items-center justify-center gap-2 text-sm bg-amber-600 text-white py-2.5 rounded-xl hover:bg-amber-700 disabled:opacity-40 font-semibold"
+          >
+            {requesting
+              ? <><Loader2 size={13} className="animate-spin" />Requesting…</>
+              : <><ShieldCheck size={14} />Approve & Issue Token</>}
+          </button>
+          <button onClick={onClose}
+            className="px-4 text-sm text-gray-500 hover:text-gray-700 border border-gray-200 rounded-xl">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── ApprovalBadge ────────────────────────────────────────────────────────────
+
+function ApprovalBadge({
+  isValid,
+  secondsLeft,
+  tokenId,
+  onClear,
+}: {
+  isValid: boolean
+  secondsLeft: number
+  tokenId: string | null
+  onClear: () => void
+}) {
+  if (!tokenId) return null
+
+  const mins = Math.floor(secondsLeft / 60)
+  const secs = secondsLeft % 60
+
+  if (!isValid) {
+    return (
+      <div className="flex items-center gap-2 text-xs bg-red-50 border border-red-200 rounded-lg px-3 py-1.5">
+        <AlertCircle size={12} className="text-red-500" />
+        <span className="text-red-700 font-medium">Approval token expired — request a new one</span>
+        <button onClick={onClear} className="ml-auto text-red-400 hover:text-red-600"><X size={11} /></button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-2 text-xs bg-green-50 border border-green-200 rounded-lg px-3 py-1.5">
+      <ShieldCheck size={12} className="text-green-600" />
+      <span className="text-green-700 font-medium">Approved</span>
+      <span className="text-green-400">·</span>
+      <Clock size={11} className="text-green-500" />
+      <span className="font-mono text-green-700">{mins}:{secs.toString().padStart(2, "0")}</span>
+      <span className="text-green-500 text-[10px]">remaining</span>
+      <button onClick={onClear} title="Cancel token" className="ml-auto text-green-400 hover:text-green-600"><X size={11} /></button>
+    </div>
+  )
+}
+
 // ─── URL FETCH tab ────────────────────────────────────────────────────────────
 
 function UrlFetchMode({ onSaved }: { onSaved: (n: number) => void }) {
-  const [urlText, setUrlText] = useState("")
+  const [urlText, setUrlText]   = useState("")
   const [fetching, setFetching] = useState(false)
   const [progress, setProgress] = useState<string | null>(null)
-  const [result, setResult] = useState<FetchResult | null>(null)
-  const [error, setError] = useState("")
+  const [result, setResult]     = useState<FetchResult | null>(null)
+  const [error, setError]       = useState("")
+  const [showModal, setShowModal] = useState(false)
+
+  const approval = useEnrichmentApproval("batch_fetch")
+
+  // Close modal once token becomes valid
+  useEffect(() => {
+    if (approval.isValid) setShowModal(false)
+  }, [approval.isValid])
 
   const urlCount = urlText.trim().split("\n").filter(l => l.trim() && (l.includes("getSinglePacketResultView") || /^\d{5,}$/.test(l.trim()))).length
 
   const handleFetch = useCallback(async () => {
     const lines = urlText.trim().split("\n").map(l => l.trim()).filter(Boolean)
     if (!lines.length) return
+
+    // Approval gate
+    if (!approval.isValid) {
+      setShowModal(true)
+      return
+    }
 
     setFetching(true)
     setError("")
@@ -128,9 +358,16 @@ function UrlFetchMode({ onSaved }: { onSaved: (n: number) => void }) {
       const res = await fetch("/api/admin/procurement/batch-fetch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ urls: lines }),
+        body: JSON.stringify({ urls: lines, approval_token: approval.tokenId }),
       }).then(r => r.json())
 
+      // Token consumed (or failed) — clear it either way
+      approval.clearToken()
+
+      if (res.code === "APPROVAL_REQUIRED" || res.code === "APPROVAL_INVALID") {
+        setError(res.error || "Approval token was rejected by the server")
+        return
+      }
       if (res.error) { setError(res.error); return }
       setResult(res)
       setProgress(null)
@@ -140,15 +377,33 @@ function UrlFetchMode({ onSaved }: { onSaved: (n: number) => void }) {
       }
     } catch {
       setError("Network error")
+      approval.clearToken()
     } finally {
       setFetching(false)
       setProgress(null)
     }
-  }, [urlText, onSaved])
+  }, [urlText, onSaved, approval])
 
   return (
     <div className="space-y-4">
+      {showModal && (
+        <ApprovalModal
+          operation="batch_fetch"
+          onRequest={approval.requestApproval}
+          requesting={approval.requesting}
+          apiError={approval.error}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+
       <ConsoleHelper />
+
+      <ApprovalBadge
+        isValid={approval.isValid}
+        secondsLeft={approval.secondsLeft}
+        tokenId={approval.tokenId}
+        onClear={approval.clearToken}
+      />
 
       <div className="space-y-2">
         <label className="text-xs font-medium text-gray-700 block">
@@ -168,7 +423,9 @@ function UrlFetchMode({ onSaved }: { onSaved: (n: number) => void }) {
           >
             {fetching
               ? <><Loader2 size={13} className="animate-spin" />{progress || "Fetching…"}</>
-              : <><Zap size={13} />Fetch {urlCount > 0 ? urlCount : ""} bids from GeM</>}
+              : approval.isValid
+              ? <><Zap size={13} />Fetch {urlCount > 0 ? urlCount : ""} bids from GeM</>
+              : <><ShieldAlert size={13} />Fetch {urlCount > 0 ? urlCount : ""} bids — approve first</>}
           </button>
           {urlText && !fetching && (
             <button onClick={() => { setUrlText(""); setResult(null) }} className="text-xs text-gray-400 hover:text-gray-600">Clear</button>
@@ -186,7 +443,6 @@ function UrlFetchMode({ onSaved }: { onSaved: (n: number) => void }) {
 
       {result && (
         <div className="space-y-3">
-          {/* Summary */}
           <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-2">
             <div className="flex items-center gap-2">
               <CheckCircle2 size={15} className="text-green-600" />
@@ -211,7 +467,6 @@ function UrlFetchMode({ onSaved }: { onSaved: (n: number) => void }) {
             )}
           </div>
 
-          {/* Bid list */}
           {result.bids.length > 0 && (
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
               <div className="px-4 py-2.5 border-b border-gray-100 text-xs text-gray-500 font-medium">
@@ -254,15 +509,24 @@ function UrlFetchMode({ onSaved }: { onSaved: (n: number) => void }) {
 // ─── TEXT PASTE tab ───────────────────────────────────────────────────────────
 
 function TextPasteMode({ onSaved }: { onSaved: (n: number) => void }) {
-  const [text, setText] = useState("")
-  const [parsing, setParsing] = useState(false)
-  const [preview, setPreview] = useState<ParseResult | null>(null)
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState<{ created: number; updated: number; new_dealers: string[] } | null>(null)
-  const [error, setError] = useState("")
+  const [text, setText]         = useState("")
+  const [parsing, setParsing]   = useState(false)
+  const [preview, setPreview]   = useState<ParseResult | null>(null)
+  const [saving, setSaving]     = useState(false)
+  const [saved, setSaved]       = useState<{ created: number; updated: number; new_dealers: string[] } | null>(null)
+  const [error, setError]       = useState("")
+  const [showModal, setShowModal] = useState(false)
+
+  const approval = useEnrichmentApproval("batch_parse_save")
+
+  // Close modal once token becomes valid
+  useEffect(() => {
+    if (approval.isValid) setShowModal(false)
+  }, [approval.isValid])
 
   const handleParse = useCallback(async () => {
     if (!text.trim()) return
+    // Parse & preview: read-only — no approval required
     setParsing(true); setError(""); setPreview(null); setSaved(null)
     try {
       const res = await fetch("/api/admin/procurement/batch-parse", {
@@ -278,24 +542,49 @@ function TextPasteMode({ onSaved }: { onSaved: (n: number) => void }) {
 
   const handleSaveAll = useCallback(async () => {
     if (!text.trim()) return
+
+    // Approval gate: saving writes to DB
+    if (!approval.isValid) {
+      setShowModal(true)
+      return
+    }
+
     setSaving(true); setError("")
     try {
       const res = await fetch("/api/admin/procurement/batch-parse", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, save: true }),
+        body: JSON.stringify({ text, save: true, approval_token: approval.tokenId }),
       }).then(r => r.json())
+
+      // Token consumed — clear it
+      approval.clearToken()
+
+      if (res.code === "APPROVAL_REQUIRED" || res.code === "APPROVAL_INVALID") {
+        setError(res.error || "Approval token was rejected by the server")
+        return
+      }
       if (res.error) { setError(res.error); return }
       setSaved({ created: res.created, updated: res.updated, new_dealers: res.new_dealers || [] })
       onSaved(res.created + res.updated)
       setText("")
       setPreview(null)
-    } catch { setError("Save failed") }
+    } catch { setError("Save failed"); approval.clearToken() }
     finally { setSaving(false) }
-  }, [text, onSaved])
+  }, [text, onSaved, approval])
 
   return (
     <div className="space-y-4">
+      {showModal && (
+        <ApprovalModal
+          operation="batch_parse_save"
+          onRequest={approval.requestApproval}
+          requesting={approval.requesting}
+          apiError={approval.error}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+
       <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-700 space-y-1">
         <p className="font-semibold">Stage 1 — Bid stub creation</p>
         <p>Copy the full rendered GeM result page (Ctrl+A → Ctrl+C from any GeM search/result page). Paste below. All bid numbers found will become records. L1/L2/L3 data extracted where visible in the page text.</p>
@@ -339,15 +628,27 @@ function TextPasteMode({ onSaved }: { onSaved: (n: number) => void }) {
 
       {preview && preview.bids.length > 0 && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <span className="text-xs text-gray-600 font-medium">{preview.bids.length} bids found in pasted text</span>
-            <button
-              onClick={handleSaveAll}
-              disabled={saving}
-              className="flex items-center gap-1.5 text-xs bg-brand-600 text-white px-4 py-1.5 rounded-lg hover:bg-brand-700 disabled:opacity-40 font-medium"
-            >
-              {saving ? <><Loader2 size={11} className="animate-spin" />Saving…</> : <><Zap size={11} />Save all {preview.bids.length} bids</>}
-            </button>
+            <div className="flex items-center gap-2">
+              <ApprovalBadge
+                isValid={approval.isValid}
+                secondsLeft={approval.secondsLeft}
+                tokenId={approval.tokenId}
+                onClear={approval.clearToken}
+              />
+              <button
+                onClick={handleSaveAll}
+                disabled={saving}
+                className="flex items-center gap-1.5 text-xs bg-brand-600 text-white px-4 py-1.5 rounded-lg hover:bg-brand-700 disabled:opacity-40 font-medium"
+              >
+                {saving
+                  ? <><Loader2 size={11} className="animate-spin" />Saving…</>
+                  : approval.isValid
+                  ? <><Zap size={11} />Save all {preview.bids.length} bids</>
+                  : <><ShieldAlert size={11} />Save all — approve first</>}
+              </button>
+            </div>
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -409,11 +710,9 @@ interface HarvesterState {
 }
 
 function HarvesterStatus({ onRefreshed }: { onRefreshed: () => void }) {
-  const [state, setState] = useState<HarvesterState | null>(null)
+  const [state, setState]       = useState<HarvesterState | null>(null)
   const [totalBids, setTotalBids] = useState<number | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [running, setRunning] = useState(false)
-  const [lastResult, setLastResult] = useState<{ found: number; saved: number; range: string } | null>(null)
+  const [loading, setLoading]   = useState(true)
 
   const loadStatus = useCallback(async () => {
     const res = await fetch("/api/admin/procurement/harvest", {
@@ -427,17 +726,6 @@ function HarvesterStatus({ onRefreshed }: { onRefreshed: () => void }) {
 
   useEffect(() => { loadStatus() }, [loadStatus])
 
-  const handleRunNow = async () => {
-    setRunning(true); setLastResult(null)
-    const res = await fetch("/api/admin/procurement/harvest").then(r => r.json()).catch(() => null)
-    setRunning(false)
-    if (res) {
-      setLastResult({ found: res.fogging_found || 0, saved: res.saved || 0, range: res.id_range || "" })
-      await loadStatus()
-      onRefreshed()
-    }
-  }
-
   if (loading) return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center gap-2 text-xs text-gray-400">
       <Loader2 size={12} className="animate-spin" />Loading harvester status…
@@ -450,12 +738,12 @@ function HarvesterStatus({ onRefreshed }: { onRefreshed: () => void }) {
         <div className="flex items-center gap-2">
           <Bot size={14} className="text-brand-600" />
           <span className="text-xs font-semibold text-gray-800">Autonomous Harvester</span>
-          <span className="text-[10px] text-gray-400">— daily cron, 06:00 IST</span>
+          <span className="text-[10px] text-gray-400">— authorized cron only</span>
         </div>
-        <button onClick={handleRunNow} disabled={running || state?.running}
-          className="flex items-center gap-1.5 text-xs bg-brand-600 text-white px-3 py-1.5 rounded-lg hover:bg-brand-700 disabled:opacity-40">
-          {running ? <><Loader2 size={11} className="animate-spin" />Running…</> : <><Play size={11} />Run now</>}
-        </button>
+        <div className="flex items-center gap-1.5 text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1">
+          <ShieldAlert size={11} />
+          Manual trigger requires approval workflow
+        </div>
       </div>
 
       <div className="px-5 py-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -485,12 +773,6 @@ function HarvesterStatus({ onRefreshed }: { onRefreshed: () => void }) {
         </div>
       )}
 
-      {lastResult && (
-        <div className="mx-5 mb-4 bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-xs text-green-800">
-          Run complete — Scanned: {lastResult.range} · Found: {lastResult.found} fogging bids · Saved: {lastResult.saved}
-        </div>
-      )}
-
       <div className="px-5 pb-4 pt-2 border-t border-gray-50 text-[10px] text-gray-400 space-y-0.5">
         <p className="font-medium text-gray-500">For bulk historical backfill (2025-present):</p>
         <code className="block bg-gray-50 rounded px-2 py-1 text-gray-600 font-mono text-[10px]">
@@ -505,7 +787,7 @@ function HarvesterStatus({ onRefreshed }: { onRefreshed: () => void }) {
 // ─── Main BatchTab component ──────────────────────────────────────────────────
 
 export function BatchTab({ onSaved }: { onSaved: () => void }) {
-  const [mode, setMode] = useState<"url" | "text">("url")
+  const [mode, setMode]           = useState<"url" | "text">("url")
   const [sessionCount, setSessionCount] = useState(0)
 
   const handleSaved = useCallback((n: number) => {
@@ -517,6 +799,7 @@ export function BatchTab({ onSaved }: { onSaved: () => void }) {
     <div className="space-y-4 max-w-3xl">
       {/* Harvester status always shown at top */}
       <HarvesterStatus onRefreshed={onSaved} />
+
       {/* Session counter */}
       {sessionCount > 0 && (
         <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 flex items-center gap-2">
@@ -528,7 +811,7 @@ export function BatchTab({ onSaved }: { onSaved: () => void }) {
       {/* Header */}
       <div>
         <h3 className="text-sm font-semibold text-gray-800 mb-1">Batch Data Acquisition</h3>
-        <p className="text-xs text-gray-400">Collect 20+ bids in one operation. Choose your method below.</p>
+        <p className="text-xs text-gray-400">Collect 20+ bids in one operation. Saving requires an approved token.</p>
       </div>
 
       {/* Mode selector */}
@@ -552,8 +835,8 @@ export function BatchTab({ onSaved }: { onSaved: () => void }) {
       {/* Effort comparison */}
       <div className="grid grid-cols-2 gap-3">
         {[
-          { label: "URL Fetch (this mode)", effort: "~5 sec/bid", detail: "Full L1/L2/L3 data. Requires console command to get URLs.", color: "border-green-200 bg-green-50", textColor: "text-green-700" },
-          { label: "Text Paste (this mode)", effort: "~0.3 sec/bid", detail: "Bid stubs only. No L1 data. Good for capturing active bids.", color: "border-blue-200 bg-blue-50", textColor: "text-blue-700" },
+          { label: "URL Fetch", effort: "~5 sec/bid", detail: "Full L1/L2/L3 data. Requires console command to get URLs.", color: "border-green-200 bg-green-50", textColor: "text-green-700" },
+          { label: "Text Paste", effort: "~0.3 sec/bid", detail: "Bid stubs only. No L1 data. Good for capturing active bids.", color: "border-blue-200 bg-blue-50", textColor: "text-blue-700" },
         ].map(c => (
           <div key={c.label} className={`rounded-xl border p-3 ${c.color}`}>
             <p className={`text-xs font-semibold ${c.textColor} mb-0.5`}>{c.label}</p>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { requirePermission } from "@/lib/rbac/server"
 
 export const maxDuration = 15
 
@@ -54,6 +55,11 @@ async function tryFetch(url: string): Promise<string | null> {
 }
 
 export async function POST(req: NextRequest) {
+  // Authentication: this route was previously unauthenticated — now enforced.
+  // No approval token required: this route is read-only (fetches GeM page, no DB write).
+  const auth = await requirePermission(req, "procurement.single_bid.view")
+  if (!("user" in auth)) return auth
+
   try {
     const { input }: { input: string } = await req.json()
     if (!input?.trim()) {

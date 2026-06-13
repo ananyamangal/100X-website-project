@@ -113,6 +113,9 @@ export type AuditAction =
   | "password_reset" | "seed"
   | "access_denied"
   | "session_revoked" | "force_logout" | "kill_all" | "session_expired"
+  | "enrichment_approved" | "enrichment_approval_rejected"
+  | "enrichment_start" | "enrichment_stop" | "enrichment_complete" | "enrichment_failed"
+  | "enrichment_unauthenticated"
 
 // ── Active session document ───────────────────────────────────────────────────
 

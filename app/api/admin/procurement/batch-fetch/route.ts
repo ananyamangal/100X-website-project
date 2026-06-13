@@ -11,6 +11,8 @@
 
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { requirePermission, writeAuditLog } from "@/lib/rbac/server"
+import { verifyAndConsumeToken } from "@/lib/gem/approval"
 
 export const maxDuration = 60
 
@@ -240,12 +242,53 @@ async function autoDetectDealers(db: Db, bids: ParsedBid[], now: Date): Promise<
 // ─── Main handler ─────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  // Authentication: this route was previously unauthenticated — now enforced.
+  const auth = await requirePermission(req, "procurement.batch_collect.run")
+  if (!("user" in auth)) return auth
+
   try {
-    const { urls }: { urls: string[] } = await req.json()
+    const body = await req.json()
+    const { urls, approval_token }: { urls: string[]; approval_token?: string } = body
+
     if (!Array.isArray(urls) || urls.length === 0)
       return NextResponse.json({ error: "urls[] required" }, { status: 400 })
     if (urls.length > 50)
       return NextResponse.json({ error: "Max 50 URLs per batch" }, { status: 400 })
+
+    // Approval token required — writes to bid_lifecycle and proc_dealers.
+    if (!approval_token) {
+      await writeAuditLog(auth.user, "enrichment_unauthenticated", "batch_fetch", {
+        reason: "missing_approval_token",
+        url_count: urls.length,
+      }, req)
+      return NextResponse.json(
+        { error: "Approval required. Call POST /api/admin/procurement/enrichment/approve first.", code: "APPROVAL_REQUIRED" },
+        { status: 403 },
+      )
+    }
+
+    const approval = await verifyAndConsumeToken(
+      approval_token,
+      auth.user.sub,
+      "batch_fetch",
+      "/api/admin/procurement/batch-fetch",
+    )
+    if (!approval) {
+      await writeAuditLog(auth.user, "enrichment_unauthenticated", "batch_fetch", {
+        reason: "invalid_expired_or_consumed_token",
+        token_id: approval_token,
+        url_count: urls.length,
+      }, req)
+      return NextResponse.json(
+        { error: "Approval token invalid, expired, or already used. Request a new approval.", code: "APPROVAL_INVALID" },
+        { status: 403 },
+      )
+    }
+
+    await writeAuditLog(auth.user, "enrichment_start", "batch_fetch", {
+      approval_token_id: approval.token_id,
+      url_count: urls.length,
+    }, req)
 
     // Extract numeric IDs
     const jobs: { input: string; id: string | null }[] = urls
@@ -304,9 +347,17 @@ export async function POST(req: NextRequest) {
     // Auto-detect dealers
     results.new_dealers = await autoDetectDealers(db, parsed, now)
 
+    await writeAuditLog(auth.user, "enrichment_complete", "batch_fetch", {
+      approval_token_id: approval.token_id,
+      created: results.created,
+      updated: results.updated,
+      skipped: results.skipped,
+      errors:  results.errors.length,
+    }, req)
+
     return NextResponse.json(JSON.parse(JSON.stringify(results)))
   } catch (err) {
-    console.error("batch-fetch error:", err)
+    console.error("[batch-fetch] error:", err)
     return NextResponse.json({ error: String(err) }, { status: 500 })
   }
 }

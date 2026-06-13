@@ -16,7 +16,8 @@
 
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
-import { requirePermission } from "@/lib/rbac/server"
+import { requirePermission, writeAuditLog } from "@/lib/rbac/server"
+import { verifyAndConsumeToken } from "@/lib/gem/approval"
 
 export const maxDuration = 120
 
@@ -256,19 +257,27 @@ async function scanRange(
 
 // ─── Route handlers ───────────────────────────────────────────────────────────
 
-// GET — called by Vercel cron
+// GET — reserved for Vercel cron (cron entry removed from vercel.json; endpoint kept
+// for future re-enablement but requires CRON_SECRET with no fallback path).
 export async function GET(req: NextRequest) {
-  // Verify this is a Vercel cron call or internal request
-  const authHeader = req.headers.get("authorization")
   const cronSecret = process.env.CRON_SECRET
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    // Still allow GET from admin (no auth header) — just don't run the scan
-    // Only block non-cron external requests
-    const referer = req.headers.get("referer") || ""
-    if (!referer.includes(process.env.NEXTAUTH_URL || "localhost")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+
+  // Fail safe: if CRON_SECRET is not configured, refuse all GET execution.
+  // This prevents unauthenticated harvest runs if the env var is missing.
+  if (!cronSecret) {
+    console.warn("[harvest GET] CRON_SECRET not set — refusing execution")
+    return NextResponse.json(
+      { error: "Cron not configured. Set CRON_SECRET to enable scheduled harvest." },
+      { status: 503 },
+    )
   }
+
+  const authHeader = req.headers.get("authorization")
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+  // Note: Referer header is intentionally NOT checked — it is trivially forgeable
+  // and must never be used as an authorization signal.
 
   try {
     const db = (await clientPromise).db()
@@ -365,6 +374,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const db = (await clientPromise).db()
 
+    // ── Status read (no approval needed, read-only) ───────────────────────────
     if (body.action === "status") {
       const state = await db.collection("harvester_state").findOne({ key: "singleton" })
       const totalBids = await db.collection("bid_lifecycle").countDocuments()
@@ -372,15 +382,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(JSON.parse(JSON.stringify({ state, totalBids, totalDealers })))
     }
 
+    // ── Lock reset (admin maintenance — no approval needed) ───────────────────
     if (body.action === "reset") {
       await db.collection("harvester_state").updateOne(
         { key: "singleton" },
         { $set: { running: false, running_since: null } },
         { upsert: true }
       )
+      await writeAuditLog(auth.user, "enrichment_stop", "harvester_state", { action: "reset_lock" }, req)
       return NextResponse.json({ ok: true, reset: true })
     }
 
+    // ── Position reset (admin maintenance — no approval needed) ──────────────
     if (body.action === "reset_position") {
       if (typeof body.to !== "number")
         return NextResponse.json({ error: "to (number) required" }, { status: 400 })
@@ -389,20 +402,75 @@ export async function POST(req: NextRequest) {
         { $set: { last_scanned_id: body.to } },
         { upsert: true }
       )
+      await writeAuditLog(auth.user, "enrichment_stop", "harvester_state", { action: "reset_position", to: body.to }, req)
       return NextResponse.json({ ok: true, new_position: body.to })
     }
 
+    // ── Scan (enrichment — requires server-side approval token) ───────────────
     if (body.action === "scan") {
-      const from: number = body.from
-      const to: number   = body.to
-      const concurrency  = Math.min(body.concurrency || 10, 20)
+      const from: number         = body.from
+      const to: number           = body.to
+      const concurrency          = Math.min(body.concurrency || 10, 20)
+      const approval_token: string | undefined = body.approval_token
+
       if (!from || !to || from >= to)
         return NextResponse.json({ error: "from and to (numbers) required, from < to" }, { status: 400 })
       if (to - from > 5000)
-        return NextResponse.json({ error: "Range too large for single API call (max 5000). Use the local harvest script for large ranges." }, { status: 400 })
+        return NextResponse.json({ error: "Range too large (max 5000). Use the local harvest script." }, { status: 400 })
+
+      // Enforce server-side approval — possession of the RBAC permission alone is insufficient.
+      if (!approval_token) {
+        await writeAuditLog(auth.user, "enrichment_unauthenticated", "harvest_scan", {
+          reason: "missing_approval_token",
+          from, to,
+        }, req)
+        return NextResponse.json(
+          {
+            error: "Approval required. Call POST /api/admin/procurement/enrichment/approve first, then include the returned token_id as approval_token.",
+            code: "APPROVAL_REQUIRED",
+          },
+          { status: 403 },
+        )
+      }
+
+      const approval = await verifyAndConsumeToken(
+        approval_token,
+        auth.user.sub,
+        "harvest_scan",
+        "/api/admin/procurement/harvest",
+      )
+      if (!approval) {
+        await writeAuditLog(auth.user, "enrichment_unauthenticated", "harvest_scan", {
+          reason: "invalid_expired_or_consumed_token",
+          token_id: approval_token,
+          from, to,
+        }, req)
+        return NextResponse.json(
+          {
+            error: "Approval token is invalid, expired, already used, or issued for a different operation. Request a new approval.",
+            code: "APPROVAL_INVALID",
+          },
+          { status: 403 },
+        )
+      }
+
+      await writeAuditLog(auth.user, "enrichment_start", "harvest_scan", {
+        approval_token_id: approval.token_id,
+        from, to, concurrency,
+      }, req)
 
       const now = new Date()
       const result = await scanRange(from, to - from, concurrency, db, now)
+
+      await writeAuditLog(auth.user, "enrichment_complete", "harvest_scan", {
+        approval_token_id: approval.token_id,
+        from, to,
+        scanned:  result.scanned,
+        found:    result.found,
+        saved:    result.saved,
+        updated:  result.updated,
+        errors:   result.errors,
+      }, req)
 
       return NextResponse.json(JSON.parse(JSON.stringify({
         ok: true,
@@ -416,9 +484,9 @@ export async function POST(req: NextRequest) {
       })))
     }
 
-    return NextResponse.json({ error: "Unknown action. Use: status | scan | reset_position" }, { status: 400 })
+    return NextResponse.json({ error: "Unknown action. Use: status | scan | reset | reset_position" }, { status: 400 })
   } catch (err) {
-    console.error("harvest POST error:", err)
+    console.error("[harvest POST] error:", err)
     return NextResponse.json({ error: String(err) }, { status: 500 })
   }
 }

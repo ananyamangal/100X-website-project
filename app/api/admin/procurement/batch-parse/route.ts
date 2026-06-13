@@ -14,6 +14,8 @@
 
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { requirePermission, writeAuditLog } from "@/lib/rbac/server"
+import { verifyAndConsumeToken } from "@/lib/gem/approval"
 
 // ─── Minimal parser (mirrors gemParser.ts for server-side use) ───────────────
 
@@ -174,10 +176,49 @@ function splitIntoBids(text: string): BidStub[] {
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  // Auth: previously unauthenticated — now enforced on all paths.
+  const auth = await requirePermission(req, "procurement.batch_collect.run")
+  if (!("user" in auth)) return auth
+
   try {
-    const { text, save = false }: { text: string; save?: boolean } = await req.json()
+    const { text, save = false, approval_token }: { text: string; save?: boolean; approval_token?: string } = await req.json()
     if (!text?.trim())
       return NextResponse.json({ error: "text required" }, { status: 400 })
+
+    // Approval gate: preview (save=false) does not write to DB — no token required.
+    // Saving (save=true) writes to bid_lifecycle — requires valid approval token.
+    if (save) {
+      if (!approval_token) {
+        await writeAuditLog(auth.user, "enrichment_unauthenticated", "batch_parse_save", {
+          reason: "missing_approval_token",
+        }, req)
+        return NextResponse.json(
+          { error: "Approval required. Issue an approval token before saving parsed bids.", code: "APPROVAL_REQUIRED" },
+          { status: 403 }
+        )
+      }
+
+      const approval = await verifyAndConsumeToken(
+        approval_token,
+        auth.user.sub,
+        "batch_parse_save",
+        "/api/admin/procurement/batch-parse"
+      )
+      if (!approval) {
+        await writeAuditLog(auth.user, "enrichment_unauthenticated", "batch_parse_save", {
+          reason: "invalid_expired_or_consumed_token",
+          token_id: approval_token,
+        }, req)
+        return NextResponse.json(
+          { error: "Approval token invalid, expired, or already used.", code: "APPROVAL_INVALID" },
+          { status: 403 }
+        )
+      }
+
+      await writeAuditLog(auth.user, "enrichment_start", "batch_parse_save", {
+        approval_token_id: approval.token_id,
+      }, req)
+    }
 
     const bids = splitIntoBids(text)
     if (bids.length === 0)
@@ -223,6 +264,13 @@ export async function POST(req: NextRequest) {
       )
       newDealers.push(name)
     }
+
+    await writeAuditLog(auth.user, "enrichment_complete", "batch_parse_save", {
+      total: bids.length,
+      created,
+      updated,
+      new_dealers: newDealers.length,
+    }, req)
 
     return NextResponse.json(
       JSON.parse(JSON.stringify({ bids, total: bids.length, created, updated, new_dealers: newDealers }))

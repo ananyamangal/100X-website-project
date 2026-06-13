@@ -2,10 +2,6 @@
   "installCommand": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install",
   "crons": [
     {
-      "path": "/api/admin/procurement/harvest",
-      "schedule": "30 0 * * *"
-    },
-    {
       "path": "/api/admin/procurement/insights",
       "schedule": "0 1 * * *"
     },
