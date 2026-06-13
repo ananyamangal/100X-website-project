@@ -6,13 +6,13 @@ export const maxDuration = 30
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { buyerSlug: string } },
+  { params }: { params: Promise<{ buyerSlug: string }> },
 ) {
   const auth = await requirePermission(req, "procurement.contracts.view")
   if (!("user" in auth)) return auth
 
   try {
-    const { buyerSlug } = params
+    const { buyerSlug } = await params
     const db  = (await clientPromise).db()
 
     const profile = await db.collection("buyer_profiles").findOne({ buyer_slug: buyerSlug })
