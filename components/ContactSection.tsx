@@ -13,13 +13,7 @@ import {
   setContactLeadContext,
 } from "@/lib/gtm"
 
-type ProductOption = { _id?: string; id?: string; name: string }
-
 const PHONE_DIGITS_RE = /\D/g
-
-function validateEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
 
 function validatePhone(phone: string) {
   const digits = phone.replace(PHONE_DIGITS_RE, "")
@@ -27,10 +21,9 @@ function validatePhone(phone: string) {
 }
 
 export default function ContactSection({
-  products,
   id = "contact",
 }: {
-  products: ProductOption[]
+  products?: unknown[]
   id?: string
 }) {
   const router = useRouter()
@@ -43,29 +36,18 @@ export default function ContactSection({
 
     const form = e.currentTarget
     const formData = new FormData(form)
-    const firstName = String(formData.get("firstName") ?? "").trim()
-    const lastName = String(formData.get("lastName") ?? "").trim()
-    const name = `${firstName} ${lastName}`.trim()
+    const name = String(formData.get("name") ?? "").trim()
     const phone = String(formData.get("phone") ?? "").trim()
-    const email = String(formData.get("email") ?? "").trim()
-    const subject = String(formData.get("subject") ?? "").trim()
-    const message = String(formData.get("message") ?? "").trim()
+    const organization = String(formData.get("organization") ?? "").trim()
+    const requirement = String(formData.get("requirement") ?? "").trim()
     const hp = String(formData.get("company_website") ?? "").trim()
 
-    if (!name || !phone || !email || !subject || !message) {
-      setError("Please complete all required fields.")
-      return
-    }
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address.")
+    if (!name) {
+      setError("Please enter your name.")
       return
     }
     if (!validatePhone(phone)) {
-      setError("Please enter a valid phone number (10–15 digits).")
-      return
-    }
-    if (message.length < 10) {
-      setError("Please add a bit more detail in your message (at least 10 characters).")
+      setError("Please enter a valid mobile number (10–15 digits).")
       return
     }
     if (hp) {
@@ -77,8 +59,8 @@ export default function ContactSection({
     pushDataLayer({
       event: "contact_form_submit_attempt",
       lead_type: "contact_form",
-      product: subject,
-      interest: subject,
+      product: "contact_form",
+      interest: organization || "general_inquiry",
     })
 
     try {
@@ -89,14 +71,13 @@ export default function ContactSection({
         body: JSON.stringify({
           name,
           phone,
-          email,
-          subject,
-          message,
+          organization,
+          message: requirement,
           type: "contact",
           attribution,
           form_page_url: window.location.href,
           form_page_path: window.location.pathname,
-          company_website: String(formData.get("company_website") ?? "").trim(),
+          company_website: hp,
         }),
       })
 
@@ -106,8 +87,8 @@ export default function ContactSection({
       }
 
       setContactLeadContext({
-        product: subject,
-        interest: subject,
+        product: "contact_form",
+        interest: organization || "general_inquiry",
         lead_type: "contact_form",
         form_page_url: window.location.href,
       })
@@ -115,7 +96,7 @@ export default function ContactSection({
       pushDataLayer({
         event: "contact_form_success",
         lead_type: "contact_form",
-        product: subject,
+        product: "contact_form",
       })
 
       form.reset()
@@ -195,7 +176,8 @@ export default function ContactSection({
                 </p>
               </div>
 
-              <form id="contact-inquiry-form" onSubmit={handleContactSubmit} className="relative space-y-6 md:space-y-7 text-lg">
+              <form id="contact-inquiry-form" onSubmit={handleContactSubmit} className="relative space-y-5 text-lg">
+                {/* Honeypot — hidden from real users, catches bots */}
                 <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
                   <label htmlFor="contact-company-website">Company website</label>
                   <input
@@ -207,55 +189,51 @@ export default function ContactSection({
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label htmlFor="contact-firstName" className="sr-only">First name</label>
-                    <Input id="contact-firstName" name="firstName" placeholder="First name" required autoComplete="given-name" className="p-5 text-lg min-h-[52px]" />
-                  </div>
-                  <div>
-                    <label htmlFor="contact-lastName" className="sr-only">Last name</label>
-                    <Input id="contact-lastName" name="lastName" placeholder="Last name" required autoComplete="family-name" className="p-5 text-lg min-h-[52px]" />
-                  </div>
-                </div>
                 <div>
-                  <label htmlFor="contact-phone" className="sr-only">Phone number</label>
-                  <Input id="contact-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="Phone number" required className="p-5 text-lg min-h-[52px]" />
-                </div>
-                <div>
-                  <label htmlFor="contact-email" className="sr-only">Email address</label>
-                  <Input id="contact-email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="Email address" required className="p-5 text-lg min-h-[52px]" />
-                </div>
-                <div>
-                  <label htmlFor="contact-subject" className="sr-only">Product interest</label>
-                  <select
-                    id="contact-subject"
-                    name="subject"
-                    className="w-full min-h-[52px] p-5 text-lg border border-gray-300 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:border-transparent bg-white"
+                  <label htmlFor="contact-name" className="sr-only">Your name</label>
+                  <Input
+                    id="contact-name"
+                    name="name"
+                    placeholder="Your name"
                     required
-                    defaultValue=""
-                  >
-                    <option value="" disabled>
-                      Select product interest
-                    </option>
-                    {products.map((product) => (
-                      <option key={product._id || product.id || product.name} value={product.name}>
-                        {product.name}
-                      </option>
-                    ))}
-                    <option value="general">General inquiry</option>
-                    <option value="support">Technical support</option>
-                    <option value="dealer">Dealer partnership</option>
-                  </select>
+                    autoComplete="name"
+                    className="p-5 text-lg min-h-[52px]"
+                  />
                 </div>
+
                 <div>
-                  <label htmlFor="contact-message" className="sr-only">Your message</label>
+                  <label htmlFor="contact-phone" className="sr-only">Mobile number</label>
+                  <Input
+                    id="contact-phone"
+                    name="phone"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    placeholder="Mobile number"
+                    required
+                    className="p-5 text-lg min-h-[52px]"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="contact-organization" className="sr-only">Organization or department</label>
+                  <Input
+                    id="contact-organization"
+                    name="organization"
+                    placeholder="Organization / Department (optional)"
+                    autoComplete="organization"
+                    className="p-5 text-lg min-h-[52px]"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="contact-requirement" className="sr-only">Your requirement</label>
                   <Textarea
-                    id="contact-message"
-                    name="message"
-                    placeholder="Your message"
-                    rows={6}
-                    required
-                    className="p-5 text-lg resize-y min-h-[140px]"
+                    id="contact-requirement"
+                    name="requirement"
+                    placeholder="Your requirement (optional) — e.g. product name, quantity, state"
+                    rows={4}
+                    className="p-5 text-lg resize-y min-h-[110px]"
                   />
                 </div>
 
@@ -277,7 +255,7 @@ export default function ContactSection({
                       Submitting…
                     </>
                   ) : (
-                    "Submit inquiry"
+                    "Send enquiry"
                   )}
                 </Button>
               </form>

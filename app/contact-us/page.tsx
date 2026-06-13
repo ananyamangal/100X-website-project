@@ -1,12 +1,9 @@
 ﻿"use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react"
 import ContactSection from "@/components/ContactSection"
 import { BUSINESS } from "@/lib/seo/site-config"
-
-type ProductOption = { _id?: string; id?: string; name: string }
 
 const TEL_HREF = `tel:${BUSINESS.phonePrimary.replace(/\s+/g, "")}`
 const WA_HREF = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(
@@ -15,23 +12,6 @@ const WA_HREF = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponen
 const ADDRESS = `${BUSINESS.streetAddress}, ${BUSINESS.addressLocality}, ${BUSINESS.addressRegion} ${BUSINESS.postalCode}`
 
 export default function ContactUsPage() {
-  const [products, setProducts] = useState<ProductOption[]>([])
-
-  useEffect(() => {
-    fetch("/api/admin/products")
-      .then((res) => res.json())
-      .then((data) => {
-        const list = Array.isArray(data) ? data : []
-        setProducts(
-          list.map((p: { _id?: string; id?: string; name?: string }) => ({
-            _id: p._id,
-            id: p.id,
-            name: p.name || "Product",
-          })),
-        )
-      })
-      .catch(() => setProducts([]))
-  }, [])
 
   return (
     <div className="min-h-screen bg-white">
@@ -191,7 +171,7 @@ export default function ContactUsPage() {
         </p>
       </section>
 
-      <ContactSection products={products} id="contact-form" />
+      <ContactSection id="contact-form" />
       </div>
     </div>
   )
