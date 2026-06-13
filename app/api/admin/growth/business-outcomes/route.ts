@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
+import { PROD_FILTER, isTestDoc } from '@/lib/testFilter'
 
 export const dynamic = 'force-dynamic'
 
@@ -126,6 +127,7 @@ export async function GET() {
     const [subDocs, popupDocs, eventDocs30, eventDocs14] = await Promise.all([
       db.collection('submissions')
         .find({
+          ...PROD_FILTER,
           createdAt: { $gte: since30 },
           type: { $in: ['contact', 'rfq'] },
         })
@@ -138,14 +140,14 @@ export async function GET() {
         .toArray(),
 
       db.collection('rfq_popup_leads')
-        .find({ createdAt: { $gte: since30 } })
+        .find({ ...PROD_FILTER, createdAt: { $gte: since30 } })
         .project({ createdAt: 1, answers: 1, pagePath: 1, utm: 1, status: 1, respondedAt: 1 })
         .toArray(),
 
       // Analytics events — last 30 days (for traffic comparison)
       db.collection('analytics_events')
         .aggregate([
-          { $match: { createdAt: { $gte: since30 } } },
+          { $match: { _test: { $ne: true }, createdAt: { $gte: since30 } } },
           { $group: { _id: { event: '$event', period: { $cond: [{ $gte: ['$createdAt', since7] }, '7d', 'prior7d'] } }, count: { $sum: 1 } } },
         ])
         .toArray(),
@@ -166,27 +168,31 @@ export async function GET() {
     }
 
     const allLeads: Lead[] = [
-      ...subDocs.map(d => {
-        const doc = d as Record<string, unknown>
-        return {
-          createdAt: String(doc.createdAt || ''),
-          type: classifyLead(doc),
-          source: classifySource(doc),
-          hasResponse: !!(doc.respondedAt || (doc.status && doc.status !== 'new')),
-          raw: doc,
-        }
-      }),
-      ...popupDocs.map(d => {
-        const doc = d as Record<string, unknown>
-        const attr = (doc.utm || {}) as Record<string, string>
-        const docWithAttr = { ...doc, attribution: attr, form_page_path: doc.pagePath }
-        return {
-          createdAt: String(doc.createdAt || ''),
-          type: classifyLead(docWithAttr),
-          source: classifySource(docWithAttr),
-          hasResponse: !!(doc.respondedAt || (doc.status && doc.status !== 'new')),
-          raw: doc,
-        }
+      ...subDocs
+        .filter(d => !isTestDoc(d as Record<string, unknown>))
+        .map(d => {
+          const doc = d as Record<string, unknown>
+          return {
+            createdAt: String(doc.createdAt || ''),
+            type: classifyLead(doc),
+            source: classifySource(doc),
+            hasResponse: !!(doc.respondedAt || (doc.status && doc.status !== 'new')),
+            raw: doc,
+          }
+        }),
+      ...popupDocs
+        .filter(d => !isTestDoc(d as Record<string, unknown>))
+        .map(d => {
+          const doc = d as Record<string, unknown>
+          const attr = (doc.utm || {}) as Record<string, string>
+          const docWithAttr = { ...doc, attribution: attr, form_page_path: doc.pagePath }
+          return {
+            createdAt: String(doc.createdAt || ''),
+            type: classifyLead(docWithAttr),
+            source: classifySource(docWithAttr),
+            hasResponse: !!(doc.respondedAt || (doc.status && doc.status !== 'new')),
+            raw: doc,
+          }
       }),
     ]
 
