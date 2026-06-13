@@ -282,7 +282,7 @@ export const HOMEPAGE_SECTIONS: SectionDef[] = [
     label: 'Mid-page RFQ Form',
     description: 'Lead capture form mid-scroll with urgency copy',
     icon: '📋',
-    defaultOrder: 85,
+    defaultOrder: 25,
     defaultVariant: 'centered-card',
     defaultHeading: 'Get a Custom Quote',
     defaultSubheading: 'Tell us what you need — we respond within 24 hours',

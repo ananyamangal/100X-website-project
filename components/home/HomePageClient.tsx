@@ -379,16 +379,16 @@ export default function HomePageClient({
     industry_applications: () => <IndustryApplicationsSection />,
     manufacturer_story: () => <ManufacturerIntroBlock content={homeContent.manufacturerIntro} />,
     technology: () => <TechnologyBlock content={homeContent.technology} />,
-    rfq_midpage: () => (
-      <>
-        <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
-        <RFQMidPageBlock />
-      </>
-    ),
+    rfq_midpage: () => <RFQMidPageBlock />,
     youtube_shorts: () => <YoutubeShortsCarousel />,
     customers: () => <OurCustomersScroll customers={customers} />,
     reviews: () => <ReviewsSection limit={4} />,
-    trust_certifications: () => <CinematicTrustSection accreditations={accreditations} />,
+    trust_certifications: () => (
+      <>
+        <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
+        <CinematicTrustSection accreditations={accreditations} />
+      </>
+    ),
     specialised_buyers: () => <SpecialisedBuyersBlock />,
     blog: () => <BlogBlock posts={displayBlogPosts} hasApiPosts={blogPosts.length > 0} />,
     faq: () => (
