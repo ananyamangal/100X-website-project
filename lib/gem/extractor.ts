@@ -7,11 +7,15 @@
  * block the archive pipeline.
  */
 
-// pdf-parse does not ship TypeScript types
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require("pdf-parse") as (buf: Buffer) => Promise<{ numpages: number; text: string }>
-
 import { ARCHIVE_SCHEMA_VERSION } from "./archive-paths"
+
+// Lazy require — pdf-parse reads a test fixture at module load time, which
+// breaks Next.js static page collection during `next build`. Deferring the
+// require to call time avoids that cold-start side effect entirely.
+function getPdfParse(): (buf: Buffer) => Promise<{ numpages: number; text: string }> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return require("pdf-parse")
+}
 
 export interface DetectedFields {
   gemc_number:          string | null
@@ -149,7 +153,7 @@ export async function extractPdf(buffer: Buffer): Promise<ExtractedContract> {
   let rawText   = ""
 
   try {
-    const data = await pdfParse(buffer)
+    const data = await getPdfParse()(buffer)
     pageCount  = data.numpages ?? 0
     rawText    = (data.text ?? "").trim()
   } catch (err) {
