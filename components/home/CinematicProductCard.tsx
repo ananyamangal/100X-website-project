@@ -42,7 +42,7 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
       style={{ animationDelay: `${index * 80}ms` }}
     >
       {/* Image — no overlapping overlays, clean aspect ratio */}
-      <Link href={{productUrl}} className="block relative overflow-hidden bg-gray-50/60 aspect-[4/3]">
+      <Link href={productUrl} className="block relative overflow-hidden bg-gray-50/60 aspect-[4/3]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={img}
@@ -81,7 +81,7 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
         </div>
 
         <h3 className="font-700 text-gray-900 text-[1.0625rem] leading-snug mb-2 group-hover:text-brand-700 transition-colors line-clamp-2">
-          <Link href={{productUrl}}>
+          <Link href={productUrl}>
             {product.name}
           </Link>
         </h3>
@@ -94,7 +94,7 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
         {/* CTA row */}
         <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
           <Link
-            href={{productUrl}}
+            href={productUrl}
             className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-600 text-brand-700 bg-brand-50 hover:bg-brand-100 px-3 py-2.5 rounded-full transition-colors"
           >
             Details <ArrowRight size={12} />
