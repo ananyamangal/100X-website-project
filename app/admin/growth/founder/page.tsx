@@ -8,6 +8,7 @@ import {
   Clock, Lock, ArrowRight, Info,
 } from "lucide-react"
 import ConversionDashboard from "./ConversionDashboard"
+import BusinessDashboard   from "./BusinessDashboard"
 
 // ══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -1284,7 +1285,10 @@ export default function FounderModePage() {
           )}
         </section>
 
-        {/* 3 — Conversion Dashboard */}
+        {/* 3 — Business Outcomes (demand · classification · pipeline · source) */}
+        <BusinessDashboard />
+
+        {/* 4 — Activity Dashboard (clicks · daily funnel · top pages) */}
         <ConversionDashboard />
 
         {/* 4 — Founder Playbook */}
