@@ -257,9 +257,11 @@ export async function archiveContract(
     expires_at:            null,
   }
 
+  // created_at must not appear in both $set and $setOnInsert (MongoDB error 40)
+  const { created_at: _ca, ...recordForSet } = record
   await col.updateOne(
     { gemc_number: paths.normalizedContractId },
-    { $set: record, $setOnInsert: { created_at: now } },
+    { $set: recordForSet, $setOnInsert: { created_at: now } },
     { upsert: true },
   )
 
