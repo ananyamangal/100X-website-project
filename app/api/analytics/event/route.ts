@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
 
-const ALLOWED = new Set(['whatsapp_click', 'call_click', 'rfq_start'])
+const ALLOWED = new Set(['whatsapp_click', 'call_click', 'rfq_start', 'rfq_submit', 'contact_submit'])
 
 export async function POST(request: NextRequest) {
   try {

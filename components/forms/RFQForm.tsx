@@ -256,6 +256,12 @@ export default function RFQForm({
       currency: "INR",
     })
 
+    fetch('/api/analytics/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: 'rfq_submit', page: typeof window !== 'undefined' ? window.location.pathname : '', source: location }),
+    }).catch(() => {})
+
     router.push("/thank-you?type=rfq")
   }
 

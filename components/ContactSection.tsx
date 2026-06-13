@@ -86,6 +86,12 @@ export default function ContactSection({
         throw new Error(errText || `Request failed (${res.status})`)
       }
 
+      fetch('/api/analytics/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'contact_submit', page: window.location.pathname, source: 'contact_section' }),
+      }).catch(() => {})
+
       setContactLeadContext({
         product: "contact_form",
         interest: organization || "general_inquiry",
