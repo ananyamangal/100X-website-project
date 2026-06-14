@@ -31,8 +31,8 @@ const CAT = 'home_fa68031381_agri_disp_fogg';
 // canonical = uppercase short brand; special-cased for 100X and Unbranded
 
 const OEM_SPECIAL = {
-  '100xcircle.com': { canonical: '100X CIRCLE', short: '100X Circle', is_100x: true },
-  '100x circle':    { canonical: '100X CIRCLE', short: '100X Circle', is_100x: true },
+  '100xcircle.com': { oem_canonical: '100X CIRCLE', oem_short_brand: '100X Circle', is_100x: true },
+  '100x circle':    { oem_canonical: '100X CIRCLE', oem_short_brand: '100X Circle', is_100x: true },
 };
 
 function parseOem(raw) {
