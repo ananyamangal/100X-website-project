@@ -8,7 +8,7 @@ import {
   BarChart2, TrendingUp, ArrowLeft, Zap, Plug,
   PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck, ClipboardList, Monitor,
   Layout, PhoneCall, ClipboardCheck, Rocket, Wand2, DollarSign, Link2, Brain, FlaskConical, Activity,
-  Globe,
+  Globe, Flame,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -51,6 +51,7 @@ const ADVANCED_MODULES: Module[] = [
   { href: "/admin/growth/content",            label: "Content Factory",      icon: FileText,        permission: "content.view",     advanced: true },
   { href: "/admin/growth/page-sections",      label: "Page Section Builder", icon: Layout,          permission: "content.view",     advanced: true },
   { href: "/admin/growth/procurement",        label: "Procurement Intel",    icon: ShoppingBag,     permission: "procurement.view", advanced: true, badge: "NEW" },
+  { href: "/admin/growth/fogging",            label: "Fogging Intelligence", icon: Flame,           permission: "procurement.view", advanced: true, badge: "NEW" },
   { href: "/admin/growth/dealers",            label: "Dealer Intelligence",  icon: Users,           permission: "dealer.view",      advanced: true },
   { href: "/admin/growth/gem",                label: "GeM Intel (Legacy)",   icon: ShoppingBag,     permission: "procurement.view", advanced: true },
   { href: "/admin/growth/ads",                    label: "Google Ads Intel",     icon: Megaphone,    permission: "ads.view",         advanced: true },
