@@ -481,7 +481,11 @@ async function downloadPdf(context, page, url, dest) {
     args: ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage",
            "--disable-gpu","--disable-software-rasterizer","--no-zygote"],
   })
-  browser.on("disconnected", () => console.error("[BROWSER] Disconnected"))
+  let browserDisconnects = 0
+  browser.on("disconnected", () => {
+    browserDisconnects++
+    console.error(`[BROWSER] Disconnected (count: ${browserDisconnects})`)
+  })
 
   const context = await browser.newContext({
     viewport: { width: 1280, height: 800 },
@@ -506,7 +510,7 @@ async function downloadPdf(context, page, url, dest) {
   const sort = valueFirst ? { contract_value_num: -1 } : { first_seen: 1 }
   const cursor = gc.find(queueQuery).sort(sort).limit(limit === Infinity ? 0 : limit)
 
-  let processed = 0, enriched = 0, failed = 0
+  let processed = 0, enriched = 0, failed = 0, consecutiveFails = 0
   const startTime = Date.now()
 
   while (await cursor.hasNext()) {
@@ -660,9 +664,11 @@ async function downloadPdf(context, page, url, dest) {
       }
 
       enriched++
+      consecutiveFails = 0
 
     } catch (err) {
       failed++
+      consecutiveFails++
       console.log(`  [FAIL] ${err.message}`)
       if (!dryRun) {
         await gc.updateOne(
@@ -676,6 +682,18 @@ async function downloadPdf(context, page, url, dest) {
             },
           }
         )
+      }
+      if (consecutiveFails >= 5) {
+        console.error(`\n[ABORT] ${consecutiveFails} consecutive failures — stopping run. Check GeM connectivity or PDF format.`)
+        break
+      }
+      if (err.message.startsWith("sbtCaptcha failed") && consecutiveFails >= 3) {
+        console.error(`\n[ABORT] Captcha/rate-limit blocking detected (${consecutiveFails} consecutive sbtCaptcha failures). Stopping.`)
+        break
+      }
+      if (browserDisconnects >= 2) {
+        console.error(`\n[ABORT] Browser disconnected ${browserDisconnects} times — stopping run.`)
+        break
       }
     }
 
