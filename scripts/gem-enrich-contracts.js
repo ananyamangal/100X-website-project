@@ -495,8 +495,10 @@ async function downloadPdf(context, page, url, dest) {
   // Establish gem.gov.in session (needed for sbtCaptcha cookie context)
   console.log("\n[SESSION] Establishing gem.gov.in session ...")
   await page.goto("https://gem.gov.in/view_contracts", {
-    waitUntil: "domcontentloaded", timeout: 60000,
-  }).catch(e => console.warn("[SESSION] Nav warning:", e.message))
+    waitUntil: "commit", timeout: 30000,
+  }).catch(e => console.warn("[SESSION] Nav warning (commit):", e.message))
+  await page.waitForLoadState("domcontentloaded", { timeout: 120000 })
+    .catch(e => console.warn("[SESSION] domcontentloaded timeout (continuing):", e.message))
   await sleep(2000)
   console.log("[SESSION] Session ready — URL:", page.url())
 
