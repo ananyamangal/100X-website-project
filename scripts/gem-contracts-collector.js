@@ -42,12 +42,17 @@ for (const arg of process.argv.slice(2)) {
 const FULL_MODE    = !!CLI.full
 const RESET_MODE   = !!CLI.reset
 const NO_ENRICH    = !!CLI["no-enrich"]  // skip PDF enrichment (use on VPN/slow connections)
+const CATEGORY_VAL = CLI.category || ""                        // --category=<gem_val>  (blank = all)
+const CHKPT_NS     = CLI["checkpoint-name"] || (CATEGORY_VAL ? CATEGORY_VAL.slice(-4) : "all")
+const DRY_RUN_COLL = !!CLI["dry-run"]                          // count only, no DB writes
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CHUNK_DAYS  = 30
 const TOTAL_DAYS  = parseInt(CLI.days || "365")   // override with --days=N
 const PARSER_VER  = 3          // increment when parseCard() logic changes
-const CHECKPOINT  = "audit/contracts-checkpoint.json"
+const CHECKPOINT  = CHKPT_NS === "all"
+  ? "audit/contracts-checkpoint.json"
+  : `audit/contracts-checkpoint-${CHKPT_NS}.json`
 
 // ── Env ───────────────────────────────────────────────────────────────────────
 function loadEnv() {
@@ -265,7 +270,7 @@ function parseCard(card) {
     city:                 null,
     // Category — not in list view
     category_name:        null,
-    category_id:          null,
+    category_id:          CATEGORY_VAL || null,
     category_path:        null,
     // Contract
     contract_date:        dateRaw,
@@ -428,13 +433,8 @@ async function processChunk(page, chunk, colGC, colRaw, state) {
   // networkidle already waited for both to finish. Extra 1s for their JS callbacks.
   await page.waitForTimeout(1000)
 
-  // Blank category = all categories
-  const catVal = await page.$eval(
-    "select#buyer_category option:checked", o => o.value
-  ).catch(() => "?")
-  if (catVal !== "") {
-    await page.selectOption("select#buyer_category", "").catch(() => {})
-  }
+  // Apply category filter (empty string = all categories, non-empty = specific category)
+  await page.selectOption("select#buyer_category", CATEGORY_VAL).catch(() => {})
 
   // Set date range via jQuery datepicker API (fields are readonly — keyboard.type fails).
   // datepicker('setDate') opens the calendar via a deferred setTimeout render.
@@ -627,6 +627,7 @@ async function processChunk(page, chunk, colGC, colRaw, state) {
       if (batchNum === 1 && page1Sample.length < 5) page1Sample.push(rec)
       if (batchNum === 1) batch1Recs.push(rec)
 
+      if (DRY_RUN_COLL) { batchInserted++; continue }
       const outcome = await upsertOne(colGC, colRaw, rec, item, ext.strategy,
                                       chunk.id, batchNum, chunk.from, chunk.to)
       if (outcome === "inserted") batchInserted++
@@ -1233,6 +1234,7 @@ async function postChunkHooks(chunk, state, db) {
       version:   2,
       totalDays: TOTAL_DAYS,
       chunkDays: CHUNK_DAYS,
+      category:  CATEGORY_VAL || null,
       chunks:    generateChunks(TOTAL_DAYS),
       createdAt: new Date().toISOString(),
     }
