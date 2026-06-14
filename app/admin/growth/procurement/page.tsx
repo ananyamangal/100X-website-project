@@ -4,7 +4,7 @@ import {
   FileSearch, Users, Map, RefreshCw,
   TrendingUp, Building2, Search, X,
   BarChart3, PlusCircle, Download, Sparkles, Zap,
-  Network, Star, Package, SlidersHorizontal, Archive, Store,
+  Network, Star, Package, SlidersHorizontal, Archive, Store, Link,
 } from "lucide-react"
 import { DealerPanel }          from "./DealerPanel"
 import { BidPanel }             from "./BidPanel"
@@ -23,7 +23,8 @@ import { CopilotTab }           from "./CopilotTab"
 import { CollectionHealthTab }  from "./CollectionHealthTab"
 import { BuyerIntelTab }        from "./BuyerIntelTab"
 import { BuyerProfilesTab }    from "./BuyerProfilesTab"
-import { SellerProfilesTab }   from "./SellerProfilesTab"
+import { SellerProfilesTab }       from "./SellerProfilesTab"
+import { ContractAnalyticsTab }    from "./ContractAnalyticsTab"
 import { CollectDataTab }       from "./CollectDataTab"
 import { ArchiveTab }           from "./ArchiveTab"
 
@@ -132,7 +133,7 @@ interface IntelData {
 
 type Tab =
   | "copilot" | "ai-analyst" | "insights" | "opportunity" | "relationships"
-  | "dealer-acq" | "product-disc" | "buyer-intel" | "buyer-profiles" | "seller-profiles"
+  | "dealer-acq" | "product-disc" | "buyer-intel" | "buyer-profiles" | "seller-profiles" | "pair-analytics"
   | "contracts" | "dealers" | "heatmap"
   | "health" | "collect-data" | "report"
   | "archive"
@@ -161,6 +162,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "buyer-intel",   label: "Buyer Intel",       icon: Building2 },
       { id: "buyer-profiles",  label: "Buyer Profiles",  icon: Users  },
       { id: "seller-profiles", label: "Seller Profiles", icon: Store  },
+      { id: "pair-analytics",  label: "Pair Analytics",  icon: Link  },
     ],
   },
   {
@@ -1003,6 +1005,7 @@ export default function ProcurementIntelligence() {
         {activeTab === "buyer-intel"    && <BuyerIntelTab onDealerClick={handleDealerClick} />}
         {activeTab === "buyer-profiles"  && <BuyerProfilesTab />}
         {activeTab === "seller-profiles" && <SellerProfilesTab />}
+        {activeTab === "pair-analytics"  && <ContractAnalyticsTab />}
         {activeTab === "contracts"     && <ContractsTab />}
         {activeTab === "dealers"       && <DealersTab onDealerClick={handleDealerClick} />}
         {activeTab === "heatmap"       && <HeatMapTab onDealerClick={handleDealerClick} />}
