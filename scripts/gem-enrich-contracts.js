@@ -37,7 +37,8 @@ const CAP_URL            = "https://gem.gov.in/assets/phpcaptcha/captcha.php"
 let PDF_DIR, TEXT_DIR, JSON_DIR
 
 function initDirs() {
-  const root = process.env.GEM_ARCHIVE_ROOT ||
+  const cliRoot = (process.argv.find(a => a.startsWith("--archive-root=")) || "").split("=")[1]
+  const root = cliRoot || process.env.GEM_ARCHIVE_ROOT ||
     path.join("F:", "OneDrive", "Data", "SULABH2018", "E drive", "GeMArchive")
   PDF_DIR  = path.join(root, "PDFs")
   TEXT_DIR = path.join(root, "RawText")
@@ -431,12 +432,13 @@ async function downloadPdf(context, page, url, dest) {
   loadEnv()
   initDirs()
 
-  const args       = process.argv.slice(2)
-  const limitIdx   = args.indexOf("--limit")
-  const limit      = limitIdx >= 0 ? parseInt(args[limitIdx + 1]) : Infinity
-  const valueFirst = args.includes("--value-first")
-  const retryFailed = args.includes("--retry-failed")
-  const dryRun     = args.includes("--dry-run")
+  const args          = process.argv.slice(2)
+  const limitIdx      = args.indexOf("--limit")
+  const limit         = limitIdx >= 0 ? parseInt(args[limitIdx + 1]) : Infinity
+  const valueFirst    = args.includes("--value-first")
+  const retryFailed   = args.includes("--retry-failed")
+  const dryRun        = args.includes("--dry-run")
+  const categoryFilter = args.find(a => a.startsWith("--category-filter="))?.split("=")[1] || null
 
   const client = new MongoClient(process.env.MONGODB_URI)
   await client.connect()
@@ -444,11 +446,13 @@ async function downloadPdf(context, page, url, dest) {
   const gc = db.collection("gem_contracts")
 
   console.log(`  Archive root : ${PDF_DIR.replace(/[/\\][^/\\]+$/, "")}`)
+  if (categoryFilter) console.log(`  Category     : ${categoryFilter}`)
 
   // Build queue query
   const queueQuery = retryFailed
     ? { detail_scraped: false, enrichment_attempts: { $lt: MAX_RETRIES } }
-    : { detail_scraped: false, enrichment_error: { $exists: false } }
+    : { detail_scraped: false, enrichment_error: { $exists: false },
+        ...(categoryFilter ? { category_id: categoryFilter } : {}) }
 
   const totalPending = await gc.countDocuments(queueQuery)
   const totalAll     = await gc.countDocuments()
