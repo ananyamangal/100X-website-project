@@ -4,7 +4,7 @@ import {
   FileSearch, Users, Map, RefreshCw,
   TrendingUp, Building2, Search, X,
   BarChart3, PlusCircle, Download, Sparkles, Zap,
-  Network, Star, Package, SlidersHorizontal, Archive,
+  Network, Star, Package, SlidersHorizontal, Archive, Store,
 } from "lucide-react"
 import { DealerPanel }          from "./DealerPanel"
 import { BidPanel }             from "./BidPanel"
@@ -23,6 +23,7 @@ import { CopilotTab }           from "./CopilotTab"
 import { CollectionHealthTab }  from "./CollectionHealthTab"
 import { BuyerIntelTab }        from "./BuyerIntelTab"
 import { BuyerProfilesTab }    from "./BuyerProfilesTab"
+import { SellerProfilesTab }   from "./SellerProfilesTab"
 import { CollectDataTab }       from "./CollectDataTab"
 import { ArchiveTab }           from "./ArchiveTab"
 
@@ -131,7 +132,7 @@ interface IntelData {
 
 type Tab =
   | "copilot" | "ai-analyst" | "insights" | "opportunity" | "relationships"
-  | "dealer-acq" | "product-disc" | "buyer-intel" | "buyer-profiles"
+  | "dealer-acq" | "product-disc" | "buyer-intel" | "buyer-profiles" | "seller-profiles"
   | "contracts" | "dealers" | "heatmap"
   | "health" | "collect-data" | "report"
   | "archive"
@@ -158,7 +159,8 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "dealer-acq",    label: "Dealer Targets",   icon: Star      },
       { id: "product-disc",  label: "Product Discovery", icon: Package  },
       { id: "buyer-intel",   label: "Buyer Intel",       icon: Building2 },
-      { id: "buyer-profiles", label: "Buyer Profiles",  icon: Users     },
+      { id: "buyer-profiles",  label: "Buyer Profiles",  icon: Users  },
+      { id: "seller-profiles", label: "Seller Profiles", icon: Store  },
     ],
   },
   {
@@ -999,7 +1001,8 @@ export default function ProcurementIntelligence() {
         {activeTab === "dealer-acq"    && <DealerAcquisitionTab onDealerClick={handleDealerClick} />}
         {activeTab === "product-disc"  && <ProductDiscoveryTab />}
         {activeTab === "buyer-intel"    && <BuyerIntelTab onDealerClick={handleDealerClick} />}
-        {activeTab === "buyer-profiles" && <BuyerProfilesTab />}
+        {activeTab === "buyer-profiles"  && <BuyerProfilesTab />}
+        {activeTab === "seller-profiles" && <SellerProfilesTab />}
         {activeTab === "contracts"     && <ContractsTab />}
         {activeTab === "dealers"       && <DealersTab onDealerClick={handleDealerClick} />}
         {activeTab === "heatmap"       && <HeatMapTab onDealerClick={handleDealerClick} />}
