@@ -196,15 +196,15 @@ function AttackAccountsBoard() {
   const [page, setPage] = useState(1)
   const PAGE = 50
 
-  const [f, setF] = useState({ state: "", oem: "", dept: "", tier: "", max_days: "" })
+  const [f, setF] = useState({ state: "", oem: "", org_type: "", tier: "", max_days: "" })
 
   const load = useCallback(() => {
     setLoading(true)
     const qs = new URLSearchParams({ page: String(page), page_size: String(PAGE) })
-    if (f.state)    qs.set("state", f.state)
-    if (f.oem)      qs.set("oem", f.oem)
-    if (f.dept)     qs.set("dept", f.dept)
-    if (f.tier)     qs.set("tier", f.tier)
+    if (f.state)    qs.set("state",    f.state)
+    if (f.oem)      qs.set("oem",      f.oem)
+    if (f.org_type) qs.set("org_type", f.org_type)
+    if (f.tier)     qs.set("tier",     f.tier)
     if (f.max_days) qs.set("max_days", f.max_days)
     fetch(`/api/fogging/sales/attack-accounts?${qs}`)
       .then(r => r.json())
@@ -231,9 +231,18 @@ function AttackAccountsBoard() {
           <option value="">All Incumbents</option>
           {ATTACK_OEMS.map(o => <option key={o}>{o}</option>)}
         </select>
-        <select className={selClx} value={f.dept} onChange={e => setF(v => ({ ...v, dept: e.target.value }))}>
-          <option value="">All Departments</option>
-          {DEPTS.map(d => <option key={d}>{d}</option>)}
+        <input
+          className={selClx}
+          placeholder="State…"
+          value={f.state}
+          onChange={e => setF(v => ({ ...v, state: e.target.value }))}
+          style={{ width: "90px" }}
+        />
+        <select className={selClx} value={f.org_type} onChange={e => setF(v => ({ ...v, org_type: e.target.value }))}>
+          <option value="">All Types</option>
+          {["Railway","Police","University","Corporation","Panchayat","Municipality",
+            "Development Authority","Health Authority","PSU","Central Department",
+            "State Department","Statutory Body"].map(t => <option key={t}>{t}</option>)}
         </select>
         <select className={selClx} value={f.max_days} onChange={e => setF(v => ({ ...v, max_days: e.target.value }))}>
           <option value="">Any Recency</option>
@@ -242,11 +251,11 @@ function AttackAccountsBoard() {
           <option value="180">Last 180 days</option>
           <option value="365">Last 365 days</option>
         </select>
-        {(f.state || f.oem || f.dept || f.tier || f.max_days) && (
-          <button onClick={() => setF({ state: "", oem: "", dept: "", tier: "", max_days: "" })}
+        {(f.state || f.oem || f.org_type || f.tier || f.max_days) && (
+          <button onClick={() => setF({ state: "", oem: "", org_type: "", tier: "", max_days: "" })}
             className="text-xs text-gray-500 hover:text-gray-800 underline px-1">Clear</button>
         )}
-        <span className="ml-auto text-xs text-gray-400 self-center">{total.toLocaleString()} buyers</span>
+        <span className="ml-auto text-xs text-gray-400 self-center">{total.toLocaleString()} accounts</span>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">

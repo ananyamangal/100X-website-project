@@ -131,6 +131,31 @@ export default function StatePage({ params }: { params: { name: string } }) {
           </div>
         )}
 
+        {/* Market Concentration insight */}
+        {summary && oems.length > 0 && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-xs text-gray-600 flex flex-wrap gap-x-4 gap-y-1 items-center">
+            <span className="font-semibold text-gray-700 shrink-0">Market Concentration</span>
+            {oems[0] && (
+              <span>Top OEM controls{" "}
+                <strong className="text-gray-900">{((oems[0].gmv / (summary.total_gmv || 1)) * 100).toFixed(1)}%</strong>
+                {" "}({oems[0].brand_name || oems[0].oem_canonical})
+              </span>
+            )}
+            {orgs[0] && (
+              <span>Top org controls{" "}
+                <strong className="text-gray-900">{((orgs[0].total_gmv / (summary.total_gmv || 1)) * 100).toFixed(1)}%</strong>
+              </span>
+            )}
+            <span><strong className="text-gray-900">{summary.org_count}</strong> orgs active</span>
+            {(() => {
+              const neptune = oems.find(o => (o.brand_name || "").toLowerCase().includes("neptune"))
+              return neptune
+                ? <span>Neptune&apos;s footprint: <strong className="text-gray-900">{neptune.contracts}</strong> contracts</span>
+                : null
+            })()}
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
           <div className="border-b border-gray-200 flex overflow-x-auto">

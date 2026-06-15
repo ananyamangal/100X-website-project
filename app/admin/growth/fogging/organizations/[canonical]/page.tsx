@@ -188,6 +188,56 @@ export default function OrganizationPage({ params }: { params: { canonical: stri
           ))}
         </div>
 
+        {/* Sales Action panel */}
+        {(() => {
+          const daysSince = org.last_contract
+            ? Math.floor((Date.now() - new Date(org.last_contract).getTime()) / 86400000)
+            : null
+          const incumbent = org.incumbent_oem_brand || org.incumbent_oem || "Unknown"
+          let action: string
+          if (org.is_100x_buyer) {
+            action = "Expand — this org already buys 100X. Deepen wallet share."
+          } else if (daysSince != null && daysSince <= 180) {
+            action = `Strike now — recent buyer, hot window. Displace ${incumbent}.`
+          } else if (daysSince != null && daysSince <= 540) {
+            action = "Nurture — mid-cycle. Send samples and pricing."
+          } else {
+            action = "Reactivate — lapsed buyer. Target in next tender cycle."
+          }
+          return (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="text-xs text-amber-700 font-semibold uppercase tracking-wide mb-3">Sales Action</div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-3 text-xs">
+                <div>
+                  <div className="text-gray-500 mb-0.5">Primary Competitor</div>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                    {incumbent}
+                  </span>
+                </div>
+                <div>
+                  <div className="text-gray-500 mb-0.5">Last Purchase</div>
+                  <div className="font-semibold text-gray-800">{fmt(org.last_contract)}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500 mb-0.5">Typical Size</div>
+                  <div className="font-semibold text-gray-800">{INR(org.avg_contract_value)}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500 mb-0.5">Status</div>
+                  <div className="font-semibold text-gray-800">
+                    {org.is_100x_buyer
+                      ? <span className="text-blue-700">100X Customer</span>
+                      : <span className="text-red-600">Not Buying 100X</span>}
+                  </div>
+                </div>
+              </div>
+              <div className="text-xs bg-amber-100 text-amber-800 rounded px-3 py-2 font-medium">
+                {action}
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Incumbent intelligence */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {org.incumbent_oem && (
