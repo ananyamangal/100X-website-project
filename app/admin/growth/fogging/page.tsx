@@ -4,7 +4,7 @@ import Link from "next/link"
 import {
   BarChart3, Target, TrendingUp, Calendar, Users, Building2,
   RefreshCw, Download, X, ExternalLink, Flame, Search,
-  ChevronRight, AlertCircle,
+  ChevronRight, AlertCircle, Store,
 } from "lucide-react"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -1582,6 +1582,12 @@ export default function FoggingIntelligencePage() {
               {t.label}
             </button>
           ))}
+          <Link
+            href="/admin/growth/fogging/sellers"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t-md transition-colors border-b-2 -mb-px whitespace-nowrap border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+          >
+            <Store size={14} /> Dealer Network
+          </Link>
         </div>
       </div>
 

@@ -75,6 +75,12 @@ function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () 
             <div className="font-semibold text-gray-800">{contract.seller_name ?? "—"}</div>
             {contract.seller_gst && <div className="font-mono text-xs text-gray-500 select-all">{contract.seller_gst}</div>}
           </div>
+          {contract.seller_gst && (
+            <a href={`/admin/growth/fogging/sellers/${encodeURIComponent(contract.seller_gst)}`}
+              className="mt-2 flex items-center gap-1.5 text-xs text-amber-700 hover:text-amber-900 hover:underline transition-colors">
+              View Seller 360 →
+            </a>
+          )}
         </div>
         <div className="border-t border-gray-100 pt-3 space-y-2">
           <a href={gemUrl} target="_blank" rel="noreferrer"
