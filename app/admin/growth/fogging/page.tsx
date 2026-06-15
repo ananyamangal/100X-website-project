@@ -4,7 +4,7 @@ import Link from "next/link"
 import {
   BarChart3, Target, TrendingUp, Calendar, Users, Building2,
   RefreshCw, Download, X, ExternalLink, Flame, Search,
-  ChevronRight, AlertCircle, Store, Database,
+  ChevronRight, AlertCircle, Store, Database, Mic,
 } from "lucide-react"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -267,7 +267,7 @@ function MarketShareTab({ oems }: { oems: OemRow[] }) {
       )}
 
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total Market GMV"  value={INR(totalGmv, true)} href="/admin/growth/fogging/sales" />
+        <KpiCard label="Total Market GMV"  value={INR(totalGmv, true)} href="/admin/growth/fogging/contracts" />
         <KpiCard label="Active OEMs"       value={oems.length.toString()} sub="view OEM profiles" href="/admin/growth/fogging/contracts" />
         <KpiCard label="100X Share"        value={PCT(entry100x?.market_share_gmv || 0)} accent href={`/admin/growth/fogging/oem/${encodeURIComponent("100X CIRCLE")}`} />
       </div>
@@ -364,114 +364,109 @@ function MarketShareTab({ oems }: { oems: OemRow[] }) {
 
 // ─── TAB 2: Attack Accounts ───────────────────────────────────────────────────
 
-const INCUMBENT_FLAGS: Record<string, string> = {
-  "NEPTUNE":   "purchased_neptune",
-  "SSE":       "purchased_sse",
-  "PULSFOG":   "purchased_pulsfog",
-  "INSTA FOG": "purchased_instafog",
-  "FOGGERS":   "purchased_foggers",
+interface OrgRow {
+  organization_canonical:  string
+  organization_name:       string
+  organization_state:      string | null
+  dept_category:           string | null
+  organization_type:       string | null
+  organization_status:     string
+  total_gmv:               number | null
+  total_contracts:         number
+  oem_count:               number
+  incumbent_oem:           string | null
+  incumbent_oem_brand:     string | null
+  is_100x_buyer:           boolean
+  first_contract:          string | null
+  last_contract:           string | null
 }
 
+const ORG_TYPES = [
+  "Railway","Police","University","Corporation","Panchayat","Municipality",
+  "Development Authority","Health Authority","PSU","Central Department",
+  "State Department","Statutory Body",
+]
+
+const ATTACK_INCUMBENT_OEMS = [
+  "NEPTUNE","SSE SAI SHREE ENTERPRISES","PULSFOG","INSTA FOG","FOGGERS","INDOFOG","LUMINICA",
+]
+
 function AttackAccountsTab() {
-  const [buyers,  setBuyers]  = useState<BuyerRow[]>([])
-  const [total,   setTotal]   = useState(0)
-  const [meta,    setMeta]    = useState<Record<string, number>>({})
-  const [loading, setLoading] = useState(true)
-  const [detail,  setDetail]  = useState<BuyerRow | null>(null)
-  const [page,    setPage]    = useState(1)
+  const [orgs,            setOrgs]            = useState<OrgRow[]>([])
+  const [total,           setTotal]           = useState(0)
+  const [totalGmvVisible, setTotalGmvVisible] = useState(0)
+  const [loading,         setLoading]         = useState(true)
+  const [page,            setPage]            = useState(1)
   const [filters, setFilters] = useState({
-    tier: "A,B", incumbent: "", state: "", days: "", view: "50", dept: ""
+    org_type: "", state: "", incumbent_oem: "", sort: "gmv_desc",
   })
 
   const load = useCallback(() => {
     setLoading(true)
     const qs = new URLSearchParams({
-      purchased_100x: "false",
-      page:           String(page),
-      page_size:      filters.view === "20" ? "20" : filters.view === "100" ? "100" : "50",
+      is_100x:   "false",
+      page:      String(page),
+      page_size: "50",
     })
-    if (filters.tier)      qs.set("opportunity_tier_in", filters.tier)
-    if (filters.state)     qs.set("buyer_state", filters.state)
-    if (filters.days)      qs.set("days_since_max", filters.days)
-    if (filters.dept)      qs.set("dept_category", filters.dept)
-    if (filters.incumbent) {
-      const flag = INCUMBENT_FLAGS[filters.incumbent]
-      if (flag) qs.set(flag, "true")
-    }
-    fetch(`/api/fogging/buyers?${qs}`)
+    if (filters.org_type)      qs.set("org_type",      filters.org_type)
+    if (filters.state)         qs.set("state",          filters.state)
+    if (filters.incumbent_oem) qs.set("incumbent_oem",  filters.incumbent_oem)
+    if (filters.sort)          qs.set("sort",           filters.sort)
+    fetch(`/api/fogging/organizations?${qs}`)
       .then(r => r.json())
-      .then(d => { setBuyers(d.data || []); setTotal(d.total || 0); setMeta(d.meta?.tiers || {}) })
+      .then(d => {
+        const rows: OrgRow[] = d.data || []
+        setOrgs(rows)
+        setTotal(d.total || 0)
+        setTotalGmvVisible(rows.reduce((s, o) => s + (o.total_gmv || 0), 0))
+      })
       .finally(() => setLoading(false))
   }, [filters, page])
 
   useEffect(() => { load() }, [load])
   useEffect(() => { setPage(1) }, [filters])
 
-  const exportUrl = () => {
-    const qs = new URLSearchParams({ limit: "100" })
-    if (filters.tier)      qs.set("tier", filters.tier)
-    if (filters.state)     qs.set("state", filters.state)
-    if (filters.days)      qs.set("days_max", filters.days)
-    if (filters.incumbent) qs.set("incumbent", filters.incumbent)
-    return `/api/fogging/attack-accounts/export?${qs}`
-  }
+  const fmtDate = (d: string | null) =>
+    d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : "—"
+
+  const selClx = "text-xs border border-gray-200 rounded px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-400"
+
+  const avgOrgSpend = orgs.length > 0 && totalGmvVisible > 0
+    ? totalGmvVisible / orgs.length
+    : null
+
+  const pages = Math.ceil(total / 50)
 
   return (
     <div className="space-y-4">
-      {/* KPI strip */}
       <div className="grid grid-cols-4 gap-3">
-        <KpiCard label="Not Buying 100X" value={total.toString()} sub="of 274 total buyers" />
-        <KpiCard label="Tier A Targets"  value={String(meta.A || 0)} sub="score 80+"  accent />
-        <KpiCard label="Tier B Targets"  value={String(meta.B || 0)} sub="score 60–79" />
-        <KpiCard label="Tier C Targets"  value={String(meta.C || 0)} sub="score 40–59" />
+        <KpiCard label="Attack Surface"      value={total.toString()}           sub="non-100X orgs" />
+        <KpiCard label="Total Opportunity"   value={INR(totalGmvVisible, true)} sub="visible GMV" />
+        <KpiCard label="Avg Org Spend"       value={INR(avgOrgSpend)}           sub="per org" />
+        <KpiCard label="Organization Directory" value="→"                       sub="all 264 orgs" href="/admin/growth/fogging/organizations" />
       </div>
 
-      {/* Filters */}
       <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-xs text-gray-500 font-medium">Tier:</span>
-        {["A", "B", "C", "A,B", "A,B,C"].map(t => (
-          <button key={t} onClick={() => setFilters(f => ({ ...f, tier: t }))}
-            className={`text-xs px-3 py-1 rounded-full border transition-colors ${filters.tier === t ? "bg-blue-600 text-white border-blue-600" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}>
-            {t}
-          </button>
-        ))}
-        <span className="text-xs text-gray-500 font-medium ml-2">Incumbent:</span>
-        {["", "NEPTUNE", "SSE", "PULSFOG", "INSTA FOG", "FOGGERS"].map(inc => (
-          <button key={inc} onClick={() => setFilters(f => ({ ...f, incumbent: inc }))}
-            className={`text-xs px-3 py-1 rounded-full border transition-colors ${filters.incumbent === inc ? "bg-gray-800 text-white border-gray-800" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}>
-            {inc || "All"}
-          </button>
-        ))}
-        <input className="border border-gray-200 rounded px-2 py-1 text-xs ml-2" placeholder="State…"
+        <select className={selClx} value={filters.org_type} onChange={e => setFilters(f => ({ ...f, org_type: e.target.value }))}>
+          <option value="">All Types</option>
+          {ORG_TYPES.map(t => <option key={t}>{t}</option>)}
+        </select>
+        <input className={`${selClx} w-32`} placeholder="State…"
           value={filters.state} onChange={e => setFilters(f => ({ ...f, state: e.target.value }))} />
-        <input type="number" className="border border-gray-200 rounded px-2 py-1 text-xs w-20" placeholder="≤Nd active"
-          value={filters.days} onChange={e => setFilters(f => ({ ...f, days: e.target.value }))} />
-        <span className="text-xs text-gray-500 font-medium ml-2">Dept:</span>
-        {[
-          { label: "All",       val: "" },
-          { label: "Urban",     val: "Urban" },
-          { label: "Defence",   val: "Defence" },
-          { label: "Forest",    val: "Forest" },
-          { label: "Agri",      val: "Agriculture" },
-          { label: "Health",    val: "Health" },
-          { label: "Rural",     val: "Rural" },
-          { label: "Railways",  val: "Rail" },
-        ].map(d => (
-          <button key={d.val} onClick={() => setFilters(f => ({ ...f, dept: d.val }))}
-            className={`text-xs px-2 py-1 rounded-full border transition-colors ${filters.dept === d.val ? "bg-indigo-600 text-white border-indigo-600" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}>
-            {d.label}
-          </button>
-        ))}
-        <span className="text-xs text-gray-500 font-medium ml-2">View:</span>
-        {["20","50","100"].map(v => (
-          <button key={v} onClick={() => setFilters(f => ({ ...f, view: v }))}
-            className={`text-xs px-2 py-1 rounded border ${filters.view === v ? "bg-gray-800 text-white border-gray-800" : "border-gray-300 text-gray-600"}`}>
-            Top {v}
-          </button>
-        ))}
-        <a href={exportUrl()} download className="ml-auto flex items-center gap-1 text-xs px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700">
-          <Download size={12} /> Export CSV
-        </a>
+        <select className={selClx} value={filters.incumbent_oem} onChange={e => setFilters(f => ({ ...f, incumbent_oem: e.target.value }))}>
+          <option value="">All Incumbents</option>
+          {ATTACK_INCUMBENT_OEMS.map(o => <option key={o}>{o}</option>)}
+        </select>
+        <select className={selClx} value={filters.sort} onChange={e => setFilters(f => ({ ...f, sort: e.target.value }))}>
+          <option value="gmv_desc">Highest GMV</option>
+          <option value="contracts_desc">Most Contracts</option>
+          <option value="name_asc">Name A–Z</option>
+        </select>
+        {(filters.org_type || filters.state || filters.incumbent_oem) && (
+          <button onClick={() => setFilters({ org_type: "", state: "", incumbent_oem: "", sort: "gmv_desc" })}
+            className="text-xs text-gray-500 hover:text-gray-800 underline px-1">Clear</button>
+        )}
+        <span className="ml-auto text-xs text-gray-400 self-center">{total.toLocaleString()} accounts</span>
       </div>
 
       {loading ? <Spinner /> : (
@@ -480,164 +475,62 @@ function AttackAccountsTab() {
             <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
               <tr>
                 <th className="px-3 py-2 text-right w-8">#</th>
-                <th className="px-4 py-2 text-left">Buyer</th>
+                <th className="px-4 py-2 text-left">Organization</th>
                 <th className="px-3 py-2 text-left">State</th>
-                <th className="px-3 py-2 text-left">Dept</th>
-                <th className="px-3 py-2 text-right">Spend</th>
+                <th className="px-3 py-2 text-left">Type</th>
+                <th className="px-3 py-2 text-left">Category</th>
+                <th className="px-3 py-2 text-right">GMV</th>
+                <th className="px-3 py-2 text-right">Contracts</th>
+                <th className="px-3 py-2 text-left">Incumbent OEM</th>
                 <th className="px-3 py-2 text-center">Last Buy</th>
-                <th className="px-3 py-2 text-left">Incumbent</th>
-                <th className="px-3 py-2 text-center">Score</th>
-                <th className="px-3 py-2 text-right">Est Opp</th>
               </tr>
             </thead>
             <tbody>
-              {buyers.map((b, idx) => (
-                <tr key={b.buyer_canonical}
-                  className={`border-t border-gray-50 cursor-pointer hover:bg-blue-50 ${detail?.buyer_canonical === b.buyer_canonical ? "bg-blue-50" : ""} ${b.is_anomalous ? "opacity-60" : ""}`}
-                  onClick={() => setDetail(detail?.buyer_canonical === b.buyer_canonical ? null : b)}>
-                  <td className="px-3 py-2 text-right text-gray-400 text-xs">
-                    {b.rank ?? ((page - 1) * parseInt(filters.view) + idx + 1)}
-                  </td>
+              {orgs.map((o, idx) => (
+                <tr key={o.organization_canonical}
+                  className="border-t border-gray-50 cursor-pointer hover:bg-indigo-50 transition-colors"
+                  onClick={() => window.location.href = `/admin/growth/fogging/organizations/${encodeURIComponent(o.organization_canonical)}`}>
+                  <td className="px-3 py-2 text-right text-gray-400 text-xs">{(page - 1) * 50 + idx + 1}</td>
                   <td className="px-4 py-2 font-medium text-sm max-w-xs">
                     <Link
-                      href={`/admin/growth/fogging/buyer/${encodeURIComponent(b.buyer_canonical)}`}
+                      href={`/admin/growth/fogging/organizations/${encodeURIComponent(o.organization_canonical)}`}
                       onClick={e => e.stopPropagation()}
-                      className="truncate block hover:text-blue-700 hover:underline transition-colors">
-                      {b.buyer_display_name}
+                      className="truncate block hover:text-indigo-700 hover:underline transition-colors">
+                      {o.organization_name}
                     </Link>
-                    {b.is_anomalous && <span className="text-xs text-amber-600">⚠ investigate identity</span>}
                   </td>
-                  <td className="px-3 py-2 text-gray-500 text-xs">{b.buyer_state || "—"}</td>
+                  <td className="px-3 py-2 text-gray-500 text-xs">{o.organization_state || "—"}</td>
+                  <td className="px-3 py-2 text-xs text-gray-500">{o.organization_type || "—"}</td>
                   <td className="px-3 py-2 text-xs">
-                    {b.dept_category
+                    {o.dept_category
                       ? <span className="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded whitespace-nowrap">
-                          {b.dept_category.split('/')[0].trim().slice(0, 14)}
+                          {o.dept_category.slice(0, 20)}
                         </span>
                       : <span className="text-gray-400">—</span>}
                   </td>
-                  <td className="px-3 py-2 text-right">{INR(b.total_gmv, true)}</td>
-                  <td className="px-3 py-2 text-center">
-                    <span className={b.days_since_last <= 30 ? "text-green-600 font-medium" : b.days_since_last <= 90 ? "text-amber-600" : "text-gray-500"}>
-                      {b.days_since_last}d
-                    </span>
-                  </td>
-                  <td className="px-3 py-2 text-xs text-gray-600">
-                    {b.primary_incumbent
+                  <td className="px-3 py-2 text-right font-medium">{INR(o.total_gmv, true)}</td>
+                  <td className="px-3 py-2 text-right text-gray-600">{o.total_contracts}</td>
+                  <td className="px-3 py-2 text-xs">
+                    {o.incumbent_oem_brand
                       ? <span className="flex items-center gap-1">
-                          <span className={`w-2 h-2 rounded-full ${oemColor(b.primary_incumbent)}`} />
-                          {b.primary_incumbent.length > 14 ? b.primary_incumbent.slice(0,14)+"…" : b.primary_incumbent}
+                          <span className={`w-2 h-2 rounded-full ${oemColor(o.incumbent_oem || "")}`} />
+                          {(o.incumbent_oem_brand).length > 16 ? o.incumbent_oem_brand.slice(0, 16) + "…" : o.incumbent_oem_brand}
                         </span>
-                      : b.oems_purchased[0] || "—"}
+                      : <span className="text-gray-400">—</span>}
                   </td>
-                  <td className="px-3 py-2 text-center">
-                    <TierPill tier={b.opportunity_tier} score={b.opportunity_score} />
-                  </td>
-                  <td className="px-3 py-2 text-right text-xs text-gray-600">
-                    {b.estimated_opportunity ? INR(b.estimated_opportunity, true) : "—"}
-                  </td>
+                  <td className="px-3 py-2 text-center text-gray-500 text-xs">{fmtDate(o.last_contract)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
           <div className="px-4 py-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-            <span>Showing {buyers.length} of {total}</span>
+            <span>Showing {orgs.length} of {total}</span>
             <div className="flex gap-2">
               <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-2 py-1 rounded hover:bg-gray-100 disabled:opacity-30">← Prev</button>
-              <span>Page {page}</span>
-              <button disabled={buyers.length < parseInt(filters.view)} onClick={() => setPage(p => p + 1)} className="px-2 py-1 rounded hover:bg-gray-100 disabled:opacity-30">Next →</button>
+              <span>Page {page} of {pages}</span>
+              <button disabled={page >= pages} onClick={() => setPage(p => p + 1)} className="px-2 py-1 rounded hover:bg-gray-100 disabled:opacity-30">Next →</button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Detail panel */}
-      {detail && (
-        <div className="bg-white border border-blue-200 rounded-lg p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="font-semibold text-gray-800">{detail.buyer_display_name}</span>
-              {detail.is_anomalous && (
-                <span className="ml-2 text-xs text-amber-600 flex items-center gap-1 inline-flex">
-                  <AlertCircle size={12} /> {detail.anomaly_reason === 'truncated_name' ? 'Truncated name — investigate raw GEMC' : detail.anomaly_reason === 'masked_gem_buyer' ? 'GeM-masked buyer — identity not resolvable from GeM data' : 'Anomalous buyer name'}
-                </span>
-              )}
-            </div>
-            <button onClick={() => setDetail(null)}><X size={16} className="text-gray-400" /></button>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-            <div><div className="text-xs text-gray-400">State / Type</div><div>{detail.buyer_state} · {detail.org_type || "—"}</div></div>
-            <div><div className="text-xs text-gray-400">Total Spend</div><div className="font-bold">{INR(detail.total_gmv, true)}</div></div>
-            <div><div className="text-xs text-gray-400">Last Purchase</div>
-              <div className={detail.days_since_last <= 30 ? "text-green-600 font-medium" : ""}>{detail.days_since_last}d ago</div>
-            </div>
-            <div><div className="text-xs text-gray-400">Score</div>
-              <TierPill tier={detail.opportunity_tier} score={detail.opportunity_score} />
-            </div>
-          </div>
-
-          {/* Incumbent OEM spend breakdown */}
-          {detail.oem_spend && detail.oem_spend.length > 0 && (
-            <div>
-              <div className="text-xs text-gray-500 font-medium uppercase mb-2">Incumbent OEM spend breakdown</div>
-              <OemSpendBar spend={detail.oem_spend} />
-              <table className="w-full text-xs mt-2">
-                <thead className="text-gray-400">
-                  <tr>
-                    <th className="text-left py-1">OEM</th>
-                    <th className="text-right py-1">GMV</th>
-                    <th className="text-right py-1">Contracts</th>
-                    <th className="text-right py-1">Share</th>
-                    <th className="text-right py-1">Last</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detail.oem_spend.map(o => (
-                    <tr key={o.oem_canonical} className={`border-t border-gray-50 ${o.is_100x ? "text-blue-700 font-medium" : ""}`}>
-                      <td className="py-1 flex items-center gap-1">
-                        <span className={`w-2 h-2 rounded-full ${oemColor(o.oem_canonical)}`} />
-                        {o.brand_name}
-                        {o.is_100x && <span className="text-xs bg-blue-100 px-1 rounded">100X</span>}
-                      </td>
-                      <td className="text-right py-1">{INR(o.gmv, true)}</td>
-                      <td className="text-right py-1 text-gray-500">{o.contracts}</td>
-                      <td className="text-right py-1">{PCT(o.share_pct)}</td>
-                      <td className="text-right py-1 text-gray-400">
-                        {o.last_contract ? new Date(o.last_contract).toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }) : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {/* Opportunity reasons */}
-          <div>
-            <div className="text-xs text-gray-500 font-medium uppercase mb-1">Score breakdown</div>
-            <ul className="text-xs space-y-0.5">
-              {detail.opportunity_reasons.map((r, i) => <li key={i} className="text-gray-600">• {r}</li>)}
-            </ul>
-          </div>
-
-          {/* Recommended action */}
-          {detail.recommended_action && (
-            <div className={`text-xs px-3 py-2 rounded ${detail.action_priority === 'immediate' ? 'bg-red-50 text-red-700' : detail.action_priority === 'nurture' ? 'bg-amber-50 text-amber-700' : 'bg-gray-50 text-gray-600'}`}>
-              <span className="font-medium uppercase mr-2">{detail.action_priority}</span>
-              {detail.recommended_action}
-            </div>
-          )}
-
-          {/* Forecast */}
-          <div className="text-xs text-gray-500">
-            Next predicted: <strong>{detail.forecast_next_month ? MONTHS[detail.forecast_next_month - 1] : "—"} {detail.forecast_next_year}</strong>
-            {" "}({detail.forecast_confidence} confidence
-            {detail.forecast_days_until != null ? `, ${detail.forecast_days_until}d` : ""})
-          </div>
-
-          <Link href={`/admin/growth/fogging/buyer/${encodeURIComponent(detail.buyer_canonical)}`}
-            className="text-xs text-blue-600 hover:underline flex items-center gap-1">
-            View Buyer 360 — full procurement history <ChevronRight size={12} />
-          </Link>
         </div>
       )}
     </div>
@@ -1817,6 +1710,7 @@ export default function FoggingIntelligencePage() {
   const [searchQ,       setSearchQ]       = useState("")
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null)
   const [searching,     setSearching]     = useState(false)
+  const [voiceActive,   setVoiceActive]   = useState(false)
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -1845,6 +1739,22 @@ export default function FoggingIntelligencePage() {
         .finally(() => setSearching(false))
     }, 300)
   }, [])
+
+  const startVoice = useCallback(() => {
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRec) return
+    const recognition = new SpeechRec()
+    recognition.lang = 'en-IN'
+    recognition.interimResults = false
+    recognition.onstart = () => setVoiceActive(true)
+    recognition.onresult = (e: any) => {
+      const t = e.results[0][0].transcript
+      handleSearch(t)
+    }
+    recognition.onerror = () => setVoiceActive(false)
+    recognition.onend  = () => setVoiceActive(false)
+    recognition.start()
+  }, [handleSearch])
 
   const totalGmv = oems.reduce((a, o) => a + (o.total_gmv || 0), 0)
   const entry100x = oems.find(o => o.is_100x)
@@ -1928,7 +1838,16 @@ export default function FoggingIntelligencePage() {
               placeholder="Search buyers, sellers, OEMs, models, GEMC#, state…"
               className="w-full pl-8 pr-8 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
             />
-            {searching && <RefreshCw size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />}
+            {searching
+              ? <RefreshCw size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
+              : <button
+                  onClick={startVoice}
+                  title="Voice search (English)"
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${voiceActive ? 'text-red-500 animate-pulse' : 'text-gray-400 hover:text-gray-600'}`}
+                >
+                  <Mic size={13} />
+                </button>
+            }
           </div>
           {searchResults && searchQ.length >= 2 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-[420px] overflow-y-auto">
@@ -1964,21 +1883,17 @@ export default function FoggingIntelligencePage() {
           )}
         </div>
 
-        {/* Persistent KPI strip — P4: all cards clickable */}
+        {/* Persistent KPI strip */}
         {!kpiLoading && oems.length > 0 && (
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-3">
-            <KpiCard label="Market GMV"    value={INR(totalGmv, true)} sub="all contracts" href="/admin/growth/fogging/sales" />
-            <KpiCard label="Active OEMs"   value={oems.length.toString()} sub="view profiles" onClick={() => setTab("oem_profiles")} />
-            <KpiCard label="100X Share"    value={PCT(entry100x?.market_share_gmv || 0)} sub={INR(entry100x?.total_gmv, true)} accent href={`/admin/growth/fogging/oem/${encodeURIComponent("100X CIRCLE")}`} />
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 mb-3">
+            <KpiCard label="Market GMV"     value={INR(totalGmv, true)}  sub="all contracts"      href="/admin/growth/fogging/contracts" />
+            <KpiCard label="Organizations"  value="264"                  sub="primary entities"   href="/admin/growth/fogging/organizations" />
+            <KpiCard label="Sellers"        value="679"                  sub="dealer network"     href="/admin/growth/fogging/sellers" />
+            <KpiCard label="Contracts"      value="1,418"                sub="total"              href="/admin/growth/fogging/contracts" />
+            <KpiCard label="100X Share"     value={PCT(entry100x?.market_share_gmv || 0)} sub={INR(entry100x?.total_gmv, true)} accent href={`/admin/growth/fogging/oem/${encodeURIComponent("100X CIRCLE")}`} />
+            <KpiCard label="Neptune Share"  value={PCT(neptune?.market_share_gmv || 0)} sub="#1 competitor" href={`/admin/growth/fogging/oem/${encodeURIComponent("NEPTUNE")}`} />
             <KpiCard label="100X Price P50" value={INR(entry100x?.median_unit_price)} sub="median unit" accent onClick={() => setTab("pricing")} />
-            <KpiCard label="Neptune Share" value={PCT(neptune?.market_share_gmv || 0)} sub="#1 competitor" href={`/admin/growth/fogging/oem/${encodeURIComponent("NEPTUNE")}`} />
-            <KpiCard label="Price Gap"
-              value={
-                (entry100x?.median_unit_price && neptune?.median_unit_price)
-                  ? INR(entry100x.median_unit_price - neptune.median_unit_price)
-                  : "—"
-              }
-              sub="100X vs Neptune P50" onClick={() => setTab("pricing")} />
+            <KpiCard label="Price Gap"      value={(entry100x?.median_unit_price && neptune?.median_unit_price) ? INR(entry100x.median_unit_price - neptune.median_unit_price) : "—"} sub="100X vs Neptune" onClick={() => setTab("pricing")} />
           </div>
         )}
 

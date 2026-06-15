@@ -88,6 +88,12 @@ export default function DataQualityCenter() {
         <div className="text-center py-24 text-gray-400">Failed to load data quality report.</div>
       ) : (
         <div className="max-w-screen-xl mx-auto px-4 py-6 space-y-6">
+          <Link
+            href="/admin/growth/fogging/data-quality/queue"
+            className="flex items-center gap-2 text-sm text-red-700 font-medium hover:underline">
+            <AlertCircle size={14} className="text-red-500" />
+            Unresolved Entity Queue →
+          </Link>
           {/* Field coverage summary */}
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-800 text-sm">

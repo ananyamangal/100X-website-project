@@ -13,7 +13,7 @@ function buildFilter(p: Record<string, string>): Filter<Document> {
   const f: Filter<Document> = {};
   if (p.state)    f.buyer_state      = p.state;
   if (p.tier)     f.opportunity_tier = { $in: p.tier.split(',') };
-  if (p.dept)     f.dept_category    = p.dept;
+  if (p.org_type) f.org_type         = p.org_type;
   if (p.min_gmv)  f.total_gmv        = { $gte: Number(p.min_gmv) };
   if (p.max_days && !isNaN(Number(p.max_days)))
                   f.days_since_last  = { $lte: Number(p.max_days) };
