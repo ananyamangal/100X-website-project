@@ -1505,9 +1505,219 @@ function BuyerProfilesTab() {
   )
 }
 
+// ─── Fogging Copilot Tab ──────────────────────────────────────────────────────
+
+const EXAMPLE_QUERIES = [
+  "Show all Neptune contracts in Bihar",
+  "Show all Royal Tradelinks sales",
+  "Show all contracts above 10 lakh",
+  "Show all purchases by e-Municipalities",
+  "Show 100X contracts in Uttar Pradesh",
+  "Show all Pulsfog contracts in 2024",
+  "Show all SSE contracts above 5 lakh",
+  "Show all contracts for NPF-35 model",
+]
+
+interface CopilotResult {
+  gemc_no: string; contract_date: string | null
+  buyer_display_name: string; buyer_canonical: string; buyer_state: string | null; org_type: string | null
+  oem_canonical: string; oem_short_brand: string | null; is_100x: boolean
+  model_raw: string | null
+  contract_value_num: number | null; quantity: number | null; unit_price: number | null
+  seller_name: string | null; seller_gst: string | null
+}
+
+interface CopilotResponse {
+  query: string; explanation: string; total: number
+  data: CopilotResult[]
+  summary: { total_gmv: number; buyer_count: number; oem_count: number; state_count: number }
+}
+
+function FoggingCopilotTab() {
+  const [query,   setQuery]   = useState("")
+  const [loading, setLoading] = useState(false)
+  const [result,  setResult]  = useState<CopilotResponse | null>(null)
+  const [error,   setError]   = useState<string | null>(null)
+
+  const run = async (q: string) => {
+    const trimmed = q.trim()
+    if (!trimmed) return
+    setLoading(true); setError(null); setResult(null)
+    try {
+      const res = await fetch('/api/fogging/copilot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: trimmed }),
+      })
+      const d = await res.json() as CopilotResponse & { error?: string }
+      if (!res.ok) { setError(d.error ?? 'Query failed'); return }
+      setResult(d)
+    } catch {
+      setError('Network error — please retry')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const exportCsv = () => {
+    if (!result) return
+    const headers = ['GEMC#', 'Date', 'Buyer', 'State', 'OEM', 'Model', 'Value (₹)', 'Qty', 'Unit ₹', 'Seller', 'GST']
+    const rows = result.data.map(c => [
+      c.gemc_no,
+      c.contract_date ? new Date(c.contract_date).toISOString().slice(0,10) : '',
+      c.buyer_display_name, c.buyer_state ?? '', c.oem_short_brand ?? c.oem_canonical,
+      c.model_raw ?? '', c.contract_value_num ?? '', c.quantity ?? '',
+      c.unit_price ?? '', c.seller_name ?? '', c.seller_gst ?? '',
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+    const csv = [headers.map(h => `"${h}"`).join(','), ...rows].join('\r\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a'); a.href = url
+    a.download = 'fogging-copilot.csv'; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Query bar */}
+      <div className="bg-white border border-blue-200 rounded-xl p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <Search size={16} className="text-blue-500" />
+          <span className="text-sm font-semibold text-gray-800">Fogging Copilot</span>
+          <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">AI</span>
+        </div>
+        <div className="flex gap-2">
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && run(query)}
+            placeholder='e.g. "Show all Neptune contracts in Bihar" or "Contracts above ₹10 lakh in UP"'
+            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
+          />
+          <button onClick={() => run(query)} disabled={loading || !query.trim()}
+            className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center gap-2">
+            {loading ? <RefreshCw size={14} className="animate-spin" /> : <Search size={14} />}
+            {loading ? 'Thinking…' : 'Run'}
+          </button>
+        </div>
+
+        {/* Example chips */}
+        <div className="mt-3 flex flex-wrap gap-2">
+          {EXAMPLE_QUERIES.map(q => (
+            <button key={q} onClick={() => { setQuery(q); run(q) }}
+              className="px-2.5 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors">
+              {q}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      {/* Results */}
+      {result && (
+        <div className="space-y-4">
+          {/* Explanation + summary */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex flex-wrap gap-4 items-center">
+            <div className="flex-1 min-w-0">
+              <div className="text-xs text-blue-400 uppercase tracking-wide mb-0.5">Interpreted as</div>
+              <div className="text-sm font-medium text-blue-900">{result.explanation}</div>
+            </div>
+            <div className="flex gap-4 text-xs text-blue-700 shrink-0">
+              <span><strong>{result.total.toLocaleString()}</strong> contracts</span>
+              <span><strong>{INR(result.summary.total_gmv, true)}</strong> GMV</span>
+              <span><strong>{result.summary.buyer_count}</strong> buyers</span>
+              <span><strong>{result.summary.state_count}</strong> states</span>
+              <button onClick={exportCsv}
+                className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <Download size={12} /> CSV
+              </button>
+            </div>
+          </div>
+
+          {result.data.length === 0 ? (
+            <div className="bg-white border border-gray-200 rounded-xl px-4 py-12 text-center text-gray-400 text-sm">
+              No contracts matched this query.
+            </div>
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr className="text-xs text-gray-500 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left">Date</th>
+                      <th className="px-4 py-3 text-left">Buyer</th>
+                      <th className="px-3 py-3 text-left">State</th>
+                      <th className="px-3 py-3 text-left">OEM</th>
+                      <th className="px-4 py-3 text-left">Model</th>
+                      <th className="px-3 py-3 text-right">Qty</th>
+                      <th className="px-3 py-3 text-right">Unit ₹</th>
+                      <th className="px-3 py-3 text-right">Value</th>
+                      <th className="px-4 py-3 text-left">Seller</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {result.data.map(c => (
+                      <tr key={c.gemc_no} className={`hover:bg-gray-50 ${c.is_100x ? "bg-blue-50/40" : ""}`}>
+                        <td className="px-4 py-2.5 text-xs text-gray-500 whitespace-nowrap">
+                          {c.contract_date ? new Date(c.contract_date).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'2-digit' }) : '—'}
+                        </td>
+                        <td className="px-4 py-2.5 text-xs max-w-48">
+                          <a href={`/admin/growth/fogging/buyer/${encodeURIComponent(c.buyer_canonical)}`}
+                            className="text-blue-700 hover:underline font-medium leading-tight block truncate">
+                            {c.buyer_display_name}
+                          </a>
+                          {c.org_type && <div className="text-gray-400 truncate">{c.org_type}</div>}
+                        </td>
+                        <td className="px-3 py-2.5 text-xs text-gray-600 whitespace-nowrap">{c.buyer_state ?? '—'}</td>
+                        <td className="px-3 py-2.5 text-xs">
+                          <span className={`font-medium ${c.is_100x ? "text-blue-700" : "text-gray-700"}`}>
+                            {c.oem_short_brand ?? c.oem_canonical}
+                          </span>
+                          {c.is_100x && <span className="ml-1 bg-blue-100 text-blue-700 px-1 rounded text-xs">100X</span>}
+                        </td>
+                        <td className="px-4 py-2.5 text-xs text-gray-600 max-w-40">
+                          <div className="truncate">{c.model_raw ?? '—'}</div>
+                        </td>
+                        <td className="px-3 py-2.5 text-right text-xs">{c.quantity ?? '—'}</td>
+                        <td className="px-3 py-2.5 text-right text-xs font-medium text-green-700">{INR(c.unit_price)}</td>
+                        <td className="px-3 py-2.5 text-right text-xs font-semibold">{INR(c.contract_value_num, true)}</td>
+                        <td className="px-4 py-2.5 text-xs max-w-40">
+                          {c.seller_gst ? (
+                            <a href={`/admin/growth/fogging/sellers/${encodeURIComponent(c.seller_gst)}`}
+                              className="text-amber-700 hover:underline font-medium truncate block">
+                              {c.seller_name ?? c.seller_gst}
+                            </a>
+                          ) : (
+                            <span className="text-gray-500 truncate block">{c.seller_name ?? '—'}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {result.total > 200 && (
+                <div className="px-4 py-2 bg-amber-50 border-t border-amber-100 text-xs text-amber-700">
+                  Showing first 200 of {result.total.toLocaleString()} results. Use Export CSV to get all.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-type TabId = "market" | "attack" | "pricing" | "forecast" | "oem_profiles" | "buyer_profiles"
+type TabId = "market" | "attack" | "pricing" | "forecast" | "oem_profiles" | "buyer_profiles" | "copilot"
 
 const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "market",        label: "Market Share",        icon: <BarChart3 size={14} /> },
@@ -1516,6 +1726,7 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "forecast",      label: "Forecasts",            icon: <Calendar size={14} /> },
   { id: "oem_profiles",  label: "OEM Profiles",         icon: <Building2 size={14} /> },
   { id: "buyer_profiles",label: "Buyer Profiles",       icon: <Users size={14} /> },
+  { id: "copilot",       label: "Copilot",              icon: <Search size={14} /> },
 ]
 
 interface CoverageData {
@@ -1745,6 +1956,7 @@ export default function FoggingIntelligencePage() {
         {tab === "forecast"      && <ForecastTab />}
         {tab === "oem_profiles"  && <OemProfilesTab oems={oems} />}
         {tab === "buyer_profiles"&& <BuyerProfilesTab />}
+        {tab === "copilot"       && <FoggingCopilotTab />}
       </div>
     </div>
   )
