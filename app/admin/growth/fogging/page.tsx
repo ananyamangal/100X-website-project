@@ -87,6 +87,12 @@ interface BuyerRow {
   forecast_confidence:   string
   forecast_days_until:   number | null
   forecast_6mo:          ForecastSlot[]
+  // Phase 4B enrichment fields
+  dept_category?:        string | null
+  has_100x?:             boolean
+  non_100x_gmv?:         number | null
+  incumbent_seller_name?:string | null
+  seller_opportunity_score?: number | null
 }
 
 interface PriceGroup {
@@ -374,7 +380,7 @@ function AttackAccountsTab() {
   const [detail,  setDetail]  = useState<BuyerRow | null>(null)
   const [page,    setPage]    = useState(1)
   const [filters, setFilters] = useState({
-    tier: "A,B", incumbent: "", state: "", days: "", view: "50"
+    tier: "A,B", incumbent: "", state: "", days: "", view: "50", dept: ""
   })
 
   const load = useCallback(() => {
@@ -387,6 +393,7 @@ function AttackAccountsTab() {
     if (filters.tier)      qs.set("opportunity_tier_in", filters.tier)
     if (filters.state)     qs.set("buyer_state", filters.state)
     if (filters.days)      qs.set("days_since_max", filters.days)
+    if (filters.dept)      qs.set("dept_category", filters.dept)
     if (filters.incumbent) {
       const flag = INCUMBENT_FLAGS[filters.incumbent]
       if (flag) qs.set(flag, "true")
@@ -439,6 +446,22 @@ function AttackAccountsTab() {
           value={filters.state} onChange={e => setFilters(f => ({ ...f, state: e.target.value }))} />
         <input type="number" className="border border-gray-200 rounded px-2 py-1 text-xs w-20" placeholder="≤Nd active"
           value={filters.days} onChange={e => setFilters(f => ({ ...f, days: e.target.value }))} />
+        <span className="text-xs text-gray-500 font-medium ml-2">Dept:</span>
+        {[
+          { label: "All",       val: "" },
+          { label: "Urban",     val: "Urban" },
+          { label: "Defence",   val: "Defence" },
+          { label: "Forest",    val: "Forest" },
+          { label: "Agri",      val: "Agriculture" },
+          { label: "Health",    val: "Health" },
+          { label: "Rural",     val: "Rural" },
+          { label: "Railways",  val: "Rail" },
+        ].map(d => (
+          <button key={d.val} onClick={() => setFilters(f => ({ ...f, dept: d.val }))}
+            className={`text-xs px-2 py-1 rounded-full border transition-colors ${filters.dept === d.val ? "bg-indigo-600 text-white border-indigo-600" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}>
+            {d.label}
+          </button>
+        ))}
         <span className="text-xs text-gray-500 font-medium ml-2">View:</span>
         {["20","50","100"].map(v => (
           <button key={v} onClick={() => setFilters(f => ({ ...f, view: v }))}
@@ -459,6 +482,7 @@ function AttackAccountsTab() {
                 <th className="px-3 py-2 text-right w-8">#</th>
                 <th className="px-4 py-2 text-left">Buyer</th>
                 <th className="px-3 py-2 text-left">State</th>
+                <th className="px-3 py-2 text-left">Dept</th>
                 <th className="px-3 py-2 text-right">Spend</th>
                 <th className="px-3 py-2 text-center">Last Buy</th>
                 <th className="px-3 py-2 text-left">Incumbent</th>
@@ -484,6 +508,13 @@ function AttackAccountsTab() {
                     {b.is_anomalous && <span className="text-xs text-amber-600">⚠ investigate identity</span>}
                   </td>
                   <td className="px-3 py-2 text-gray-500 text-xs">{b.buyer_state || "—"}</td>
+                  <td className="px-3 py-2 text-xs">
+                    {b.dept_category
+                      ? <span className="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded whitespace-nowrap">
+                          {b.dept_category.split('/')[0].trim().slice(0, 14)}
+                        </span>
+                      : <span className="text-gray-400">—</span>}
+                  </td>
                   <td className="px-3 py-2 text-right">{INR(b.total_gmv, true)}</td>
                   <td className="px-3 py-2 text-center">
                     <span className={b.days_since_last <= 30 ? "text-green-600 font-medium" : b.days_since_last <= 90 ? "text-amber-600" : "text-gray-500"}>

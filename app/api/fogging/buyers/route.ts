@@ -40,6 +40,9 @@ function buildMatch(p: Record<string, string>): Filter<Document> {
   if (p.is_switcher === 'true')  m.oem_count = { $gte: 2 };
   if (p.is_switcher === 'false') m.oem_count = 1;
 
+  // Department category (Phase 4B enrichment)
+  if (p.dept_category) m.dept_category = new RegExp(p.dept_category, 'i');
+
   return m;
 }
 
