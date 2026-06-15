@@ -1588,6 +1588,12 @@ export default function FoggingIntelligencePage() {
           >
             <Store size={14} /> Dealer Network
           </Link>
+          <Link
+            href="/admin/growth/fogging/sales"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t-md transition-colors border-b-2 -mb-px whitespace-nowrap border-transparent text-red-600 hover:text-red-800 hover:bg-red-50 font-semibold"
+          >
+            <Target size={14} /> Sales Command Center
+          </Link>
         </div>
       </div>
 
