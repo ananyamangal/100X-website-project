@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 // ── Formatters ─────────────────────────────────────────────────────────────────
@@ -508,7 +509,7 @@ function StateExpansionBoard() {
               return (
                 <tr key={r.state}
                   className={`${rowCls} cursor-pointer transition-colors`}
-                  onClick={() => router.push(`/admin/growth/fogging/sales?tab=attack&state=${encodeURIComponent(r.state)}`)}>
+                  onClick={() => router.push(`/admin/growth/fogging/contracts?buyer_state=${encodeURIComponent(r.state)}`)}>
                   <td className="px-3 py-2.5 text-gray-400">{i + 1}</td>
                   <td className="px-3 py-2.5">
                     <div className="font-medium text-gray-900">{r.state}</div>
@@ -528,7 +529,11 @@ function StateExpansionBoard() {
                   <td className="px-3 py-2.5 text-right font-mono text-gray-700">{INR(r.opp_score)}</td>
                   <td className="px-3 py-2.5">
                     <div className="flex flex-wrap gap-1">
-                      {r.top_oems.slice(0, 2).map(o => <OemChip key={o} name={o} highlight />)}
+                      {r.top_oems.slice(0, 2).map(o => (
+                        <Link key={o} href={`/admin/growth/fogging/oem/${encodeURIComponent(o)}`} onClick={e => e.stopPropagation()}>
+                          <OemChip name={o} highlight />
+                        </Link>
+                      ))}
                     </div>
                   </td>
                 </tr>
@@ -640,7 +645,11 @@ function ModelGapsBoard() {
                       {r.model_display || r.model_normalized}
                     </div>
                   </td>
-                  <td className="px-3 py-2.5"><OemChip name={r.oem_canonical} highlight={!r.is_100x} /></td>
+                  <td className="px-3 py-2.5">
+                    <Link href={`/admin/growth/fogging/oem/${encodeURIComponent(r.oem_canonical)}`} onClick={e => e.stopPropagation()}>
+                      <OemChip name={r.oem_canonical} highlight={!r.is_100x} />
+                    </Link>
+                  </td>
                   <td className="px-3 py-2.5 text-right font-mono text-gray-700">{INR(r.total_gmv)}</td>
                   <td className="px-3 py-2.5 text-right text-gray-700">{r.buyer_count}</td>
                   <td className="px-3 py-2.5 text-right font-mono text-gray-700">{fmtPrice(r.p50_price)}</td>

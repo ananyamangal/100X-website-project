@@ -268,7 +268,7 @@ function MarketShareTab({ oems }: { oems: OemRow[] }) {
 
       <div className="grid grid-cols-3 gap-3">
         <KpiCard label="Total Market GMV"  value={INR(totalGmv, true)} href="/admin/growth/fogging/sales" />
-        <KpiCard label="Active OEMs"       value={oems.length.toString()} sub="click any row below" />
+        <KpiCard label="Active OEMs"       value={oems.length.toString()} sub="view OEM profiles" href="/admin/growth/fogging/contracts" />
         <KpiCard label="100X Share"        value={PCT(entry100x?.market_share_gmv || 0)} accent href={`/admin/growth/fogging/oem/${encodeURIComponent("100X CIRCLE")}`} />
       </div>
 
@@ -734,6 +734,16 @@ function PricingTab() {
                           className="hover:text-blue-700 hover:underline">
                           {row.label || String(row.group)}
                         </Link>
+                      ) : pricingView === "buyer" && row.group ? (
+                        <Link href={`/admin/growth/fogging/buyer/${encodeURIComponent(String(row.group))}`}
+                          className="hover:text-blue-700 hover:underline">
+                          {row.label || String(row.group)}
+                        </Link>
+                      ) : pricingView === "state" && row.group ? (
+                        <Link href={`/admin/growth/fogging/contracts?buyer_state=${encodeURIComponent(String(row.group))}`}
+                          className="hover:text-blue-600 hover:underline">
+                          {row.label || String(row.group)}
+                        </Link>
                       ) : (
                         row.label || String(row.group)
                       )}
@@ -1055,6 +1065,10 @@ function ForecastTab() {
             </div>
           )}
           <div className="text-xs text-gray-600">OEMs: {(detail.oems_purchased || []).join(", ")}</div>
+          <Link href={`/admin/growth/fogging/buyer/${encodeURIComponent(detail.buyer_canonical)}`}
+            className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1">
+            View Buyer 360 →
+          </Link>
         </div>
       )}
     </div>
@@ -1179,7 +1193,10 @@ function OemProfilesTab({ oems }: { oems: OemRow[] }) {
                   <tbody>
                     {detail.buyer_breakdown.slice(0, 10).map(b => (
                       <tr key={b._id} className="border-t border-gray-50 hover:bg-gray-50">
-                        <td className="px-3 py-1.5 max-w-[160px] truncate" title={b.name}>{b.name}</td>
+                        <td className="px-3 py-1.5 max-w-[160px] truncate">
+                          <Link href={`/admin/growth/fogging/buyer/${encodeURIComponent(b._id)}`}
+                            className="text-blue-700 hover:underline truncate block" title={b.name}>{b.name}</Link>
+                        </td>
                         <td className="px-3 py-1.5 text-right">{INR(b.gmv, true)}</td>
                         <td className="px-3 py-1.5 text-right text-gray-400">{b.cnt}</td>
                       </tr>
@@ -1202,7 +1219,12 @@ function OemProfilesTab({ oems }: { oems: OemRow[] }) {
                   <tbody>
                     {detail.state_breakdown.slice(0, 10).map(s => (
                       <tr key={s._id} className="border-t border-gray-50 hover:bg-gray-50">
-                        <td className="px-3 py-1.5">{s._id || "—"}</td>
+                        <td className="px-3 py-1.5">
+                          {s._id ? (
+                            <Link href={`/admin/growth/fogging/contracts?buyer_state=${encodeURIComponent(s._id)}&oem_canonical=${encodeURIComponent(detail.profile.oem_canonical)}`}
+                              className="text-blue-600 hover:underline">{s._id}</Link>
+                          ) : "—"}
+                        </td>
                         <td className="px-3 py-1.5 text-right">{INR(s.gmv, true)}</td>
                         <td className="px-3 py-1.5 text-right text-gray-400">{s.cnt}</td>
                       </tr>
@@ -1227,7 +1249,12 @@ function OemProfilesTab({ oems }: { oems: OemRow[] }) {
                   <tbody>
                     {detail.model_breakdown.slice(0, 8).map(m => (
                       <tr key={m._id} className="border-t border-gray-50">
-                        <td className="px-3 py-1.5">{m.model || m._id || "—"}</td>
+                        <td className="px-3 py-1.5">
+                          {m._id ? (
+                            <Link href={`/admin/growth/fogging/model/${encodeURIComponent(m._id)}`}
+                              className="text-green-700 hover:underline">{m.model || m._id}</Link>
+                          ) : "—"}
+                        </td>
                         <td className="px-3 py-1.5 text-right">{INR(m.gmv, true)}</td>
                         <td className="px-3 py-1.5 text-right text-gray-400">{m.cnt}</td>
                       </tr>
@@ -1265,13 +1292,12 @@ function OemProfilesTab({ oems }: { oems: OemRow[] }) {
                     ? <div className="text-xs text-amber-700 mt-0.5"><strong>{attackCount}</strong> buyers use {detail.profile.brand_name} and have NOT purchased 100X — these are your targets.</div>
                     : <div className="text-xs text-amber-700 mt-0.5">Buyers of {detail.profile.brand_name} who haven&apos;t bought 100X.</div>}
                 </div>
-                <a
-                  href="#"
-                  onClick={e => { e.preventDefault(); /* switch to attack tab with incumbent filter — handled by parent */ }}
+                <Link
+                  href={`/admin/growth/fogging/contracts?oem_canonical=${encodeURIComponent(detail.profile.oem_canonical)}`}
                   className="text-xs px-3 py-1.5 bg-amber-600 text-white rounded hover:bg-amber-700 whitespace-nowrap"
                 >
-                  View in Attack Accounts →
-                </a>
+                  View Contracts →
+                </Link>
               </div>
             )}
           </div>
@@ -1406,7 +1432,8 @@ function BuyerProfilesTab() {
                         <tr key={o.oem_canonical} className={`border-t border-gray-50 ${o.is_100x ? "text-blue-700 bg-blue-50" : ""}`}>
                           <td className="px-3 py-1.5 flex items-center gap-1">
                             <span className={`w-2 h-2 rounded-full ${oemColor(o.oem_canonical)}`} />
-                            {o.brand_name}
+                            <Link href={`/admin/growth/fogging/oem/${encodeURIComponent(o.oem_canonical)}`}
+                              className="hover:text-blue-700 hover:underline">{o.brand_name}</Link>
                           </td>
                           <td className="px-3 py-1.5 text-right">{INR(o.gmv, true)}</td>
                           <td className="px-3 py-1.5 text-right text-gray-400">{o.contracts}</td>
@@ -1429,7 +1456,10 @@ function BuyerProfilesTab() {
                     <tbody>
                       {detail.oem_history.map(o => (
                         <tr key={o.oem_canonical} className="border-t border-gray-50">
-                          <td className="px-3 py-1.5">{o.oem_canonical}</td>
+                          <td className="px-3 py-1.5">
+                            <Link href={`/admin/growth/fogging/oem/${encodeURIComponent(o.oem_canonical)}`}
+                              className="hover:text-blue-700 hover:underline">{o.oem_canonical}</Link>
+                          </td>
                           <td className="px-3 py-1.5 text-right text-gray-400">{o.count}</td>
                           <td className="px-3 py-1.5 text-right text-gray-400">
                             {o.last ? new Date(o.last).toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }) : "—"}
@@ -1438,7 +1468,6 @@ function BuyerProfilesTab() {
                       ))}
                     </tbody>
                   </table>
-                  <p className="text-xs text-gray-400 mt-2">Rebuild fogging-02 to see GMV per OEM.</p>
                 </div>
               )}
             </div>
@@ -1503,6 +1532,7 @@ function BuyerProfilesTab() {
               <table className="w-full text-xs">
                 <thead className="bg-gray-50 text-gray-400">
                   <tr>
+                    <th className="px-3 py-1.5 text-left">GEMC#</th>
                     <th className="px-3 py-1.5 text-left">Date</th>
                     <th className="px-3 py-1.5 text-left">OEM</th>
                     <th className="px-3 py-1.5 text-left">Model</th>
@@ -1515,6 +1545,10 @@ function BuyerProfilesTab() {
                 <tbody>
                   {detail.contracts.map(c => (
                     <tr key={c.gemc_no} className="border-t border-gray-50 hover:bg-gray-50">
+                      <td className="px-3 py-1.5">
+                        <Link href={`/admin/growth/fogging/contracts/${encodeURIComponent(c.gemc_no)}`}
+                          className="font-mono text-blue-600 hover:underline text-[10px]">{c.gemc_no.slice(-8)}</Link>
+                      </td>
                       <td className="px-3 py-1.5 text-gray-500">
                         {c.contract_date ? new Date(c.contract_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : "—"}
                       </td>
@@ -1975,6 +2009,24 @@ export default function FoggingIntelligencePage() {
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t-md transition-colors border-b-2 -mb-px whitespace-nowrap border-transparent text-red-600 hover:text-red-800 hover:bg-red-50 font-semibold"
           >
             <Target size={14} /> Sales Command Center
+          </Link>
+          <Link
+            href="/admin/growth/fogging/contracts"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t-md transition-colors border-b-2 -mb-px whitespace-nowrap border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+          >
+            <Database size={14} /> Contracts
+          </Link>
+          <Link
+            href="/admin/growth/fogging/search"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t-md transition-colors border-b-2 -mb-px whitespace-nowrap border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+          >
+            <Search size={14} /> Search
+          </Link>
+          <Link
+            href="/admin/growth/fogging/data-quality"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t-md transition-colors border-b-2 -mb-px whitespace-nowrap border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+          >
+            <AlertCircle size={14} /> Data Quality
           </Link>
         </div>
       </div>

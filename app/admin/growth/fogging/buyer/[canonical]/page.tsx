@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState, useCallback, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
+import Link from "next/link"
 import { ArrowLeft, Download, Search, ExternalLink, X, ChevronLeft, ChevronRight } from "lucide-react"
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -105,6 +106,10 @@ function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () 
             </div>
             <ExternalLink size={14} className="text-gray-400 group-hover:text-blue-600 flex-shrink-0" />
           </a>
+          <Link href={`/admin/growth/fogging/contracts/${encodeURIComponent(contract.gemc_no)}`}
+            className="mt-2 flex items-center gap-1 text-xs text-blue-600 hover:underline">
+            Contract 360 <ChevronRight size={12} />
+          </Link>
         </div>
       </div>
     </div>
@@ -296,8 +301,8 @@ export default function BuyerPage() {
                     <tr key={o.oem_canonical} className={o.is_100x ? "text-blue-700 font-medium" : ""}>
                       <td className="py-1.5 flex items-center gap-1.5">
                         {o.is_100x && <span className="text-xs bg-blue-100 text-blue-700 px-1 rounded">100X</span>}
-                        <button onClick={() => setFilters(f => ({ ...f, oem: o.oem_canonical }))}
-                          className="hover:underline text-left">{o.brand_name}</button>
+                        <Link href={`/admin/growth/fogging/oem/${encodeURIComponent(o.oem_canonical)}`}
+                          className="hover:underline hover:text-blue-700 transition-colors">{o.brand_name}</Link>
                       </td>
                       <td className="py-1.5 text-right">{INR(o.gmv, true)}</td>
                       <td className="py-1.5 text-right text-gray-500">{o.contracts}</td>

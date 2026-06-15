@@ -153,7 +153,7 @@ export async function GET(req: NextRequest) {
         sub:     [c.buyer_display_name, c.oem_short_brand ?? c.oem_canonical].filter(Boolean).join(' · '),
         gmv:     INR(c.contract_value_num),
         badge:   c.is_100x ? '100X' : null,
-        href:    `/admin/growth/fogging/buyer/${encodeURIComponent(c.buyer_canonical)}`,
+        href:    `/admin/growth/fogging/contracts/${encodeURIComponent(c.gemc_no)}`,
       })),
     };
 

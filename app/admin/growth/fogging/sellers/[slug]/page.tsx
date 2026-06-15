@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
+import Link from "next/link"
 import { ArrowLeft, ExternalLink, MapPin, Phone, Mail, Building2, X, ChevronLeft, ChevronRight } from "lucide-react"
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -65,7 +66,7 @@ interface YearItem { year: number; gmv: number; contracts: number }
 
 interface LiveContract {
   gemc_no: string; contract_date: string | null; contract_quarter: string | null
-  buyer_display_name: string; buyer_state: string | null; org_type: string | null
+  buyer_display_name: string; buyer_canonical: string; buyer_state: string | null; org_type: string | null
   oem_canonical: string; oem_short_brand: string | null; model_raw: string | null
   contract_value_num: number | null; quantity: number | null; unit_price: number | null
   contract_status: string | null; has_unit_price: boolean
@@ -111,6 +112,17 @@ function ContractPanel({ contract, onClose }: { contract: LiveContract; onClose:
             </div>
             <ExternalLink size={14} className="text-gray-400 group-hover:text-blue-600 flex-shrink-0" />
           </a>
+        </div>
+        <div className="border-t border-gray-100 pt-3 space-y-2">
+          <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">Quick Links</div>
+          <Link href={`/admin/growth/fogging/buyer/${encodeURIComponent(contract.buyer_canonical)}`}
+            className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+            View Buyer 360 →
+          </Link>
+          <Link href={`/admin/growth/fogging/contracts/${encodeURIComponent(contract.gemc_no)}`}
+            className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+            Contract 360 →
+          </Link>
         </div>
       </div>
     </div>
