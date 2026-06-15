@@ -131,7 +131,7 @@ const CENTRAL_GOVT = new Set([
 
 // ── Dept category inference ───────────────────────────────────────────────────
 function inferDeptCategory(canonical) {
-  const c = canonical;
+  const c = canonical.replace(/_/g, ' ');
   if (/(railway|locomotive|banaras locomotive)/.test(c))          return 'Railways';
   if (/(metro rail|metro rail corporation|mumbai metro)/.test(c)) return 'Public Works';
   if (/(health|medical|welfare|hospital|aiims|icmr|nhm|nrhm|rims|esis|hll lifecare|port health|clinical)/.test(c)) return 'Health';
@@ -150,7 +150,7 @@ function inferDeptCategory(canonical) {
 
 // ── Organization type inference ───────────────────────────────────────────────
 function inferOrgType(canonical, orgType) {
-  const c = canonical;
+  const c = canonical.replace(/_/g, ' ');
   const ot = (orgType || '').toLowerCase();
 
   if (/(railway|locomotive)/.test(c))                              return 'Railway';

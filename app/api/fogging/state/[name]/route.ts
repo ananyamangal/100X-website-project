@@ -11,6 +11,22 @@ export async function GET(
   const client    = await clientPromise;
   const db        = client.db(DB);
 
+  // Central Government orgs have organization_state="Central Government" but their
+  // contracts carry the original buyer_state from GeM (null or unmatched), so we
+  // must aggregate by buyer_canonical instead of buyer_state.
+  let contractMatch: Record<string, unknown>;
+  if (stateName === 'Central Government') {
+    const centralOrgs = await db.collection('fogging_organizations')
+      .find({ organization_state: 'Central Government' }, { projection: { buyer_canonicals: 1 } })
+      .toArray();
+    const buyerCanonicals = centralOrgs.flatMap(
+      (o: { buyer_canonicals?: string[] }) => o.buyer_canonicals ?? []
+    );
+    contractMatch = { buyer_canonical: { $in: buyerCanonicals } };
+  } else {
+    contractMatch = { buyer_state: stateName };
+  }
+
   const [orgs, oems, summary] = await Promise.all([
     db.collection('fogging_organizations').find(
       { organization_state: stateName },
@@ -26,7 +42,7 @@ export async function GET(
     ).sort({ total_gmv: -1 }).toArray(),
 
     db.collection('fogging_contracts').aggregate([
-      { $match: { buyer_state: stateName } },
+      { $match: contractMatch },
       { $group: {
         _id:       '$oem_canonical',
         brand:     { $first: '$oem_short_brand' },
@@ -39,7 +55,7 @@ export async function GET(
     ]).toArray(),
 
     db.collection('fogging_contracts').aggregate([
-      { $match: { buyer_state: stateName } },
+      { $match: contractMatch },
       { $group: {
         _id:             null,
         total_gmv:       { $sum: '$contract_value_num' },
@@ -57,7 +73,7 @@ export async function GET(
 
   // Quarterly timeline for state
   const qtRows = await db.collection('fogging_contracts').aggregate([
-    { $match: { buyer_state: stateName } },
+    { $match: contractMatch },
     { $group: {
       _id: '$contract_quarter',
       gmv: { $sum: '$contract_value_num' },
