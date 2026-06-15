@@ -29,6 +29,7 @@ export async function GET(
           contract_value_num: 1, quantity: 1, unit_price: 1,
           contract_status: 1, buying_mode: 1,
           seller_name: 1, seller_gst: 1,
+          is_100x: 1, contract_year: 1,
         })
         .toArray(),
     ]);

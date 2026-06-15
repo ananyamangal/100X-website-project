@@ -94,14 +94,15 @@ function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () 
         </div>
 
         <div className="border-t border-gray-100 pt-3">
-          <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">Embedded View</div>
-          <iframe
-            src={gemUrl}
-            className="w-full h-64 border border-gray-200 rounded-lg bg-gray-50"
-            title={`GeM Contract ${contract.gemc_no}`}
-            onError={() => {}}
-          />
-          <p className="text-xs text-gray-400 mt-1">If frame is blocked, use the button above.</p>
+          <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">Contract Reference</div>
+          <a href={gemUrl} target="_blank" rel="noreferrer"
+            className="flex items-center justify-between px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors group">
+            <div>
+              <div className="font-mono text-sm font-medium text-blue-700 select-all">{contract.gemc_no}</div>
+              <div className="text-xs text-gray-500 mt-0.5">GeM brochure · delivery terms · contract PDF</div>
+            </div>
+            <ExternalLink size={14} className="text-gray-400 group-hover:text-blue-600 flex-shrink-0" />
+          </a>
         </div>
       </div>
     </div>

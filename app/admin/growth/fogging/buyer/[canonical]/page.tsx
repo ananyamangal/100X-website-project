@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { ArrowLeft, Download, Search, ExternalLink, X, ChevronLeft, ChevronRight } from "lucide-react"
 
@@ -22,11 +22,12 @@ const PCT = (v: number | null | undefined) => v != null ? `${v.toFixed(1)}%` : "
 
 interface BuyerProfile {
   buyer_canonical: string; buyer_display_name: string; buyer_state: string | null
-  org_type: string | null; is_anomalous: boolean; anomaly_reason: string | null
+  org_type: string | null; ministry: string | null; is_anomalous: boolean; anomaly_reason: string | null
   total_contracts: number; total_gmv: number; oem_count: number
   last_purchase: string | null; days_since_last: number
   opportunity_tier: string; opportunity_score: number
   primary_incumbent: string | null; purchased_100x: boolean
+  non_100x_gmv?: number; _100x_spend?: number; has_100x?: boolean
   oem_spend: { oem_canonical: string; brand_name: string; gmv: number; contracts: number; share_pct: number; last_contract: string | null; is_100x: boolean }[]
 }
 
@@ -92,13 +93,18 @@ function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () 
             className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
             <ExternalLink size={15} /> Open on GeM Portal
           </a>
-          <p className="text-xs text-gray-400">Contract PDF is available on the GeM portal page.</p>
+          <p className="text-xs text-gray-400">View brochure, delivery terms, and download contract PDF on GeM.</p>
         </div>
         <div className="border-t border-gray-100 pt-3">
-          <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">Embedded View</div>
-          <iframe src={gemUrl} className="w-full h-64 border border-gray-200 rounded-lg bg-gray-50"
-            title={`GeM Contract ${contract.gemc_no}`} onError={() => {}} />
-          <p className="text-xs text-gray-400 mt-1">If frame is blocked, use the button above.</p>
+          <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">Contract Reference</div>
+          <a href={gemUrl} target="_blank" rel="noreferrer"
+            className="flex items-center justify-between px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors group">
+            <div>
+              <div className="font-mono text-sm font-medium text-blue-700 select-all">{contract.gemc_no}</div>
+              <div className="text-xs text-gray-500 mt-0.5">GeM brochure · delivery terms · contract PDF</div>
+            </div>
+            <ExternalLink size={14} className="text-gray-400 group-hover:text-blue-600 flex-shrink-0" />
+          </a>
         </div>
       </div>
     </div>
@@ -112,15 +118,16 @@ export default function BuyerPage() {
   const router    = useRouter()
   const canonical = decodeURIComponent(params.canonical as string)
 
-  const [profile,   setProfile]   = useState<BuyerProfile | null>(null)
-  const [oems,      setOems]      = useState<string[]>([])
-  const [contracts, setContracts] = useState<Contract[]>([])
-  const [total,     setTotal]     = useState(0)
-  const [summary,   setSummary]   = useState<{ total_gmv: number; min_unit_price: number | null; max_unit_price: number | null } | null>(null)
-  const [page,      setPage]      = useState(1)
-  const [loading,   setLoading]   = useState(true)
-  const [profLoad,  setProfLoad]  = useState(true)
-  const [selected,  setSelected]  = useState<Contract | null>(null)
+  const [profile,      setProfile]      = useState<BuyerProfile | null>(null)
+  const [oems,         setOems]         = useState<string[]>([])
+  const [allContracts, setAllContracts] = useState<Contract[]>([])
+  const [contracts,    setContracts]    = useState<Contract[]>([])
+  const [total,        setTotal]        = useState(0)
+  const [summary,      setSummary]      = useState<{ total_gmv: number; min_unit_price: number | null; max_unit_price: number | null } | null>(null)
+  const [page,         setPage]         = useState(1)
+  const [loading,      setLoading]      = useState(true)
+  const [profLoad,     setProfLoad]     = useState(true)
+  const [selected,     setSelected]     = useState<Contract | null>(null)
 
   const [filters, setFilters] = useState({
     oem: "", year: "", q: "", sort: "date_desc"
@@ -134,6 +141,7 @@ export default function BuyerPage() {
       .then(r => r.json())
       .then((d: BuyerApiResponse) => {
         setProfile(d.profile)
+        setAllContracts(d.contracts ?? [])
         const oemList = (d.profile?.oem_spend ?? []).map(o => o.oem_canonical)
         setOems(oemList)
       })
@@ -171,6 +179,36 @@ export default function BuyerPage() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
+  // P5: Seller distribution from full contract list
+  const sellerDist = useMemo(() => {
+    const map: Record<string, { name: string; gst: string | null; gmv: number; contracts: number }> = {}
+    for (const c of allContracts) {
+      const key = c.seller_gst ?? c.seller_name ?? '__unknown__'
+      if (!map[key]) map[key] = { name: c.seller_name ?? 'Unknown', gst: c.seller_gst ?? null, gmv: 0, contracts: 0 }
+      map[key].gmv       += c.contract_value_num ?? 0
+      map[key].contracts += 1
+    }
+    const total = Object.values(map).reduce((s, x) => s + x.gmv, 0)
+    return Object.values(map)
+      .sort((a, b) => b.gmv - a.gmv)
+      .slice(0, 8)
+      .map(s => ({ ...s, share_pct: total > 0 ? (s.gmv / total) * 100 : 0 }))
+  }, [allContracts])
+
+  // P5: Year-by-year GMV breakdown
+  const yearTimeline = useMemo(() => {
+    const map: Record<number, { gmv: number; cnt: number; gmv_100x: number }> = {}
+    for (const c of allContracts) {
+      const yr = c.contract_date ? new Date(c.contract_date).getFullYear() : 0
+      if (!yr) continue
+      if (!map[yr]) map[yr] = { gmv: 0, cnt: 0, gmv_100x: 0 }
+      map[yr].gmv     += c.contract_value_num ?? 0
+      map[yr].cnt     += 1
+      if (c.is_100x) map[yr].gmv_100x += c.contract_value_num ?? 0
+    }
+    return Object.entries(map).map(([y, v]) => ({ year: +y, ...v })).sort((a, b) => a.year - b.year)
+  }, [allContracts])
+
   if (profLoad) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -203,7 +241,10 @@ export default function BuyerPage() {
                 <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">⚠ {profile.anomaly_reason}</span>
               )}
             </div>
-            <div className="text-xs text-gray-400">Buyer 360 · {profile?.buyer_state ?? "—"} · {profile?.org_type ?? "—"}</div>
+            <div className="text-xs text-gray-400">
+              Buyer 360 · {profile?.buyer_state ?? "—"} · {profile?.org_type ?? "—"}
+              {profile?.ministry && <span className="text-gray-500"> · {profile.ministry}</span>}
+            </div>
           </div>
           <button onClick={exportCsv}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors">
@@ -262,6 +303,108 @@ export default function BuyerPage() {
                       <td className="py-1.5 text-right text-gray-500">{o.contracts}</td>
                       <td className="py-1.5 text-right">{PCT(o.share_pct)}</td>
                       <td className="py-1.5 text-right text-gray-400">{fmt(o.last_contract)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* P5: Leakage + Expansion Analysis */}
+        {profile && (profile.non_100x_gmv != null || profile.has_100x != null) && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className={`bg-white border rounded-xl p-4 ${profile.has_100x ? "border-blue-200" : "border-gray-200"}`}>
+              <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide">100X Spend</div>
+              <div className="text-xl font-bold text-blue-700">{INR(profile._100x_spend ?? 0, true)}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{profile.has_100x ? "existing 100X buyer" : "no 100X history"}</div>
+            </div>
+            <div className="bg-white border border-red-200 rounded-xl p-4">
+              <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Competitor Leakage</div>
+              <div className="text-xl font-bold text-red-700">{INR(profile.non_100x_gmv ?? profile.total_gmv, true)}</div>
+              <div className="text-xs text-gray-400 mt-0.5">spend not with 100X</div>
+            </div>
+            <div className="bg-white border border-green-200 rounded-xl p-4">
+              <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Opp Score</div>
+              <div className={`text-xl font-bold ${
+                profile.opportunity_tier === 'A' ? "text-red-700" :
+                profile.opportunity_tier === 'B' ? "text-amber-700" : "text-gray-700"
+              }`}>Tier {profile.opportunity_tier} · {profile.opportunity_score}</div>
+              <div className="text-xs text-gray-400 mt-0.5">
+                {profile.primary_incumbent ? `Incumbent: ${profile.primary_incumbent}` : "no primary supplier"}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* P5: Seller Distribution */}
+        {sellerDist.length > 0 && (
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Procurement by Seller / Dealer</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-gray-400 border-b border-gray-100">
+                    <th className="pb-2 text-left">Seller</th>
+                    <th className="pb-2 text-right">GMV</th>
+                    <th className="pb-2 text-right">Orders</th>
+                    <th className="pb-2 text-right">Share</th>
+                    <th className="pb-2 text-left">GST</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {sellerDist.map((s, i) => (
+                    <tr key={i} className="hover:bg-gray-50">
+                      <td className="py-1.5">
+                        {s.gst ? (
+                          <a href={`/admin/growth/fogging/sellers/${encodeURIComponent(s.gst)}`}
+                            className="font-medium text-amber-700 hover:underline">{s.name}</a>
+                        ) : (
+                          <span className="font-medium text-gray-700">{s.name}</span>
+                        )}
+                      </td>
+                      <td className="py-1.5 text-right font-medium">{INR(s.gmv, true)}</td>
+                      <td className="py-1.5 text-right text-gray-500">{s.contracts}</td>
+                      <td className="py-1.5 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <div className="h-1.5 bg-amber-300 rounded" style={{ width: `${Math.max(2, s.share_pct * 0.8)}px` }} />
+                          {s.share_pct.toFixed(1)}%
+                        </div>
+                      </td>
+                      <td className="py-1.5 text-gray-400 font-mono text-xs">{s.gst ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* P5: Procurement Timeline (year-by-year) */}
+        {yearTimeline.length > 1 && (
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Procurement History by Year</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-gray-400 border-b border-gray-100">
+                    <th className="pb-2 text-left">Year</th>
+                    <th className="pb-2 text-right">Total GMV</th>
+                    <th className="pb-2 text-right">Orders</th>
+                    <th className="pb-2 text-right">100X GMV</th>
+                    <th className="pb-2 text-right">100X %</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {yearTimeline.map(y => (
+                    <tr key={y.year} className={y.gmv_100x > 0 ? "text-blue-700" : ""}>
+                      <td className="py-1.5 font-medium">{y.year}</td>
+                      <td className="py-1.5 text-right">{INR(y.gmv, true)}</td>
+                      <td className="py-1.5 text-right text-gray-500">{y.cnt}</td>
+                      <td className="py-1.5 text-right">{y.gmv_100x > 0 ? INR(y.gmv_100x, true) : "—"}</td>
+                      <td className="py-1.5 text-right">
+                        {y.gmv > 0 ? `${((y.gmv_100x / y.gmv) * 100).toFixed(0)}%` : "—"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

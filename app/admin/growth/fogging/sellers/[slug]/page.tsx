@@ -44,6 +44,10 @@ interface SellerProfile {
   min_unit_price: number | null; max_unit_price: number | null; priced_contract_count: number
   oems_represented: OemItem[]; top_buyers: BuyerItem[]; models_sold: ModelItem[]
   yearly_gmv: YearItem[]
+  // Phase 4B enrichment
+  seller_opportunity_score?: number; competitor_oem_count?: number
+  carries_neptune?: boolean; carries_sse?: boolean; carries_instafog?: boolean
+  carries_pulsfog?: boolean; carries_spacespray?: boolean; carries_foggers?: boolean
 }
 
 interface OemItem {
@@ -98,10 +102,15 @@ function ContractPanel({ contract, onClose }: { contract: LiveContract; onClose:
           </a>
         </div>
         <div className="border-t border-gray-100 pt-3">
-          <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">Embedded View</div>
-          <iframe src={gemUrl} className="w-full h-64 border border-gray-200 rounded-lg bg-gray-50"
-            title={`GeM ${contract.gemc_no}`} onError={() => {}} />
-          <p className="text-xs text-gray-400 mt-1">If frame is blocked, use the button above.</p>
+          <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">Contract Reference</div>
+          <a href={gemUrl} target="_blank" rel="noreferrer"
+            className="flex items-center justify-between px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors group">
+            <div>
+              <div className="font-mono text-sm font-medium text-blue-700 select-all">{contract.gemc_no}</div>
+              <div className="text-xs text-gray-500 mt-0.5">GeM brochure · delivery terms · contract PDF</div>
+            </div>
+            <ExternalLink size={14} className="text-gray-400 group-hover:text-blue-600 flex-shrink-0" />
+          </a>
         </div>
       </div>
     </div>
@@ -180,6 +189,7 @@ export default function SellerPage() {
   }
 
   const { profile, quarterly_trend = [], buyer_breakdown = [] } = data
+  const stateBreakdown: { _id: string; cnt: number; gmv: number }[] = (data as unknown as { state_breakdown?: { _id: string; cnt: number; gmv: number }[] }).state_breakdown ?? []
   const totalLivePages = Math.ceil(liveTotal / PAGE_SIZE)
 
   // Seller type tag
@@ -225,20 +235,37 @@ export default function SellerPage() {
         {/* ── 1. KPI Strip ──────────────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {[
-            { label: "Total GMV",    value: INR(profile.total_gmv, true),                  sub: undefined },
-            { label: "Contracts",    value: profile.total_contracts.toString(),             sub: `Avg ${INR(profile.average_contract_value, true)}` },
-            { label: "Buyers Served",value: profile.buyers_served.toString(),               sub: `${profile.states_served} states` },
-            { label: "OEM Brands",   value: profile.oem_count.toString(),                  sub: `${profile.model_count} models` },
-            { label: "Median Price", value: INR(profile.median_unit_price),                 sub: profile.priced_contract_count ? `${profile.priced_contract_count} priced` : undefined },
-            { label: "Last Contract",value: daysAgo(profile.days_since_last),              sub: fmt(profile.last_contract_date) },
+            { label: "Total GMV",    value: INR(profile.total_gmv, true),     sub: `${profile.total_contracts} contracts` },
+            { label: "Buyers Served",value: profile.buyers_served.toString(), sub: `${profile.states_served} states` },
+            { label: "OEM Brands",   value: profile.oem_count.toString(),     sub: `${profile.model_count} models` },
+            { label: "Median Price", value: INR(profile.median_unit_price),   sub: profile.priced_contract_count ? `${profile.priced_contract_count} priced` : undefined },
+            { label: "Last Contract",value: daysAgo(profile.days_since_last), sub: fmt(profile.last_contract_date) },
+            { label: profile.is_100x_dealer ? "Dealer Score" : "Opp Score",
+              value: profile.seller_opportunity_score != null ? INR(profile.seller_opportunity_score, true) : "—",
+              sub: profile.is_100x_dealer ? "100X partner" : `${profile.competitor_oem_count ?? 0} competitor OEMs` },
           ].map(k => (
-            <div key={k.label} className="bg-white border border-gray-200 rounded-xl p-4">
+            <div key={k.label} className={`border rounded-xl p-4 ${k.label.includes('Score') ? "bg-amber-50 border-amber-200" : "bg-white border-gray-200"}`}>
               <div className="text-xs text-gray-400 mb-1">{k.label}</div>
-              <div className="text-xl font-bold text-gray-900">{k.value}</div>
+              <div className={`text-xl font-bold ${k.label.includes('Score') ? "text-amber-700" : "text-gray-900"}`}>{k.value}</div>
               {k.sub && <div className="text-xs text-gray-400 mt-0.5">{k.sub}</div>}
             </div>
           ))}
         </div>
+
+        {/* ── OEM carrier flags (Phase 4B) ────────────────────────────────────── */}
+        {(profile.carries_neptune || profile.carries_sse || profile.carries_instafog || profile.carries_pulsfog) && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex flex-wrap gap-2 items-center text-xs">
+            <span className="font-semibold text-amber-700 mr-1">Competitor OEMs carried:</span>
+            {profile.carries_neptune  && <span className="px-2 py-0.5 bg-blue-100   text-blue-700   rounded-full font-medium">Neptune</span>}
+            {profile.carries_sse      && <span className="px-2 py-0.5 bg-green-100  text-green-700  rounded-full font-medium">SSE</span>}
+            {profile.carries_instafog && <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full font-medium">InstFog</span>}
+            {profile.carries_pulsfog  && <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full font-medium">Pulsfog</span>}
+            {profile.carries_foggers  && <span className="px-2 py-0.5 bg-pink-100   text-pink-700   rounded-full font-medium">Foggers</span>}
+            {!profile.is_100x_dealer && (
+              <span className="ml-auto text-amber-600 font-medium">Recruitment Target</span>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* ── Left column: Identity + OEM Portfolio ───────────────────────── */}
@@ -438,6 +465,32 @@ export default function SellerPage() {
                 })}
               </div>
             </div>
+
+            {/* ── 5b. Geography — States Served ───────────────────────────────── */}
+            {stateBreakdown.length > 0 && (
+              <div className="bg-white border border-gray-200 rounded-xl p-5">
+                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                  Geography <span className="normal-case font-normal">({stateBreakdown.length} states)</span>
+                </div>
+                <div className="space-y-1.5">
+                  {stateBreakdown.slice(0, 10).map(s => {
+                    const maxGmv = stateBreakdown[0]?.gmv || 1
+                    const pct    = (s.gmv / maxGmv * 100)
+                    return (
+                      <div key={s._id ?? 'unknown'}>
+                        <div className="flex justify-between text-xs text-gray-700 mb-0.5">
+                          <span className="font-medium truncate max-w-[60%]">{s._id ?? '(Unknown)'}</span>
+                          <span className="text-gray-500">{s.cnt}c · {INR(s.gmv, true)}</span>
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-1">
+                          <div className="bg-teal-400 h-1 rounded-full" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* ── 6. Contract Timeline (Yearly GMV) ─────────────────────────── */}
             <div className="bg-white border border-gray-200 rounded-xl p-5">

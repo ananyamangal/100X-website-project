@@ -4,7 +4,7 @@ import Link from "next/link"
 import {
   BarChart3, Target, TrendingUp, Calendar, Users, Building2,
   RefreshCw, Download, X, ExternalLink, Flame, Search,
-  ChevronRight, AlertCircle, Store,
+  ChevronRight, AlertCircle, Store, Database,
 } from "lucide-react"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -176,14 +176,20 @@ const oemColor = (c: string) => OEM_COLORS[c] ?? "bg-gray-400"
 
 // ─── Shared components ────────────────────────────────────────────────────────
 
-function KpiCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: boolean }) {
-  return (
-    <div className={`rounded-lg border p-3 ${accent ? "border-blue-200 bg-blue-50" : "border-gray-200 bg-white"}`}>
+function KpiCard({ label, value, sub, accent, href, onClick }: {
+  label: string; value: string; sub?: string; accent?: boolean; href?: string; onClick?: () => void
+}) {
+  const cls = `rounded-lg border p-3 ${accent ? "border-blue-200 bg-blue-50" : "border-gray-200 bg-white"} ${href || onClick ? "cursor-pointer hover:shadow-md transition-shadow" : ""}`
+  const inner = (
+    <>
       <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">{label}</div>
       <div className={`text-xl font-bold ${accent ? "text-blue-700" : "text-gray-900"}`}>{value}</div>
       {sub && <div className="text-xs text-gray-400 mt-0.5">{sub}</div>}
-    </div>
+    </>
   )
+  if (href)    return <Link href={href} className={cls}>{inner}</Link>
+  if (onClick) return <div className={cls} onClick={onClick} role="button" tabIndex={0}>{inner}</div>
+  return <div className={cls}>{inner}</div>
 }
 
 function Spinner() {
@@ -255,9 +261,9 @@ function MarketShareTab({ oems }: { oems: OemRow[] }) {
       )}
 
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total Market GMV"  value={INR(totalGmv, true)} />
-        <KpiCard label="Active OEMs"       value={oems.length.toString()} />
-        <KpiCard label="100X Share"        value={PCT(entry100x?.market_share_gmv || 0)} accent />
+        <KpiCard label="Total Market GMV"  value={INR(totalGmv, true)} href="/admin/growth/fogging/sales" />
+        <KpiCard label="Active OEMs"       value={oems.length.toString()} sub="click any row below" />
+        <KpiCard label="100X Share"        value={PCT(entry100x?.market_share_gmv || 0)} accent href={`/admin/growth/fogging/oem/${encodeURIComponent("100X CIRCLE")}`} />
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -1512,10 +1518,30 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: "buyer_profiles",label: "Buyer Profiles",       icon: <Users size={14} /> },
 ]
 
+interface CoverageData {
+  coverage_start: string | null; coverage_end: string | null
+  total_contracts: number; total_gmv: number
+  last_harvest: string | null; next_harvest_window: string | null; days_until_next: number | null
+}
+
+interface SearchResult {
+  type: string; id: string; label: string; sub?: string; gmv?: string; badge?: string | null; href: string
+}
+
+interface SearchResults {
+  buyers: SearchResult[]; sellers: SearchResult[]; oems: SearchResult[]
+  models: SearchResult[]; contracts: SearchResult[]
+}
+
 export default function FoggingIntelligencePage() {
   const [tab,  setTab]  = useState<TabId>("market")
   const [oems, setOems] = useState<OemRow[]>([])
-  const [kpiLoading, setKpiLoading] = useState(true)
+  const [kpiLoading,    setKpiLoading]    = useState(true)
+  const [coverage,      setCoverage]      = useState<CoverageData | null>(null)
+  const [searchQ,       setSearchQ]       = useState("")
+  const [searchResults, setSearchResults] = useState<SearchResults | null>(null)
+  const [searching,     setSearching]     = useState(false)
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     fetch("/api/fogging/oems")
@@ -1524,9 +1550,41 @@ export default function FoggingIntelligencePage() {
       .finally(() => setKpiLoading(false))
   }, [])
 
+  useEffect(() => {
+    fetch("/api/fogging/coverage")
+      .then(r => r.json())
+      .then((d: CoverageData) => setCoverage(d))
+      .catch(() => {})
+  }, [])
+
+  const handleSearch = useCallback((q: string) => {
+    setSearchQ(q)
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    if (q.length < 2) { setSearchResults(null); return }
+    searchTimer.current = setTimeout(() => {
+      setSearching(true)
+      fetch(`/api/fogging/search?q=${encodeURIComponent(q)}`)
+        .then(r => r.json())
+        .then(d => setSearchResults((d.results ?? null) as SearchResults | null))
+        .finally(() => setSearching(false))
+    }, 300)
+  }, [])
+
   const totalGmv = oems.reduce((a, o) => a + (o.total_gmv || 0), 0)
   const entry100x = oems.find(o => o.is_100x)
   const neptune   = oems.find(o => o.oem_canonical === "NEPTUNE")
+
+  const fmtMon = (d: string | null) =>
+    d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : '—'
+
+  const TYPE_LABEL: Record<string, string> = {
+    buyers: 'Buyers', sellers: 'Sellers', oems: 'OEMs', models: 'Models', contracts: 'Contracts',
+  }
+  const TYPE_COLOR: Record<string, string> = {
+    buyers: 'text-blue-600 bg-blue-50', sellers: 'text-amber-600 bg-amber-50',
+    oems: 'text-purple-600 bg-purple-50', models: 'text-green-600 bg-green-50',
+    contracts: 'text-gray-600 bg-gray-100',
+  }
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
@@ -1548,21 +1606,103 @@ export default function FoggingIntelligencePage() {
           </a>
         </div>
 
-        {/* Persistent KPI strip */}
+        {/* Harvest Coverage Registry — P9 */}
+        {coverage && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 mb-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-gray-600 items-center">
+            <span className="flex items-center gap-1 font-semibold text-gray-700 shrink-0">
+              <Database size={11} /> Coverage Registry
+            </span>
+            <span>
+              <span className="text-gray-400">Window:</span>{' '}
+              <strong className="text-gray-800">{fmtMon(coverage.coverage_start)} → {fmtMon(coverage.coverage_end)}</strong>
+            </span>
+            <span>
+              <span className="text-gray-400">Contracts:</span>{' '}
+              <strong className="text-gray-800">{coverage.total_contracts.toLocaleString()}</strong>
+            </span>
+            <span>
+              <span className="text-gray-400">GMV:</span>{' '}
+              <strong className="text-gray-800">{INR(coverage.total_gmv, true)}</strong>
+            </span>
+            {coverage.last_harvest && (
+              <span>
+                <span className="text-gray-400">Last Harvest:</span>{' '}
+                <strong className="text-gray-800">{fmtMon(coverage.last_harvest)}</strong>
+              </span>
+            )}
+            {coverage.next_harvest_window && (
+              <span>
+                <span className="text-gray-400">Next Window:</span>{' '}
+                <strong className={(coverage.days_until_next ?? 1) <= 0 ? "text-red-600" : "text-green-700"}>
+                  {(coverage.days_until_next ?? 1) <= 0 ? "Due now" : `in ${coverage.days_until_next}d (${fmtMon(coverage.next_harvest_window)})`}
+                </strong>
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Universal Search — P2 */}
+        <div className="relative mb-3">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <input
+              value={searchQ}
+              onChange={e => handleSearch(e.target.value)}
+              onBlur={() => setTimeout(() => { setSearchResults(null); setSearchQ('') }, 200)}
+              placeholder="Search buyers, sellers, OEMs, models, GEMC#, state…"
+              className="w-full pl-8 pr-8 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
+            />
+            {searching && <RefreshCw size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />}
+          </div>
+          {searchResults && searchQ.length >= 2 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-[420px] overflow-y-auto">
+              {(Object.entries(searchResults) as [string, SearchResult[]][]).map(([type, items]) => {
+                if (!items.length) return null
+                return (
+                  <div key={type}>
+                    <div className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wide border-b border-gray-100 ${TYPE_COLOR[type]}`}>
+                      {TYPE_LABEL[type]} ({items.length})
+                    </div>
+                    {items.map(r => (
+                      <Link key={r.id} href={r.href}
+                        onMouseDown={() => { setSearchQ(''); setSearchResults(null) }}
+                        className="flex items-center justify-between px-4 py-2.5 hover:bg-blue-50 border-b border-gray-50 transition-colors">
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-gray-900 truncate">{r.label}</div>
+                          {r.sub && <div className="text-xs text-gray-500 truncate">{r.sub}</div>}
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                          {r.gmv && <span className="text-xs text-gray-500 whitespace-nowrap">{r.gmv}</span>}
+                          {r.badge && <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{r.badge}</span>}
+                          <ChevronRight size={12} className="text-gray-400" />
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )
+              })}
+              {Object.values(searchResults).every(a => a.length === 0) && (
+                <div className="px-4 py-6 text-sm text-gray-400 text-center">No results for &ldquo;{searchQ}&rdquo;</div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Persistent KPI strip — P4: all cards clickable */}
         {!kpiLoading && oems.length > 0 && (
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-3">
-            <KpiCard label="Market GMV"    value={INR(totalGmv, true)} sub="1,418 contracts" />
-            <KpiCard label="Active OEMs"   value={oems.length.toString()} sub="34 brands" />
-            <KpiCard label="100X Share"    value={PCT(entry100x?.market_share_gmv || 0)} sub={INR(entry100x?.total_gmv, true)} accent />
-            <KpiCard label="100X Price P50" value={INR(entry100x?.median_unit_price)} sub="median unit" accent />
-            <KpiCard label="Neptune Share" value={PCT(neptune?.market_share_gmv || 0)} sub="#1 competitor" />
+            <KpiCard label="Market GMV"    value={INR(totalGmv, true)} sub="all contracts" href="/admin/growth/fogging/sales" />
+            <KpiCard label="Active OEMs"   value={oems.length.toString()} sub="view profiles" onClick={() => setTab("oem_profiles")} />
+            <KpiCard label="100X Share"    value={PCT(entry100x?.market_share_gmv || 0)} sub={INR(entry100x?.total_gmv, true)} accent href={`/admin/growth/fogging/oem/${encodeURIComponent("100X CIRCLE")}`} />
+            <KpiCard label="100X Price P50" value={INR(entry100x?.median_unit_price)} sub="median unit" accent onClick={() => setTab("pricing")} />
+            <KpiCard label="Neptune Share" value={PCT(neptune?.market_share_gmv || 0)} sub="#1 competitor" href={`/admin/growth/fogging/oem/${encodeURIComponent("NEPTUNE")}`} />
             <KpiCard label="Price Gap"
               value={
                 (entry100x?.median_unit_price && neptune?.median_unit_price)
                   ? INR(entry100x.median_unit_price - neptune.median_unit_price)
                   : "—"
               }
-              sub="100X vs Neptune P50" />
+              sub="100X vs Neptune P50" onClick={() => setTab("pricing")} />
           </div>
         )}
 
