@@ -227,7 +227,7 @@ async function main() {
       buyer_display_name: (doc.buyer_name || '').trim().slice(0, 200),
       buyer_state:        buyerState(doc),
       org_type:           doc.org_type ?? null,
-      ministry:           doc.dept_name ?? doc.ministry ?? null,
+      ministry:           doc.ministry ?? doc.dept_name ?? null,
 
       oem_canonical:      oem.oem_canonical,
       oem_short_brand:    oem.oem_short_brand,

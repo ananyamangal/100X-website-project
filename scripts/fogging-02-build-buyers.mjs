@@ -125,6 +125,83 @@ function computeForecast(purchaseMonths, lastPurchaseDate, yearCount) {
   };
 }
 
+// ── 6-month forecast horizon ──────────────────────────────────────────────────
+function computeForecast6mo(purchaseMonths, avgContractValue, yearCount, baseConfidence) {
+  const sources = purchaseMonths && purchaseMonths.length > 0 ? purchaseMonths : MARKET_PEAKS.slice(0, 3);
+  const isMarket = !purchaseMonths || purchaseMonths.length === 0;
+  const now = new Date();
+  const curMonth = now.getUTCMonth() + 1;
+  const curYear  = now.getUTCFullYear();
+  const slots = [];
+
+  for (let offset = 1; offset <= 14 && slots.length < 6; offset++) {
+    const month = ((curMonth - 1 + offset) % 12) + 1;
+    const year  = curYear + Math.floor((curMonth - 1 + offset) / 12);
+    if (sources.includes(month)) {
+      const predDate  = new Date(Date.UTC(year, month - 1, 1));
+      const daysUntil = Math.round((predDate - now) / 86400000);
+      let conf = isMarket ? 'low' : baseConfidence;
+      if (!isMarket && slots.length >= 2 && yearCount < 3) conf = 'medium';
+      if (!isMarket && slots.length >= 3 && yearCount < 4) conf = 'low';
+      slots.push({ month, year, quarter: `${year}-${Q_MAP[month - 1]}`, days_until: daysUntil, confidence: conf, predicted_gmv: Math.round(avgContractValue || 0) });
+    }
+  }
+  return slots;
+}
+
+// ── Derived classification fields ─────────────────────────────────────────────
+function computeUrgency(forecastDaysUntil, daysSinceLast) {
+  if (daysSinceLast > 548) return 'stale'; // >18 months inactive
+  if (forecastDaysUntil == null) return 'distant';
+  if (forecastDaysUntil <= 30)  return 'hot';
+  if (forecastDaysUntil <= 90)  return 'warm';
+  if (forecastDaysUntil <= 180) return 'upcoming';
+  return 'distant';
+}
+
+function computeRecommendedAction(score, daysSinceLast, primaryIncumbent) {
+  const inc = primaryIncumbent ? `${primaryIncumbent} customer. ` : '';
+  if (score >= 80 && daysSinceLast <= 90)
+    return { action_priority: 'immediate', recommended_action: `Active Tier A. ${inc}Reach out this week.` };
+  if (score >= 80)
+    return { action_priority: 'immediate', recommended_action: `Tier A score, stale (${daysSinceLast}d). Queue for reactivation.` };
+  if (score >= 60 && daysSinceLast <= 180)
+    return { action_priority: 'nurture', recommended_action: 'Warm Tier B. Add to outreach sequence.' };
+  if (score >= 40)
+    return { action_priority: 'watch', recommended_action: 'Tier C — set 90-day reminder.' };
+  return { action_priority: 'monitor', recommended_action: 'Low priority. Monitor for GeM activity.' };
+}
+
+function isAnomalous(buyerCanonical, buyerDisplayName) {
+  if (!buyerCanonical || buyerCanonical.trim() === '')
+    return { is_anomalous: true, anomaly_reason: 'empty_canonical' };
+  if (buyerCanonical === 'unknown')
+    return { is_anomalous: true, anomaly_reason: 'catch_all' };
+  if (buyerDisplayName?.startsWith(','))
+    return { is_anomalous: true, anomaly_reason: 'truncated_name' };
+  if (/[ऀ-ॿ]/.test(buyerDisplayName || ''))
+    return { is_anomalous: true, anomaly_reason: 'masked_gem_buyer' };
+  return { is_anomalous: false, anomaly_reason: null };
+}
+
+function computePeakMonths(monthCounts) {
+  if (!monthCounts || !Object.keys(monthCounts).length) return [];
+  return Object.entries(monthCounts)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 3)
+    .map(([m]) => parseInt(m));
+}
+
+function computePeakQuarter(peakMonths) {
+  if (!peakMonths || !peakMonths.length) return null;
+  const counts = {};
+  for (const m of peakMonths) {
+    const q = Q_MAP[m - 1];
+    counts[q] = (counts[q] || 0) + 1;
+  }
+  return Object.entries(counts).sort(([, a], [, b]) => b - a)[0]?.[0] ?? null;
+}
+
 async function ensureIndexes(fb) {
   const defs = [
     [{ buyer_canonical: 1 },                        { unique: true, name: 'uniq_buyer'        }],
@@ -143,6 +220,11 @@ async function ensureIndexes(fb) {
     [{ purchased_100x: 1, opportunity_score: -1 }, { name: 'cidx_attack'        }],
     [{ purchased_neptune: 1, purchased_100x: 1 },  { name: 'cidx_neptune_100x'  }],
     [{ forecast_next_month: 1, purchased_100x: 1 },{ name: 'cidx_forecast_opp'  }],
+    [{ rank: 1 },                                  { name: 'idx_rank', sparse: true              }],
+    [{ primary_incumbent: 1, opportunity_tier: 1 },{ name: 'cidx_incumbent_tier'                 }],
+    [{ urgency: 1, opportunity_tier: 1 },          { name: 'cidx_urgency_tier'                   }],
+    [{ action_priority: 1, opportunity_score: -1 },{ name: 'cidx_action_score'                   }],
+    [{ buyer_display_name: 1 },                    { name: 'idx_display_name'                    }],
   ];
   for (const [key, opts] of defs) {
     await fb.createIndex(key, opts).catch(() => {});
@@ -216,6 +298,56 @@ async function main() {
   const buyers = await fc.aggregate(pipeline, { allowDiskUse: true }).toArray();
   console.log(`✓ Aggregated ${buyers.length} buyers`);
 
+  // Secondary aggregation: per-buyer OEM spend breakdown (for oem_spend + primary_incumbent)
+  const oemSpendRaw = await fc.aggregate([
+    { $group: {
+      _id:           { buyer: '$buyer_canonical', oem: '$oem_canonical' },
+      brand_name:    { $first: '$oem_short_brand' },
+      is_100x:       { $first: '$is_100x' },
+      gmv:           { $sum: '$contract_value_num' },
+      contracts:     { $sum: 1 },
+      last_contract: { $max: '$contract_date' },
+    }},
+  ], { allowDiskUse: true }).toArray();
+
+  const oemSpendMap = new Map();
+  for (const row of oemSpendRaw) {
+    const buyer = row._id.buyer;
+    if (!oemSpendMap.has(buyer)) oemSpendMap.set(buyer, []);
+    oemSpendMap.get(buyer).push({
+      oem_canonical: row._id.oem,
+      brand_name:    row.brand_name,
+      is_100x:       row.is_100x,
+      gmv:           row.gmv,
+      contracts:     row.contracts,
+      last_contract: row.last_contract,
+      share_pct:     0, // computed below
+    });
+  }
+  for (const [, oems] of oemSpendMap) {
+    const total = oems.reduce((a, o) => a + (o.gmv || 0), 0);
+    oems.sort((a, b) => (b.gmv || 0) - (a.gmv || 0));
+    for (const o of oems) o.share_pct = total > 0 ? Math.round((o.gmv / total) * 1000) / 10 : 0;
+  }
+  console.log(`✓ OEM spend map built (${oemSpendMap.size} buyers)`);
+
+  // Secondary aggregation: purchase month frequency per buyer (for peak_months)
+  const monthFreqRaw = await fc.aggregate([
+    { $match: { contract_month: { $ne: null } } },
+    { $group: {
+      _id:   { buyer: '$buyer_canonical', month: '$contract_month' },
+      count: { $sum: 1 },
+    }},
+  ], { allowDiskUse: true }).toArray();
+
+  const monthCountMap = new Map();
+  for (const row of monthFreqRaw) {
+    const buyer = row._id.buyer;
+    if (!monthCountMap.has(buyer)) monthCountMap.set(buyer, {});
+    monthCountMap.get(buyer)[String(row._id.month)] = row.count;
+  }
+  console.log(`✓ Month frequency map built`);
+
   // Post-aggregation: compute opportunity score, forecast, percentiles
   const ops = [];
   let tierCounts = { A: 0, B: 0, C: 0, D: 0 };
@@ -229,7 +361,27 @@ async function main() {
       : null;
 
     const { opportunity_score, opportunity_tier, opportunity_reasons } = computeOpportunity(b);
-    const forecast = computeForecast(b.purchase_months || [], b.last_purchase, b.year_count);
+    const forecast      = computeForecast(b.purchase_months || [], b.last_purchase, b.year_count);
+    const daysSinceLast = Math.round(b.days_since_last || 0);
+
+    // New Phase 2 fields
+    const oemSpend    = oemSpendMap.get(b.buyer_canonical) || [];
+    const monthCounts = monthCountMap.get(b.buyer_canonical) || {};
+    const peakMonths  = computePeakMonths(monthCounts);
+    // Primary incumbent = highest-GMV OEM that is NOT 100X
+    const primaryIncumbent = oemSpend.find(o => !o.is_100x)?.oem_canonical ?? null;
+    const estimatedOpportunity = Math.round(
+      Math.min(((b.total_gmv || 0) / Math.max(b.oem_count || 1, 1)) * 0.25, 5_000_000)
+    );
+    const forecast6mo = computeForecast6mo(
+      b.purchase_months || [], Math.round(b.avg_contract_value || 0),
+      b.year_count || 0, forecast.forecast_confidence,
+    );
+    const urgency = computeUrgency(forecast.forecast_days_until, daysSinceLast);
+    const { action_priority, recommended_action } = b.purchased_100x
+      ? { action_priority: 'retention', recommended_action: 'Existing 100X customer.' }
+      : computeRecommendedAction(opportunity_score, daysSinceLast, primaryIncumbent);
+    const anom = isAnomalous(b.buyer_canonical, b.buyer_display_name);
 
     tierCounts[opportunity_tier]++;
 
@@ -249,13 +401,18 @@ async function main() {
       supplier_count:     b.supplier_count,
       oem_count:          b.oem_count,
       oems_purchased:     b.oems_purchased || [],
+      oem_spend:          oemSpend,
+      primary_incumbent:  primaryIncumbent,
 
       first_purchase:     b.first_purchase,
       last_purchase:      b.last_purchase,
-      days_since_last:    Math.round(b.days_since_last || 0),
+      days_since_last:    daysSinceLast,
       active_years:       (b.active_years || []).sort(),
       year_count:         b.year_count,
       purchase_months:    (b.purchase_months || []).filter(Boolean).sort((a, c) => a - c),
+      purchase_month_counts: monthCounts,
+      peak_months:        peakMonths,
+      peak_quarter:       computePeakQuarter(peakMonths),
 
       purchased_100x:     b.purchased_100x,
       purchased_neptune:  b.purchased_neptune,
@@ -267,8 +424,17 @@ async function main() {
       opportunity_score,
       opportunity_tier,
       opportunity_reasons,
+      estimated_opportunity: estimatedOpportunity,
+      action_priority,
+      recommended_action,
 
       ...forecast,
+      forecast_6mo: forecast6mo,
+      urgency,
+
+      is_anomalous:  anom.is_anomalous,
+      anomaly_reason: anom.anomaly_reason,
+      rank:          null, // assigned after loop for non-100X buyers
 
       updated_at: new Date(),
     };
@@ -281,6 +447,14 @@ async function main() {
       }
     });
   }
+
+  // Assign ranks to non-100X buyers (sorted by opportunity_score desc, total_gmv desc)
+  const nonHundredX = ops
+    .map(op => op.replaceOne.replacement)
+    .filter(d => !d.purchased_100x)
+    .sort((a, b) => (b.opportunity_score - a.opportunity_score) || (b.total_gmv - a.total_gmv));
+  nonHundredX.forEach((d, i) => { d.rank = i + 1; });
+  console.log(`✓ Ranks assigned to ${nonHundredX.length} non-100X buyers`);
 
   await fb.bulkWrite(ops, { ordered: false });
   console.log(`✓ Written ${ops.length} buyer docs`);

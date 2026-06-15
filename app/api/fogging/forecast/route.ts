@@ -24,24 +24,41 @@ export async function GET(req: NextRequest) {
   const now    = new Date();
   const cutoff = new Date(now.getTime() + window * 86400000);
 
-  // Determine which months fall within the window
+  // Compute display months for response metadata (not used for filtering)
   const targetMonths: number[] = [];
   for (let d = new Date(now); d <= cutoff; d.setUTCDate(d.getUTCDate() + 1)) {
     const m = d.getUTCMonth() + 1;
     if (!targetMonths.includes(m)) targetMonths.push(m);
   }
-  const targetYears = [now.getUTCFullYear(), now.getUTCFullYear() + 1];
 
-  const filter: Filter<Document> = {};
-
-  // Month/year filter: buyers predicted in the window
+  // Window filter: use $expr with $dateFromParts for exact date range matching.
+  // The previous month×year $in filter was a Cartesian product that matched
+  // e.g. June 2027 (351 days away) when the window was 30 days.
+  let windowFilter: Record<string, unknown>;
   if (p.month && p.year) {
-    filter.forecast_next_month = parseInt(p.month);
-    filter.forecast_next_year  = parseInt(p.year);
+    // Calendar-click: specific month+year is unambiguous, direct equality is correct
+    windowFilter = {
+      forecast_next_month: parseInt(p.month),
+      forecast_next_year:  parseInt(p.year),
+    };
   } else {
-    filter.forecast_next_month = { $in: targetMonths };
-    filter.forecast_next_year  = { $in: targetYears };
+    windowFilter = {
+      $expr: {
+        $and: [
+          { $gte: [
+            { $dateFromParts: { year: '$forecast_next_year', month: '$forecast_next_month', day: 1 } },
+            now,
+          ]},
+          { $lte: [
+            { $dateFromParts: { year: '$forecast_next_year', month: '$forecast_next_month', day: 1 } },
+            cutoff,
+          ]},
+        ],
+      },
+    };
   }
+
+  const filter: Filter<Document> = { ...windowFilter } as Filter<Document>;
 
   // Optional filters
   if (p.confidence)  filter.forecast_confidence = p.confidence;
