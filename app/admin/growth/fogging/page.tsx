@@ -2028,6 +2028,12 @@ export default function FoggingIntelligencePage() {
           >
             <AlertCircle size={14} /> Data Quality
           </Link>
+          <Link
+            href="/admin/growth/fogging/organizations"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t-md transition-colors border-b-2 -mb-px whitespace-nowrap border-indigo-500 text-indigo-700 bg-indigo-50 hover:bg-indigo-100"
+          >
+            <Building2 size={14} /> Organizations
+          </Link>
         </div>
       </div>
 

@@ -21,10 +21,12 @@ const FROM = parseInt(CLI.from || '1');
 const ONLY = CLI.only ? parseInt(CLI.only) : null;
 
 const STEPS = [
-  { n: 1, name: 'fogging_contracts',  script: 'fogging-01-build-contracts.mjs' },
-  { n: 2, name: 'fogging_buyers',     script: 'fogging-02-build-buyers.mjs'    },
-  { n: 3, name: 'fogging_oems',       script: 'fogging-03-build-oems.mjs'      },
-  { n: 4, name: 'fogging_models',     script: 'fogging-04-build-models.mjs'    },
+  { n: 1, name: 'fogging_contracts',     script: 'fogging-01-build-contracts.mjs'     },
+  { n: 2, name: 'fogging_buyers',        script: 'fogging-02-build-buyers.mjs'         },
+  { n: 3, name: 'fogging_oems',          script: 'fogging-03-build-oems.mjs'           },
+  { n: 4, name: 'fogging_models',        script: 'fogging-04-build-models.mjs'         },
+  { n: 5, name: 'fogging_sellers',       script: 'fogging-05-build-sellers.mjs'        },
+  { n: 7, name: 'fogging_organizations', script: 'fogging-07-build-organizations.mjs' },
 ];
 
 const steps = STEPS.filter(s => ONLY ? s.n === ONLY : s.n >= FROM);
