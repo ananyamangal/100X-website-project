@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState, useCallback } from "react"
-import { Search, Link2, AlertCircle, ExternalLink, CheckCircle2, XCircle, Play, RotateCw, TrendingUp, TrendingDown, Zap, RefreshCw, Clock, Info, Target, ChevronDown, ChevronUp, Pause, Check, Shield, History, Globe, RotateCcw, Loader2, FlaskConical, ArrowRight } from "lucide-react"
+import { Search, Link2, AlertCircle, ExternalLink, CheckCircle2, XCircle, Play, RotateCw, TrendingUp, TrendingDown, Zap, RefreshCw, Clock, Info, Target, ChevronDown, ChevronUp, Pause, Check, Shield, History, Globe, RotateCcw, Loader2, FlaskConical, ArrowRight, AlertTriangle, Activity, BarChart2 } from "lucide-react"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -49,6 +49,12 @@ interface SeoRec {
     checks: Record<string, { pass: boolean; reason?: string; value?: unknown }>
     safe_types_only: boolean
   }
+  sanity_flags?: {
+    ctr_capped?: boolean
+    original_expected_clicks?: number
+    review_required?: boolean
+    revenue_note?: string
+  }
   implementation_package?: {
     meta_title?: string
     meta_description?: string
@@ -73,6 +79,40 @@ interface ExecLogEntry {
   final_status: string
   auto_rollback?: boolean
   manual_rollback?: boolean
+  risk_gate?: { risk_level: string; risk_score: number; founder_approval: boolean; admin_override: boolean }
+}
+
+type RiskLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
+
+interface RiskProfile {
+  path: string
+  risk_level: RiskLevel
+  risk_score: number
+  clicks_28d: number
+  impressions_28d: number
+  avg_position: number
+  ranking_keywords: number
+  top10_keywords: number
+  backlink_count: number
+  referring_domains: number
+  revenue_attribution_30d: number
+  requires_founder_approval: boolean
+  requires_admin_approval: boolean
+  warnings: string[]
+  scored_at: string
+}
+
+interface TrafficAlert {
+  _id: string
+  path: string
+  rec_id: string
+  alert_types: string[]
+  message: string
+  suggestion: string
+  click_drop_pct: number
+  position_drop: number
+  status: "active" | "acknowledged"
+  created_at: string
 }
 
 // ─── Small helpers ────────────────────────────────────────────────────────────
@@ -144,6 +184,8 @@ export default function SEOCommandCenter() {
   const [execLog, setExecLog] = useState<ExecLogEntry[]>([])
   const [execLogLoading, setExecLogLoading] = useState(false)
   const [showExecLog, setShowExecLog] = useState(false)
+  const [trafficAlerts, setTrafficAlerts] = useState<TrafficAlert[]>([])
+  const [runningMonitor, setRunningMonitor] = useState(false)
 
   const [activeTab, setActiveTab] = useState<"keywords" | "pages" | "near-wins" | "trends" | "schema" | "links" | "recommendations">("keywords")
   const [syncing, setSyncing] = useState(false)
@@ -177,7 +219,14 @@ export default function SEOCommandCenter() {
     } catch { /* ignore */ } finally { setRecsLoading(false) }
   }, [])
 
-  useEffect(() => { loadGSC(); loadRecs() }, [loadGSC, loadRecs])
+  const loadTrafficAlerts = useCallback(async () => {
+    try {
+      const d = await fetch("/api/admin/growth/seo/traffic-monitor").then(r => r.json())
+      setTrafficAlerts(d.alerts || [])
+    } catch { /* ignore */ }
+  }, [])
+
+  useEffect(() => { loadGSC(); loadRecs(); loadTrafficAlerts() }, [loadGSC, loadRecs, loadTrafficAlerts])
 
   const generateRecs = async () => {
     setGeneratingRecs(true); setRecsResult(null)
@@ -200,10 +249,14 @@ export default function SEOCommandCenter() {
     } catch { /* ignore */ } finally { setActioning(null) }
   }
 
-  const executeRec = async (id: string) => {
+  const executeRec = async (id: string, options?: { founder_approval?: boolean; admin_override?: boolean }) => {
     setExecutingId(id); setExecResult(null)
     try {
-      const d = await fetch(`/api/admin/growth/seo/recommendations/${id}/execute`, { method: "POST" }).then(r => r.json())
+      const d = await fetch(`/api/admin/growth/seo/recommendations/${id}/execute`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(options || {}),
+      }).then(r => r.json())
       const ok = d.ok && d.status === "implemented"
       setExecResult({
         id,
@@ -216,6 +269,15 @@ export default function SEOCommandCenter() {
     } catch (e) {
       setExecResult({ id, ok: false, msg: String(e) })
     } finally { setExecutingId(null) }
+  }
+
+  const runTrafficMonitor = async () => {
+    setRunningMonitor(true)
+    try {
+      await fetch("/api/admin/growth/seo/traffic-monitor", { method: "POST" })
+      await loadTrafficAlerts()
+    } catch { /* ignore */ }
+    setRunningMonitor(false)
   }
 
   const rollbackRec = async (id: string) => {
@@ -750,10 +812,13 @@ export default function SEOCommandCenter() {
             execLog={execLog}
             execLogLoading={execLogLoading}
             showExecLog={showExecLog}
+            trafficAlerts={trafficAlerts}
+            runningMonitor={runningMonitor}
             onGenerate={generateRecs}
             onAction={actionRec}
             onExecute={executeRec}
             onRollback={rollbackRec}
+            onRunMonitor={runTrafficMonitor}
             onToggleExecLog={() => {
               if (!showExecLog) loadExecLog()
               setShowExecLog(p => !p)
@@ -933,6 +998,224 @@ function ValidationPanel({ result }: { result: SeoRec["validation_result"] }) {
   )
 }
 
+// ─── Risk Badge ──────────────────────────────────────────────────────────────
+
+const RISK_COLOR: Record<string, string> = {
+  CRITICAL: "bg-red-100 text-red-700 border-red-300",
+  HIGH:     "bg-orange-100 text-orange-700 border-orange-300",
+  MEDIUM:   "bg-amber-100 text-amber-700 border-amber-300",
+  LOW:      "bg-green-100 text-green-700 border-green-300",
+}
+
+function RiskBadge({ level, score }: { level: string; score: number }) {
+  return (
+    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${RISK_COLOR[level] || "bg-gray-100 text-gray-600 border-gray-300"}`}>
+      <Shield size={9} />
+      {level} RISK · {score}/100
+    </span>
+  )
+}
+
+// ─── SEO Equity Shield (pre-execution gate panel) ─────────────────────────────
+
+function SeoEquityShield({ rec, riskProfile, riskLoading, confirmed, founderApproved, onConfirmedChange, onFounderChange, onConfirm, onCancel, executing }: {
+  rec: SeoRec
+  riskProfile: RiskProfile | null
+  riskLoading: boolean
+  confirmed: boolean
+  founderApproved: boolean
+  onConfirmedChange: (v: boolean) => void
+  onFounderChange: (v: boolean) => void
+  onConfirm: () => void
+  onCancel: () => void
+  executing: boolean
+}) {
+  const rl = riskProfile?.risk_level
+
+  const canConfirm = !executing && riskProfile && (
+    rl === "LOW" ? confirmed
+    : rl === "MEDIUM" ? confirmed
+    : founderApproved && confirmed   // HIGH + CRITICAL need founder
+  )
+
+  return (
+    <div className={`border-t px-5 py-4 space-y-3 ${rl === "CRITICAL" ? "bg-red-50 border-red-200" : rl === "HIGH" ? "bg-orange-50 border-orange-200" : rl === "MEDIUM" ? "bg-amber-50 border-amber-200" : "bg-blue-50 border-blue-200"}`}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Shield size={13} className={rl === "CRITICAL" || rl === "HIGH" ? "text-red-600" : rl === "MEDIUM" ? "text-amber-600" : "text-blue-600"} />
+          <span className="text-xs font-bold text-gray-800">SEO Equity Shield</span>
+          <span className="text-[10px] text-gray-500">v2.5.1</span>
+        </div>
+        <button onClick={onCancel} className="text-[10px] text-gray-400 hover:text-gray-600">Cancel</button>
+      </div>
+
+      {riskLoading ? (
+        <div className="flex items-center gap-2 text-xs text-gray-500 py-3">
+          <Loader2 size={12} className="animate-spin" />Scanning page SEO equity…
+        </div>
+      ) : riskProfile ? (
+        <>
+          {/* Risk score header */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <RiskBadge level={riskProfile.risk_level} score={riskProfile.risk_score} />
+            <span className="text-[11px] text-gray-500">{rec.url}</span>
+          </div>
+
+          {/* Metrics grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {[
+              { label: "Organic Clicks", value: riskProfile.clicks_28d.toLocaleString(), sub: "28-day", color: "text-green-700" },
+              { label: "Impressions", value: riskProfile.impressions_28d.toLocaleString(), sub: "28-day", color: "text-blue-700" },
+              { label: "Top-10 Keywords", value: riskProfile.top10_keywords, sub: "in top 10", color: riskProfile.top10_keywords > 0 ? "text-amber-700" : "text-gray-500" },
+              { label: "Est. Revenue/mo", value: `₹${Math.round(riskProfile.revenue_attribution_30d / 1000)}K`, sub: "at current traffic", color: "text-emerald-700" },
+            ].map(({ label, value, sub, color }) => (
+              <div key={label} className="bg-white rounded-lg border border-gray-200 px-3 py-2 text-center">
+                <p className={`text-sm font-bold ${color}`}>{value}</p>
+                <p className="text-[10px] text-gray-400 leading-tight">{label}</p>
+                <p className="text-[9px] text-gray-300">{sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Backlinks row */}
+          {(riskProfile.backlink_count > 0 || riskProfile.referring_domains > 0) && (
+            <div className="flex items-start gap-2 bg-white border border-amber-200 rounded-lg px-3 py-2 text-[11px]">
+              <AlertTriangle size={11} className="text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-amber-800">Backlink protection: </span>
+                <span className="text-amber-700">
+                  {riskProfile.backlink_count} backlink{riskProfile.backlink_count !== 1 ? "s" : ""}
+                  {riskProfile.referring_domains > 0 ? ` from ${riskProfile.referring_domains} domain${riskProfile.referring_domains !== 1 ? "s" : ""}` : ""} point to this page.
+                  Changes to this page affect these inbound links.
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Warnings */}
+          {riskProfile.warnings.length > 0 && (
+            <div className="space-y-1">
+              {riskProfile.warnings.map((w, i) => (
+                <div key={i} className="flex items-center gap-1.5 text-[11px] text-gray-600">
+                  <AlertCircle size={10} className="text-amber-500 shrink-0" />
+                  {w}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Risk-level specific approval controls */}
+          <div className="border-t border-gray-200 pt-3 space-y-2">
+            {rl === "LOW" && (
+              <div className="flex items-start gap-2">
+                <input type="checkbox" id="shield-low-confirm" checked={confirmed} onChange={e => onConfirmedChange(e.target.checked)}
+                  className="mt-0.5 accent-brand-600" />
+                <label htmlFor="shield-low-confirm" className="text-xs text-gray-700 cursor-pointer">
+                  I confirm this change is safe to execute. Low-risk page — no significant traffic or backlinks.
+                </label>
+              </div>
+            )}
+
+            {rl === "MEDIUM" && (
+              <div className="flex items-start gap-2">
+                <input type="checkbox" id="shield-medium-confirm" checked={confirmed} onChange={e => onConfirmedChange(e.target.checked)}
+                  className="mt-0.5 accent-amber-600" />
+                <label htmlFor="shield-medium-confirm" className="text-xs text-amber-800 cursor-pointer font-medium">
+                  Admin Override — I have reviewed the risk profile and approve this change as admin.
+                </label>
+              </div>
+            )}
+
+            {(rl === "HIGH" || rl === "CRITICAL") && (
+              <div className="space-y-2">
+                {rl === "CRITICAL" && (
+                  <div className="bg-red-100 border border-red-300 rounded-lg px-3 py-2 text-[11px] text-red-800 font-semibold">
+                    CRITICAL RISK — This page generates significant organic traffic, has top-10 keyword rankings, or has inbound backlinks.
+                    Any SEO change carries high risk of ranking loss.
+                  </div>
+                )}
+                <div className="flex items-start gap-2">
+                  <input type="checkbox" id="shield-founder-confirm" checked={founderApproved} onChange={e => onFounderChange(e.target.checked)}
+                    className="mt-0.5 accent-red-600" />
+                  <label htmlFor="shield-founder-confirm" className="text-xs text-red-800 cursor-pointer font-semibold">
+                    Founder Approval — I confirm the Founder has explicitly approved this SEO change.
+                  </label>
+                </div>
+                <div className="flex items-start gap-2">
+                  <input type="checkbox" id="shield-high-confirm" checked={confirmed} onChange={e => onConfirmedChange(e.target.checked)}
+                    className="mt-0.5 accent-red-600" />
+                  <label htmlFor="shield-high-confirm" className="text-xs text-gray-700 cursor-pointer">
+                    I understand this change may affect organic rankings, traffic, and revenue for this page.
+                  </label>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                onClick={onConfirm}
+                disabled={!canConfirm}
+                className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-md disabled:opacity-40 ${
+                  rl === "CRITICAL" || rl === "HIGH" ? "bg-red-600 text-white hover:bg-red-700"
+                  : rl === "MEDIUM" ? "bg-amber-600 text-white hover:bg-amber-700"
+                  : "bg-brand-600 text-white hover:bg-brand-700"
+                }`}
+              >
+                {executing ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
+                {executing ? "Executing…" : "Confirm & Execute"}
+              </button>
+              <button onClick={onCancel} disabled={executing}
+                className="px-3 py-1.5 text-xs text-gray-500 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-40">
+                Cancel
+              </button>
+              {!canConfirm && (
+                <span className="text-[10px] text-gray-400">
+                  {rl === "LOW" || rl === "MEDIUM" ? "Check the box above to proceed" : "Both checkboxes required"}
+                </span>
+              )}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="text-xs text-red-600 py-2">Could not load risk profile. Refresh and try again.</div>
+      )}
+    </div>
+  )
+}
+
+// ─── Traffic Alert Banner ─────────────────────────────────────────────────────
+
+function TrafficAlertBanner({ alerts, onRunMonitor, running }: { alerts: TrafficAlert[]; onRunMonitor: () => void; running: boolean }) {
+  if (alerts.length === 0) return null
+  return (
+    <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 space-y-2">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <Activity size={13} className="text-red-600" />
+          <span className="text-xs font-bold text-red-800">Traffic Regression Alerts ({alerts.length})</span>
+          <span className="text-[10px] text-red-600">Post-implementation monitoring</span>
+        </div>
+        <button onClick={onRunMonitor} disabled={running}
+          className="inline-flex items-center gap-1 text-[10px] px-2.5 py-1 border border-red-300 text-red-700 rounded-md hover:bg-red-100 disabled:opacity-50">
+          {running ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+          Run check
+        </button>
+      </div>
+      {alerts.slice(0, 3).map(alert => (
+        <div key={alert._id} className="flex items-start gap-2 text-[11px]">
+          <AlertTriangle size={11} className="text-red-500 shrink-0 mt-0.5" />
+          <div>
+            <code className="text-red-700 font-mono">{alert.path}</code>
+            <span className="text-red-600 ml-1">— {alert.message}</span>
+            <span className="text-gray-500 ml-1 italic">{alert.suggestion}</span>
+          </div>
+        </div>
+      ))}
+      {alerts.length > 3 && <p className="text-[10px] text-red-500">+{alerts.length - 3} more alerts — see Execution Audit Log for details</p>}
+    </div>
+  )
+}
+
 // ─── SeoRecCard ───────────────────────────────────────────────────────────────
 
 function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onExecute, onRollback }: {
@@ -941,11 +1224,18 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
   executingId: string | null
   rollingBackId: string | null
   onAction: (id: string, status: string) => Promise<void>
-  onExecute: (id: string) => Promise<void>
+  onExecute: (id: string, options?: { founder_approval?: boolean; admin_override?: boolean }) => Promise<void>
   onRollback: (id: string) => Promise<void>
 }) {
   const [showPackage, setShowPackage] = useState(false)
   const [showSerp, setShowSerp] = useState(false)
+  // Gate state (v2.5.1)
+  const [showGate, setShowGate] = useState(false)
+  const [riskProfile, setRiskProfile] = useState<RiskProfile | null>(null)
+  const [riskLoading, setRiskLoading] = useState(false)
+  const [gateConfirmed, setGateConfirmed] = useState(false)
+  const [gateFounderApproved, setGateFounderApproved] = useState(false)
+
   const isActioning = actioning === rec._id
   const isExecuting = executingId === rec._id
   const isRollingBack = rollingBackId === rec._id
@@ -953,6 +1243,35 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
   const canExecute = AUTO_EXEC_TYPES.has(rec.type)
   const canSerp = SERP_PREVIEW_TYPES.has(rec.type) && (pkg?.meta_title || pkg?.meta_description)
   const inProgress = rec.status === "executing" || rec.status === "validating"
+
+  const openGate = async () => {
+    setShowGate(true)
+    setRiskProfile(null)
+    setRiskLoading(true)
+    setGateConfirmed(false)
+    setGateFounderApproved(false)
+    try {
+      const d = await fetch(`/api/admin/growth/seo/risk-score?path=${encodeURIComponent(rec.url)}`).then(r => r.json())
+      setRiskProfile(d.profile || null)
+    } catch { /* ignore */ }
+    setRiskLoading(false)
+  }
+
+  const closeGate = () => {
+    setShowGate(false)
+    setRiskProfile(null)
+    setGateConfirmed(false)
+    setGateFounderApproved(false)
+  }
+
+  const handleConfirmExecute = () => {
+    const options: { founder_approval?: boolean; admin_override?: boolean } = {}
+    const rl = riskProfile?.risk_level
+    if (rl === "MEDIUM") options.admin_override = gateConfirmed
+    if (rl === "HIGH" || rl === "CRITICAL") options.founder_approval = gateFounderApproved
+    onExecute(rec._id, options)
+    closeGate()
+  }
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -1003,6 +1322,16 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
           </span>
           {rec.executed_at && <span className="text-gray-400">Executed: {new Date(rec.executed_at).toLocaleDateString("en-IN")}</span>}
           {rec.rolled_back_at && <span className="text-orange-500">Rolled back: {new Date(rec.rolled_back_at).toLocaleDateString("en-IN")}</span>}
+          {rec.sanity_flags?.ctr_capped && (
+            <span className="flex items-center gap-1 text-amber-600 font-medium">
+              <AlertTriangle size={10} />Projection capped (CTR sanity)
+            </span>
+          )}
+          {rec.sanity_flags?.review_required && (
+            <span className="flex items-center gap-1 text-red-600 font-medium">
+              <AlertTriangle size={10} />Revenue projection: review manually
+            </span>
+          )}
         </div>
       </div>
 
@@ -1103,10 +1432,10 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
         </div>
       )}
 
-      {rec.status === "approved" && (
+      {rec.status === "approved" && !showGate && (
         <div className="border-t border-gray-100 px-5 py-3 bg-blue-50 flex flex-wrap gap-2 items-center">
           {canExecute ? (
-            <button onClick={() => onExecute(rec._id)} disabled={isExecuting}
+            <button onClick={openGate} disabled={isExecuting}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-brand-600 text-white rounded-md hover:bg-brand-700 disabled:opacity-50">
               {isExecuting ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
               {isExecuting ? "Executing…" : "Execute"}
@@ -1117,9 +1446,24 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
             <CheckCircle2 size={11} />Mark Implemented
           </button>
           <span className="text-[10px] text-blue-500 ml-auto">
-            {canExecute ? "Execute applies change to override store + validates automatically" : "Manual implementation required"}
+            {canExecute ? "Execute opens SEO Equity Shield — risk check before applying" : "Manual implementation required"}
           </span>
         </div>
+      )}
+
+      {rec.status === "approved" && showGate && (
+        <SeoEquityShield
+          rec={rec}
+          riskProfile={riskProfile}
+          riskLoading={riskLoading}
+          confirmed={gateConfirmed}
+          founderApproved={gateFounderApproved}
+          onConfirmedChange={setGateConfirmed}
+          onFounderChange={setGateFounderApproved}
+          onConfirm={handleConfirmExecute}
+          onCancel={closeGate}
+          executing={isExecuting}
+        />
       )}
 
       {rec.status === "implemented" && (
@@ -1150,7 +1494,7 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
   )
 }
 
-function SeoRecommendationsTab({ recs, loading, generating, result, actioning, executingId, rollingBackId, execResult, execLog, execLogLoading, showExecLog, onGenerate, onAction, onExecute, onRollback, onToggleExecLog }: {
+function SeoRecommendationsTab({ recs, loading, generating, result, actioning, executingId, rollingBackId, execResult, execLog, execLogLoading, showExecLog, trafficAlerts, runningMonitor, onGenerate, onAction, onExecute, onRollback, onRunMonitor, onToggleExecLog }: {
   recs: SeoRec[]
   loading: boolean
   generating: boolean
@@ -1162,10 +1506,13 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, e
   execLog: ExecLogEntry[]
   execLogLoading: boolean
   showExecLog: boolean
+  trafficAlerts: TrafficAlert[]
+  runningMonitor: boolean
   onGenerate: () => void
   onAction: (id: string, status: string) => Promise<void>
-  onExecute: (id: string) => Promise<void>
+  onExecute: (id: string, options?: { founder_approval?: boolean; admin_override?: boolean }) => Promise<void>
   onRollback: (id: string) => Promise<void>
+  onRunMonitor: () => void
   onToggleExecLog: () => void
 }) {
   const [statusFilter, setStatusFilter] = useState<"pending" | "approved" | "implemented" | "all">("pending")
@@ -1186,9 +1533,9 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, e
           <div className="flex items-center gap-2">
             <Target size={16} className="text-brand-600" />
             <h2 className="text-sm font-bold text-gray-900">SEO Recommendation Engine</h2>
-            <span className="text-[10px] px-1.5 py-0.5 bg-brand-100 text-brand-700 rounded font-bold">v2.4</span>
+            <span className="text-[10px] px-1.5 py-0.5 bg-brand-100 text-brand-700 rounded font-bold">v2.5.1</span>
           </div>
-          <p className="text-[11px] text-gray-500 mt-0.5">Detect → Generate → Approve → Implement — SEO opportunities from GSC + Schema + Link audit</p>
+          <p className="text-[11px] text-gray-500 mt-0.5">Detect → Approve → Execute (SEO Equity Shield) → Validate → Implement — risk-gated execution</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="text-center">
@@ -1219,10 +1566,13 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, e
         </div>
       )}
 
+      {/* Traffic regression alerts */}
+      <TrafficAlertBanner alerts={trafficAlerts} onRunMonitor={onRunMonitor} running={runningMonitor} />
+
       {/* SEO Preservation notice */}
       <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-[11px] text-amber-800">
-        <strong>SEO Equity Protection:</strong> Only safe changes are auto-generated — meta title/description updates, schema additions, internal links.
-        URL changes, redirects, and canonical modifications require explicit founder approval and are never auto-deployed.
+        <strong>SEO Equity Protection v2.5.1:</strong> Risk-gated execution — LOW auto, MEDIUM needs admin, HIGH/CRITICAL needs Founder approval.
+        Sanity engine validates projections. Traffic monitored 14 days post-implementation. No URL/redirect/canonical changes ever.
       </div>
 
       {/* Status filter tabs */}
@@ -1267,6 +1617,26 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, e
           ))}
         </div>
       )}
+
+      {/* Traffic Monitor Panel */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-5 py-3 flex items-center gap-2 flex-wrap">
+          <Activity size={13} className="text-gray-400" />
+          <span className="text-xs font-semibold text-gray-700">Traffic Loss Protection</span>
+          <span className="text-[10px] text-gray-400">14-day post-implementation monitoring</span>
+          {trafficAlerts.length > 0 && (
+            <span className="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-semibold ml-1">{trafficAlerts.length} active alert{trafficAlerts.length !== 1 ? "s" : ""}</span>
+          )}
+          <button onClick={onRunMonitor} disabled={runningMonitor}
+            className="ml-auto inline-flex items-center gap-1 text-[10px] px-2.5 py-1 border border-gray-300 text-gray-600 rounded-md hover:bg-gray-50 disabled:opacity-50">
+            {runningMonitor ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+            Run monitor check
+          </button>
+        </div>
+        {trafficAlerts.length === 0 && (
+          <p className="px-5 pb-3 text-[11px] text-gray-400">No traffic regressions detected. Alerts appear here if clicks drop &gt;20% or position drops &gt;3 places after an implementation.</p>
+        )}
+      </div>
 
       {/* Execution Audit Log */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -1313,6 +1683,14 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, e
                     </div>
                     {entry.validation_result && !entry.validation_result.pass && entry.validation_result.reason && (
                       <p className="text-[11px] text-red-600 mt-1">Reason: {entry.validation_result.reason}</p>
+                    )}
+                    {entry.risk_gate && (
+                      <div className="flex items-center gap-2 mt-1 text-[10px] text-gray-400">
+                        <BarChart2 size={9} />
+                        Risk gate: <span className={`font-semibold ${entry.risk_gate.risk_level === "CRITICAL" || entry.risk_gate.risk_level === "HIGH" ? "text-red-600" : entry.risk_gate.risk_level === "MEDIUM" ? "text-amber-600" : "text-green-600"}`}>{entry.risk_gate.risk_level}</span>
+                        {entry.risk_gate.founder_approval && <span className="bg-orange-100 text-orange-700 px-1 py-0.5 rounded">FOUNDER APPROVED</span>}
+                        {entry.risk_gate.admin_override && <span className="bg-blue-100 text-blue-700 px-1 py-0.5 rounded">ADMIN OVERRIDE</span>}
+                      </div>
                     )}
                   </div>
                 ))}

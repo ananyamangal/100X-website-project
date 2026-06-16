@@ -40,6 +40,12 @@ export interface SeoRecommendation {
   generated_at: string
   reviewed_at?: string
   implemented_at?: string
+  sanity_flags?: {
+    ctr_capped?: boolean
+    original_expected_clicks?: number
+    review_required?: boolean
+    revenue_note?: string
+  }
   implementation_package?: {
     meta_title?: string
     meta_description?: string
@@ -142,10 +148,26 @@ export async function POST(req: NextRequest) {
       if (ctrGap < 0.01) continue
 
       // impressions is already a 28-day GSC total; extrapolate to 30-day month
-      const expectedNewClicks = Math.round((impressions / 28) * 30 * ctrGap)
-      const expectedRevenue = expectedNewClicks * REVENUE_PER_CLICK
+      const monthly30d = (impressions / 28) * 30
+      let expectedNewClicks = Math.round(monthly30d * ctrGap)
+      let expectedRevenue = expectedNewClicks * REVENUE_PER_CLICK
 
-      const rec: Omit<SeoRecommendation, "_id"> = {
+      // ── Sanity engine (v2.5.1): cap impossible projections ───────────────────
+      const impliedNewCtr = monthly30d > 0 ? expectedNewClicks / monthly30d : 0
+      const sanityFlags: Record<string, unknown> = {}
+      if (impliedNewCtr > 0.40) {
+        // CTR gap cannot exceed 40% of monthly impressions — cap it
+        sanityFlags.ctr_capped = true
+        sanityFlags.original_expected_clicks = expectedNewClicks
+        expectedNewClicks = Math.round(monthly30d * 0.35)
+        expectedRevenue = expectedNewClicks * REVENUE_PER_CLICK
+      }
+      if (expectedRevenue > 500_000) {
+        sanityFlags.review_required = true
+        sanityFlags.revenue_note = "Projection >₹5L/mo — verify manually before executing"
+      }
+
+      const rec: Omit<SeoRecommendation, "_id"> & { sanity_flags?: Record<string, unknown> } = {
         type: position <= 8 ? "ctr_opportunity" : "ranking_opportunity",
         priority: "high",
         title: `${position <= 8 ? "Optimize title/meta" : "Expand content"} for "${query}"`,
@@ -170,6 +192,7 @@ export async function POST(req: NextRequest) {
         },
       }
       rec.priority = inferPriority(rec)
+      if (Object.keys(sanityFlags).length > 0) rec.sanity_flags = sanityFlags
       recs.push(rec)
     }
 

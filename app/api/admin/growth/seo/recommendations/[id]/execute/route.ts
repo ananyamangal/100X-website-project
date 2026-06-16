@@ -6,15 +6,17 @@
  *
  * Safety rules enforced here (not just in UI):
  *  - Only "approved" recs can be executed
+ *  - Risk gate: MEDIUM → admin_override:true required; HIGH/CRITICAL → founder_approval:true required
  *  - Forbidden patterns (redirect/canonical/url change) are blocked at API level
  *  - Before snapshot stored in seo_execution_log before any write
  *  - Validation runs after write — auto-rollback on failure
- *  - No URL, slug, redirect, or canonical changes are possible through this endpoint
+ *  - Traffic baseline captured on success for 14-day monitoring
  */
 import { type NextRequest, NextResponse } from "next/server"
 import { ObjectId } from "mongodb"
 import clientPromise from "@/lib/mongodb"
 import { requireAuth } from "@/lib/rbac/server"
+import { scorePageRisk } from "@/lib/growth-os/seo-risk-engine"
 
 export const dynamic = "force-dynamic"
 
@@ -103,6 +105,10 @@ export async function POST(
     return NextResponse.json({ error: "Invalid recommendation ID" }, { status: 400 })
   }
 
+  const body = await req.json().catch(() => ({}))
+  const founder_approval = body.founder_approval === true
+  const admin_override   = body.admin_override   === true
+
   const db = (await clientPromise).db()
   const now = new Date().toISOString()
 
@@ -116,6 +122,50 @@ export async function POST(
     return NextResponse.json({ error: `Type "${rec.type}" is not auto-executable in v2.5` }, { status: 400 })
   }
 
+  // ── 1b. Risk gate (v2.5.1) ───────────────────────────────────────────────────
+  const recPath = rec.url || "/"
+  const pageRows = await db.collection("gsc_query_rows")
+    .find({ $or: [{ page: recPath }, { pagePath: recPath }] })
+    .toArray()
+  const clicks_28d     = pageRows.reduce((s: number, r: Record<string, unknown>) => s + Number(r.clicks || 0), 0)
+  const impressions_28d = pageRows.reduce((s: number, r: Record<string, unknown>) => s + Number(r.impressions || 0), 0)
+  const avg_position   = pageRows.length > 0 ? pageRows.reduce((s: number, r: Record<string, unknown>) => s + Number(r.position || 0), 0) / pageRows.length : 0
+  const top10_keywords = pageRows.filter((r: Record<string, unknown>) => Number(r.position || 99) <= 10).length
+  const cachedScore    = await db.collection("seo_page_risk_scores").findOne({ path: recPath })
+
+  const riskProfile = scorePageRisk({
+    path: recPath,
+    clicks_28d,
+    impressions_28d,
+    avg_position,
+    ranking_keywords: pageRows.length,
+    top10_keywords,
+    backlink_count:    cachedScore?.backlink_count    ?? 0,
+    referring_domains: cachedScore?.referring_domains ?? 0,
+  })
+
+  if (riskProfile.risk_level === "MEDIUM" && !admin_override) {
+    return NextResponse.json({
+      error: "Admin approval required before executing this change",
+      gate: "MEDIUM",
+      risk_level: riskProfile.risk_level,
+      risk_score: riskProfile.risk_score,
+      warnings: riskProfile.warnings,
+      requires: "Confirm in the UI that you approve this change as admin (admin_override: true)",
+    }, { status: 403 })
+  }
+
+  if ((riskProfile.risk_level === "HIGH" || riskProfile.risk_level === "CRITICAL") && !founder_approval) {
+    return NextResponse.json({
+      error: `Founder approval required — this page has ${riskProfile.risk_level} SEO risk`,
+      gate: riskProfile.risk_level,
+      risk_level: riskProfile.risk_level,
+      risk_score: riskProfile.risk_score,
+      warnings: riskProfile.warnings,
+      requires: "Confirm Founder has approved this change (founder_approval: true)",
+    }, { status: 403 })
+  }
+
   // ── 2. Forbidden content check ───────────────────────────────────────────────
   const proposedText = [rec.proposed_change, rec.title, rec.implementation_package?.meta_title || ""].join(" ")
   const forbidden = checkForbidden(proposedText)
@@ -123,7 +173,7 @@ export async function POST(
     return NextResponse.json({ error: forbidden, auto_blocked: true }, { status: 400 })
   }
 
-  const path = rec.url || "/"
+  const path = recPath
   const pkg = (rec.implementation_package || {}) as Record<string, unknown>
 
   // ── 3. Load before snapshot ──────────────────────────────────────────────────
@@ -232,7 +282,27 @@ export async function POST(
     executed_at: now,
     final_status: finalStatus,
     auto_rollback: !validation.pass,
+    risk_gate: { risk_level: riskProfile.risk_level, risk_score: riskProfile.risk_score, founder_approval, admin_override },
   })
+
+  // ── 8b. Capture traffic baseline for 14-day monitoring (v2.5.1) ─────────────
+  if (finalStatus === "implemented") {
+    await db.collection("seo_traffic_baselines").updateOne(
+      { rec_id: id },
+      {
+        $set: {
+          path,
+          rec_id: id,
+          clicks: clicks_28d,
+          impressions: impressions_28d,
+          avg_position,
+          period: "28d_at_execution",
+          captured_at: now,
+        }
+      },
+      { upsert: true }
+    )
+  }
 
   // ── 9. Set final rec status ──────────────────────────────────────────────────
   await db.collection("seo_recommendations").updateOne(
