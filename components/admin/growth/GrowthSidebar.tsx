@@ -3,113 +3,208 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import {
-  LayoutDashboard, Search, Bot, Radar, Lightbulb, FileText,
-  Users, ShoppingBag, Megaphone, Settings2, ScrollText,
-  BarChart2, TrendingUp, ArrowLeft, Zap, Plug,
-  PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck, ClipboardList, Monitor,
-  Layout, PhoneCall, ClipboardCheck, Rocket, Wand2, DollarSign, Link2, Brain, FlaskConical, Activity,
-  Globe, Flame,
+  LayoutDashboard, Search, Bot, FileText,
+  Users, ShoppingBag, Megaphone, ScrollText,
+  BarChart2, TrendingUp, Zap, Plug,
+  PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck,
+  Layout, Wand2, Link2, FlaskConical, Activity,
+  Globe, Flame, ClipboardCheck, ChevronDown, ChevronRight,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
 import type { Permission } from "@/lib/rbac/permissions"
-import { MODULE_PERMISSIONS } from "@/lib/rbac/permissions"
 
-interface Module {
-  href:       string
-  label:      string
-  icon:       React.ComponentType<{ size?: number; className?: string }>
-  badge?:     string | null
-  sub?:       boolean
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type SectionId = "founder" | "marketing" | "market_intel" | "system"
+
+interface NavModule {
+  section: SectionId
+  href: string
+  label: string
+  icon: React.ComponentType<{ size?: number; className?: string }>
+  badge?: string | null
+  sub?: boolean
   permission: Permission
-  advanced?:  boolean   // hidden behind Advanced Tools toggle
 }
 
-// Primary modules — shown by default (founder-facing)
-const PRIMARY_MODULES: Module[] = [
-  { href: "/admin/growth/director",            label: "Revenue Director",     icon: TrendingUp,     permission: "dashboard.view",       badge: "NEW" },
-  { href: "/admin/growth/operations",          label: "Operations Center",    icon: Activity,       permission: "dashboard.view",       badge: "NEW" },
-  { href: "/admin/growth/launch",              label: "Launch Status",        icon: Rocket,         permission: "ads.view",             badge: "LIVE" },
-  { href: "/admin/growth/founder",             label: "Founder Mode",         icon: Zap,            permission: "dashboard.view" },
-  { href: "/admin/growth/landing-pages",       label: "Landing Pages",        icon: Globe,          permission: "landing_pages.view" },
-  { href: "/admin/growth/market-intelligence", label: "Market Intel",         icon: Brain,          permission: "ads.view",             badge: "NEW" },
-  { href: "/admin/growth/ads/approval-queue",  label: "Review Queue",         icon: ClipboardCheck, permission: "ads.view" },
-  { href: "/admin/growth/contact-this-week",   label: "Contact This Week",    icon: PhoneCall,      permission: "dealer.view" },
-  { href: "/admin/growth/paid",                label: "Paid Growth",          icon: TrendingUp,     permission: "ads.view" },
+// ─── Navigation config ────────────────────────────────────────────────────────
+
+const SECTION_META: Record<SectionId, { label: string; founderOnly: boolean }> = {
+  founder:      { label: "FOUNDER",             founderOnly: false },
+  marketing:    { label: "MARKETING",            founderOnly: true },
+  market_intel: { label: "MARKET INTELLIGENCE",  founderOnly: true },
+  system:       { label: "SYSTEM",               founderOnly: true },
+}
+
+const SECTION_ORDER: SectionId[] = ["founder", "marketing", "market_intel", "system"]
+
+const NAV_MODULES: NavModule[] = [
+  // ── FOUNDER ──────────────────────────────────────────────────────────────
+  { section: "founder", href: "/admin/growth/director",   label: "Revenue Director",    icon: TrendingUp,     permission: "dashboard.view",      badge: "AI" },
+  { section: "founder", href: "/admin/growth/dashboard",  label: "Executive Dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
+  { section: "founder", href: "/admin/growth/operations", label: "Operations Center",   icon: Activity,        permission: "dashboard.view" },
+  { section: "founder", href: "/admin/growth/reports",    label: "Reporting Center",    icon: BarChart2,       permission: "reports.view" },
+
+  // ── MARKETING ────────────────────────────────────────────────────────────
+  { section: "marketing", href: "/admin/growth/ads",                   label: "Ads",                 icon: Megaphone,    permission: "ads.view" },
+  { section: "marketing", href: "/admin/growth/ads/director",          label: "↳ Approvals",         icon: ClipboardCheck, permission: "ads.view", sub: true },
+  { section: "marketing", href: "/admin/growth/ads/creative-director", label: "↳ Creative Director", icon: Wand2,        permission: "ads.view", sub: true },
+  { section: "marketing", href: "/admin/growth/ads/setup",             label: "↳ Setup",             icon: Plug,         permission: "ads.view", sub: true },
+  { section: "marketing", href: "/admin/growth/seo",                   label: "SEO",                 icon: Search,       permission: "seo.view" },
+  { section: "marketing", href: "/admin/growth/seo/setup",             label: "↳ Search Console",    icon: Globe,        permission: "seo.view", sub: true },
+  { section: "marketing", href: "/admin/growth/seo/offpage",           label: "↳ Off-Page SEO",      icon: Link2,        permission: "seo.view", sub: true },
+  { section: "marketing", href: "/admin/growth/seo/offpage/validate",  label: "↳ Validation",        icon: FlaskConical, permission: "seo.view", sub: true },
+  { section: "marketing", href: "/admin/growth/content",               label: "Content",             icon: FileText,     permission: "content.view" },
+  { section: "marketing", href: "/admin/growth/landing-pages",         label: "Landing Pages",       icon: Layout,       permission: "landing_pages.view" },
+  { section: "marketing", href: "/admin/growth/analytics",             label: "Analytics",           icon: BarChart2,    permission: "analytics.view" },
+
+  // ── MARKET INTELLIGENCE ──────────────────────────────────────────────────
+  { section: "market_intel", href: "/admin/growth/fogging",     label: "Fogging Intelligence", icon: Flame,       permission: "procurement.view" },
+  { section: "market_intel", href: "/admin/growth/dealers",     label: "Dealer Intelligence",  icon: Users,       permission: "dealer.view" },
+  { section: "market_intel", href: "/admin/growth/procurement", label: "Procurement Intel",    icon: ShoppingBag, permission: "procurement.view" },
+  { section: "market_intel", href: "/admin/growth/geo",         label: "GEO / AI Search",      icon: Bot,         permission: "geo.view" },
+
+  // ── SYSTEM ───────────────────────────────────────────────────────────────
+  { section: "system", href: "/admin/growth/security", label: "Security", icon: ShieldCheck, permission: "dashboard.view" },
+  { section: "system", href: "/admin/growth/users",    label: "Users",    icon: UserCog,     permission: "users.view" },
+  { section: "system", href: "/admin/growth/logs",     label: "Logs",     icon: ScrollText,  permission: "logs.view" },
 ]
 
-// Advanced modules — collapsed behind "Advanced Tools"
-const ADVANCED_MODULES: Module[] = [
-  { href: "/admin/growth/dashboard",          label: "Executive Dashboard",  icon: LayoutDashboard, permission: "dashboard.view",   advanced: true },
-  { href: "/admin/growth/seo",                    label: "SEO Command Center",     icon: Search,        permission: "seo.view",         advanced: true },
-  { href: "/admin/growth/seo/setup",              label: "↳ Search Console",       icon: Plug,          permission: "seo.view",         advanced: true, sub: true },
-  { href: "/admin/growth/seo/offpage",            label: "↳ Off-Page SEO",         icon: Link2,         permission: "seo.view",         advanced: true, sub: true, badge: "NEW" },
-  { href: "/admin/growth/seo/offpage/validate",   label: "↳ SEO Validation",       icon: FlaskConical,  permission: "seo.view",         advanced: true, sub: true },
-  { href: "/admin/growth/analytics",          label: "GA4 Analytics",        icon: BarChart2,       permission: "analytics.view",   advanced: true },
-  { href: "/admin/growth/analytics/setup",    label: "↳ Analytics Setup",    icon: Plug,            permission: "analytics.view",   advanced: true, sub: true },
-  { href: "/admin/growth/geo",                label: "GEO / AI Search",      icon: Bot,             permission: "geo.view",         advanced: true },
-  { href: "/admin/growth/competitors",        label: "Competitor Intel",     icon: Radar,           permission: "competitors.view", advanced: true },
-  { href: "/admin/growth/opportunities",      label: "Opportunity Engine",   icon: Lightbulb,       permission: "opportunities.view", advanced: true, badge: "NEW" },
-  { href: "/admin/growth/content",            label: "Content Factory",      icon: FileText,        permission: "content.view",     advanced: true },
-  { href: "/admin/growth/page-sections",      label: "Page Section Builder", icon: Layout,          permission: "content.view",     advanced: true },
-  { href: "/admin/growth/procurement",        label: "Procurement Intel",    icon: ShoppingBag,     permission: "procurement.view", advanced: true, badge: "NEW" },
-  { href: "/admin/growth/fogging",            label: "Fogging Intelligence", icon: Flame,           permission: "procurement.view", advanced: true, badge: "NEW" },
-  { href: "/admin/growth/dealers",            label: "Dealer Intelligence",  icon: Users,           permission: "dealer.view",      advanced: true },
-  { href: "/admin/growth/gem",                label: "GeM Intel (Legacy)",   icon: ShoppingBag,     permission: "procurement.view", advanced: true },
-  { href: "/admin/growth/ads",                    label: "Google Ads Intel",     icon: Megaphone,    permission: "ads.view",         advanced: true },
-  { href: "/admin/growth/ads/director",           label: "↳ Ads Director",       icon: Megaphone,    permission: "ads.view",         advanced: true, sub: true },
-  { href: "/admin/growth/ads/setup",              label: "↳ Ads Setup",          icon: Plug,         permission: "ads.view",         advanced: true, sub: true },
-  { href: "/admin/growth/ads/dashboard",          label: "↳ Ads Dashboard",      icon: BarChart2,    permission: "ads.view",         advanced: true, sub: true },
-  { href: "/admin/growth/ads/creative-director",          label: "↳ Creative Director",   icon: Wand2,        permission: "ads.view", advanced: true, sub: true, badge: "NEW" },
-  { href: "/admin/growth/ads/creative-director/validate", label: "↳ CD Validation",       icon: FlaskConical, permission: "ads.view", advanced: true, sub: true },
-  { href: "/admin/growth/ads/revenue",                    label: "↳ Revenue Attribution", icon: DollarSign,   permission: "ads.view", advanced: true, sub: true, badge: "NEW" },
-  { href: "/admin/growth/agents/health-check",  label: "AI Health Check",      icon: Activity,        permission: "dashboard.view",   advanced: true, badge: "DIAG" },
-  { href: "/admin/growth/automation",          label: "Automation Center",    icon: Settings2,       permission: "automation.view",  advanced: true },
-  { href: "/admin/growth/logs",               label: "Activity Logs",        icon: ScrollText,      permission: "logs.view",        advanced: true },
-  { href: "/admin/growth/reports",            label: "Reporting Center",     icon: BarChart2,       permission: "reports.view",     advanced: true },
-  { href: "/admin/growth/users",              label: "User Management",      icon: UserCog,         permission: "users.view",       advanced: true },
-  { href: "/admin/growth/permissions",        label: "Permission Matrix",    icon: ShieldCheck,     permission: "permissions.view", advanced: true },
-  { href: "/admin/growth/audit/permissions",  label: "Permission Audit",     icon: ClipboardList,   permission: "users.view",       advanced: true, sub: true },
-  { href: "/admin/growth/security",                       label: "Security",             icon: ShieldCheck,     permission: "dashboard.view",   advanced: true },
-  { href: "/admin/growth/security/sessions",            label: "↳ Active Sessions",    icon: Monitor,         permission: "dashboard.view",   advanced: true, sub: true },
-  { href: "/admin/growth/security/auth-diagnostics",   label: "↳ Auth Diagnostics",   icon: Activity,        permission: "users.view",       advanced: true, sub: true, badge: "DIAG" },
-  { href: "/admin/growth/security/orphans",             label: "↳ Orphan Cleanup",     icon: ClipboardList,   permission: "users.view",       advanced: true, sub: true },
-]
+// ─── Storage keys ─────────────────────────────────────────────────────────────
 
-// Combined for active-route detection
-const MODULES = [...PRIMARY_MODULES, ...ADVANCED_MODULES]
+const SIDEBAR_KEY      = "growth:sidebar:collapsed"
+const FOUNDER_MODE_KEY = "growth:founder-mode"
+const SECTIONS_KEY     = "growth:sidebar:sections"
 
-const SIDEBAR_KEY   = "growth:sidebar:collapsed"
-const ADVANCED_KEY  = "growth:sidebar:advanced"
+// ─── Badge colors ─────────────────────────────────────────────────────────────
+
+const BADGE_STYLE: Record<string, string> = {
+  AI:   "bg-violet-100 text-violet-700",
+  NEW:  "bg-blue-100 text-blue-700",
+  LIVE: "bg-green-100 text-green-700",
+  DIAG: "bg-gray-100 text-gray-500",
+}
+
+// ─── Module link ─────────────────────────────────────────────────────────────
+
+function ModuleLink({
+  mod, active, collapsed,
+}: {
+  mod: NavModule; active: boolean; collapsed: boolean
+}) {
+  const Icon = mod.icon
+  return (
+    <Link
+      href={mod.href}
+      title={collapsed ? mod.label : undefined}
+      className={`
+        flex items-center gap-2.5 rounded-md transition-colors
+        ${collapsed ? "justify-center px-1.5 py-2" : mod.sub ? "pl-7 pr-2 py-1.5" : "px-2.5 py-1.5"}
+        ${active
+          ? "bg-gray-900 text-white"
+          : "text-gray-400 hover:bg-gray-800 hover:text-gray-100"
+        }
+      `}
+    >
+      <Icon size={14} className="flex-shrink-0" />
+      {!collapsed && (
+        <>
+          <span className="flex-1 text-[12px] leading-tight truncate font-medium">{mod.label}</span>
+          {mod.badge && (
+            <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold flex-shrink-0 ${BADGE_STYLE[mod.badge] || BADGE_STYLE.NEW}`}>
+              {mod.badge}
+            </span>
+          )}
+        </>
+      )}
+    </Link>
+  )
+}
+
+// ─── Section block ────────────────────────────────────────────────────────────
+
+function SectionBlock({
+  sectionId, modules, collapsed, pathname, sectionOpen, onToggle,
+}: {
+  sectionId: SectionId
+  modules: NavModule[]
+  collapsed: boolean
+  pathname: string
+  sectionOpen: boolean
+  onToggle: () => void
+}) {
+  const meta = SECTION_META[sectionId]
+
+  return (
+    <div className="mb-1">
+      {/* Section header — hide when sidebar collapsed */}
+      {!collapsed && (
+        <button
+          onClick={onToggle}
+          className="w-full flex items-center justify-between px-2.5 py-1.5 text-left group"
+        >
+          <span className="text-[9px] font-bold tracking-widest text-gray-600 uppercase">{meta.label}</span>
+          {sectionId !== "founder" && (
+            sectionOpen
+              ? <ChevronDown  size={10} className="text-gray-600 group-hover:text-gray-400" />
+              : <ChevronRight size={10} className="text-gray-600 group-hover:text-gray-400" />
+          )}
+        </button>
+      )}
+
+      {/* Divider when collapsed */}
+      {collapsed && sectionId !== "founder" && (
+        <div className="my-2 mx-3 border-t border-gray-800" />
+      )}
+
+      {/* Module list */}
+      {(sectionId === "founder" || sectionOpen || collapsed) && (
+        <div className="space-y-0.5">
+          {modules.map(mod => (
+            <ModuleLink
+              key={mod.href}
+              mod={mod}
+              active={mod.sub ? pathname === mod.href : pathname.startsWith(mod.href)}
+              collapsed={collapsed}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Main sidebar ─────────────────────────────────────────────────────────────
 
 export function GrowthSidebar() {
-  const pathname  = usePathname()
+  const pathname   = usePathname()
   const { permissions, loading, user } = useAuth()
 
-  const [collapsed, setCollapsed]         = useState(false)
-  const [mounted, setMounted]             = useState(false)
-  const [gscConfigured, setGscConfigured] = useState<boolean | null>(null)
-  const [advancedOpen, setAdvancedOpen]   = useState(false)
+  const [collapsed,    setCollapsed]    = useState(false)
+  const [founderMode,  setFounderMode]  = useState(false)
+  const [mounted,      setMounted]      = useState(false)
+  const [sectionsOpen, setSectionsOpen] = useState<Record<SectionId, boolean>>({
+    founder: true, marketing: true, market_intel: true, system: true,
+  })
 
   useEffect(() => {
-    const stored = localStorage.getItem(SIDEBAR_KEY)
-    const isCollapsed = stored === "true"
+    const isCollapsed   = localStorage.getItem(SIDEBAR_KEY) === "true"
+    const isFounderMode = localStorage.getItem(FOUNDER_MODE_KEY) === "true"
+    const savedSections = localStorage.getItem(SECTIONS_KEY)
+
     setCollapsed(isCollapsed)
+    setFounderMode(isFounderMode)
     document.documentElement.style.setProperty("--sidebar-w", isCollapsed ? "56px" : "224px")
-    const storedAdv = localStorage.getItem(ADVANCED_KEY)
-    if (storedAdv === "true") setAdvancedOpen(true)
+
+    if (savedSections) {
+      try { setSectionsOpen(JSON.parse(savedSections)) } catch { /* ignore */ }
+    }
+
     setMounted(true)
   }, [])
 
-  useEffect(() => {
-    if (!permissions.includes("seo.view")) return
-    fetch("/api/admin/gsc/sync")
-      .then(r => r.json())
-      .then(d => setGscConfigured(d.configured === true))
-      .catch(() => setGscConfigured(false))
-  }, [permissions])
-
-  const toggle = () => {
+  function toggleSidebar() {
     setCollapsed(prev => {
       const next = !prev
       localStorage.setItem(SIDEBAR_KEY, String(next))
@@ -118,172 +213,125 @@ export function GrowthSidebar() {
     })
   }
 
-
-  if (!mounted) {
-    return <aside className="fixed left-0 top-0 bottom-0 w-56 bg-gray-950 z-40" />
+  function toggleFounderMode() {
+    setFounderMode(prev => {
+      const next = !prev
+      localStorage.setItem(FOUNDER_MODE_KEY, String(next))
+      return next
+    })
   }
 
-  // Filter to only permitted modules; hide inaccessible ones entirely
-  const visiblePrimary  = loading ? [] : PRIMARY_MODULES.filter(m => permissions.includes(m.permission))
-  const visibleAdvanced = loading ? [] : ADVANCED_MODULES.filter(m => permissions.includes(m.permission))
-
-  const w = collapsed ? "w-14" : "w-56"
-
-  function NavLink({ href, label, icon: Icon, badge, sub }: Module) {
-    if (collapsed && sub) return null
-    const active = sub
-      ? pathname === href
-      : pathname === href || (
-          pathname.startsWith(href + "/") &&
-          href !== "/admin/growth/seo" &&
-          href !== "/admin/growth/analytics" &&
-          href !== "/admin/growth/ads"
-        )
-    return (
-      <Link
-        href={href}
-        title={collapsed ? label : undefined}
-        className={`flex items-center rounded-lg text-xs font-medium transition-all group ${
-          collapsed ? "p-2 justify-center"
-          : sub     ? "px-2 py-1.5 ml-3 gap-2.5"
-                    : "px-3 py-2 gap-2.5"
-        } ${
-          active
-            ? "bg-brand-600/15 text-brand-400 border border-brand-600/25"
-            : "text-gray-400 hover:text-white hover:bg-gray-800"
-        }`}
-      >
-        <Icon size={collapsed ? 16 : sub ? 12 : 14}
-          className={active ? "text-brand-400" : "text-gray-500 group-hover:text-gray-300"} />
-        {!collapsed && (
-          <>
-            <span className="flex-1 leading-tight truncate">{label}</span>
-            {href === "/admin/growth/seo/setup" && gscConfigured !== null && (
-              <span
-                className={`w-1.5 h-1.5 rounded-full shrink-0 ${gscConfigured ? "bg-green-500" : "bg-red-400"}`}
-                title={gscConfigured ? "Connected" : "Not connected"}
-              />
-            )}
-            {badge && (
-              <span className="text-[9px] bg-brand-600 text-white px-1.5 py-0.5 rounded-full font-bold">{badge}</span>
-            )}
-          </>
-        )}
-      </Link>
-    )
+  function toggleSection(id: SectionId) {
+    if (id === "founder") return // FOUNDER section never collapses
+    setSectionsOpen(prev => {
+      const next = { ...prev, [id]: !prev[id] }
+      localStorage.setItem(SECTIONS_KEY, JSON.stringify(next))
+      return next
+    })
   }
+
+  // Filter modules by permission and Founder Mode
+  const visibleModules = mounted && !loading
+    ? NAV_MODULES.filter(m => {
+        if (founderMode && SECTION_META[m.section].founderOnly) return false
+        if (!permissions.includes(m.permission)) return false
+        return true
+      })
+    : []
+
+  // Group by section
+  const bySection = SECTION_ORDER.reduce((acc, id) => {
+    acc[id] = visibleModules.filter(m => m.section === id)
+    return acc
+  }, {} as Record<SectionId, NavModule[]>)
 
   return (
-    <aside className={`fixed left-0 top-0 bottom-0 ${w} bg-gray-950 border-r border-gray-800 flex flex-col z-40 overflow-y-auto overflow-x-hidden transition-[width] duration-200`}>
+    <aside
+      style={{ width: "var(--sidebar-w, 224px)" }}
+      className="fixed top-0 left-0 h-screen bg-gray-950 border-r border-gray-800 flex flex-col z-30 transition-all duration-200 overflow-hidden"
+    >
       {/* Header */}
-      <div className={`border-b border-gray-800 flex items-center gap-2 ${collapsed ? "px-3 py-4 justify-center" : "px-4 py-5"}`}>
-        <div className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center flex-shrink-0">
-          <Zap size={14} className="text-white" />
-        </div>
+      <div className={`flex items-center border-b border-gray-800 h-12 flex-shrink-0 ${collapsed ? "justify-center px-2" : "justify-between px-3"}`}>
         {!collapsed && (
-          <div>
-            <span className="text-white font-bold text-sm tracking-wide">Growth OS</span>
-            <p className="text-gray-500 text-xs">100X Circle</p>
+          <div className="flex items-center gap-2 min-w-0">
+            <Flame size={15} className="text-orange-400 flex-shrink-0" />
+            <span className="text-xs font-bold text-gray-200 truncate">Growth OS</span>
+            {founderMode && (
+              <span className="ml-1 text-[9px] px-1.5 py-0.5 bg-violet-900 text-violet-300 rounded font-bold flex-shrink-0">
+                FOCUS
+              </span>
+            )}
           </div>
         )}
+        <button onClick={toggleSidebar} className="text-gray-600 hover:text-gray-300 flex-shrink-0 p-1 rounded hover:bg-gray-800">
+          {collapsed ? <PanelLeftOpen size={14} /> : <PanelLeftClose size={14} />}
+        </button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-2 py-3 space-y-0.5">
-        {loading ? (
-          <div className="space-y-1 px-1">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-8 bg-gray-800/50 rounded-lg animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <>
-            {/* Primary modules */}
-            {visiblePrimary.map(m => <NavLink key={m.href} {...m} />)}
-
-            {/* Advanced Tools toggle */}
-            {!collapsed && visibleAdvanced.length > 0 && (
-              <div className="pt-2">
-                <button
-                  onClick={() => {
-                    const next = !advancedOpen
-                    setAdvancedOpen(next)
-                    localStorage.setItem(ADVANCED_KEY, String(next))
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-gray-600 hover:text-gray-400 transition-colors"
-                >
-                  <Settings2 size={11} className="text-gray-600" />
-                  <span className="flex-1 text-left">Advanced Tools</span>
-                  {advancedOpen
-                    ? <span className="text-[10px] text-gray-600">▲</span>
-                    : <span className="text-[10px] text-gray-600">▼</span>
-                  }
-                </button>
-                {advancedOpen && (
-                  <div className="mt-0.5 border-l border-gray-800 ml-3 pl-1 space-y-0.5">
-                    {visibleAdvanced.map(m => <NavLink key={m.href} {...m} />)}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Collapsed: show advanced icons without label */}
-            {collapsed && visibleAdvanced.map(m => {
-              if (m.sub) return null
-              return <NavLink key={m.href} {...m} />
-            })}
-          </>
-        )}
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0">
+        {SECTION_ORDER.map(sectionId => {
+          const modules = bySection[sectionId] || []
+          if (modules.length === 0) return null
+          return (
+            <SectionBlock
+              key={sectionId}
+              sectionId={sectionId}
+              modules={modules}
+              collapsed={collapsed}
+              pathname={pathname}
+              sectionOpen={sectionsOpen[sectionId]}
+              onToggle={() => toggleSection(sectionId)}
+            />
+          )
+        })}
       </nav>
 
-      {/* Footer: user chip + collapse + back + logout */}
-      <div className="px-2 py-3 border-t border-gray-800 space-y-1">
-        {/* User chip */}
-        {!collapsed && !loading && user && (
-          <a href="/admin/growth/security/sessions"
-            className="flex items-center gap-2.5 px-3 py-2 mb-1 rounded-lg bg-gray-900 hover:bg-gray-800 transition-colors group">
-            <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
-              <span className="text-[10px] font-bold text-white">
-                {user.name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2)}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-medium truncate">{user.name}</p>
-              <p className="text-gray-500 text-[10px] truncate capitalize">{user.role.replace(/_/g, " ")}</p>
-            </div>
-            <ShieldCheck size={11} className="text-gray-600 group-hover:text-brand-400 transition-colors flex-shrink-0" />
-          </a>
-        )}
+      {/* Footer */}
+      <div className="flex-shrink-0 border-t border-gray-800 p-2 space-y-1">
 
-        <button
-          onClick={toggle}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className={`w-full flex items-center rounded-lg text-xs text-gray-500 hover:text-white hover:bg-gray-800 transition-colors ${
-            collapsed ? "p-2 justify-center" : "px-3 py-2 gap-2"
-          }`}
-        >
-          {collapsed ? <PanelLeftOpen size={14} /> : <><PanelLeftClose size={13} /><span>Collapse</span></>}
-        </button>
-
+        {/* Founder Mode toggle */}
         {!collapsed && (
-          <Link
-            href="/admin"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500 hover:text-white hover:bg-gray-800 transition-colors"
+          <button
+            onClick={toggleFounderMode}
+            className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
+              founderMode
+                ? "bg-violet-900/60 text-violet-300 hover:bg-violet-900"
+                : "text-gray-500 hover:bg-gray-800 hover:text-gray-300"
+            }`}
           >
-            <ArrowLeft size={13} />Back to Admin
-          </Link>
+            <Zap size={12} className="flex-shrink-0" />
+            {founderMode ? "Exit Founder Mode" : "Founder Mode"}
+          </button>
         )}
 
-        <button
-          onClick={performAdminLogout}
-          title="Sign out"
-          className={`w-full flex items-center rounded-lg text-xs text-red-500 hover:text-red-400 hover:bg-red-950/30 transition-colors ${
-            collapsed ? "p-2 justify-center" : "px-3 py-2 gap-2"
-          }`}
-        >
-          <LogOut size={13} />
-          {!collapsed && <span>Sign Out</span>}
-        </button>
+        {collapsed && (
+          <button
+            onClick={toggleFounderMode}
+            title={founderMode ? "Exit Founder Mode" : "Founder Mode"}
+            className={`w-full flex justify-center py-2 rounded-md transition-colors ${
+              founderMode ? "text-violet-400 bg-violet-900/40" : "text-gray-600 hover:text-gray-300 hover:bg-gray-800"
+            }`}
+          >
+            <Zap size={14} />
+          </button>
+        )}
+
+        {/* User / Logout */}
+        {!loading && user && (
+          <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2 px-2"}`}>
+            {!collapsed && (
+              <span className="flex-1 text-[11px] text-gray-600 truncate">{user.email?.split("@")[0]}</span>
+            )}
+            <button
+              onClick={() => performAdminLogout()}
+              title="Sign out"
+              className="text-gray-700 hover:text-gray-400 p-1 rounded hover:bg-gray-800 flex-shrink-0"
+            >
+              <LogOut size={13} />
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   )
