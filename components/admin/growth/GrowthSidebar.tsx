@@ -10,7 +10,7 @@ import {
   Layout, Wand2, Link2, FlaskConical, Activity,
   Globe, Flame, ClipboardCheck, ChevronDown, ChevronRight,
   Building2, Inbox, Key, Brain, Factory, DollarSign,
-  RotateCcw, Calendar, Rocket, Database,
+  RotateCcw, Calendar, Rocket, Database, Target,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -46,6 +46,7 @@ const SECTION_ORDER: SectionId[] = ["founder", "marketing", "market_intel", "crm
 const NAV_MODULES: NavModule[] = [
   // ── FOUNDER ──────────────────────────────────────────────────────────────
   { section: "founder", href: "/admin/growth/director",   label: "Revenue Director",    icon: TrendingUp,      permission: "dashboard.view",  badge: "AI" },
+  { section: "founder", href: "/admin/growth/execution",  label: "Execution Hub",       icon: Zap,             permission: "dashboard.view",  badge: "NEW" },
   { section: "founder", href: "/admin/growth/dashboard",  label: "Executive Dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
   { section: "founder", href: "/admin/growth/operations", label: "Operations Center",   icon: Activity,        permission: "dashboard.view" },
   { section: "founder", href: "/admin/growth/reports",    label: "Reporting Center",    icon: BarChart2,       permission: "reports.view" },
@@ -54,9 +55,11 @@ const NAV_MODULES: NavModule[] = [
   { section: "marketing", href: "/admin/growth/ads",                   label: "Ads",                 icon: Megaphone,      permission: "ads.view" },
   { section: "marketing", href: "/admin/growth/ads/director",          label: "↳ Approvals",         icon: ClipboardCheck, permission: "ads.view", sub: true },
   { section: "marketing", href: "/admin/growth/ads/creative-director", label: "↳ Creative Director", icon: Wand2,          permission: "ads.view", sub: true },
+  { section: "marketing", href: "/admin/growth/ads/workflow",          label: "↳ Ads Workflow",      icon: FileText,       permission: "ads.view", sub: true },
   { section: "marketing", href: "/admin/growth/ads/setup",             label: "↳ Setup",             icon: Plug,           permission: "ads.view", sub: true },
   { section: "marketing", href: "/admin/growth/seo",                   label: "SEO",                 icon: Search,         permission: "seo.view" },
   { section: "marketing", href: "/admin/growth/seo/setup",             label: "↳ Search Console",    icon: Globe,          permission: "seo.view", sub: true },
+  { section: "marketing", href: "/admin/growth/seo/workflow",          label: "↳ SEO Workflow",      icon: FileText,       permission: "seo.view", sub: true },
   { section: "marketing", href: "/admin/growth/seo/offpage",           label: "↳ Off-Page SEO",      icon: Link2,          permission: "seo.view", sub: true },
   { section: "marketing", href: "/admin/growth/seo/offpage/validate",  label: "↳ Validation",        icon: FlaskConical,   permission: "seo.view", sub: true },
   { section: "marketing", href: "/admin/growth/content",               label: "Content",             icon: FileText,       permission: "content.view" },
@@ -70,8 +73,10 @@ const NAV_MODULES: NavModule[] = [
   { section: "market_intel", href: "/admin/growth/geo",         label: "GEO / AI Search",      icon: Bot,         permission: "geo.view" },
 
   // ── CRM ──────────────────────────────────────────────────────────────────
-  { section: "crm", href: "/admin/growth/contact-this-week", label: "Leads",         icon: Inbox,       permission: "dealer.view" },
-  { section: "crm", href: "/admin/growth/opportunities",     label: "Opportunities", icon: TrendingUp,  permission: "opportunities.view" },
+  { section: "crm", href: "/admin/growth/crm/dealers",       label: "Dealer Pipeline",      icon: Users,       permission: "dealer.view",         badge: "NEW" },
+  { section: "crm", href: "/admin/growth/crm/opportunities", label: "Opportunity Pipeline", icon: Target,      permission: "opportunities.view",  badge: "NEW" },
+  { section: "crm", href: "/admin/growth/contact-this-week", label: "Leads",                icon: Inbox,       permission: "dealer.view" },
+  { section: "crm", href: "/admin/growth/opportunities",     label: "Opportunities (Old)",  icon: TrendingUp,  permission: "opportunities.view" },
 
   // ── ADMINISTRATION ───────────────────────────────────────────────────────
   { section: "admin", href: "/admin/growth/users",       label: "Users",       icon: UserCog,    permission: "users.view" },
