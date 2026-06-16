@@ -31,6 +31,7 @@ interface ModelOption { value: string; label: string }
 interface Contract {
   gemc_no: string; contract_date: string | null
   buyer_display_name: string; buyer_state: string | null; buyer_canonical: string
+  organization_name?: string; organization_canonical?: string | null
   model_raw: string | null; model_normalized: string | null
   quantity: number | null; unit_price: number | null; contract_value_num: number | null
   seller_name: string | null; seller_gst: string | null
@@ -60,7 +61,17 @@ function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () 
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div><div className="text-xs text-gray-400 mb-0.5">Date</div><div className="font-medium">{fmt(contract.contract_date)}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">Value</div><div className="font-semibold text-blue-700">{INR(contract.contract_value_num, true)}</div></div>
-          <div><div className="text-xs text-gray-400 mb-0.5">Buyer</div><div className="font-medium leading-tight">{contract.buyer_display_name}</div></div>
+          <div>
+            <div className="text-xs text-gray-400 mb-0.5">Organization</div>
+            {contract.organization_canonical ? (
+              <a href={`/admin/growth/fogging/organizations/${encodeURIComponent(contract.organization_canonical)}`}
+                className="font-medium leading-tight text-indigo-700 hover:underline">
+                {contract.organization_name ?? contract.buyer_display_name}
+              </a>
+            ) : (
+              <div className="font-medium leading-tight">{contract.buyer_display_name}</div>
+            )}
+          </div>
           <div><div className="text-xs text-gray-400 mb-0.5">State / Type</div><div>{contract.buyer_state ?? "—"} · {contract.org_type ?? "—"}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">Model</div><div className="font-medium">{contract.model_raw ?? "—"}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">Quantity</div><div className="font-medium">{contract.quantity ?? "—"}</div></div>
@@ -320,7 +331,7 @@ export default function OemPage() {
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr className="text-xs text-gray-500 uppercase tracking-wide">
                       <th className="px-4 py-3 text-left">Date</th>
-                      <th className="px-4 py-3 text-left">Buyer</th>
+                      <th className="px-4 py-3 text-left">Organization</th>
                       <th className="px-3 py-3 text-left">State</th>
                       <th className="px-4 py-3 text-left">Model</th>
                       <th className="px-3 py-3 text-right">Qty</th>
@@ -336,8 +347,15 @@ export default function OemPage() {
                         className="hover:bg-gray-50 cursor-pointer transition-colors"
                         onClick={() => setSelected(c)}>
                         <td className="px-4 py-2.5 text-xs text-gray-500 whitespace-nowrap">{fmt(c.contract_date)}</td>
-                        <td className="px-4 py-2.5 max-w-xs">
-                          <div className="font-medium text-gray-900 truncate text-xs leading-tight">{c.buyer_display_name}</div>
+                        <td className="px-4 py-2.5 max-w-xs" onClick={e => e.stopPropagation()}>
+                          {c.organization_canonical ? (
+                            <a href={`/admin/growth/fogging/organizations/${encodeURIComponent(c.organization_canonical)}`}
+                              className="font-medium text-indigo-700 hover:underline truncate block text-xs leading-tight">
+                              {c.organization_name ?? c.buyer_display_name}
+                            </a>
+                          ) : (
+                            <div className="font-medium text-gray-900 truncate text-xs leading-tight">{c.buyer_display_name}</div>
+                          )}
                         </td>
                         <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">{c.buyer_state ?? "—"}</td>
                         <td className="px-4 py-2.5 text-xs text-gray-700 max-w-48">

@@ -181,6 +181,7 @@ const ATTACK_OEMS = ["NEPTUNE","SSE SAI SHREE ENTERPRISES","PULSFOG","INSTA FOG"
 
 interface AttackRow {
   buyer_canonical: string; buyer_display_name: string; buyer_state: string
+  organization_name?: string; organization_canonical?: string | null
   dept_category: string; total_gmv: number; non_100x_gmv: number; has_100x: boolean
   contract_count: number; primary_incumbent: string
   incumbent_seller_gst: string | null; incumbent_seller_name: string | null
@@ -263,8 +264,8 @@ function AttackAccountsBoard() {
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase tracking-wide">
               <th className="px-3 py-2 text-left font-semibold w-8">#</th>
-              <th className="px-3 py-2 text-left font-semibold">Buyer</th>
-              <th className="px-3 py-2 text-left font-semibold">Dept</th>
+              <th className="px-3 py-2 text-left font-semibold">Organization</th>
+              <th className="px-3 py-2 text-left font-semibold">Category</th>
               <th className="px-3 py-2 text-right font-semibold">GMV</th>
               <th className="px-3 py-2 text-left font-semibold">Incumbent OEM</th>
               <th className="px-3 py-2 text-left font-semibold">Incumbent Seller</th>
@@ -285,11 +286,17 @@ function AttackAccountsBoard() {
                 : "bg-white hover:bg-gray-50"
               return (
                 <tr key={r.buyer_canonical} className={`${rowCls} cursor-pointer transition-colors`}
-                  onClick={() => router.push(`/admin/growth/fogging/buyer/${encodeURIComponent(r.buyer_canonical)}`)}>
+                  onClick={() => router.push(
+                    r.organization_canonical
+                      ? `/admin/growth/fogging/organizations/${encodeURIComponent(r.organization_canonical)}`
+                      : `/admin/growth/fogging/buyer/${encodeURIComponent(r.buyer_canonical)}`
+                  )}>
                   <td className="px-3 py-2.5 text-gray-400">{r.rank}</td>
                   <td className="px-3 py-2.5">
-                    <div className="font-medium text-gray-900 max-w-[220px] truncate">{r.buyer_display_name}</div>
-                    <div className="text-gray-400">{r.buyer_state}</div>
+                    <div className="font-medium text-indigo-900 max-w-[220px] truncate">
+                      {r.organization_name ?? r.buyer_display_name}
+                    </div>
+                    <div className="text-gray-400 text-[10px]">{r.buyer_state}</div>
                   </td>
                   <td className="px-3 py-2.5 text-gray-500 max-w-[130px] truncate">{r.dept_category || "—"}</td>
                   <td className="px-3 py-2.5 text-right font-mono text-gray-700">{INR(r.total_gmv)}</td>

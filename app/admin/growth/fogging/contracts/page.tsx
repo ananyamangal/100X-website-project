@@ -20,6 +20,8 @@ interface Contract {
   contract_date: string | null
   buyer_display_name: string
   buyer_canonical: string
+  organization_name?: string
+  organization_canonical?: string | null
   buyer_state: string | null
   oem_canonical: string
   oem_short_brand: string | null
@@ -205,7 +207,7 @@ export default function ContractDirectory() {
                   <tr>
                     <th className="px-3 py-2 text-left font-semibold">GEMC#</th>
                     <th className="px-3 py-2 text-left font-semibold">Date</th>
-                    <th className="px-3 py-2 text-left font-semibold">Buyer</th>
+                    <th className="px-3 py-2 text-left font-semibold">Organization</th>
                     <th className="px-3 py-2 text-left font-semibold">St</th>
                     <th className="px-3 py-2 text-left font-semibold">OEM</th>
                     <th className="px-3 py-2 text-left font-semibold">Model</th>
@@ -229,8 +231,17 @@ export default function ContractDirectory() {
                         {r.contract_date ? new Date(r.contract_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : "—"}
                       </td>
                       <td className="px-3 py-2 max-w-[160px]">
-                        <Link href={`/admin/growth/fogging/buyer/${encodeURIComponent(r.buyer_canonical)}`}
-                          className="font-medium text-blue-700 hover:underline block truncate">{r.buyer_display_name}</Link>
+                        {r.organization_canonical ? (
+                          <Link href={`/admin/growth/fogging/organizations/${encodeURIComponent(r.organization_canonical)}`}
+                            className="font-medium text-indigo-700 hover:underline block truncate">
+                            {r.organization_name ?? r.buyer_display_name}
+                          </Link>
+                        ) : (
+                          <Link href={`/admin/growth/fogging/buyer/${encodeURIComponent(r.buyer_canonical)}`}
+                            className="font-medium text-blue-700 hover:underline block truncate">
+                            {r.buyer_display_name}
+                          </Link>
+                        )}
                       </td>
                       <td className="px-3 py-2 text-gray-500">{r.buyer_state?.slice(0, 3) ?? "—"}</td>
                       <td className="px-3 py-2">

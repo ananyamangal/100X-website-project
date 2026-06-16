@@ -24,21 +24,23 @@ export async function GET(req: NextRequest) {
     const pattern = re(q);
 
     const [buyers, sellers, oems, models, contracts] = await Promise.all([
-      // Buyers: search display name, org_type, ministry, state
-      db.collection('fogging_buyers').find({
+      // Organizations: primary entity — search name, canonical, state, type
+      db.collection('fogging_organizations').find({
         $or: [
-          { buyer_display_name: pattern },
-          { ministry:           pattern },
-          { buyer_state:        pattern },
-          { buyer_canonical:    pattern },
+          { organization_name:      pattern },
+          { organization_canonical: pattern },
+          { organization_state:     pattern },
+          { organization_type:      pattern },
+          { dept_category:          pattern },
+          { buyer_display_names:    pattern },
         ],
       }, {
         projection: {
-          buyer_canonical: 1, buyer_display_name: 1,
-          buyer_state: 1, org_type: 1, ministry: 1,
-          total_gmv: 1, opportunity_tier: 1,
+          organization_canonical: 1, organization_name: 1,
+          organization_state: 1, dept_category: 1, organization_type: 1,
+          total_gmv: 1, is_100x_buyer: 1, incumbent_oem_brand: 1,
         },
-      }).sort({ opportunity_score: -1 }).limit(LIMIT).toArray(),
+      }).sort({ total_gmv: -1 }).limit(LIMIT).toArray(),
 
       // Sellers: search display name, GST, canonical, state
       db.collection('fogging_sellers').find({
@@ -111,13 +113,13 @@ export async function GET(req: NextRequest) {
 
     const results = {
       buyers: buyers.map(b => ({
-        type:    'buyer' as const,
-        id:      b.buyer_canonical,
-        label:   b.buyer_display_name,
-        sub:     [b.buyer_state, b.org_type, b.ministry].filter(Boolean).join(' · '),
+        type:    'organization' as const,
+        id:      b.organization_canonical,
+        label:   b.organization_name,
+        sub:     [b.organization_state, b.dept_category, b.incumbent_oem_brand ? `Incumbent: ${b.incumbent_oem_brand}` : null].filter(Boolean).join(' · '),
         gmv:     INR(b.total_gmv),
-        badge:   b.opportunity_tier,
-        href:    `/admin/growth/fogging/buyer/${encodeURIComponent(b.buyer_canonical)}`,
+        badge:   b.is_100x_buyer ? '100X' : null,
+        href:    `/admin/growth/fogging/organizations/${encodeURIComponent(b.organization_canonical)}`,
       })),
       sellers: sellers.map(s => ({
         type:    'seller' as const,

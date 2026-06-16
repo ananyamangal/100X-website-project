@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { Filter, Document } from 'mongodb';
+import { enrichWithOrg } from '@/lib/fogging-org-lookup';
 
 const DB   = '100xDB';
 const COLL = 'fogging_buyers';
@@ -67,11 +68,12 @@ export async function GET(req: NextRequest) {
       coll.countDocuments(filter),
     ]);
 
-    const data = docs.map((d, i) => ({
+    const ranked = docs.map((d, i) => ({
       ...d,
       rank: skip + i + 1,
       contract_count: d.total_contracts ?? d.contract_count ?? 0,
     }));
+    const data = await enrichWithOrg(client.db(DB), ranked);
 
     return NextResponse.json(
       { data, total, page, page_size: size, pages: Math.ceil(total / size) },

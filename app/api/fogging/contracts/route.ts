@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { Document, Filter } from 'mongodb';
+import { enrichWithOrg } from '@/lib/fogging-org-lookup';
 
 const DB   = '100xDB';
 const COLL = 'fogging_contracts';
@@ -35,7 +36,13 @@ function buildMatch(p: Record<string, string>): Filter<Document> {
       { model_raw:          re },
       { seller_name:        re },
       { oem_short_brand:    re },
+      { ministry:           re },
     ];
+  }
+
+  // Support filtering by organization (resolves to buyer_canonical set via org API)
+  if (p.organization_canonical) {
+    m._organization_canonical_filter = p.organization_canonical; // sentinel — handled below
   }
 
   if (p.date_from || p.date_to) {
@@ -85,13 +92,30 @@ export async function GET(req: NextRequest) {
     const match  = buildMatch(p);
     const sort   = sortSpec(p.sort);
 
+    // Resolve organization_canonical → buyer_canonical $in filter
+    if (match._organization_canonical_filter) {
+      const orgCanonical = match._organization_canonical_filter as string;
+      delete match._organization_canonical_filter;
+      const org = await client.db(DB).collection('fogging_organizations')
+        .findOne({ organization_canonical: orgCanonical }, { projection: { buyer_canonicals: 1 } });
+      if (org?.buyer_canonicals?.length) {
+        match.buyer_canonical = { $in: org.buyer_canonicals };
+      } else {
+        return NextResponse.json({ data: [], total: 0, page, page_size: pageSize, pages: 0, summary: { total_gmv: 0, priced_count: 0, avg_unit_price: null, min_unit_price: null, max_unit_price: null, total_qty: 0 } });
+      }
+    } else {
+      delete match._organization_canonical_filter;
+    }
+
     // CSV export — return all matching rows up to 5,000 as a download
     if (p.export === 'csv') {
-      const rows = await coll.find(match).sort(sort).limit(5000).toArray();
-      const headers = ['GEMC#','Date','Buyer','State','Org','Ministry','OEM','Model (raw)','Value (₹)','Qty','Unit ₹','Seller','GST','Mode','Status'];
+      const rawRows = await coll.find(match).sort(sort).limit(5000).toArray();
+      const rows = await enrichWithOrg(client.db(DB), rawRows) as typeof rawRows;
+      const headers = ['GEMC#','Date','Organization','Buyer (Dept)','State','Org Type','Ministry','OEM','Model (raw)','Value (₹)','Qty','Unit ₹','Seller','GST','Mode','Status'];
       const csvRows = rows.map(d => [
         d.gemc_no,
         d.contract_date ? new Date(d.contract_date).toISOString().slice(0,10) : '',
+        (d as Record<string,unknown>).organization_name ?? d.buyer_display_name,
         d.buyer_display_name,
         d.buyer_state ?? '',
         d.org_type ?? '',
@@ -116,7 +140,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const [docs, total, summaryArr] = await Promise.all([
+    const [rawDocs, total, summaryArr] = await Promise.all([
       coll.find(match).sort(sort).skip(skip).limit(pageSize).toArray(),
       coll.countDocuments(match),
       coll.aggregate([
@@ -133,6 +157,7 @@ export async function GET(req: NextRequest) {
       ]).toArray(),
     ]);
 
+    const docs = await enrichWithOrg(client.db(DB), rawDocs);
     const s = summaryArr[0] ?? {};
 
     return NextResponse.json({
