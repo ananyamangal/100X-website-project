@@ -335,6 +335,183 @@ function LifecycleTimeline({ rec }: { rec: Rec }) {
   )
 }
 
+// ─── Execution Path Panel ─────────────────────────────────────────────────────
+
+function ExecutionPathPanel({ rec }: { rec: Rec }) {
+  const steps: Array<{
+    step: number
+    label: string
+    status: "done" | "active" | "generating" | "pending" | "skipped"
+    content: React.ReactNode
+  }> = [
+    {
+      step: 1,
+      label: "Intelligence Signal",
+      status: "done",
+      content: (
+        <div className="text-xs text-gray-600 space-y-1">
+          <div className="flex flex-wrap items-center gap-1">
+            <span className="font-medium text-gray-700">Sources:</span>
+            {rec.sources.map(s => (
+              <span key={s} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded text-[11px]">{s}</span>
+            ))}
+          </div>
+          <p className="text-gray-500 text-[11px]">{rec.evidence}</p>
+        </div>
+      ),
+    },
+    {
+      step: 2,
+      label: "Recommendation Generated",
+      status: "done",
+      content: (
+        <div className="text-xs text-gray-600 space-y-0.5">
+          <p><span className="font-medium">Type:</span> {TYPE_LABEL[rec.type]}</p>
+          <p><span className="font-medium">Est. impact:</span> {INR(rec.expected_revenue_impact)}</p>
+          <p><span className="font-medium">Confidence:</span> {rec.confidence}%</p>
+          <p className="text-gray-400 text-[11px]">Generated {fmtDate(rec.generated_at)} at {fmtTime(rec.generated_at)}</p>
+        </div>
+      ),
+    },
+    {
+      step: 3,
+      label: "Founder Decision",
+      status: rec.status !== "pending" ? "done" : "pending",
+      content: rec.status !== "pending" ? (
+        <div className="text-xs text-gray-600 space-y-0.5">
+          <p>
+            <span className={`font-medium ${
+              ["approved","in_progress","applied","completed","won"].includes(rec.status) ? "text-green-700" :
+              rec.status === "rejected" ? "text-red-700" : "text-gray-700"
+            }`}>
+              {STATUS_DISPLAY[rec.status]?.label ?? rec.status}
+            </span>
+            {rec.reviewed_at && (
+              <span className="text-gray-400 ml-1.5 text-[11px]">on {fmtDate(rec.reviewed_at)}</span>
+            )}
+          </p>
+          {rec.rejection_reason && (
+            <p className="text-red-600 text-[11px]">Reason: {rec.rejection_reason}</p>
+          )}
+        </div>
+      ) : (
+        <p className="text-xs text-gray-400 italic">Awaiting founder review</p>
+      ),
+    },
+    {
+      step: 4,
+      label: "Execution Pack",
+      status: rec.execution_pack_id
+        ? "done"
+        : ["approved","in_progress","applied","completed","won"].includes(rec.status)
+          ? "generating"
+          : "skipped",
+      content: rec.execution_pack_id ? (
+        <p className="text-xs text-green-700">Pack generated. Expand "View Execution Pack" above to see outreach emails, call scripts, and briefs.</p>
+      ) : ["approved","in_progress","applied","completed","won"].includes(rec.status) ? (
+        <p className="text-xs text-yellow-600 italic">Generating execution artifacts…</p>
+      ) : (
+        <p className="text-xs text-gray-400 italic">No pack — recommendation was not approved.</p>
+      ),
+    },
+    {
+      step: 5,
+      label: "Execution",
+      status: ["in_progress","applied","completed","won","lost"].includes(rec.status) ? "done"
+        : rec.status === "approved" ? "active"
+        : "pending",
+      content: (
+        <div className="text-xs text-gray-600 space-y-0.5">
+          {rec.owner && <p><span className="font-medium">Owner:</span> {rec.owner}</p>}
+          {rec.target_completion_date && (
+            <p><span className="font-medium">Target:</span> {rec.target_completion_date}</p>
+          )}
+          {rec.in_progress_at && (
+            <p className="text-gray-400 text-[11px]">Started {fmtDate(rec.in_progress_at)}</p>
+          )}
+          {!rec.owner && !rec.in_progress_at && (
+            <p className="text-gray-400 italic">Not yet started</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      step: 6,
+      label: "Outcome",
+      status: ["won","lost"].includes(rec.status) ? "done"
+        : rec.status === "completed" ? "active"
+        : "pending",
+      content: (
+        <div className="text-xs text-gray-600 space-y-0.5">
+          {rec.status === "won" && (
+            <>
+              <p className="text-emerald-700 font-medium">Won on {fmtDate(rec.won_at)}</p>
+              <p>
+                <span className="font-medium">Revenue captured:</span>{" "}
+                <span className="text-emerald-700 font-semibold">{INR(rec.realized_impact || 0)}</span>
+                {rec.expected_revenue_impact > 0 && rec.realized_impact ? (
+                  <span className="text-gray-400 ml-1.5 text-[11px]">
+                    ({Math.round((rec.realized_impact / rec.expected_revenue_impact) * 100)}% of {INR(rec.expected_revenue_impact)} estimate)
+                  </span>
+                ) : null}
+              </p>
+              {rec.outcome_notes && <p className="text-gray-500 text-[11px]">{rec.outcome_notes}</p>}
+            </>
+          )}
+          {rec.status === "lost" && (
+            <>
+              <p className="text-red-600 font-medium">Lost on {fmtDate(rec.lost_at)}</p>
+              {rec.outcome_notes && <p className="text-gray-500 text-[11px]">{rec.outcome_notes}</p>}
+            </>
+          )}
+          {rec.status === "completed" && (
+            <p className="text-indigo-700 italic">Completed — awaiting final outcome (Won / Lost)</p>
+          )}
+          {!["won","lost","completed"].includes(rec.status) && (
+            <p className="text-gray-400 italic">No outcome recorded yet</p>
+          )}
+        </div>
+      ),
+    },
+  ]
+
+  return (
+    <div className="space-y-0">
+      {steps.map((step, i) => (
+        <div key={step.step} className="flex gap-3">
+          <div className="flex flex-col items-center">
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${
+              step.status === "done"       ? "bg-gray-800 text-white" :
+              step.status === "active"     ? "bg-blue-600 text-white" :
+              step.status === "generating" ? "bg-yellow-400 text-yellow-900" :
+              "bg-gray-100 text-gray-400 border border-gray-200"
+            }`}>
+              {step.step}
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`w-px flex-1 min-h-[16px] my-1 ${step.status === "done" ? "bg-gray-300" : "bg-gray-100"}`} />
+            )}
+          </div>
+          <div className="flex-1 pb-3">
+            <p className={`text-xs font-semibold mb-1 ${
+              step.status === "done"       ? "text-gray-800" :
+              step.status === "active"     ? "text-blue-700" :
+              step.status === "generating" ? "text-yellow-700" :
+              "text-gray-400"
+            }`}>
+              {step.label}
+              {step.status === "generating" && (
+                <span className="ml-1.5 text-[10px] font-normal text-yellow-600">generating…</span>
+              )}
+            </p>
+            {step.content}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ─── Rec Card ─────────────────────────────────────────────────────────────────
 
 function RecCard({
@@ -348,6 +525,7 @@ function RecCard({
   const [rejectReason, setRejectReason] = useState("")
   const [showHelp, setShowHelp]         = useState(false)
   const [showPack, setShowPack]         = useState(false)
+  const [showPath, setShowPath]         = useState(false)
   const [showOwner, setShowOwner]       = useState(false)
   const [owner, setOwner]               = useState(rec.owner || "")
   const [targetDate, setTargetDate]     = useState(rec.target_completion_date || "")
@@ -509,6 +687,25 @@ function RecCard({
           {showPack && (
             <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
               <ExecutionPackPanel recId={rec._id} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Execution path */}
+      {rec.status !== "pending" && (
+        <div className="border-t border-gray-100">
+          <button
+            onClick={() => setShowPath(p => !p)}
+            className="w-full flex items-center gap-1.5 px-4 py-2 text-xs text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+          >
+            <ChevronRight size={12} />
+            {showPath ? "Hide Execution Path" : "Show Execution Path"}
+            {showPath ? <ChevronUp size={11} className="ml-auto" /> : <ChevronDown size={11} className="ml-auto" />}
+          </button>
+          {showPath && (
+            <div className="px-4 py-4 border-t border-gray-100">
+              <ExecutionPathPanel rec={rec} />
             </div>
           )}
         </div>

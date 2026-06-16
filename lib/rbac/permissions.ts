@@ -304,7 +304,17 @@ export const MODULE_PERMISSIONS: Record<string, string> = {
   "/admin/growth/users":               "users.view",
   "/admin/growth/logs":                "logs.view",
   "/admin/growth/permissions":         "permissions.view",
-  // Legacy paths (still accessible, just removed from nav)
+  // CRM
+  "/admin/growth/contact-this-week":   "dealer.view",
+  // Advanced Tools (all previously hidden, now surfaced)
+  "/admin/growth/market-intelligence": "dashboard.view",
+  "/admin/growth/launch":              "dashboard.view",
+  "/admin/growth/agents/health-check": "dashboard.view",
+  "/admin/growth/platform-registry":   "dashboard.view",
+  "/admin/growth/ads/campaign-factory": "ads.view",
+  "/admin/growth/ads/revenue":          "ads.view",
+  "/admin/growth/ads/remarketing-readiness": "ads.view",
+  // Legacy paths (still accessible, just removed from primary nav)
   "/admin/growth/competitors":         "competitors.view",
   "/admin/growth/opportunities":       "opportunities.view",
   "/admin/growth/automation":          "automation.view",

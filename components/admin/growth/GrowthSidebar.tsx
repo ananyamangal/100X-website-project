@@ -9,6 +9,8 @@ import {
   PanelLeftClose, PanelLeftOpen, UserCog, LogOut, ShieldCheck,
   Layout, Wand2, Link2, FlaskConical, Activity,
   Globe, Flame, ClipboardCheck, ChevronDown, ChevronRight,
+  Building2, Inbox, Key, Brain, Factory, DollarSign,
+  RotateCcw, Calendar, Rocket, Database,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -16,7 +18,7 @@ import type { Permission } from "@/lib/rbac/permissions"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type SectionId = "founder" | "marketing" | "market_intel" | "system"
+type SectionId = "founder" | "marketing" | "market_intel" | "crm" | "admin" | "advanced"
 
 interface NavModule {
   section: SectionId
@@ -34,30 +36,32 @@ const SECTION_META: Record<SectionId, { label: string; founderOnly: boolean }> =
   founder:      { label: "FOUNDER",             founderOnly: false },
   marketing:    { label: "MARKETING",            founderOnly: true },
   market_intel: { label: "MARKET INTELLIGENCE",  founderOnly: true },
-  system:       { label: "SYSTEM",               founderOnly: true },
+  crm:          { label: "CRM",                  founderOnly: true },
+  admin:        { label: "ADMINISTRATION",        founderOnly: true },
+  advanced:     { label: "ADVANCED TOOLS",        founderOnly: true },
 }
 
-const SECTION_ORDER: SectionId[] = ["founder", "marketing", "market_intel", "system"]
+const SECTION_ORDER: SectionId[] = ["founder", "marketing", "market_intel", "crm", "admin", "advanced"]
 
 const NAV_MODULES: NavModule[] = [
   // ── FOUNDER ──────────────────────────────────────────────────────────────
-  { section: "founder", href: "/admin/growth/director",   label: "Revenue Director",    icon: TrendingUp,     permission: "dashboard.view",      badge: "AI" },
+  { section: "founder", href: "/admin/growth/director",   label: "Revenue Director",    icon: TrendingUp,      permission: "dashboard.view",  badge: "AI" },
   { section: "founder", href: "/admin/growth/dashboard",  label: "Executive Dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
   { section: "founder", href: "/admin/growth/operations", label: "Operations Center",   icon: Activity,        permission: "dashboard.view" },
   { section: "founder", href: "/admin/growth/reports",    label: "Reporting Center",    icon: BarChart2,       permission: "reports.view" },
 
   // ── MARKETING ────────────────────────────────────────────────────────────
-  { section: "marketing", href: "/admin/growth/ads",                   label: "Ads",                 icon: Megaphone,    permission: "ads.view" },
+  { section: "marketing", href: "/admin/growth/ads",                   label: "Ads",                 icon: Megaphone,      permission: "ads.view" },
   { section: "marketing", href: "/admin/growth/ads/director",          label: "↳ Approvals",         icon: ClipboardCheck, permission: "ads.view", sub: true },
-  { section: "marketing", href: "/admin/growth/ads/creative-director", label: "↳ Creative Director", icon: Wand2,        permission: "ads.view", sub: true },
-  { section: "marketing", href: "/admin/growth/ads/setup",             label: "↳ Setup",             icon: Plug,         permission: "ads.view", sub: true },
-  { section: "marketing", href: "/admin/growth/seo",                   label: "SEO",                 icon: Search,       permission: "seo.view" },
-  { section: "marketing", href: "/admin/growth/seo/setup",             label: "↳ Search Console",    icon: Globe,        permission: "seo.view", sub: true },
-  { section: "marketing", href: "/admin/growth/seo/offpage",           label: "↳ Off-Page SEO",      icon: Link2,        permission: "seo.view", sub: true },
-  { section: "marketing", href: "/admin/growth/seo/offpage/validate",  label: "↳ Validation",        icon: FlaskConical, permission: "seo.view", sub: true },
-  { section: "marketing", href: "/admin/growth/content",               label: "Content",             icon: FileText,     permission: "content.view" },
-  { section: "marketing", href: "/admin/growth/landing-pages",         label: "Landing Pages",       icon: Layout,       permission: "landing_pages.view" },
-  { section: "marketing", href: "/admin/growth/analytics",             label: "Analytics",           icon: BarChart2,    permission: "analytics.view" },
+  { section: "marketing", href: "/admin/growth/ads/creative-director", label: "↳ Creative Director", icon: Wand2,          permission: "ads.view", sub: true },
+  { section: "marketing", href: "/admin/growth/ads/setup",             label: "↳ Setup",             icon: Plug,           permission: "ads.view", sub: true },
+  { section: "marketing", href: "/admin/growth/seo",                   label: "SEO",                 icon: Search,         permission: "seo.view" },
+  { section: "marketing", href: "/admin/growth/seo/setup",             label: "↳ Search Console",    icon: Globe,          permission: "seo.view", sub: true },
+  { section: "marketing", href: "/admin/growth/seo/offpage",           label: "↳ Off-Page SEO",      icon: Link2,          permission: "seo.view", sub: true },
+  { section: "marketing", href: "/admin/growth/seo/offpage/validate",  label: "↳ Validation",        icon: FlaskConical,   permission: "seo.view", sub: true },
+  { section: "marketing", href: "/admin/growth/content",               label: "Content",             icon: FileText,       permission: "content.view" },
+  { section: "marketing", href: "/admin/growth/landing-pages",         label: "Landing Pages",       icon: Layout,         permission: "landing_pages.view" },
+  { section: "marketing", href: "/admin/growth/analytics",             label: "Analytics",           icon: BarChart2,      permission: "analytics.view" },
 
   // ── MARKET INTELLIGENCE ──────────────────────────────────────────────────
   { section: "market_intel", href: "/admin/growth/fogging",     label: "Fogging Intelligence", icon: Flame,       permission: "procurement.view" },
@@ -65,10 +69,28 @@ const NAV_MODULES: NavModule[] = [
   { section: "market_intel", href: "/admin/growth/procurement", label: "Procurement Intel",    icon: ShoppingBag, permission: "procurement.view" },
   { section: "market_intel", href: "/admin/growth/geo",         label: "GEO / AI Search",      icon: Bot,         permission: "geo.view" },
 
-  // ── SYSTEM ───────────────────────────────────────────────────────────────
-  { section: "system", href: "/admin/growth/security", label: "Security", icon: ShieldCheck, permission: "dashboard.view" },
-  { section: "system", href: "/admin/growth/users",    label: "Users",    icon: UserCog,     permission: "users.view" },
-  { section: "system", href: "/admin/growth/logs",     label: "Logs",     icon: ScrollText,  permission: "logs.view" },
+  // ── CRM ──────────────────────────────────────────────────────────────────
+  { section: "crm", href: "/admin/growth/contact-this-week", label: "Leads",         icon: Inbox,       permission: "dealer.view" },
+  { section: "crm", href: "/admin/growth/dealers",           label: "Dealers",       icon: Building2,   permission: "dealer.view" },
+  { section: "crm", href: "/admin/growth/opportunities",     label: "Opportunities", icon: TrendingUp,  permission: "opportunities.view" },
+
+  // ── ADMINISTRATION ───────────────────────────────────────────────────────
+  { section: "admin", href: "/admin/growth/users",       label: "Users",       icon: UserCog,    permission: "users.view" },
+  { section: "admin", href: "/admin/growth/permissions", label: "Permissions", icon: Key,        permission: "permissions.view" },
+  { section: "admin", href: "/admin/growth/security",    label: "Security",    icon: ShieldCheck, permission: "dashboard.view" },
+  { section: "admin", href: "/admin/growth/logs",        label: "Logs",        icon: ScrollText, permission: "logs.view" },
+
+  // ── ADVANCED TOOLS ───────────────────────────────────────────────────────
+  { section: "advanced", href: "/admin/growth/market-intelligence",    label: "Market Intelligence",   icon: Brain,          permission: "dashboard.view" },
+  { section: "advanced", href: "/admin/growth/competitors",            label: "Competitor Intel",       icon: BarChart2,      permission: "competitors.view" },
+  { section: "advanced", href: "/admin/growth/founder",                label: "Revenue Dashboard",      icon: LayoutDashboard, permission: "dashboard.view" },
+  { section: "advanced", href: "/admin/growth/ads/campaign-factory",   label: "Campaign Factory",       icon: Factory,        permission: "ads.view" },
+  { section: "advanced", href: "/admin/growth/ads/revenue",            label: "Revenue Attribution",    icon: DollarSign,     permission: "ads.view" },
+  { section: "advanced", href: "/admin/growth/ads/remarketing-readiness", label: "Remarketing Ready",  icon: RotateCcw,      permission: "ads.view" },
+  { section: "advanced", href: "/admin/growth/contact-this-week",      label: "Contact This Week",      icon: Calendar,       permission: "dealer.view" },
+  { section: "advanced", href: "/admin/growth/launch",                 label: "Launch Status",          icon: Rocket,         permission: "dashboard.view" },
+  { section: "advanced", href: "/admin/growth/agents/health-check",    label: "Agent Health Check",     icon: Activity,       permission: "dashboard.view" },
+  { section: "advanced", href: "/admin/growth/platform-registry",      label: "Platform Registry",      icon: Database,       permission: "dashboard.view", badge: "NEW" },
 ]
 
 // ─── Storage keys ─────────────────────────────────────────────────────────────
@@ -76,6 +98,11 @@ const NAV_MODULES: NavModule[] = [
 const SIDEBAR_KEY      = "growth:sidebar:collapsed"
 const FOUNDER_MODE_KEY = "growth:founder-mode"
 const SECTIONS_KEY     = "growth:sidebar:sections"
+
+const DEFAULT_SECTIONS: Record<SectionId, boolean> = {
+  founder: true, marketing: true, market_intel: true,
+  crm: true, admin: true, advanced: false,
+}
 
 // ─── Badge colors ─────────────────────────────────────────────────────────────
 
@@ -138,7 +165,6 @@ function SectionBlock({
 
   return (
     <div className="mb-1">
-      {/* Section header — hide when sidebar collapsed */}
       {!collapsed && (
         <button
           onClick={onToggle}
@@ -153,17 +179,15 @@ function SectionBlock({
         </button>
       )}
 
-      {/* Divider when collapsed */}
       {collapsed && sectionId !== "founder" && (
         <div className="my-2 mx-3 border-t border-gray-800" />
       )}
 
-      {/* Module list */}
       {(sectionId === "founder" || sectionOpen || collapsed) && (
         <div className="space-y-0.5">
           {modules.map(mod => (
             <ModuleLink
-              key={mod.href}
+              key={mod.href + mod.section}
               mod={mod}
               active={mod.sub ? pathname === mod.href : pathname.startsWith(mod.href)}
               collapsed={collapsed}
@@ -184,9 +208,7 @@ export function GrowthSidebar() {
   const [collapsed,    setCollapsed]    = useState(false)
   const [founderMode,  setFounderMode]  = useState(false)
   const [mounted,      setMounted]      = useState(false)
-  const [sectionsOpen, setSectionsOpen] = useState<Record<SectionId, boolean>>({
-    founder: true, marketing: true, market_intel: true, system: true,
-  })
+  const [sectionsOpen, setSectionsOpen] = useState<Record<SectionId, boolean>>(DEFAULT_SECTIONS)
 
   useEffect(() => {
     const isCollapsed   = localStorage.getItem(SIDEBAR_KEY) === "true"
@@ -198,7 +220,11 @@ export function GrowthSidebar() {
     document.documentElement.style.setProperty("--sidebar-w", isCollapsed ? "56px" : "224px")
 
     if (savedSections) {
-      try { setSectionsOpen(JSON.parse(savedSections)) } catch { /* ignore */ }
+      try {
+        const parsed = JSON.parse(savedSections)
+        // Merge saved state with defaults so new sections get their default value
+        setSectionsOpen({ ...DEFAULT_SECTIONS, ...parsed })
+      } catch { /* ignore */ }
     }
 
     setMounted(true)
@@ -222,7 +248,7 @@ export function GrowthSidebar() {
   }
 
   function toggleSection(id: SectionId) {
-    if (id === "founder") return // FOUNDER section never collapses
+    if (id === "founder") return
     setSectionsOpen(prev => {
       const next = { ...prev, [id]: !prev[id] }
       localStorage.setItem(SECTIONS_KEY, JSON.stringify(next))
@@ -230,7 +256,6 @@ export function GrowthSidebar() {
     })
   }
 
-  // Filter modules by permission and Founder Mode
   const visibleModules = mounted && !loading
     ? NAV_MODULES.filter(m => {
         if (founderMode && SECTION_META[m.section].founderOnly) return false
@@ -239,7 +264,6 @@ export function GrowthSidebar() {
       })
     : []
 
-  // Group by section
   const bySection = SECTION_ORDER.reduce((acc, id) => {
     acc[id] = visibleModules.filter(m => m.section === id)
     return acc
@@ -289,8 +313,6 @@ export function GrowthSidebar() {
 
       {/* Footer */}
       <div className="flex-shrink-0 border-t border-gray-800 p-2 space-y-1">
-
-        {/* Founder Mode toggle */}
         {!collapsed && (
           <button
             onClick={toggleFounderMode}
@@ -317,7 +339,6 @@ export function GrowthSidebar() {
           </button>
         )}
 
-        {/* User / Logout */}
         {!loading && user && (
           <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2 px-2"}`}>
             {!collapsed && (
