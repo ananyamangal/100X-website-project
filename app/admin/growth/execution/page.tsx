@@ -59,20 +59,20 @@ const REC_STATUS_COLOR: Record<string, string> = {
 }
 
 const DEALER_STAGE_COLOR: Record<string, string> = {
-  lead:       "bg-gray-100 text-gray-600",
-  contacted:  "bg-blue-100 text-blue-700",
-  qualified:  "bg-indigo-100 text-indigo-700",
-  discussion: "bg-yellow-100 text-yellow-700",
-  authorized: "bg-purple-100 text-purple-700",
+  lead:              "bg-gray-100 text-gray-600",
+  contacted:         "bg-blue-100 text-blue-700",
+  meeting_scheduled: "bg-yellow-100 text-yellow-700",
+  proposal_sent:     "bg-orange-100 text-orange-700",
+  authorized:        "bg-purple-100 text-purple-700",
 }
 
 const OPP_STAGE_COLOR: Record<string, string> = {
-  identified:          "bg-gray-100 text-gray-600",
-  approved:            "bg-blue-100 text-blue-700",
-  research:            "bg-indigo-100 text-indigo-700",
-  meeting_scheduled:   "bg-yellow-100 text-yellow-700",
-  quotation_submitted: "bg-orange-100 text-orange-700",
-  bid_submitted:       "bg-purple-100 text-purple-700",
+  identified:    "bg-gray-100 text-gray-600",
+  research:      "bg-indigo-100 text-indigo-700",
+  contacted:     "bg-blue-100 text-blue-700",
+  demo:          "bg-yellow-100 text-yellow-700",
+  tender_support:"bg-orange-100 text-orange-700",
+  bid_submitted: "bg-purple-100 text-purple-700",
 }
 
 const OPP_TYPE_LABEL: Record<string, string> = {
