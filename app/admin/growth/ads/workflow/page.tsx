@@ -467,9 +467,23 @@ export default function AdsWorkflowPage() {
       </div>
 
       {/* Mandatory notice */}
-      <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-700 flex items-start gap-2">
+      <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-700 flex items-start gap-2">
         <AlertCircle size={14} className="text-amber-500 flex-shrink-0 mt-0.5" />
         <span>No automatic deployment — when a campaign is ready, submit it manually in Google Ads and then update the stage to Deployed here.</span>
+      </div>
+
+      {/* Quick links to related tools */}
+      <div className="mb-4 flex flex-wrap gap-1.5 text-[11px]">
+        <span className="text-gray-400 self-center">Related:</span>
+        <a href="/admin/growth/ads/campaign-factory" className="inline-flex items-center gap-1 px-2 py-1 rounded border border-gray-200 bg-white text-gray-600 hover:bg-gray-50">
+          <Link2 size={10} />Campaign Factory
+        </a>
+        <a href="/admin/growth/ads/creative-director" className="inline-flex items-center gap-1 px-2 py-1 rounded border border-gray-200 bg-white text-gray-600 hover:bg-gray-50">
+          <Link2 size={10} />Creative Director
+        </a>
+        <a href="/admin/growth/director" className="inline-flex items-center gap-1 px-2 py-1 rounded border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100">
+          <Link2 size={10} />Revenue Director
+        </a>
       </div>
 
       {/* Filters */}

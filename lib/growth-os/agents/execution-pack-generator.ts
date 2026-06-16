@@ -741,6 +741,124 @@ ${segments.slice(0, 3).map(s => `${s.segment_name}: ${s.count} orgs, ${inr(s.gmv
   }
 }
 
+// ─── Procurement Target Pack ──────────────────────────────────────────────────
+
+async function procurementTargetPack(rec: DirectorRec, db: Db): Promise<OEMDisplacementPack> {
+  const orgName  = String(rec.payload.organization_name || "")
+  const orgState = String(rec.payload.organization_state || "")
+  const totalGmv = Number(rec.payload.total_gmv || 0)
+  const deptCategory = String(rec.payload.dept_category || "Government Department")
+
+  // Pull nearest 100X seller in same state for response time
+  const nearestSeller = await db.collection("fogging_sellers")
+    .findOne({ is_100x: true, seller_state: orgState })
+
+  const market_evidence = `Procurement target: ${orgName}
+State: ${orgState}
+Department: ${deptCategory}
+Active procurement GMV: ${inr(totalGmv)}
+100X seller in ${orgState}: ${nearestSeller ? String(nearestSeller.seller_name || "exists") : "NONE — dealer required"}
+GeM status: Active buyer with procurement history
+Window: Active — submit GeM quote before tender closes`
+
+  const outreach_email_draft = `Subject: 100X Circle — Thermal Fogging Machines for ${orgName} (GeM Listed)
+
+Dear Purchase/Nodal Officer,
+
+I'm writing from 100X Circle, a GeM-listed manufacturer of thermal fogging machines.
+
+We've identified ${orgName} (${deptCategory}) has an active or upcoming procurement requirement for thermal fogging equipment.
+
+WHY 100X CIRCLE:
+• GeM-listed with all required government certifications
+• Competitive L1 pricing — request a rate comparison
+• Pan-India delivery with local dealer support in ${orgState || "your state"}
+• AMC contracts available for post-purchase maintenance
+• Typical delivery: 2-3 weeks from PO
+
+NEXT STEP:
+Please find our GeM catalog listing at [GeM Seller Link]. We'd like to submit a quote for your upcoming requirement.
+
+Could we schedule a 15-minute call this week to understand your exact specifications?
+
+Best regards,
+[Dealer/100X Representative]
+100X Circle | 100xcircle.com`
+
+  const whatsapp_draft = `Hello,
+
+This is [Name] from 100X Circle — thermal fogging machines, GeM-listed.
+
+I noticed ${orgName} has active fogging procurement requirements. We'd like to quote for your upcoming tender.
+
+Competitive pricing, government-approved, local support in ${orgState || "your state"}.
+
+May I share our product catalog?
+
+— 100X Circle | 100xcircle.com`
+
+  const call_script = `PROCUREMENT TARGET OUTREACH — ${orgName}
+
+OPENING:
+"Good morning, I'm calling from 100X Circle — we manufacture thermal fogging machines listed on GeM. Could I speak with the purchase officer for sanitation or fogging equipment?"
+
+KEY POINTS:
+• "We noticed ${orgName} has procurement requirements for fogging equipment"
+• "100X Circle is GeM-listed with all required certifications"
+• "We're competitive on L1 pricing — happy to share a rate card"
+• "We have dealer support in ${orgState || "your state"} for quick delivery and maintenance"
+
+ASK:
+"Can I share our GeM product listing and submit a quote for your next tender?"
+"What are your exact specifications? I can send a detailed proposal."
+
+FOLLOW-UP:
+Send: GeM catalog link + spec sheet + rate card within 1 hour of call.`
+
+  const meeting_agenda = `PROCUREMENT MEETING — ${orgName}
+
+Duration: 20 minutes
+Goal: Qualify requirement, submit quote, get on approved vendor list
+
+1. REQUIREMENT UNDERSTANDING (5 min)
+   - Machine type needed (ULV/thermal/vehicle-mounted)
+   - Quantity and delivery timeline
+   - Budget range or reference rates from prior purchases
+
+2. PRODUCT PRESENTATION (5 min)
+   - 100X Circle machine variants matching requirements
+   - GeM listing and certifications
+   - Pricing vs market rates (L1 positioning)
+
+3. QUOTE SUBMISSION (5 min)
+   - Submit GeM quote on portal during or immediately after meeting
+   - Offer demo unit if required before purchase decision
+
+4. NEXT STEPS (5 min)
+   - Confirm tender submission deadline
+   - Share AMC proposal if machines already in service
+   - Exchange contact details for procurement officer
+
+ACTION ITEMS:
+□ Submit GeM quote within 24 hours
+□ Share technical specification sheet
+□ Confirm AMC/service availability in ${orgState || "state"}`
+
+  return {
+    type: "oem_displacement",
+    organization_name: orgName,
+    organization_state: orgState,
+    incumbent_oem: "current supplier",
+    incumbent_gmv: totalGmv,
+    total_gmv: totalGmv,
+    market_evidence,
+    outreach_email_draft,
+    whatsapp_draft,
+    call_script,
+    meeting_agenda,
+  }
+}
+
 // ─── Main router ──────────────────────────────────────────────────────────────
 
 export async function generateExecutionPack(
@@ -752,6 +870,8 @@ export async function generateExecutionPack(
         return await dealerRecruitmentPack(rec, db)
       case "oem_displacement":
         return await oemDisplacementPack(rec, db)
+      case "procurement_target":
+        return await procurementTargetPack(rec, db)
       case "landing_page_create":
       case "content_create":
         return await landingPagePack(rec, db)

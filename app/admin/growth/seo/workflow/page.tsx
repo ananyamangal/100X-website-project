@@ -410,6 +410,20 @@ export default function SeoWorkflowPage() {
         ))}
       </div>
 
+      {/* Quick links */}
+      <div className="mb-4 flex flex-wrap gap-1.5 text-[11px]">
+        <span className="text-gray-400 self-center">Related:</span>
+        <a href="/admin/growth/landing-pages" className="inline-flex items-center gap-1 px-2 py-1 rounded border border-gray-200 bg-white text-gray-600 hover:bg-gray-50">
+          <ExternalLink size={10} />Landing Pages
+        </a>
+        <a href="/admin/growth/content" className="inline-flex items-center gap-1 px-2 py-1 rounded border border-gray-200 bg-white text-gray-600 hover:bg-gray-50">
+          <ExternalLink size={10} />Content Factory
+        </a>
+        <a href="/admin/growth/director" className="inline-flex items-center gap-1 px-2 py-1 rounded border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100">
+          <ExternalLink size={10} />Revenue Director
+        </a>
+      </div>
+
       {/* Stage filter */}
       <div className="flex flex-wrap gap-1 mb-4 bg-gray-100 p-1 rounded-lg w-fit">
         <button

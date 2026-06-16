@@ -1,14 +1,16 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import Link from "next/link"
 import {
   TrendingUp, Zap, Clock, RefreshCw, CheckCircle2, XCircle, Pause,
   AlertTriangle, ChevronRight, Target, Users, Search, FileText,
   DollarSign, Cpu, BarChart3, Flame, Megaphone, ArrowRight,
   ChevronDown, ChevronUp, Package, Circle, Trophy, X,
   Bot, Youtube, Monitor, MousePointerClick, Swords, RotateCcw,
-  HelpCircle, Calendar, User, Check, Play, BookOpen,
+  HelpCircle, Calendar, User, Check, Play, BookOpen, Lightbulb,
 } from "lucide-react"
+import { getCampaignIntelligence } from "@/lib/growth-os/campaign-decision-engine"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -56,6 +58,8 @@ interface Rec {
   help_if_ignored?: string
   // v1.1 pack
   execution_pack_id?: string
+  // payload for campaign intelligence
+  payload?: Record<string, unknown>
 }
 
 interface DailyRun {
@@ -512,6 +516,107 @@ function ExecutionPathPanel({ rec }: { rec: Rec }) {
   )
 }
 
+// ─── Campaign Intelligence Panel ─────────────────────────────────────────────
+
+function CampaignIntelPanel({ rec }: { rec: Rec }) {
+  const [showRejected, setShowRejected] = useState(false)
+  const intel = getCampaignIntelligence(
+    rec.type,
+    rec.payload ?? {},
+    rec.confidence,
+    rec.expected_revenue_impact,
+  )
+
+  return (
+    <div className="space-y-3">
+      {/* Strategic thesis */}
+      <p className="text-xs text-gray-700 leading-relaxed bg-amber-50 border border-amber-100 rounded px-3 py-2">
+        {intel.strategic_thesis}
+      </p>
+
+      {/* Primary bundles */}
+      <div className="space-y-2">
+        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Recommended Campaigns</p>
+        {intel.primary_bundles.map((b, i) => (
+          <div key={i} className="border border-green-200 rounded bg-green-50 px-3 py-2 space-y-1">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold text-green-800">{b.campaign_label}</span>
+              <div className="flex items-center gap-2 text-[10px] text-green-700">
+                {b.estimated_budget_inr > 0 && (
+                  <span className="flex items-center gap-0.5"><DollarSign size={10} />{INR(b.estimated_budget_inr)}/mo</span>
+                )}
+                <span>{b.confidence_pct}% conf.</span>
+              </div>
+            </div>
+            <p className="text-[11px] text-gray-600">{b.reason_selected}</p>
+            <div className="flex gap-3 text-[10px] text-green-700 pt-0.5">
+              <span>~{b.expected_leads} leads</span>
+              <span>·</span>
+              <span>{INR(b.expected_revenue_inr)} est. rev.</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* If-nothing */}
+      <div className="bg-red-50 border border-red-100 rounded px-3 py-2">
+        <p className="text-[10px] font-semibold text-red-600 mb-0.5 uppercase tracking-wide">If Nothing Happens</p>
+        <p className="text-xs text-red-700">{intel.if_nothing_impact}</p>
+      </div>
+
+      {/* Totals */}
+      <div className="flex gap-4 text-xs text-gray-600 bg-gray-50 rounded px-3 py-2">
+        <span><span className="font-semibold text-gray-800">Budget:</span> {intel.total_budget_estimate_inr > 0 ? INR(intel.total_budget_estimate_inr) + "/mo" : "₹0 (organic)"}</span>
+        <span><span className="font-semibold text-gray-800">Rev target:</span> {INR(intel.total_expected_revenue_inr)}</span>
+        <span><span className="font-semibold text-gray-800">Confidence:</span> {intel.overall_confidence}%</span>
+      </div>
+
+      {/* Rejected campaigns */}
+      {intel.rejected_bundles.length > 0 && (
+        <div>
+          <button
+            onClick={() => setShowRejected(r => !r)}
+            className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-gray-600"
+          >
+            {showRejected ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+            {showRejected ? "Hide" : "Show"} rejected alternatives ({intel.rejected_bundles.length})
+          </button>
+          {showRejected && (
+            <div className="mt-1.5 space-y-1.5">
+              {intel.rejected_bundles.map((b, i) => (
+                <div key={i} className="border border-gray-200 rounded bg-gray-50 px-3 py-2">
+                  <div className="flex items-center gap-1.5">
+                    <XCircle size={10} className="text-gray-400" />
+                    <span className="text-[11px] font-medium text-gray-600">{b.campaign_label}</span>
+                  </div>
+                  <p className="text-[11px] text-gray-500 mt-0.5 ml-3.5">{b.reason_rejected}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Cross-links */}
+      <div className="flex flex-wrap gap-1.5 pt-1">
+        {intel.cross_links.map((link, i) => (
+          <Link
+            key={i}
+            href={link.href}
+            className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:border-gray-300"
+          >
+            <ArrowRight size={9} />
+            {link.label}
+            {link.badge && (
+              <span className="ml-0.5 px-1 py-0 text-[9px] bg-gray-100 text-gray-500 rounded">{link.badge}</span>
+            )}
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ─── Rec Card ─────────────────────────────────────────────────────────────────
 
 function RecCard({
@@ -526,6 +631,7 @@ function RecCard({
   const [showHelp, setShowHelp]         = useState(false)
   const [showPack, setShowPack]         = useState(false)
   const [showPath, setShowPath]         = useState(false)
+  const [showIntel, setShowIntel]       = useState(false)
   const [showOwner, setShowOwner]       = useState(false)
   const [owner, setOwner]               = useState(rec.owner || "")
   const [targetDate, setTargetDate]     = useState(rec.target_completion_date || "")
@@ -672,6 +778,23 @@ function RecCard({
           )}
         </div>
       )}
+
+      {/* Campaign Intelligence */}
+      <div className="border-t border-gray-100">
+        <button
+          onClick={() => setShowIntel(v => !v)}
+          className="w-full flex items-center gap-1.5 px-4 py-2 text-xs text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+        >
+          <Lightbulb size={12} className="text-amber-500" />
+          Campaign Intelligence — why this, budget, if nothing
+          {showIntel ? <ChevronUp size={11} className="ml-auto" /> : <ChevronDown size={11} className="ml-auto" />}
+        </button>
+        {showIntel && (
+          <div className="px-4 py-3 border-t border-amber-50 bg-white">
+            <CampaignIntelPanel rec={rec} />
+          </div>
+        )}
+      </div>
 
       {/* Execution pack */}
       {(hasPack || rec.status === "approved" || ["in_progress", "applied", "completed", "won"].includes(rec.status)) && (
