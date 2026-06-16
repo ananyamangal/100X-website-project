@@ -92,25 +92,28 @@ const nextConfig = {
   },
 
   async headers() {
-    const securityHeaders = [
+    const commonHeaders = [
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
       { key: 'X-DNS-Prefetch-Control', value: 'on' },
-      {
-        key: 'Permissions-Policy',
-        value: 'camera=(), microphone=(), geolocation=()',
-      },
     ]
     return [
+      // Public pages — block microphone (no public voice features)
+      // Negative lookahead excludes /admin/* so their Permissions-Policy is not stacked
       {
-        source: '/:path*',
-        headers: securityHeaders,
+        source: '/((?!admin).*)',
+        headers: [
+          ...commonHeaders,
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
       },
+      // Admin pages — microphone=(self) enables voice search on the fogging dashboard
       {
         source: '/admin/:path*',
         headers: [
-          ...securityHeaders,
+          ...commonHeaders,
           { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=()' },
         ],
       },
       // Immutable cache for hashed Next.js static assets (_next/static)
