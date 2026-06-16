@@ -122,8 +122,64 @@ export async function POST(
     return NextResponse.json({ error: `Type "${rec.type}" is not auto-executable in v2.5` }, { status: 400 })
   }
 
-  // ── 1b. Risk gate (v2.5.1) ───────────────────────────────────────────────────
+  // ── 1b. Safety pre-checks (v2.5.2) ─────────────────────────────────────────
   const recPath = rec.url || "/"
+
+  // FREEZE CHECK — blocks ALL executions globally
+  const freezeDoc = await db.collection("seo_global_settings").findOne({ key: "automation_freeze" })
+  if (freezeDoc?.value === true) {
+    return NextResponse.json({
+      error: "SEO Automation Freeze is active — all executions blocked by Founder directive. Disable freeze to proceed.",
+      freeze_active: true,
+    }, { status: 503 })
+  }
+
+  // VELOCITY CHECK — max 5 successful executions per 24h; founder_approval bypasses
+  const oneDayAgo = new Date(Date.now() - 86_400_000).toISOString()
+  const todayCount = await db.collection("seo_execution_log").countDocuments({
+    action: "execute",
+    final_status: "implemented",
+    executed_at: { $gte: oneDayAgo },
+  })
+  if (todayCount >= 5 && !founder_approval) {
+    return NextResponse.json({
+      error: `Change velocity limit: ${todayCount}/5 SEO executions already made today. Founder approval required to exceed daily limit.`,
+      velocity_blocked: true,
+      today_count: todayCount,
+      velocity_limit: 5,
+      requires: "founder_approval: true in request body",
+    }, { status: 429 })
+  }
+
+  // COOL-DOWN CHECK — 14 days per page; founder_approval bypasses
+  const fourteenDaysAgo = new Date(Date.now() - 14 * 86_400_000).toISOString()
+  const lastPageExecution = await db.collection("seo_execution_log").findOne(
+    { path: recPath, action: "execute", final_status: "implemented", executed_at: { $gte: fourteenDaysAgo } },
+    { sort: { executed_at: -1 } }
+  )
+  if (lastPageExecution && !founder_approval) {
+    const daysAgo = (Date.now() - new Date(lastPageExecution.executed_at).getTime()) / 86_400_000
+    const cooldownRemaining = Math.ceil(14 - daysAgo)
+    return NextResponse.json({
+      error: `Page cool-down: ${Math.floor(daysAgo)}d since last execution. ${cooldownRemaining}d remaining before this page can be changed again. Founder approval overrides.`,
+      cooldown_active: true,
+      last_execution_at: lastPageExecution.executed_at,
+      cooldown_remaining_days: cooldownRemaining,
+      requires: "founder_approval: true in request body",
+    }, { status: 409 })
+  }
+
+  // HIGH-VALUE PAGE LOCK — protected pages always require founder_approval
+  const protectedPage = await db.collection("seo_protected_pages").findOne({ path: recPath })
+  if (protectedPage && !founder_approval) {
+    return NextResponse.json({
+      error: `Protected page (${protectedPage.reason}): Founder approval required for all changes to this page — no exceptions.`,
+      protected_page: true,
+      protection_reason: protectedPage.reason,
+      requires: "founder_approval: true in request body",
+    }, { status: 403 })
+  }
+
   const pageRows = await db.collection("gsc_query_rows")
     .find({ $or: [{ page: recPath }, { pagePath: recPath }] })
     .toArray()
@@ -269,7 +325,7 @@ export async function POST(
   }
 
   // ── 8. Write audit log ───────────────────────────────────────────────────────
-  await db.collection("seo_execution_log").insertOne({
+  const logResult = await db.collection("seo_execution_log").insertOne({
     rec_id: id,
     rec_type: rec.type,
     rec_title: rec.title,
@@ -282,24 +338,37 @@ export async function POST(
     executed_at: now,
     final_status: finalStatus,
     auto_rollback: !validation.pass,
-    risk_gate: { risk_level: riskProfile.risk_level, risk_score: riskProfile.risk_score, founder_approval, admin_override },
+    risk_gate: {
+      risk_level: riskProfile.risk_level,
+      risk_score: riskProfile.risk_score,
+      founder_approval,
+      admin_override,
+      today_count: todayCount,
+      protected_page: !!protectedPage,
+      cooldown_bypassed: !!lastPageExecution && founder_approval,
+    },
   })
+  const executionId = String(logResult.insertedId)
 
-  // ── 8b. Capture traffic baseline for 14-day monitoring (v2.5.1) ─────────────
+  // ── 8b. Enhanced GSC snapshot (v2.5.2 — seo_execution_baselines) ────────────
   if (finalStatus === "implemented") {
+    const ctr_28d = impressions_28d > 0 ? clicks_28d / impressions_28d : 0
+    await db.collection("seo_execution_baselines").insertOne({
+      execution_id: executionId,
+      path,
+      rec_id: id,
+      clicks_28d,
+      impressions_28d,
+      ctr_28d,
+      avg_position_28d: avg_position,
+      keyword_count: pageRows.length,
+      top10_count: top10_keywords,
+      captured_at: now,
+    })
+    // Keep traffic_baselines for the monitoring route (existing)
     await db.collection("seo_traffic_baselines").updateOne(
       { rec_id: id },
-      {
-        $set: {
-          path,
-          rec_id: id,
-          clicks: clicks_28d,
-          impressions: impressions_28d,
-          avg_position,
-          period: "28d_at_execution",
-          captured_at: now,
-        }
-      },
+      { $set: { path, rec_id: id, clicks: clicks_28d, impressions: impressions_28d, avg_position, period: "28d_at_execution", captured_at: now } },
       { upsert: true }
     )
   }
@@ -320,8 +389,10 @@ export async function POST(
   return NextResponse.json({
     ok: true,
     status: finalStatus,
+    execution_id: executionId,
     validation,
     auto_rollback: !validation.pass,
     reason: validation.pass ? null : validation.reason,
+    today_count: todayCount + (finalStatus === "implemented" ? 1 : 0),
   })
 }

@@ -34,6 +34,7 @@ interface SeoRec {
   current_state: string
   proposed_change: string
   expected_clicks: number
+  expected_traffic_pct: number
   expected_revenue_inr: number
   confidence: number
   difficulty: string
@@ -115,6 +116,45 @@ interface TrafficAlert {
   created_at: string
 }
 
+interface GateContext {
+  profile: RiskProfile | null
+  cooldown: { active: boolean; days_since?: number; remaining_days?: number; last_execution_at?: string }
+  protected: { is_protected: boolean; reason: string | null }
+  freeze_active: boolean
+  today_executions: number
+  velocity_limit: number
+  velocity_remaining: number
+}
+
+interface HistoryEvent {
+  date: string
+  type: string
+  label: string
+  detail: string
+  rec_id?: string
+  ok?: boolean
+  status?: string
+}
+
+interface ImpactReport {
+  available: boolean
+  days_since_execution?: number
+  confidence?: "low" | "medium" | "high"
+  before?: { clicks: number; impressions: number; ctr: number; avg_position: number }
+  after?: { clicks: number; impressions: number; ctr: number; avg_position: number }
+  changes?: { click_change: number; click_change_pct: number | null; impression_change: number; impression_change_pct?: number | null; ctr_change_pp: number; position_change: number }
+  verdict?: { overall_positive: boolean; regression: boolean; label: string }
+  reason?: string
+}
+
+interface FreezeStatus {
+  freeze_enabled: boolean
+  today_executions: number
+  velocity_limit: number
+  velocity_remaining: number
+  protected_page_count: number
+}
+
 // ─── Small helpers ────────────────────────────────────────────────────────────
 
 function pct(n: number) { return `${Math.round(n * 1000) / 10}%` }
@@ -186,6 +226,12 @@ export default function SEOCommandCenter() {
   const [showExecLog, setShowExecLog] = useState(false)
   const [trafficAlerts, setTrafficAlerts] = useState<TrafficAlert[]>([])
   const [runningMonitor, setRunningMonitor] = useState(false)
+  const [freezeStatus, setFreezeStatus] = useState<FreezeStatus | null>(null)
+  const [togglingFreeze, setTogglingFreeze] = useState(false)
+  const [classifyingPages, setClassifyingPages] = useState(false)
+  const [historyPath, setHistoryPath] = useState<string | null>(null)
+  const [historyEvents, setHistoryEvents] = useState<HistoryEvent[]>([])
+  const [historyLoading, setHistoryLoading] = useState(false)
 
   const [activeTab, setActiveTab] = useState<"keywords" | "pages" | "near-wins" | "trends" | "schema" | "links" | "recommendations">("keywords")
   const [syncing, setSyncing] = useState(false)
@@ -226,7 +272,48 @@ export default function SEOCommandCenter() {
     } catch { /* ignore */ }
   }, [])
 
-  useEffect(() => { loadGSC(); loadRecs(); loadTrafficAlerts() }, [loadGSC, loadRecs, loadTrafficAlerts])
+  const loadFreezeStatus = useCallback(async () => {
+    try {
+      const d = await fetch("/api/admin/growth/seo/freeze").then(r => r.json())
+      setFreezeStatus(d)
+    } catch { /* ignore */ }
+  }, [])
+
+  const toggleFreeze = async () => {
+    if (!freezeStatus) return
+    setTogglingFreeze(true)
+    try {
+      await fetch("/api/admin/growth/seo/freeze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: !freezeStatus.freeze_enabled }),
+      })
+      await loadFreezeStatus()
+    } catch { /* ignore */ }
+    setTogglingFreeze(false)
+  }
+
+  const classifyProtectedPages = async () => {
+    setClassifyingPages(true)
+    try {
+      await fetch("/api/admin/growth/seo/protected-pages", { method: "POST" })
+      await loadFreezeStatus()
+    } catch { /* ignore */ }
+    setClassifyingPages(false)
+  }
+
+  const loadPageHistory = async (path: string) => {
+    if (historyPath === path) { setHistoryPath(null); return }
+    setHistoryPath(path)
+    setHistoryLoading(true)
+    try {
+      const d = await fetch(`/api/admin/growth/seo/page-history?path=${encodeURIComponent(path)}`).then(r => r.json())
+      setHistoryEvents(d.events || [])
+    } catch { /* ignore */ }
+    setHistoryLoading(false)
+  }
+
+  useEffect(() => { loadGSC(); loadRecs(); loadTrafficAlerts(); loadFreezeStatus() }, [loadGSC, loadRecs, loadTrafficAlerts, loadFreezeStatus])
 
   const generateRecs = async () => {
     setGeneratingRecs(true); setRecsResult(null)
@@ -814,11 +901,20 @@ export default function SEOCommandCenter() {
             showExecLog={showExecLog}
             trafficAlerts={trafficAlerts}
             runningMonitor={runningMonitor}
+            freezeStatus={freezeStatus}
+            togglingFreeze={togglingFreeze}
+            classifyingPages={classifyingPages}
+            historyPath={historyPath}
+            historyEvents={historyEvents}
+            historyLoading={historyLoading}
             onGenerate={generateRecs}
             onAction={actionRec}
             onExecute={executeRec}
             onRollback={rollbackRec}
             onRunMonitor={runTrafficMonitor}
+            onToggleFreeze={toggleFreeze}
+            onClassifyPages={classifyProtectedPages}
+            onViewHistory={loadPageHistory}
             onToggleExecLog={() => {
               if (!showExecLog) loadExecLog()
               setShowExecLog(p => !p)
@@ -1018,9 +1114,9 @@ function RiskBadge({ level, score }: { level: string; score: number }) {
 
 // ─── SEO Equity Shield (pre-execution gate panel) ─────────────────────────────
 
-function SeoEquityShield({ rec, riskProfile, riskLoading, confirmed, founderApproved, onConfirmedChange, onFounderChange, onConfirm, onCancel, executing }: {
+function SeoEquityShield({ rec, gateCtx, riskLoading, confirmed, founderApproved, onConfirmedChange, onFounderChange, onConfirm, onCancel, executing }: {
   rec: SeoRec
-  riskProfile: RiskProfile | null
+  gateCtx: GateContext | null
   riskLoading: boolean
   confirmed: boolean
   founderApproved: boolean
@@ -1030,24 +1126,38 @@ function SeoEquityShield({ rec, riskProfile, riskLoading, confirmed, founderAppr
   onCancel: () => void
   executing: boolean
 }) {
+  const riskProfile = gateCtx?.profile ?? null
   const rl = riskProfile?.risk_level
+  const cooldown = gateCtx?.cooldown
+  const isProtected = gateCtx?.protected?.is_protected
+  const protectionReason = gateCtx?.protected?.reason
+  const todayExec = gateCtx?.today_executions ?? 0
+  const velocityLimit = gateCtx?.velocity_limit ?? 5
+  const freezeActive = gateCtx?.freeze_active ?? false
 
-  const canConfirm = !executing && riskProfile && (
-    rl === "LOW" ? confirmed
-    : rl === "MEDIUM" ? confirmed
-    : founderApproved && confirmed   // HIGH + CRITICAL need founder
+  // Require founder_approval when protected, HIGH, or CRITICAL
+  const needsFounder = isProtected || rl === "HIGH" || rl === "CRITICAL"
+  const canConfirm = !executing && riskProfile && !freezeActive && (
+    needsFounder ? (founderApproved && confirmed) : confirmed
   )
 
   return (
-    <div className={`border-t px-5 py-4 space-y-3 ${rl === "CRITICAL" ? "bg-red-50 border-red-200" : rl === "HIGH" ? "bg-orange-50 border-orange-200" : rl === "MEDIUM" ? "bg-amber-50 border-amber-200" : "bg-blue-50 border-blue-200"}`}>
+    <div className={`border-t px-5 py-4 space-y-3 ${freezeActive ? "bg-red-50 border-red-400" : rl === "CRITICAL" ? "bg-red-50 border-red-200" : rl === "HIGH" ? "bg-orange-50 border-orange-200" : rl === "MEDIUM" ? "bg-amber-50 border-amber-200" : "bg-blue-50 border-blue-200"}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Shield size={13} className={rl === "CRITICAL" || rl === "HIGH" ? "text-red-600" : rl === "MEDIUM" ? "text-amber-600" : "text-blue-600"} />
+          <Shield size={13} className={freezeActive ? "text-red-700" : rl === "CRITICAL" || rl === "HIGH" ? "text-red-600" : rl === "MEDIUM" ? "text-amber-600" : "text-blue-600"} />
           <span className="text-xs font-bold text-gray-800">SEO Equity Shield</span>
-          <span className="text-[10px] text-gray-500">v2.5.1</span>
+          <span className="text-[10px] text-gray-500">v2.5.2</span>
         </div>
         <button onClick={onCancel} className="text-[10px] text-gray-400 hover:text-gray-600">Cancel</button>
       </div>
+
+      {/* Freeze banner */}
+      {freezeActive && (
+        <div className="bg-red-100 border border-red-400 rounded-lg px-3 py-2 text-[11px] text-red-800 font-bold text-center">
+          SEO AUTOMATION FREEZE ACTIVE — Executions blocked by Founder directive. Disable freeze in the Safety Status bar.
+        </div>
+      )}
 
       {riskLoading ? (
         <div className="flex items-center gap-2 text-xs text-gray-500 py-3">
@@ -1055,19 +1165,44 @@ function SeoEquityShield({ rec, riskProfile, riskLoading, confirmed, founderAppr
         </div>
       ) : riskProfile ? (
         <>
-          {/* Risk score header */}
-          <div className="flex items-center gap-3 flex-wrap">
+          {/* Risk score + status row */}
+          <div className="flex items-center gap-2 flex-wrap">
             <RiskBadge level={riskProfile.risk_level} score={riskProfile.risk_score} />
-            <span className="text-[11px] text-gray-500">{rec.url}</span>
+            {isProtected && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border bg-red-100 text-red-700 border-red-300">
+                <Shield size={8} />PROTECTED · {protectionReason}
+              </span>
+            )}
+            <span className="text-[11px] text-gray-500 ml-auto">{rec.url}</span>
           </div>
+
+          {/* Velocity + Cooldown warnings */}
+          <div className="flex gap-2 flex-wrap">
+            <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${todayExec >= velocityLimit ? "bg-red-100 text-red-700" : todayExec >= 3 ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-500"}`}>
+              {todayExec}/{velocityLimit} executions today
+            </span>
+            {cooldown?.active && (
+              <span className="inline-flex items-center gap-1 text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-medium">
+                <Clock size={9} />Cool-down: {cooldown.remaining_days}d remaining
+              </span>
+            )}
+          </div>
+
+          {/* Cooldown override notice */}
+          {cooldown?.active && (
+            <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-[11px]">
+              <AlertTriangle size={11} className="text-amber-500 shrink-0 mt-0.5" />
+              <span className="text-amber-800">Page cool-down active ({cooldown.days_since?.toFixed(0)}d since last execution, {cooldown.remaining_days}d remaining). Founder approval required to override.</span>
+            </div>
+          )}
 
           {/* Metrics grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
               { label: "Organic Clicks", value: riskProfile.clicks_28d.toLocaleString(), sub: "28-day", color: "text-green-700" },
               { label: "Impressions", value: riskProfile.impressions_28d.toLocaleString(), sub: "28-day", color: "text-blue-700" },
-              { label: "Top-10 Keywords", value: riskProfile.top10_keywords, sub: "in top 10", color: riskProfile.top10_keywords > 0 ? "text-amber-700" : "text-gray-500" },
-              { label: "Est. Revenue/mo", value: `₹${Math.round(riskProfile.revenue_attribution_30d / 1000)}K`, sub: "at current traffic", color: "text-emerald-700" },
+              { label: "Top-10 Keywords", value: riskProfile.top10_keywords, sub: "ranking", color: riskProfile.top10_keywords > 0 ? "text-amber-700" : "text-gray-500" },
+              { label: "Est. Revenue/mo", value: `₹${Math.round(riskProfile.revenue_attribution_30d / 1000)}K`, sub: "current traffic", color: "text-emerald-700" },
             ].map(({ label, value, sub, color }) => (
               <div key={label} className="bg-white rounded-lg border border-gray-200 px-3 py-2 text-center">
                 <p className={`text-sm font-bold ${color}`}>{value}</p>
@@ -1077,18 +1212,41 @@ function SeoEquityShield({ rec, riskProfile, riskLoading, confirmed, founderAppr
             ))}
           </div>
 
+          {/* Execution Simulator (item 5) */}
+          <div className="bg-white border border-gray-200 rounded-lg px-4 py-3">
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Execution Simulator — Expected Impact</p>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <p className="text-sm font-bold text-emerald-700">+{rec.expected_clicks.toLocaleString()}</p>
+                <p className="text-[10px] text-gray-400">clicks/month</p>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-blue-700">+{rec.expected_traffic_pct || 0}%</p>
+                <p className="text-[10px] text-gray-400">CTR lift</p>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-violet-700">{INR_SEO(rec.expected_revenue_inr)}</p>
+                <p className="text-[10px] text-gray-400">revenue/month</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 mt-1.5">
+              <span className="text-[10px] text-gray-400">Confidence:</span>
+              <div className="flex-1 bg-gray-100 rounded-full h-1">
+                <div className="bg-brand-500 h-1 rounded-full" style={{ width: `${rec.confidence}%` }} />
+              </div>
+              <span className="text-[10px] text-gray-600 font-medium">{rec.confidence}%</span>
+            </div>
+          </div>
+
           {/* Backlinks row */}
           {(riskProfile.backlink_count > 0 || riskProfile.referring_domains > 0) && (
             <div className="flex items-start gap-2 bg-white border border-amber-200 rounded-lg px-3 py-2 text-[11px]">
               <AlertTriangle size={11} className="text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <span className="font-semibold text-amber-800">Backlink protection: </span>
-                <span className="text-amber-700">
-                  {riskProfile.backlink_count} backlink{riskProfile.backlink_count !== 1 ? "s" : ""}
-                  {riskProfile.referring_domains > 0 ? ` from ${riskProfile.referring_domains} domain${riskProfile.referring_domains !== 1 ? "s" : ""}` : ""} point to this page.
-                  Changes to this page affect these inbound links.
-                </span>
-              </div>
+              <span className="text-amber-700">
+                <strong>Backlink protection:</strong> {riskProfile.backlink_count} backlink{riskProfile.backlink_count !== 1 ? "s" : ""}
+                {riskProfile.referring_domains > 0 ? ` from ${riskProfile.referring_domains} domain${riskProfile.referring_domains !== 1 ? "s" : ""}` : ""}.
+                Changes to this page affect these inbound links.
+              </span>
             </div>
           )}
 
@@ -1097,80 +1255,59 @@ function SeoEquityShield({ rec, riskProfile, riskLoading, confirmed, founderAppr
             <div className="space-y-1">
               {riskProfile.warnings.map((w, i) => (
                 <div key={i} className="flex items-center gap-1.5 text-[11px] text-gray-600">
-                  <AlertCircle size={10} className="text-amber-500 shrink-0" />
-                  {w}
+                  <AlertCircle size={10} className="text-amber-500 shrink-0" />{w}
                 </div>
               ))}
             </div>
           )}
 
-          {/* Risk-level specific approval controls */}
+          {/* Approval controls */}
           <div className="border-t border-gray-200 pt-3 space-y-2">
-            {rl === "LOW" && (
-              <div className="flex items-start gap-2">
-                <input type="checkbox" id="shield-low-confirm" checked={confirmed} onChange={e => onConfirmedChange(e.target.checked)}
-                  className="mt-0.5 accent-brand-600" />
-                <label htmlFor="shield-low-confirm" className="text-xs text-gray-700 cursor-pointer">
-                  I confirm this change is safe to execute. Low-risk page — no significant traffic or backlinks.
-                </label>
-              </div>
-            )}
-
-            {rl === "MEDIUM" && (
-              <div className="flex items-start gap-2">
-                <input type="checkbox" id="shield-medium-confirm" checked={confirmed} onChange={e => onConfirmedChange(e.target.checked)}
-                  className="mt-0.5 accent-amber-600" />
-                <label htmlFor="shield-medium-confirm" className="text-xs text-amber-800 cursor-pointer font-medium">
-                  Admin Override — I have reviewed the risk profile and approve this change as admin.
-                </label>
-              </div>
-            )}
-
-            {(rl === "HIGH" || rl === "CRITICAL") && (
+            {(rl === "HIGH" || rl === "CRITICAL" || isProtected) && (
               <div className="space-y-2">
-                {rl === "CRITICAL" && (
+                {(rl === "CRITICAL" || isProtected) && (
                   <div className="bg-red-100 border border-red-300 rounded-lg px-3 py-2 text-[11px] text-red-800 font-semibold">
-                    CRITICAL RISK — This page generates significant organic traffic, has top-10 keyword rankings, or has inbound backlinks.
-                    Any SEO change carries high risk of ranking loss.
+                    {isProtected ? `PROTECTED PAGE (${protectionReason}) — ` : "CRITICAL RISK — "}
+                    Founder approval required. No exceptions.
                   </div>
                 )}
                 <div className="flex items-start gap-2">
-                  <input type="checkbox" id="shield-founder-confirm" checked={founderApproved} onChange={e => onFounderChange(e.target.checked)}
-                    className="mt-0.5 accent-red-600" />
-                  <label htmlFor="shield-founder-confirm" className="text-xs text-red-800 cursor-pointer font-semibold">
-                    Founder Approval — I confirm the Founder has explicitly approved this SEO change.
-                  </label>
-                </div>
-                <div className="flex items-start gap-2">
-                  <input type="checkbox" id="shield-high-confirm" checked={confirmed} onChange={e => onConfirmedChange(e.target.checked)}
-                    className="mt-0.5 accent-red-600" />
-                  <label htmlFor="shield-high-confirm" className="text-xs text-gray-700 cursor-pointer">
-                    I understand this change may affect organic rankings, traffic, and revenue for this page.
+                  <input type="checkbox" id="shield-founder" checked={founderApproved} onChange={e => onFounderChange(e.target.checked)} className="mt-0.5 accent-red-600" />
+                  <label htmlFor="shield-founder" className="text-xs text-red-800 cursor-pointer font-semibold">
+                    Founder Approval — I confirm the Founder has explicitly approved this change.
                   </label>
                 </div>
               </div>
             )}
 
+            {rl === "MEDIUM" && !isProtected && (
+              <p className="text-[10px] text-amber-700 font-medium">Admin Override required (medium-risk page)</p>
+            )}
+
+            <div className="flex items-start gap-2">
+              <input type="checkbox" id="shield-confirm" checked={confirmed} onChange={e => onConfirmedChange(e.target.checked)} className={`mt-0.5 ${needsFounder ? "accent-red-600" : "accent-brand-600"}`} />
+              <label htmlFor="shield-confirm" className="text-xs text-gray-700 cursor-pointer">
+                {needsFounder
+                  ? "I understand this change may affect organic rankings, traffic, and revenue."
+                  : rl === "MEDIUM" ? "Admin Override — I have reviewed the risk profile and approve this change."
+                  : "I confirm this change is safe to execute."}
+              </label>
+            </div>
+
             <div className="flex items-center gap-2 pt-1">
-              <button
-                onClick={onConfirm}
-                disabled={!canConfirm}
+              <button onClick={onConfirm} disabled={!canConfirm}
                 className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-md disabled:opacity-40 ${
-                  rl === "CRITICAL" || rl === "HIGH" ? "bg-red-600 text-white hover:bg-red-700"
+                  freezeActive ? "bg-gray-400 text-white cursor-not-allowed"
+                  : needsFounder ? "bg-red-600 text-white hover:bg-red-700"
                   : rl === "MEDIUM" ? "bg-amber-600 text-white hover:bg-amber-700"
-                  : "bg-brand-600 text-white hover:bg-brand-700"
-                }`}
-              >
+                  : "bg-brand-600 text-white hover:bg-brand-700"}`}>
                 {executing ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
                 {executing ? "Executing…" : "Confirm & Execute"}
               </button>
-              <button onClick={onCancel} disabled={executing}
-                className="px-3 py-1.5 text-xs text-gray-500 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-40">
-                Cancel
-              </button>
-              {!canConfirm && (
+              <button onClick={onCancel} disabled={executing} className="px-3 py-1.5 text-xs text-gray-500 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-40">Cancel</button>
+              {!canConfirm && !freezeActive && (
                 <span className="text-[10px] text-gray-400">
-                  {rl === "LOW" || rl === "MEDIUM" ? "Check the box above to proceed" : "Both checkboxes required"}
+                  {needsFounder ? "Both approvals required" : "Check box above"}
                 </span>
               )}
             </div>
@@ -1178,6 +1315,221 @@ function SeoEquityShield({ rec, riskProfile, riskLoading, confirmed, founderAppr
         </>
       ) : (
         <div className="text-xs text-red-600 py-2">Could not load risk profile. Refresh and try again.</div>
+      )}
+    </div>
+  )
+}
+
+// ─── Founder Safety Status Bar (item 10) ────────────────────────────────────
+
+function FounderSafetyBar({ freeze, onToggleFreeze, toggling, onClassify, classifying }: {
+  freeze: FreezeStatus | null
+  onToggleFreeze: () => void
+  toggling: boolean
+  onClassify: () => void
+  classifying: boolean
+}) {
+  if (!freeze) return null
+
+  const allSafe = !freeze.freeze_enabled && freeze.protected_page_count > 0
+
+  const items = [
+    { label: "Risk gate", ok: true, detail: "MEDIUM/HIGH/CRITICAL gated" },
+    { label: "Velocity limit", ok: true, detail: `${freeze.today_executions}/${freeze.velocity_limit} today` },
+    { label: "Cool-down", ok: true, detail: "14 days per page" },
+    { label: "Protected pages", ok: freeze.protected_page_count > 0, detail: freeze.protected_page_count > 0 ? `${freeze.protected_page_count} pages` : "Not classified yet" },
+    { label: "Baselines", ok: true, detail: "GSC snapshot on execute" },
+    { label: "Traffic monitor", ok: true, detail: "14-day post-exec check" },
+  ]
+
+  return (
+    <div className={`rounded-xl border px-4 py-3 ${freeze.freeze_enabled ? "bg-red-50 border-red-300" : "bg-white border-gray-200 shadow-sm"}`}>
+      <div className="flex items-center gap-3 flex-wrap mb-2">
+        <div className="flex items-center gap-2">
+          <Shield size={14} className={freeze.freeze_enabled ? "text-red-600" : "text-emerald-600"} />
+          <span className="text-xs font-bold text-gray-900">Founder Safety Status</span>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${allSafe && !freeze.freeze_enabled ? "bg-emerald-100 text-emerald-700 border-emerald-300" : freeze.freeze_enabled ? "bg-red-100 text-red-700 border-red-300" : "bg-amber-100 text-amber-700 border-amber-300"}`}>
+            {freeze.freeze_enabled ? "FROZEN" : allSafe ? "FOUNDER SAFE ✓" : "SETUP NEEDED"}
+          </span>
+        </div>
+
+        {/* Emergency Freeze Toggle */}
+        <div className="ml-auto flex items-center gap-2">
+          {freeze.freeze_enabled && (
+            <span className="text-[10px] text-red-700 font-semibold animate-pulse">ALL EXECUTIONS BLOCKED</span>
+          )}
+          <button
+            onClick={onToggleFreeze}
+            disabled={toggling}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md border disabled:opacity-50 ${
+              freeze.freeze_enabled
+                ? "bg-red-600 text-white border-red-700 hover:bg-red-700"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+            }`}
+          >
+            {toggling ? <Loader2 size={10} className="animate-spin" /> : <Shield size={10} />}
+            {freeze.freeze_enabled ? "Disable Freeze" : "Enable Freeze"}
+          </button>
+        </div>
+      </div>
+
+      {/* Safety checklist */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        {items.map(item => (
+          <div key={item.label} className="flex items-center gap-1 text-[10px]">
+            {item.ok
+              ? <CheckCircle2 size={9} className="text-emerald-500 shrink-0" />
+              : <AlertCircle size={9} className="text-amber-500 shrink-0" />}
+            <span className="text-gray-600 font-medium">{item.label}</span>
+            <span className="text-gray-400">{item.detail}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Classify pages call-to-action */}
+      {freeze.protected_page_count === 0 && (
+        <div className="mt-2 flex items-center gap-2">
+          <AlertTriangle size={11} className="text-amber-500" />
+          <span className="text-[11px] text-amber-700">Protected pages not classified — high-value pages won&apos;t be locked.</span>
+          <button onClick={onClassify} disabled={classifying}
+            className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 bg-amber-600 text-white rounded disabled:opacity-50">
+            {classifying ? <Loader2 size={9} className="animate-spin" /> : null}
+            Classify now
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Impact Report Panel (item 4) ─────────────────────────────────────────────
+
+function ImpactReportPanel({ recId }: { recId: string }) {
+  const [report, setReport] = useState<ImpactReport | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [open, setOpen] = useState(false)
+
+  const load = async () => {
+    if (report) { setOpen(p => !p); return }
+    setOpen(true); setLoading(true)
+    try {
+      const d = await fetch(`/api/admin/growth/seo/impact-report?rec_id=${recId}`).then(r => r.json())
+      setReport(d)
+    } catch { /* ignore */ }
+    setLoading(false)
+  }
+
+  return (
+    <div className="border-t border-gray-100">
+      <button onClick={load} className="w-full flex items-center gap-1.5 px-5 py-2 text-xs text-gray-500 hover:bg-gray-50 hover:text-gray-700">
+        <BarChart2 size={11} />SEO Impact Report
+        {open ? <ChevronUp size={10} className="ml-auto" /> : <ChevronDown size={10} className="ml-auto" />}
+      </button>
+      {open && (
+        <div className="px-5 pb-3 border-t border-gray-100">
+          {loading ? (
+            <div className="flex items-center gap-2 text-xs text-gray-400 py-3"><Loader2 size={11} className="animate-spin" />Loading impact data…</div>
+          ) : !report?.available ? (
+            <p className="text-[11px] text-gray-400 py-2">{report?.reason || "No impact data available yet. Data appears after execution."}</p>
+          ) : (
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                  report.confidence === "high" ? "bg-green-100 text-green-700 border-green-300"
+                  : report.confidence === "medium" ? "bg-amber-100 text-amber-700 border-amber-300"
+                  : "bg-gray-100 text-gray-500 border-gray-200"}`}>
+                  Confidence: {report.confidence?.toUpperCase()}
+                </span>
+                <span className="text-[10px] text-gray-400">{report.days_since_execution?.toFixed(1)} days since execution</span>
+                <span className={`text-[10px] font-semibold ml-auto ${report.verdict?.regression ? "text-red-600" : report.verdict?.overall_positive ? "text-emerald-600" : "text-gray-500"}`}>
+                  {report.verdict?.label}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { label: "Clicks", before: report.before?.clicks ?? 0, change: report.changes?.click_change ?? 0, pct: report.changes?.click_change_pct ?? null, unit: "" },
+                  { label: "Impressions", before: report.before?.impressions ?? 0, change: report.changes?.impression_change ?? 0, pct: report.changes?.impression_change_pct ?? null, unit: "" },
+                  { label: "CTR change", before: null, change: report.changes?.ctr_change_pp ?? 0, pct: null, unit: "pp" },
+                  { label: "Position", before: report.before?.avg_position ?? 0, change: report.changes?.position_change ?? 0, pct: null, unit: "" },
+                ].map(({ label, before, change, pct: changePct, unit }) => {
+                  const positive = label === "Position" ? change < 0 : change > 0
+                  const negative = label === "Position" ? change > 0 : change < 0
+                  return (
+                    <div key={label} className="bg-gray-50 rounded-lg px-3 py-2 text-center">
+                      <p className="text-[10px] text-gray-400 mb-0.5">{label}</p>
+                      {before !== null && <p className="text-[10px] text-gray-500">was: {typeof before === "number" ? before.toFixed(1) : before}</p>}
+                      <p className={`text-sm font-bold ${positive ? "text-emerald-600" : negative ? "text-red-600" : "text-gray-600"}`}>
+                        {change >= 0 ? "+" : ""}{typeof change === "number" ? change.toFixed(label === "CTR change" || label === "Position" ? 2 : 0) : change}{unit}
+                        {changePct !== null && <span className="text-[10px] ml-1">({changePct >= 0 ? "+" : ""}{changePct}%)</span>}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+              {report.confidence === "low" && (
+                <p className="text-[10px] text-amber-600">Data still maturing — wait 7+ days for reliable signal. GSC data typically takes 3-5 days to stabilize after changes.</p>
+              )}
+              {report.verdict?.regression && (
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded px-3 py-2 text-[11px]">
+                  <AlertTriangle size={11} className="text-red-500 shrink-0" />
+                  <span className="text-red-700 font-medium">Regression detected. Consider rollback — requires Founder approval to proceed.</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Page History Timeline Panel (item 2) ─────────────────────────────────────
+
+const HISTORY_EVENT_COLOR: Record<string, string> = {
+  generated:    "bg-gray-200 text-gray-600",
+  approved:     "bg-blue-100 text-blue-700",
+  rejected:     "bg-red-100 text-red-700",
+  deferred:     "bg-gray-100 text-gray-500",
+  executed:     "bg-brand-100 text-brand-700",
+  implemented:  "bg-emerald-100 text-emerald-700",
+  rolled_back:  "bg-orange-100 text-orange-700",
+  traffic_alert:"bg-red-100 text-red-700",
+  traffic_ok:   "bg-gray-100 text-gray-500",
+}
+
+function PageHistoryPanel({ path, events, loading, onClose }: { path: string; events: HistoryEvent[]; loading: boolean; onClose: () => void }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <History size={13} className="text-gray-400" />
+          <span className="text-xs font-semibold text-gray-800">SEO History</span>
+          <code className="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{path}</code>
+        </div>
+        <button onClick={onClose} className="text-[10px] text-gray-400 hover:text-gray-600">Close</button>
+      </div>
+      {loading ? (
+        <div className="flex items-center gap-2 text-xs text-gray-400 px-5 py-4"><Loader2 size={12} className="animate-spin" />Loading history…</div>
+      ) : events.length === 0 ? (
+        <p className="px-5 py-4 text-xs text-gray-400">No history yet for this page.</p>
+      ) : (
+        <div className="divide-y divide-gray-50 max-h-80 overflow-y-auto">
+          {events.map((ev, i) => (
+            <div key={i} className="px-5 py-2.5 flex items-start gap-3">
+              <div className="shrink-0 mt-0.5">
+                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${HISTORY_EVENT_COLOR[ev.type] || "bg-gray-100 text-gray-500"}`}>
+                  {ev.label}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] text-gray-700 truncate">{ev.detail}</p>
+              </div>
+              <span className="text-[10px] text-gray-400 shrink-0">
+                {new Date(ev.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "2-digit" })}
+              </span>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )
@@ -1218,7 +1570,7 @@ function TrafficAlertBanner({ alerts, onRunMonitor, running }: { alerts: Traffic
 
 // ─── SeoRecCard ───────────────────────────────────────────────────────────────
 
-function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onExecute, onRollback }: {
+function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onExecute, onRollback, onViewHistory }: {
   rec: SeoRec
   actioning: string | null
   executingId: string | null
@@ -1226,12 +1578,13 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
   onAction: (id: string, status: string) => Promise<void>
   onExecute: (id: string, options?: { founder_approval?: boolean; admin_override?: boolean }) => Promise<void>
   onRollback: (id: string) => Promise<void>
+  onViewHistory: (path: string) => void
 }) {
   const [showPackage, setShowPackage] = useState(false)
   const [showSerp, setShowSerp] = useState(false)
-  // Gate state (v2.5.1)
+  // Gate state (v2.5.2)
   const [showGate, setShowGate] = useState(false)
-  const [riskProfile, setRiskProfile] = useState<RiskProfile | null>(null)
+  const [gateCtx, setGateCtx] = useState<GateContext | null>(null)
   const [riskLoading, setRiskLoading] = useState(false)
   const [gateConfirmed, setGateConfirmed] = useState(false)
   const [gateFounderApproved, setGateFounderApproved] = useState(false)
@@ -1246,29 +1599,30 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
 
   const openGate = async () => {
     setShowGate(true)
-    setRiskProfile(null)
+    setGateCtx(null)
     setRiskLoading(true)
     setGateConfirmed(false)
     setGateFounderApproved(false)
     try {
       const d = await fetch(`/api/admin/growth/seo/risk-score?path=${encodeURIComponent(rec.url)}`).then(r => r.json())
-      setRiskProfile(d.profile || null)
+      setGateCtx(d as GateContext)
     } catch { /* ignore */ }
     setRiskLoading(false)
   }
 
   const closeGate = () => {
     setShowGate(false)
-    setRiskProfile(null)
+    setGateCtx(null)
     setGateConfirmed(false)
     setGateFounderApproved(false)
   }
 
   const handleConfirmExecute = () => {
+    const rl = gateCtx?.profile?.risk_level
+    const isProtected = gateCtx?.protected?.is_protected
     const options: { founder_approval?: boolean; admin_override?: boolean } = {}
-    const rl = riskProfile?.risk_level
-    if (rl === "MEDIUM") options.admin_override = gateConfirmed
-    if (rl === "HIGH" || rl === "CRITICAL") options.founder_approval = gateFounderApproved
+    if (isProtected || rl === "HIGH" || rl === "CRITICAL") options.founder_approval = gateFounderApproved
+    else if (rl === "MEDIUM") options.admin_override = gateConfirmed
     onExecute(rec._id, options)
     closeGate()
   }
@@ -1316,6 +1670,7 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
         <div className="mt-2.5 flex flex-wrap gap-3 text-[11px] text-gray-500">
           <span>+{rec.expected_clicks} clicks/mo</span>
           <span>Conf: {rec.confidence}%</span>
+          {rec.expected_traffic_pct > 0 && <span>+{rec.expected_traffic_pct}% CTR lift</span>}
           <span>Effort: {EFFORT_LABEL_SEO[rec.effort] || rec.effort}</span>
           <span className={`font-medium ${rec.difficulty === "easy" ? "text-green-600" : rec.difficulty === "medium" ? "text-amber-600" : "text-red-600"}`}>
             {rec.difficulty}
@@ -1361,6 +1716,15 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
           )}
         </div>
       )}
+
+      {/* Page History button */}
+      <div className="border-t border-gray-100">
+        <button onClick={() => onViewHistory(rec.url)}
+          className="w-full flex items-center gap-1.5 px-5 py-2 text-xs text-gray-400 hover:bg-gray-50 hover:text-gray-600">
+          <History size={11} />Page SEO History
+          <ChevronDown size={10} className="ml-auto" />
+        </button>
+      </div>
 
       {/* Implementation Package */}
       {pkg && (
@@ -1454,7 +1818,7 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
       {rec.status === "approved" && showGate && (
         <SeoEquityShield
           rec={rec}
-          riskProfile={riskProfile}
+          gateCtx={gateCtx}
           riskLoading={riskLoading}
           confirmed={gateConfirmed}
           founderApproved={gateFounderApproved}
@@ -1467,16 +1831,19 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
       )}
 
       {rec.status === "implemented" && (
-        <div className="border-t border-gray-100 px-5 py-3 bg-emerald-50 flex flex-wrap gap-2 items-center">
-          <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
-            <CheckCircle2 size={12} />Live in override store
-          </span>
-          <button onClick={() => onRollback(rec._id)} disabled={isRollingBack}
-            className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white text-orange-600 rounded-md hover:bg-orange-50 border border-orange-200 disabled:opacity-50">
-            {isRollingBack ? <Loader2 size={11} className="animate-spin" /> : <RotateCcw size={11} />}
-            {isRollingBack ? "Rolling back…" : "Rollback"}
-          </button>
-        </div>
+        <>
+          <ImpactReportPanel recId={rec._id} />
+          <div className="border-t border-gray-100 px-5 py-3 bg-emerald-50 flex flex-wrap gap-2 items-center">
+            <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
+              <CheckCircle2 size={12} />Live in override store
+            </span>
+            <button onClick={() => onRollback(rec._id)} disabled={isRollingBack}
+              className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white text-orange-600 rounded-md hover:bg-orange-50 border border-orange-200 disabled:opacity-50">
+              {isRollingBack ? <Loader2 size={11} className="animate-spin" /> : <RotateCcw size={11} />}
+              {isRollingBack ? "Rolling back…" : "Rollback"}
+            </button>
+          </div>
+        </>
       )}
 
       {(rec.status === "failed" || rec.status === "rolled_back") && (
@@ -1494,7 +1861,7 @@ function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onEx
   )
 }
 
-function SeoRecommendationsTab({ recs, loading, generating, result, actioning, executingId, rollingBackId, execResult, execLog, execLogLoading, showExecLog, trafficAlerts, runningMonitor, onGenerate, onAction, onExecute, onRollback, onRunMonitor, onToggleExecLog }: {
+function SeoRecommendationsTab({ recs, loading, generating, result, actioning, executingId, rollingBackId, execResult, execLog, execLogLoading, showExecLog, trafficAlerts, runningMonitor, freezeStatus, togglingFreeze, classifyingPages, historyPath, historyEvents, historyLoading, onGenerate, onAction, onExecute, onRollback, onRunMonitor, onToggleFreeze, onClassifyPages, onViewHistory, onToggleExecLog }: {
   recs: SeoRec[]
   loading: boolean
   generating: boolean
@@ -1508,11 +1875,20 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, e
   showExecLog: boolean
   trafficAlerts: TrafficAlert[]
   runningMonitor: boolean
+  freezeStatus: FreezeStatus | null
+  togglingFreeze: boolean
+  classifyingPages: boolean
+  historyPath: string | null
+  historyEvents: HistoryEvent[]
+  historyLoading: boolean
   onGenerate: () => void
   onAction: (id: string, status: string) => Promise<void>
   onExecute: (id: string, options?: { founder_approval?: boolean; admin_override?: boolean }) => Promise<void>
   onRollback: (id: string) => Promise<void>
   onRunMonitor: () => void
+  onToggleFreeze: () => void
+  onClassifyPages: () => void
+  onViewHistory: (path: string) => void
   onToggleExecLog: () => void
 }) {
   const [statusFilter, setStatusFilter] = useState<"pending" | "approved" | "implemented" | "all">("pending")
@@ -1552,6 +1928,15 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, e
           </button>
         </div>
       </div>
+
+      {/* Founder Safety Status Bar (item 10) */}
+      <FounderSafetyBar
+        freeze={freezeStatus}
+        onToggleFreeze={onToggleFreeze}
+        toggling={togglingFreeze}
+        onClassify={onClassifyPages}
+        classifying={classifyingPages}
+      />
 
       {result && (
         <div className={`text-xs px-4 py-2.5 rounded-lg border ${result.startsWith("Error") ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"}`}>
@@ -1613,9 +1998,20 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, e
               onAction={onAction}
               onExecute={onExecute}
               onRollback={onRollback}
+              onViewHistory={onViewHistory}
             />
           ))}
         </div>
+      )}
+
+      {/* Page History Timeline (item 2) */}
+      {historyPath && (
+        <PageHistoryPanel
+          path={historyPath}
+          events={historyEvents}
+          loading={historyLoading}
+          onClose={() => onViewHistory(historyPath)}
+        />
       )}
 
       {/* Traffic Monitor Panel */}

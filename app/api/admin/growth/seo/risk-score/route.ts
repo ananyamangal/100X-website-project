@@ -16,20 +16,55 @@ export async function GET(req: NextRequest) {
   const path = new URL(req.url).searchParams.get("path") || "/"
   const db = (await clientPromise).db()
 
-  // Try cached first
-  const cached = await db.collection("seo_page_risk_scores").findOne({ path }, { sort: { scored_at: -1 } })
-  if (cached) {
-    return NextResponse.json({ profile: { ...cached, _id: String(cached._id) }, cached: true })
+  // Run all context lookups in parallel
+  const [cachedScore, cooldownLog, protectedPage, freezeDoc, todayCount] = await Promise.all([
+    db.collection("seo_page_risk_scores").findOne({ path }),
+    // Most recent successful execution for this path within 14 days
+    db.collection("seo_execution_log").findOne(
+      { path, action: "execute", final_status: "implemented", executed_at: { $gte: new Date(Date.now() - 14 * 86_400_000).toISOString() } },
+      { sort: { executed_at: -1 } }
+    ),
+    db.collection("seo_protected_pages").findOne({ path }),
+    db.collection("seo_global_settings").findOne({ key: "automation_freeze" }),
+    db.collection("seo_execution_log").countDocuments({
+      action: "execute", final_status: "implemented",
+      executed_at: { $gte: new Date(Date.now() - 86_400_000).toISOString() },
+    }),
+  ])
+
+  let profile
+  if (cachedScore) {
+    profile = { ...cachedScore, _id: String(cachedScore._id) }
+  } else {
+    profile = await computeRiskProfile(db, path)
+    await db.collection("seo_page_risk_scores").updateOne({ path }, { $set: profile }, { upsert: true })
   }
 
-  // Compute inline if no cache
-  const profile = await computeRiskProfile(db, path)
-  await db.collection("seo_page_risk_scores").updateOne(
-    { path },
-    { $set: profile },
-    { upsert: true }
-  )
-  return NextResponse.json({ profile, cached: false })
+  // Cool-down context
+  const cooldown = cooldownLog
+    ? {
+        active: true,
+        last_execution_at: cooldownLog.executed_at,
+        days_since: Math.round((Date.now() - new Date(cooldownLog.executed_at).getTime()) / 86_400_000 * 10) / 10,
+        remaining_days: Math.max(0, Math.round((14 - (Date.now() - new Date(cooldownLog.executed_at).getTime()) / 86_400_000) * 10) / 10),
+        rec_id: cooldownLog.rec_id,
+      }
+    : { active: false }
+
+  return NextResponse.json({
+    profile,
+    cached: !!cachedScore,
+    cooldown,
+    protected: {
+      is_protected: !!protectedPage,
+      reason: protectedPage?.reason ?? null,
+      note: protectedPage?.note ?? null,
+    },
+    freeze_active: freezeDoc?.value === true,
+    today_executions: todayCount,
+    velocity_limit: 5,
+    velocity_remaining: Math.max(0, 5 - todayCount),
+  })
 }
 
 export async function POST(req: NextRequest) {
