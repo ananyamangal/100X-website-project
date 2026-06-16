@@ -74,6 +74,19 @@ function canonicalizeBuyer(name) {
   return BUYER_OVERRIDES[c] || c;
 }
 
+// Primary entity: GeM org_name (when a real institution) > office_name > buyer_name
+// org_name = the GoI ministry/department org (100% coverage)
+// office_name = the specific procuring office (100% coverage)
+// buyer_name = often garbled or truncated — used only as last fallback
+const NA_ORG = new Set(['N/A', 'NA', 'n/a', 'N/A ', '']);
+// GoI digital portals — not real procurement entities, skip to office_name
+const PLATFORM_ORG_RE = /^(e-municipalities|e-nagar palika|e_nagarpalika|eservices to citizens)/i;
+function primaryEntityName(doc) {
+  const orgName = (doc.org_name || '').trim();
+  if (orgName && !NA_ORG.has(orgName) && !PLATFORM_ORG_RE.test(orgName)) return orgName;
+  return ((doc.office_name || doc.buyer_name || '')).trim();
+}
+
 // Sorted-word key for collision detection (different word orders = same entity)
 function wordSortKey(name) {
   return canonicalizeBuyer(name).split(' ').sort().join(' ');
@@ -174,8 +187,9 @@ async function main() {
   // Step 3: Collision detection
   const wordKeyMap = new Map(); // wordSortKey → Set of canonical forms
   for (const doc of docs) {
-    const canon = canonicalizeBuyer(doc.buyer_name);
-    const wk    = wordSortKey(doc.buyer_name);
+    const primary = primaryEntityName(doc);
+    const canon = canonicalizeBuyer(primary);
+    const wk    = wordSortKey(primary);
     if (!wordKeyMap.has(wk)) wordKeyMap.set(wk, new Set());
     wordKeyMap.get(wk).add(canon);
   }
@@ -223,8 +237,10 @@ async function main() {
       buying_mode:        doc.buying_mode    ?? null,
       contract_status:    doc.contract_status ?? doc.status ?? null,
 
-      buyer_canonical:    canonicalizeBuyer(doc.buyer_name),
-      buyer_display_name: (doc.buyer_name || '').trim().slice(0, 200),
+      buyer_canonical:    canonicalizeBuyer(primaryEntityName(doc)),
+      buyer_display_name: primaryEntityName(doc).slice(0, 200),
+      dept_name:          (doc.dept_name || '').trim().slice(0, 200),
+      gem_office_name:    (doc.office_name || '').trim().slice(0, 200),
       buyer_state:        buyerState(doc),
       org_type:           doc.org_type ?? null,
       ministry:           doc.ministry ?? doc.dept_name ?? null,

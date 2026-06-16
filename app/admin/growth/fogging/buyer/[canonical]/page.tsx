@@ -43,6 +43,7 @@ interface Contract {
   gemc_no: string; contract_date: string | null
   oem_canonical: string; oem_short_brand: string | null; is_100x: boolean
   buyer_display_name: string; buyer_state: string | null; buyer_canonical: string
+  dept_name?: string | null
   organization_name?: string; organization_canonical?: string | null
   model_raw: string | null; model_normalized: string | null
   quantity: number | null; unit_price: number | null; contract_value_num: number | null
@@ -77,8 +78,8 @@ function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () 
             ) : (
               <div className="font-medium text-xs leading-tight">{contract.organization_name ?? contract.buyer_display_name}</div>
             )}
-            {contract.organization_name && contract.organization_name !== contract.buyer_display_name && (
-              <div className="text-xs text-gray-400 mt-0.5">Dept: {contract.buyer_display_name}</div>
+            {contract.dept_name && contract.dept_name !== contract.buyer_display_name && (
+              <div className="text-xs text-gray-400 mt-0.5">Dept: {contract.dept_name}</div>
             )}
           </div>
           <div><div className="text-xs text-gray-400 mb-0.5">OEM</div>

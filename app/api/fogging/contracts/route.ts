@@ -33,6 +33,8 @@ function buildMatch(p: Record<string, string>): Filter<Document> {
     m.$or = [
       { gemc_no:            re },
       { buyer_display_name: re },
+      { dept_name:          re },
+      { gem_office_name:    re },
       { model_raw:          re },
       { seller_name:        re },
       { oem_short_brand:    re },

@@ -18,7 +18,8 @@ export async function GET(
         projection: {
           gemc_no: 1, product_name: 1, buying_mode: 1, contract_status: 1,
           seller_name_canonical: 1, seller_gst: 1, seller_msme_category: 1,
-          dept_name: 1, ministry: 1, quantity: 1, unit_rate: 1,
+          org_name: 1, dept_name: 1, office_name: 1, ministry: 1,
+          quantity: 1, unit_rate: 1,
           contract_value_num: 1, contract_date_dt: 1,
         },
       }),

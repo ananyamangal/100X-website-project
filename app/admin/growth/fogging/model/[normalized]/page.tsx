@@ -39,6 +39,7 @@ interface BuyerRow {
 interface Contract {
   gemc_no: string; contract_date: string | null
   buyer_display_name: string; buyer_state: string | null; buyer_canonical: string
+  dept_name?: string | null
   organization_name?: string; organization_canonical?: string | null
   oem_canonical: string; oem_short_brand: string | null; is_100x: boolean
   model_raw: string | null
@@ -74,8 +75,8 @@ function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () 
             ) : (
               <div className="font-medium text-xs leading-tight">{contract.organization_name ?? contract.buyer_display_name}</div>
             )}
-            {contract.organization_name && contract.organization_name !== contract.buyer_display_name && (
-              <div className="text-xs text-gray-400 mt-0.5">Dept: {contract.buyer_display_name}</div>
+            {contract.dept_name && contract.dept_name !== contract.buyer_display_name && (
+              <div className="text-xs text-gray-400 mt-0.5">Dept: {contract.dept_name}</div>
             )}
           </div>
           <div><div className="text-xs text-gray-400 mb-0.5">State</div><div>{contract.buyer_state ?? "—"}</div></div>
@@ -294,7 +295,7 @@ export default function ModelPage() {
                           </a>
                         )}
                         {b.organization_name && b.organization_name !== b.buyer_display_name && (
-                          <div className="text-gray-400 text-[10px] truncate">{b.buyer_display_name}</div>
+                          <div className="text-gray-400 text-[10px] truncate">{b.organization_name}</div>
                         )}
                       </td>
                       <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">{b.buyer_state ?? "—"}</td>
@@ -398,8 +399,8 @@ export default function ModelPage() {
                                   {c.organization_name ?? c.buyer_display_name}
                                 </div>
                               )}
-                              {c.organization_name && c.organization_name !== c.buyer_display_name && (
-                                <div className="text-gray-400 text-[10px] truncate">{c.buyer_display_name}</div>
+                              {c.dept_name && c.dept_name !== c.buyer_display_name && (
+                                <div className="text-gray-400 text-[10px] truncate">{c.dept_name}</div>
                               )}
                             </td>
                             <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">{c.buyer_state ?? "—"}</td>

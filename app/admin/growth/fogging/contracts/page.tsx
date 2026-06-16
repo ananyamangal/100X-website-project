@@ -20,6 +20,7 @@ interface Contract {
   contract_date: string | null
   buyer_display_name: string
   buyer_canonical: string
+  dept_name?: string | null
   organization_name?: string
   organization_canonical?: string | null
   buyer_state: string | null
@@ -245,8 +246,8 @@ export default function ContractDirectory() {
                         )}
                       </td>
                       <td className="px-3 py-2 max-w-[130px]">
-                        <span className="text-gray-400 text-[10px] truncate block" title={r.buyer_display_name}>
-                          {r.buyer_display_name?.slice(0, 24) ?? "—"}
+                        <span className="text-gray-400 text-[10px] truncate block" title={r.dept_name ?? r.buyer_display_name}>
+                          {(r.dept_name ?? r.buyer_display_name)?.slice(0, 24) ?? "—"}
                         </span>
                       </td>
                       <td className="px-3 py-2 text-gray-500">{r.buyer_state?.slice(0, 3) ?? "—"}</td>

@@ -30,56 +30,25 @@ const DB = '100xDB';
 
 // ── A1  Duplicate merge map ───────────────────────────────────────────────────
 // buyer_canonical → unified organization_canonical
+// NOTE: With org_name-based canonical (fogging-01 v1.4+), most historical merge
+// variants are resolved at source. Add entries only when org_name still produces
+// two canonical forms for the same real entity.
 const MERGE_MAP = {
-  'urban development directorate':                      'urban_dev_directorate_uttarakhand',
-  'urban development directorate of uttarakhand':       'urban_dev_directorate_uttarakhand',
-  'of medical health':                                  'medical_health_dept_up',
-  'medical health and family welfare department uttar': 'medical_health_dept_up',
-  'police department':                                  'uttar_pradesh_police',
-  'uttar pradesh police':                               'uttar_pradesh_police',
-  'directorate of urban local bodies':                  'dulb_haryana',
-  'urban local bodies':                                 'dulb_haryana',
-  'ahmednagar district panchayats':                     'ahmednagar_zilla_parishad',
-  'ahmednagar zilla parishad maharashtra':              'ahmednagar_zilla_parishad',
-  'solapur district panchayats':                        'solapur_zilla_parishad',
-  'solapur zilla parishad maharashtra':                 'solapur_zilla_parishad',
-  'chandrapur district panchayats':                     'chandrapur_zilla_parishad',
-  'zilla parishad chandrapur':                          'chandrapur_zilla_parishad',
-  'sangli district panchayats':                         'sangli_zilla_parishad',
-  'zilla parishad sangli':                              'sangli_zilla_parishad',
-  'satara district panchayats':                         'satara_zilla_parishad',
-  'zilla parishad satara':                              'satara_zilla_parishad',
-  'anand':                                              'anand_district_panchayat',
-  'district panchayat anand':                           'anand_district_panchayat',
+  // Add entries here only when org_name still produces two canonical forms
+  // for the same real entity (rare since org_name is GeM master data).
 };
 
 // Metadata for merged targets
-const MERGE_META = {
-  'urban_dev_directorate_uttarakhand': { organization_name: 'Uttarakhand Urban Dev Directorate', dept_category: 'Urban Development', organization_type: 'State Department', organization_state: 'Uttarakhand' },
-  'medical_health_dept_up':            { organization_name: 'UP Medical Health Dept',            dept_category: 'Health',            organization_type: 'State Department', organization_state: 'Uttar Pradesh' },
-  'uttar_pradesh_police':              { organization_name: 'Uttar Pradesh Police',               dept_category: 'Defence & Police',  organization_type: 'Police',           organization_state: 'Uttar Pradesh' },
-  'dulb_haryana':                      { organization_name: 'Haryana Directorate of Urban Local Bodies', dept_category: 'Urban Development', organization_type: 'State Department', organization_state: 'Haryana' },
-  'ahmednagar_zilla_parishad':         { organization_name: 'Ahmednagar Zilla Parishad',         dept_category: 'Agriculture & Rural', organization_type: 'Panchayat',       organization_state: 'Maharashtra' },
-  'solapur_zilla_parishad':            { organization_name: 'Solapur Zilla Parishad',            dept_category: 'Agriculture & Rural', organization_type: 'Panchayat',       organization_state: 'Maharashtra' },
-  'chandrapur_zilla_parishad':         { organization_name: 'Chandrapur Zilla Parishad',         dept_category: 'Agriculture & Rural', organization_type: 'Panchayat',       organization_state: 'Maharashtra' },
-  'sangli_zilla_parishad':             { organization_name: 'Sangli Zilla Parishad',             dept_category: 'Agriculture & Rural', organization_type: 'Panchayat',       organization_state: 'Maharashtra' },
-  'satara_zilla_parishad':             { organization_name: 'Satara Zilla Parishad',             dept_category: 'Agriculture & Rural', organization_type: 'Panchayat',       organization_state: 'Maharashtra' },
-  'anand_district_panchayat':          { organization_name: 'Anand District Panchayat',          dept_category: 'Agriculture & Rural', organization_type: 'Panchayat',       organization_state: 'Gujarat' },
-};
+const MERGE_META = {};
 
 // ── A2  Unresolved / broken entries ──────────────────────────────────────────
+// With org_name-based canonical (fogging-01 v1.4+), most garbled buyer_names
+// are now resolved. Only truly unidentifiable entities remain here.
 const UNRESOLVED = new Set([
-  '',                    // empty canonical (Hindi-encoded Punjab ₹300.7L)
+  '',                    // empty canonical (Hindi-encoded text)
   'unknown',             // catch-all
-  'madhya pradesh',      // comma-prefix state ₹207L
-  'chhattisgarh',        // state as org ₹5.2L
-  'punjab',              // state as org ₹10.2L
-  'odisha',              // state as org ₹8.8L
-  'tehri',               // district name ₹0.8L
-  'gram panchayat',      // generic
+  'gram panchayat',      // generic (no specific entity)
   'community health center', // generic
-  'nagar palika',        // generic UK ₹30.2L
-  'municipal council',   // generic MH ₹18.3L
 ]);
 
 // ── A2  Central Govt entities (override organization_state → "Central Government") ──

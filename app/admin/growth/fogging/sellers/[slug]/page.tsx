@@ -68,6 +68,7 @@ interface YearItem { year: number; gmv: number; contracts: number }
 interface LiveContract {
   gemc_no: string; contract_date: string | null; contract_quarter: string | null
   buyer_display_name: string; buyer_canonical: string; buyer_state: string | null; org_type: string | null
+  dept_name?: string | null
   organization_name?: string; organization_canonical?: string | null
   oem_canonical: string; oem_short_brand: string | null; model_raw: string | null
   contract_value_num: number | null; quantity: number | null; unit_price: number | null
@@ -100,8 +101,8 @@ function ContractPanel({ contract, onClose }: { contract: LiveContract; onClose:
             ) : (
               <div className="font-medium text-xs leading-tight">{contract.organization_name ?? contract.buyer_display_name}</div>
             )}
-            {contract.organization_name && contract.organization_name !== contract.buyer_display_name && (
-              <div className="text-xs text-gray-400 mt-0.5">Dept: {contract.buyer_display_name}</div>
+            {contract.dept_name && contract.dept_name !== contract.buyer_display_name && (
+              <div className="text-xs text-gray-400 mt-0.5">Dept: {contract.dept_name}</div>
             )}
           </div>
           <div><div className="text-xs text-gray-400 mb-0.5">State / Type</div><div className="text-sm">{contract.buyer_state ?? "—"} · {contract.org_type ?? "—"}</div></div>
@@ -652,8 +653,8 @@ export default function SellerPage() {
                               {c.organization_name ?? c.buyer_display_name}
                             </div>
                           )}
-                          {c.organization_name && c.organization_name !== c.buyer_display_name && (
-                            <div className="text-[10px] text-gray-400 truncate">{c.buyer_display_name}</div>
+                          {c.dept_name && c.dept_name !== c.buyer_display_name && (
+                            <div className="text-[10px] text-gray-400 truncate">{c.dept_name}</div>
                           )}
                         </td>
                         <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">{c.buyer_state ?? "—"}</td>
