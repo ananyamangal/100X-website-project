@@ -1,6 +1,11 @@
 "use client"
 import { useEffect, useState, useCallback } from "react"
-import { BarChart2, TrendingUp, TrendingDown, Zap, Clock, RefreshCw, RotateCw, ExternalLink } from "lucide-react"
+import {
+  BarChart2, TrendingUp, TrendingDown, Zap, Clock, RefreshCw, RotateCw, ExternalLink,
+  Calendar, Target, Users, Search, Megaphone,
+} from "lucide-react"
+
+// ── SEO types ─────────────────────────────────────────────────────────────────
 
 interface QueryRow { query: string; clicks: number; impressions: number; ctr: number; position: number }
 interface NearWin { query: string; position: number; impressions: number; clicks: number; ctr: number; expectedCtr: number; ctrGap: number; priority: string }
@@ -9,6 +14,166 @@ interface TrendPage { pagePath: string; clicks: number; impressions: number; cli
 interface Trends { syncedAt: string; currentPeriod: { startDate: string; endDate: string }; previousPeriod?: { startDate: string; endDate: string }; risingQueries: TrendQuery[]; fallingQueries: TrendQuery[]; risingPages: TrendPage[]; fallingPages: TrendPage[] }
 interface Overview { syncedAt: string; period: { startDate: string; endDate: string }; totalClicks: number; totalImpressions: number; avgPosition: number; uniqueQueries: number; uniquePages: number; nearWinCount: number }
 interface SEOAgentResult { summary: string; opportunitiesCreated: number; nearWinsFound: number; rankDropsFound: number; newKeywordsFound: number }
+
+// ── Weekly Plan types ─────────────────────────────────────────────────────────
+
+interface WeeklyAction {
+  rank: number
+  channel: "seo" | "ads" | "dealer" | "procurement"
+  title: string
+  why: string
+  effort: string
+  expected_impact: string
+  source: string
+  href: string
+}
+
+interface WeeklyPlanData {
+  generated_at: string
+  week_start: string
+  week_end: string
+  actions: WeeklyAction[]
+  summary: { seo: number; ads: number; dealer: number; procurement: number; total: number }
+  top3_message: string
+}
+
+// ── Weekly Plan Channel config ────────────────────────────────────────────────
+
+const CHANNEL_META: Record<WeeklyAction["channel"], { label: string; icon: React.ElementType; color: string; bg: string; border: string }> = {
+  seo:         { label: "SEO",         icon: Search,    color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200" },
+  ads:         { label: "Ads",         icon: Megaphone, color: "text-violet-700", bg: "bg-violet-50", border: "border-violet-200" },
+  dealer:      { label: "Dealer",      icon: Users,     color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" },
+  procurement: { label: "Procurement", icon: Target,    color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200" },
+}
+
+// ── Weekly Plan Tab ───────────────────────────────────────────────────────────
+
+function WeeklyPlanTab() {
+  const [data, setData] = useState<WeeklyPlanData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [channelFilter, setChannelFilter] = useState<WeeklyAction["channel"] | "all">("all")
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch("/api/admin/growth/reports/weekly-plan")
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      setData(await res.json())
+    } catch (e) { setError(String(e)) }
+    finally { setLoading(false) }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const filtered = data?.actions.filter(a => channelFilter === "all" || a.channel === channelFilter) ?? []
+
+  const channels: Array<WeeklyAction["channel"] | "all"> = ["all", "seo", "ads", "dealer", "procurement"]
+
+  return (
+    <div className="space-y-4">
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded text-xs text-red-700">{error}</div>
+      )}
+
+      {loading ? (
+        <div className="flex justify-center py-16">
+          <div className="w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : !data ? null : (
+        <>
+          {/* Top 3 message */}
+          <div className="bg-violet-50 border border-violet-200 rounded-xl px-5 py-4">
+            <div className="flex items-start gap-3">
+              <Calendar size={16} className="text-violet-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-violet-900 mb-1">
+                  Week of {new Date(data.week_start + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "long" })}
+                  {" – "}
+                  {new Date(data.week_end + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "long" })}
+                </p>
+                <p className="text-xs text-violet-800">{data.top3_message}</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-4 mt-3 pt-3 border-t border-violet-200">
+              {(["seo", "ads", "dealer", "procurement"] as const).map(ch => {
+                const m = CHANNEL_META[ch]
+                const count = data.summary[ch]
+                return (
+                  <span key={ch} className="flex items-center gap-1 text-[11px]">
+                    <m.icon size={11} className={m.color} />
+                    <span className="text-gray-600">{m.label}:</span>
+                    <span className="font-semibold text-gray-800">{count} actions</span>
+                  </span>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Channel filter */}
+          <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm w-fit flex-wrap">
+            {channels.map(ch => (
+              <button key={ch} onClick={() => setChannelFilter(ch)}
+                className={`text-xs px-3 py-1.5 rounded-lg font-medium capitalize transition-colors ${channelFilter === ch ? "bg-brand-600 text-white" : "text-gray-500 hover:text-gray-700"}`}>
+                {ch === "all" ? `All (${data.summary.total})` : `${CHANNEL_META[ch].label} (${data.summary[ch]})`}
+              </button>
+            ))}
+          </div>
+
+          {/* Action list */}
+          {filtered.length === 0 ? (
+            <div className="bg-white rounded-xl border border-dashed border-gray-200 p-10 text-center">
+              <p className="text-gray-400 text-sm">No actions for this channel. Run Revenue Director to generate priorities.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {filtered.map(action => {
+                const m = CHANNEL_META[action.channel]
+                return (
+                  <div key={action.rank} className={`bg-white rounded-xl border shadow-sm overflow-hidden border-l-4 ${m.border}`}>
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                          <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white mt-0.5 ${
+                            action.rank <= 3 ? "bg-violet-600" : "bg-gray-400"
+                          }`}>{action.rank}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${m.bg} ${m.color}`}>
+                                <m.icon size={9} />{m.label}
+                              </span>
+                              <span className="text-[10px] text-gray-400">{action.effort}</span>
+                              <span className="text-[10px] text-gray-400">· {action.source}</span>
+                            </div>
+                            <p className="text-sm font-semibold text-gray-900 mt-1">{action.title}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{action.why}</p>
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <p className="text-xs font-semibold text-emerald-700">{action.expected_impact}</p>
+                        </div>
+                      </div>
+                      <div className="mt-2 pl-9">
+                        <a href={action.href} className="text-[11px] text-blue-600 hover:underline">Open →</a>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          <p className="text-[10px] text-gray-400">
+            Generated {new Date(data.generated_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })} · Based on pending Revenue Director recs, GSC near-wins, and CRM pipeline · Run Revenue Director first for best results
+          </p>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function pos(n: number) { return Math.round(n * 10) / 10 }
 function pct(n: number) { return `${Math.round(n * 1000) / 10}%` }
@@ -21,7 +186,7 @@ export default function ReportingCenter() {
   const [runningAgent, setRunningAgent] = useState(false)
   const [agentResult, setAgentResult] = useState<SEOAgentResult | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<"near-wins" | "keywords-gained" | "keywords-lost" | "pages-gained" | "pages-lost" | "ctr-issues">("near-wins")
+  const [activeTab, setActiveTab] = useState<"near-wins" | "keywords-gained" | "keywords-lost" | "pages-gained" | "pages-lost" | "ctr-issues" | "weekly-plan">("near-wins")
 
   const loadAll = useCallback(async () => {
     setLoading(true)
@@ -50,12 +215,13 @@ export default function ReportingCenter() {
 
   const noData = !overview
   const tabs = [
-    { id: "near-wins", label: `Near-Wins (${nearWins.length})` },
+    { id: "near-wins",       label: `Near-Wins (${nearWins.length})` },
     { id: "keywords-gained", label: `Keywords Gained (${trends?.risingQueries.length ?? 0})` },
-    { id: "keywords-lost", label: `Keywords Lost (${trends?.fallingQueries.length ?? 0})` },
-    { id: "pages-gained", label: `Pages Gained (${trends?.risingPages.length ?? 0})` },
-    { id: "pages-lost", label: `Pages Lost (${trends?.fallingPages.length ?? 0})` },
-    { id: "ctr-issues", label: `Low CTR (${lowCtrOpportunities.length})` },
+    { id: "keywords-lost",   label: `Keywords Lost (${trends?.fallingQueries.length ?? 0})` },
+    { id: "pages-gained",    label: `Pages Gained (${trends?.risingPages.length ?? 0})` },
+    { id: "pages-lost",      label: `Pages Lost (${trends?.fallingPages.length ?? 0})` },
+    { id: "ctr-issues",      label: `Low CTR (${lowCtrOpportunities.length})` },
+    { id: "weekly-plan",     label: "Weekly Plan" },
   ] as const
 
   return (
@@ -92,14 +258,30 @@ export default function ReportingCenter() {
           <div className="flex items-center justify-center py-16">
             <div className="w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : noData ? (
-          <div className="bg-white rounded-xl border border-dashed border-gray-200 p-12 text-center">
-            <BarChart2 size={32} className="text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 text-sm font-medium">No GSC data yet</p>
-            <p className="text-gray-400 text-xs mt-1">Go to SEO Command Center → Sync now to pull data from Google Search Console.</p>
-          </div>
         ) : (
           <>
+            {/* Tabs — always visible */}
+            <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm flex-wrap">
+              {tabs.map(tab => (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                  className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors whitespace-nowrap ${activeTab === tab.id ? "bg-brand-600 text-white" : "text-gray-500 hover:text-gray-700"}`}>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Weekly Plan — rendered before GSC content, available without GSC data */}
+            {activeTab === "weekly-plan" && <WeeklyPlanTab />}
+
+            {/* GSC content — only when GSC data available and not on weekly-plan */}
+            {activeTab !== "weekly-plan" && (noData ? (
+              <div className="bg-white rounded-xl border border-dashed border-gray-200 p-12 text-center">
+                <BarChart2 size={32} className="text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm font-medium">No GSC data yet</p>
+                <p className="text-gray-400 text-xs mt-1">Go to SEO Command Center → Sync now to pull data from Google Search Console.</p>
+              </div>
+            ) : (
+            <>
             {/* Summary stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               {[
@@ -114,16 +296,6 @@ export default function ReportingCenter() {
                   <p className={`text-xl font-bold ${color}`}>{value}</p>
                   <p className="text-[10px] text-gray-400 mt-0.5">{label}</p>
                 </div>
-              ))}
-            </div>
-
-            {/* Tabs */}
-            <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm flex-wrap">
-              {tabs.map(tab => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors whitespace-nowrap ${activeTab === tab.id ? "bg-brand-600 text-white" : "text-gray-500 hover:text-gray-700"}`}>
-                  {tab.label}
-                </button>
               ))}
             </div>
 
@@ -274,7 +446,9 @@ export default function ReportingCenter() {
               </p>
             )}
           </>
-        )}
+        ))}
+      </>
+      )}
       </div>
     </div>
   )

@@ -1101,6 +1101,96 @@ function MeasurementStrip({ m }: { m: Measurement }) {
   )
 }
 
+// ─── Budget Allocation Engine ─────────────────────────────────────────────────
+
+const BUDGET_BY_TYPE: Record<string, number> = {
+  oem_displacement:            0,
+  dealer_recruit:              0,
+  procurement_target:          0,
+  negative_keyword:            0,
+  landing_page_create:         0,
+  content_create:              0,
+  search_campaign:             15000,
+  customer_match:              10000,
+  customer_match_campaign:     10000,
+  remarketing_campaign:        8000,
+  youtube_campaign:            20000,
+  performance_max_campaign:    25000,
+  competitor_conquest_campaign: 20000,
+  creative_refresh:            0,
+  budget_reallocate:           0,
+}
+
+function BudgetRankPanel({ pendingRecs }: { pendingRecs: Rec[] }) {
+  if (pendingRecs.length === 0) return null
+
+  interface RankedRec { rec: Rec; budget: number; roi: number | null; score: number }
+
+  const ranked: RankedRec[] = pendingRecs
+    .map(rec => {
+      const budget = BUDGET_BY_TYPE[rec.type] ?? 0
+      const revenue = rec.expected_revenue_impact
+      const conf = rec.confidence / 100
+      const roi = budget > 0 ? Math.round(((revenue - budget) / budget) * 100) : null
+      const score = revenue * conf - (budget > 0 ? budget * 0.5 : 0)
+      return { rec, budget, roi, score }
+    })
+    .sort((a, b) => b.score - a.score)
+
+  const top3 = ranked.slice(0, 3)
+  const totalBudget = top3.reduce((s, r) => s + r.budget, 0)
+  const totalRevenue = top3.reduce((s, r) => s + r.rec.expected_revenue_impact, 0)
+
+  return (
+    <div className="mb-4 bg-violet-50 border border-violet-200 rounded-lg overflow-hidden">
+      <div className="px-4 py-3 border-b border-violet-100 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Trophy size={14} className="text-violet-600" />
+          <span className="text-sm font-semibold text-violet-900">Budget Allocation Engine — Top 3 to approve this week</span>
+        </div>
+        <div className="flex items-center gap-3 text-[11px] text-violet-700">
+          {totalBudget > 0 && <span>Budget needed: <span className="font-semibold">{INR(totalBudget)}/mo</span></span>}
+          <span>Expected: <span className="font-semibold text-emerald-700">{INR(totalRevenue)}</span></span>
+        </div>
+      </div>
+      <div className="divide-y divide-violet-100">
+        {top3.map(({ rec, budget, roi }, i) => (
+          <div key={rec._id} className="px-4 py-3 flex items-start gap-3">
+            <span className="shrink-0 w-6 h-6 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center mt-0.5">
+              {i + 1}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-semibold text-gray-900">{rec.title}</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold border ${PRIORITY_COLOR[rec.priority]}`}>
+                  {rec.priority.toUpperCase()}
+                </span>
+              </div>
+              <p className="text-[11px] text-gray-500 mt-0.5">{rec.why_now || rec.evidence}</p>
+              <div className="flex flex-wrap gap-3 mt-1.5 text-[11px]">
+                <span className="text-gray-500">Budget: <span className="font-semibold text-gray-700">{budget > 0 ? `${INR(budget)}/mo` : "₹0 (no spend)"}</span></span>
+                <span className="text-gray-500">Expected: <span className="font-semibold text-emerald-700">{INR(rec.expected_revenue_impact)}</span></span>
+                <span className="text-gray-500">Confidence: <span className="font-semibold text-gray-700">{rec.confidence}%</span></span>
+                {roi !== null && (
+                  <span className="text-gray-500">ROI: <span className={`font-semibold ${roi > 0 ? "text-emerald-700" : "text-red-600"}`}>{roi}%</span></span>
+                )}
+                {roi === null && (
+                  <span className="text-emerald-700 font-semibold">∞ ROI (no spend)</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {pendingRecs.length > 3 && (
+        <div className="px-4 py-2 bg-violet-100/50 text-[11px] text-violet-700 text-center">
+          {pendingRecs.length - 3} more pending — approve these 3 first for maximum ROI
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function RevenueDashboardPage() {
@@ -1297,6 +1387,11 @@ export default function RevenueDashboardPage() {
           </button>
         ))}
       </div>
+
+      {/* Budget Allocation Engine — top 3 when viewing pending */}
+      {!loading && filter === "pending" && (
+        <BudgetRankPanel pendingRecs={pendingRecs} />
+      )}
 
       {/* Recommendations */}
       {loading ? (
