@@ -278,7 +278,7 @@ export default function ContractDirectory() {
                         )}
                       </td>
                       <td className="px-3 py-2 text-center">
-                        <a href={`https://gem.gov.in/orders/contract/${r.gemc_no}`}
+                        <a href={`https://mkp.gem.gov.in/contract/order-detail/${r.gemc_no}`}
                           target="_blank" rel="noreferrer"
                           className="text-blue-500 hover:text-blue-700">
                           <ExternalLink size={12} />

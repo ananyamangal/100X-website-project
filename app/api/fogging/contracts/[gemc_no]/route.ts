@@ -32,7 +32,7 @@ export async function GET(
     return NextResponse.json({
       contract,
       gem_src: gemSrc,
-      gem_url: `https://gem.gov.in/orders/contract/${gemcNo}`,
+      gem_url: `https://mkp.gem.gov.in/contract/order-detail/${gemcNo}`,
     });
   } catch (e) {
     console.error('[fogging/contracts/[gemc_no]]', e);

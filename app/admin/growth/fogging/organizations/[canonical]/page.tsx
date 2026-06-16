@@ -366,7 +366,7 @@ export default function OrganizationPage({ params }: { params: { canonical: stri
                             ) : <span className="text-gray-500 truncate block">{c.seller_name?.slice(0, 16)}</span>}
                           </td>
                           <td className="px-3 py-2 text-center">
-                            <a href={`https://gem.gov.in/orders/contract/${c.gemc_no}`}
+                            <a href={`https://mkp.gem.gov.in/contract/order-detail/${c.gemc_no}`}
                               target="_blank" rel="noreferrer" className="text-blue-400 hover:text-blue-700">
                               <ExternalLink size={11}/>
                             </a>

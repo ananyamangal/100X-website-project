@@ -101,11 +101,17 @@ export default function Contract360() {
 
   const { contract, gem_src, gem_url } = data
 
-  // Entity hierarchy: org_name (primary) → dept_name (secondary) → office_name (tertiary)
-  const orgName    = gem_src?.org_name && gem_src.org_name !== "N/A" ? gem_src.org_name : null
-  const deptName   = contract.dept_name || gem_src?.dept_name || null
-  const officeName = contract.gem_office_name || gem_src?.office_name || null
-  const primaryEntity = orgName ?? contract.buyer_display_name
+  // Entity hierarchy: builder output (buyer_display_name) is always primary
+  // gem_src.org_name shown only if it adds context beyond the primary entity
+  const DEPT_ORG_RE = /^urban development and housing department$/i
+  const primaryEntity = contract.buyer_display_name
+  const gemOrgName = gem_src?.org_name && gem_src.org_name !== "N/A" && !DEPT_ORG_RE.test(gem_src.org_name)
+    ? gem_src.org_name : null
+  const showParentOrg = gemOrgName && gemOrgName.toLowerCase() !== primaryEntity.toLowerCase()
+  const deptName = contract.dept_name || gem_src?.dept_name || null
+  // Hide numeric office zone codes (GeM internal codes like "803213")
+  const rawOffice = contract.gem_office_name || gem_src?.office_name || null
+  const officeName = rawOffice && !/^\d+$/.test(rawOffice) ? rawOffice : null
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -156,7 +162,7 @@ export default function Contract360() {
             <Building2 size={14} /> Entity Hierarchy
           </div>
           <div className="space-y-3">
-            {/* Organization (primary) */}
+            {/* Organization (primary — builder output) */}
             <div className="flex items-start gap-3">
               <div className="w-24 text-xs text-gray-400 pt-0.5 shrink-0">Organization</div>
               <div>
@@ -171,6 +177,13 @@ export default function Contract360() {
                 )}
               </div>
             </div>
+            {/* Parent org (only if different from primary entity and adds context) */}
+            {showParentOrg && (
+              <div className="flex items-start gap-3">
+                <div className="w-24 text-xs text-gray-400 pt-0.5 shrink-0">Parent Org</div>
+                <div className="text-sm text-gray-600 leading-snug">{gemOrgName}</div>
+              </div>
+            )}
             {/* Department (secondary) */}
             {deptName && deptName !== primaryEntity && (
               <div className="flex items-start gap-3">
@@ -178,7 +191,7 @@ export default function Contract360() {
                 <div className="text-sm text-gray-700 leading-snug">{deptName}</div>
               </div>
             )}
-            {/* Office (tertiary) */}
+            {/* Office (tertiary — numeric zone codes hidden) */}
             {officeName && officeName !== primaryEntity && officeName !== deptName && (
               <div className="flex items-start gap-3">
                 <div className="w-24 text-xs text-gray-400 pt-0.5 shrink-0">Office</div>

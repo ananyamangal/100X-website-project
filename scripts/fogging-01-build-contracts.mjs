@@ -81,10 +81,29 @@ function canonicalizeBuyer(name) {
 const NA_ORG = new Set(['N/A', 'NA', 'n/a', 'N/A ', '']);
 // GoI digital portals — not real procurement entities, skip to office_name
 const PLATFORM_ORG_RE = /^(e-municipalities|e-nagar palika|e_nagarpalika|eservices to citizens)/i;
+// Dept-level org names used as umbrella by ULBs — individual offices are real buyers
+const DEPT_ORG_RE = /^urban development and housing department$/i;
+
+// When office_name is a numeric zone code, try extracting municipality from buyer_address
+function extractMuniFromAddress(addr) {
+  if (!addr) return null;
+  const part = addr.split(',')[0].trim();
+  if (part.length > 5 && /\b(nagar|panchayat|palika|parishad|nigam|municipal|council)\b/i.test(part)) return part;
+  return null;
+}
+
 function primaryEntityName(doc) {
   const orgName = (doc.org_name || '').trim();
-  if (orgName && !NA_ORG.has(orgName) && !PLATFORM_ORG_RE.test(orgName)) return orgName;
-  return ((doc.office_name || doc.buyer_name || '')).trim();
+  if (orgName && !NA_ORG.has(orgName) && !PLATFORM_ORG_RE.test(orgName) && !DEPT_ORG_RE.test(orgName)) {
+    return orgName;
+  }
+  const officeName = (doc.office_name || '').trim();
+  // Skip numeric zone codes (GeM office zone codes like "803213")
+  if (officeName && !/^\d+$/.test(officeName)) return officeName;
+  // Numeric zone code: try extracting municipality name from buyer_address
+  const fromAddr = extractMuniFromAddress(doc.buyer_address || '');
+  if (fromAddr) return fromAddr;
+  return (doc.buyer_name || '').trim();
 }
 
 // Sorted-word key for collision detection (different word orders = same entity)

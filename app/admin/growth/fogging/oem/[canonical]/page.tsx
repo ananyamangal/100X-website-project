@@ -46,7 +46,7 @@ interface Summary {
 // ── Contract Detail Panel ────────────────────────────────────────────────────
 
 function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () => void }) {
-  const gemUrl = `https://gem.gov.in/orders/contract/${contract.gemc_no}`
+  const gemUrl = `https://mkp.gem.gov.in/contract/order-detail/${contract.gemc_no}`
   return (
     <div className="fixed inset-y-0 right-0 w-full max-w-lg bg-white border-l border-gray-200 shadow-2xl z-50 flex flex-col">
       <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
@@ -381,7 +381,7 @@ export default function OemPage() {
                               Detail
                             </button>
                             <a
-                              href={`https://gem.gov.in/orders/contract/${c.gemc_no}`}
+                              href={`https://mkp.gem.gov.in/contract/order-detail/${c.gemc_no}`}
                               target="_blank" rel="noreferrer"
                               className="px-2 py-1 bg-blue-50 hover:bg-blue-100 rounded text-xs text-blue-700 transition-colors flex items-center gap-0.5"
                               title="Open on GeM">
