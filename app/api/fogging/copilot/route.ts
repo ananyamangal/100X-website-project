@@ -32,6 +32,7 @@ Fields available in fogging_contracts:
 - contract_date (ISO string): date of contract
 - contract_year (number): 2019–2025
 - buying_mode (string): e.g. "GeM Pool", "Direct Purchase"
+- spec_mount_type (string): "Vehicle Mounted" or "Hand Carried" — use this for vehicle/mounted/backpack type queries
 - is_100x (boolean): true if 100X Circle contract
 - has_unit_price (boolean): true if unit price available
 
@@ -43,10 +44,7 @@ Fields available in fogging_sellers:
 - oem_count (number): number of distinct OEM brands carried
 - buyers_served (number): unique buyers served
 - is_100x_dealer (boolean): true if carries 100X Circle
-- carries_neptune (boolean)
-- carries_sse (boolean)
-- carries_instafog (boolean)
-- carries_pulsfog (boolean)
+- oems_represented (array): array of {oem_canonical, brand_name, gmv, contracts}. To filter by OEM use DOT notation: {"oems_represented.oem_canonical": "NEPTUNE"}. Values: "NEPTUNE", "SSE SAI SHREE ENTERPRISES", "PULSFOG", "INSTA FOG", "100X CIRCLE"
 - seller_gst (string): GSTIN
 - has_gst (boolean): has valid GST registration
 - seller_msme (string): social category (General/OBC/SC/ST)
@@ -74,7 +72,7 @@ Q: "find dealers who sell multiple OEMs"
 A: {"query_type":"sellers","filter":{"oem_count":{"$gt":1}},"sort":{"oem_count":-1},"explanation":"Dealers who carry more than one OEM brand, ranked by OEM count."}
 
 Q: "show Neptune dealers in UP"
-A: {"query_type":"sellers","filter":{"carries_neptune":true,"seller_state":"Uttar Pradesh"},"sort":{"total_gmv":-1},"explanation":"Neptune dealers operating in Uttar Pradesh."}
+A: {"query_type":"sellers","filter":{"oems_represented.oem_canonical":"NEPTUNE","seller_state":"Uttar Pradesh"},"sort":{"total_gmv":-1},"explanation":"Neptune dealers operating in Uttar Pradesh."}
 
 Q: "who are the top dealers in Bihar"
 A: {"query_type":"sellers","filter":{"seller_state":"Bihar"},"sort":{"total_gmv":-1},"explanation":"Dealers operating in Bihar by total GMV."}
@@ -92,7 +90,13 @@ Q: "Show all contracts above 10 lakh"
 A: {"query_type":"contracts","filter":{"contract_value_num":{"$gte":1000000}},"explanation":"All contracts with value above ₹10 lakh."}
 
 Q: "Show 100X contracts in UP"
-A: {"query_type":"contracts","filter":{"is_100x":true,"buyer_state":"Uttar Pradesh"},"explanation":"100X Circle contracts in Uttar Pradesh."}`;
+A: {"query_type":"contracts","filter":{"is_100x":true,"buyer_state":"Uttar Pradesh"},"explanation":"100X Circle contracts in Uttar Pradesh."}
+
+Q: "vehicle mounted fogging contracts"
+A: {"query_type":"contracts","filter":{"spec_mount_type":"Vehicle Mounted"},"sort":{"contract_value_num":-1},"explanation":"All contracts for vehicle-mounted fogging machines."}
+
+Q: "largest Bihar opportunity"
+A: {"query_type":"contracts","filter":{"buyer_state":"Bihar"},"sort":{"contract_value_num":-1},"explanation":"Bihar contracts sorted by value, largest first."}`;
 
 interface SellerDoc {
   seller_slug?: string; seller_gst?: string | null; seller_display_name?: string;

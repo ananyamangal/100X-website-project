@@ -1527,22 +1527,36 @@ function FoggingCopilotTab() {
     }
   }
 
-  const startMic = () => {
+  const startMic = async () => {
     setMicError(null)
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SpeechRec) { setMicError('Voice not supported in this browser. Use Chrome.'); return }
+    if (navigator.permissions) {
+      try {
+        const perm = await navigator.permissions.query({ name: 'microphone' as PermissionName })
+        if (perm.state === 'denied') {
+          setMicError('Microphone blocked. Open Chrome Settings → Privacy & Security → Site Settings → Microphone and allow this site.')
+          return
+        }
+      } catch { /* proceed */ }
+    }
     const rec = new SpeechRec()
     rec.lang = 'en-IN'; rec.interimResults = false
     rec.onstart  = () => setMicActive(true)
     rec.onresult = (e: any) => { const t = e.results[0][0].transcript; setQuery(t); run(t) }
     rec.onerror  = (e: any) => {
       setMicActive(false)
-      if (e.error === 'not-allowed') setMicError('Mic permission denied — allow microphone access and retry.')
+      if (e.error === 'not-allowed') setMicError('Mic access denied. Click the lock icon in your address bar → allow microphone, then retry.')
       else if (e.error === 'no-speech') setMicError('No speech detected. Try again.')
-      else setMicError('Voice search failed. Try again.')
+      else setMicError(`Voice failed (${e.error}). Try again.`)
     }
     rec.onend = () => setMicActive(false)
-    rec.start()
+    try {
+      rec.start()
+    } catch (err: any) {
+      setMicActive(false)
+      setMicError(`Could not start microphone: ${err?.message ?? 'unknown error'}. Try refreshing.`)
+    }
   }
 
   const exportCsv = () => {
@@ -1629,10 +1643,14 @@ function FoggingCopilotTab() {
               <div className="text-sm font-medium text-blue-900">{result.explanation}</div>
             </div>
             <div className="flex gap-4 text-xs text-blue-700 shrink-0">
-              <span><strong>{result.total.toLocaleString()}</strong> contracts</span>
+              <span><strong>{result.total.toLocaleString()}</strong> {result.collection === 'sellers' ? 'dealers' : 'contracts'}</span>
               <span><strong>{INR(result.summary.total_gmv, true)}</strong> GMV</span>
-              <span><strong>{result.summary.buyer_count}</strong> buyers</span>
-              <span><strong>{result.summary.state_count}</strong> states</span>
+              {result.collection !== 'sellers' && result.summary.buyer_count != null && (
+                <span><strong>{result.summary.buyer_count}</strong> buyers</span>
+              )}
+              {result.summary.state_count != null && (
+                <span><strong>{result.summary.state_count}</strong> states</span>
+              )}
               <button onClick={exportCsv}
                 className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                 <Download size={12} /> CSV
@@ -1854,12 +1872,22 @@ export default function FoggingIntelligencePage() {
     }, 300)
   }, [])
 
-  const startVoice = useCallback(() => {
+  const startVoice = useCallback(async () => {
     setVoiceError(null)
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SpeechRec) {
       setVoiceError('Voice search requires Chrome or Edge. Try typing instead.')
       return
+    }
+    // Pre-check permission state so we can give a specific message before the browser denies
+    if (navigator.permissions) {
+      try {
+        const perm = await navigator.permissions.query({ name: 'microphone' as PermissionName })
+        if (perm.state === 'denied') {
+          setVoiceError('Microphone blocked. Open Chrome Settings → Privacy & Security → Site Settings → Microphone and allow this site.')
+          return
+        }
+      } catch { /* permissions API not available, proceed */ }
     }
     const recognition = new SpeechRec()
     recognition.lang = 'en-IN'
@@ -1872,15 +1900,20 @@ export default function FoggingIntelligencePage() {
     recognition.onerror = (e: any) => {
       setVoiceActive(false)
       if (e.error === 'not-allowed') {
-        setVoiceError('Microphone permission denied. Click the lock icon in your browser address bar to allow it.')
+        setVoiceError('Microphone access denied. Click the lock icon in your address bar → allow microphone, then retry.')
       } else if (e.error === 'no-speech') {
         setVoiceError('No speech detected. Please try again.')
       } else {
-        setVoiceError('Voice search failed. Please type your search instead.')
+        setVoiceError(`Voice search failed (${e.error}). Please type your search instead.`)
       }
     }
     recognition.onend  = () => setVoiceActive(false)
-    recognition.start()
+    try {
+      recognition.start()
+    } catch (err: any) {
+      setVoiceActive(false)
+      setVoiceError(`Could not start microphone: ${err?.message ?? 'unknown error'}. Try refreshing the page.`)
+    }
   }, [handleSearch])
 
   const totalGmv = oems.reduce((a, o) => a + (o.total_gmv || 0), 0)
@@ -1910,7 +1943,7 @@ export default function FoggingIntelligencePage() {
               Fogging Intelligence
             </h1>
             <p className="text-xs text-gray-500 mt-0.5">
-              1,418 contracts · 274 buyers · 34 OEMs · 27 states
+              1,418 contracts · 670 buyers · 34 OEMs · 27 states
             </p>
           </div>
           <a href="/api/fogging/oems" target="_blank" rel="noreferrer"
