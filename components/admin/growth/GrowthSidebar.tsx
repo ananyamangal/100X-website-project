@@ -35,7 +35,7 @@ interface NavModule {
 const SECTION_META: Record<SectionId, { label: string; founderOnly: boolean }> = {
   founder:      { label: "FOUNDER",             founderOnly: false },
   marketing:    { label: "MARKETING",            founderOnly: true },
-  market_intel: { label: "MARKET INTELLIGENCE",  founderOnly: true },
+  market_intel: { label: "INTELLIGENCE",           founderOnly: true },
   crm:          { label: "CRM",                  founderOnly: true },
   admin:        { label: "ADMINISTRATION",        founderOnly: true },
   advanced:     { label: "ADVANCED TOOLS",        founderOnly: true },
@@ -71,7 +71,6 @@ const NAV_MODULES: NavModule[] = [
 
   // ── CRM ──────────────────────────────────────────────────────────────────
   { section: "crm", href: "/admin/growth/contact-this-week", label: "Leads",         icon: Inbox,       permission: "dealer.view" },
-  { section: "crm", href: "/admin/growth/dealers",           label: "Dealers",       icon: Building2,   permission: "dealer.view" },
   { section: "crm", href: "/admin/growth/opportunities",     label: "Opportunities", icon: TrendingUp,  permission: "opportunities.view" },
 
   // ── ADMINISTRATION ───────────────────────────────────────────────────────

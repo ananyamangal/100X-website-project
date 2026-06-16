@@ -392,6 +392,41 @@ export default function OperationsCenterPage() {
         </div>
       )}
 
+      {/* Auto vs Manual summary strip */}
+      {stats && (
+        <div className="mb-4 p-3 bg-gray-900 rounded-lg flex flex-wrap items-center gap-x-6 gap-y-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0" />
+            <span className="text-xs text-gray-300">
+              <span className="font-bold text-white">{stats.scheduled}</span> run automatically on schedule
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-purple-400 flex-shrink-0" />
+            <span className="text-xs text-gray-300">
+              <span className="font-bold text-white">{stats.manual}</span> require manual trigger
+            </span>
+          </div>
+          {stats.broken > 0 ? (
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 animate-pulse" />
+              <span className="text-xs text-red-400 font-semibold">{stats.broken} broken — needs attention</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
+              <span className="text-xs text-green-400 font-medium">0 broken</span>
+            </div>
+          )}
+          {upcoming.length > 0 && (
+            <div className="ml-auto text-xs text-gray-500">
+              Next: <span className="text-gray-300 font-medium">{upcoming[0].module}</span>
+              {" "}· {relativeTimeAhead(upcoming[0].next_run_at)}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* KPI strip */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
