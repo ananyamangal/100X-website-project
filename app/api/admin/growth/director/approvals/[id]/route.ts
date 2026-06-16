@@ -2,10 +2,28 @@ import { type NextRequest, NextResponse } from "next/server"
 import { ObjectId } from "mongodb"
 import clientPromise from "@/lib/mongodb"
 import { requireAuth } from "@/lib/rbac/server"
+import { generateExecutionPack } from "@/lib/growth-os/agents/execution-pack-generator"
+import type { DirectorRec } from "@/lib/growth-os/director-types"
 
 export const dynamic = "force-dynamic"
 
-/** POST /api/admin/growth/director/approvals/[id] — approve | reject | defer | apply */
+const VALID_ACTIONS = [
+  "approved", "rejected", "deferred", "applied",  // original (preserved)
+  "in_progress", "completed", "won", "lost",       // v1.1 lifecycle
+  "update_meta",                                    // v1.1 owner + target date update
+]
+
+/**
+ * POST /api/admin/growth/director/approvals/[id]
+ * Actions: approved | rejected | deferred | in_progress | completed | won | lost | update_meta
+ * Body:
+ *   action: string
+ *   reason?: string (for rejected)
+ *   realized_impact?: number (for won/lost)
+ *   outcome_notes?: string (for completed/won/lost)
+ *   owner?: string (for update_meta or in_progress)
+ *   target_completion_date?: string (for update_meta or in_progress)
+ */
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -20,16 +38,48 @@ export async function POST(
 
   const body = await req.json().catch(() => ({}))
   const action = body.action as string
-  if (!["approved", "rejected", "deferred", "applied"].includes(action)) {
-    return NextResponse.json({ error: "action must be approved | rejected | deferred | applied" }, { status: 400 })
+  if (!VALID_ACTIONS.includes(action)) {
+    return NextResponse.json({ error: `action must be one of: ${VALID_ACTIONS.join(" | ")}` }, { status: 400 })
   }
 
   const db = (await clientPromise).db()
   const now = new Date().toISOString()
 
-  const update: Record<string, unknown> = { status: action, reviewed_at: now }
+  // Build the update object
+  const update: Record<string, unknown> = { status: action === "update_meta" ? undefined : action }
+  delete update.status // will add conditionally below
+
+  if (action !== "update_meta") update.status = action
+  update.reviewed_at = now
+
+  // Action-specific fields
   if (action === "rejected" && body.reason) update.rejection_reason = body.reason
-  if (action === "applied") update.applied_at = now
+  if (action === "applied" || action === "in_progress") {
+    update.in_progress_at = now
+    update.applied_at = now // backward compat
+    if (body.owner) update.owner = body.owner
+    if (body.target_completion_date) update.target_completion_date = body.target_completion_date
+  }
+  if (action === "completed") {
+    update.completed_at = now
+    if (body.outcome_notes) update.outcome_notes = body.outcome_notes
+  }
+  if (action === "won") {
+    update.won_at = now
+    update.completed_at = update.completed_at || now
+    if (body.realized_impact !== undefined) update.realized_impact = Number(body.realized_impact)
+    if (body.outcome_notes) update.outcome_notes = body.outcome_notes
+  }
+  if (action === "lost") {
+    update.lost_at = now
+    update.completed_at = update.completed_at || now
+    if (body.realized_impact !== undefined) update.realized_impact = Number(body.realized_impact) || 0
+    if (body.outcome_notes) update.outcome_notes = body.outcome_notes
+  }
+  if (action === "update_meta") {
+    if (body.owner !== undefined) update.owner = body.owner
+    if (body.target_completion_date !== undefined) update.target_completion_date = body.target_completion_date
+  }
 
   const result = await db.collection("director_recommendations").updateOne(
     { _id: new ObjectId(id) },
@@ -40,9 +90,9 @@ export async function POST(
     return NextResponse.json({ error: "Recommendation not found" }, { status: 404 })
   }
 
-  // Write to outcomes for learning loop
-  if (action === "approved" || action === "rejected" || action === "deferred") {
-    const rec = await db.collection("director_recommendations").findOne({ _id: new ObjectId(id) })
+  // Write to outcomes collection for learning loop
+  if (["approved", "rejected", "deferred", "in_progress", "completed", "won", "lost"].includes(action)) {
+    const rec = await db.collection("director_recommendations").findOne({ _id: new ObjectId(id) }) as DirectorRec | null
     if (rec) {
       await db.collection("director_outcomes").insertOne({
         rec_id: id,
@@ -52,8 +102,34 @@ export async function POST(
         decision: action,
         decided_at: now,
         expected_revenue: rec.expected_revenue_impact || 0,
+        actual_revenue: action === "won" ? (Number(body.realized_impact) || null) : null,
+        outcome_notes: body.outcome_notes || null,
+        closed_at: ["won", "lost", "rejected"].includes(action) ? now : null,
         created_at: now,
       })
+
+      // On approval: generate execution pack asynchronously (non-blocking)
+      if (action === "approved") {
+        generateExecutionPack(rec, db)
+          .then(async (pack) => {
+            if (!pack) return
+            const packResult = await db.collection("director_execution_packs").insertOne({
+              rec_id: id,
+              rec_type: rec.type,
+              rec_title: rec.title,
+              generated_at: new Date().toISOString(),
+              pack,
+            })
+            const packId = packResult.insertedId.toString()
+            await db.collection("director_recommendations").updateOne(
+              { _id: new ObjectId(id) },
+              { $set: { execution_pack_id: packId } }
+            )
+          })
+          .catch((err) => {
+            console.error("Execution pack generation failed:", err)
+          })
+      }
     }
   }
 
