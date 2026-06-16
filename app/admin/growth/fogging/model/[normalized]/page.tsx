@@ -30,6 +30,7 @@ interface ModelProfile {
 
 interface BuyerRow {
   _id: string; buyer_display_name: string; buyer_state: string | null
+  organization_name?: string; organization_canonical?: string | null
   contract_count: number; total_gmv: number; total_qty: number
   min_price: number | null; max_price: number | null; avg_price: number | null
   last_purchase: string | null; sellers: string[]
@@ -38,6 +39,7 @@ interface BuyerRow {
 interface Contract {
   gemc_no: string; contract_date: string | null
   buyer_display_name: string; buyer_state: string | null; buyer_canonical: string
+  organization_name?: string; organization_canonical?: string | null
   oem_canonical: string; oem_short_brand: string | null; is_100x: boolean
   model_raw: string | null
   quantity: number | null; unit_price: number | null; contract_value_num: number | null
@@ -62,7 +64,20 @@ function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () 
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div><div className="text-xs text-gray-400 mb-0.5">Date</div><div className="font-medium">{fmt(contract.contract_date)}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">Value</div><div className="font-semibold text-blue-700">{INR(contract.contract_value_num, true)}</div></div>
-          <div><div className="text-xs text-gray-400 mb-0.5">Buyer</div><div className="font-medium leading-tight text-xs">{contract.buyer_display_name}</div></div>
+          <div className="col-span-2">
+            <div className="text-xs text-gray-400 mb-0.5">Organization</div>
+            {contract.organization_canonical ? (
+              <a href={`/admin/growth/fogging/organizations/${encodeURIComponent(contract.organization_canonical)}`}
+                className="font-medium text-indigo-700 hover:underline text-xs leading-tight">
+                {contract.organization_name ?? contract.buyer_display_name}
+              </a>
+            ) : (
+              <div className="font-medium text-xs leading-tight">{contract.organization_name ?? contract.buyer_display_name}</div>
+            )}
+            {contract.organization_name && contract.organization_name !== contract.buyer_display_name && (
+              <div className="text-xs text-gray-400 mt-0.5">Dept: {contract.buyer_display_name}</div>
+            )}
+          </div>
           <div><div className="text-xs text-gray-400 mb-0.5">State</div><div>{contract.buyer_state ?? "—"}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">OEM</div><div className={`font-medium ${contract.is_100x ? "text-blue-700" : ""}`}>{contract.oem_short_brand ?? contract.oem_canonical}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">Quantity</div><div className="font-medium">{contract.quantity ?? "—"}</div></div>
@@ -250,7 +265,7 @@ export default function ModelPage() {
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr className="text-xs text-gray-500 uppercase tracking-wide">
                     <th className="px-4 py-3 text-left">#</th>
-                    <th className="px-4 py-3 text-left">Buyer</th>
+                    <th className="px-4 py-3 text-left">Organization</th>
                     <th className="px-3 py-3 text-left">State</th>
                     <th className="px-3 py-3 text-right">Contracts</th>
                     <th className="px-3 py-3 text-right">Total Qty</th>
@@ -267,10 +282,20 @@ export default function ModelPage() {
                     <tr key={b._id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-2.5 text-xs text-gray-400">{i + 1}</td>
                       <td className="px-4 py-2.5 max-w-xs">
-                        <a href={`/admin/growth/fogging/buyer/${encodeURIComponent(b._id)}`}
-                          className="font-medium text-blue-700 hover:underline text-xs leading-tight block truncate">
-                          {b.buyer_display_name}
-                        </a>
+                        {b.organization_canonical ? (
+                          <a href={`/admin/growth/fogging/organizations/${encodeURIComponent(b.organization_canonical)}`}
+                            className="font-medium text-indigo-700 hover:underline text-xs leading-tight block truncate">
+                            {b.organization_name ?? b.buyer_display_name}
+                          </a>
+                        ) : (
+                          <a href={`/admin/growth/fogging/buyer/${encodeURIComponent(b._id)}`}
+                            className="font-medium text-blue-700 hover:underline text-xs leading-tight block truncate">
+                            {b.organization_name ?? b.buyer_display_name}
+                          </a>
+                        )}
+                        {b.organization_name && b.organization_name !== b.buyer_display_name && (
+                          <div className="text-gray-400 text-[10px] truncate">{b.buyer_display_name}</div>
+                        )}
                       </td>
                       <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">{b.buyer_state ?? "—"}</td>
                       <td className="px-3 py-2.5 text-right text-xs">{b.contract_count}</td>
@@ -346,7 +371,7 @@ export default function ModelPage() {
                       <thead className="bg-gray-50 border-b border-gray-200">
                         <tr className="text-xs text-gray-500 uppercase tracking-wide">
                           <th className="px-4 py-3 text-left">Date</th>
-                          <th className="px-4 py-3 text-left">Buyer</th>
+                          <th className="px-4 py-3 text-left">Organization</th>
                           <th className="px-3 py-3 text-left">State</th>
                           <th className="px-4 py-3 text-left">OEM</th>
                           <th className="px-3 py-3 text-right">Qty</th>
@@ -363,7 +388,19 @@ export default function ModelPage() {
                             onClick={() => setSelected(c)}>
                             <td className="px-4 py-2.5 text-xs text-gray-500 whitespace-nowrap">{fmt(c.contract_date)}</td>
                             <td className="px-4 py-2.5 max-w-xs">
-                              <div className="font-medium text-gray-900 truncate text-xs">{c.buyer_display_name}</div>
+                              {c.organization_canonical ? (
+                                <a href={`/admin/growth/fogging/organizations/${encodeURIComponent(c.organization_canonical)}`}
+                                  className="font-medium text-indigo-700 hover:underline truncate block text-xs">
+                                  {c.organization_name ?? c.buyer_display_name}
+                                </a>
+                              ) : (
+                                <div className="font-medium text-gray-900 truncate text-xs">
+                                  {c.organization_name ?? c.buyer_display_name}
+                                </div>
+                              )}
+                              {c.organization_name && c.organization_name !== c.buyer_display_name && (
+                                <div className="text-gray-400 text-[10px] truncate">{c.buyer_display_name}</div>
+                              )}
                             </td>
                             <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">{c.buyer_state ?? "—"}</td>
                             <td className="px-4 py-2.5 text-xs">

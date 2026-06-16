@@ -56,6 +56,7 @@ interface OemItem {
 }
 interface BuyerItem {
   buyer_canonical: string; buyer_display_name: string; buyer_state: string | null
+  organization_name?: string; organization_canonical?: string | null
   gmv: number; contracts: number; last_purchase: string | null
 }
 interface ModelItem {
@@ -67,6 +68,7 @@ interface YearItem { year: number; gmv: number; contracts: number }
 interface LiveContract {
   gemc_no: string; contract_date: string | null; contract_quarter: string | null
   buyer_display_name: string; buyer_canonical: string; buyer_state: string | null; org_type: string | null
+  organization_name?: string; organization_canonical?: string | null
   oem_canonical: string; oem_short_brand: string | null; model_raw: string | null
   contract_value_num: number | null; quantity: number | null; unit_price: number | null
   contract_status: string | null; has_unit_price: boolean
@@ -88,7 +90,20 @@ function ContractPanel({ contract, onClose }: { contract: LiveContract; onClose:
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div><div className="text-xs text-gray-400 mb-0.5">Date</div><div className="font-medium">{fmt(contract.contract_date)}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">Value</div><div className="font-semibold text-blue-700">{INR(contract.contract_value_num, true)}</div></div>
-          <div><div className="text-xs text-gray-400 mb-0.5">Buyer</div><div className="font-medium leading-tight text-xs">{contract.buyer_display_name}</div></div>
+          <div className="col-span-2">
+            <div className="text-xs text-gray-400 mb-0.5">Organization</div>
+            {contract.organization_canonical ? (
+              <a href={`/admin/growth/fogging/organizations/${encodeURIComponent(contract.organization_canonical)}`}
+                className="font-medium text-indigo-700 hover:underline text-xs leading-tight">
+                {contract.organization_name ?? contract.buyer_display_name}
+              </a>
+            ) : (
+              <div className="font-medium text-xs leading-tight">{contract.organization_name ?? contract.buyer_display_name}</div>
+            )}
+            {contract.organization_name && contract.organization_name !== contract.buyer_display_name && (
+              <div className="text-xs text-gray-400 mt-0.5">Dept: {contract.buyer_display_name}</div>
+            )}
+          </div>
           <div><div className="text-xs text-gray-400 mb-0.5">State / Type</div><div className="text-sm">{contract.buyer_state ?? "—"} · {contract.org_type ?? "—"}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">OEM / Brand</div><div className="font-medium">{contract.oem_short_brand ?? contract.oem_canonical ?? "—"}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">Model</div><div className="font-medium text-xs leading-tight">{contract.model_raw ?? "—"}</div></div>
@@ -387,20 +402,31 @@ export default function SellerPage() {
               </div>
               <div className="space-y-2">
                 {(buyer_breakdown.length > 0 ? buyer_breakdown : profile.top_buyers).slice(0, 12).map(b => {
-                  const buyer = 'buyer_display_name' in b ? b.buyer_display_name : (b as BuyerItem).buyer_display_name
-                  const buyerGmv = 'gmv' in b ? b.gmv : 0
-                  const buyerCnt = 'contracts' in b ? (b as BuyerItem).contracts : ('cnt' in b ? (b as unknown as { cnt: number }).cnt : 0)
+                  const orgName    = ('organization_name' in b ? b.organization_name : null) as string | null
+                  const deptName   = 'buyer_display_name' in b ? b.buyer_display_name : (b as BuyerItem).buyer_display_name
+                  const buyerGmv   = 'gmv' in b ? b.gmv : 0
+                  const buyerCnt   = 'contracts' in b ? (b as BuyerItem).contracts : ('cnt' in b ? (b as unknown as { cnt: number }).cnt : 0)
                   const buyerState = 'buyer_state' in b ? b.buyer_state : null
-                  const buyerCanonical = 'buyer_canonical' in b
+                  const orgCanon   = ('organization_canonical' in b ? b.organization_canonical : null) as string | null
+                  const buyerCanon = 'buyer_canonical' in b
                     ? (b as BuyerItem).buyer_canonical
                     : ('_id' in b ? (b as unknown as { _id: string })._id : '')
+                  const displayName = orgName ?? deptName
                   const share = profile.total_gmv > 0 ? (buyerGmv / profile.total_gmv * 100) : 0
+                  const href = orgCanon
+                    ? `/admin/growth/fogging/organizations/${encodeURIComponent(orgCanon)}`
+                    : `/admin/growth/fogging/buyer/${encodeURIComponent(buyerCanon)}`
                   return (
-                    <div key={buyerCanonical}
+                    <div key={buyerCanon}
                       className="cursor-pointer hover:bg-gray-50 -mx-2 px-2 py-2 rounded-lg transition-colors"
-                      onClick={() => router.push(`/admin/growth/fogging/buyer/${encodeURIComponent(buyerCanonical)}`)}>
+                      onClick={() => router.push(href)}>
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <div className="text-xs font-medium text-gray-900 leading-snug flex-1 min-w-0 truncate">{buyer}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-medium text-indigo-700 leading-snug truncate">{displayName}</div>
+                          {orgName && orgName !== deptName && (
+                            <div className="text-[10px] text-gray-400 truncate">{deptName}</div>
+                          )}
+                        </div>
                         <div className="shrink-0 text-right">
                           <div className="text-xs font-semibold text-gray-800">{INR(buyerGmv, true)}</div>
                           <div className="text-xs text-gray-400">{buyerCnt}c</div>
@@ -615,8 +641,20 @@ export default function SellerPage() {
                         onClick={() => setSelected(c)}>
                         <td className="px-4 py-2.5 text-xs text-gray-500 whitespace-nowrap">{fmt(c.contract_date)}</td>
                         <td className="px-4 py-2.5 max-w-xs">
-                          <div className="font-medium text-gray-900 truncate text-xs leading-tight">{c.buyer_display_name}</div>
-                          {c.org_type && <div className="text-xs text-gray-400">{c.org_type}</div>}
+                          {c.organization_canonical ? (
+                            <a href={`/admin/growth/fogging/organizations/${encodeURIComponent(c.organization_canonical)}`}
+                              className="font-medium text-indigo-700 hover:underline truncate block text-xs leading-tight"
+                              onClick={e => e.stopPropagation()}>
+                              {c.organization_name ?? c.buyer_display_name}
+                            </a>
+                          ) : (
+                            <div className="font-medium text-gray-900 truncate text-xs leading-tight">
+                              {c.organization_name ?? c.buyer_display_name}
+                            </div>
+                          )}
+                          {c.organization_name && c.organization_name !== c.buyer_display_name && (
+                            <div className="text-[10px] text-gray-400 truncate">{c.buyer_display_name}</div>
+                          )}
                         </td>
                         <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">{c.buyer_state ?? "—"}</td>
                         <td className="px-4 py-2.5 text-xs text-gray-700 max-w-52">
@@ -682,5 +720,7 @@ interface QuarterItem {
   _id: string; cnt: number; gmv: number; buyer_count: number; oem_count: number
 }
 interface BuyerBreak {
-  _id: string; buyer_display_name: string; buyer_state: string | null; gmv: number; contracts: number; cnt: number
+  _id: string; buyer_display_name: string; buyer_state: string | null
+  organization_name?: string; organization_canonical?: string | null
+  gmv: number; contracts: number; cnt: number
 }

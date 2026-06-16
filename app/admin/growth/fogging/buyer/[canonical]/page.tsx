@@ -29,6 +29,7 @@ interface BuyerProfile {
   opportunity_tier: string; opportunity_score: number
   primary_incumbent: string | null; purchased_100x: boolean
   non_100x_gmv?: number; _100x_spend?: number; has_100x?: boolean
+  organization_name?: string; organization_canonical?: string | null
   oem_spend: { oem_canonical: string; brand_name: string; gmv: number; contracts: number; share_pct: number; last_contract: string | null; is_100x: boolean }[]
 }
 
@@ -42,6 +43,7 @@ interface Contract {
   gemc_no: string; contract_date: string | null
   oem_canonical: string; oem_short_brand: string | null; is_100x: boolean
   buyer_display_name: string; buyer_state: string | null; buyer_canonical: string
+  organization_name?: string; organization_canonical?: string | null
   model_raw: string | null; model_normalized: string | null
   quantity: number | null; unit_price: number | null; contract_value_num: number | null
   seller_name: string | null; seller_gst: string | null
@@ -65,6 +67,20 @@ function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () 
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div><div className="text-xs text-gray-400 mb-0.5">Date</div><div className="font-medium">{fmt(contract.contract_date)}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">Value</div><div className="font-semibold text-blue-700">{INR(contract.contract_value_num, true)}</div></div>
+          <div className="col-span-2">
+            <div className="text-xs text-gray-400 mb-0.5">Organization</div>
+            {contract.organization_canonical ? (
+              <a href={`/admin/growth/fogging/organizations/${encodeURIComponent(contract.organization_canonical)}`}
+                className="font-medium text-indigo-700 hover:underline leading-tight text-xs">
+                {contract.organization_name ?? contract.buyer_display_name}
+              </a>
+            ) : (
+              <div className="font-medium text-xs leading-tight">{contract.organization_name ?? contract.buyer_display_name}</div>
+            )}
+            {contract.organization_name && contract.organization_name !== contract.buyer_display_name && (
+              <div className="text-xs text-gray-400 mt-0.5">Dept: {contract.buyer_display_name}</div>
+            )}
+          </div>
           <div><div className="text-xs text-gray-400 mb-0.5">OEM</div>
             <div className={`font-medium ${contract.is_100x ? "text-blue-700" : ""}`}>
               {contract.oem_short_brand ?? contract.oem_canonical}
@@ -240,13 +256,16 @@ export default function BuyerPage() {
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-lg font-bold text-gray-900 leading-tight">
-                {profile?.buyer_display_name ?? canonical}
+                {profile?.organization_name ?? profile?.buyer_display_name ?? canonical}
               </h1>
               {profile?.is_anomalous && (
                 <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">⚠ {profile.anomaly_reason}</span>
               )}
             </div>
             <div className="text-xs text-gray-400">
+              {profile?.organization_name && profile.organization_name !== profile.buyer_display_name && (
+                <span className="text-gray-500 mr-1">Dept: {profile.buyer_display_name} ·</span>
+              )}
               Buyer 360 · {profile?.buyer_state ?? "—"} · {profile?.org_type ?? "—"}
               {profile?.ministry && <span className="text-gray-500"> · {profile.ministry}</span>}
             </div>

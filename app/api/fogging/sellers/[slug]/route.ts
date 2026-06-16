@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { enrichWithOrg } from '@/lib/fogging-org-lookup';
 
 const DB = '100xDB';
 
@@ -131,14 +132,22 @@ export async function GET(
         .toArray(),
     ]);
 
+    const [enrichedBuyers, enrichedRecent] = await Promise.all([
+      enrichWithOrg(
+        db,
+        buyerBreakdown.map(b => ({ ...b, buyer_canonical: (b as unknown as { _id: string })._id })) as Record<string, unknown>[]
+      ),
+      enrichWithOrg(db, recentContracts as Record<string, unknown>[]),
+    ]);
+
     return NextResponse.json({
       profile,
       state_breakdown:  stateBreakdown,
-      buyer_breakdown:  buyerBreakdown,
+      buyer_breakdown:  enrichedBuyers,
       model_breakdown:  modelBreakdown,
       oem_breakdown:    oemBreakdown,
       quarterly_trend:  quarterlyTrend,
-      recent_contracts: recentContracts,
+      recent_contracts: enrichedRecent,
     }, {
       headers: { 'Cache-Control': 'public, s-maxage=300' }
     });

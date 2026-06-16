@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { enrichWithOrg } from '@/lib/fogging-org-lookup';
 
 const DB = '100xDB';
 
@@ -85,9 +86,14 @@ export async function GET(
       return NextResponse.json({ error: 'Model not found' }, { status: 404 });
     }
 
+    const enrichedBuyers = await enrichWithOrg(
+      db,
+      buyerBreakdown.map(b => ({ ...b, buyer_canonical: (b as unknown as { _id: string })._id })) as Record<string, unknown>[]
+    );
+
     return NextResponse.json({
       profile,
-      buyer_breakdown:    buyerBreakdown,
+      buyer_breakdown:    enrichedBuyers,
       oem_breakdown:      oemBreakdown,
       state_breakdown:    stateBreakdown,
       quarterly_trend:    quarterlyTrend,

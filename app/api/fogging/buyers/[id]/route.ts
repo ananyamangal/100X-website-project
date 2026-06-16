@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { enrichWithOrg } from '@/lib/fogging-org-lookup';
 
 const DB = '100xDB';
 
@@ -17,26 +18,31 @@ export async function GET(
     const client = await clientPromise;
     const db     = client.db(DB);
 
-    const [profile, contracts] = await Promise.all([
+    const [profile, org] = await Promise.all([
       db.collection('fogging_buyers').findOne({ buyer_canonical: buyerCanonical }),
-      db.collection('fogging_contracts')
-        .find({ buyer_canonical: buyerCanonical })
-        .sort({ contract_date: -1 })
-        .project({
-          gemc_no: 1, contract_date: 1, contract_quarter: 1,
-          oem_canonical: 1, oem_short_brand: 1,
-          model_raw: 1, model_normalized: 1,
-          contract_value_num: 1, quantity: 1, unit_price: 1,
-          contract_status: 1, buying_mode: 1,
-          seller_name: 1, seller_gst: 1,
-          is_100x: 1, contract_year: 1,
-        })
-        .toArray(),
+      db.collection('fogging_organizations')
+        .findOne({ buyer_canonicals: buyerCanonical },
+          { projection: { organization_name: 1, organization_canonical: 1 } }),
     ]);
 
     if (!profile) {
       return NextResponse.json({ error: 'Buyer not found' }, { status: 404 });
     }
+
+    const contracts = await db.collection('fogging_contracts')
+      .find({ buyer_canonical: buyerCanonical })
+      .sort({ contract_date: -1 })
+      .project({
+        gemc_no: 1, contract_date: 1, contract_quarter: 1,
+        oem_canonical: 1, oem_short_brand: 1,
+        model_raw: 1, model_normalized: 1,
+        contract_value_num: 1, quantity: 1, unit_price: 1,
+        contract_status: 1, buying_mode: 1,
+        seller_name: 1, seller_gst: 1,
+        is_100x: 1, contract_year: 1,
+        buyer_display_name: 1,
+      })
+      .toArray();
 
     // Derive OEM timeline from contracts
     const oemTimeline: Record<string, { first: Date | null; last: Date | null; count: number; gmv: number }> = {};
@@ -59,7 +65,11 @@ export async function GET(
       .sort((a, b) => (b.last?.getTime() ?? 0) - (a.last?.getTime() ?? 0));
 
     return NextResponse.json({
-      profile,
+      profile: {
+        ...profile,
+        organization_name:      org?.organization_name      ?? profile.buyer_display_name ?? buyerCanonical,
+        organization_canonical: org?.organization_canonical ?? null,
+      },
       contracts,
       oem_history: oemHistory,
     });
