@@ -2195,6 +2195,71 @@ const BUDGET_BY_TYPE: Record<string, number> = {
   budget_reallocate:           0,
 }
 
+// ─── SEO This Week Strip (v2.4) ──────────────────────────────────────────────
+
+interface SeoMiniRec { _id: string; title: string; type: string; priority: string; url: string; expected_revenue_inr: number; effort: string }
+
+const SEO_EFFORT_LABEL: Record<string, string> = { "5_min": "5 min", "30_min": "30 min", "1_hour": "1 hr", "half_day": "½ day", "project": "Project" }
+const SEO_INR = (n: number) => n >= 1e5 ? `₹${(n / 1e5).toFixed(1)} L` : n > 0 ? `₹${Math.round(n).toLocaleString("en-IN")}` : "₹0"
+
+function SeoThisWeekStrip() {
+  const [recs, setRecs] = useState<SeoMiniRec[]>([])
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/admin/growth/seo/recommendations?status=pending&limit=10")
+      .then(r => r.json())
+      .then(d => {
+        const sorted = (d.recs || [])
+          .sort((a: SeoMiniRec, b: SeoMiniRec) => b.expected_revenue_inr - a.expected_revenue_inr)
+          .slice(0, 3)
+        setRecs(sorted)
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true))
+  }, [])
+
+  if (!loaded || recs.length === 0) return null
+
+  const totalOpp = recs.reduce((s, r) => s + r.expected_revenue_inr, 0)
+
+  return (
+    <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-xl p-4 border border-blue-700/50">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Target size={14} className="text-blue-300" />
+          <span className="text-sm font-bold text-white">SEO This Week</span>
+          <span className="text-[10px] px-1.5 py-0.5 bg-blue-700/60 text-blue-200 rounded font-semibold">v2.4</span>
+        </div>
+        <div className="text-right">
+          <span className="text-sm font-bold text-emerald-300">{SEO_INR(totalOpp)}</span>
+          <span className="text-[10px] text-blue-300 ml-1">top-3 opportunity</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        {recs.map((rec, i) => (
+          <div key={rec._id} className="bg-white/10 rounded-lg px-3 py-2.5 border border-white/10">
+            <div className="flex items-start justify-between gap-1 mb-1">
+              <span className="text-[10px] font-bold text-blue-200">#{i + 1}</span>
+              <span className="text-[10px] font-semibold text-emerald-300">{SEO_INR(rec.expected_revenue_inr)}</span>
+            </div>
+            <p className="text-xs text-white font-medium leading-snug line-clamp-2">{rec.title}</p>
+            <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+              <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${rec.priority === "critical" ? "bg-red-500/30 text-red-200" : rec.priority === "high" ? "bg-orange-500/30 text-orange-200" : "bg-blue-500/30 text-blue-200"}`}>
+                {rec.priority}
+              </span>
+              <span className="text-[10px] text-blue-300">{SEO_EFFORT_LABEL[rec.effort] || rec.effort}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-[10px] text-blue-400">
+        Approve in SEO Command Center → Recommendations tab
+      </p>
+    </div>
+  )
+}
+
 function BudgetRankPanel({ pendingRecs }: { pendingRecs: Rec[] }) {
   if (pendingRecs.length === 0) return null
 
@@ -2466,6 +2531,7 @@ export default function RevenueDashboardPage() {
       {!loading && filter === "pending" && (
         <>
           <FounderPriorityMode pendingRecs={pendingRecs} sourcesConnected={run?.sources_connected ?? []} />
+          <SeoThisWeekStrip />
           <BudgetRankPanel pendingRecs={pendingRecs} />
         </>
       )}

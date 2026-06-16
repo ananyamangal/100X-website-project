@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState, useCallback } from "react"
-import { Search, Link2, AlertCircle, ExternalLink, CheckCircle2, XCircle, Play, RotateCw, TrendingUp, TrendingDown, Zap, RefreshCw, Clock, Info } from "lucide-react"
+import { Search, Link2, AlertCircle, ExternalLink, CheckCircle2, XCircle, Play, RotateCw, TrendingUp, TrendingDown, Zap, RefreshCw, Clock, Info, Target, ChevronDown, ChevronUp, Pause, Check } from "lucide-react"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -23,6 +23,31 @@ interface SchemaAudit { pagesFromSitemap: number; pagesAudited: number; auditedA
 interface LinkPage { path: string; priority?: number; inboundCount?: number; addLinkFrom?: string[]; linkedBy?: string[] }
 interface LinkRec { from: string; to: string; reason: string }
 interface LinkGraph { sourcesAnalyzed: number; authorityPagesTracked: number; auditedAt: string; orphanPages: LinkPage[]; weakPages: LinkPage[]; strongPages: LinkPage[]; recommendations: LinkRec[] }
+
+interface SeoRec {
+  _id: string
+  type: string
+  priority: "critical" | "high" | "medium" | "low"
+  title: string
+  url: string
+  why: string
+  current_state: string
+  proposed_change: string
+  expected_clicks: number
+  expected_revenue_inr: number
+  confidence: number
+  difficulty: string
+  effort: string
+  status: "pending" | "approved" | "rejected" | "deferred" | "implemented"
+  generated_at: string
+  implementation_package?: {
+    meta_title?: string
+    meta_description?: string
+    schema_snippet?: string
+    link_recommendations?: Array<{ from: string; anchor: string; to: string }>
+    notes?: string
+  }
+}
 
 // ─── Small helpers ────────────────────────────────────────────────────────────
 
@@ -82,8 +107,13 @@ export default function SEOCommandCenter() {
   const [trends, setTrends] = useState<Trends | null>(null)
   const [schemaAudit, setSchemaAudit] = useState<SchemaAudit | null>(null)
   const [linkGraph, setLinkGraph] = useState<LinkGraph | null>(null)
+  const [seoRecs, setSeoRecs] = useState<SeoRec[]>([])
+  const [recsLoading, setRecsLoading] = useState(false)
+  const [generatingRecs, setGeneratingRecs] = useState(false)
+  const [recsResult, setRecsResult] = useState<string | null>(null)
+  const [actioning, setActioning] = useState<string | null>(null)
 
-  const [activeTab, setActiveTab] = useState<"keywords" | "pages" | "near-wins" | "trends" | "schema" | "links">("keywords")
+  const [activeTab, setActiveTab] = useState<"keywords" | "pages" | "near-wins" | "trends" | "schema" | "links" | "recommendations">("keywords")
   const [syncing, setSyncing] = useState(false)
   const [syncError, setSyncError] = useState<string | null>(null)
   const [runningSchema, setRunningSchema] = useState(false)
@@ -107,7 +137,36 @@ export default function SEOCommandCenter() {
     setGscLoading(false)
   }, [])
 
-  useEffect(() => { loadGSC() }, [loadGSC])
+  const loadRecs = useCallback(async () => {
+    setRecsLoading(true)
+    try {
+      const d = await fetch("/api/admin/growth/seo/recommendations").then(r => r.json())
+      setSeoRecs(d.recs || [])
+    } catch { /* ignore */ } finally { setRecsLoading(false) }
+  }, [])
+
+  useEffect(() => { loadGSC(); loadRecs() }, [loadGSC, loadRecs])
+
+  const generateRecs = async () => {
+    setGeneratingRecs(true); setRecsResult(null)
+    try {
+      const d = await fetch("/api/admin/growth/seo/recommendations", { method: "POST" }).then(r => r.json())
+      setRecsResult(d.error ? `Error: ${d.error}` : `${d.created} new recommendations generated (${d.skipped || 0} duplicates skipped)`)
+      await loadRecs()
+    } catch (e) { setRecsResult(String(e)) } finally { setGeneratingRecs(false) }
+  }
+
+  const actionRec = async (id: string, status: string) => {
+    setActioning(id)
+    try {
+      await fetch(`/api/admin/growth/seo/recommendations/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, reviewed_at: new Date().toISOString() }),
+      })
+      await loadRecs()
+    } catch { /* ignore */ } finally { setActioning(null) }
+  }
 
   const syncNow = async () => {
     setSyncing(true); setSyncError(null)
@@ -140,6 +199,7 @@ export default function SEOCommandCenter() {
 
   const configured = (syncStatus?.oauthConfigured && syncStatus?.connected) ?? false
   const hasGSCData = !!overview
+  const pendingRecs = seoRecs.filter(r => r.status === "pending")
   const tabs = [
     { id: "keywords", label: "Keywords" },
     { id: "pages", label: "Pages" },
@@ -147,6 +207,7 @@ export default function SEOCommandCenter() {
     { id: "trends", label: "Trends" },
     { id: "schema", label: "Schema" },
     { id: "links", label: "Internal Links" },
+    { id: "recommendations", label: `Recommendations${pendingRecs.length ? ` (${pendingRecs.length})` : ""}` },
   ] as const
 
   return (
@@ -605,7 +666,308 @@ export default function SEOCommandCenter() {
             )}
           </div>
         )}
+
+        {/* ── RECOMMENDATIONS (v2.4) ──────────────────────────────────────────── */}
+        {activeTab === "recommendations" && (
+          <SeoRecommendationsTab
+            recs={seoRecs}
+            loading={recsLoading}
+            generating={generatingRecs}
+            result={recsResult}
+            actioning={actioning}
+            onGenerate={generateRecs}
+            onAction={actionRec}
+          />
+        )}
       </div>
+    </div>
+  )
+}
+
+// ─── SEO Recommendations Tab ─────────────────────────────────────────────────
+
+const REC_TYPE_LABEL: Record<string, string> = {
+  ctr_opportunity:    "CTR Opportunity",
+  ranking_opportunity: "Ranking Opportunity",
+  schema_fix:         "Schema Fix",
+  internal_link:      "Internal Link",
+  content_gap:        "Content Gap",
+  title_optimization: "Title Optimization",
+}
+
+const REC_TYPE_COLOR: Record<string, string> = {
+  ctr_opportunity:    "bg-blue-50 text-blue-700 border-blue-200",
+  ranking_opportunity: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  schema_fix:         "bg-orange-50 text-orange-700 border-orange-200",
+  internal_link:      "bg-green-50 text-green-700 border-green-200",
+  content_gap:        "bg-violet-50 text-violet-700 border-violet-200",
+  title_optimization: "bg-amber-50 text-amber-700 border-amber-200",
+}
+
+const PRIORITY_COLOR_SEO: Record<string, string> = {
+  critical: "bg-red-100 text-red-700 border-red-200",
+  high:     "bg-orange-100 text-orange-700 border-orange-200",
+  medium:   "bg-yellow-100 text-yellow-700 border-yellow-200",
+  low:      "bg-gray-100 text-gray-600 border-gray-200",
+}
+
+const STATUS_COLOR_SEO: Record<string, string> = {
+  pending:     "bg-gray-100 text-gray-600",
+  approved:    "bg-green-100 text-green-700",
+  rejected:    "bg-red-100 text-red-600",
+  deferred:    "bg-gray-100 text-gray-500",
+  implemented: "bg-emerald-100 text-emerald-700",
+}
+
+const EFFORT_LABEL_SEO: Record<string, string> = {
+  "5_min": "5 min", "30_min": "30 min", "1_hour": "1 hr", "half_day": "½ day", "project": "Project",
+}
+
+const INR_SEO = (n: number) =>
+  n >= 1e7 ? `₹${(n / 1e7).toFixed(2)} Cr` :
+  n >= 1e5 ? `₹${(n / 1e5).toFixed(1)} L` :
+  n > 0 ? `₹${Math.round(n).toLocaleString("en-IN")}` : "₹0"
+
+function SeoRecCard({ rec, actioning, onAction }: {
+  rec: SeoRec
+  actioning: string | null
+  onAction: (id: string, status: string) => Promise<void>
+}) {
+  const [showPackage, setShowPackage] = useState(false)
+  const isActioning = actioning === rec._id
+  const pkg = rec.implementation_package
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="px-5 py-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${PRIORITY_COLOR_SEO[rec.priority]}`}>{rec.priority.toUpperCase()}</span>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${REC_TYPE_COLOR[rec.type] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
+              {REC_TYPE_LABEL[rec.type] || rec.type}
+            </span>
+            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${STATUS_COLOR_SEO[rec.status]}`}>{rec.status}</span>
+          </div>
+          <div className="text-right shrink-0">
+            <div className="text-base font-bold text-emerald-700">{INR_SEO(rec.expected_revenue_inr)}</div>
+            <div className="text-[10px] text-gray-400">est. revenue</div>
+          </div>
+        </div>
+
+        <h3 className="mt-2.5 text-sm font-semibold text-gray-900 leading-snug">{rec.title}</h3>
+        <code className="text-[10px] text-gray-400 mt-0.5 block">{rec.url}</code>
+
+        <p className="mt-2 text-xs text-gray-600">{rec.why}</p>
+
+        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+          <div className="bg-gray-50 rounded px-3 py-2">
+            <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide mb-0.5">Current State</p>
+            <p className="text-gray-700">{rec.current_state}</p>
+          </div>
+          <div className="bg-blue-50 rounded px-3 py-2">
+            <p className="text-[10px] text-blue-500 font-semibold uppercase tracking-wide mb-0.5">Proposed Change</p>
+            <p className="text-blue-800">{rec.proposed_change}</p>
+          </div>
+        </div>
+
+        <div className="mt-2.5 flex flex-wrap gap-3 text-[11px] text-gray-500">
+          <span>+{rec.expected_clicks} clicks/mo</span>
+          <span>Conf: {rec.confidence}%</span>
+          <span>Effort: {EFFORT_LABEL_SEO[rec.effort] || rec.effort}</span>
+          <span className={`font-medium ${rec.difficulty === "easy" ? "text-green-600" : rec.difficulty === "medium" ? "text-amber-600" : "text-red-600"}`}>
+            {rec.difficulty}
+          </span>
+        </div>
+      </div>
+
+      {/* Implementation Package */}
+      {pkg && (
+        <div className="border-t border-gray-100">
+          <button
+            onClick={() => setShowPackage(p => !p)}
+            className="w-full flex items-center gap-1.5 px-5 py-2 text-xs text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+          >
+            <Target size={11} />
+            Implementation Package
+            {showPackage ? <ChevronUp size={10} className="ml-auto" /> : <ChevronDown size={10} className="ml-auto" />}
+          </button>
+          {showPackage && (
+            <div className="px-5 py-3 border-t border-gray-100 bg-gray-50 space-y-3">
+              {pkg.meta_title && (
+                <div>
+                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Proposed Meta Title</p>
+                  <code className="text-xs text-gray-800 bg-white border border-gray-200 rounded px-2 py-1.5 block">{pkg.meta_title}</code>
+                  <span className={`text-[10px] ${pkg.meta_title.length > 60 ? "text-red-500" : "text-gray-400"}`}>{pkg.meta_title.length}/60 chars</span>
+                </div>
+              )}
+              {pkg.meta_description && (
+                <div>
+                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Proposed Meta Description</p>
+                  <code className="text-xs text-gray-800 bg-white border border-gray-200 rounded px-2 py-1.5 block">{pkg.meta_description}</code>
+                  <span className={`text-[10px] ${pkg.meta_description.length > 160 ? "text-red-500" : "text-gray-400"}`}>{pkg.meta_description.length}/160 chars</span>
+                </div>
+              )}
+              {pkg.schema_snippet && (
+                <div>
+                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Schema JSON-LD to Add</p>
+                  <pre className="text-[10px] text-gray-700 bg-white border border-gray-200 rounded px-2 py-1.5 overflow-x-auto max-h-40">{pkg.schema_snippet}</pre>
+                </div>
+              )}
+              {pkg.link_recommendations && pkg.link_recommendations.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Link Recommendations</p>
+                  {pkg.link_recommendations.map((lr, i) => (
+                    <div key={i} className="text-[11px] text-gray-700 flex items-center gap-1.5 mb-1">
+                      <code className="text-gray-500">{lr.from}</code>
+                      <span className="text-gray-300">→</span>
+                      <span className="text-blue-600 font-medium">"{lr.anchor}"</span>
+                      <span className="text-gray-300">→</span>
+                      <code className="text-brand-600">{lr.to}</code>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {pkg.notes && (
+                <p className="text-[11px] text-gray-500 italic">{pkg.notes}</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Actions */}
+      {rec.status === "pending" && (
+        <div className="border-t border-gray-100 px-5 py-3 bg-gray-50 flex flex-wrap gap-2">
+          <button
+            onClick={() => onAction(rec._id, "approved")}
+            disabled={isActioning}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+          >
+            <Check size={11} />Approve
+          </button>
+          <button
+            onClick={() => onAction(rec._id, "deferred")}
+            disabled={isActioning}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white text-gray-600 rounded-md hover:bg-gray-100 border border-gray-300 disabled:opacity-50"
+          >
+            <Pause size={11} />Defer
+          </button>
+          <button
+            onClick={() => onAction(rec._id, "rejected")}
+            disabled={isActioning}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 rounded-md hover:bg-red-100 border border-red-200 disabled:opacity-50"
+          >
+            <XCircle size={11} />Reject
+          </button>
+        </div>
+      )}
+      {rec.status === "approved" && (
+        <div className="border-t border-gray-100 px-5 py-3 bg-green-50 flex gap-2">
+          <button
+            onClick={() => onAction(rec._id, "implemented")}
+            disabled={isActioning}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50"
+          >
+            <CheckCircle2 size={11} />Mark Implemented
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SeoRecommendationsTab({ recs, loading, generating, result, actioning, onGenerate, onAction }: {
+  recs: SeoRec[]
+  loading: boolean
+  generating: boolean
+  result: string | null
+  actioning: string | null
+  onGenerate: () => void
+  onAction: (id: string, status: string) => Promise<void>
+}) {
+  const [statusFilter, setStatusFilter] = useState<"pending" | "approved" | "implemented" | "all">("pending")
+
+  const filtered = statusFilter === "all" ? recs : recs.filter(r => r.status === statusFilter)
+  const pendingCount = recs.filter(r => r.status === "pending").length
+  const approvedCount = recs.filter(r => r.status === "approved").length
+  const implementedCount = recs.filter(r => r.status === "implemented").length
+
+  const totalExpectedRevenue = recs.filter(r => r.status === "pending").reduce((s, r) => s + r.expected_revenue_inr, 0)
+
+  return (
+    <div className="space-y-4">
+      {/* Header strip */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <div className="flex items-center gap-2">
+            <Target size={16} className="text-brand-600" />
+            <h2 className="text-sm font-bold text-gray-900">SEO Recommendation Engine</h2>
+            <span className="text-[10px] px-1.5 py-0.5 bg-brand-100 text-brand-700 rounded font-bold">v2.4</span>
+          </div>
+          <p className="text-[11px] text-gray-500 mt-0.5">Detect → Generate → Approve → Implement — SEO opportunities from GSC + Schema + Link audit</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="text-center">
+            <p className="text-sm font-bold text-emerald-700">{INR_SEO(totalExpectedRevenue)}</p>
+            <p className="text-[10px] text-gray-400">pending opportunity</p>
+          </div>
+          <button
+            onClick={onGenerate}
+            disabled={generating}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:opacity-50"
+          >
+            {generating ? <RefreshCw size={11} className="animate-spin" /> : <Zap size={11} />}
+            {generating ? "Detecting…" : "Detect Opportunities"}
+          </button>
+        </div>
+      </div>
+
+      {result && (
+        <div className={`text-xs px-4 py-2.5 rounded-lg border ${result.startsWith("Error") ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"}`}>
+          {result}
+        </div>
+      )}
+
+      {/* SEO Preservation notice */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-[11px] text-amber-800">
+        <strong>SEO Equity Protection:</strong> Only safe changes are auto-generated — meta title/description updates, schema additions, internal links.
+        URL changes, redirects, and canonical modifications require explicit founder approval and are never auto-deployed.
+      </div>
+
+      {/* Status filter tabs + counters */}
+      <div className="flex gap-1 flex-wrap">
+        {([
+          { key: "pending", label: `Pending (${pendingCount})` },
+          { key: "approved", label: `Approved (${approvedCount})` },
+          { key: "implemented", label: `Implemented (${implementedCount})` },
+          { key: "all", label: `All (${recs.length})` },
+        ] as const).map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setStatusFilter(tab.key)}
+            className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${statusFilter === tab.key ? "bg-brand-600 text-white" : "bg-white text-gray-500 border border-gray-200 hover:text-gray-700"}`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Rec cards */}
+      {loading ? (
+        <div className="text-center py-10 text-gray-400 text-sm"><RefreshCw size={16} className="animate-spin mx-auto mb-2" />Loading…</div>
+      ) : filtered.length === 0 ? (
+        <div className="bg-white rounded-xl border border-dashed border-gray-200 p-10 text-center">
+          <Target size={28} className="text-gray-200 mx-auto mb-3" />
+          <p className="text-gray-400 text-sm">{recs.length === 0 ? 'No recommendations yet — click "Detect Opportunities" to scan GSC data' : `No ${statusFilter} recommendations`}</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map(rec => (
+            <SeoRecCard key={rec._id} rec={rec} actioning={actioning} onAction={onAction} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
