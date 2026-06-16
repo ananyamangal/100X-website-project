@@ -15,11 +15,11 @@ interface SearchResults {
 }
 
 const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  buyers:    { label: "Buyers",    icon: <Building2 size={13} />,  color: "text-blue-700 bg-blue-50 border-blue-200" },
-  sellers:   { label: "Sellers",   icon: <Truck size={13} />,      color: "text-amber-700 bg-amber-50 border-amber-200" },
-  oems:      { label: "OEMs",      icon: <BarChart3 size={13} />,  color: "text-purple-700 bg-purple-50 border-purple-200" },
-  models:    { label: "Models",    icon: <Package size={13} />,    color: "text-green-700 bg-green-50 border-green-200" },
-  contracts: { label: "Contracts", icon: <FileText size={13} />,   color: "text-gray-700 bg-gray-50 border-gray-200" },
+  buyers:    { label: "Organizations", icon: <Building2 size={13} />,  color: "text-indigo-700 bg-indigo-50 border-indigo-200" },
+  sellers:   { label: "Sellers",       icon: <Truck size={13} />,      color: "text-amber-700 bg-amber-50 border-amber-200" },
+  oems:      { label: "OEMs",          icon: <BarChart3 size={13} />,  color: "text-purple-700 bg-purple-50 border-purple-200" },
+  models:    { label: "Models",        icon: <Package size={13} />,    color: "text-green-700 bg-green-50 border-green-200" },
+  contracts: { label: "Contracts",     icon: <FileText size={13} />,   color: "text-gray-700 bg-gray-50 border-gray-200" },
 }
 
 function SearchPageInner() {
@@ -65,7 +65,7 @@ function SearchPageInner() {
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="Search buyers, sellers, OEMs, models, GEMC#, GST, state…"
+                placeholder="Search organizations, sellers, OEMs, models, GEMC#, GST, state…"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}

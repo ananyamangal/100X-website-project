@@ -208,6 +208,7 @@ export default function ContractDirectory() {
                     <th className="px-3 py-2 text-left font-semibold">GEMC#</th>
                     <th className="px-3 py-2 text-left font-semibold">Date</th>
                     <th className="px-3 py-2 text-left font-semibold">Organization</th>
+                    <th className="px-3 py-2 text-left font-semibold">Dept</th>
                     <th className="px-3 py-2 text-left font-semibold">St</th>
                     <th className="px-3 py-2 text-left font-semibold">OEM</th>
                     <th className="px-3 py-2 text-left font-semibold">Model</th>
@@ -230,7 +231,7 @@ export default function ContractDirectory() {
                       <td className="px-3 py-2 text-gray-500 whitespace-nowrap">
                         {r.contract_date ? new Date(r.contract_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : "—"}
                       </td>
-                      <td className="px-3 py-2 max-w-[160px]">
+                      <td className="px-3 py-2 max-w-[150px]">
                         {r.organization_canonical ? (
                           <Link href={`/admin/growth/fogging/organizations/${encodeURIComponent(r.organization_canonical)}`}
                             className="font-medium text-indigo-700 hover:underline block truncate">
@@ -242,6 +243,11 @@ export default function ContractDirectory() {
                             {r.buyer_display_name}
                           </Link>
                         )}
+                      </td>
+                      <td className="px-3 py-2 max-w-[130px]">
+                        <span className="text-gray-400 text-[10px] truncate block" title={r.buyer_display_name}>
+                          {r.buyer_display_name?.slice(0, 24) ?? "—"}
+                        </span>
                       </td>
                       <td className="px-3 py-2 text-gray-500">{r.buyer_state?.slice(0, 3) ?? "—"}</td>
                       <td className="px-3 py-2">

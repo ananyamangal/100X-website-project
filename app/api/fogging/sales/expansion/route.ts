@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { enrichWithOrg } from '@/lib/fogging-org-lookup';
 
 const DB   = '100xDB';
 const COLL = 'fogging_buyers';
@@ -33,11 +34,12 @@ export async function GET(_req: NextRequest) {
       .sort({ non_100x_gmv: -1 })
       .toArray();
 
-    // Augment with computed fields for display
-    const data = docs.map(d => ({
+    // Augment with computed fields for display, then enrich with org
+    const mapped = docs.map(d => ({
       ...d,
       contract_count: d.total_contracts ?? d.contract_count ?? 0,
     }));
+    const data = await enrichWithOrg(client.db(DB), mapped);
 
     return NextResponse.json(
       { data, total: data.length },

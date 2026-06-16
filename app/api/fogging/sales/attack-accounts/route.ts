@@ -73,7 +73,40 @@ export async function GET(req: NextRequest) {
       rank: skip + i + 1,
       contract_count: d.total_contracts ?? d.contract_count ?? 0,
     }));
-    const data = await enrichWithOrg(client.db(DB), ranked);
+    const enriched = await enrichWithOrg(client.db(DB), ranked);
+
+    // Collapse duplicate departments that belong to the same organization
+    const TIER_RANK: Record<string, number> = { A: 0, B: 1, C: 2, D: 3 };
+    const orgMap = new Map<string, Record<string, unknown>>();
+    for (const row of enriched) {
+      const key = (row.organization_canonical as string) ?? (row.buyer_canonical as string);
+      const existing = orgMap.get(key);
+      if (!existing) {
+        orgMap.set(key, { ...row });
+      } else {
+        const e = existing;
+        e.total_gmv     = ((e.total_gmv     as number) || 0) + ((row.total_gmv     as number) || 0);
+        e.non_100x_gmv  = ((e.non_100x_gmv  as number) || 0) + ((row.non_100x_gmv  as number) || 0);
+        e._100x_spend   = ((e._100x_spend   as number) || 0) + ((row._100x_spend   as number) || 0);
+        e.contract_count= ((e.contract_count as number) || 0) + ((row.contract_count as number) || 0);
+        if ((row.opportunity_score as number) > (e.opportunity_score as number)) {
+          e.opportunity_score = row.opportunity_score;
+        }
+        const etr = TIER_RANK[e.opportunity_tier as string] ?? 3;
+        const rtr = TIER_RANK[row.opportunity_tier as string] ?? 3;
+        if (rtr < etr) e.opportunity_tier = row.opportunity_tier;
+        if ((row.days_since_last as number) < (e.days_since_last as number)) {
+          e.days_since_last      = row.days_since_last;
+          e.last_contract_date   = row.last_contract_date;
+          e.incumbent_seller_gst = row.incumbent_seller_gst;
+          e.incumbent_seller_name= row.incumbent_seller_name;
+        }
+      }
+    }
+    const deduped = [...orgMap.values()].sort(
+      (a, b) => (b.opportunity_score as number) - (a.opportunity_score as number)
+    );
+    const data = deduped.map((r, i) => ({ ...r, rank: skip + i + 1 }));
 
     return NextResponse.json(
       { data, total, page, page_size: size, pages: Math.ceil(total / size) },

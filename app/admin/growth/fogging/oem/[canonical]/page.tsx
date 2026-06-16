@@ -73,6 +73,10 @@ function ContractPanel({ contract, onClose }: { contract: Contract; onClose: () 
             )}
           </div>
           <div><div className="text-xs text-gray-400 mb-0.5">State / Type</div><div>{contract.buyer_state ?? "—"} · {contract.org_type ?? "—"}</div></div>
+          <div className="col-span-2">
+            <div className="text-xs text-gray-400 mb-0.5">Department (Procurement Entity)</div>
+            <div className="text-xs text-gray-600">{contract.buyer_display_name}</div>
+          </div>
           <div><div className="text-xs text-gray-400 mb-0.5">Model</div><div className="font-medium">{contract.model_raw ?? "—"}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">Quantity</div><div className="font-medium">{contract.quantity ?? "—"}</div></div>
           <div><div className="text-xs text-gray-400 mb-0.5">Unit Price</div><div className="font-medium text-green-700">{INR(contract.unit_price)}</div></div>
