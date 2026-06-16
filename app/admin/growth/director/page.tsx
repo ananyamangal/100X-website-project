@@ -190,10 +190,130 @@ const FILTER_TABS: Array<Status | "all"> = [
 
 // ─── Execution Pack Panel ─────────────────────────────────────────────────────
 
-function ExecutionPackPanel({ recId }: { recId: string }) {
+interface NextStep { step: string; action: string; time: string; owner: string; dependency: string }
+
+const NEXT_STEPS: Record<string, NextStep[]> = {
+  dealer_recruitment: [
+    { step: "1", action: "Send WhatsApp message using the draft below", time: "5 min", owner: "Founder", dependency: "Dealer phone number" },
+    { step: "2", action: "Send outreach email using the draft below", time: "5 min", owner: "Founder", dependency: "Dealer email address" },
+    { step: "3", action: "Call using the call script if no response in 24 hours", time: "15 min", owner: "Founder", dependency: "WhatsApp sent" },
+    { step: "4", action: "Run meeting using agenda below when call is confirmed", time: "45 min", owner: "Founder", dependency: "Call booked" },
+  ],
+  oem_displacement: [
+    { step: "1", action: "Send outreach email using the draft below", time: "5 min", owner: "Founder", dependency: "Purchase officer email" },
+    { step: "2", action: "Send WhatsApp message using the draft below", time: "5 min", owner: "Founder", dependency: "Officer phone number" },
+    { step: "3", action: "Call using the call script if no response in 2 days", time: "10 min", owner: "Founder", dependency: "Email sent" },
+    { step: "4", action: "Run meeting using agenda when demo is confirmed", time: "30 min", owner: "Founder / Dealer", dependency: "Meeting scheduled" },
+  ],
+  landing_page: [
+    { step: "1", action: "Brief developer with SEO brief below", time: "15 min", owner: "Founder", dependency: "Developer available" },
+    { step: "2", action: "Create page content using content outline below", time: "2 hours", owner: "Developer / Writer", dependency: "Brief approved" },
+    { step: "3", action: "Publish using meta tags below and submit to GSC", time: "30 min", owner: "Developer", dependency: "Content ready" },
+    { step: "4", action: "Add internal links from existing pages to new page", time: "15 min", owner: "Developer", dependency: "Page live" },
+  ],
+  campaign: [
+    { step: "1", action: "Review creative brief and targeting notes below", time: "10 min", owner: "Founder", dependency: "None" },
+    { step: "2", action: "Create campaign in Google Ads using ad copy drafts", time: "30 min", owner: "Founder", dependency: "Google Ads access" },
+    { step: "3", action: "Set budget per recommendation in Revenue Director", time: "5 min", owner: "Founder", dependency: "Campaign created" },
+    { step: "4", action: "Monitor performance after 72 hours, adjust bids", time: "15 min", owner: "Founder", dependency: "Campaign running" },
+  ],
+  customer_match: [
+    { step: "1", action: "Download the audience CSV below and clean email column", time: "30 min", owner: "Founder", dependency: "CSV exported" },
+    { step: "2", action: "Upload CSV to Google Ads → Tools → Audience Manager → Customer Lists", time: "10 min", owner: "Founder", dependency: "CSV ready" },
+    { step: "3", action: "Wait 24-48 hours for Google to process and build audience", time: "0 min", owner: "Google", dependency: "Upload complete" },
+    { step: "4", action: "Add audience to campaign with +30% bid adjustment", time: "10 min", owner: "Founder", dependency: "Audience built" },
+  ],
+}
+
+interface AudienceCategoryBreakdown {
+  category: string
+  org_count: number
+  total_gmv: number
+  priority_score: number
+}
+
+function CustomerMatchBreakdown({ recId }: { recId: string }) {
+  const [breakdown, setBreakdown] = useState<{ categories: AudienceCategoryBreakdown[]; total_orgs: number; total_gmv: number; upload_ready: boolean } | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch("/api/admin/growth/director/customer-match-export")
+      .then(r => r.json())
+      .then(d => setBreakdown(d))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [recId])
+
+  const INR_fmt = (n: number) =>
+    n >= 1e7 ? `₹${(n / 1e7).toFixed(1)}Cr` :
+    n >= 1e5 ? `₹${(n / 1e5).toFixed(1)}L` : `₹${Math.round(n).toLocaleString()}`
+
+  if (loading) return <div className="text-xs text-gray-400 py-2">Loading audience breakdown…</div>
+  if (!breakdown) return null
+
+  return (
+    <div className="space-y-3 mt-2">
+      {/* Summary strip */}
+      <div className="flex flex-wrap gap-4 text-xs bg-blue-50 rounded px-3 py-2.5 border border-blue-100">
+        <span><span className="font-semibold text-blue-900">Total orgs:</span> <span className="text-blue-700">{breakdown.total_orgs.toLocaleString()}</span></span>
+        <span><span className="font-semibold text-blue-900">Market GMV:</span> <span className="text-blue-700">{INR_fmt(breakdown.total_gmv)}</span></span>
+        <span>
+          <span className="font-semibold text-blue-900">Upload ready:</span>{" "}
+          <span className={breakdown.upload_ready ? "text-green-700 font-semibold" : "text-amber-600"}>
+            {breakdown.upload_ready ? "Yes (≥1,000 orgs)" : `No (${breakdown.total_orgs} — need 1,000+)`}
+          </span>
+        </span>
+      </div>
+
+      {/* Category breakdown table */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-gray-100 bg-gray-50">
+              {["Audience Category", "Org Count", "Market GMV", "Priority"].map(h => (
+                <th key={h} className="text-left px-3 py-2 text-gray-400 font-medium whitespace-nowrap">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {breakdown.categories.map(cat => (
+              <tr key={cat.category} className="hover:bg-gray-50/50">
+                <td className="px-3 py-2 font-semibold text-gray-800">{cat.category}</td>
+                <td className="px-3 py-2 text-gray-600">{cat.org_count.toLocaleString()}</td>
+                <td className="px-3 py-2 text-emerald-700 font-semibold">{INR_fmt(cat.total_gmv)}</td>
+                <td className="px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 rounded-full bg-gray-200 w-16 overflow-hidden">
+                      <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.min(cat.priority_score, 100)}%` }} />
+                    </div>
+                    <span className="text-gray-500">{cat.priority_score}%</span>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Download button */}
+      <a
+        href="/api/admin/growth/director/customer-match-export?format=csv"
+        download
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
+        <Package size={11} />
+        Download Customer Match CSV ({breakdown.total_orgs.toLocaleString()} orgs)
+      </a>
+      <p className="text-[10px] text-gray-400">CSV contains: org name, state, dept category, GMV, contracts, audience category. Upload to Google Ads → Tools → Audience Manager → Customer Lists.</p>
+    </div>
+  )
+}
+
+function ExecutionPackPanel({ recId, recType }: { recId: string; recType: string }) {
   const [pack, setPack] = useState<Record<string, unknown> | null>(null)
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [doneSteps, setDoneSteps] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetch(`/api/admin/growth/director/packs/${recId}`)
@@ -214,6 +334,8 @@ function ExecutionPackPanel({ recId }: { recId: string }) {
   )
 
   const packType = String(pack.type || "")
+  const nextSteps = NEXT_STEPS[packType] ?? []
+
   const sections: Array<{ key: string; label: string; content: string }> = []
 
   if (packType === "dealer_recruitment") {
@@ -247,28 +369,83 @@ function ExecutionPackPanel({ recId }: { recId: string }) {
     if (pack.upload_instructions) sections.push({ key: "upload", label: "Upload Instructions", content: String(pack.upload_instructions) })
   }
 
-  if (sections.length === 0) return (
-    <div className="text-xs text-gray-400 py-1">Pack generated (type: {packType})</div>
-  )
-
   return (
-    <div className="space-y-1.5">
-      {sections.map(s => (
-        <div key={s.key} className="border border-gray-200 rounded overflow-hidden">
-          <button
-            onClick={() => setExpanded(expanded === s.key ? null : s.key)}
-            className="w-full flex items-center justify-between px-3 py-2 text-left bg-gray-50 hover:bg-gray-100"
-          >
-            <span className="text-xs font-semibold text-gray-700">{s.label}</span>
-            {expanded === s.key ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-          </button>
-          {expanded === s.key && (
-            <div className="px-3 py-2.5">
-              <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">{s.content}</pre>
-            </div>
-          )}
+    <div className="space-y-2">
+      {/* ── Next Steps: one-click handoff ──────────────────────────────────── */}
+      {nextSteps.length > 0 && (
+        <div className="border border-emerald-200 rounded overflow-hidden">
+          <div className="bg-emerald-50 px-3 py-2 flex items-center justify-between">
+            <span className="text-xs font-semibold text-emerald-800">Next Steps — Exact Actions</span>
+            <span className="text-[10px] text-emerald-600">{doneSteps.size}/{nextSteps.length} complete</span>
+          </div>
+          <div className="divide-y divide-emerald-50">
+            {nextSteps.map(ns => {
+              const done = doneSteps.has(ns.step)
+              return (
+                <div key={ns.step} className={`flex items-start gap-3 px-3 py-2.5 ${done ? "bg-emerald-50/50" : "bg-white"}`}>
+                  <button
+                    onClick={() => setDoneSteps(prev => {
+                      const next = new Set(prev)
+                      if (next.has(ns.step)) next.delete(ns.step)
+                      else next.add(ns.step)
+                      return next
+                    })}
+                    className={`shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
+                      done ? "bg-emerald-500 border-emerald-500" : "border-gray-300 hover:border-emerald-400"
+                    }`}
+                  >
+                    {done && <Check size={10} className="text-white" />}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-xs font-medium ${done ? "text-gray-400 line-through" : "text-gray-800"}`}>
+                      Step {ns.step}: {ns.action}
+                    </p>
+                    <div className="flex gap-3 mt-0.5 text-[10px] text-gray-400">
+                      <span>⏱ {ns.time}</span>
+                      <span>👤 {ns.owner}</span>
+                      {ns.dependency && <span>🔗 Needs: {ns.dependency}</span>}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
-      ))}
+      )}
+
+      {/* ── Audience Breakdown for Customer Match ──────────────────────────── */}
+      {packType === "customer_match" && (
+        <div className="border border-blue-200 rounded overflow-hidden">
+          <div className="bg-blue-50 px-3 py-2">
+            <span className="text-xs font-semibold text-blue-800">Audience Breakdown by Category</span>
+          </div>
+          <div className="px-3 py-3">
+            <CustomerMatchBreakdown recId={recId} />
+          </div>
+        </div>
+      )}
+
+      {/* ── Pack sections ───────────────────────────────────────────────────── */}
+      {sections.length === 0 ? (
+        <div className="text-xs text-gray-400 py-1">Pack generated (type: {packType})</div>
+      ) : (
+        sections.map(s => (
+          <div key={s.key} className="border border-gray-200 rounded overflow-hidden">
+            <button
+              onClick={() => setExpanded(expanded === s.key ? null : s.key)}
+              className="w-full flex items-center justify-between px-3 py-2 text-left bg-gray-50 hover:bg-gray-100"
+            >
+              <span className="text-xs font-semibold text-gray-700">{s.label}</span>
+              {expanded === s.key ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+            </button>
+            {expanded === s.key && (
+              <div className="px-3 py-2.5">
+                <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">{s.content}</pre>
+              </div>
+            )}
+          </div>
+        ))
+      )}
     </div>
   )
 }
@@ -645,7 +822,7 @@ function RecCard({
   const [showHelp, setShowHelp]         = useState(false)
   const [showPack, setShowPack]         = useState(false)
   const [showPath, setShowPath]         = useState(false)
-  const [showIntel, setShowIntel]       = useState(false)
+  const [showIntel, setShowIntel]       = useState(true)
   const [showOwner, setShowOwner]       = useState(false)
   const [owner, setOwner]               = useState(rec.owner || "")
   const [targetDate, setTargetDate]     = useState(rec.target_completion_date || "")
@@ -823,7 +1000,7 @@ function RecCard({
           </button>
           {showPack && (
             <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
-              <ExecutionPackPanel recId={rec._id} />
+              <ExecutionPackPanel recId={rec._id} recType={rec.type} />
             </div>
           )}
         </div>
@@ -1286,7 +1463,7 @@ export default function RevenueDashboardPage() {
           <div className="flex items-center gap-2">
             <TrendingUp size={22} className="text-blue-600" />
             <h1 className="text-xl font-bold text-gray-900">Revenue Director</h1>
-            <span className="text-[10px] px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded font-bold">v1.1</span>
+            <span className="text-[10px] px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded font-bold">Revenue OS v2.2.2</span>
             {criticalCount > 0 && (
               <span className="px-2 py-0.5 text-xs font-bold bg-red-600 text-white rounded-full animate-pulse">
                 {criticalCount} CRITICAL
