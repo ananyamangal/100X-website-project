@@ -22,19 +22,21 @@ export async function GET(
   const db = (await clientPromise).db()
 
   // Look up by rec_id (string)
-  const pack = await db.collection("director_execution_packs").findOne({ rec_id: id })
+  let doc = await db.collection("director_execution_packs").findOne({ rec_id: id })
 
-  if (!pack) {
+  if (!doc) {
     // Also check by ObjectId in case it was stored differently
-    const byObjId = ObjectId.isValid(id)
+    doc = ObjectId.isValid(id)
       ? await db.collection("director_execution_packs").findOne({ rec_id: new ObjectId(id) })
       : null
-
-    if (!byObjId) {
-      return NextResponse.json({ error: "Pack not found", rec_id: id }, { status: 404 })
-    }
-    return NextResponse.json({ pack: byObjId })
   }
 
-  return NextResponse.json({ pack })
+  if (!doc) {
+    return NextResponse.json({ error: "Pack not found", rec_id: id }, { status: 404 })
+  }
+
+  // The wrapper document has shape { rec_id, rec_type, rec_title, generated_at, pack: <actual_data> }.
+  // Return the inner pack object so the UI can read pack.type, pack.market_evidence, etc. directly.
+  const innerPack = (doc.pack as Record<string, unknown>) ?? doc
+  return NextResponse.json({ pack: innerPack })
 }
