@@ -27,6 +27,7 @@ interface Module {
 
 // Primary modules — shown by default (founder-facing)
 const PRIMARY_MODULES: Module[] = [
+  { href: "/admin/growth/director",            label: "Revenue Director",     icon: TrendingUp,     permission: "dashboard.view",       badge: "NEW" },
   { href: "/admin/growth/launch",              label: "Launch Status",        icon: Rocket,         permission: "ads.view",             badge: "LIVE" },
   { href: "/admin/growth/founder",             label: "Founder Mode",         icon: Zap,            permission: "dashboard.view" },
   { href: "/admin/growth/landing-pages",       label: "Landing Pages",        icon: Globe,          permission: "landing_pages.view" },
