@@ -3,6 +3,8 @@
  * Updated: 2026-06-16 | Source: full codebase scan
  */
 
+export const PLATFORM_VERSION = "v2.2.3"
+
 export type CapabilityStatus =
   | "active"      // confirmed working and discoverable
   | "hidden"      // functional but removed from nav

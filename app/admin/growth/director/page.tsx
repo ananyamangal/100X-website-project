@@ -11,6 +11,7 @@ import {
   HelpCircle, Calendar, User, Check, Play, BookOpen, Lightbulb,
 } from "lucide-react"
 import { getCampaignIntelligence } from "@/lib/growth-os/campaign-decision-engine"
+import { PLATFORM_VERSION } from "@/lib/growth-os/platform-registry"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -187,6 +188,256 @@ const STATUS_DISPLAY: Record<Status, { label: string; color: string; icon: React
 const FILTER_TABS: Array<Status | "all"> = [
   "pending", "approved", "in_progress", "completed", "won", "lost", "rejected", "all",
 ]
+
+// ─── Execution Readiness ──────────────────────────────────────────────────────
+
+interface ReadinessItem { label: string; status: "YES" | "NO" | "PENDING" | "NA"; note?: string }
+
+interface ReadinessAssessment {
+  status: "READY" | "PARTIAL" | "BLOCKED"
+  score: number
+  audience: string
+  budget: string
+  roi: string
+  blockers: string[]
+  ads_checklist?: ReadinessItem[]
+  is_customer_match: boolean
+  display_title?: string
+}
+
+const AD_REC_TYPES = new Set([
+  "search_campaign", "remarketing_campaign", "youtube_campaign",
+  "performance_max_campaign", "competitor_conquest_campaign",
+  "customer_match", "customer_match_campaign",
+  "negative_keyword", "budget_reallocate", "creative_refresh",
+])
+
+function getReadiness(rec: Rec, sourcesConnected: string[]): ReadinessAssessment {
+  const type = rec.type
+  const payload = rec.payload ?? {}
+  const hasGoogleAds = sourcesConnected.some(s => s.toLowerCase().includes("google ads") || s.toLowerCase().includes("ads"))
+
+  // Customer Match — always BLOCKED without contact data
+  if (type === "customer_match" || type === "customer_match_campaign") {
+    return {
+      status: "BLOCKED",
+      score: 15,
+      audience: `~450 govt orgs identified — 0 emails or phones available`,
+      budget: "₹10,000/mo ad spend planned — cannot deploy without contacts",
+      roi: "0% until contact enrichment complete",
+      blockers: [
+        "No email or phone data — Google Ads Customer Match requires contact identifiers",
+        "Fogging intelligence has organization names only, not purchase officer contacts",
+        "Action: Source contacts via GeM Seller Directory or LinkedIn before spending",
+      ],
+      ads_checklist: [
+        { label: "Contact list (emails/phones)", status: "NO", note: "0 contacts — enrichment required before upload" },
+        { label: "Ad copy drafts", status: "PENDING", note: "Available in execution pack after approval" },
+        { label: "Budget ₹10K/mo", status: "YES" },
+        { label: "Landing page / quote form", status: "PENDING", note: "Verify current page conversion rate" },
+        { label: "Conversion tracking", status: "PENDING", note: "Verify Google Ads conversion tag is installed" },
+        { label: "Google Ads account", status: hasGoogleAds ? "YES" : "NO", note: hasGoogleAds ? undefined : "Connect in Ads Director" },
+      ],
+      is_customer_match: true,
+      display_title: "Government Buyer Audience Identified — Contact Enrichment Required",
+    }
+  }
+
+  // Dealer Recruitment
+  if (type === "dealer_recruit") {
+    const state = String(payload.state || "")
+    const orgCount = Number(payload.org_count || 0)
+    return {
+      status: "PARTIAL",
+      score: 60,
+      audience: `Distributors / dealers in ${state || "target state"}${orgCount ? ` · ${orgCount} buyer orgs in market` : ""}`,
+      budget: "₹0 — direct outreach, no ad spend",
+      roi: `${INR(rec.expected_revenue_impact)} if dealer authorised and wins GeM tenders`,
+      blockers: [
+        `Find dealer candidates in ${state || "target state"} (IndiaMart, TradeIndia, trade directories)`,
+        "Get phone number and email — required for WhatsApp + email outreach",
+        "Confirm candidate has active GeM Seller account (or can register)",
+      ],
+      is_customer_match: false,
+    }
+  }
+
+  // OEM Displacement / Procurement Target
+  if (type === "oem_displacement" || type === "procurement_target") {
+    const orgName = String(payload.organization_name || "target organization")
+    const state = String(payload.organization_state || payload.state || "")
+    return {
+      status: "PARTIAL",
+      score: 55,
+      audience: `${orgName}${state ? ` · ${state}` : ""}`,
+      budget: "₹0 — direct government buyer outreach",
+      roi: `${INR(rec.expected_revenue_impact)} if GeM bid won`,
+      blockers: [
+        `Source purchase officer contact for ${orgName} (GeM Seller Directory → find buyer contact)`,
+        state ? `Confirm 100X dealer or rep is available in ${state}` : "Assign dealer for this state",
+        "Check GeM for next tender cycle and open bids from this org",
+      ],
+      is_customer_match: false,
+    }
+  }
+
+  // SEO / Content
+  if (type === "landing_page_create" || type === "content_create") {
+    const keyword = String(payload.query || payload.keyword || "target keyword")
+    const impressions = Number(payload.impressions || 0)
+    return {
+      status: "PARTIAL",
+      score: 50,
+      audience: `Organic search — "${keyword}"${impressions ? ` · ${impressions.toLocaleString()} impressions/mo` : ""}`,
+      budget: "₹0 — organic SEO, no ad spend",
+      roi: "Organic traffic increase, measured via GSC impressions and clicks",
+      blockers: [
+        "Brief developer or writer using the SEO brief in the execution pack",
+        `Create and publish page targeting "${keyword}" (goal: top 3 ranking)`,
+        "Submit URL to Google Search Console after publishing",
+      ],
+      is_customer_match: false,
+    }
+  }
+
+  // Ad types
+  const budgetByType: Record<string, number> = {
+    search_campaign: 15000, remarketing_campaign: 8000, youtube_campaign: 20000,
+    performance_max_campaign: 25000, competitor_conquest_campaign: 20000,
+    negative_keyword: 0, budget_reallocate: 0, creative_refresh: 0,
+  }
+  const adBudget = budgetByType[type] ?? 0
+  const blockers: string[] = []
+  if (!hasGoogleAds) blockers.push("Google Ads account not connected — link account in Ads Director first")
+  if (adBudget > 0) blockers.push(`Budget approval required: ${INR(adBudget)}/month`)
+  if (type === "remarketing_campaign") blockers.push("Remarketing pixel must be installed on 100xcircle.com first")
+  blockers.push("Ad creatives (copy + images) need to be built — drafts available in execution pack after approval")
+
+  return {
+    status: "PARTIAL",
+    score: !hasGoogleAds ? 35 : blockers.length <= 2 ? 60 : 45,
+    audience: type === "remarketing_campaign"
+      ? "Previous site visitors (remarketing audience)"
+      : "Google search users targeting thermal fogging keywords",
+    budget: adBudget > 0 ? `${INR(adBudget)}/month` : "₹0 — optimization action",
+    roi: `${INR(rec.expected_revenue_impact)} estimated if campaign runs`,
+    blockers,
+    ads_checklist: [
+      {
+        label: type === "remarketing_campaign" ? "Audience: Remarketing list (site visitors)" : "Audience: Keyword / intent targeting",
+        status: type === "remarketing_campaign" ? "PENDING" : "YES",
+        note: type === "remarketing_campaign" ? "Pixel install + 100 visitor minimum required" : undefined,
+      },
+      { label: "Ad copy drafts", status: "PENDING", note: "Approve rec → execution pack generates drafts" },
+      { label: `Budget: ${adBudget > 0 ? INR(adBudget) + "/mo" : "₹0 (optimisation)"}`, status: "YES" },
+      { label: "Landing page / quote form", status: "PENDING", note: "Verify page converts before launch" },
+      { label: "Conversion tracking", status: "PENDING", note: "Verify Google Ads conversion tag is active" },
+      { label: "Google Ads account", status: hasGoogleAds ? "YES" : "NO", note: hasGoogleAds ? undefined : "Link account in Ads Director" },
+    ],
+    is_customer_match: false,
+  }
+}
+
+const READINESS_STYLE = {
+  READY:   { border: "border-green-200", bg: "bg-green-50",  badge: "bg-green-100 text-green-800",  bullet: "text-green-600" },
+  PARTIAL: { border: "border-amber-200", bg: "bg-amber-50",  badge: "bg-amber-100 text-amber-800",  bullet: "text-amber-600" },
+  BLOCKED: { border: "border-red-200",   bg: "bg-red-50",    badge: "bg-red-100 text-red-800",      bullet: "text-red-600"   },
+}
+
+function ReadinessStrip({ rec, sourcesConnected }: { rec: Rec; sourcesConnected: string[] }) {
+  const r = getReadiness(rec, sourcesConnected)
+  const [showAll, setShowAll] = useState(false)
+  const s = READINESS_STYLE[r.status]
+
+  return (
+    <div className={`mt-3 rounded-lg border p-3 space-y-2.5 ${s.border} ${s.bg}`}>
+      {/* Status + score */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${s.badge}`}>{r.status}</span>
+        <span className="text-[11px] text-gray-600">Execution Readiness: <strong className="text-gray-800">{r.score}/100</strong></span>
+        {r.is_customer_match && (
+          <span className="text-[10px] font-bold text-red-700 bg-red-100 border border-red-200 px-2 py-0.5 rounded">
+            Contact Enrichment Required
+          </span>
+        )}
+      </div>
+
+      {/* Audience / Budget / ROI */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+        <div>
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Audience</p>
+          <p className="text-gray-700 leading-snug">{r.audience}</p>
+        </div>
+        <div>
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Budget</p>
+          <p className="text-gray-700 leading-snug">{r.budget}</p>
+        </div>
+        <div>
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Expected ROI</p>
+          <p className="text-gray-700 leading-snug">{r.roi}</p>
+        </div>
+      </div>
+
+      {/* Blockers */}
+      {r.blockers.length > 0 && (
+        <div>
+          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">What must happen before execution</p>
+          <div className="space-y-1">
+            {(showAll ? r.blockers : r.blockers.slice(0, 2)).map((b, i) => (
+              <div key={i} className="flex items-start gap-1.5 text-[11px] text-gray-700">
+                <span className={`shrink-0 font-bold ${s.bullet}`}>▸</span>
+                <span>{b}</span>
+              </div>
+            ))}
+          </div>
+          {r.blockers.length > 2 && (
+            <button onClick={() => setShowAll(v => !v)} className="text-[10px] text-blue-600 underline mt-1.5">
+              {showAll ? "Show less" : `+${r.blockers.length - 2} more blockers`}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AdsDeploymentChecklist({ items }: { items: ReadinessItem[] }) {
+  const yesCount = items.filter(i => i.status === "YES").length
+  const score = Math.round(yesCount / items.length * 100)
+
+  const ITEM_STYLE: Record<string, string> = {
+    YES:     "bg-green-100 text-green-800 border-green-200",
+    NO:      "bg-red-100 text-red-800 border-red-200",
+    PENDING: "bg-amber-100 text-amber-800 border-amber-200",
+    NA:      "bg-gray-100 text-gray-500 border-gray-200",
+  }
+
+  return (
+    <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
+      <div className="flex items-center gap-2">
+        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Google Ads Deployment Readiness</p>
+        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+          score >= 70 ? "bg-green-100 text-green-800 border-green-200" :
+          score >= 40 ? "bg-amber-100 text-amber-800 border-amber-200" :
+          "bg-red-100 text-red-800 border-red-200"
+        }`}>{score}% ready</span>
+      </div>
+      <div className="space-y-1.5">
+        {items.map((item, i) => (
+          <div key={i} className="flex items-start gap-2 text-[11px]">
+            <span className={`shrink-0 min-w-[48px] text-center px-1.5 py-0.5 rounded border text-[9px] font-bold ${ITEM_STYLE[item.status]}`}>
+              {item.status}
+            </span>
+            <div className="flex-1 min-w-0">
+              <span className="text-gray-700">{item.label}</span>
+              {item.note && <span className="text-gray-400 ml-1">— {item.note}</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 // ─── Execution Pack Panel ─────────────────────────────────────────────────────
 
@@ -703,7 +954,7 @@ function ExecutionPathPanel({ rec }: { rec: Rec }) {
 
 // ─── Campaign Intelligence Panel ─────────────────────────────────────────────
 
-function CampaignIntelPanel({ rec }: { rec: Rec }) {
+function CampaignIntelPanel({ rec, sourcesConnected }: { rec: Rec; sourcesConnected: string[] }) {
   const [showRejected, setShowRejected] = useState(true)
   const intel = getCampaignIntelligence(
     rec.type,
@@ -711,6 +962,7 @@ function CampaignIntelPanel({ rec }: { rec: Rec }) {
     rec.confidence,
     rec.expected_revenue_impact,
   )
+  const readiness = getReadiness(rec, sourcesConnected)
 
   return (
     <div className="space-y-3">
@@ -812,6 +1064,11 @@ function CampaignIntelPanel({ rec }: { rec: Rec }) {
           </Link>
         ))}
       </div>
+
+      {/* Google Ads Deployment Readiness — for all ad-type recs */}
+      {readiness.ads_checklist && readiness.ads_checklist.length > 0 && (
+        <AdsDeploymentChecklist items={readiness.ads_checklist} />
+      )}
     </div>
   )
 }
@@ -819,11 +1076,12 @@ function CampaignIntelPanel({ rec }: { rec: Rec }) {
 // ─── Rec Card ─────────────────────────────────────────────────────────────────
 
 function RecCard({
-  rec, onAction, actioning,
+  rec, onAction, actioning, sourcesConnected,
 }: {
   rec: Rec
   onAction: (id: string, action: string, extra?: Record<string, unknown>) => Promise<void>
   actioning: string | null
+  sourcesConnected: string[]
 }) {
   const [showReject, setShowReject]     = useState(false)
   const [rejectReason, setRejectReason] = useState("")
@@ -842,6 +1100,8 @@ function RecCard({
   const isActioning = actioning === rec._id
   const hasPack = Boolean(rec.execution_pack_id)
   const statusDisplay = STATUS_DISPLAY[rec.status] || STATUS_DISPLAY.pending
+  const readiness = getReadiness(rec, sourcesConnected)
+  const displayTitle = readiness.display_title || rec.title
 
   const needsOutcomeInput = (action: "won" | "lost") => {
     if (action === "won") setShowWonInput(true)
@@ -899,7 +1159,10 @@ function RecCard({
         </div>
 
         {/* Title */}
-        <h3 className="mt-3 text-[15px] font-semibold text-gray-900 leading-snug">{rec.title}</h3>
+        <h3 className="mt-3 text-[15px] font-semibold text-gray-900 leading-snug">{displayTitle}</h3>
+        {readiness.display_title && (
+          <p className="text-[10px] text-gray-400 mt-0.5">Original: {rec.title}</p>
+        )}
 
         {/* Why now */}
         <p className="mt-1.5 text-sm text-gray-700">{rec.why_now}</p>
@@ -937,6 +1200,11 @@ function RecCard({
         <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
           <div className="h-full bg-blue-400 rounded-full" style={{ width: `${rec.confidence}%` }} />
         </div>
+
+        {/* Pre-approval readiness — visible for pending recs */}
+        {rec.status === "pending" && (
+          <ReadinessStrip rec={rec} sourcesConnected={sourcesConnected} />
+        )}
 
         {/* Lifecycle timeline for non-pending */}
         {rec.status !== "pending" && (
@@ -990,7 +1258,7 @@ function RecCard({
         </button>
         {showIntel && (
           <div className="px-4 py-3 border-t border-amber-50 bg-white">
-            <CampaignIntelPanel rec={rec} />
+            <CampaignIntelPanel rec={rec} sourcesConnected={sourcesConnected} />
           </div>
         )}
       </div>
@@ -1471,7 +1739,7 @@ export default function RevenueDashboardPage() {
           <div className="flex items-center gap-2">
             <TrendingUp size={22} className="text-blue-600" />
             <h1 className="text-xl font-bold text-gray-900">Revenue Director</h1>
-            <span className="text-[10px] px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded font-bold">Revenue OS v2.2.2</span>
+            <span className="text-[10px] px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded font-bold">Revenue OS {PLATFORM_VERSION}</span>
             {criticalCount > 0 && (
               <span className="px-2 py-0.5 text-xs font-bold bg-red-600 text-white rounded-full animate-pulse">
                 {criticalCount} CRITICAL
@@ -1608,7 +1876,7 @@ export default function RevenueDashboardPage() {
       ) : (
         <div className="space-y-3">
           {recs.map(rec => (
-            <RecCard key={rec._id} rec={rec} onAction={handleAction} actioning={actioning} />
+            <RecCard key={rec._id} rec={rec} onAction={handleAction} actioning={actioning} sourcesConnected={run?.sources_connected ?? []} />
           ))}
         </div>
       )}
