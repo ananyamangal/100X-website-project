@@ -190,38 +190,38 @@ const FILTER_TABS: Array<Status | "all"> = [
 
 // ─── Execution Pack Panel ─────────────────────────────────────────────────────
 
-interface NextStep { step: string; action: string; time: string; owner: string; dependency: string }
+interface NextStep { step: string; action: string; time: string; owner: string; dependency: string; expected_result: string }
 
 const NEXT_STEPS: Record<string, NextStep[]> = {
   dealer_recruitment: [
-    { step: "1", action: "Send WhatsApp message using the draft below", time: "5 min", owner: "Founder", dependency: "Dealer phone number" },
-    { step: "2", action: "Send outreach email using the draft below", time: "5 min", owner: "Founder", dependency: "Dealer email address" },
-    { step: "3", action: "Call using the call script if no response in 24 hours", time: "15 min", owner: "Founder", dependency: "WhatsApp sent" },
-    { step: "4", action: "Run meeting using agenda below when call is confirmed", time: "45 min", owner: "Founder", dependency: "Call booked" },
+    { step: "1", action: "Send WhatsApp message using the draft below", time: "5 min", owner: "Founder", dependency: "Dealer phone number", expected_result: "Dealer opens message; replies within 24 hours" },
+    { step: "2", action: "Send outreach email using the draft below", time: "5 min", owner: "Founder", dependency: "Dealer email address", expected_result: "Dealer reads market data; gets on a call" },
+    { step: "3", action: "Call using the call script if no response in 24 hours", time: "15 min", owner: "Founder", dependency: "WhatsApp sent", expected_result: "Call booked or verbal interest confirmed" },
+    { step: "4", action: "Run meeting using agenda below when call is confirmed", time: "45 min", owner: "Founder", dependency: "Call booked", expected_result: "Dealer agreement signed or next meeting set" },
   ],
   oem_displacement: [
-    { step: "1", action: "Send outreach email using the draft below", time: "5 min", owner: "Founder", dependency: "Purchase officer email" },
-    { step: "2", action: "Send WhatsApp message using the draft below", time: "5 min", owner: "Founder", dependency: "Officer phone number" },
-    { step: "3", action: "Call using the call script if no response in 2 days", time: "10 min", owner: "Founder", dependency: "Email sent" },
-    { step: "4", action: "Run meeting using agenda when demo is confirmed", time: "30 min", owner: "Founder / Dealer", dependency: "Meeting scheduled" },
+    { step: "1", action: "Send outreach email using the draft below", time: "5 min", owner: "Founder", dependency: "Purchase officer email", expected_result: "Officer reads email; requests catalog or quote" },
+    { step: "2", action: "Send WhatsApp message using the draft below", time: "5 min", owner: "Founder", dependency: "Officer phone number", expected_result: "WhatsApp reply within 48 hours" },
+    { step: "3", action: "Call using the call script if no response in 2 days", time: "10 min", owner: "Founder", dependency: "Email sent", expected_result: "Demo or meeting booked with purchase team" },
+    { step: "4", action: "Run meeting using agenda when demo is confirmed", time: "30 min", owner: "Founder / Dealer", dependency: "Meeting scheduled", expected_result: "Tender specification includes 100X; quote submitted on GeM" },
   ],
   landing_page: [
-    { step: "1", action: "Brief developer with SEO brief below", time: "15 min", owner: "Founder", dependency: "Developer available" },
-    { step: "2", action: "Create page content using content outline below", time: "2 hours", owner: "Developer / Writer", dependency: "Brief approved" },
-    { step: "3", action: "Publish using meta tags below and submit to GSC", time: "30 min", owner: "Developer", dependency: "Content ready" },
-    { step: "4", action: "Add internal links from existing pages to new page", time: "15 min", owner: "Developer", dependency: "Page live" },
+    { step: "1", action: "Brief developer with SEO brief below", time: "15 min", owner: "Founder", dependency: "Developer available", expected_result: "Developer has clear spec; can start same day" },
+    { step: "2", action: "Create page content using content outline below", time: "2 hours", owner: "Developer / Writer", dependency: "Brief approved", expected_result: "Draft content ready for founder review" },
+    { step: "3", action: "Publish using meta tags below and submit to GSC", time: "30 min", owner: "Developer", dependency: "Content ready", expected_result: "Page indexed within 3-7 days; GSC shows impressions" },
+    { step: "4", action: "Add internal links from existing pages to new page", time: "15 min", owner: "Developer", dependency: "Page live", expected_result: "Page authority improves; faster rank movement" },
   ],
   campaign: [
-    { step: "1", action: "Review creative brief and targeting notes below", time: "10 min", owner: "Founder", dependency: "None" },
-    { step: "2", action: "Create campaign in Google Ads using ad copy drafts", time: "30 min", owner: "Founder", dependency: "Google Ads access" },
-    { step: "3", action: "Set budget per recommendation in Revenue Director", time: "5 min", owner: "Founder", dependency: "Campaign created" },
-    { step: "4", action: "Monitor performance after 72 hours, adjust bids", time: "15 min", owner: "Founder", dependency: "Campaign running" },
+    { step: "1", action: "Review creative brief and targeting notes below", time: "10 min", owner: "Founder", dependency: "None", expected_result: "Campaign strategy confirmed before spend begins" },
+    { step: "2", action: "Create campaign in Google Ads using ad copy drafts", time: "30 min", owner: "Founder", dependency: "Google Ads access", expected_result: "Campaign live within 24-48 hours" },
+    { step: "3", action: "Set budget per recommendation in Revenue Director", time: "5 min", owner: "Founder", dependency: "Campaign created", expected_result: "Budget allocated; campaign starts generating impressions" },
+    { step: "4", action: "Monitor performance after 72 hours, adjust bids", time: "15 min", owner: "Founder", dependency: "Campaign running", expected_result: "Optimized CPC; first leads within 5-7 days" },
   ],
   customer_match: [
-    { step: "1", action: "Download the audience CSV below and clean email column", time: "30 min", owner: "Founder", dependency: "CSV exported" },
-    { step: "2", action: "Upload CSV to Google Ads → Tools → Audience Manager → Customer Lists", time: "10 min", owner: "Founder", dependency: "CSV ready" },
-    { step: "3", action: "Wait 24-48 hours for Google to process and build audience", time: "0 min", owner: "Google", dependency: "Upload complete" },
-    { step: "4", action: "Add audience to campaign with +30% bid adjustment", time: "10 min", owner: "Founder", dependency: "Audience built" },
+    { step: "1", action: "Download audience CSV below — source contact emails separately (purchase officers)", time: "30 min", owner: "Founder", dependency: "CSV downloaded", expected_result: "Clean CSV with emails + org names ready for upload" },
+    { step: "2", action: "Upload contact CSV to Google Ads → Tools → Audience Manager → Customer Lists", time: "10 min", owner: "Founder", dependency: "CSV ready (min 1,000 contacts)", expected_result: "Audience list appears in Google Ads within 24 hours" },
+    { step: "3", action: "Wait 24-48 hours for Google to match and build audience", time: "0 min", owner: "Google", dependency: "Upload complete", expected_result: "Matched audience of 300-500 contacts (28% match rate)" },
+    { step: "4", action: "Add audience to campaign with +30% bid adjustment", time: "10 min", owner: "Founder", dependency: "Audience built", expected_result: "Higher ad visibility to known buyers; improved conversion rate" },
   ],
 }
 
@@ -295,16 +295,21 @@ function CustomerMatchBreakdown({ recId }: { recId: string }) {
         </table>
       </div>
 
-      {/* Download button */}
+      {/* Download button + Google Ads warning */}
+      <div className="bg-amber-50 border border-amber-200 rounded px-3 py-2.5 text-[11px] text-amber-800 space-y-1">
+        <p className="font-semibold">Before uploading to Google Ads Customer Match:</p>
+        <p>This CSV contains <strong>procurement intelligence</strong> (org names, GMV, categories) — not contact details. Google Ads Customer Match requires email addresses or phone numbers.</p>
+        <p>Step 1: Download this CSV to identify which orgs to target. Step 2: Source contact details (purchase officers) via GeM directory or LinkedIn. Step 3: Upload the contact file to Google Ads.</p>
+      </div>
       <a
         href="/api/admin/growth/director/customer-match-export?format=csv"
         download
         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700"
       >
         <Package size={11} />
-        Download Customer Match CSV ({breakdown.total_orgs.toLocaleString()} orgs)
+        Download Audience Intelligence CSV ({breakdown.total_orgs.toLocaleString()} orgs)
       </a>
-      <p className="text-[10px] text-gray-400">CSV contains: org name, state, dept category, GMV, contracts, audience category. Upload to Google Ads → Tools → Audience Manager → Customer Lists.</p>
+      <p className="text-[10px] text-gray-400">Columns: org name · state · dept category · GMV · contracts · audience category · priority score</p>
     </div>
   )
 }
@@ -400,11 +405,14 @@ function ExecutionPackPanel({ recId, recType }: { recId: string; recType: string
                     <p className={`text-xs font-medium ${done ? "text-gray-400 line-through" : "text-gray-800"}`}>
                       Step {ns.step}: {ns.action}
                     </p>
-                    <div className="flex gap-3 mt-0.5 text-[10px] text-gray-400">
+                    <div className="flex flex-wrap gap-3 mt-0.5 text-[10px] text-gray-400">
                       <span>⏱ {ns.time}</span>
                       <span>👤 {ns.owner}</span>
                       {ns.dependency && <span>🔗 Needs: {ns.dependency}</span>}
                     </div>
+                    {ns.expected_result && !done && (
+                      <p className="text-[10px] text-emerald-700 mt-0.5">✓ Expected: {ns.expected_result}</p>
+                    )}
                   </div>
                 </div>
               )
@@ -696,7 +704,7 @@ function ExecutionPathPanel({ rec }: { rec: Rec }) {
 // ─── Campaign Intelligence Panel ─────────────────────────────────────────────
 
 function CampaignIntelPanel({ rec }: { rec: Rec }) {
-  const [showRejected, setShowRejected] = useState(false)
+  const [showRejected, setShowRejected] = useState(true)
   const intel = getCampaignIntelligence(
     rec.type,
     rec.payload ?? {},
