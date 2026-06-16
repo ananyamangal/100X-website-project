@@ -141,7 +141,8 @@ export async function POST(req: NextRequest) {
       const ctrGap = expectedCtr - actualCtr
       if (ctrGap < 0.01) continue
 
-      const expectedNewClicks = Math.round(impressions * ctrGap * 30) // monthly
+      // impressions is already a 28-day GSC total; extrapolate to 30-day month
+      const expectedNewClicks = Math.round((impressions / 28) * 30 * ctrGap)
       const expectedRevenue = expectedNewClicks * REVENUE_PER_CLICK
 
       const rec: Omit<SeoRecommendation, "_id"> = {
@@ -149,7 +150,7 @@ export async function POST(req: NextRequest) {
         priority: "high",
         title: `${position <= 8 ? "Optimize title/meta" : "Expand content"} for "${query}"`,
         url: String(row.page || row.pagePath || "/"),
-        why: `Position ${position.toFixed(1)} · ${impressions.toLocaleString()} impressions/mo · only ${clicks} clicks · expected CTR ${Math.round(expectedCtr * 100)}% vs actual ${Math.round(actualCtr * 100)}%`,
+        why: `Position ${position.toFixed(1)} · ${impressions.toLocaleString()} impressions (28-day) · only ${clicks} clicks · expected CTR ${Math.round(expectedCtr * 100)}% vs actual ${Math.round(actualCtr * 100)}%`,
         current_state: `Position: ${position.toFixed(1)}, CTR: ${(actualCtr * 100).toFixed(1)}%, Impressions: ${impressions}`,
         proposed_change: position <= 8
           ? `Rewrite title tag to include "${query}" in first 30 chars. Update meta description with clear CTA.`
@@ -202,12 +203,15 @@ export async function POST(req: NextRequest) {
               ? JSON.stringify({
                   "@context": "https://schema.org",
                   "@type": "Product",
-                  "name": "100X Circle Thermal Fogging Machine",
+                  "name": "FILL: Product name for this page",
+                  "description": "FILL: Product description (required for rich results)",
+                  "image": "FILL: Absolute URL to product image (required for rich results)",
                   "brand": { "@type": "Brand", "name": "100X Circle" },
                   "offers": {
                     "@type": "Offer",
-                    "availability": "https://schema.org/InStock",
+                    "price": "FILL: price as number e.g. 45000",
                     "priceCurrency": "INR",
+                    "availability": "https://schema.org/InStock",
                     "seller": { "@type": "Organization", "name": "100X Circle Pvt Ltd" }
                   }
                 }, null, 2)
