@@ -135,8 +135,8 @@ export async function POST(
           if (DEALER_TYPES.includes(recType) && !existingDealer) {
             await db.collection("crm_dealers").insertOne({
               name:                    rec.title,
-              company:                 (rec.payload?.target_state as string) ? `Target: ${rec.payload.target_state}` : "",
-              state:                   (rec.payload?.target_state as string) ?? "",
+              company:                 (rec.payload?.state as string) ? `Target: ${rec.payload.state}` : "",
+              state:                   (rec.payload?.state as string) ?? "",
               stage:                   "lead",
               gem_status:              "unknown",
               oem_status:              "unknown",
@@ -175,30 +175,38 @@ export async function POST(
           if (SEO_TYPES.includes(recType) && !existingSeo) {
             await db.collection("seo_workflow_items").insertOne({
               title:                   rec.title,
-              keyword:                 (rec.payload?.keyword as string) ?? "",
-              stage:                   "keyword_research",
+              target_keyword:          (rec.payload?.query as string) ?? (rec.payload?.keyword as string) ?? "",
+              stage:                   "identified",       // first valid stage in SEO workflow
               target_url:              "",
-              author:                  "",
+              content_type:            recType === "landing_page_create" ? "landing_page" : "blog",
+              draft_content:           "",
+              publish_url:             "",
+              owner:                   "",
               notes:                   rec.why_now ?? "",
               source_recommendation_id: recId,
-              source_type:             "director_auto",
+              source_opportunity_id:   recId,             // SEO UI reads this field for attribution
               created_at:              now,
               updated_at:              now,
+              published_at:            null,
             })
           }
 
           if (ADS_TYPES.includes(recType) && !existingAds) {
             await db.collection("ads_workflow_items").insertOne({
-              title:                   rec.title,
+              name:                    rec.title,          // Ads UI uses 'name' not 'title'
               campaign_type:           recType,
-              stage:                   "draft",
-              objective:               rec.expected_action ?? "",
+              stage:                   "recommendation",   // first valid stage; Ads UI starts here
+              brief:                   rec.expected_action ?? "",
               budget:                  (rec.payload?.budget_recommendation_inr as number) ?? 0,
               notes:                   rec.why_now ?? "",
+              owner:                   "",
+              actual_spend:            0,
+              actual_clicks:           0,
+              actual_conversions:      0,
               source_recommendation_id: recId,
-              source_type:             "director_auto",
               created_at:              now,
               updated_at:              now,
+              deployed_at:             null,
             })
           }
         } catch (err) {

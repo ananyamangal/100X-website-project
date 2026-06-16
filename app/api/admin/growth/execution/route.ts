@@ -3,7 +3,7 @@ import clientPromise from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
 
-const WORK_STATUSES = ["approved", "in_progress", "applied", "waiting", "completed"]
+const WORK_STATUSES = ["approved", "in_progress", "applied", "completed"]
 
 export async function GET(req: NextRequest) {
   try {
