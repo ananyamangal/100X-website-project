@@ -24,7 +24,12 @@ export async function PATCH(
   const body = await req.json().catch(() => ({}))
   const now = new Date().toISOString()
 
-  const allowed = ["status", "reviewed_at", "implemented_at", "implementation_package", "notes"]
+  const VALID_STATUSES = ["pending", "approved", "rejected", "deferred", "implemented", "executing", "validating", "failed", "rolled_back"]
+  if (body.status && !VALID_STATUSES.includes(body.status)) {
+    return NextResponse.json({ error: `Invalid status: "${body.status}"` }, { status: 400 })
+  }
+
+  const allowed = ["status", "reviewed_at", "implemented_at", "executed_at", "rolled_back_at", "validation_result", "implementation_package", "notes"]
   const update: Record<string, unknown> = { updated_at: now }
 
   for (const key of allowed) {

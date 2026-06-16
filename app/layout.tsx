@@ -11,6 +11,7 @@ import './globals.css'
 import Navbar from '../components/Navbar'
 import SiteFooter from '@/components/SiteFooter'
 import GlobalJsonLd from '@/components/seo/GlobalJsonLd'
+import SeoSchemaOverrideInjector from '@/components/seo/SeoSchemaOverrideInjector'
 import UtmPersist from '@/components/UtmPersist'
 import { Toaster } from '@/components/ui/sonner'
 import { MobileCtaProvider } from '@/components/cta/MobileCtaContext'
@@ -200,6 +201,7 @@ export default async function RootLayout({
           />
         </noscript>
         <GlobalJsonLd />
+        <SeoSchemaOverrideInjector />
         <Suspense fallback={null}>
           <UtmPersist />
         </Suspense>

@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState, useCallback } from "react"
-import { Search, Link2, AlertCircle, ExternalLink, CheckCircle2, XCircle, Play, RotateCw, TrendingUp, TrendingDown, Zap, RefreshCw, Clock, Info, Target, ChevronDown, ChevronUp, Pause, Check } from "lucide-react"
+import { Search, Link2, AlertCircle, ExternalLink, CheckCircle2, XCircle, Play, RotateCw, TrendingUp, TrendingDown, Zap, RefreshCw, Clock, Info, Target, ChevronDown, ChevronUp, Pause, Check, Shield, History, Globe, RotateCcw, Loader2, FlaskConical, ArrowRight } from "lucide-react"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -38,8 +38,17 @@ interface SeoRec {
   confidence: number
   difficulty: string
   effort: string
-  status: "pending" | "approved" | "rejected" | "deferred" | "implemented"
+  status: "pending" | "approved" | "rejected" | "deferred" | "implementing" | "executing" | "validating" | "implemented" | "failed" | "rolled_back"
   generated_at: string
+  executed_at?: string
+  implemented_at?: string
+  rolled_back_at?: string
+  validation_result?: {
+    pass: boolean
+    reason?: string
+    checks: Record<string, { pass: boolean; reason?: string; value?: unknown }>
+    safe_types_only: boolean
+  }
   implementation_package?: {
     meta_title?: string
     meta_description?: string
@@ -47,6 +56,23 @@ interface SeoRec {
     link_recommendations?: Array<{ from: string; anchor: string; to: string }>
     notes?: string
   }
+}
+
+interface ExecLogEntry {
+  _id: string
+  rec_id: string
+  rec_type: string
+  rec_title: string
+  action: "execute" | "rollback"
+  path: string
+  before: Record<string, unknown> | null
+  after: Record<string, unknown> | null
+  status: "success" | "failed"
+  validation_result?: SeoRec["validation_result"]
+  executed_at: string
+  final_status: string
+  auto_rollback?: boolean
+  manual_rollback?: boolean
 }
 
 // ─── Small helpers ────────────────────────────────────────────────────────────
@@ -112,6 +138,12 @@ export default function SEOCommandCenter() {
   const [generatingRecs, setGeneratingRecs] = useState(false)
   const [recsResult, setRecsResult] = useState<string | null>(null)
   const [actioning, setActioning] = useState<string | null>(null)
+  const [executingId, setExecutingId] = useState<string | null>(null)
+  const [rollingBackId, setRollingBackId] = useState<string | null>(null)
+  const [execResult, setExecResult] = useState<{ id: string; ok: boolean; msg: string } | null>(null)
+  const [execLog, setExecLog] = useState<ExecLogEntry[]>([])
+  const [execLogLoading, setExecLogLoading] = useState(false)
+  const [showExecLog, setShowExecLog] = useState(false)
 
   const [activeTab, setActiveTab] = useState<"keywords" | "pages" | "near-wins" | "trends" | "schema" | "links" | "recommendations">("keywords")
   const [syncing, setSyncing] = useState(false)
@@ -167,6 +199,43 @@ export default function SEOCommandCenter() {
       await loadRecs()
     } catch { /* ignore */ } finally { setActioning(null) }
   }
+
+  const executeRec = async (id: string) => {
+    setExecutingId(id); setExecResult(null)
+    try {
+      const d = await fetch(`/api/admin/growth/seo/recommendations/${id}/execute`, { method: "POST" }).then(r => r.json())
+      const ok = d.ok && d.status === "implemented"
+      setExecResult({
+        id,
+        ok,
+        msg: ok
+          ? `Executed successfully — ${d.status}`
+          : d.error || `Validation failed: ${d.reason || "unknown reason"}${d.auto_rollback ? " (auto-rolled back)" : ""}`,
+      })
+      await loadRecs()
+    } catch (e) {
+      setExecResult({ id, ok: false, msg: String(e) })
+    } finally { setExecutingId(null) }
+  }
+
+  const rollbackRec = async (id: string) => {
+    setRollingBackId(id); setExecResult(null)
+    try {
+      const d = await fetch(`/api/admin/growth/seo/recommendations/${id}/rollback`, { method: "POST" }).then(r => r.json())
+      setExecResult({ id, ok: !!d.ok, msg: d.ok ? "Rolled back successfully" : (d.error || "Rollback failed") })
+      await loadRecs()
+    } catch (e) {
+      setExecResult({ id, ok: false, msg: String(e) })
+    } finally { setRollingBackId(null) }
+  }
+
+  const loadExecLog = useCallback(async () => {
+    setExecLogLoading(true)
+    try {
+      const d = await fetch("/api/admin/growth/seo/execution-log?limit=30").then(r => r.json())
+      setExecLog(d.entries || [])
+    } catch { /* ignore */ } finally { setExecLogLoading(false) }
+  }, [])
 
   const syncNow = async () => {
     setSyncing(true); setSyncError(null)
@@ -667,7 +736,7 @@ export default function SEOCommandCenter() {
           </div>
         )}
 
-        {/* ── RECOMMENDATIONS (v2.4) ──────────────────────────────────────────── */}
+        {/* ── RECOMMENDATIONS (v2.5) ──────────────────────────────────────────── */}
         {activeTab === "recommendations" && (
           <SeoRecommendationsTab
             recs={seoRecs}
@@ -675,8 +744,20 @@ export default function SEOCommandCenter() {
             generating={generatingRecs}
             result={recsResult}
             actioning={actioning}
+            executingId={executingId}
+            rollingBackId={rollingBackId}
+            execResult={execResult}
+            execLog={execLog}
+            execLogLoading={execLogLoading}
+            showExecLog={showExecLog}
             onGenerate={generateRecs}
             onAction={actionRec}
+            onExecute={executeRec}
+            onRollback={rollbackRec}
+            onToggleExecLog={() => {
+              if (!showExecLog) loadExecLog()
+              setShowExecLog(p => !p)
+            }}
           />
         )}
       </div>
@@ -713,11 +794,27 @@ const PRIORITY_COLOR_SEO: Record<string, string> = {
 
 const STATUS_COLOR_SEO: Record<string, string> = {
   pending:     "bg-gray-100 text-gray-600",
-  approved:    "bg-green-100 text-green-700",
+  approved:    "bg-blue-100 text-blue-700",
+  executing:   "bg-amber-100 text-amber-700",
+  validating:  "bg-violet-100 text-violet-700",
+  implemented: "bg-emerald-100 text-emerald-700",
+  failed:      "bg-red-100 text-red-700",
+  rolled_back: "bg-orange-100 text-orange-700",
   rejected:    "bg-red-100 text-red-600",
   deferred:    "bg-gray-100 text-gray-500",
-  implemented: "bg-emerald-100 text-emerald-700",
 }
+
+// State machine steps for display
+const STATE_STEPS = ["Detected", "Approved", "Executing", "Validating", "Implemented"]
+const STATE_STEP_INDEX: Record<string, number> = {
+  pending: 0, approved: 1, executing: 2, validating: 3, implemented: 4,
+  failed: 3, rolled_back: 3,
+}
+
+// Types that support SERP preview
+const SERP_PREVIEW_TYPES = new Set(["ctr_opportunity", "title_optimization"])
+// Types that are auto-executable
+const AUTO_EXEC_TYPES = new Set(["ctr_opportunity", "ranking_opportunity", "schema_fix", "internal_link", "title_optimization", "content_gap"])
 
 const EFFORT_LABEL_SEO: Record<string, string> = {
   "5_min": "5 min", "30_min": "30 min", "1_hour": "1 hr", "half_day": "½ day", "project": "Project",
@@ -728,17 +825,142 @@ const INR_SEO = (n: number) =>
   n >= 1e5 ? `₹${(n / 1e5).toFixed(1)} L` :
   n > 0 ? `₹${Math.round(n).toLocaleString("en-IN")}` : "₹0"
 
-function SeoRecCard({ rec, actioning, onAction }: {
+// ─── SERP Preview ─────────────────────────────────────────────────────────────
+
+function SerpPreview({ url, title, description }: { url: string; title: string; description: string }) {
+  const displayUrl = `www.100xcircle.com${url}`.replace(/\/$/, "")
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+      <div className="flex items-center gap-1.5 mb-2">
+        <Globe size={10} className="text-gray-400" />
+        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">SERP Preview</span>
+      </div>
+      <div className="max-w-[520px] font-sans">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-5 h-5 rounded-full bg-brand-100 flex items-center justify-center text-[8px] font-bold text-brand-600">1</div>
+          <div>
+            <p className="text-[11px] text-gray-700 font-medium leading-none">100x Circle</p>
+            <p className="text-[10px] text-gray-400 leading-none mt-0.5">{displayUrl} ▾</p>
+          </div>
+        </div>
+        <p className="text-[17px] text-[#1a0dab] font-normal leading-tight mt-1 hover:underline cursor-pointer line-clamp-1">
+          {title || <span className="text-gray-400 italic">No title set</span>}
+        </p>
+        <p className="text-[12px] text-[#4d5156] leading-snug mt-0.5 line-clamp-2">
+          {description || <span className="text-gray-400 italic">No description set</span>}
+        </p>
+        <div className="flex gap-3 mt-1.5">
+          <span className={`text-[10px] ${(title?.length || 0) > 60 ? "text-red-500 font-semibold" : "text-gray-400"}`}>
+            Title: {title?.length || 0}/60
+          </span>
+          <span className={`text-[10px] ${(description?.length || 0) > 160 ? "text-red-500 font-semibold" : "text-gray-400"}`}>
+            Desc: {description?.length || 0}/160
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── State Machine Stepper ────────────────────────────────────────────────────
+
+function StateStepper({ status }: { status: string }) {
+  const currentStep = STATE_STEP_INDEX[status] ?? 0
+  const failed = status === "failed" || status === "rolled_back"
+  return (
+    <div className="flex items-center gap-0 py-3 px-5 bg-gray-50 border-t border-gray-100 overflow-x-auto">
+      {STATE_STEPS.map((step, i) => {
+        const done = i < currentStep || status === "implemented"
+        const active = i === currentStep && !failed
+        const isFailed = failed && i === currentStep
+        return (
+          <div key={step} className="flex items-center gap-0 shrink-0">
+            <div className="flex flex-col items-center">
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold border
+                ${done ? "bg-emerald-500 border-emerald-500 text-white" :
+                  isFailed ? "bg-red-500 border-red-500 text-white" :
+                  active ? "bg-brand-600 border-brand-600 text-white" :
+                  "bg-white border-gray-300 text-gray-400"}`}>
+                {done ? "✓" : isFailed ? "✗" : i + 1}
+              </div>
+              <p className={`text-[9px] mt-0.5 font-medium whitespace-nowrap
+                ${done ? "text-emerald-600" : isFailed ? "text-red-600" : active ? "text-brand-700" : "text-gray-400"}`}>
+                {step}
+              </p>
+            </div>
+            {i < STATE_STEPS.length - 1 && (
+              <div className={`h-[1px] w-8 mx-0.5 mb-3.5 ${i < currentStep ? "bg-emerald-400" : "bg-gray-200"}`} />
+            )}
+          </div>
+        )
+      })}
+      {(status === "failed" || status === "rolled_back") && (
+        <div className="ml-3 flex items-center gap-1 text-[10px] text-red-600 font-semibold shrink-0">
+          <ArrowRight size={10} />{status === "rolled_back" ? "Rolled Back" : "Failed"}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Validation Result Panel ──────────────────────────────────────────────────
+
+function ValidationPanel({ result }: { result: SeoRec["validation_result"] }) {
+  if (!result) return null
+  return (
+    <div className={`border-t px-5 py-3 ${result.pass ? "bg-emerald-50 border-emerald-100" : "bg-red-50 border-red-100"}`}>
+      <div className="flex items-center gap-2 mb-2">
+        <FlaskConical size={12} className={result.pass ? "text-emerald-600" : "text-red-600"} />
+        <span className={`text-xs font-semibold ${result.pass ? "text-emerald-700" : "text-red-700"}`}>
+          Validation {result.pass ? "Passed" : "Failed"}
+        </span>
+        {!result.pass && result.reason && (
+          <span className="text-[10px] text-red-600">— {result.reason}</span>
+        )}
+      </div>
+      {Object.entries(result.checks).map(([key, check]) => (
+        <div key={key} className="flex items-start gap-2 text-[11px] mb-0.5">
+          {check.pass
+            ? <CheckCircle2 size={10} className="text-emerald-500 mt-0.5 shrink-0" />
+            : <XCircle size={10} className="text-red-500 mt-0.5 shrink-0" />}
+          <span className="text-gray-600 font-medium">{key.replace(/_/g, " ")}:</span>
+          <span className={check.pass ? "text-gray-500" : "text-red-600"}>
+            {check.pass ? (check.value !== undefined ? String(check.value) : "OK") : check.reason || "Failed"}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ─── SeoRecCard ───────────────────────────────────────────────────────────────
+
+function SeoRecCard({ rec, actioning, executingId, rollingBackId, onAction, onExecute, onRollback }: {
   rec: SeoRec
   actioning: string | null
+  executingId: string | null
+  rollingBackId: string | null
   onAction: (id: string, status: string) => Promise<void>
+  onExecute: (id: string) => Promise<void>
+  onRollback: (id: string) => Promise<void>
 }) {
   const [showPackage, setShowPackage] = useState(false)
+  const [showSerp, setShowSerp] = useState(false)
   const isActioning = actioning === rec._id
+  const isExecuting = executingId === rec._id
+  const isRollingBack = rollingBackId === rec._id
   const pkg = rec.implementation_package
+  const canExecute = AUTO_EXEC_TYPES.has(rec.type)
+  const canSerp = SERP_PREVIEW_TYPES.has(rec.type) && (pkg?.meta_title || pkg?.meta_description)
+  const inProgress = rec.status === "executing" || rec.status === "validating"
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      {/* State machine stepper — shown for any non-pending/approved status */}
+      {!["pending", "approved", "rejected", "deferred"].includes(rec.status) && (
+        <StateStepper status={rec.status} />
+      )}
+
       {/* Header */}
       <div className="px-5 py-4">
         <div className="flex items-start justify-between gap-3">
@@ -747,7 +969,9 @@ function SeoRecCard({ rec, actioning, onAction }: {
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${REC_TYPE_COLOR[rec.type] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
               {REC_TYPE_LABEL[rec.type] || rec.type}
             </span>
-            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${STATUS_COLOR_SEO[rec.status]}`}>{rec.status}</span>
+            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${STATUS_COLOR_SEO[rec.status] || "bg-gray-100 text-gray-600"}`}>
+              {inProgress ? <span className="flex items-center gap-1"><Loader2 size={9} className="animate-spin" />{rec.status}</span> : rec.status}
+            </span>
           </div>
           <div className="text-right shrink-0">
             <div className="text-base font-bold text-emerald-700">{INR_SEO(rec.expected_revenue_inr)}</div>
@@ -757,7 +981,6 @@ function SeoRecCard({ rec, actioning, onAction }: {
 
         <h3 className="mt-2.5 text-sm font-semibold text-gray-900 leading-snug">{rec.title}</h3>
         <code className="text-[10px] text-gray-400 mt-0.5 block">{rec.url}</code>
-
         <p className="mt-2 text-xs text-gray-600">{rec.why}</p>
 
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
@@ -778,8 +1001,37 @@ function SeoRecCard({ rec, actioning, onAction }: {
           <span className={`font-medium ${rec.difficulty === "easy" ? "text-green-600" : rec.difficulty === "medium" ? "text-amber-600" : "text-red-600"}`}>
             {rec.difficulty}
           </span>
+          {rec.executed_at && <span className="text-gray-400">Executed: {new Date(rec.executed_at).toLocaleDateString("en-IN")}</span>}
+          {rec.rolled_back_at && <span className="text-orange-500">Rolled back: {new Date(rec.rolled_back_at).toLocaleDateString("en-IN")}</span>}
         </div>
       </div>
+
+      {/* Validation result */}
+      {rec.validation_result && !["pending", "approved"].includes(rec.status) && (
+        <ValidationPanel result={rec.validation_result} />
+      )}
+
+      {/* SERP Preview toggle */}
+      {canSerp && rec.status === "approved" && (
+        <div className="border-t border-gray-100">
+          <button
+            onClick={() => setShowSerp(p => !p)}
+            className="w-full flex items-center gap-1.5 px-5 py-2 text-xs text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+          >
+            <Globe size={11} />SERP Preview
+            {showSerp ? <ChevronUp size={10} className="ml-auto" /> : <ChevronDown size={10} className="ml-auto" />}
+          </button>
+          {showSerp && pkg && (
+            <div className="px-5 pb-3">
+              <SerpPreview
+                url={rec.url}
+                title={pkg.meta_title || rec.title}
+                description={pkg.meta_description || rec.why}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Implementation Package */}
       {pkg && (
@@ -788,8 +1040,7 @@ function SeoRecCard({ rec, actioning, onAction }: {
             onClick={() => setShowPackage(p => !p)}
             className="w-full flex items-center gap-1.5 px-5 py-2 text-xs text-gray-500 hover:bg-gray-50 hover:text-gray-700"
           >
-            <Target size={11} />
-            Implementation Package
+            <Target size={11} />Implementation Package
             {showPackage ? <ChevronUp size={10} className="ml-auto" /> : <ChevronDown size={10} className="ml-auto" />}
           </button>
           {showPackage && (
@@ -828,48 +1079,70 @@ function SeoRecCard({ rec, actioning, onAction }: {
                   ))}
                 </div>
               )}
-              {pkg.notes && (
-                <p className="text-[11px] text-gray-500 italic">{pkg.notes}</p>
-              )}
+              {pkg.notes && <p className="text-[11px] text-gray-500 italic">{pkg.notes}</p>}
             </div>
           )}
         </div>
       )}
 
-      {/* Actions */}
+      {/* ── Action bar ── */}
       {rec.status === "pending" && (
         <div className="border-t border-gray-100 px-5 py-3 bg-gray-50 flex flex-wrap gap-2">
-          <button
-            onClick={() => onAction(rec._id, "approved")}
-            disabled={isActioning}
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
-          >
+          <button onClick={() => onAction(rec._id, "approved")} disabled={isActioning}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50">
             <Check size={11} />Approve
           </button>
-          <button
-            onClick={() => onAction(rec._id, "deferred")}
-            disabled={isActioning}
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white text-gray-600 rounded-md hover:bg-gray-100 border border-gray-300 disabled:opacity-50"
-          >
+          <button onClick={() => onAction(rec._id, "deferred")} disabled={isActioning}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white text-gray-600 rounded-md hover:bg-gray-100 border border-gray-300 disabled:opacity-50">
             <Pause size={11} />Defer
           </button>
-          <button
-            onClick={() => onAction(rec._id, "rejected")}
-            disabled={isActioning}
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 rounded-md hover:bg-red-100 border border-red-200 disabled:opacity-50"
-          >
+          <button onClick={() => onAction(rec._id, "rejected")} disabled={isActioning}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 rounded-md hover:bg-red-100 border border-red-200 disabled:opacity-50">
             <XCircle size={11} />Reject
           </button>
         </div>
       )}
+
       {rec.status === "approved" && (
-        <div className="border-t border-gray-100 px-5 py-3 bg-green-50 flex gap-2">
-          <button
-            onClick={() => onAction(rec._id, "implemented")}
-            disabled={isActioning}
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50"
-          >
+        <div className="border-t border-gray-100 px-5 py-3 bg-blue-50 flex flex-wrap gap-2 items-center">
+          {canExecute ? (
+            <button onClick={() => onExecute(rec._id)} disabled={isExecuting}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-brand-600 text-white rounded-md hover:bg-brand-700 disabled:opacity-50">
+              {isExecuting ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
+              {isExecuting ? "Executing…" : "Execute"}
+            </button>
+          ) : null}
+          <button onClick={() => onAction(rec._id, "implemented")} disabled={isActioning}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white text-gray-700 rounded-md hover:bg-gray-100 border border-gray-300 disabled:opacity-50">
             <CheckCircle2 size={11} />Mark Implemented
+          </button>
+          <span className="text-[10px] text-blue-500 ml-auto">
+            {canExecute ? "Execute applies change to override store + validates automatically" : "Manual implementation required"}
+          </span>
+        </div>
+      )}
+
+      {rec.status === "implemented" && (
+        <div className="border-t border-gray-100 px-5 py-3 bg-emerald-50 flex flex-wrap gap-2 items-center">
+          <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
+            <CheckCircle2 size={12} />Live in override store
+          </span>
+          <button onClick={() => onRollback(rec._id)} disabled={isRollingBack}
+            className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white text-orange-600 rounded-md hover:bg-orange-50 border border-orange-200 disabled:opacity-50">
+            {isRollingBack ? <Loader2 size={11} className="animate-spin" /> : <RotateCcw size={11} />}
+            {isRollingBack ? "Rolling back…" : "Rollback"}
+          </button>
+        </div>
+      )}
+
+      {(rec.status === "failed" || rec.status === "rolled_back") && (
+        <div className="border-t border-gray-100 px-5 py-3 bg-orange-50 flex flex-wrap gap-2 items-center">
+          <span className="text-[11px] text-orange-700">
+            {rec.status === "rolled_back" ? "Change rolled back — safe to re-approve with updated implementation package" : "Execution failed — review validation results above"}
+          </span>
+          <button onClick={() => onAction(rec._id, "approved")} disabled={isActioning}
+            className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white text-blue-600 rounded-md hover:bg-blue-50 border border-blue-200 disabled:opacity-50">
+            <RotateCcw size={11} />Re-approve
           </button>
         </div>
       )}
@@ -877,14 +1150,23 @@ function SeoRecCard({ rec, actioning, onAction }: {
   )
 }
 
-function SeoRecommendationsTab({ recs, loading, generating, result, actioning, onGenerate, onAction }: {
+function SeoRecommendationsTab({ recs, loading, generating, result, actioning, executingId, rollingBackId, execResult, execLog, execLogLoading, showExecLog, onGenerate, onAction, onExecute, onRollback, onToggleExecLog }: {
   recs: SeoRec[]
   loading: boolean
   generating: boolean
   result: string | null
   actioning: string | null
+  executingId: string | null
+  rollingBackId: string | null
+  execResult: { id: string; ok: boolean; msg: string } | null
+  execLog: ExecLogEntry[]
+  execLogLoading: boolean
+  showExecLog: boolean
   onGenerate: () => void
   onAction: (id: string, status: string) => Promise<void>
+  onExecute: (id: string) => Promise<void>
+  onRollback: (id: string) => Promise<void>
+  onToggleExecLog: () => void
 }) {
   const [statusFilter, setStatusFilter] = useState<"pending" | "approved" | "implemented" | "all">("pending")
 
@@ -892,6 +1174,7 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, o
   const pendingCount = recs.filter(r => r.status === "pending").length
   const approvedCount = recs.filter(r => r.status === "approved").length
   const implementedCount = recs.filter(r => r.status === "implemented").length
+  const rolledBackCount = recs.filter(r => r.status === "rolled_back" || r.status === "failed").length
 
   const totalExpectedRevenue = recs.filter(r => r.status === "pending").reduce((s, r) => s + r.expected_revenue_inr, 0)
 
@@ -929,19 +1212,26 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, o
         </div>
       )}
 
+      {execResult && (
+        <div className={`text-xs px-4 py-2.5 rounded-lg border flex items-start gap-2 ${execResult.ok ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-red-50 border-red-200 text-red-700"}`}>
+          {execResult.ok ? <CheckCircle2 size={13} className="shrink-0 mt-0.5" /> : <XCircle size={13} className="shrink-0 mt-0.5" />}
+          <span>{execResult.msg}</span>
+        </div>
+      )}
+
       {/* SEO Preservation notice */}
       <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-[11px] text-amber-800">
         <strong>SEO Equity Protection:</strong> Only safe changes are auto-generated — meta title/description updates, schema additions, internal links.
         URL changes, redirects, and canonical modifications require explicit founder approval and are never auto-deployed.
       </div>
 
-      {/* Status filter tabs + counters */}
+      {/* Status filter tabs */}
       <div className="flex gap-1 flex-wrap">
         {([
-          { key: "pending", label: `Pending (${pendingCount})` },
-          { key: "approved", label: `Approved (${approvedCount})` },
+          { key: "pending",     label: `Pending (${pendingCount})` },
+          { key: "approved",    label: `Approved (${approvedCount})` },
           { key: "implemented", label: `Implemented (${implementedCount})` },
-          { key: "all", label: `All (${recs.length})` },
+          { key: "all",         label: `All (${recs.length})${rolledBackCount > 0 ? ` · ${rolledBackCount} failed/rolled-back` : ""}` },
         ] as const).map(tab => (
           <button
             key={tab.key}
@@ -964,10 +1254,73 @@ function SeoRecommendationsTab({ recs, loading, generating, result, actioning, o
       ) : (
         <div className="space-y-3">
           {filtered.map(rec => (
-            <SeoRecCard key={rec._id} rec={rec} actioning={actioning} onAction={onAction} />
+            <SeoRecCard
+              key={rec._id}
+              rec={rec}
+              actioning={actioning}
+              executingId={executingId}
+              rollingBackId={rollingBackId}
+              onAction={onAction}
+              onExecute={onExecute}
+              onRollback={onRollback}
+            />
           ))}
         </div>
       )}
+
+      {/* Execution Audit Log */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <button
+          onClick={onToggleExecLog}
+          className="w-full flex items-center gap-2 px-5 py-3 text-xs text-gray-600 hover:bg-gray-50"
+        >
+          <History size={13} className="text-gray-400" />
+          <span className="font-semibold">Execution Audit Log</span>
+          {execLog.length > 0 && <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">{execLog.length} entries</span>}
+          {showExecLog ? <ChevronUp size={11} className="ml-auto text-gray-400" /> : <ChevronDown size={11} className="ml-auto text-gray-400" />}
+        </button>
+        {showExecLog && (
+          <div className="border-t border-gray-100">
+            {execLogLoading ? (
+              <div className="flex items-center justify-center py-6 text-gray-400 text-xs gap-2">
+                <Loader2 size={13} className="animate-spin" />Loading audit log…
+              </div>
+            ) : execLog.length === 0 ? (
+              <p className="px-5 py-6 text-center text-xs text-gray-400">No execution history yet. Execute a recommendation to see the audit trail.</p>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {execLog.map(entry => (
+                  <div key={entry._id} className="px-5 py-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${entry.status === "success" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
+                          {entry.action.toUpperCase()}
+                        </span>
+                        {entry.auto_rollback && <span className="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded">AUTO-ROLLBACK</span>}
+                        {entry.manual_rollback && <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">MANUAL-ROLLBACK</span>}
+                        <span className="text-[11px] font-medium text-gray-700">{entry.rec_title || entry.rec_type}</span>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className={`text-[10px] font-semibold ${entry.status === "success" ? "text-emerald-600" : "text-red-600"}`}>
+                          {entry.final_status}
+                        </span>
+                        <p className="text-[10px] text-gray-400">{new Date(entry.executed_at).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 mt-1 text-[10px] text-gray-400">
+                      <Shield size={9} />
+                      <code>{entry.path}</code>
+                    </div>
+                    {entry.validation_result && !entry.validation_result.pass && entry.validation_result.reason && (
+                      <p className="text-[11px] text-red-600 mt-1">Reason: {entry.validation_result.reason}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
