@@ -1499,7 +1499,7 @@ interface CopilotResponse {
   summary: { total_gmv: number; buyer_count?: number; oem_count?: number; state_count?: number }
 }
 
-function FoggingCopilotTab() {
+function FoggingCopilotTab({ initialQuery }: { initialQuery?: string }) {
   const [query,       setQuery]       = useState("")
   const [loading,     setLoading]     = useState(false)
   const [result,      setResult]      = useState<CopilotResponse | null>(null)
@@ -1527,18 +1527,34 @@ function FoggingCopilotTab() {
     }
   }
 
+  // Auto-run when parent routes a query to this tab via initialQuery prop
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (initialQuery && initialQuery.trim().length > 2) {
+      setQuery(initialQuery)
+      run(initialQuery)
+    }
+  }, [initialQuery])
+
   const startMic = async () => {
     setMicError(null)
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SpeechRec) { setMicError('Voice not supported in this browser. Use Chrome.'); return }
-    if (navigator.permissions) {
+    if (!SpeechRec) { setMicError('Voice requires Chrome or Edge.'); return }
+    // getUserMedia gives precise error type before SpeechRecognition starts
+    if (navigator.mediaDevices?.getUserMedia) {
       try {
-        const perm = await navigator.permissions.query({ name: 'microphone' as PermissionName })
-        if (perm.state === 'denied') {
-          setMicError('Microphone blocked. Open Chrome Settings → Privacy & Security → Site Settings → Microphone and allow this site.')
-          return
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        stream.getTracks().forEach(t => t.stop())
+      } catch (err: any) {
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          setMicError('Microphone blocked. Click the lock icon → allow microphone. Windows users: also check Settings → Privacy → Microphone → allow Chrome.')
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+          setMicError('No microphone detected. Please connect a microphone and try again.')
+        } else {
+          setMicError(`Microphone unavailable (${err.name}). Please try again.`)
         }
-      } catch { /* proceed */ }
+        return
+      }
     }
     const rec = new SpeechRec()
     rec.lang = 'en-IN'; rec.interimResults = false
@@ -1546,23 +1562,23 @@ function FoggingCopilotTab() {
     rec.onresult = (e: any) => { const t = e.results[0][0].transcript; setQuery(t); run(t) }
     rec.onerror  = (e: any) => {
       setMicActive(false)
-      if (e.error === 'not-allowed') setMicError('Mic access denied. Click the lock icon in your address bar → allow microphone, then retry.')
+      if (e.error === 'not-allowed') setMicError('Mic blocked by browser. Click lock icon → allow microphone.')
       else if (e.error === 'no-speech') setMicError('No speech detected. Try again.')
-      else setMicError(`Voice failed (${e.error}). Try again.`)
+      else setMicError(`Voice error (${e.error}). Try again.`)
     }
     rec.onend = () => setMicActive(false)
     try {
       rec.start()
     } catch (err: any) {
       setMicActive(false)
-      setMicError(`Could not start microphone: ${err?.message ?? 'unknown error'}. Try refreshing.`)
+      setMicError(`Could not start microphone: ${err?.message ?? 'unknown'}. Try refreshing.`)
     }
   }
 
   const exportCsv = () => {
     if (!result) return
     const headers = ['GEMC#', 'Date', 'Buyer', 'State', 'OEM', 'Model', 'Value (₹)', 'Qty', 'Unit ₹', 'Seller', 'GST']
-    const rows = result.data.map(c => [
+    const rows = (result.data as CopilotResult[]).map(c => [
       c.gemc_no,
       c.contract_date ? new Date(c.contract_date).toISOString().slice(0,10) : '',
       c.buyer_display_name, c.buyer_state ?? '', c.oem_short_brand ?? c.oem_canonical,
@@ -1833,6 +1849,9 @@ interface SearchResults {
   models: SearchResult[]; contracts: SearchResult[]
 }
 
+// Intent phrases that signal an AI/NLQ query rather than an entity name lookup
+const INTENT_RE = /\b(dealers?|sellers?|distributors?|contracts?|buyers?|opportunity|opportunities|mounted|electrical|starting|recruit|multiple|find|largest|top|best|show|who\b|never\b|oem\b)/i
+
 export default function FoggingIntelligencePage() {
   const [tab,  setTab]  = useState<TabId>("market")
   const [oems, setOems] = useState<OemRow[]>([])
@@ -1843,7 +1862,9 @@ export default function FoggingIntelligencePage() {
   const [searching,     setSearching]     = useState(false)
   const [voiceActive,   setVoiceActive]   = useState(false)
   const [voiceError,    setVoiceError]    = useState<string | null>(null)
+  const [copilotQ,      setCopilotQ]      = useState("")
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
 
   useEffect(() => {
     fetch("/api/fogging/oems")
@@ -1872,6 +1893,20 @@ export default function FoggingIntelligencePage() {
     }, 300)
   }, [])
 
+  // Smart query router: intent phrases → Copilot tab; entity names → keyword search
+  const handleSmartQuery = useCallback((q: string) => {
+    const trimmed = q.trim()
+    if (trimmed.length < 2) return
+    if (INTENT_RE.test(trimmed)) {
+      setSearchQ('')
+      setSearchResults(null)
+      setCopilotQ(trimmed)
+      setTab('copilot')
+    } else {
+      handleSearch(trimmed)
+    }
+  }, [handleSearch])
+
   const startVoice = useCallback(async () => {
     setVoiceError(null)
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
@@ -1879,15 +1914,21 @@ export default function FoggingIntelligencePage() {
       setVoiceError('Voice search requires Chrome or Edge. Try typing instead.')
       return
     }
-    // Pre-check permission state so we can give a specific message before the browser denies
-    if (navigator.permissions) {
+    // getUserMedia gives precise error types — more reliable than SpeechRecognition onerror
+    if (navigator.mediaDevices?.getUserMedia) {
       try {
-        const perm = await navigator.permissions.query({ name: 'microphone' as PermissionName })
-        if (perm.state === 'denied') {
-          setVoiceError('Microphone blocked. Open Chrome Settings → Privacy & Security → Site Settings → Microphone and allow this site.')
-          return
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        stream.getTracks().forEach(t => t.stop())
+      } catch (err: any) {
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          setVoiceError('Microphone blocked. Click the lock icon in your address bar → allow microphone. Windows: check Settings → Privacy → Microphone → allow Chrome.')
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+          setVoiceError('No microphone found. Please connect a microphone and try again.')
+        } else {
+          setVoiceError(`Microphone unavailable (${err.name}). Please try again.`)
         }
-      } catch { /* permissions API not available, proceed */ }
+        return
+      }
     }
     const recognition = new SpeechRec()
     recognition.lang = 'en-IN'
@@ -1895,16 +1936,17 @@ export default function FoggingIntelligencePage() {
     recognition.onstart = () => setVoiceActive(true)
     recognition.onresult = (e: any) => {
       const t = e.results[0][0].transcript
-      handleSearch(t)
+      // Voice queries are natural language — always route through smart query router
+      handleSmartQuery(t)
     }
     recognition.onerror = (e: any) => {
       setVoiceActive(false)
       if (e.error === 'not-allowed') {
-        setVoiceError('Microphone access denied. Click the lock icon in your address bar → allow microphone, then retry.')
+        setVoiceError('Microphone blocked by browser. Click lock icon → allow microphone, then retry.')
       } else if (e.error === 'no-speech') {
         setVoiceError('No speech detected. Please try again.')
       } else {
-        setVoiceError(`Voice search failed (${e.error}). Please type your search instead.`)
+        setVoiceError(`Voice error (${e.error}). Please try again.`)
       }
     }
     recognition.onend  = () => setVoiceActive(false)
@@ -1912,9 +1954,9 @@ export default function FoggingIntelligencePage() {
       recognition.start()
     } catch (err: any) {
       setVoiceActive(false)
-      setVoiceError(`Could not start microphone: ${err?.message ?? 'unknown error'}. Try refreshing the page.`)
+      setVoiceError(`Could not start microphone: ${err?.message ?? 'unknown error'}. Try refreshing.`)
     }
-  }, [handleSearch])
+  }, [handleSmartQuery])
 
   const totalGmv = oems.reduce((a, o) => a + (o.total_gmv || 0), 0)
   const entry100x = oems.find(o => o.is_100x)
@@ -1995,7 +2037,8 @@ export default function FoggingIntelligencePage() {
               value={searchQ}
               onChange={e => handleSearch(e.target.value)}
               onBlur={() => setTimeout(() => { setSearchResults(null); setSearchQ('') }, 200)}
-              placeholder="Search buyers, sellers, OEMs, models, GEMC#, state…"
+              onKeyDown={e => { if (e.key === 'Enter') handleSmartQuery(searchQ) }}
+              placeholder='Search buyers, sellers, OEMs… or ask "pulsfog dealers", "vehicle mounted contracts"'
               className="w-full pl-8 pr-8 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
             />
             {searching && (
@@ -2126,7 +2169,7 @@ export default function FoggingIntelligencePage() {
         {tab === "forecast"      && <ForecastTab />}
         {tab === "oem_profiles"  && <OemProfilesTab oems={oems} />}
         {tab === "buyer_profiles"&& <BuyerProfilesTab />}
-        {tab === "copilot"       && <FoggingCopilotTab />}
+        {tab === "copilot"       && <FoggingCopilotTab initialQuery={copilotQ} />}
       </div>
     </div>
   )
