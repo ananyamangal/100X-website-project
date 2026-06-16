@@ -128,6 +128,19 @@ export interface DealerRecruitmentPack {
   whatsapp_draft: string
   call_script: string
   meeting_agenda: string
+  // v2.3 execution layer
+  outreach_schedule?: {
+    day_1: { whatsapp: string; email: string; note: string }
+    day_3: { call_script: string; note: string }
+    day_7: { follow_up_whatsapp: string; note: string }
+    day_14: { final_whatsapp: string; note: string }
+  }
+  whatsapp_sequence?: {
+    first_message: string
+    follow_up: string
+    reminder: string
+    meeting_confirmation: string
+  }
 }
 
 export interface OEMDisplacementPack {
@@ -142,6 +155,13 @@ export interface OEMDisplacementPack {
   whatsapp_draft: string
   call_script: string
   meeting_agenda: string
+  // v2.3 execution layer
+  whatsapp_sequence?: {
+    first_message: string
+    follow_up: string
+    reminder: string
+    meeting_confirmation: string
+  }
 }
 
 export interface LandingPagePack {
@@ -169,6 +189,17 @@ export interface CampaignPack {
   ad_copy_drafts: Array<{ headline: string; description: string; display_url: string }>
   creative_brief: string
   targeting_notes: string
+  // v2.3 deployment package
+  campaign_name?: string
+  campaign_objective?: string
+  ad_groups?: Array<{
+    name: string
+    match_type: string
+    keywords: string[]
+    headlines: string[]
+    descriptions: string[]
+  }>
+  negative_keywords?: string[]
 }
 
 export interface CustomerMatchPack {

@@ -9,6 +9,7 @@ import {
   ChevronDown, ChevronUp, Package, Circle, Trophy, X,
   Bot, Youtube, Monitor, MousePointerClick, Swords, RotateCcw,
   HelpCircle, Calendar, User, Check, Play, BookOpen, Lightbulb,
+  Phone, Mail, Plus, Trash2, MessageSquare,
 } from "lucide-react"
 import { getCampaignIntelligence } from "@/lib/growth-os/campaign-decision-engine"
 import { PLATFORM_VERSION } from "@/lib/growth-os/platform-registry"
@@ -93,6 +94,19 @@ interface Measurement {
   realized_impact_total: number
   impact_realization_rate_pct: number
   packs_generated: number
+}
+
+interface Contact {
+  _id: string
+  org_name: string
+  contact_name: string
+  designation: string
+  department: string
+  email: string
+  phone: string
+  source: "gem" | "website" | "procurement_records" | "crm" | "founder_added"
+  confidence: number
+  created_at: string
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -193,9 +207,13 @@ const FILTER_TABS: Array<Status | "all"> = [
 
 interface ReadinessItem { label: string; status: "YES" | "NO" | "PENDING" | "NA"; note?: string }
 
+interface ReadinessDimension { label: string; status: "YES" | "NO" | "PARTIAL" | "NA"; note?: string }
+
 interface ReadinessAssessment {
   status: "READY" | "PARTIAL" | "BLOCKED"
   score: number
+  dimensions: ReadinessDimension[]
+  ready_to_execute: boolean
   audience: string
   budget: string
   roi: string
@@ -212,16 +230,40 @@ const AD_REC_TYPES = new Set([
   "negative_keyword", "budget_reallocate", "creative_refresh",
 ])
 
-function getReadiness(rec: Rec, sourcesConnected: string[]): ReadinessAssessment {
+function scoreFromDims(dims: ReadinessDimension[]): number {
+  const scoreable = dims.filter(d => d.status !== "NA")
+  if (scoreable.length === 0) return 50
+  const sum = scoreable.reduce((acc, d) => acc + (d.status === "YES" ? 1 : d.status === "PARTIAL" ? 0.5 : 0), 0)
+  return Math.round((sum / scoreable.length) * 100)
+}
+
+function contactQuality(contacts: Contact[]): "NO" | "PARTIAL" | "YES" {
+  if (!contacts || contacts.length === 0) return "NO"
+  const hasEmailOrPhone = contacts.some(c => c.email || c.phone)
+  return hasEmailOrPhone ? "YES" : "PARTIAL"
+}
+
+function getReadiness(rec: Rec, sourcesConnected: string[], contacts: Contact[] = []): ReadinessAssessment {
   const type = rec.type
   const payload = rec.payload ?? {}
   const hasGoogleAds = sourcesConnected.some(s => s.toLowerCase().includes("google ads") || s.toLowerCase().includes("ads"))
 
   // Customer Match — always BLOCKED without contact data
   if (type === "customer_match" || type === "customer_match_campaign") {
+    const dims: ReadinessDimension[] = [
+      { label: "Data Ready", status: "YES", note: "Fogging procurement data available" },
+      { label: "Audience Ready", status: "PARTIAL", note: "670 orgs identified — no contact details" },
+      { label: "Contact Ready", status: "NO", note: "0 emails/phones — required for Customer Match upload" },
+      { label: "Creative Ready", status: "PARTIAL", note: "Ad copy drafts available on approval" },
+      { label: "Landing Page Ready", status: "PARTIAL", note: "Verify quote form conversion rate" },
+      { label: "Tracking Ready", status: hasGoogleAds ? "PARTIAL" : "NO", note: hasGoogleAds ? "Conversion tag install unverified" : "Google Ads not connected" },
+    ]
+    const score = scoreFromDims(dims)
     return {
       status: "BLOCKED",
-      score: 15,
+      score,
+      dimensions: dims,
+      ready_to_execute: false,
       audience: `~450 govt orgs identified — 0 emails or phones available`,
       budget: "₹10,000/mo ad spend planned — cannot deploy without contacts",
       roi: "0% until contact enrichment complete",
@@ -247,9 +289,21 @@ function getReadiness(rec: Rec, sourcesConnected: string[]): ReadinessAssessment
   if (type === "dealer_recruit") {
     const state = String(payload.state || "")
     const orgCount = Number(payload.org_count || 0)
+    const cq = contactQuality(contacts)
+    const dims: ReadinessDimension[] = [
+      { label: "Data Ready", status: "YES", note: `${state} market data — ${orgCount} orgs identified` },
+      { label: "Audience Ready", status: "PARTIAL", note: "Dealer candidates need to be identified (IndiaMart, trade directories)" },
+      { label: "Contact Ready", status: cq, note: cq === "NO" ? "No contacts — add dealer name/email/phone" : cq === "PARTIAL" ? "Name added — add email or phone to reach out" : "Email or phone available — ready to outreach" },
+      { label: "Creative Ready", status: "YES", note: "WhatsApp draft + email template in execution pack" },
+      { label: "Landing Page Ready", status: "NA" },
+      { label: "Tracking Ready", status: "PARTIAL", note: "Manual tracking via CRM notes" },
+    ]
+    const score = scoreFromDims(dims)
     return {
-      status: "PARTIAL",
-      score: 60,
+      status: score >= 80 ? "READY" : "PARTIAL",
+      score,
+      dimensions: dims,
+      ready_to_execute: score >= 80,
       audience: `Distributors / dealers in ${state || "target state"}${orgCount ? ` · ${orgCount} buyer orgs in market` : ""}`,
       budget: "₹0 — direct outreach, no ad spend",
       roi: `${INR(rec.expected_revenue_impact)} if dealer authorised and wins GeM tenders`,
@@ -266,9 +320,21 @@ function getReadiness(rec: Rec, sourcesConnected: string[]): ReadinessAssessment
   if (type === "oem_displacement" || type === "procurement_target") {
     const orgName = String(payload.organization_name || "target organization")
     const state = String(payload.organization_state || payload.state || "")
+    const cq = contactQuality(contacts)
+    const dims: ReadinessDimension[] = [
+      { label: "Data Ready", status: "YES", note: "GeM procurement intelligence available" },
+      { label: "Audience Ready", status: "YES", note: orgName },
+      { label: "Contact Ready", status: cq, note: cq === "NO" ? "No purchase officer contact — source from GeM directory" : cq === "PARTIAL" ? "Name added — add email or phone" : "Contact available — ready to outreach" },
+      { label: "Creative Ready", status: "YES", note: "Email + WhatsApp + call script in execution pack" },
+      { label: "Landing Page Ready", status: "NA" },
+      { label: "Tracking Ready", status: "PARTIAL", note: "Track via GeM bid status + CRM" },
+    ]
+    const score = scoreFromDims(dims)
     return {
-      status: "PARTIAL",
-      score: 55,
+      status: score >= 80 ? "READY" : "PARTIAL",
+      score,
+      dimensions: dims,
+      ready_to_execute: score >= 80,
       audience: `${orgName}${state ? ` · ${state}` : ""}`,
       budget: "₹0 — direct government buyer outreach",
       roi: `${INR(rec.expected_revenue_impact)} if GeM bid won`,
@@ -285,9 +351,20 @@ function getReadiness(rec: Rec, sourcesConnected: string[]): ReadinessAssessment
   if (type === "landing_page_create" || type === "content_create") {
     const keyword = String(payload.query || payload.keyword || "target keyword")
     const impressions = Number(payload.impressions || 0)
+    const dims: ReadinessDimension[] = [
+      { label: "Data Ready", status: "YES", note: `GSC keyword: "${keyword}"${impressions ? ` — ${impressions.toLocaleString()} impressions` : ""}` },
+      { label: "Audience Ready", status: "YES", note: "Search intent defined from GSC data" },
+      { label: "Contact Ready", status: "NA" },
+      { label: "Creative Ready", status: "PARTIAL", note: "Content brief + outline in execution pack" },
+      { label: "Landing Page Ready", status: "NO", note: "Page needs to be created and published" },
+      { label: "Tracking Ready", status: "PARTIAL", note: "GSC connected — submit URL after publish" },
+    ]
+    const score = scoreFromDims(dims)
     return {
       status: "PARTIAL",
-      score: 50,
+      score,
+      dimensions: dims,
+      ready_to_execute: score >= 80,
       audience: `Organic search — "${keyword}"${impressions ? ` · ${impressions.toLocaleString()} impressions/mo` : ""}`,
       budget: "₹0 — organic SEO, no ad spend",
       roi: "Organic traffic increase, measured via GSC impressions and clicks",
@@ -313,9 +390,21 @@ function getReadiness(rec: Rec, sourcesConnected: string[]): ReadinessAssessment
   if (type === "remarketing_campaign") blockers.push("Remarketing pixel must be installed on 100xcircle.com first")
   blockers.push("Ad creatives (copy + images) need to be built — drafts available in execution pack after approval")
 
+  const adDims: ReadinessDimension[] = [
+    { label: "Data Ready", status: hasGoogleAds ? "YES" : "PARTIAL", note: hasGoogleAds ? "Google Ads connected" : "Connect Google Ads account first" },
+    { label: "Audience Ready", status: type === "remarketing_campaign" ? "PARTIAL" : "YES", note: type === "remarketing_campaign" ? "Pixel install + 100 visitor minimum required" : "Keyword/intent targeting defined" },
+    { label: "Contact Ready", status: "NA" },
+    { label: "Creative Ready", status: "PARTIAL", note: "Ad copy drafts generated on approval — needs copywriter review" },
+    { label: "Landing Page Ready", status: "PARTIAL", note: "Verify quote form conversion rate before launch" },
+    { label: "Tracking Ready", status: hasGoogleAds ? "PARTIAL" : "NO", note: hasGoogleAds ? "Verify conversion tag is active" : "Google Ads not connected" },
+  ]
+  const adScore = scoreFromDims(adDims)
+
   return {
     status: "PARTIAL",
-    score: !hasGoogleAds ? 35 : blockers.length <= 2 ? 60 : 45,
+    score: adScore,
+    dimensions: adDims,
+    ready_to_execute: adScore >= 80,
     audience: type === "remarketing_campaign"
       ? "Previous site visitors (remarketing audience)"
       : "Google search users targeting thermal fogging keywords",
@@ -344,17 +433,29 @@ const READINESS_STYLE = {
   BLOCKED: { border: "border-red-200",   bg: "bg-red-50",    badge: "bg-red-100 text-red-800",      bullet: "text-red-600"   },
 }
 
-function ReadinessStrip({ rec, sourcesConnected }: { rec: Rec; sourcesConnected: string[] }) {
-  const r = getReadiness(rec, sourcesConnected)
-  const [showAll, setShowAll] = useState(false)
+const DIM_BADGE: Record<string, string> = {
+  YES:     "bg-green-100 text-green-800 border-green-200",
+  NO:      "bg-red-100 text-red-800 border-red-200",
+  PARTIAL: "bg-amber-100 text-amber-800 border-amber-200",
+  NA:      "bg-gray-100 text-gray-400 border-gray-200",
+}
+
+function ReadinessScore({ readiness }: { readiness: ReadinessAssessment }) {
+  const r = readiness
   const s = READINESS_STYLE[r.status]
+  const [showAll, setShowAll] = useState(false)
 
   return (
     <div className={`mt-3 rounded-lg border p-3 space-y-2.5 ${s.border} ${s.bg}`}>
-      {/* Status + score */}
+      {/* Status + score + READY badge */}
       <div className="flex flex-wrap items-center gap-2">
         <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${s.badge}`}>{r.status}</span>
-        <span className="text-[11px] text-gray-600">Execution Readiness: <strong className="text-gray-800">{r.score}/100</strong></span>
+        <span className="text-[11px] text-gray-600">Execution Readiness: <strong className="text-gray-800">{r.score}%</strong></span>
+        {r.ready_to_execute && (
+          <span className="text-[10px] font-bold text-green-800 bg-green-100 border border-green-300 px-2 py-0.5 rounded">
+            ✓ READY TO EXECUTE
+          </span>
+        )}
         {r.is_customer_match && (
           <span className="text-[10px] font-bold text-red-700 bg-red-100 border border-red-200 px-2 py-0.5 rounded">
             Contact Enrichment Required
@@ -362,24 +463,31 @@ function ReadinessStrip({ rec, sourcesConnected }: { rec: Rec; sourcesConnected:
         )}
       </div>
 
-      {/* Audience / Budget / ROI */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
-        <div>
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Audience</p>
-          <p className="text-gray-700 leading-snug">{r.audience}</p>
-        </div>
-        <div>
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Budget</p>
-          <p className="text-gray-700 leading-snug">{r.budget}</p>
-        </div>
-        <div>
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Expected ROI</p>
-          <p className="text-gray-700 leading-snug">{r.roi}</p>
-        </div>
+      {/* Progress bar */}
+      <div className="h-1.5 bg-white/60 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all ${r.score >= 80 ? "bg-green-500" : r.score >= 50 ? "bg-amber-400" : "bg-red-400"}`}
+          style={{ width: `${r.score}%` }}
+        />
       </div>
 
+      {/* 6-dimension grid */}
+      {r.dimensions && r.dimensions.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+          {r.dimensions.map((dim, i) => (
+            <div key={i} className="flex items-center gap-1.5 min-w-0">
+              <span className={`shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded border ${DIM_BADGE[dim.status]}`}>{dim.status}</span>
+              <div className="min-w-0">
+                <span className="text-[10px] text-gray-700 font-medium truncate block">{dim.label}</span>
+                {dim.note && <span className="text-[9px] text-gray-400 leading-none block">{dim.note}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Blockers */}
-      {r.blockers.length > 0 && (
+      {r.blockers.length > 0 && !r.ready_to_execute && (
         <div>
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">What must happen before execution</p>
           <div className="space-y-1">
@@ -434,6 +542,399 @@ function AdsDeploymentChecklist({ items }: { items: ReadinessItem[] }) {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Contact Panel ────────────────────────────────────────────────────────────
+
+function ContactPanel({
+  orgName, contacts, onContactAdded, onContactDeleted,
+}: {
+  orgName: string
+  contacts: Contact[]
+  onContactAdded: (c: Contact) => void
+  onContactDeleted: (id: string) => void
+}) {
+  const [showForm, setShowForm] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({ contact_name: "", designation: "", department: "", email: "", phone: "", source: "founder_added", confidence: "80" })
+
+  async function addContact() {
+    if (!form.contact_name.trim()) return
+    setSaving(true)
+    try {
+      const res = await fetch("/api/admin/growth/director/contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ org_name: orgName, ...form, confidence: Number(form.confidence) }),
+      })
+      const d = await res.json()
+      if (d.contact) {
+        onContactAdded(d.contact)
+        setForm({ contact_name: "", designation: "", department: "", email: "", phone: "", source: "founder_added", confidence: "80" })
+        setShowForm(false)
+      }
+    } catch { /* ignore */ } finally { setSaving(false) }
+  }
+
+  async function deleteContact(id: string) {
+    try {
+      await fetch(`/api/admin/growth/director/contacts/${id}`, { method: "DELETE" })
+      onContactDeleted(id)
+    } catch { /* ignore */ }
+  }
+
+  return (
+    <div className="space-y-2">
+      {/* Contact list */}
+      {contacts.length > 0 ? (
+        <div className="divide-y divide-gray-100 rounded border border-gray-200 overflow-hidden">
+          {contacts.map(c => (
+            <div key={c._id} className="flex items-start gap-2 px-3 py-2 bg-white">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs font-semibold text-gray-800">{c.contact_name}</span>
+                  {c.designation && <span className="text-[10px] text-gray-500">{c.designation}</span>}
+                  {c.department && <span className="text-[10px] text-gray-400">· {c.department}</span>}
+                  <span className={`text-[9px] px-1 py-0.5 rounded border font-semibold ${
+                    c.confidence >= 80 ? "bg-green-50 text-green-700 border-green-200" :
+                    c.confidence >= 50 ? "bg-amber-50 text-amber-700 border-amber-200" :
+                    "bg-gray-50 text-gray-500 border-gray-200"
+                  }`}>{c.confidence}%</span>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-0.5 text-[10px]">
+                  {c.email && <span className="flex items-center gap-0.5 text-blue-600"><Mail size={9} />{c.email}</span>}
+                  {c.phone && <span className="flex items-center gap-0.5 text-green-600"><Phone size={9} />{c.phone}</span>}
+                  <span className="text-gray-400">{c.source}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => deleteContact(c._id)}
+                className="shrink-0 text-gray-300 hover:text-red-500 mt-0.5"
+              >
+                <Trash2 size={12} />
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-[11px] text-gray-400 italic">No contacts yet — add purchase officer or dealer contact below.</p>
+      )}
+
+      {/* Add form */}
+      {showForm ? (
+        <div className="border border-blue-200 rounded bg-blue-50 p-3 space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="text" placeholder="Contact name *" value={form.contact_name}
+              onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))}
+              className="col-span-2 text-xs border border-gray-300 rounded px-2 py-1.5"
+            />
+            <input
+              type="text" placeholder="Designation" value={form.designation}
+              onChange={e => setForm(f => ({ ...f, designation: e.target.value }))}
+              className="text-xs border border-gray-300 rounded px-2 py-1.5"
+            />
+            <input
+              type="text" placeholder="Department" value={form.department}
+              onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
+              className="text-xs border border-gray-300 rounded px-2 py-1.5"
+            />
+            <input
+              type="email" placeholder="Email" value={form.email}
+              onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+              className="text-xs border border-gray-300 rounded px-2 py-1.5"
+            />
+            <input
+              type="tel" placeholder="Phone" value={form.phone}
+              onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+              className="text-xs border border-gray-300 rounded px-2 py-1.5"
+            />
+            <select
+              value={form.source}
+              onChange={e => setForm(f => ({ ...f, source: e.target.value }))}
+              className="text-xs border border-gray-300 rounded px-2 py-1.5"
+            >
+              <option value="founder_added">Founder added</option>
+              <option value="gem">GeM directory</option>
+              <option value="website">Website</option>
+              <option value="procurement_records">Procurement records</option>
+              <option value="crm">CRM</option>
+            </select>
+            <input
+              type="number" placeholder="Confidence 0–100" value={form.confidence}
+              onChange={e => setForm(f => ({ ...f, confidence: e.target.value }))}
+              className="text-xs border border-gray-300 rounded px-2 py-1.5"
+              min={0} max={100}
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={addContact} disabled={saving || !form.contact_name.trim()}
+              className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              {saving ? "Saving…" : "Save Contact"}
+            </button>
+            <button onClick={() => setShowForm(false)} className="text-xs text-gray-400 underline">Cancel</button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => setShowForm(true)}
+          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
+        >
+          <Plus size={11} />Add contact
+        </button>
+      )}
+    </div>
+  )
+}
+
+// ─── Outreach Timeline Panel ──────────────────────────────────────────────────
+
+function OutreachTimelinePanel({ schedule }: {
+  schedule: {
+    day_1: { whatsapp: string; email: string; note: string }
+    day_3: { call_script: string; note: string }
+    day_7: { follow_up_whatsapp: string; note: string }
+    day_14: { final_whatsapp: string; note: string }
+  }
+}) {
+  const [activeDay, setActiveDay] = useState<"day_1" | "day_3" | "day_7" | "day_14">("day_1")
+
+  const tabs: Array<{ key: "day_1" | "day_3" | "day_7" | "day_14"; label: string; color: string; activeColor: string }> = [
+    { key: "day_1",  label: "Day 1",  color: "text-gray-500", activeColor: "border-blue-500 text-blue-700 bg-blue-50" },
+    { key: "day_3",  label: "Day 3",  color: "text-gray-500", activeColor: "border-indigo-500 text-indigo-700 bg-indigo-50" },
+    { key: "day_7",  label: "Day 7",  color: "text-gray-500", activeColor: "border-violet-500 text-violet-700 bg-violet-50" },
+    { key: "day_14", label: "Day 14", color: "text-gray-500", activeColor: "border-gray-500 text-gray-700 bg-gray-100" },
+  ]
+
+  return (
+    <div className="border border-emerald-200 rounded overflow-hidden">
+      <div className="bg-emerald-50 px-3 py-2 flex items-center gap-2">
+        <Calendar size={11} className="text-emerald-700" />
+        <span className="text-xs font-semibold text-emerald-800">Outreach Timeline — Day-by-day sequence</span>
+      </div>
+      {/* Tab row */}
+      <div className="flex border-b border-gray-200 bg-white">
+        {tabs.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveDay(tab.key)}
+            className={`flex-1 text-[11px] font-medium py-1.5 border-b-2 transition-colors ${
+              activeDay === tab.key ? tab.activeColor + " border-b-2" : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      {/* Content */}
+      <div className="p-3 space-y-2.5 bg-white">
+        {activeDay === "day_1" && (
+          <>
+            <p className="text-[10px] text-blue-700 font-medium bg-blue-50 px-2 py-1 rounded">{schedule.day_1.note}</p>
+            <div>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">WhatsApp Message</p>
+              <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed bg-gray-50 rounded p-2 border border-gray-100">{schedule.day_1.whatsapp}</pre>
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Email</p>
+              <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed bg-gray-50 rounded p-2 border border-gray-100">{schedule.day_1.email}</pre>
+            </div>
+          </>
+        )}
+        {activeDay === "day_3" && (
+          <>
+            <p className="text-[10px] text-indigo-700 font-medium bg-indigo-50 px-2 py-1 rounded">{schedule.day_3.note}</p>
+            <div>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Call Script</p>
+              <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed bg-gray-50 rounded p-2 border border-gray-100">{schedule.day_3.call_script}</pre>
+            </div>
+          </>
+        )}
+        {activeDay === "day_7" && (
+          <>
+            <p className="text-[10px] text-violet-700 font-medium bg-violet-50 px-2 py-1 rounded">{schedule.day_7.note}</p>
+            <div>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Follow-up WhatsApp</p>
+              <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed bg-gray-50 rounded p-2 border border-gray-100">{schedule.day_7.follow_up_whatsapp}</pre>
+            </div>
+          </>
+        )}
+        {activeDay === "day_14" && (
+          <>
+            <p className="text-[10px] text-gray-700 font-medium bg-gray-100 px-2 py-1 rounded">{schedule.day_14.note}</p>
+            <div>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Final WhatsApp</p>
+              <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed bg-gray-50 rounded p-2 border border-gray-100">{schedule.day_14.final_whatsapp}</pre>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── WhatsApp Sequence Panel ──────────────────────────────────────────────────
+
+function WhatsAppSequencePanel({ sequence }: {
+  sequence: { first_message: string; follow_up: string; reminder: string; meeting_confirmation: string }
+}) {
+  const [active, setActive] = useState<"first" | "followup" | "reminder" | "confirm">("first")
+
+  const tabs: Array<{ key: "first" | "followup" | "reminder" | "confirm"; label: string }> = [
+    { key: "first",   label: "First" },
+    { key: "followup", label: "Follow-up" },
+    { key: "reminder", label: "Reminder" },
+    { key: "confirm", label: "Meeting Confirm" },
+  ]
+  const content = {
+    first: sequence.first_message,
+    followup: sequence.follow_up,
+    reminder: sequence.reminder,
+    confirm: sequence.meeting_confirmation,
+  }
+
+  return (
+    <div className="border border-green-200 rounded overflow-hidden">
+      <div className="bg-green-50 px-3 py-2 flex items-center gap-2">
+        <MessageSquare size={11} className="text-green-700" />
+        <span className="text-xs font-semibold text-green-800">WhatsApp Sequence</span>
+      </div>
+      <div className="flex border-b border-gray-200 bg-white">
+        {tabs.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActive(tab.key)}
+            className={`flex-1 text-[11px] font-medium py-1.5 border-b-2 transition-colors ${
+              active === tab.key ? "border-green-500 text-green-700 bg-green-50" : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      <div className="p-3 bg-white">
+        <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed bg-gray-50 rounded p-2 border border-gray-100">
+          {content[active]}
+        </pre>
+      </div>
+    </div>
+  )
+}
+
+// ─── Ads Deployment Package ───────────────────────────────────────────────────
+
+function AdsDeploymentPackage({ pack }: { pack: Record<string, unknown> }) {
+  const [openGroup, setOpenGroup] = useState<number | null>(0)
+
+  const campaignName = String(pack.campaign_name || "")
+  const objective = String(pack.campaign_objective || "")
+  const adGroups = (pack.ad_groups as Array<{
+    name: string; match_type: string; keywords: string[]; headlines: string[]; descriptions: string[]
+  }>) || []
+  const negKw = (pack.negative_keywords as string[]) || []
+
+  if (!campaignName && adGroups.length === 0) return null
+
+  return (
+    <div className="border border-blue-200 rounded overflow-hidden">
+      <div className="bg-blue-50 px-3 py-2 space-y-0.5">
+        <div className="flex items-center gap-1.5">
+          <Megaphone size={11} className="text-blue-700" />
+          <span className="text-xs font-semibold text-blue-800">Google Ads Deployment Package</span>
+        </div>
+        <p className="text-[10px] text-blue-600">Copy directly into Google Ads — no editing needed</p>
+      </div>
+
+      <div className="p-3 space-y-3 bg-white">
+        {/* Campaign name + objective */}
+        {campaignName && (
+          <div className="space-y-1">
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Campaign Name</p>
+            <code className="text-xs bg-gray-100 px-2 py-1 rounded block text-gray-800 font-mono">{campaignName}</code>
+            {objective && <p className="text-[11px] text-gray-600">{objective}</p>}
+          </div>
+        )}
+
+        {/* Ad groups */}
+        {adGroups.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Ad Groups ({adGroups.length})</p>
+            {adGroups.map((group, gi) => (
+              <div key={gi} className="border border-gray-200 rounded overflow-hidden">
+                <button
+                  onClick={() => setOpenGroup(openGroup === gi ? null : gi)}
+                  className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 text-left"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-gray-800">{group.name}</span>
+                    <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{group.match_type}</span>
+                  </div>
+                  {openGroup === gi ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                </button>
+                {openGroup === gi && (
+                  <div className="px-3 py-2.5 space-y-3">
+                    {/* Keywords */}
+                    {group.keywords.length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Keywords</p>
+                        <div className="flex flex-wrap gap-1">
+                          {group.keywords.map((kw, ki) => (
+                            <span key={ki} className="text-[10px] bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded border border-gray-200">{kw}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {/* Headlines */}
+                    {group.headlines.length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Headlines <span className="text-gray-300 font-normal">(max 30 chars each)</span></p>
+                        <div className="space-y-1">
+                          {group.headlines.map((h, hi) => (
+                            <div key={hi} className="flex items-start gap-2">
+                              <span className="text-xs text-gray-700 flex-1">{h}</span>
+                              <span className={`text-[9px] shrink-0 font-mono ${h.length > 30 ? "text-red-600" : "text-gray-400"}`}>{h.length}/30</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {/* Descriptions */}
+                    {group.descriptions.length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Descriptions <span className="text-gray-300 font-normal">(max 90 chars each)</span></p>
+                        <div className="space-y-1">
+                          {group.descriptions.map((d, di) => (
+                            <div key={di} className="flex items-start gap-2">
+                              <span className="text-xs text-gray-700 flex-1">{d}</span>
+                              <span className={`text-[9px] shrink-0 font-mono ${d.length > 90 ? "text-red-600" : "text-gray-400"}`}>{d.length}/90</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Negative keywords */}
+        {negKw.length > 0 && (
+          <div>
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Negative Keywords</p>
+            <div className="flex flex-wrap gap-1">
+              {negKw.map((kw, ki) => (
+                <span key={ki} className="text-[10px] bg-red-50 text-red-700 border border-red-200 px-1.5 py-0.5 rounded">[{kw}]</span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -625,10 +1126,18 @@ function ExecutionPackPanel({ recId, recType }: { recId: string; recType: string
     if (pack.upload_instructions) sections.push({ key: "upload", label: "Upload Instructions", content: String(pack.upload_instructions) })
   }
 
+  // v2.3: outreach schedule (dealer packs) replaces next steps checklist
+  const hasOutreachSchedule = packType === "dealer_recruitment" && pack.outreach_schedule != null
+  const hasWhatsAppSeq = (packType === "dealer_recruitment" || packType === "oem_displacement" || packType === "campaign") && pack.whatsapp_sequence != null
+  const hasAdGroups = packType === "campaign" && Array.isArray(pack.ad_groups) && (pack.ad_groups as unknown[]).length > 0
+
   return (
     <div className="space-y-2">
-      {/* ── Next Steps: one-click handoff ──────────────────────────────────── */}
-      {nextSteps.length > 0 && (
+      {/* ── Outreach Timeline (v2.3 dealer packs) ────────────────────────── */}
+      {hasOutreachSchedule ? (
+        <OutreachTimelinePanel schedule={pack.outreach_schedule as Parameters<typeof OutreachTimelinePanel>[0]["schedule"]} />
+      ) : nextSteps.length > 0 && (
+        /* ── Next Steps: one-click handoff ──────────────────────────────── */
         <div className="border border-emerald-200 rounded overflow-hidden">
           <div className="bg-emerald-50 px-3 py-2 flex items-center justify-between">
             <span className="text-xs font-semibold text-emerald-800">Next Steps — Exact Actions</span>
@@ -670,6 +1179,16 @@ function ExecutionPackPanel({ recId, recType }: { recId: string; recType: string
             })}
           </div>
         </div>
+      )}
+
+      {/* ── WhatsApp Sequence (v2.3) ─────────────────────────────────────── */}
+      {hasWhatsAppSeq && (
+        <WhatsAppSequencePanel sequence={pack.whatsapp_sequence as Parameters<typeof WhatsAppSequencePanel>[0]["sequence"]} />
+      )}
+
+      {/* ── Google Ads Deployment Package (v2.3 campaign packs) ──────────── */}
+      {hasAdGroups && (
+        <AdsDeploymentPackage pack={pack} />
       )}
 
       {/* ── Audience Breakdown for Customer Match ──────────────────────────── */}
@@ -1090,17 +1609,34 @@ function RecCard({
   const [showPath, setShowPath]         = useState(false)
   const [showIntel, setShowIntel]       = useState(true)
   const [showOwner, setShowOwner]       = useState(false)
+  const [showContacts, setShowContacts] = useState(false)
   const [owner, setOwner]               = useState(rec.owner || "")
   const [targetDate, setTargetDate]     = useState(rec.target_completion_date || "")
   const [realizedImpact, setRealizedImpact] = useState("")
   const [outcomeNotes, setOutcomeNotes] = useState("")
   const [showWonInput, setShowWonInput] = useState(false)
   const [showLostInput, setShowLostInput] = useState(false)
+  const [contacts, setContacts]         = useState<Contact[]>([])
+
+  // Fetch contacts for org-based recs (oem_displacement, procurement_target, dealer_recruit)
+  const orgName = ["oem_displacement", "procurement_target"].includes(rec.type)
+    ? String(rec.payload?.organization_name || "")
+    : rec.type === "dealer_recruit"
+    ? String(rec.payload?.state || "")
+    : ""
+
+  useEffect(() => {
+    if (!orgName) return
+    fetch(`/api/admin/growth/director/contacts?org_name=${encodeURIComponent(orgName)}`)
+      .then(r => r.json())
+      .then(d => setContacts(d.contacts || []))
+      .catch(() => {})
+  }, [orgName])
 
   const isActioning = actioning === rec._id
   const hasPack = Boolean(rec.execution_pack_id)
   const statusDisplay = STATUS_DISPLAY[rec.status] || STATUS_DISPLAY.pending
-  const readiness = getReadiness(rec, sourcesConnected)
+  const readiness = getReadiness(rec, sourcesConnected, contacts)
   const displayTitle = readiness.display_title || rec.title
 
   const needsOutcomeInput = (action: "won" | "lost") => {
@@ -1203,7 +1739,7 @@ function RecCard({
 
         {/* Pre-approval readiness — visible for pending recs */}
         {rec.status === "pending" && (
-          <ReadinessStrip rec={rec} sourcesConnected={sourcesConnected} />
+          <ReadinessScore readiness={readiness} />
         )}
 
         {/* Lifecycle timeline for non-pending */}
@@ -1277,6 +1813,34 @@ function RecCard({
           {showPack && (
             <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
               <ExecutionPackPanel recId={rec._id} recType={rec.type} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Contact Intelligence — for org-based recs */}
+      {orgName && (
+        <div className="border-t border-gray-100">
+          <button
+            onClick={() => setShowContacts(c => !c)}
+            className="w-full flex items-center gap-1.5 px-4 py-2 text-xs text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+          >
+            <Phone size={12} />
+            Contact Intelligence
+            {contacts.length > 0 && (
+              <span className="ml-1 text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded font-semibold">{contacts.length} contact{contacts.length !== 1 ? "s" : ""}</span>
+            )}
+            {showContacts ? <ChevronUp size={11} className="ml-auto" /> : <ChevronDown size={11} className="ml-auto" />}
+          </button>
+          {showContacts && (
+            <div className="px-4 py-3 border-t border-gray-100">
+              <p className="text-[10px] text-gray-400 mb-2">Contacts for <strong>{orgName}</strong></p>
+              <ContactPanel
+                orgName={orgName}
+                contacts={contacts}
+                onContactAdded={c => setContacts(prev => [c, ...prev])}
+                onContactDeleted={id => setContacts(prev => prev.filter(c => c._id !== id))}
+              />
             </div>
           )}
         </div>
@@ -1547,6 +2111,63 @@ function MeasurementStrip({ m }: { m: Measurement }) {
           <div key={item.label}>
             <div className={`text-base font-bold ${item.color}`}>{item.value}</div>
             <div className="text-[10px] text-gray-500">{item.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Founder Priority Mode ────────────────────────────────────────────────────
+
+function FounderPriorityMode({ pendingRecs, sourcesConnected }: { pendingRecs: Rec[]; sourcesConnected: string[] }) {
+  if (pendingRecs.length === 0) return null
+
+  const RANK_BADGE = ["", "🥇", "🥈", "🥉", "4.", "5."]
+
+  const scored = pendingRecs.map(rec => {
+    const revenueScore = Math.min(rec.expected_revenue_impact / 500_000, 1)
+    const confScore = rec.confidence / 100
+    const readiness = getReadiness(rec, sourcesConnected, [])
+    const readinessScore = readiness.score / 100
+    const composite = revenueScore * 0.4 + confScore * 0.3 + readinessScore * 0.3
+    return { rec, composite, readiness }
+  }).sort((a, b) => b.composite - a.composite).slice(0, 5)
+
+  return (
+    <div className="mb-4 bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
+      <div className="px-4 py-3 border-b border-gray-800">
+        <div className="flex items-center gap-2">
+          <Zap size={14} className="text-yellow-400" />
+          <span className="text-sm font-bold text-white">Founder Priority Mode</span>
+        </div>
+        <p className="text-xs text-gray-400 mt-0.5">If you have 2 hours this week — do these {scored.length} things first</p>
+      </div>
+      <div className="divide-y divide-gray-800">
+        {scored.map(({ rec, composite, readiness }, i) => (
+          <div key={rec._id} className="px-4 py-3 flex items-start gap-3">
+            <span className={`shrink-0 text-base leading-none mt-0.5 ${i === 0 ? "text-yellow-400" : i === 1 ? "text-gray-300" : i === 2 ? "text-amber-600" : "text-gray-500"}`}>
+              {RANK_BADGE[i + 1]}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-white leading-snug">{rec.title}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{rec.expected_action}</p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-xs font-bold text-emerald-400">{INR(rec.expected_revenue_impact)}</p>
+                  <p className="text-[9px] text-gray-500">est. impact</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-1.5 text-[10px]">
+                <span className={`px-1.5 py-0.5 rounded font-semibold ${PRIORITY_COLOR[rec.priority]}`}>{rec.priority.toUpperCase()}</span>
+                <span className="text-gray-500">Conf: <span className="text-gray-300">{rec.confidence}%</span></span>
+                <span className="text-gray-500">Ready: <span className={readiness.score >= 70 ? "text-green-400" : "text-amber-400"}>{readiness.score}%</span></span>
+                <span className="text-gray-500">Score: <span className="text-white font-mono">{(composite * 100).toFixed(0)}</span></span>
+                <span className="text-gray-500">Effort: <span className="text-gray-300">{EFFORT_LABEL[rec.effort] || rec.effort}</span></span>
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -1841,9 +2462,12 @@ export default function RevenueDashboardPage() {
         ))}
       </div>
 
-      {/* Budget Allocation Engine — top 3 when viewing pending */}
+      {/* Priority Mode + Budget Engine — when viewing pending */}
       {!loading && filter === "pending" && (
-        <BudgetRankPanel pendingRecs={pendingRecs} />
+        <>
+          <FounderPriorityMode pendingRecs={pendingRecs} sourcesConnected={run?.sources_connected ?? []} />
+          <BudgetRankPanel pendingRecs={pendingRecs} />
+        </>
       )}
 
       {/* Recommendations */}

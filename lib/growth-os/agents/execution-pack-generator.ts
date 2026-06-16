@@ -173,6 +173,33 @@ ACTION ITEMS:
 □ 100X to identify 3 live tenders in ${state} for immediate bidding
 □ Schedule follow-up in 1 week`
 
+  const outreach_schedule = {
+    day_1: {
+      whatsapp: whatsapp_draft,
+      email: outreach_email_draft,
+      note: "Send WhatsApp first (higher open rate), then email within 30 min. Do not call on Day 1. Let the data speak.",
+    },
+    day_3: {
+      call_script,
+      note: "If no WhatsApp or email response in 48 hours: call between 10am–12pm or 3pm–5pm IST. Reference the email sent on Day 1.",
+    },
+    day_7: {
+      follow_up_whatsapp: `Hi [Name],\n\nFollowing up on my message from last week about the ${state} dealer opportunity.\n\n${state} has ${inr(marketGmv)} in active fogging demand — still looking for the right partner here.\n\nAre you available for a 15-minute call this week?\n\n— [Your name], 100X Circle`,
+      note: "If still no response after Day 3 call: send a short follow-up WhatsApp. Do NOT resend the full pitch — keep it brief.",
+    },
+    day_14: {
+      final_whatsapp: `Hi [Name],\n\nLast message from my side about the 100X Circle dealer opportunity in ${state}.\n\nIf this isn't the right time, no problem at all. Feel free to reach out whenever you're ready — 100xcircle.com.\n\nWishing you well!\n— [Your name], 100X Circle`,
+      note: "If no response in 14 days: send a polite close message. Mark this lead as Deferred in your CRM. Move to the next candidate.",
+    },
+  }
+
+  const whatsapp_sequence = {
+    first_message: whatsapp_draft,
+    follow_up: `Hi [Name],\n\nJust following up on my message about 100X Circle dealer opportunity in ${state}.\n\nThis market has ${inr(marketGmv)} in active procurement with zero local representation right now — first mover advantage is real.\n\n5 minutes to connect? 📞\n\n— [Name], 100X Circle`,
+    reminder: `Hi [Name],\n\nLast follow-up on ${state}.\n\nIf now isn't the right time, happy to reconnect in a few months. Just let me know!\n\n— [Name], 100X Circle`,
+    meeting_confirmation: `Hi [Name],\n\nConfirming our call/meeting on [Date] at [Time].\n\nI'll have ready:\n• ${state} market data (${orgCount} active buyers, ${inr(marketGmv)} GMV)\n• 100X Circle product catalog\n• Dealer pricing and margin structure\n• Live GeM tenders in ${state}\n\nLooking forward to it!\n— [Name], 100X Circle`,
+  }
+
   return {
     type: "dealer_recruitment",
     target_state: state,
@@ -185,6 +212,8 @@ ACTION ITEMS:
     whatsapp_draft,
     call_script,
     meeting_agenda,
+    outreach_schedule,
+    whatsapp_sequence,
   }
 }
 
@@ -317,6 +346,13 @@ ACTION ITEMS:
 □ Confirm next tender schedule with purchase officer
 □ Submit GeM rate card for comparison`
 
+  const whatsapp_sequence = {
+    first_message: whatsapp_draft,
+    follow_up: `Hello [Name],\n\nFollowing up on my earlier message about 100X Circle machines for ${orgName}.\n\nWe're GeM-listed, competitively priced, and have local support in ${orgState}. Happy to share a rate comparison vs your current supplier.\n\nCould I send our product catalog?\n\n— [Name], 100X Circle`,
+    reminder: `Hello,\n\nLast follow-up regarding 100X Circle fogging machines for ${orgName}.\n\nIf you have upcoming procurement plans, we'd love to be considered. Otherwise, feel free to reach out whenever needed — 100xcircle.com.\n\nThank you 🙏\n— 100X Circle`,
+    meeting_confirmation: `Hello [Name],\n\nConfirming our meeting/call on [Date] at [Time] regarding fogging machine procurement for ${orgName}.\n\nI'll bring:\n• 100X Circle product catalog and GeM listing details\n• Rate comparison vs current supplier\n• Technical spec sheets matching your requirements\n• AMC/service contract proposal\n\nLooking forward to meeting you!\n— [Name], 100X Circle`,
+  }
+
   return {
     type: "oem_displacement",
     organization_name: orgName,
@@ -329,6 +365,7 @@ ACTION ITEMS:
     whatsapp_draft,
     call_script,
     meeting_agenda,
+    whatsapp_sequence,
   }
 }
 
@@ -469,6 +506,10 @@ async function campaignPack(rec: DirectorRec, db: Db): Promise<CampaignPack> {
     creative_brief: string
     targeting: string
     ad_copies: Array<{ headline: string; description: string; display_url: string }>
+    campaign_name: string
+    campaign_objective: string
+    ad_groups: Array<{ name: string; match_type: string; keywords: string[]; headlines: string[]; descriptions: string[] }>
+    negative_keywords: string[]
   }> = {
     remarketing_campaign: {
       label: "Remarketing Campaign",
@@ -483,6 +524,31 @@ async function campaignPack(rec: DirectorRec, db: Db): Promise<CampaignPack> {
       ad_copies: [
         { headline: "Still Looking for Fogging Machines?", description: "100X Circle — GeM Listed, Government Approved. Get your quote today.", display_url: "100xcircle.com/fogging-machines" },
         { headline: "100X Circle | Government Grade Fogging", description: "₹[price] onwards. Certified machines for municipal & health departments. Request demo.", display_url: "100xcircle.com/get-quote" },
+      ],
+      campaign_name: "100X Circle | Remarketing — Site Visitors",
+      campaign_objective: "Re-engage site visitors — drive quote form submission",
+      negative_keywords: ["job", "career", "vacancy", "repair service", "spare parts", "used", "second hand", "rent", "hire"],
+      ad_groups: [
+        {
+          name: "All Visitors — 30 Day",
+          match_type: "Audience (remarketing)",
+          keywords: [],
+          headlines: ["Still Looking for a Fogger?", "100X Circle — Get Quote", "Fogging Machine Quote", "GeM Listed | 100X Circle", "Government Grade Fogging", "Compare Before You Buy"],
+          descriptions: [
+            "You visited 100xcircle.com. Ready to get a quote? GeM-listed, government-approved. 24-hour response.",
+            "Don't let the next tender pass. 100X Circle thermal fogging machines — get your rate card today.",
+          ],
+        },
+        {
+          name: "Product Page Visitors — 90 Day",
+          match_type: "Audience (remarketing)",
+          keywords: [],
+          headlines: ["100X Circle Thermal Fogger", "Ready to Order?", "Get GeM Rate Card", "Government Approved Fogger", "Quote in 24 Hours", "Bulk Orders Welcome"],
+          descriptions: [
+            "You viewed our fogging machines. Let us send you a formal quote — delivered within 24 hours.",
+            "100X Circle machines: ISO certified, GeM-listed, with local dealer support across India.",
+          ],
+        },
       ],
     },
     youtube_campaign: {
@@ -503,6 +569,21 @@ TONE: Professional, trustworthy, government-appropriate`,
       ad_copies: [
         { headline: "100X Circle Thermal Fogging Machines", description: "Government-approved, GeM-listed. Used by 100+ municipal and health departments.", display_url: "100xcircle.com" },
       ],
+      campaign_name: "100X Circle | YouTube — Government Fogging Awareness",
+      campaign_objective: "Brand awareness — reach government buyers before next tender cycle",
+      negative_keywords: ["children", "kids", "cartoon", "gaming", "music"],
+      ad_groups: [
+        {
+          name: "TrueView In-Stream — Government Audience",
+          match_type: "Custom Intent / Affinity",
+          keywords: ["thermal fogging machine", "fogging machine for government", "fogging machine tender", "municipal fogging equipment", "sanitation equipment india"],
+          headlines: ["100X Circle | GeM Listed Fogging Machines", "Government Approved Thermal Fogger", "Trusted by 100+ Govt Departments"],
+          descriptions: [
+            "100X Circle: Government-grade thermal fogging machines. GeM-listed. Available across India with local dealer support.",
+            "Used by municipal corporations and health departments. Request a demo before your next tender.",
+          ],
+        },
+      ],
     },
     performance_max_campaign: {
       label: "Performance Max Campaign",
@@ -521,6 +602,29 @@ Videos: 30s product demo, 60s testimonial (if available)`,
       ad_copies: [
         { headline: "100X Circle | GeM Listed Fogging Machines", description: "Government-approved thermal foggers. Quote in 24 hours. Local dealer support.", display_url: "100xcircle.com/fogging-machines" },
         { headline: "Thermal Fogging Machine — Buy on GeM", description: "100X Circle: Trusted by 100+ govt departments. Compare prices, get quote.", display_url: "100xcircle.com" },
+      ],
+      campaign_name: "100X Circle | Performance Max — Fogging",
+      campaign_objective: "All-channels lead generation — quote form submissions",
+      negative_keywords: ["second hand", "used", "rent", "repair", "spare parts", "job", "career", "diy", "personal use", "mini", "toy"],
+      ad_groups: [
+        {
+          name: "Asset Group 1 — Primary",
+          match_type: "Performance Max (AI-driven)",
+          keywords: ["thermal fogging machine", "fogging machine india", "buy fogging machine", "fogging machine for government", "thermal fogger price", "ulv fogger india"],
+          headlines: [
+            "100X Circle Thermal Fogger", "GeM Listed Fogging Machines", "Government Approved Fogger",
+            "Dengue Control Equipment", "Buy Fogging Machine Online", "Certified Thermal Fogger India",
+            "Municipal Grade Fogger", "Get Quote — Same Day", "Fogging Machine ₹[price]+",
+            "Made in India Fogger", "ISO Certified Thermal Fogger", "Pan-India Dealer Support",
+            "100+ Govt Departments Trust Us", "Compare Before You Buy", "Request Demo Today",
+          ],
+          descriptions: [
+            "100X Circle thermal fogging machines are government-approved and GeM-listed. Available across India with dealer support.",
+            "Used by 100+ municipal corporations and health departments. Request a quote and get GeM rate card instantly.",
+            "Domestic manufacturer with full after-sales support. ISO certified. Competitive pricing for government bulk orders.",
+            "Compare against imported machines — 100X Circle delivers better value, faster delivery, and local service.",
+          ],
+        },
       ],
     },
     competitor_conquest_campaign: {
@@ -549,6 +653,34 @@ IMPORTANT: Use phrase match, not broad. Monitor search terms for irrelevant traf
         { headline: "Compare Before You Buy — 100X Circle", description: "GeM-listed, government-approved fogging machines. Compare specs and pricing. Made in India.", display_url: "100xcircle.com/compare" },
         { headline: "100X Circle vs [Competitor Brand]", description: "Domestic manufacturer. Full after-sales support. Competitive pricing. Get a quote in 24 hours.", display_url: "100xcircle.com/get-quote" },
       ],
+      campaign_name: "100X Circle | Conquest — Competitor Keywords",
+      campaign_objective: "Intercept competitor brand searches — convert to 100X leads",
+      negative_keywords: ["second hand", "used", "repair", "spare parts", "job", "rent"],
+      ad_groups: [
+        {
+          name: "Competitor Brand Terms",
+          match_type: "Phrase Match",
+          keywords: [
+            ...String(payload.top_competitors || "").split(",").map((c: string) => c.trim().toLowerCase() + " fogging machine").filter(Boolean),
+            "biofog fogging machine", "kisankraft fogger price", "pulsfog machine india",
+          ].filter(Boolean),
+          headlines: ["Compare Before You Buy", "100X Circle vs [Competitor]", "Better Than [Competitor]?", "GeM Listed | 100X Circle", "Domestic Manufacturer", "Get Free Quote Today"],
+          descriptions: [
+            "Considering a competitor? Compare 100X Circle — GeM-listed, government-approved, domestic manufacturer.",
+            "Better value, faster delivery, local support. 100X Circle thermal fogging machines. Free quote in 24 hours.",
+          ],
+        },
+        {
+          name: "Comparison / Alternative Terms",
+          match_type: "Phrase Match",
+          keywords: ["best fogging machine india", "fogging machine comparison", "thermal fogger brands india", "fogging machine alternative", "compare thermal fogger"],
+          headlines: ["Best Fogging Machine India", "100X Circle | Top Rated", "Compare Fogger Brands", "Why Choose 100X Circle?", "GeM Listed | ISO Certified", "Free Comparison Report"],
+          descriptions: [
+            "100X Circle: domestic manufacturer, GeM-listed, ISO certified. Compare against any competitor — free.",
+            "See why 100+ government departments prefer 100X Circle. Request specs and pricing comparison today.",
+          ],
+        },
+      ],
     },
     search_campaign: {
       label: "Search Campaign",
@@ -571,6 +703,45 @@ Extensions: Sitelinks (Quote, Products, Dealers, GeM Listing), Callout (GeM List
         { headline: "Thermal Fogging Machines — GeM Listed", description: "Government-approved 100X Circle foggers. Get quote for bulk procurement. Pan-India delivery.", display_url: "100xcircle.com/fogging-machines" },
         { headline: "100X Circle | Buy Fogging Machine", description: "Government-grade thermal foggers. ISO certified, GeM listed. Request a demo in your state.", display_url: "100xcircle.com/get-quote" },
       ],
+      campaign_name: "100X Circle | Search — Fogging Machine Buyers",
+      campaign_objective: "Leads — quote form submissions from government buyers",
+      negative_keywords: [
+        "second hand", "used", "rent", "hire", "repair", "spare parts", "job", "career", "vacancy",
+        "diy", "homemade", "personal use", "mini", "toy", "fake", "cheap quality", "mosquito coil",
+        "manual sprayer", "hand sprayer", "knapsack", "backpack sprayer",
+      ],
+      ad_groups: [
+        {
+          name: "Buy Intent — Fogging Machine",
+          match_type: "Phrase Match",
+          keywords: ["buy thermal fogging machine", "fogging machine price india", "purchase thermal fogger", "fogging machine online india", "buy fogger machine india"],
+          headlines: ["Buy Thermal Fogging Machine", "100X Circle | GeM Listed Fogger", "Fogging Machine — Get Quote", "100X Circle Thermal Fogger", "Government Grade Fogging", "Thermal Fogger — Pan India"],
+          descriptions: [
+            "100X Circle thermal fogging machines: GeM-listed, government-approved. Get your quote in 24 hours.",
+            "Competitive pricing for bulk government orders. ISO certified. Domestic manufacturer. Pan-India delivery.",
+          ],
+        },
+        {
+          name: "Government / GeM Intent",
+          match_type: "Phrase Match",
+          keywords: ["fogging machine for government", "fogging machine gem", "thermal fogger government approved", "fogging machine municipal corporation", "fogger for health department"],
+          headlines: ["GeM Listed Fogging Machine", "Government Approved Fogger", "100X Circle | GeM Seller", "Thermal Fogger for Govt Dept", "Bulk Orders Welcome", "GeM Rate Card Available"],
+          descriptions: [
+            "Available on GeM portal. 100X Circle — trusted by municipal and health departments across India.",
+            "Request GeM rate card. Compare vs current supplier. Same-day quote response. Local dealer support.",
+          ],
+        },
+        {
+          name: "Price / Comparison Intent",
+          match_type: "Phrase Match",
+          keywords: ["thermal fogging machine price", "fogging machine cost india", "fogging machine rate", "best fogging machine india", "thermal fogger comparison"],
+          headlines: ["Thermal Fogger Price India", "Compare Fogging Machines", "100X Circle | Best Value", "Fogging Machine ₹[Price]+", "Get Price List Today", "100X Circle Fogging"],
+          descriptions: [
+            "Get 100X Circle price list for thermal fogging machines. Compare against current supplier. ISO certified.",
+            "Transparent pricing. No hidden costs. Request quote + GeM rate card — respond within 24 hours.",
+          ],
+        },
+      ],
     },
     negative_keyword: {
       label: "Negative Keyword Fix",
@@ -592,6 +763,10 @@ STEPS:
 IMPACT: Prevents ${payload.clicks} future irrelevant clicks at ${inr(Number(payload.spend || 0))} per batch`,
       targeting: `Campaign: ${payload.campaign}\nAction type: Exclude (negative keyword)\nScope: Campaign level`,
       ad_copies: [],
+      campaign_name: `[Optimisation] Negative Keyword — ${payload.campaign || "Campaign"}`,
+      campaign_objective: "Eliminate wasted spend on non-converting search terms",
+      ad_groups: [],
+      negative_keywords: [String(payload.searchTerm || "")].filter(Boolean),
     },
     budget_reallocate: {
       label: "Budget Reallocation",
@@ -608,6 +783,10 @@ Amount to shift: ${inr(Number(payload.shift_amount || 0))} per day
 Expected improvement: More conversions from same total spend`,
       targeting: `From: ${payload.from_campaign}\nTo: ${payload.to_campaign}\nMethod: Reduce daily budget by ${payload.reduction_pct || "20"}% on source, increase target proportionally`,
       ad_copies: [],
+      campaign_name: `[Optimisation] Budget Reallocation`,
+      campaign_objective: "Shift spend from low-ROAS to high-ROAS campaigns",
+      ad_groups: [],
+      negative_keywords: [],
     },
     creative_refresh: {
       label: "Creative Refresh",
@@ -631,6 +810,29 @@ NEW CREATIVE GUIDELINES:
         { headline: "100X Circle | GeM Listed Fogger", description: "Government-approved thermal foggers. Competitive pricing for bulk orders. Quote in 24h.", display_url: "100xcircle.com" },
         { headline: "Thermal Fogging Machines — Govt Grade", description: "ISO certified. Pan-India dealer support. Used by 100+ municipal departments. Get quote.", display_url: "100xcircle.com/fogging-machines" },
       ],
+      campaign_name: `[Optimisation] Creative Refresh — ${payload.campaign || "Campaign"}`,
+      campaign_objective: "Replace low-CTR ad creatives to improve conversion rate",
+      ad_groups: [
+        {
+          name: "Refreshed Creatives",
+          match_type: "RSA (Responsive Search Ad)",
+          keywords: [],
+          headlines: [
+            "100X Circle | GeM Listed Fogger", "Thermal Fogging Machine India", "Government Approved Fogger",
+            "GeM Listed | Government Approved", "Fogging Machine — Get Quote", "Thermal Fogger ₹[Price]+",
+            "100X Circle Thermal Fogger", "Bulk Orders | Fast Delivery", "ISO Certified Fogging Machine",
+            "Used by Govt Departments", "Pan-India Dealer Support", "Get Quote in 24 Hours",
+            "Compare Before You Buy", "Domestic Manufacturer", "Request Demo in Your State",
+          ],
+          descriptions: [
+            "100X Circle thermal fogging machines: GeM-listed, ISO certified, government-approved. Quote in 24 hours.",
+            "Competitive pricing for bulk orders. Domestic manufacturer with pan-India dealer support and AMC contracts.",
+            "100+ municipal and health departments trust 100X Circle. Compare specs and pricing — free quote today.",
+            "GeM portal listed. All government certifications. Local dealer support in your state. Fast delivery.",
+          ],
+        },
+      ],
+      negative_keywords: [],
     },
   }
 
@@ -649,6 +851,10 @@ NEW CREATIVE GUIDELINES:
     ad_copy_drafts: config.ad_copies,
     creative_brief: config.creative_brief,
     targeting_notes: config.targeting,
+    campaign_name: config.campaign_name,
+    campaign_objective: config.campaign_objective,
+    ad_groups: config.ad_groups ?? [],
+    negative_keywords: config.negative_keywords ?? [],
   }
 }
 
@@ -844,6 +1050,13 @@ ACTION ITEMS:
 □ Share technical specification sheet
 □ Confirm AMC/service availability in ${orgState || "state"}`
 
+  const whatsapp_sequence = {
+    first_message: whatsapp_draft,
+    follow_up: `Hello,\n\nFollowing up about 100X Circle fogging machines for ${orgName}.\n\nWe're GeM-listed and ready to quote for your upcoming requirement. Happy to share our rate card and technical specs.\n\nMay I connect with the purchase officer?\n\n— [Name], 100X Circle`,
+    reminder: `Hello,\n\nLast follow-up regarding 100X Circle for ${orgName}.\n\nIf procurement is planned soon, please reach out — we'd love to submit a competitive quote on GeM.\n\n100xcircle.com\n— 100X Circle`,
+    meeting_confirmation: `Hello [Name],\n\nConfirming our meeting/call on [Date] at [Time] for ${orgName} procurement discussion.\n\nI'll have ready:\n• GeM product listing and certifications\n• Rate card and comparison vs current supplier\n• Technical specification sheet\n• Delivery and AMC details\n\nThank you!\n— [Name], 100X Circle`,
+  }
+
   return {
     type: "oem_displacement",
     organization_name: orgName,
@@ -856,6 +1069,7 @@ ACTION ITEMS:
     whatsapp_draft,
     call_script,
     meeting_agenda,
+    whatsapp_sequence,
   }
 }
 
