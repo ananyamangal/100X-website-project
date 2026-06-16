@@ -553,6 +553,12 @@ function CampaignIntelPanel({ rec }: { rec: Rec }) {
               <span>~{b.expected_leads} leads</span>
               <span>·</span>
               <span>{INR(b.expected_revenue_inr)} est. rev.</span>
+              <span>·</span>
+              <span className="font-semibold">
+                {b.estimated_budget_inr > 0
+                  ? `${Math.round((b.expected_revenue_inr - b.estimated_budget_inr) / b.estimated_budget_inr * 100)}% ROI`
+                  : "Organic (∞ ROI)"}
+              </span>
             </div>
           </div>
         ))}
@@ -565,9 +571,17 @@ function CampaignIntelPanel({ rec }: { rec: Rec }) {
       </div>
 
       {/* Totals */}
-      <div className="flex gap-4 text-xs text-gray-600 bg-gray-50 rounded px-3 py-2">
+      <div className="flex flex-wrap gap-4 text-xs text-gray-600 bg-gray-50 rounded px-3 py-2">
         <span><span className="font-semibold text-gray-800">Budget:</span> {intel.total_budget_estimate_inr > 0 ? INR(intel.total_budget_estimate_inr) + "/mo" : "₹0 (organic)"}</span>
         <span><span className="font-semibold text-gray-800">Rev target:</span> {INR(intel.total_expected_revenue_inr)}</span>
+        <span>
+          <span className="font-semibold text-gray-800">ROI:</span>{" "}
+          <span className={intel.total_budget_estimate_inr > 0 && intel.total_expected_revenue_inr > intel.total_budget_estimate_inr ? "text-emerald-700 font-semibold" : "text-gray-600"}>
+            {intel.total_budget_estimate_inr > 0
+              ? `${Math.round((intel.total_expected_revenue_inr - intel.total_budget_estimate_inr) / intel.total_budget_estimate_inr * 100)}%`
+              : "∞ (organic)"}
+          </span>
+        </span>
         <span><span className="font-semibold text-gray-800">Confidence:</span> {intel.overall_confidence}%</span>
       </div>
 
