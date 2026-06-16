@@ -1,88 +1,119 @@
 // POST /api/fogging/copilot
-// Natural language query → MongoDB filter → contract results
-// Powers the Fogging Copilot (P3) — "Show all Neptune contracts in Bihar"
+// Natural language query → intent detection → MongoDB filter → results
+// Supports: fogging_contracts (purchase queries) + fogging_sellers (dealer queries)
 
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import clientPromise from '@/lib/mongodb';
 
-const DB   = '100xDB';
-const COLL = 'fogging_contracts';
+const DB = '100xDB';
 
-const SYSTEM_PROMPT = `You are a query parser for a thermal fogging machine procurement database (GeM India).
-Convert the user's natural language query into a MongoDB filter object (JSON).
+const SYSTEM_PROMPT = `You are a query parser for a thermal fogging machine procurement intelligence platform (GeM India).
 
-Available fields and their types:
-- oem_canonical (string): OEM brand key. Known values: "NEPTUNE", "SSE SAI SHREE ENTERPRISES", "PULSFOG", "INSTA FOG", "FOGGERS", "100X CIRCLE"
-- oem_short_brand (string): Short brand label (e.g. "Neptune", "Pulsfog", "100X Circle")
-- buyer_state (string): Indian state name e.g. "Bihar", "Uttar Pradesh", "Rajasthan"
-- buyer_display_name (string): Full buyer/department name
-- org_type (string): "Central Government", "State Government", "Urban Local Body", "Public Sector Undertaking", "Autonomous Body", "Local Bodies"
-- ministry (string): Ministry name e.g. "Ministry of Defence"
-- seller_name (string): Seller/dealer display name
+Classify the query intent and return a MongoDB filter.
+
+## QUERY TYPES
+
+### "contracts" — purchase/order/OEM/state/price queries
+Fields available in fogging_contracts:
+- oem_canonical (string): "NEPTUNE", "SSE SAI SHREE ENTERPRISES", "PULSFOG", "INSTA FOG", "FOGGERS", "100X CIRCLE"
+- oem_short_brand (string): short brand label e.g. "Neptune", "Pulsfog", "100X Circle"
+- buyer_state (string): Indian state name e.g. "Bihar", "Uttar Pradesh"
+- buyer_display_name (string): full buyer/department name
+- org_type (string): "Central Government", "State Government", "Urban Local Body", "Public Sector Undertaking"
+- ministry (string): ministry name
+- seller_name (string): seller/dealer name
 - seller_gst (string): 15-digit GSTIN
-- model_raw (string): Raw product model string from GeM
-- model_normalized (string): Normalized model identifier
-- contract_value_num (number): Contract value in INR rupees
-- unit_price (number): Unit price in INR rupees
-- quantity (number): Quantity ordered
-- contract_date (date string ISO): Date of contract
+- model_raw (string): product model string from GeM
+- model_normalized (string): normalized model identifier
+- contract_value_num (number): value in INR (1 lakh=100000, 1 crore=10000000)
+- unit_price (number): per-unit price in INR
+- quantity (number): units ordered
+- contract_date (ISO string): date of contract
+- contract_year (number): 2019–2025
 - buying_mode (string): e.g. "GeM Pool", "Direct Purchase"
 - is_100x (boolean): true if 100X Circle contract
-- contract_year (number): Year (2019-2025)
-- has_unit_price (boolean): true if unit price was extractable
+- has_unit_price (boolean): true if unit price available
 
-Rules:
-1. Use $regex with $options:"i" for text searches on names/models/buyer
+### "sellers" — dealer/distributor/seller queries
+Fields available in fogging_sellers:
+- seller_display_name (string): dealer/company name
+- seller_state (string): state of operation
+- total_gmv (number): total GMV in INR
+- oem_count (number): number of distinct OEM brands carried
+- buyers_served (number): unique buyers served
+- is_100x_dealer (boolean): true if carries 100X Circle
+- carries_neptune (boolean)
+- carries_sse (boolean)
+- carries_instafog (boolean)
+- carries_pulsfog (boolean)
+- seller_gst (string): GSTIN
+- has_gst (boolean): has valid GST registration
+- seller_msme (string): social category (General/OBC/SC/ST)
+
+## OUTPUT FORMAT
+
+Always return a single JSON object with exactly these keys:
+- "query_type": "contracts" or "sellers"
+- "filter": MongoDB filter object for the appropriate collection
+- "explanation": one sentence describing what was filtered
+- "sort": optional sort field and direction e.g. {"oem_count": -1}
+
+## RULES
+1. Use $regex with $options:"i" for text name searches
 2. Use $gte/$lte for number ranges
-3. For OEM names, prefer oem_canonical with the exact key (uppercase) OR use $regex on oem_short_brand
-4. For "lakh" amounts: 1 lakh = 100000; "10 lakh" = 1000000; "1 crore" = 10000000
-5. For org types like "municipality": match org_type with {$regex:"Urban Local Body|municipality", $options:"i"}
-6. For "100X" or "100x circle": use is_100x:true
-7. For date ranges use ISODate strings: "2024-01-01" format
-8. Return ONLY a JSON object with two keys:
-   - "filter": the MongoDB filter object
-   - "explanation": a one-sentence plain English description of what was filtered
+3. For OEM canonicals use UPPERCASE exact keys
+4. "dealers", "distributors", "sellers", "who sells", "which companies sell" → query_type: sellers
+5. "contracts", "purchases", "orders", "OEM sold", "bought by" → query_type: contracts
+6. For ambiguous queries about OEM brands: prefer contracts
+7. For "multiple OEMs" / "multi-OEM" → oem_count: {$gt:1}
 
-Examples:
+## EXAMPLES
+
+Q: "find dealers who sell multiple OEMs"
+A: {"query_type":"sellers","filter":{"oem_count":{"$gt":1}},"sort":{"oem_count":-1},"explanation":"Dealers who carry more than one OEM brand, ranked by OEM count."}
+
+Q: "show Neptune dealers in UP"
+A: {"query_type":"sellers","filter":{"carries_neptune":true,"seller_state":"Uttar Pradesh"},"sort":{"total_gmv":-1},"explanation":"Neptune dealers operating in Uttar Pradesh."}
+
+Q: "who are the top dealers in Bihar"
+A: {"query_type":"sellers","filter":{"seller_state":"Bihar"},"sort":{"total_gmv":-1},"explanation":"Dealers operating in Bihar by total GMV."}
+
+Q: "dealers not carrying 100X"
+A: {"query_type":"sellers","filter":{"is_100x_dealer":false},"sort":{"total_gmv":-1},"explanation":"Dealers who do not currently carry 100X Circle."}
+
 Q: "Show all Neptune contracts in Bihar"
-A: {"filter":{"oem_canonical":"NEPTUNE","buyer_state":"Bihar"},"explanation":"All Neptune contracts where the buyer is in Bihar."}
+A: {"query_type":"contracts","filter":{"oem_canonical":"NEPTUNE","buyer_state":"Bihar"},"explanation":"All Neptune contracts where the buyer is in Bihar."}
 
 Q: "Show all Royal Tradelinks sales"
-A: {"filter":{"seller_name":{"$regex":"Royal Tradelinks","$options":"i"}},"explanation":"All contracts sold by Royal Tradelinks."}
-
-Q: "Show all NPF-35 purchases"
-A: {"filter":{"model_raw":{"$regex":"NPF-35","$options":"i"}},"explanation":"All contracts for the NPF-35 model."}
+A: {"query_type":"contracts","filter":{"seller_name":{"$regex":"Royal Tradelinks","$options":"i"}},"explanation":"All contracts sold by Royal Tradelinks."}
 
 Q: "Show all contracts above 10 lakh"
-A: {"filter":{"contract_value_num":{"$gte":1000000}},"explanation":"All contracts with value above ₹10 lakh."}
+A: {"query_type":"contracts","filter":{"contract_value_num":{"$gte":1000000}},"explanation":"All contracts with value above ₹10 lakh."}
 
-Q: "Show all purchases by e-Municipalities"
-A: {"filter":{"org_type":{"$regex":"Urban Local Body","$options":"i"}},"explanation":"All contracts where the buyer is an Urban Local Body."}
+Q: "Show 100X contracts in UP"
+A: {"query_type":"contracts","filter":{"is_100x":true,"buyer_state":"Uttar Pradesh"},"explanation":"100X Circle contracts in Uttar Pradesh."}`;
 
-Q: "Show 100X contracts in UP last year"
-A: {"filter":{"is_100x":true,"buyer_state":"Uttar Pradesh","contract_year":2024},"explanation":"100X Circle contracts in Uttar Pradesh from 2024."}`;
+interface SellerDoc {
+  seller_slug?: string; seller_gst?: string | null; seller_display_name?: string;
+  seller_state?: string; total_gmv?: number | null; oem_count?: number | null;
+  buyers_served?: number | null; is_100x_dealer?: boolean;
+  oems_represented?: { oem_canonical: string; brand_name: string; gmv: number }[];
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const body   = await req.json() as { query?: string };
-    const query  = (body.query ?? '').trim();
+    const body  = await req.json() as { query?: string };
+    const query = (body.query ?? '').trim();
 
-    if (!query || query.length < 3) {
-      return NextResponse.json({ error: 'Query too short' }, { status: 400 });
-    }
-    if (query.length > 500) {
-      return NextResponse.json({ error: 'Query too long' }, { status: 400 });
-    }
+    if (!query || query.length < 3)  return NextResponse.json({ error: 'Query too short' },  { status: 400 });
+    if (query.length > 500)          return NextResponse.json({ error: 'Query too long' },   { status: 400 });
 
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
-    if (!anthropicKey) {
-      return NextResponse.json({ error: 'AI not configured' }, { status: 503 });
-    }
+    if (!anthropicKey) return NextResponse.json({ error: 'AI not configured' }, { status: 503 });
 
     const anthropic = new Anthropic({ apiKey: anthropicKey });
 
-    // Parse NL query → MongoDB filter
     const msg = await anthropic.messages.create({
       model:      'claude-haiku-4-5-20251001',
       max_tokens: 512,
@@ -92,27 +123,65 @@ export async function POST(req: NextRequest) {
 
     const raw = (msg.content[0] as { type: string; text: string }).text?.trim() ?? '';
 
-    // Extract JSON from the response
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return NextResponse.json({ error: 'Could not parse query', raw }, { status: 422 });
-    }
+    if (!jsonMatch) return NextResponse.json({ error: 'Could not parse query', raw }, { status: 422 });
 
-    let parsed: { filter?: Record<string, unknown>; explanation?: string };
+    let parsed: { query_type?: string; filter?: Record<string, unknown>; explanation?: string; sort?: Record<string, unknown> };
     try {
       parsed = JSON.parse(jsonMatch[0]) as typeof parsed;
     } catch {
       return NextResponse.json({ error: 'Invalid filter JSON', raw }, { status: 422 });
     }
 
-    const filter      = parsed.filter ?? {};
+    const queryType  = parsed.query_type ?? 'contracts';
+    const filter     = parsed.filter ?? {};
+    const sortSpec   = (parsed.sort ?? {}) as Record<string, 1 | -1>;
     const explanation = parsed.explanation ?? query;
 
-    // Execute filter against fogging_contracts
-    const client    = await clientPromise;
-    const coll      = client.db(DB).collection(COLL);
+    const client = await clientPromise;
+    const db     = client.db(DB);
+
+    // ── Seller query ──────────────────────────────────────────────────────────
+    if (queryType === 'sellers') {
+      const defaultSort: Record<string, 1 | -1> = Object.keys(sortSpec).length
+        ? (sortSpec as Record<string, 1 | -1>)
+        : { total_gmv: -1 };
+
+      const [docs, total] = await Promise.all([
+        db.collection('fogging_sellers').find(filter, {
+          projection: {
+            seller_slug: 1, seller_gst: 1, seller_display_name: 1,
+            seller_state: 1, total_gmv: 1, oem_count: 1, buyers_served: 1,
+            is_100x_dealer: 1, oems_represented: 1,
+          },
+        }).sort(defaultSort).limit(100).toArray() as Promise<SellerDoc[]>,
+        db.collection('fogging_sellers').countDocuments(filter),
+      ]);
+
+      const summaryArr = await db.collection('fogging_sellers').aggregate([
+        { $match: filter },
+        { $group: { _id: null, total_gmv: { $sum: '$total_gmv' }, states: { $addToSet: '$seller_state' } } },
+      ]).toArray();
+      const s = summaryArr[0] ?? {};
+
+      return NextResponse.json({
+        query, explanation, filter, total,
+        collection: 'sellers',
+        data: docs,
+        summary: {
+          total_gmv:   s.total_gmv ?? 0,
+          state_count: (s.states ?? []).length,
+        },
+      });
+    }
+
+    // ── Contract query (default) ───────────────────────────────────────────────
+    const defaultSort: Record<string, 1 | -1> = Object.keys(sortSpec).length
+      ? (sortSpec as Record<string, 1 | -1>)
+      : { contract_date: -1 };
+
     const [docs, total] = await Promise.all([
-      coll.find(filter, {
+      db.collection('fogging_contracts').find(filter, {
         projection: {
           gemc_no: 1, contract_date: 1,
           buyer_display_name: 1, buyer_canonical: 1, buyer_state: 1, org_type: 1,
@@ -122,12 +191,11 @@ export async function POST(req: NextRequest) {
           seller_name: 1, seller_gst: 1,
           buying_mode: 1,
         },
-      }).sort({ contract_date: -1 }).limit(200).toArray(),
-      coll.countDocuments(filter),
+      }).sort(defaultSort).limit(200).toArray(),
+      db.collection('fogging_contracts').countDocuments(filter),
     ]);
 
-    // Summary aggregation
-    const summaryArr = await coll.aggregate([
+    const summaryArr = await db.collection('fogging_contracts').aggregate([
       { $match: filter },
       { $group: {
         _id:       null,
@@ -140,16 +208,14 @@ export async function POST(req: NextRequest) {
     const s = summaryArr[0] ?? {};
 
     return NextResponse.json({
-      query,
-      explanation,
-      filter,
-      total,
-      data:  docs,
+      query, explanation, filter, total,
+      collection: 'contracts',
+      data: docs,
       summary: {
-        total_gmv:    s.total_gmv ?? 0,
-        buyer_count:  (s.buyers ?? []).length,
-        oem_count:    (s.oems   ?? []).length,
-        state_count:  (s.states ?? []).length,
+        total_gmv:   s.total_gmv ?? 0,
+        buyer_count: (s.buyers ?? []).length,
+        oem_count:   (s.oems   ?? []).length,
+        state_count: (s.states ?? []).length,
       },
     });
   } catch (e) {

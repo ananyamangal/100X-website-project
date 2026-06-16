@@ -1485,17 +1485,27 @@ interface CopilotResult {
   seller_name: string | null; seller_gst: string | null
 }
 
+interface SellerResult {
+  seller_slug?: string; seller_gst?: string | null; seller_display_name?: string
+  seller_state?: string; total_gmv?: number | null; oem_count?: number | null
+  buyers_served?: number | null; is_100x_dealer?: boolean
+  oems_represented?: { oem_canonical: string; brand_name: string; gmv: number }[]
+}
+
 interface CopilotResponse {
   query: string; explanation: string; total: number
-  data: CopilotResult[]
-  summary: { total_gmv: number; buyer_count: number; oem_count: number; state_count: number }
+  collection?: "contracts" | "sellers"
+  data: CopilotResult[] | SellerResult[]
+  summary: { total_gmv: number; buyer_count?: number; oem_count?: number; state_count?: number }
 }
 
 function FoggingCopilotTab() {
-  const [query,   setQuery]   = useState("")
-  const [loading, setLoading] = useState(false)
-  const [result,  setResult]  = useState<CopilotResponse | null>(null)
-  const [error,   setError]   = useState<string | null>(null)
+  const [query,       setQuery]       = useState("")
+  const [loading,     setLoading]     = useState(false)
+  const [result,      setResult]      = useState<CopilotResponse | null>(null)
+  const [error,       setError]       = useState<string | null>(null)
+  const [micActive,   setMicActive]   = useState(false)
+  const [micError,    setMicError]    = useState<string | null>(null)
 
   const run = async (q: string) => {
     const trimmed = q.trim()
@@ -1515,6 +1525,24 @@ function FoggingCopilotTab() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const startMic = () => {
+    setMicError(null)
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRec) { setMicError('Voice not supported in this browser. Use Chrome.'); return }
+    const rec = new SpeechRec()
+    rec.lang = 'en-IN'; rec.interimResults = false
+    rec.onstart  = () => setMicActive(true)
+    rec.onresult = (e: any) => { const t = e.results[0][0].transcript; setQuery(t); run(t) }
+    rec.onerror  = (e: any) => {
+      setMicActive(false)
+      if (e.error === 'not-allowed') setMicError('Mic permission denied — allow microphone access and retry.')
+      else if (e.error === 'no-speech') setMicError('No speech detected. Try again.')
+      else setMicError('Voice search failed. Try again.')
+    }
+    rec.onend = () => setMicActive(false)
+    rec.start()
   }
 
   const exportCsv = () => {
@@ -1545,19 +1573,33 @@ function FoggingCopilotTab() {
           <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">AI</span>
         </div>
         <div className="flex gap-2">
-          <input
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && run(query)}
-            placeholder='e.g. "Show all Neptune contracts in Bihar" or "Contracts above ₹10 lakh in UP"'
-            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
-          />
+          <div className="relative flex-1">
+            <input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && run(query)}
+              placeholder='e.g. "find dealers who sell multiple OEMs" or "Neptune contracts in Bihar"'
+              className="w-full px-4 pr-10 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
+            />
+            <button
+              onClick={startMic}
+              disabled={loading || micActive}
+              title="Voice query (say your question)"
+              className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors ${micActive ? 'text-red-500 animate-pulse' : 'text-gray-400 hover:text-blue-500'}`}>
+              <Mic size={14} />
+            </button>
+          </div>
           <button onClick={() => run(query)} disabled={loading || !query.trim()}
             className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center gap-2">
             {loading ? <RefreshCw size={14} className="animate-spin" /> : <Search size={14} />}
             {loading ? 'Thinking…' : 'Run'}
           </button>
         </div>
+        {micError && (
+          <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+            <AlertCircle size={11} /> {micError}
+          </p>
+        )}
 
         {/* Example chips */}
         <div className="mt-3 flex flex-wrap gap-2">
@@ -1600,9 +1642,80 @@ function FoggingCopilotTab() {
 
           {result.data.length === 0 ? (
             <div className="bg-white border border-gray-200 rounded-xl px-4 py-12 text-center text-gray-400 text-sm">
-              No contracts matched this query.
+              No results matched this query.
+            </div>
+          ) : result.collection === 'sellers' ? (
+            /* ── Seller results ──────────────────────────────────────────── */
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr className="text-xs text-gray-500 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left w-8">#</th>
+                      <th className="px-4 py-3 text-left">Dealer / Seller</th>
+                      <th className="px-3 py-3 text-left">State</th>
+                      <th className="px-3 py-3 text-right">GMV</th>
+                      <th className="px-3 py-3 text-right">OEMs</th>
+                      <th className="px-3 py-3 text-right">Buyers</th>
+                      <th className="px-4 py-3 text-left">OEMs Carried</th>
+                      <th className="px-3 py-3 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {(result.data as SellerResult[]).map((s, i) => {
+                      const slug = s.seller_slug ?? s.seller_gst
+                      return (
+                        <tr key={slug ?? i} className={`hover:bg-gray-50 ${s.is_100x_dealer ? 'bg-green-50/40' : ''}`}>
+                          <td className="px-4 py-2.5 text-xs text-gray-400">{i + 1}</td>
+                          <td className="px-4 py-2.5 text-xs max-w-52">
+                            {slug ? (
+                              <a href={`/admin/growth/fogging/sellers/${encodeURIComponent(slug)}`}
+                                className="font-medium text-amber-700 hover:underline truncate block">
+                                {s.seller_display_name ?? slug}
+                              </a>
+                            ) : (
+                              <span className="font-medium text-gray-800 truncate block">{s.seller_display_name ?? '—'}</span>
+                            )}
+                            {s.seller_gst && <div className="text-gray-400 font-mono text-[10px]">{s.seller_gst}</div>}
+                          </td>
+                          <td className="px-3 py-2.5 text-xs text-gray-600">{s.seller_state ?? '—'}</td>
+                          <td className="px-3 py-2.5 text-right text-xs font-semibold">{INR(s.total_gmv, true)}</td>
+                          <td className="px-3 py-2.5 text-right text-xs font-bold text-purple-700">{s.oem_count ?? '—'}</td>
+                          <td className="px-3 py-2.5 text-right text-xs text-gray-700">{s.buyers_served ?? '—'}</td>
+                          <td className="px-4 py-2.5 text-xs">
+                            <div className="flex flex-wrap gap-1">
+                              {(s.oems_represented ?? []).slice(0, 4).map(o => (
+                                <span key={o.oem_canonical}
+                                  className="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px]">
+                                  {o.brand_name || o.oem_canonical}
+                                </span>
+                              ))}
+                              {(s.oems_represented?.length ?? 0) > 4 && (
+                                <span className="text-gray-400 text-[10px]">+{(s.oems_represented?.length ?? 0) - 4}</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2.5 text-center">
+                            {s.is_100x_dealer ? (
+                              <span className="text-xs bg-green-100 text-green-700 border border-green-200 px-1.5 py-0.5 rounded font-bold">100X</span>
+                            ) : (
+                              <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">Recruit</span>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {result.total > 100 && (
+                <div className="px-4 py-2 bg-amber-50 border-t border-amber-100 text-xs text-amber-700">
+                  Showing first 100 of {result.total.toLocaleString()} sellers. Visit the <a href="/admin/growth/fogging/sales" className="underline">Dealer Recruitment board</a> for full filters.
+                </div>
+              )}
             </div>
           ) : (
+            /* ── Contract results ────────────────────────────────────────── */
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -1620,7 +1733,7 @@ function FoggingCopilotTab() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {result.data.map(c => (
+                    {(result.data as CopilotResult[]).map(c => (
                       <tr key={c.gemc_no} className={`hover:bg-gray-50 ${c.is_100x ? "bg-blue-50/40" : ""}`}>
                         <td className="px-4 py-2.5 text-xs text-gray-500 whitespace-nowrap">
                           {c.contract_date ? new Date(c.contract_date).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'2-digit' }) : '—'}
@@ -1711,6 +1824,7 @@ export default function FoggingIntelligencePage() {
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null)
   const [searching,     setSearching]     = useState(false)
   const [voiceActive,   setVoiceActive]   = useState(false)
+  const [voiceError,    setVoiceError]    = useState<string | null>(null)
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -1741,8 +1855,12 @@ export default function FoggingIntelligencePage() {
   }, [])
 
   const startVoice = useCallback(() => {
+    setVoiceError(null)
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SpeechRec) return
+    if (!SpeechRec) {
+      setVoiceError('Voice search requires Chrome or Edge. Try typing instead.')
+      return
+    }
     const recognition = new SpeechRec()
     recognition.lang = 'en-IN'
     recognition.interimResults = false
@@ -1751,7 +1869,16 @@ export default function FoggingIntelligencePage() {
       const t = e.results[0][0].transcript
       handleSearch(t)
     }
-    recognition.onerror = () => setVoiceActive(false)
+    recognition.onerror = (e: any) => {
+      setVoiceActive(false)
+      if (e.error === 'not-allowed') {
+        setVoiceError('Microphone permission denied. Click the lock icon in your browser address bar to allow it.')
+      } else if (e.error === 'no-speech') {
+        setVoiceError('No speech detected. Please try again.')
+      } else {
+        setVoiceError('Voice search failed. Please type your search instead.')
+      }
+    }
     recognition.onend  = () => setVoiceActive(false)
     recognition.start()
   }, [handleSearch])
@@ -1764,10 +1891,10 @@ export default function FoggingIntelligencePage() {
     d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : '—'
 
   const TYPE_LABEL: Record<string, string> = {
-    buyers: 'Buyers', sellers: 'Sellers', oems: 'OEMs', models: 'Models', contracts: 'Contracts',
+    buyers: 'Organizations', sellers: 'Sellers', oems: 'OEMs', models: 'Models', contracts: 'Contracts',
   }
   const TYPE_COLOR: Record<string, string> = {
-    buyers: 'text-blue-600 bg-blue-50', sellers: 'text-amber-600 bg-amber-50',
+    buyers: 'text-indigo-700 bg-indigo-50', sellers: 'text-amber-600 bg-amber-50',
     oems: 'text-purple-600 bg-purple-50', models: 'text-green-600 bg-green-50',
     contracts: 'text-gray-600 bg-gray-100',
   }
@@ -1838,17 +1965,23 @@ export default function FoggingIntelligencePage() {
               placeholder="Search buyers, sellers, OEMs, models, GEMC#, state…"
               className="w-full pl-8 pr-8 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
             />
-            {searching
-              ? <RefreshCw size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
-              : <button
-                  onClick={startVoice}
-                  title="Voice search (English)"
-                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${voiceActive ? 'text-red-500 animate-pulse' : 'text-gray-400 hover:text-gray-600'}`}
-                >
-                  <Mic size={13} />
-                </button>
-            }
+            {searching && (
+              <RefreshCw size={13} className="absolute right-7 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
+            )}
+            <button
+              onClick={startVoice}
+              disabled={voiceActive}
+              title={voiceActive ? 'Listening…' : 'Voice search (English)'}
+              className={`absolute right-2.5 top-1/2 -translate-y-1/2 transition-colors ${voiceActive ? 'text-red-500 animate-pulse' : 'text-gray-400 hover:text-blue-500'}`}
+            >
+              <Mic size={13} />
+            </button>
           </div>
+          {voiceError && (
+            <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+              <AlertCircle size={11} /> {voiceError}
+            </p>
+          )}
           {searchResults && searchQ.length >= 2 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-[420px] overflow-y-auto">
               {(Object.entries(searchResults) as [string, SearchResult[]][]).map(([type, items]) => {
