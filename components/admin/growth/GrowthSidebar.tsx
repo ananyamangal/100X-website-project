@@ -11,6 +11,7 @@ import {
   Globe, Flame, ClipboardCheck, ChevronDown, ChevronRight,
   Building2, Inbox, Key, Brain, Factory, DollarSign,
   RotateCcw, Calendar, Rocket, Database, Target,
+  BookOpen, MessageSquare,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -49,7 +50,10 @@ const NAV_MODULES: NavModule[] = [
   { section: "founder", href: "/admin/growth/execution",  label: "Execution Hub",       icon: Zap,             permission: "dashboard.view",  badge: "NEW" },
   { section: "founder", href: "/admin/growth/dashboard",  label: "Executive Dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
   { section: "founder", href: "/admin/growth/operations", label: "Operations Center",   icon: Activity,        permission: "dashboard.view" },
-  { section: "founder", href: "/admin/growth/reports",    label: "Reporting Center",    icon: BarChart2,       permission: "reports.view" },
+  { section: "founder", href: "/admin/growth/reports",     label: "Reporting Center",    icon: BarChart2,       permission: "reports.view" },
+  { section: "founder", href: "/admin/growth/help/today", label: "Founder Daily Brief", icon: Zap,             permission: "dashboard.view", badge: "NEW" },
+  { section: "founder", href: "/admin/growth/help",       label: "Knowledge Center",    icon: BookOpen,        permission: "dashboard.view" },
+  { section: "founder", href: "/admin/growth/help/chat",  label: "↳ Ask Growth OS",     icon: MessageSquare,   permission: "dashboard.view", sub: true },
 
   // ── MARKETING ────────────────────────────────────────────────────────────
   { section: "marketing", href: "/admin/growth/ads",                   label: "Ads",                 icon: Megaphone,      permission: "ads.view" },

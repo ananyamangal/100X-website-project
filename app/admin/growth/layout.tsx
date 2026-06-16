@@ -3,6 +3,7 @@ import { GrowthSidebar }    from "@/components/admin/growth/GrowthSidebar"
 import { UserMenu }         from "@/components/admin/growth/UserMenu"
 import { Breadcrumb }       from "@/components/admin/growth/Breadcrumb"
 import { CommandPalette }   from "@/components/admin/growth/CommandPalette"
+import { PageHelp, openPageHelp } from "@/components/admin/growth/PageHelp"
 import { AuthProvider }     from "@/lib/rbac/client"
 import { useEffect, useRef } from "react"
 import { useRouter }        from "next/navigation"
@@ -41,6 +42,7 @@ export default function GrowthOSLayout({ children }: { children: React.ReactNode
     <AuthProvider>
       <SessionHeartbeat />
       <CommandPalette />
+      <PageHelp />
       <div style={{ display: "flex", minHeight: "100vh", background: "#f3f4f6" }}>
         <GrowthSidebar />
         <div
@@ -101,6 +103,14 @@ export default function GrowthOSLayout({ children }: { children: React.ReactNode
                 title="Search (⌘K)"
               >
                 <Search size={13} />
+              </button>
+              {/* Page help button */}
+              <button
+                onClick={openPageHelp}
+                className="flex items-center justify-center w-7 h-7 rounded-md border border-gray-200 text-gray-500 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700 transition-colors"
+                title="Explain this page (?)"
+              >
+                <span className="text-[12px] font-bold leading-none">?</span>
               </button>
               <UserMenu />
             </div>

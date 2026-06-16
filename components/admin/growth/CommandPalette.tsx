@@ -28,7 +28,10 @@ const QUICK_NAV: PaletteItem[] = [
   { label: "Landing Pages",          route: "/admin/growth/landing-pages",       category: "Marketing",     description: "Landing page CMS and section builder" },
   { label: "Permissions",            route: "/admin/growth/permissions",         category: "Admin",         description: "RBAC permission matrix" },
   { label: "Platform Registry",      route: "/admin/growth/platform-registry",   category: "System",        description: "Full inventory of all capabilities and collections" },
-  { label: "RFQ Leads",              route: "/admin",                            category: "Main Admin",    description: "RFQ submissions live in the main admin panel", badge: "External" },
+  { label: "RFQ Leads",             route: "/admin",                             category: "Main Admin",    description: "RFQ submissions live in the main admin panel", badge: "External" },
+  { label: "Founder Daily Brief",   route: "/admin/growth/help/today",           category: "Founder",       description: "What should I do today? — prioritised action list" },
+  { label: "Knowledge Center",      route: "/admin/growth/help",                 category: "Founder",       description: "Platform documentation, daily workflow, changelog" },
+  { label: "Ask Growth OS",         route: "/admin/growth/help/chat",            category: "Founder",       description: "Natural language AI assistant for the platform" },
 ]
 
 export function CommandPalette() {
