@@ -108,8 +108,105 @@ export async function POST(
         created_at: now,
       })
 
-      // On approval: generate execution pack asynchronously (non-blocking)
+      // On approval: auto-create downstream CRM / workflow records + generate execution pack
       if (action === "approved") {
+        // ── Auto-record creation (synchronous — must exist before response returns) ──
+        try {
+          const recId   = id
+          const recType = rec.type
+
+          // Guard: skip if a downstream record already exists for this rec
+          const existingDealer = await db.collection("crm_dealers").findOne({ source_recommendation_id: recId })
+          const existingOpp    = await db.collection("crm_opportunities").findOne({ source_recommendation_id: recId })
+          const existingSeo    = await db.collection("seo_workflow_items").findOne({ source_recommendation_id: recId })
+          const existingAds    = await db.collection("ads_workflow_items").findOne({ source_recommendation_id: recId })
+
+          const DEALER_TYPES  = ["dealer_recruit"]
+          const OPP_DEALER_TYPES = [] as string[]  // dealer recs → dealer CRM, not opp CRM
+          const OPP_TYPES     = ["oem_displacement", "procurement_target"]
+          const SEO_TYPES     = ["content_create", "landing_page_create"]
+          const ADS_TYPES     = [
+            "search_campaign", "remarketing_campaign", "youtube_campaign",
+            "performance_max_campaign", "customer_match_campaign",
+            "competitor_conquest_campaign", "creative_refresh",
+            "budget_reallocate", "negative_keyword", "customer_match",
+          ]
+
+          if (DEALER_TYPES.includes(recType) && !existingDealer) {
+            await db.collection("crm_dealers").insertOne({
+              name:                    rec.title,
+              company:                 (rec.payload?.target_state as string) ? `Target: ${rec.payload.target_state}` : "",
+              state:                   (rec.payload?.target_state as string) ?? "",
+              stage:                   "lead",
+              gem_status:              "unknown",
+              oem_status:              "unknown",
+              expected_revenue:        rec.expected_revenue_impact ?? 0,
+              notes:                   rec.why_now ?? "",
+              source_recommendation_id: recId,
+              source_type:             "director_auto",
+              created_at:              now,
+              updated_at:              now,
+            })
+          }
+
+          if (OPP_TYPES.includes(recType) && !existingOpp) {
+            const oppType = recType === "oem_displacement" ? "oem_displacement"
+                          : recType === "procurement_target" ? "procurement"
+                          : "other"
+            await db.collection("crm_opportunities").insertOne({
+              name:                    rec.title,
+              organization:            (rec.payload?.organization_name as string) ?? "",
+              state:                   (rec.payload?.organization_state as string) ?? "",
+              opportunity_type:        oppType,
+              stage:                   "identified",
+              value:                   rec.expected_revenue_impact ?? 0,
+              probability:             50,
+              actual_revenue:          0,
+              owner:                   "",
+              next_action:             rec.expected_action ?? "",
+              notes:                   rec.why_now ?? "",
+              source_recommendation_id: recId,
+              source_type:             "director_auto",
+              created_at:              now,
+              updated_at:              now,
+            })
+          }
+
+          if (SEO_TYPES.includes(recType) && !existingSeo) {
+            await db.collection("seo_workflow_items").insertOne({
+              title:                   rec.title,
+              keyword:                 (rec.payload?.keyword as string) ?? "",
+              stage:                   "keyword_research",
+              target_url:              "",
+              author:                  "",
+              notes:                   rec.why_now ?? "",
+              source_recommendation_id: recId,
+              source_type:             "director_auto",
+              created_at:              now,
+              updated_at:              now,
+            })
+          }
+
+          if (ADS_TYPES.includes(recType) && !existingAds) {
+            await db.collection("ads_workflow_items").insertOne({
+              title:                   rec.title,
+              campaign_type:           recType,
+              stage:                   "draft",
+              objective:               rec.expected_action ?? "",
+              budget:                  (rec.payload?.budget_recommendation_inr as number) ?? 0,
+              notes:                   rec.why_now ?? "",
+              source_recommendation_id: recId,
+              source_type:             "director_auto",
+              created_at:              now,
+              updated_at:              now,
+            })
+          }
+        } catch (err) {
+          // Auto-creation failure is non-fatal — log but don't block the approval response
+          console.error("Auto-record creation failed:", err)
+        }
+
+        // ── Execution pack generation (async fire-and-forget) ──
         generateExecutionPack(rec, db)
           .then(async (pack) => {
             if (!pack) return

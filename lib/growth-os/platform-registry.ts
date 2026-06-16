@@ -462,6 +462,19 @@ export const CAPABILITY_REGISTRY: Capability[] = [
     statusNote: "Packs are viewable inline in Revenue Director card. No standalone browsable page to see all packs across all recommendations.",
   },
   {
+    id: "weekly-review",
+    name: "Founder Weekly Review",
+    category: "revenue_intelligence",
+    status: "active",
+    description: "Weekly revenue execution summary: won/lost revenue, dealer activations, SEO/Ads output, Director outcomes, and platform preservation audit.",
+    route: "/admin/growth/reports/weekly-review",
+    api: "/api/admin/growth/reports/weekly-review",
+    collections: ["crm_opportunities", "crm_dealers", "seo_workflow_items", "ads_workflow_items", "director_recommendations"],
+    trigger: "Manual (founder opens page)",
+    output: "Revenue summary, pipeline state, execution counts, preservation audit.",
+    usedBy: "Founder (weekly review)",
+  },
+  {
     id: "dealer-crm",
     name: "Dealer CRM",
     category: "crm",
@@ -762,6 +775,8 @@ export const COLLECTION_REGISTRY: CollectionEntry[] = [
   { name: "automation_registry",    category: "System",         purpose: "Seeded automation catalog for Operations Center",        writtenBy: "Operations seed API",       readBy: "Operations Center",           status: "active" },
   { name: "active_sessions",        category: "System",         purpose: "Active admin sessions",                                  writtenBy: "Auth system",               readBy: "Security Center",             status: "active" },
   { name: "market_intelligence_runs", category: "Analytics",    purpose: "Market Intelligence agent run outputs",                  writtenBy: "Market Intelligence Agent", readBy: "Market Intelligence UI",      status: "active" },
+  // Revenue OS v2.1
+  { name: "platform_changelog", category: "System",         purpose: "Platform changelog — every capability/route addition, auto-seeded on first call",   writtenBy: "Changelog API",              readBy: "Knowledge Center",            status: "active" },
   // Revenue OS v2 CRM
   { name: "crm_dealers",         category: "CRM",            purpose: "Dealer CRM pipeline — 7 stages, GeM/OEM status, expected revenue, attribution to Director recs",   writtenBy: "Dealer CRM UI / API",       readBy: "Dealer CRM UI, Execution Hub", status: "active" },
   { name: "crm_opportunities",   category: "CRM",            purpose: "Opportunity pipeline — 8 stages, value/probability, 4 types, attribution to Director recs",        writtenBy: "Opportunity CRM UI / API",  readBy: "Opportunity CRM UI, Execution Hub", status: "active" },

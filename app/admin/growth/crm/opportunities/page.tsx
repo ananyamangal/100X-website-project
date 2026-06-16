@@ -8,8 +8,8 @@ import {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Stage =
-  | "identified" | "approved" | "research" | "meeting_scheduled"
-  | "quotation_submitted" | "bid_submitted" | "won" | "lost"
+  | "identified" | "research" | "contacted" | "demo"
+  | "tender_support" | "bid_submitted" | "won" | "lost"
 
 type OppType = "dealer_recruitment" | "oem_displacement" | "procurement" | "other"
 
@@ -37,30 +37,30 @@ interface Opportunity {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const STAGES: Stage[] = [
-  "identified", "approved", "research", "meeting_scheduled",
-  "quotation_submitted", "bid_submitted", "won", "lost",
+  "identified", "research", "contacted", "demo",
+  "tender_support", "bid_submitted", "won", "lost",
 ]
 
 const STAGE_LABEL: Record<Stage, string> = {
-  identified:           "Identified",
-  approved:             "Approved",
-  research:             "Research",
-  meeting_scheduled:    "Meeting Scheduled",
-  quotation_submitted:  "Quotation Submitted",
-  bid_submitted:        "Bid Submitted",
-  won:                  "Won",
-  lost:                 "Lost",
+  identified:    "Identified",
+  research:      "Research",
+  contacted:     "Contacted",
+  demo:          "Demo",
+  tender_support:"Tender Support",
+  bid_submitted: "Bid Submitted",
+  won:           "Won",
+  lost:          "Lost",
 }
 
 const STAGE_COLOR: Record<Stage, string> = {
-  identified:           "bg-gray-100 text-gray-600 border-gray-200",
-  approved:             "bg-blue-100 text-blue-700 border-blue-200",
-  research:             "bg-indigo-100 text-indigo-700 border-indigo-200",
-  meeting_scheduled:    "bg-yellow-100 text-yellow-700 border-yellow-200",
-  quotation_submitted:  "bg-orange-100 text-orange-700 border-orange-200",
-  bid_submitted:        "bg-purple-100 text-purple-700 border-purple-200",
-  won:                  "bg-green-100 text-green-700 border-green-200",
-  lost:                 "bg-red-100 text-red-600 border-red-200",
+  identified:    "bg-gray-100 text-gray-600 border-gray-200",
+  research:      "bg-blue-100 text-blue-700 border-blue-200",
+  contacted:     "bg-indigo-100 text-indigo-700 border-indigo-200",
+  demo:          "bg-yellow-100 text-yellow-700 border-yellow-200",
+  tender_support:"bg-orange-100 text-orange-700 border-orange-200",
+  bid_submitted: "bg-purple-100 text-purple-700 border-purple-200",
+  won:           "bg-green-100 text-green-700 border-green-200",
+  lost:          "bg-red-100 text-red-600 border-red-200",
 }
 
 const TYPE_LABEL: Record<OppType, string> = {
@@ -78,8 +78,8 @@ const TYPE_COLOR: Record<OppType, string> = {
 }
 
 const STAGE_PROGRESS: Record<Stage, number> = {
-  identified: 1, approved: 2, research: 3, meeting_scheduled: 4,
-  quotation_submitted: 5, bid_submitted: 6, won: 7, lost: 0,
+  identified: 1, research: 2, contacted: 3, demo: 4,
+  tender_support: 5, bid_submitted: 6, won: 7, lost: 0,
 }
 
 const INR = (n: number) =>

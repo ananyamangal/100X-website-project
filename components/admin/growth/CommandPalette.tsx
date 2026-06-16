@@ -29,6 +29,7 @@ const QUICK_NAV: PaletteItem[] = [
   { label: "Permissions",            route: "/admin/growth/permissions",         category: "Admin",         description: "RBAC permission matrix" },
   { label: "Platform Registry",      route: "/admin/growth/platform-registry",   category: "System",        description: "Full inventory of all capabilities and collections" },
   { label: "RFQ Leads",             route: "/admin",                             category: "Main Admin",    description: "RFQ submissions live in the main admin panel", badge: "External" },
+  { label: "Weekly Review",         route: "/admin/growth/reports/weekly-review", category: "Founder", description: "Revenue won/lost, dealers, SEO/ads output, preservation audit" },
   { label: "Founder Daily Brief",   route: "/admin/growth/help/today",           category: "Founder",       description: "What should I do today? — prioritised action list" },
   { label: "Knowledge Center",      route: "/admin/growth/help",                 category: "Founder",       description: "Platform documentation, daily workflow, changelog" },
   { label: "Ask Growth OS",         route: "/admin/growth/help/chat",            category: "Founder",       description: "Natural language AI assistant for the platform" },

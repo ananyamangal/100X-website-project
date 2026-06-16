@@ -9,7 +9,7 @@ import {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Stage =
-  | "lead" | "contacted" | "qualified" | "discussion"
+  | "lead" | "contacted" | "meeting_scheduled" | "proposal_sent"
   | "authorized" | "active_dealer" | "lost"
 
 type GemStatus  = "registered" | "not_registered" | "pending" | "unknown"
@@ -38,38 +38,38 @@ interface Dealer {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const STAGES: Stage[] = [
-  "lead", "contacted", "qualified", "discussion",
+  "lead", "contacted", "meeting_scheduled", "proposal_sent",
   "authorized", "active_dealer", "lost",
 ]
 
 const STAGE_LABEL: Record<Stage, string> = {
-  lead:          "Lead",
-  contacted:     "Contacted",
-  qualified:     "Qualified",
-  discussion:    "Discussion",
-  authorized:    "Authorized",
-  active_dealer: "Active Dealer",
-  lost:          "Lost",
+  lead:             "Lead",
+  contacted:        "Contacted",
+  meeting_scheduled:"Meeting Scheduled",
+  proposal_sent:    "Proposal Sent",
+  authorized:       "Authorized",
+  active_dealer:    "Active Dealer",
+  lost:             "Lost",
 }
 
 const STAGE_COLOR: Record<Stage, string> = {
-  lead:          "bg-gray-100 text-gray-600 border-gray-200",
-  contacted:     "bg-blue-100 text-blue-700 border-blue-200",
-  qualified:     "bg-indigo-100 text-indigo-700 border-indigo-200",
-  discussion:    "bg-yellow-100 text-yellow-700 border-yellow-200",
-  authorized:    "bg-purple-100 text-purple-700 border-purple-200",
-  active_dealer: "bg-green-100 text-green-700 border-green-200",
-  lost:          "bg-red-100 text-red-600 border-red-200",
+  lead:             "bg-gray-100 text-gray-600 border-gray-200",
+  contacted:        "bg-blue-100 text-blue-700 border-blue-200",
+  meeting_scheduled:"bg-yellow-100 text-yellow-700 border-yellow-200",
+  proposal_sent:    "bg-orange-100 text-orange-700 border-orange-200",
+  authorized:       "bg-purple-100 text-purple-700 border-purple-200",
+  active_dealer:    "bg-green-100 text-green-700 border-green-200",
+  lost:             "bg-red-100 text-red-600 border-red-200",
 }
 
 const STAGE_BAR_COLOR: Record<Stage, string> = {
-  lead:          "bg-gray-300",
-  contacted:     "bg-blue-400",
-  qualified:     "bg-indigo-500",
-  discussion:    "bg-yellow-400",
-  authorized:    "bg-purple-500",
-  active_dealer: "bg-green-500",
-  lost:          "bg-red-400",
+  lead:             "bg-gray-300",
+  contacted:        "bg-blue-400",
+  meeting_scheduled:"bg-yellow-400",
+  proposal_sent:    "bg-orange-400",
+  authorized:       "bg-purple-500",
+  active_dealer:    "bg-green-500",
+  lost:             "bg-red-400",
 }
 
 const INR = (n: number) =>
