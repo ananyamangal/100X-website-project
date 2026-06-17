@@ -62,6 +62,7 @@ const NAV_MODULES: NavModule[] = [
   { section: "marketing", href: "/admin/growth/ads/creative-director", label: "↳ Creative Director", icon: Wand2,          permission: "ads.view", sub: true },
   { section: "marketing", href: "/admin/growth/ads/workflow",          label: "↳ Ads Workflow",      icon: FileText,       permission: "ads.view", sub: true },
   { section: "marketing", href: "/admin/growth/ads/setup",             label: "↳ Setup",             icon: Plug,           permission: "ads.view", sub: true },
+  { section: "marketing", href: "/admin/growth/ads/customer-match",    label: "↳ Customer Match",    icon: Users,          permission: "ads.view", sub: true },
   { section: "marketing", href: "/admin/growth/seo",                   label: "SEO",                 icon: Search,         permission: "seo.view" },
   { section: "marketing", href: "/admin/growth/seo/setup",             label: "↳ Search Console",    icon: Globe,          permission: "seo.view", sub: true },
   { section: "marketing", href: "/admin/growth/seo/workflow",          label: "↳ SEO Workflow",      icon: FileText,       permission: "seo.view", sub: true },

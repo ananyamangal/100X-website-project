@@ -577,6 +577,150 @@ export async function enableCampaignPostApproval(
   )
 }
 
+// ── Customer Match — create user list ────────────────────────────────────────
+
+export interface CustomerMatchListResult {
+  resourceName: string   // customers/{id}/userLists/{listId}
+  listId:       string
+}
+
+export async function createCustomerMatchList(
+  customerId:       string,
+  accessToken:      string,
+  listName:         string,
+  description?:     string,
+  loginCustomerId?: string,
+): Promise<CustomerMatchListResult> {
+  const url = `${BASE}/customers/${customerId}/userLists:mutate`
+  const res = await fetch(url, {
+    method:  "POST",
+    headers: adsHeaders(accessToken, loginCustomerId),
+    body: JSON.stringify({
+      operations: [{
+        create: {
+          name:             listName,
+          description:      description ?? `Customer Match list — ${listName}`,
+          membershipStatus: "OPEN",
+          membershipLifeSpan: 540,
+          crmBasedUserList: {
+            uploadKeyType:  "CONTACT_INFO",
+            dataSourceType: "FIRST_PARTY",
+          },
+        },
+      }],
+    }),
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`createCustomerMatchList failed (${res.status}): ${err.slice(0, 300)}`)
+  }
+
+  const data = await res.json() as {
+    results: Array<{ resourceName: string }>
+  }
+
+  const resourceName = data.results?.[0]?.resourceName ?? ""
+  const listId = resourceName.split("/").pop() ?? ""
+  return { resourceName, listId }
+}
+
+// ── Customer Match — upload members via OfflineUserDataJob ────────────────────
+
+export interface MemberIdentifier {
+  hashedEmail?:       string
+  hashedPhoneNumber?: string
+  addressInfo?: {
+    hashedFirstName?: string
+    hashedLastName?:  string
+    countryCode?:     string
+    postalCode?:      string
+  }
+}
+
+export interface CustomerMatchUploadResult {
+  jobResourceName: string
+  jobId:           string
+  status:          "queued" | "failed"
+}
+
+export async function uploadCustomerMatchMembers(
+  customerId:           string,
+  accessToken:          string,
+  userListResourceName: string,
+  members:              MemberIdentifier[],
+  loginCustomerId?:     string,
+): Promise<CustomerMatchUploadResult> {
+  const headers = adsHeaders(accessToken, loginCustomerId)
+
+  // Step 1 — create the offline job
+  const createUrl = `${BASE}/customers/${customerId}/offlineUserDataJobs:create`
+  const createRes = await fetch(createUrl, {
+    method:  "POST",
+    headers,
+    body: JSON.stringify({
+      job: {
+        type: "CUSTOMER_MATCH_USER_LIST",
+        customerMatchUserListMetadata: {
+          userList: userListResourceName,
+        },
+      },
+    }),
+  })
+
+  if (!createRes.ok) {
+    const err = await createRes.text()
+    throw new Error(`offlineUserDataJobs:create failed (${createRes.status}): ${err.slice(0, 300)}`)
+  }
+
+  const createData = await createRes.json() as { resourceName: string }
+  const jobResourceName = createData.resourceName
+  const jobId = jobResourceName.split("/").pop() ?? ""
+
+  // Step 2 — add operations in batches of 10,000
+  const BATCH = 10_000
+  for (let i = 0; i < members.length; i += BATCH) {
+    const batch = members.slice(i, i + BATCH)
+    const addUrl = `${BASE}/${jobResourceName}:addOperations`
+    const addRes = await fetch(addUrl, {
+      method:  "POST",
+      headers,
+      body: JSON.stringify({
+        enablePartialFailure: true,
+        operations: batch.map(m => ({
+          create: {
+            userIdentifiers: [
+              ...(m.hashedEmail       ? [{ hashedEmail:       m.hashedEmail       }] : []),
+              ...(m.hashedPhoneNumber ? [{ hashedPhoneNumber: m.hashedPhoneNumber }] : []),
+              ...(m.addressInfo       ? [{ addressInfo: m.addressInfo             }] : []),
+            ],
+          },
+        })),
+      }),
+    })
+
+    if (!addRes.ok) {
+      const err = await addRes.text()
+      throw new Error(`offlineUserDataJobs:addOperations failed (${addRes.status}): ${err.slice(0, 300)}`)
+    }
+  }
+
+  // Step 3 — run the job
+  const runUrl = `${BASE}/${jobResourceName}:run`
+  const runRes = await fetch(runUrl, {
+    method:  "POST",
+    headers,
+    body:    JSON.stringify({}),
+  })
+
+  if (!runRes.ok) {
+    const err = await runRes.text()
+    throw new Error(`offlineUserDataJobs:run failed (${runRes.status}): ${err.slice(0, 300)}`)
+  }
+
+  return { jobResourceName, jobId, status: "queued" }
+}
+
 // ── Developer token readiness check ────────────────────────────────────────
 
 export function isDeveloperTokenReady(): boolean {
