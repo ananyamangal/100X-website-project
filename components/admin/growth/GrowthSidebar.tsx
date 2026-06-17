@@ -11,7 +11,7 @@ import {
   Globe, Flame, ClipboardCheck, ChevronDown, ChevronRight,
   Building2, Inbox, Key, Brain, Factory, DollarSign,
   RotateCcw, Calendar, Rocket, Database, Target,
-  BookOpen, MessageSquare,
+  BookOpen, MessageSquare, Layers,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -47,7 +47,7 @@ const SECTION_ORDER: SectionId[] = ["founder", "marketing", "market_intel", "crm
 const NAV_MODULES: NavModule[] = [
   // ── FOUNDER ──────────────────────────────────────────────────────────────
   { section: "founder", href: "/admin/growth/director",   label: "Revenue Director",    icon: TrendingUp,      permission: "dashboard.view",  badge: "AI" },
-  { section: "founder", href: "/admin/growth/execution",  label: "Execution Hub",       icon: Zap,             permission: "dashboard.view",  badge: "NEW" },
+  { section: "founder", href: "/admin/growth/execution",  label: "Execution Hub",       icon: Zap,             permission: "dashboard.view",  badge: "v2" },
   { section: "founder", href: "/admin/growth/dashboard",  label: "Executive Dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
   { section: "founder", href: "/admin/growth/operations", label: "Operations Center",   icon: Activity,        permission: "dashboard.view" },
   { section: "founder", href: "/admin/growth/reports",             label: "Reporting Center",    icon: BarChart2,       permission: "reports.view" },
@@ -65,10 +65,12 @@ const NAV_MODULES: NavModule[] = [
   { section: "marketing", href: "/admin/growth/seo",                   label: "SEO",                 icon: Search,         permission: "seo.view" },
   { section: "marketing", href: "/admin/growth/seo/setup",             label: "↳ Search Console",    icon: Globe,          permission: "seo.view", sub: true },
   { section: "marketing", href: "/admin/growth/seo/workflow",          label: "↳ SEO Workflow",      icon: FileText,       permission: "seo.view", sub: true },
+  { section: "marketing", href: "/admin/growth/seo/execution",         label: "↳ SEO Execution",     icon: Layers,         permission: "seo.view", sub: true },
   { section: "marketing", href: "/admin/growth/seo/offpage",           label: "↳ Off-Page SEO",      icon: Link2,          permission: "seo.view", sub: true },
   { section: "marketing", href: "/admin/growth/seo/offpage/validate",  label: "↳ Validation",        icon: FlaskConical,   permission: "seo.view", sub: true },
   { section: "marketing", href: "/admin/growth/content",               label: "Content",             icon: FileText,       permission: "content.view" },
   { section: "marketing", href: "/admin/growth/landing-pages",         label: "Landing Pages",       icon: Layout,         permission: "landing_pages.view" },
+  { section: "marketing", href: "/admin/growth/landing",               label: "↳ LP Factory",        icon: Layers,         permission: "landing_pages.view", sub: true, badge: "NEW" },
   { section: "marketing", href: "/admin/growth/analytics",             label: "Analytics",           icon: BarChart2,      permission: "analytics.view" },
 
   // ── MARKET INTELLIGENCE ──────────────────────────────────────────────────
