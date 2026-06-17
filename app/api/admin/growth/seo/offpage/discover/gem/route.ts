@@ -14,13 +14,19 @@ const SELLER_VARIANTS = [
 // ─── GeM authority opportunities we can seed even without contract matches ───
 
 const BASELINE_GEM_OPPORTUNITIES: {
-  type: string; title: string; url: string; authority_value: string
-  backlink_opportunity: boolean; opportunity_notes: string; notes: string
+  type: string; title: string; url: string
+  listing_url: string; oem_url: string; tender_url: string; procurement_url: string
+  authority_value: string; backlink_opportunity: boolean
+  opportunity_notes: string; notes: string
 }[] = [
   {
     type: "gem_listing",
     title: "GeM Catalogue — Thermal Fogging Machine",
-    url: "https://mkp.gem.gov.in/",
+    url:            "https://mkp.gem.gov.in/search?q=thermal+fogging+machine",
+    listing_url:    "https://mkp.gem.gov.in/search?q=thermal+fogging+machine",
+    oem_url:        "https://gem.gov.in/oem-authorization-request",
+    tender_url:     "https://mkp.gem.gov.in/search?q=thermal+fogging+machine&service=false",
+    procurement_url:"https://mkp.gem.gov.in/catnlogue/catnlogue_list/Search",
     authority_value: "high",
     backlink_opportunity: true,
     opportunity_notes: "GeM product listing creates a gov.in backlink — ensure product page is live and optimized",
@@ -29,7 +35,11 @@ const BASELINE_GEM_OPPORTUNITIES: {
   {
     type: "oem_authorization",
     title: "OEM Authorization Certificate — GeM Portal",
-    url: "https://gem.gov.in/oem-authorization",
+    url:            "https://gem.gov.in/oem-authorization-request",
+    listing_url:    "https://mkp.gem.gov.in/search?q=100x+circle",
+    oem_url:        "https://gem.gov.in/oem-authorization-request",
+    tender_url:     "",
+    procurement_url:"",
     authority_value: "high",
     backlink_opportunity: true,
     opportunity_notes: "OEM authorization on GeM creates additional authority signals and brand mentions",
@@ -38,7 +48,11 @@ const BASELINE_GEM_OPPORTUNITIES: {
   {
     type: "procurement_portal",
     title: "NVBDCP (National Vector Borne Disease Control) Approved Vendor",
-    url: "https://nvbdcp.gov.in/",
+    url:            "https://nvbdcp.gov.in/",
+    listing_url:    "https://nvbdcp.gov.in/",
+    oem_url:        "",
+    tender_url:     "https://mkp.gem.gov.in/search?q=vector+control+fogging",
+    procurement_url:"https://nvbdcp.gov.in/index4.php?lang=1&level=0&linkid=454&lid=3795",
     authority_value: "high",
     backlink_opportunity: true,
     opportunity_notes: "NVBDCP approved vendor list — DA 58. Getting listed creates high-authority .gov.in backlink",
@@ -47,7 +61,11 @@ const BASELINE_GEM_OPPORTUNITIES: {
   {
     type: "procurement_portal",
     title: "MSME Udyam Registration — Public Registry",
-    url: "https://udyamregistration.gov.in/",
+    url:            "https://udyamregistration.gov.in/",
+    listing_url:    "https://udyamregistration.gov.in/",
+    oem_url:        "",
+    tender_url:     "",
+    procurement_url:"https://udyamregistration.gov.in/",
     authority_value: "medium",
     backlink_opportunity: false,
     opportunity_notes: "",
@@ -56,7 +74,11 @@ const BASELINE_GEM_OPPORTUNITIES: {
   {
     type: "government_mention",
     title: "Make in India Initiative — Thermal Fogging Equipment",
-    url: "https://www.makeinindia.com/",
+    url:            "https://www.makeinindia.com/sector/agriculture",
+    listing_url:    "https://www.makeinindia.com/sector/agriculture",
+    oem_url:        "",
+    tender_url:     "",
+    procurement_url:"https://www.makeinindia.com/sector/agriculture",
     authority_value: "high",
     backlink_opportunity: true,
     opportunity_notes: "Make in India mention for domestic manufacturing creates DA 65+ backlink",
@@ -65,7 +87,11 @@ const BASELINE_GEM_OPPORTUNITIES: {
   {
     type: "gem_listing",
     title: "GeM — ULV Cold Fogging Machine Listing",
-    url: "https://mkp.gem.gov.in/",
+    url:            "https://mkp.gem.gov.in/search?q=ulv+cold+fogging+machine",
+    listing_url:    "https://mkp.gem.gov.in/search?q=ulv+cold+fogging+machine",
+    oem_url:        "https://gem.gov.in/oem-authorization-request",
+    tender_url:     "https://mkp.gem.gov.in/search?q=ulv+fogger&service=false",
+    procurement_url:"https://mkp.gem.gov.in/search?q=ulv+fogger",
     authority_value: "medium",
     backlink_opportunity: true,
     opportunity_notes: "Separate listing for ULV cold fogging machine product variant",
@@ -112,10 +138,16 @@ export async function POST(req: NextRequest) {
     const existing = await gem.findOne({ title })
     if (existing) { skipped++; continue }
 
+    const tenderUrl = `https://mkp.gem.gov.in/search?q=${encodeURIComponent(org._id)}`
     await gem.insertOne({
       type:                "tender_reference",
       title,
-      url:                 "https://gem.gov.in/",
+      url:                 tenderUrl,
+      listing_url:         tenderUrl,
+      oem_url:             "https://gem.gov.in/oem-authorization-request",
+      tender_url:          tenderUrl,
+      procurement_url:     `https://mkp.gem.gov.in/search?q=${encodeURIComponent((org.products?.[0] ?? "fogging machine"))}`,
+      verification_date:   now,
       organization:        org._id,
       ministry:            org.ministry || "",
       authority_value:     org.total_val > 500000 ? "high" : "medium",
@@ -140,11 +172,12 @@ export async function POST(req: NextRequest) {
 
     await gem.insertOne({
       ...opp,
-      organization:  "100x Circle / GoI",
-      status:        "identified",
-      discovered_by: "gem_baseline_seed",
-      created_at:    now,
-      updated_at:    now,
+      organization:     "100x Circle / GoI",
+      status:           "identified",
+      verification_date: now,
+      discovered_by:    "gem_baseline_seed",
+      created_at:       now,
+      updated_at:       now,
     })
     fromBaseline++
   }

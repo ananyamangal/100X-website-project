@@ -18,6 +18,15 @@ interface Backlink {
 }
 interface Citation { _id:string;platform:string;platform_label:string;listing_url:string;nap_consistent:boolean;status:CitationStatus;notes:string;submitted_at:string|null;verified_at:string|null;created_at:string }
 interface CompetitorLink { _id:string;competitor:string;backlink_url:string;domain:string;anchor_text:string;domain_authority:number;gap_status:string;opportunity:string }
+interface Competitor {
+  _id:string; name:string; normalized_name:string; website:string; rank:number
+  sources:string[]
+  gem_data:{contract_count:number;total_gmv:number;gem_id:string|null;gem_listing_url:string;departments:string[];categories:string[];states:string[]}
+  procurement_data:{is_fogging:boolean;is_health:boolean;is_municipal:boolean}
+  ai_mentions:{chatgpt:boolean;gemini:boolean;claude:boolean;perplexity:boolean;mention_count:number}
+  scores:{gem_visibility:number;tender_visibility:number;search_visibility:number;revenue_potential:number;ai_search_visibility:number;authority:number;total:number}
+  backlink_opportunity_count:number; last_updated:string
+}
 interface Partnership { _id:string;company_name:string;website:string;contact_name:string;contact_email:string;partner_type:string;status:PartnerStatus;has_existing_link:boolean;backlink_opportunity:boolean;notes:string }
 interface OutreachItem { _id:string;type:string;target_domain:string;target_url:string;contact_email:string;subject:string;body:string;status:OutreachStatus;sent_at:string|null;replied_at:string|null;approved_at:string|null;notes:string }
 interface GemItem { _id:string;type:GemType;title:string;url:string;organization:string;authority_value:string;status:string;backlink_opportunity:boolean;opportunity_notes:string;notes:string }
@@ -64,10 +73,7 @@ const CITATION_PLATFORMS=[
   {id:"industry_association",label:"Industry Association"},{id:"msme_directory",label:"MSME Directory"},
   {id:"gem_portal",label:"GeM Portal"},{id:"google_business",label:"Google Business Profile"},
 ]
-const COMPETITORS=[
-  {id:"balwaan",label:"Balwaan"},{id:"kisankraft",label:"Kisankraft"},
-  {id:"neptune",label:"Neptune"},{id:"vectorfog",label:"VectorFog"},{id:"curtisdynafog",label:"Curtis Dyna-Fog"},
-]
+// COMPETITORS static list removed — now dynamic via seo_competitors collection (v3.2)
 const GEM_TYPES:{id:GemType;label:string}[]=[
   {id:"gem_listing",label:"GeM Listing"},{id:"oem_authorization",label:"OEM Authorization"},
   {id:"tender_reference",label:"Tender Reference"},{id:"procurement_portal",label:"Procurement Portal"},
@@ -133,7 +139,7 @@ function OverallBadge({status}:{status:"success"|"partial"|"failed"}){
 function ReportCard({run}:{run:DiscoveryRunResult}){
   const [expanded,setExpanded]=useState<string|null>(null)
   const ORDER=["competitors","citations","gem","authority_score"]
-  const LABELS:Record<string,string>={competitors:"Competitor Discovery",citations:"Citation Scan",gem:"GeM Authority",authority_score:"Authority Score"}
+  const LABELS:Record<string,string>={competitors:"Dynamic Competitor Intel",citations:"Citation Scan",gem:"GeM Authority",authority_score:"Authority Score"}
 
   return(
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -253,7 +259,7 @@ function DiscoveryPanel({onRunAll,discovering,lastRun,history}:{
             <span className="text-xs font-semibold text-indigo-700">Discovery running…</span>
           </div>
           <div className="grid grid-cols-4 gap-3">
-            {[{label:"Competitor Links",desc:"Scanning 5 competitors"},{label:"Citations",desc:"Checking 8 platforms"},{label:"GeM Authority",desc:"Mining gem_contracts DB"},{label:"Authority Score",desc:"Recalculating"}].map(({label,desc})=>(
+            {[{label:"Competitor Intel",desc:"Mining gem_contracts (60 sellers)"},{label:"Citations",desc:"Checking 8 platforms"},{label:"GeM Authority",desc:"Mining gem_contracts DB"},{label:"Authority Score",desc:"Recalculating"}].map(({label,desc})=>(
               <div key={label} className="bg-indigo-50 rounded-lg p-2.5 border border-indigo-100">
                 <div className="flex items-center gap-1 mb-1"><div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"/><span className="text-[10px] font-semibold text-indigo-700">{label}</span></div>
                 <p className="text-[9px] text-indigo-500">{desc}</p>
@@ -728,110 +734,241 @@ function CitationsTab({items,loading,onRefresh}:{items:Citation[];loading:boolea
   )
 }
 
-// ─── Competitor Links Tab ─────────────────────────────────────────────────────
+// ─── Score bar mini-component ─────────────────────────────────────────────────
 
-function CompetitorLinksTab({items,summary,loading,onRefresh}:{
+function ScoreBar({label,value,color}:{label:string;value:number;color:string}){
+  return(
+    <div className="flex items-center gap-1.5">
+      <span className="text-[9px] text-gray-400 w-[68px] shrink-0">{label}</span>
+      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className={`h-full rounded-full ${color}`} style={{width:`${value}%`}}/>
+      </div>
+      <span className="text-[9px] font-semibold text-gray-600 w-5 text-right">{value}</span>
+    </div>
+  )
+}
+
+function SourceBadge({src}:{src:string}){
+  const MAP:Record<string,string>={
+    gem_intelligence:"bg-indigo-100 text-indigo-700",
+    fogging_intelligence:"bg-teal-100 text-teal-700",
+    procurement_intelligence:"bg-amber-100 text-amber-700",
+    ai_search_intelligence:"bg-purple-100 text-purple-700",
+    backlink_intelligence:"bg-blue-100 text-blue-700",
+  }
+  const LABELS:Record<string,string>={
+    gem_intelligence:"GeM",fogging_intelligence:"Fogging",
+    procurement_intelligence:"Procurement",ai_search_intelligence:"AI Search",
+    backlink_intelligence:"Backlinks",
+  }
+  return<span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${MAP[src]??"bg-gray-100 text-gray-500"}`}>{LABELS[src]??src}</span>
+}
+
+// ─── Competitor Intel Tab (Dynamic v3.2) ──────────────────────────────────────
+
+function CompetitorLinksTab({items,summary,loading,onRefresh,competitors,loadingCompetitors,onDiscoverDynamic,discovering}:{
   items:CompetitorLink[];summary:{_id:string;total:number;gaps:number;avg_da:number}[]
   loading:boolean;onRefresh:()=>void
+  competitors:Competitor[];loadingCompetitors:boolean
+  onDiscoverDynamic:()=>void;discovering:boolean
 }){
-  const [activeComp,setActiveComp]=useState("balwaan")
-  const [showAdd,setShowAdd]=useState(false)
-  const [discovering,setDiscovering]=useState(false)
-  const [discResult,setDiscResult]=useState<Record<string,{discovered:number;gaps:number}>|null>(null)
-  const [form,setForm]=useState({competitor:"balwaan",competitor_domain:"balwaan.in",backlink_url:"",domain:"",anchor_text:"",domain_authority:"",gap_status:"gap",opportunity:"medium"})
-  const [saving,setSaving]=useState(false)
+  const [expanded,setExpanded]=useState<string|null>(null)
+  const [editAI,setEditAI]=useState<string|null>(null)
+  const [aiForm,setAIForm]=useState({chatgpt:false,gemini:false,claude:false,perplexity:false})
+  const [savingAI,setSavingAI]=useState(false)
 
-  const discover=async(comp:string)=>{
-    setDiscovering(true);setDiscResult(null)
-    const res=await fetch("/api/admin/growth/seo/offpage/discover/competitors",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({competitor:comp})})
-    const d=await res.json()
-    setDiscResult(d.results??{})
-    setDiscovering(false);onRefresh()
+  const saveAI=async(id:string)=>{
+    setSavingAI(true)
+    await fetch("/api/admin/growth/seo/offpage/competitors",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({_id:id,ai_mentions:aiForm})})
+    setSavingAI(false);setEditAI(null);onRefresh()
   }
-  const add=async()=>{
-    setSaving(true)
-    await fetch("/api/admin/growth/seo/offpage/competitor-links",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...form,domain_authority:Number(form.domain_authority)||0})})
-    setSaving(false);setShowAdd(false);onRefresh()
-  }
-  const filtered=items.filter(i=>i.competitor===activeComp)
-  const compSummary=summary.find(s=>String(s._id)===activeComp)
+
+  const linkGapsFor=(comp:Competitor)=>items.filter(i=>i.competitor===comp.normalized_name)
+
+  const totalCompetitors=competitors.length
+  const totalGaps=summary.reduce((a,b)=>a+(b.gaps??0),0)
 
   return(
     <div className="space-y-4">
-      <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1">
-        {COMPETITORS.map(c=>{
-          const s=summary.find(x=>String(x._id)===c.id)
-          return(
-            <button key={c.id} onClick={()=>setActiveComp(c.id)}
-              className={`flex-1 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${activeComp===c.id?"bg-brand-600 text-white":"text-gray-500 hover:text-gray-700"}`}>
-              {c.label}{s&&s.gaps>0&&<span className="ml-1 text-[10px] opacity-75">({s.gaps} gaps)</span>}
-            </button>
-          )
-        })}
-      </div>
-      {compSummary&&(
+      {/* Header */}
+      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-sm font-bold text-purple-900">Dynamic Competitor Intelligence</h3>
+            <p className="text-[11px] text-purple-600">Auto-discovered from GeM contracts · Procurement intel · AI search signals · Backlink gaps</p>
+          </div>
+          <button onClick={onDiscoverDynamic} disabled={discovering}
+            className="flex items-center gap-1.5 text-xs bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 font-semibold">
+            <Database size={11} className={discovering?"animate-pulse":""}/>
+            {discovering?"Running…":"Run Dynamic Discovery"}
+          </button>
+        </div>
         <div className="grid grid-cols-3 gap-3">
-          {[{label:"Total Links Tracked",value:compSummary.total},{label:"Link Gaps",value:compSummary.gaps,color:"text-red-500"},{label:"Avg Domain Authority",value:Math.round(Number(compSummary.avg_da||0))}].map(({label,value,color})=>(
-            <div key={label} className="bg-white rounded-xl border border-gray-200 p-3 shadow-sm text-center">
-              <p className={`text-xl font-bold ${color??"text-gray-800"}`}>{value}</p><p className="text-[10px] text-gray-400">{label}</p>
+          {[
+            {label:"Competitors Found",value:totalCompetitors,color:"text-purple-700"},
+            {label:"Link Gaps",value:totalGaps,color:"text-red-600"},
+            {label:"Sources",value:"5",color:"text-indigo-700"},
+          ].map(({label,value,color})=>(
+            <div key={label} className="bg-white/70 rounded-lg p-2.5 text-center border border-purple-100">
+              <p className={`text-lg font-bold ${color}`}>{value}</p>
+              <p className="text-[10px] text-gray-500">{label}</p>
             </div>
           ))}
         </div>
-      )}
-      <div className="flex items-center gap-2 flex-wrap">
-        <button onClick={()=>discover(activeComp)} disabled={discovering}
-          className="flex items-center gap-1.5 text-xs bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 font-semibold">
-          <Database size={11} className={discovering?"animate-pulse":""}/>
-          {discovering?"Discovering…":`Discover ${COMPETITORS.find(c=>c.id===activeComp)?.label} Links`}
-        </button>
-        <button onClick={()=>discover("all")} disabled={discovering} className="flex items-center gap-1.5 text-xs border border-indigo-300 text-indigo-600 px-3 py-2 rounded-lg hover:bg-indigo-50 disabled:opacity-50">
-          <Database size={11}/>All Competitors
-        </button>
-        {discResult&&<span className="text-xs text-green-600">+{Object.values(discResult).reduce((a,b)=>a+(b.discovered??0),0)} discovered</span>}
-        <button onClick={onRefresh} className="flex items-center gap-1.5 text-xs text-gray-500 border border-gray-200 px-3 py-2 rounded-lg hover:bg-gray-50"><RotateCw size={11}/>Refresh</button>
-        <button onClick={()=>setShowAdd(s=>!s)} className="flex items-center gap-1.5 text-xs bg-brand-600 text-white px-3 py-2 rounded-lg hover:bg-brand-700 ml-auto"><Plus size={11}/>Add</button>
       </div>
 
-      {showAdd&&(
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[10px] text-gray-500 block mb-0.5">Competitor</label>
-              <select value={form.competitor} onChange={e=>setForm(f=>({...f,competitor:e.target.value}))} className="w-full text-xs border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none">
-                {COMPETITORS.map(c=><option key={c.id} value={c.id}>{c.label}</option>)}
-              </select>
-            </div>
-            {[{key:"backlink_url",label:"Backlink URL",ph:"https://..."},{key:"domain",label:"Linking Domain",ph:"example.com"},{key:"anchor_text",label:"Anchor Text",ph:"fogging machine"},{key:"domain_authority",label:"Est. DA",ph:"40"}].map(({key,label,ph})=>(
-              <div key={key}>
-                <label className="text-[10px] text-gray-500 block mb-0.5">{label}</label>
-                <input value={(form as Record<string,string>)[key]} onChange={e=>setForm(f=>({...f,[key]:e.target.value}))} placeholder={ph} className="w-full text-xs border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none"/>
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <button onClick={add} disabled={saving} className="text-xs bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 disabled:opacity-50">{saving?"Saving…":"Add"}</button>
-            <button onClick={()=>setShowAdd(false)} className="text-xs text-gray-500 px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50">Cancel</button>
-          </div>
+      {/* Ranked competitor list */}
+      {loadingCompetitors?(
+        <div className="py-10 text-center text-gray-400 text-sm">Loading competitor intelligence…</div>
+      ):competitors.length===0?(
+        <div className="bg-white rounded-xl border border-dashed border-gray-200 p-10 text-center">
+          <Search size={28} className="mx-auto text-gray-300 mb-2"/>
+          <p className="text-sm text-gray-500 font-medium">No competitors discovered yet</p>
+          <p className="text-xs text-gray-400 mt-1">Click "Run Dynamic Discovery" to mine gem_contracts for fogging-category competitors</p>
         </div>
-      )}
-
-      {loading?<div className="py-12 text-center text-gray-400 text-sm">Loading…</div>:(
+      ):(
         <div className="space-y-2">
-          {filtered.length===0&&<div className="bg-white rounded-xl border border-dashed border-gray-200 p-10 text-center text-sm text-gray-400">Click "Discover" to auto-populate competitor link gaps</div>}
-          {filtered.map(cl=>(
-            <div key={cl._id} className="bg-white rounded-xl border border-gray-200 p-3 shadow-sm flex items-center gap-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-medium text-gray-800">{cl.domain}</span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${cl.gap_status==="gap"?"bg-red-100 text-red-600":cl.gap_status==="shared"?"bg-amber-100 text-amber-700":"bg-green-100 text-green-700"}`}>{cl.gap_status}</span>
-                  {cl.domain_authority>0&&<span className="text-[10px] text-gray-400">DA {cl.domain_authority}</span>}
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${cl.opportunity==="high"?"bg-orange-100 text-orange-700":cl.opportunity==="medium"?"bg-blue-100 text-blue-700":"bg-gray-100 text-gray-500"}`}>{cl.opportunity}</span>
-                </div>
-                {cl.anchor_text&&<p className="text-[11px] text-gray-400 mt-0.5">Anchor: {cl.anchor_text}</p>}
+          <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wide">Top {competitors.length} Competitors — Ranked by Intelligence Score</p>
+          {competitors.map(comp=>{
+            const gaps=linkGapsFor(comp)
+            const isOpen=expanded===comp._id
+            const compSummary=summary.find(s=>String(s._id)===comp.normalized_name)
+            return(
+              <div key={comp._id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                {/* Competitor row */}
+                <button onClick={()=>setExpanded(e=>e===comp._id?null:comp._id)} className="w-full flex items-start gap-3 p-4 hover:bg-gray-50 text-left">
+                  {/* Rank badge */}
+                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${comp.rank<=3?"bg-amber-100 text-amber-700":comp.rank<=10?"bg-gray-100 text-gray-600":"bg-gray-50 text-gray-400"}`}>
+                    {comp.rank}
+                  </div>
+                  {/* Main info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className="text-sm font-bold text-gray-900">{comp.name}</span>
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-lg ${comp.scores.total>=70?"bg-red-100 text-red-700":comp.scores.total>=40?"bg-amber-100 text-amber-700":"bg-gray-100 text-gray-500"}`}>
+                        Score {comp.scores.total}
+                      </span>
+                      {comp.sources.map(s=><SourceBadge key={s} src={s}/>)}
+                    </div>
+                    <div className="flex items-center gap-4 text-[10px] text-gray-500">
+                      {comp.gem_data.contract_count>0&&<span><strong className="text-gray-700">{comp.gem_data.contract_count}</strong> GeM contracts</span>}
+                      {comp.gem_data.total_gmv>0&&<span><strong className="text-gray-700">₹{(comp.gem_data.total_gmv/100000).toFixed(1)}L</strong> GMV</span>}
+                      {gaps.length>0&&<span className="text-red-600"><strong>{gaps.length}</strong> link gaps</span>}
+                      {comp.ai_mentions.mention_count>0&&<span className="text-purple-600"><strong>{comp.ai_mentions.mention_count}</strong> AI engines</span>}
+                    </div>
+                  </div>
+                  {/* Score bars (collapsed) */}
+                  <div className="hidden sm:block w-36 space-y-1 shrink-0">
+                    <ScoreBar label="GeM"         value={comp.scores.gem_visibility}    color="bg-indigo-400"/>
+                    <ScoreBar label="Revenue"     value={comp.scores.revenue_potential} color="bg-green-400"/>
+                    <ScoreBar label="Procurement" value={comp.scores.tender_visibility} color="bg-amber-400"/>
+                  </div>
+                  {isOpen?<ChevronUp size={13} className="text-gray-400 shrink-0 mt-1"/>:<ChevronDown size={13} className="text-gray-400 shrink-0 mt-1"/>}
+                </button>
+
+                {/* Expanded panel */}
+                {isOpen&&(
+                  <div className="border-t border-gray-100 bg-gray-50 p-4 space-y-4">
+                    {/* Full score breakdown */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Intelligence Scores</p>
+                        <ScoreBar label="GeM Visibility"    value={comp.scores.gem_visibility}    color="bg-indigo-400"/>
+                        <ScoreBar label="Revenue Potential" value={comp.scores.revenue_potential} color="bg-green-400"/>
+                        <ScoreBar label="Procurement"       value={comp.scores.tender_visibility} color="bg-amber-400"/>
+                        <ScoreBar label="Search Visibility" value={comp.scores.search_visibility} color="bg-teal-400"/>
+                        <ScoreBar label="AI Visibility"     value={comp.scores.ai_search_visibility} color="bg-purple-400"/>
+                        <ScoreBar label="Authority"         value={comp.scores.authority}         color="bg-blue-400"/>
+                      </div>
+                      <div className="space-y-3">
+                        {/* GeM data */}
+                        {comp.gem_data.departments.length>0&&(
+                          <div>
+                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Departments Won</p>
+                            <div className="flex flex-wrap gap-1">
+                              {comp.gem_data.departments.slice(0,6).map(d=><span key={d} className="text-[9px] bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">{d}</span>)}
+                              {comp.gem_data.departments.length>6&&<span className="text-[9px] text-gray-400">+{comp.gem_data.departments.length-6} more</span>}
+                            </div>
+                          </div>
+                        )}
+                        {/* Procurement type */}
+                        <div>
+                          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Category Signals</p>
+                          <div className="flex gap-1.5 flex-wrap">
+                            {comp.procurement_data.is_fogging&&<span className="text-[9px] bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded-full">Fogging</span>}
+                            {comp.procurement_data.is_health&&<span className="text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">Health</span>}
+                            {comp.procurement_data.is_municipal&&<span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">Municipal</span>}
+                          </div>
+                        </div>
+                        {/* AI search */}
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">AI Search Presence</p>
+                            {editAI===comp._id?(
+                              <button onClick={()=>setEditAI(null)} className="text-[9px] text-gray-400 underline">Cancel</button>
+                            ):(
+                              <button onClick={()=>{setEditAI(comp._id);setAIForm(comp.ai_mentions)}} className="text-[9px] text-brand-600 underline">Update</button>
+                            )}
+                          </div>
+                          {editAI===comp._id?(
+                            <div className="space-y-2">
+                              <div className="flex gap-3 flex-wrap">
+                                {(["chatgpt","gemini","claude","perplexity"] as const).map(k=>(
+                                  <label key={k} className="flex items-center gap-1 text-[10px] text-gray-700 cursor-pointer">
+                                    <input type="checkbox" checked={aiForm[k]} onChange={e=>setAIForm(f=>({...f,[k]:e.target.checked}))} className="w-3 h-3"/>
+                                    {k}
+                                  </label>
+                                ))}
+                              </div>
+                              <button onClick={()=>saveAI(comp._id)} disabled={savingAI} className="text-[10px] bg-brand-600 text-white px-2.5 py-1 rounded hover:bg-brand-700 disabled:opacity-50">{savingAI?"Saving…":"Save"}</button>
+                            </div>
+                          ):(
+                            <div className="flex gap-2 flex-wrap">
+                              {(["chatgpt","gemini","claude","perplexity"] as const).map(k=>(
+                                <span key={k} className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${comp.ai_mentions[k]?"bg-purple-100 text-purple-700":"bg-gray-100 text-gray-400"}`}>{k}{comp.ai_mentions[k]?" ✓":""}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {/* GeM listing link */}
+                        {comp.gem_data.gem_listing_url&&(
+                          <div>
+                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">GeM Profile</p>
+                            <a href={comp.gem_data.gem_listing_url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-brand-600 flex items-center gap-1 hover:underline">
+                              {comp.gem_data.gem_listing_url.slice(0,55)}…<ExternalLink size={9}/>
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Link gaps */}
+                    {loading?(
+                      <p className="text-[11px] text-gray-400">Loading link gaps…</p>
+                    ):gaps.length>0?(
+                      <div>
+                        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">{gaps.length} Link Gap Opportunities</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {gaps.slice(0,12).map(g=>(
+                            <div key={g._id} className="bg-white rounded-lg border border-gray-100 p-2.5">
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                <span className="text-[10px] font-semibold text-gray-700 truncate">{g.domain}</span>
+                                <span className={`text-[8px] px-1 py-0.5 rounded ${g.opportunity==="high"?"bg-orange-100 text-orange-700":g.opportunity==="medium"?"bg-blue-100 text-blue-700":"bg-gray-100 text-gray-400"}`}>{g.opportunity}</span>
+                              </div>
+                              {g.domain_authority>0&&<p className="text-[9px] text-gray-400">DA {g.domain_authority}</p>}
+                            </div>
+                          ))}
+                        </div>
+                        {gaps.length>12&&<p className="text-[10px] text-gray-400 mt-1">+{gaps.length-12} more gaps</p>}
+                      </div>
+                    ):(
+                      <p className="text-[11px] text-gray-400">No link gaps yet. Run discovery to auto-populate.</p>
+                    )}
+                  </div>
+                )}
               </div>
-              <a href={cl.backlink_url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-brand-600"><ExternalLink size={13}/></a>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
@@ -1278,6 +1415,9 @@ export default function OffPageSEOPage(){
   const [citations,setCitations]=useState<Citation[]>([])
   const [competitorLinks,setCompetitorLinks]=useState<CompetitorLink[]>([])
   const [competitorSummary,setCompetitorSummary]=useState<{_id:string;total:number;gaps:number;avg_da:number}[]>([])
+  const [dynamicCompetitors,setDynamicCompetitors]=useState<Competitor[]>([])
+  const [loadingCompetitors,setLoadingCompetitors]=useState(false)
+  const [discoveringCompetitors,setDiscoveringCompetitors]=useState(false)
   const [partnerships,setPartnerships]=useState<Partnership[]>([])
   const [outreach,setOutreach]=useState<OutreachItem[]>([])
   const [gemItems,setGemItems]=useState<GemItem[]>([])
@@ -1315,6 +1455,7 @@ export default function OffPageSEOPage(){
   const loadBacklinks=useCallback(async()=>{setLoadingBL(true);const res=await fetch("/api/admin/growth/seo/offpage/backlinks");setBacklinks(await res.json());setLoadingBL(false)},[])
   const loadCitations=useCallback(async()=>{setLoadingCit(true);const res=await fetch("/api/admin/growth/seo/offpage/citations");setCitations(await res.json());setLoadingCit(false)},[])
   const loadCompetitorLinks=useCallback(async()=>{setLoadingComp(true);const res=await fetch("/api/admin/growth/seo/offpage/competitor-links");const d=await res.json();setCompetitorLinks(d.items??[]);setCompetitorSummary(d.summary??[]);setLoadingComp(false)},[])
+  const loadDynamicCompetitors=useCallback(async()=>{setLoadingCompetitors(true);const res=await fetch("/api/admin/growth/seo/offpage/competitors?limit=20");const d=await res.json().catch(()=>[]);setDynamicCompetitors(Array.isArray(d)?d:[]);setLoadingCompetitors(false)},[])
   const loadPartnerships=useCallback(async()=>{setLoadingPart(true);const res=await fetch("/api/admin/growth/seo/offpage/partnerships");setPartnerships(await res.json());setLoadingPart(false)},[])
   const loadOutreach=useCallback(async()=>{setLoadingOut(true);const res=await fetch("/api/admin/growth/seo/offpage/outreach");setOutreach(await res.json());setLoadingOut(false)},[])
   const loadGem=useCallback(async()=>{setLoadingGem(true);const res=await fetch("/api/admin/growth/seo/offpage/gem-authority");const d=await res.json();setGemItems(d.items??[]);setGemStats(d.stats??[]);setLoadingGem(false)},[])
@@ -1325,7 +1466,7 @@ export default function OffPageSEOPage(){
   useEffect(()=>{
     if(activeTab==="backlinks"&&backlinks.length===0)loadBacklinks()
     if(activeTab==="citations"&&citations.length===0)loadCitations()
-    if(activeTab==="competitor-links"&&competitorLinks.length===0)loadCompetitorLinks()
+    if(activeTab==="competitor-links"&&competitorLinks.length===0){loadCompetitorLinks();loadDynamicCompetitors()}
     if(activeTab==="partnerships"&&partnerships.length===0)loadPartnerships()
     if(activeTab==="outreach"&&outreach.length===0)loadOutreach()
     if(activeTab==="gem-authority"&&gemItems.length===0)loadGem()
@@ -1353,6 +1494,14 @@ export default function OffPageSEOPage(){
     if(competitorLinks.length>0)loadCompetitorLinks()
     if(citations.length>0)loadCitations()
     if(gemItems.length>0)loadGem()
+    loadDynamicCompetitors()
+  }
+
+  const runDynamicCompetitorDiscovery=async()=>{
+    setDiscoveringCompetitors(true)
+    await fetch("/api/admin/growth/seo/offpage/discover/competitors-dynamic",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({})})
+    await Promise.all([loadDynamicCompetitors(),loadCompetitorLinks()])
+    setDiscoveringCompetitors(false)
   }
 
   return(
@@ -1366,7 +1515,7 @@ export default function OffPageSEOPage(){
               <Zap size={18} className="text-brand-600"/>
               <div>
                 <h1 className="text-base font-bold text-gray-900">Off-Page SEO Authority Engine</h1>
-                <p className="text-gray-400 text-[11px]">Backlinks · Citations · Competitor Intel · GeM Authority · Digital PR — Revenue OS v3.1.1</p>
+                <p className="text-gray-400 text-[11px]">Backlinks · Citations · Competitor Intel · GeM Authority · Digital PR — Revenue OS v3.2</p>
               </div>
             </div>
           </div>
@@ -1376,7 +1525,7 @@ export default function OffPageSEOPage(){
               <Cpu size={11} className={discovering?"animate-pulse":""}/>
               {discovering?"Running…":"Run Intelligence"}
             </button>
-            <span className="text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-semibold">v3.1.1</span>
+            <span className="text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-semibold">v3.2</span>
           </div>
         </div>
       </div>
@@ -1394,7 +1543,7 @@ export default function OffPageSEOPage(){
         {activeTab==="dashboard"&&<DashboardTab data={loadingDash?null:dashboard} onCalcScore={calcScore} calculating={calculating} onRunAll={runAllDiscovery} discovering={discovering} lastRun={lastRun} runHistory={runHistory}/>}
         {activeTab==="backlinks"&&<BacklinksTab items={backlinks} loading={loadingBL} onRefresh={loadBacklinks}/>}
         {activeTab==="citations"&&<CitationsTab items={citations} loading={loadingCit} onRefresh={loadCitations}/>}
-        {activeTab==="competitor-links"&&<CompetitorLinksTab items={competitorLinks} summary={competitorSummary} loading={loadingComp} onRefresh={loadCompetitorLinks}/>}
+        {activeTab==="competitor-links"&&<CompetitorLinksTab items={competitorLinks} summary={competitorSummary} loading={loadingComp} onRefresh={()=>{loadCompetitorLinks();loadDynamicCompetitors()}} competitors={dynamicCompetitors} loadingCompetitors={loadingCompetitors} onDiscoverDynamic={runDynamicCompetitorDiscovery} discovering={discoveringCompetitors}/>}
         {activeTab==="link-recovery"&&<LinkRecoveryTab items={recoveryItems} counts={recoveryCounts} loading={loadingRec} onRefresh={loadRecovery}/>}
         {activeTab==="partnerships"&&<PartnershipsTab items={partnerships} loading={loadingPart} onRefresh={loadPartnerships}/>}
         {activeTab==="outreach"&&<OutreachTab items={outreach} loading={loadingOut} onRefresh={loadOutreach}/>}

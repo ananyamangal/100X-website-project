@@ -54,32 +54,53 @@ function analyzeCompetitors(
 ): PhaseReport {
   if (error || !data) {
     return {
-      status: "failed", label: "Competitor Discovery",
+      status: "failed", label: "Dynamic Competitor Intelligence",
       summary: "Failed to run", detail: error ?? "No response",
       counts: {}, errors: [error ?? "No response"], duration_ms: ms,
     }
   }
 
+  // Handle both dynamic (v3.2+) and legacy static discovery response shapes
+  const isDynamic = "discovered" in data
+
+  if (isDynamic) {
+    const discovered    = Number(data.discovered    ?? 0)
+    const ranked        = Number(data.ranked        ?? 0)
+    const linksCreated  = Number(data.links_created ?? 0)
+    const top = (data.top_competitors as Array<{name:string;score:number;rank:number}> | undefined) ?? []
+
+    const status: PhaseStatus =
+      discovered > 0 && ranked > 0  ? "success" :
+      discovered > 0                ? "partial"  : "failed"
+
+    return {
+      status, label: "Dynamic Competitor Intelligence",
+      summary: discovered > 0
+        ? `${discovered} competitors from gem_contracts · Top: ${top[0]?.name ?? "—"}`
+        : "No competitors found in gem_contracts",
+      detail: `${ranked} ranked by intelligence score · ${linksCreated} link gaps created · 5 sources`,
+      counts: { discovered, ranked, link_gaps_created: linksCreated },
+      errors: discovered === 0 ? ["No fogging-category sellers found in gem_contracts"] : [],
+      duration_ms: ms,
+    }
+  }
+
+  // Legacy static discovery path
   const results = (data.results ?? {}) as Record<string, { discovered: number; gaps: number; skipped: number }>
-  const competitors = Object.keys(results)
+  const competitors   = Object.keys(results)
   const totalDiscovered = Object.values(results).reduce((a, b) => a + (b.discovered ?? 0), 0)
   const totalGaps       = Object.values(results).reduce((a, b) => a + (b.gaps ?? 0), 0)
   const totalSkipped    = Object.values(results).reduce((a, b) => a + (b.skipped ?? 0), 0)
-  const failed          = (data.errors as string[] | undefined)?.length ?? 0
 
   const status: PhaseStatus =
-    totalDiscovered > 0 && failed === 0  ? "success" :
-    totalDiscovered > 0 && failed > 0    ? "partial"  :
-    totalSkipped > 0                     ? "partial"  : "failed"
+    totalDiscovered > 0 ? "success" : totalSkipped > 0 ? "partial" : "failed"
 
   return {
-    status, label: "Competitor Discovery",
+    status, label: "Dynamic Competitor Intelligence",
     summary: totalDiscovered > 0
       ? `${totalDiscovered} gap opportunities discovered`
-      : totalSkipped > 0
-        ? `${totalSkipped} already tracked (no new gaps)`
-        : "No opportunities found",
-    detail: `${competitors.length} competitors scanned · ${totalGaps} gaps · ${totalSkipped} already tracked`,
+      : totalSkipped > 0 ? `${totalSkipped} already tracked` : "No opportunities found",
+    detail: `${competitors.length} competitors scanned · ${totalGaps} gaps`,
     counts: { discovered: totalDiscovered, gaps: totalGaps, skipped: totalSkipped, competitors: competitors.length },
     errors: [],
     duration_ms: ms,
@@ -210,13 +231,13 @@ export async function POST(req: NextRequest) {
   const rawErrors:   Record<string, string | null>                  = { competitors: null, citations: null, gem: null, authority_score: null }
   const phaseMs:     Record<string, number>                         = {}
 
-  // ── 1. Competitor discovery ───────────────────────────────────────────────
+  // ── 1. Dynamic competitor discovery (v3.2: mines gem_contracts for all fogging sellers) ───
   {
     const t = Date.now()
     try {
-      const res = await fetch(`${base}/api/admin/growth/seo/offpage/discover/competitors`, {
+      const res = await fetch(`${base}/api/admin/growth/seo/offpage/discover/competitors-dynamic`, {
         method: "POST", headers: { "Content-Type": "application/json", cookie },
-        body: JSON.stringify({ competitor: "all" }),
+        body: JSON.stringify({}),
       })
       rawResults.competitors = await res.json()
     } catch (e) { rawErrors.competitors = String(e) }
@@ -276,7 +297,7 @@ export async function POST(req: NextRequest) {
 
   const totals = {
     items_discovered:    (phases.competitors.counts.discovered ?? 0) + (phases.citations.counts.found ?? 0) + (phases.gem.counts.from_contracts ?? 0) + (phases.gem.counts.from_baseline ?? 0),
-    competitors_scanned: phases.competitors.counts.competitors ?? 0,
+    competitors_scanned: phases.competitors.counts.ranked ?? phases.competitors.counts.competitors ?? 0,
     citations_checked:   (phases.citations.counts.found ?? 0) + (phases.citations.counts.missing ?? 0) + (phases.citations.counts.already_tracked ?? 0),
     gem_opportunities:   (phases.gem.counts.from_contracts ?? 0) + (phases.gem.counts.from_baseline ?? 0),
     authority_score:     snap.authority_score ?? 0,
