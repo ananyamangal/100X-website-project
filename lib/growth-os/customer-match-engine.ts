@@ -187,12 +187,45 @@ async function buildCrmLeads(db: Db): Promise<NormalizedRecord[]> {
 }
 
 async function buildDealers(db: Db): Promise<NormalizedRecord[]> {
-  const dealers = await db.collection("crm_dealers").find({}).limit(3000).toArray()
-  return dealers.map(d => {
+  // Primary: dealer_prospects (real contacts from acquisition engine)
+  const [prospects, crmDealers] = await Promise.all([
+    db.collection("dealer_prospects")
+      .find({ status: { $ne: "rejected" } })
+      .limit(5000)
+      .toArray(),
+    db.collection("crm_dealers").find({}).limit(500).toArray(),
+  ])
+
+  const records: NormalizedRecord[] = []
+
+  for (const d of prospects) {
+    const nameParts = String(d.contact_person || d.dealer_name || "").trim().split(/\s+/)
+    const email     = String(d.email  || "").toLowerCase().trim()
+    const phone     = normalizePhone(String(d.mobile || ""))
+    records.push({
+      recordId:     String(d._id),
+      firstName:    nameParts[0] || "",
+      lastName:     nameParts.slice(1).join(" "),
+      email,
+      phone,
+      company:      String(d.dealer_name || ""),
+      city:         String(d.city  || ""),
+      state:        String(d.state || ""),
+      country:      "IN",
+      postalCode:   "",
+      source:       "dealer_prospects",
+      missingEmail: !email,
+      missingPhone: !phone,
+    })
+  }
+
+  // Supplement with any crm_dealers records that have contact data
+  for (const d of crmDealers) {
+    const email = String(d.email || "").toLowerCase().trim()
+    const phone = normalizePhone(String(d.phone || ""))
+    if (!email && !phone) continue  // skip pipeline-only records
     const nameParts = String(d.name || "").trim().split(/\s+/)
-    const email     = String(d.email || "").toLowerCase().trim()
-    const phone     = normalizePhone(String(d.phone || ""))
-    return {
+    records.push({
       recordId:     String(d._id),
       firstName:    nameParts[0] || "",
       lastName:     nameParts.slice(1).join(" "),
@@ -206,8 +239,10 @@ async function buildDealers(db: Db): Promise<NormalizedRecord[]> {
       source:       "crm_dealers",
       missingEmail: !email,
       missingPhone: !phone,
-    }
-  })
+    })
+  }
+
+  return records
 }
 
 async function buildGovernmentBuyers(db: Db): Promise<NormalizedRecord[]> {

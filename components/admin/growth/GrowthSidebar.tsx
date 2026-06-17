@@ -76,7 +76,8 @@ const NAV_MODULES: NavModule[] = [
 
   // ── MARKET INTELLIGENCE ──────────────────────────────────────────────────
   { section: "market_intel", href: "/admin/growth/fogging",     label: "Fogging Intelligence", icon: Flame,       permission: "procurement.view" },
-  { section: "market_intel", href: "/admin/growth/dealers",     label: "Dealer Intelligence",  icon: Users,       permission: "dealer.view" },
+  { section: "market_intel", href: "/admin/growth/dealers",               label: "Dealer Intelligence",  icon: Users,       permission: "dealer.view" },
+  { section: "market_intel", href: "/admin/growth/dealers/prospects",      label: "↳ Prospect Engine",    icon: TrendingUp,  permission: "dealer.view", sub: true, badge: "NEW" },
   { section: "market_intel", href: "/admin/growth/procurement", label: "Procurement Intel",    icon: ShoppingBag, permission: "procurement.view" },
   { section: "market_intel", href: "/admin/growth/geo",         label: "GEO / AI Search",      icon: Bot,         permission: "geo.view" },
 
