@@ -36,7 +36,7 @@ const OAUTH_URL = 'https://oauth2.googleapis.com/token'
 const DOC_ID    = 'google-oauth-singleton'
 const SETTINGS_DOC_ID = 'ads-settings'
 
-// ── Core logic (mirrors customer-match-engine.ts exactly) ─────────────────────
+// ── Core logic (mirrors customer-match-engine.ts v2 — reads dealer_prospects) ──
 
 function sha256(value) {
   return crypto.createHash('sha256').update(String(value).trim().toLowerCase()).digest('hex')
@@ -52,25 +52,32 @@ function normalizePhone(raw) {
   return ''
 }
 
+// Mirrors buildDealers() in customer-match-engine.ts:
+// Primary source = dealer_prospects; supplement = crm_dealers (contact-only)
 function buildDealerRecord(d) {
-  const nameParts = String(d.name || '').trim().split(/\s+/)
+  // dealer_prospects fields: contact_person, dealer_name, mobile, email, city, state
+  const nameParts = String(d.contact_person || d.dealer_name || d.name || '').trim().split(/\s+/)
   const email     = String(d.email || '').toLowerCase().trim()
-  const phone     = normalizePhone(String(d.phone || ''))
+  const phone     = normalizePhone(String(d.mobile || d.phone || ''))
   return {
     recordId:     String(d._id),
     firstName:    nameParts[0] || '',
     lastName:     nameParts.slice(1).join(' '),
     email,
     phone,
-    company:      String(d.company || ''),
-    city:         String(d.city || ''),
+    company:      String(d.dealer_name || d.company || ''),
+    city:         String(d.city  || ''),
     state:        String(d.state || ''),
     country:      'IN',
     postalCode:   String(d.pincode || ''),
-    source:       'crm_dealers',
+    source:       d.source || 'dealer_prospects',
     missingEmail: !email,
     missingPhone: !phone,
-    _raw: { name: d.name, email: d.email, phone: d.phone },
+    _raw: {
+      name:  d.contact_person || d.name,
+      email: d.email,
+      phone: d.mobile || d.phone,
+    },
   }
 }
 
@@ -166,15 +173,15 @@ try {
   const db = client.db('100xDB')
 
   // ── 1. PULL ALL DEALER RECORDS ─────────────────────────────────────────────
-  sep('1. FULL QUALITY METRICS — crm_dealers')
+  sep('1. FULL QUALITY METRICS — dealer_prospects')
 
-  const raw = await db.collection('crm_dealers').find({}).toArray()
+  const raw = await db.collection('dealer_prospects').find({ status: { $ne: 'rejected' } }).toArray()
   const records = raw.map(buildDealerRecord)
 
   // Deduplicate by email (mirrors engine dedup)
   const seen = new Set()
   const deduped = records.filter(r => {
-    const key = r.email || `${r.company}::crm_dealers::${r.recordId}`
+    const key = r.email || r._raw?.dedup_key || `${r.company}::dealer_prospects::${r.recordId}`
     if (seen.has(key)) return false
     seen.add(key)
     return true
@@ -184,7 +191,7 @@ try {
 
   const pct = (n) => deduped.length > 0 ? ` (${Math.round(n / deduped.length * 100)}%)` : ''
 
-  console.log(`\n  Total raw records (crm_dealers)   : ${raw.length}`)
+  console.log(`\n  Total raw records (dealer_prospects): ${raw.length}`)
   console.log(`  After deduplication               : ${deduped.length}`)
   console.log(`  Records with email                : ${qs.withEmail}${pct(qs.withEmail)}`)
   console.log(`  Records with phone                : ${qs.withPhone}${pct(qs.withPhone)}`)
