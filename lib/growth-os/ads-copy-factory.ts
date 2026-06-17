@@ -13,7 +13,7 @@
  *   - Generated headlines/descriptions are empty after enforcement
  */
 
-import Anthropic from "@anthropic-ai/sdk"
+import { callLLM } from "@/lib/llm-client"
 import type { Db } from "mongodb"
 import clientPromise from "@/lib/mongodb"
 import type { AdGroupTheme } from "@/lib/growth-os/ads-keyword-intelligence"
@@ -140,24 +140,11 @@ async function generateViaLLM(
   landingPage: string,
   keywords:    GeneratedKeyword[],
 ): Promise<{ headlines: string[]; descriptions: string[]; method: GenerationMethod }> {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) {
-    return { headlines: [], descriptions: [], method: "fallback_template" }
-  }
-
   try {
-    const client  = new Anthropic({ apiKey })
-    const message = await client.messages.create({
-      model:      MODEL,
-      max_tokens: 1024,
-      messages:   [{ role: "user", content: buildPrompt(theme, landingPage, keywords) }],
-    })
+    const raw = await callLLM(buildPrompt(theme, landingPage, keywords), { model: MODEL, maxTokens: 1024 })
 
-    const raw  = message.content[0]
-    if (raw.type !== "text") throw new Error("Non-text response")
-
-    const jsonStr = raw.text.match(/\{[\s\S]*\}/)?.[0]
-    if (!jsonStr)  throw new Error("No JSON found in response")
+    const jsonStr = raw.match(/\{[\s\S]*\}/)?.[0]
+    if (!jsonStr) throw new Error("No JSON found in response")
 
     const parsed = JSON.parse(jsonStr) as { headlines?: unknown; descriptions?: unknown }
     const hls    = Array.isArray(parsed.headlines)    ? (parsed.headlines as string[]).map(enforceHeadline).filter(h => h.length > 0)    : []

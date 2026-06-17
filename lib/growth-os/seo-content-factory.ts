@@ -14,7 +14,7 @@
  */
 
 import clientPromise from "@/lib/mongodb"
-import Anthropic from "@anthropic-ai/sdk"
+import { callLLM } from "@/lib/llm-client"
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -227,7 +227,6 @@ async function generateWithLLM(
   proposedChange: string,
   gscContext: string,
 ): Promise<SeoGeneratedContent> {
-  const client = new Anthropic()
 
   const prompt = `You are an expert SEO content writer for 100x Circle, a B2B fogging machine company in India.
 
@@ -270,13 +269,7 @@ Requirements:
 - At least 3 internal links to: /thermal-fogging-machine, /become-a-dealer, /gem-oem-authorization
 - 2-3 compelling CTAs specific to B2B fogging machine buyers in India`
 
-  const response = await client.messages.create({
-    model:      "claude-haiku-4-5-20251001",
-    max_tokens: 4096,
-    messages:   [{ role: "user", content: prompt }],
-  })
-
-  const text = (response.content[0] as { type: string; text: string }).text?.trim() ?? ""
+  const text = (await callLLM(prompt, { model: "claude-haiku-4-5-20251001", maxTokens: 4096 })).trim()
   // Strip any accidental markdown code fence
   const clean = text.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/, "").trim()
   const parsed = JSON.parse(clean) as Omit<SeoGeneratedContent, "generationMethod">
@@ -366,22 +359,16 @@ export async function runSeoContentFactory(input: SeoFactoryInput): Promise<SeoF
     }
   }
 
-  const hasApiKey = !!(process.env.ANTHROPIC_API_KEY || "").trim()
   const gscContext = await fetchGscContext(keyword)
   const baseline   = await fetchBaseline(keyword)
 
   let generatedContent: SeoGeneratedContent
   let simulated = false
 
-  if (hasApiKey) {
-    try {
-      generatedContent = await generateWithLLM(keyword, targetUrl, contentType, currentState, proposedChange, gscContext)
-    } catch (e) {
-      console.warn("[seo-content-factory] LLM failed, falling back to template:", String(e))
-      generatedContent = generateTemplate(keyword, targetUrl, contentType)
-      simulated = true
-    }
-  } else {
+  try {
+    generatedContent = await generateWithLLM(keyword, targetUrl, contentType, currentState, proposedChange, gscContext)
+  } catch (e) {
+    console.warn("[seo-content-factory] All providers failed, using template:", String(e))
     generatedContent = generateTemplate(keyword, targetUrl, contentType)
     simulated = true
   }

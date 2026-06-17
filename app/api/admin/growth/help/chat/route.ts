@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { requireAuth } from "@/lib/rbac/server"
 import { buildDocContext, DOC_REGISTRY } from "@/lib/growth-os/doc-registry"
 import { CAPABILITY_REGISTRY } from "@/lib/growth-os/platform-registry"
+import { callLLMChat, ALL_PROVIDERS_UNAVAILABLE } from "@/lib/llm-client"
 
 const SYSTEM_PROMPT = `You are Growth OS Assistant — an AI advisor embedded inside 100x Circle's internal Growth OS platform.
 
@@ -29,14 +30,6 @@ export async function POST(req: NextRequest) {
   const authError = await requireAuth(req)
   if (authError) return authError
 
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY not configured. Set it in Vercel environment variables to enable AI chat." },
-      { status: 503 }
-    )
-  }
-
   const body = await req.json()
   const { messages } = body as { messages: Array<{ role: "user" | "assistant"; content: string }> }
 
@@ -44,29 +37,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "messages array required" }, { status: 400 })
   }
 
-  // Build Anthropic request
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      messages,
-    }),
-  })
-
-  if (!response.ok) {
-    const error = await response.text()
-    return NextResponse.json({ error: `AI service error: ${response.status}` }, { status: 502 })
+  try {
+    const text = await callLLMChat(messages, {
+      systemPrompt: SYSTEM_PROMPT,
+      maxTokens:    1024,
+      model:        "claude-haiku-4-5-20251001",
+    })
+    return NextResponse.json({ reply: text })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    const status = msg === ALL_PROVIDERS_UNAVAILABLE ? 503 : 502
+    return NextResponse.json(
+      { error: "AI service unavailable. Configure ANTHROPIC_API_KEY, OPENAI_API_KEY, or GOOGLE_GEMINI_API_KEY in Vercel." },
+      { status }
+    )
   }
-
-  const data = await response.json()
-  const text = data.content?.[0]?.text ?? "No response"
-
-  return NextResponse.json({ reply: text })
 }

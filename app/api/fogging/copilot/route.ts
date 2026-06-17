@@ -3,7 +3,7 @@
 // Supports: fogging_contracts (purchase queries) + fogging_sellers (dealer queries)
 
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { callLLM, ALL_PROVIDERS_UNAVAILABLE } from '@/lib/llm-client';
 import clientPromise from '@/lib/mongodb';
 
 const DB = '100xDB';
@@ -113,19 +113,14 @@ export async function POST(req: NextRequest) {
     if (!query || query.length < 3)  return NextResponse.json({ error: 'Query too short' },  { status: 400 });
     if (query.length > 500)          return NextResponse.json({ error: 'Query too long' },   { status: 400 });
 
-    const anthropicKey = process.env.ANTHROPIC_API_KEY;
-    if (!anthropicKey) return NextResponse.json({ error: 'AI not configured' }, { status: 503 });
-
-    const anthropic = new Anthropic({ apiKey: anthropicKey });
-
-    const msg = await anthropic.messages.create({
-      model:      'claude-haiku-4-5-20251001',
-      max_tokens: 512,
-      system:     SYSTEM_PROMPT,
-      messages:   [{ role: 'user', content: query }],
-    });
-
-    const raw = (msg.content[0] as { type: string; text: string }).text?.trim() ?? '';
+    let raw: string;
+    try {
+      raw = (await callLLM(query, { systemPrompt: SYSTEM_PROMPT, maxTokens: 512, model: 'claude-haiku-4-5-20251001' })).trim();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      const status = msg === ALL_PROVIDERS_UNAVAILABLE ? 503 : 502;
+      return NextResponse.json({ error: 'AI service unavailable. No providers configured or all failed.' }, { status });
+    }
 
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return NextResponse.json({ error: 'Could not parse query', raw }, { status: 422 });

@@ -3,7 +3,7 @@
  * Generates scored Google Ads RSA assets across 8 persuasion frameworks.
  * Learns from performance data to weight future generation.
  */
-import Anthropic from "@anthropic-ai/sdk"
+import { callLLM } from "@/lib/llm-client"
 import clientPromise from "@/lib/mongodb"
 import { logAgentRun } from "@/lib/growth-os/log-agent"
 
@@ -512,28 +512,18 @@ async function withRetry<T>(fn: () => Promise<T>, maxAttempts = 2, delayMs = 300
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export async function runCreativeDirector(input: CreativeDirectorInput): Promise<CreativeDirectorRun> {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured")
-
   const tier      = input.model ?? "sonnet"
   const modelId   = MODEL_IDS[tier]
   const db        = (await clientPromise).db()
   const learnings = await loadLearnings()
   const prompt    = buildPrompt(input, learnings)
-  const anthropic = new Anthropic({ apiKey })
   const runId     = `cr_${Date.now()}`
   const startedAt = new Date().toISOString()
 
-  let message: Awaited<ReturnType<typeof anthropic.messages.create>>
+  let rawText: string
 
   try {
-    message = await withRetry(() =>
-      anthropic.messages.create({
-        model:      modelId,
-        max_tokens: 8000,
-        messages:   [{ role: "user", content: prompt }],
-      })
-    )
+    rawText = await withRetry(() => callLLM(prompt, { model: modelId, maxTokens: 8000 }))
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err)
     await logAgentRun(db, {
@@ -545,10 +535,8 @@ export async function runCreativeDirector(input: CreativeDirectorInput): Promise
       level:          "error",
       module:         "ads",
     })
-    throw new Error(`Claude API error: ${errMsg}`)
+    throw new Error(`LLM provider error: ${errMsg}`)
   }
-
-  const rawText = message.content.find(b => b.type === "text")?.text ?? ""
   const jsonStr = rawText.replace(/^```[a-z]*\n?/m, "").replace(/\n?```$/m, "").trim()
 
   let parsed: RawResponse
@@ -573,7 +561,7 @@ export async function runCreativeDirector(input: CreativeDirectorInput): Promise
 
   const parsed_ = parseResponse(parsed, input)
   const cqs     = computeCQS(parsed_.headlines, parsed_.descriptions, parsed_.callouts, input.keywordCluster, parsed_.frameworkCounts)
-  const cost    = calcCost(tier, message.usage?.input_tokens ?? 0, message.usage?.output_tokens ?? 0)
+  const cost    = calcCost(tier, 0, 0)
 
   const run: CreativeDirectorRun = {
     runId,

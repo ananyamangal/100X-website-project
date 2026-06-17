@@ -3,7 +3,7 @@
  * Aggregates GSC, Ads, Lead, and GeM signals into scored opportunities
  * and a founder-level weekly briefing answering: What to sell? Where? Who? Which campaign?
  */
-import Anthropic from "@anthropic-ai/sdk"
+import { callLLM, ALL_PROVIDERS_UNAVAILABLE } from "@/lib/llm-client"
 import clientPromise from "@/lib/mongodb"
 import { logAgentRun } from "@/lib/growth-os/log-agent"
 
@@ -355,10 +355,6 @@ async function synthesize(
   states:          StateOpportunity[]
   campaigns:       CampaignBudgetScore[]
 }> {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured")
-  const anthropic = new Anthropic({ apiKey })
-
   const productLines = products.slice(0, 6).map((p, i) =>
     `${i+1}. ${p.product}: ${p.leadCount} leads · ${p.brochureCount} brochures · ${p.searchClicks} search clicks · Score ${p.opportunityScore}/100 [${p.momentum}]`
   ).join("\n")
@@ -405,13 +401,14 @@ Return ONLY JSON (no preamble):
   "campaign_insights": [{"campaign": "exact campaign name from list", "insight": "one-line budget rationale"}]
 }`
 
-  const message = await anthropic.messages.create({
-    model:      MODEL_IDS[tier],
-    max_tokens: 1500,
-    messages:   [{ role: "user", content: prompt }],
-  })
-
-  const raw  = message.content.find(b => b.type === "text")?.text ?? "{}"
+  let raw: string
+  try {
+    raw = await callLLM(prompt, { model: MODEL_IDS[tier], maxTokens: 1500 })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    if (msg !== ALL_PROVIDERS_UNAVAILABLE) console.warn("[market-intelligence] LLM failed:", msg)
+    raw = "{}"
+  }
   const json = raw.replace(/^```[a-z]*\n?/m, "").replace(/\n?```$/m, "").trim()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

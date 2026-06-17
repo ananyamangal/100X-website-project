@@ -5,7 +5,7 @@
  * Focuses on: GeM/government, fogging/MSME, India B2B.
  * Never suggests PBNs or spam networks.
  */
-import Anthropic from "@anthropic-ai/sdk"
+import { callLLM } from "@/lib/llm-client"
 import clientPromise from "@/lib/mongodb"
 import { logAgentRun } from "@/lib/growth-os/log-agent"
 
@@ -154,10 +154,6 @@ function computePriorityScore(s: Omit<BacklinkScore, "priorityScore">): number {
 // ── Claude — generate outreach email ─────────────────────────────────────────
 
 export async function generateOutreachEmail(opp: BacklinkOpportunity): Promise<{ subject: string; body: string; followUps: string[] }> {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured")
-
-  const anthropic = new Anthropic({ apiKey })
 
   const prompt = `You are writing an outreach email on behalf of Sulabh Mangal, Founder of 100X Circle (100xcircle.com), India's leading BIS-certified thermal fogging machine manufacturer.
 
@@ -192,18 +188,12 @@ Return JSON only (no preamble):
   "follow_up_2": "..."
 }`
 
-  let message: Awaited<ReturnType<typeof anthropic.messages.create>>
+  let raw: string
   try {
-    message = await anthropic.messages.create({
-      model:      "claude-haiku-4-5-20251001",
-      max_tokens: 1000,
-      messages:   [{ role: "user", content: prompt }],
-    })
+    raw = await callLLM(prompt, { model: "claude-haiku-4-5-20251001", maxTokens: 1000 })
   } catch (err) {
-    throw new Error(`Claude API error generating outreach for ${opp.domain}: ${err instanceof Error ? err.message : String(err)}`)
+    throw new Error(`LLM API error generating outreach for ${opp.domain}: ${err instanceof Error ? err.message : String(err)}`)
   }
-
-  const raw  = message.content.find(b => b.type === "text")?.text ?? "{}"
   const json = raw.replace(/^```[a-z]*\n?/m, "").replace(/\n?```$/m, "").trim()
 
   let parsed: { subject?: string; body?: string; follow_up_1?: string; follow_up_2?: string } = {}
@@ -225,10 +215,6 @@ Return JSON only (no preamble):
 // ── Discover new opportunities via Claude ─────────────────────────────────────
 
 export async function discoverOpportunities(vertical: string, count: number = 10): Promise<BacklinkOpportunity[]> {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured")
-
-  const anthropic = new Anthropic({ apiKey })
 
   const prompt = `You are an Off-Page SEO expert for 100X Circle (fogging machine manufacturer, India).
 
@@ -259,29 +245,24 @@ Return JSON array (no preamble):
   "suggested_topic": "..."
 }]`
 
-  let message: Awaited<ReturnType<typeof anthropic.messages.create>>
+  let raw: string
   try {
-    message = await anthropic.messages.create({
-      model:      "claude-haiku-4-5-20251001",
-      max_tokens: 2000,
-      messages:   [{ role: "user", content: prompt }],
-    })
+    raw = await callLLM(prompt, { model: "claude-haiku-4-5-20251001", maxTokens: 2000 })
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err)
     const db2 = (await clientPromise).db()
     await logAgentRun(db2, {
       agent:          "Off-Page SEO Director",
       action:         `FAILED discovery for vertical: ${vertical}`,
-      reason:         "Claude API call failed",
+      reason:         "All LLM providers failed",
       expectedImpact: "n/a",
       actualImpact:   `Error: ${errMsg.slice(0, 200)}`,
       level:          "error",
       module:         "seo",
     })
-    throw new Error(`Claude API error during discovery: ${errMsg}`)
+    throw new Error(`LLM provider error during discovery: ${errMsg}`)
   }
 
-  const raw  = message.content.find(b => b.type === "text")?.text ?? "[]"
   const json = raw.replace(/^```[a-z]*\n?/m, "").replace(/\n?```$/m, "").trim()
 
   let items: Array<Record<string, unknown>> = []

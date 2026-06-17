@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import Anthropic from "@anthropic-ai/sdk"
+import { callLLM } from "@/lib/llm-client"
 import { type Db } from "mongodb"
 import clientPromise from "@/lib/mongodb"
 import { requirePermission } from "@/lib/rbac/server"
@@ -354,15 +354,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Question too short" }, { status: 400 })
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY
+  const hasAiProvider = !!(
+    (process.env.ANTHROPIC_API_KEY   ?? "").trim() ||
+    (process.env.OPENAI_API_KEY      ?? "").trim() ||
+    (process.env.GOOGLE_GEMINI_API_KEY ?? "").trim()
+  )
   const db = (await clientPromise).db()
 
   // ── Cache setup (once per cold start) ────────────────────────────────────────
   await ensureCacheTtlIndex(db).catch(() => {})
 
-  // ── Cache lookup (AI mode only — no key = skip cache) ────────────────────────
+  // ── Cache lookup (AI mode only — no provider = skip cache) ───────────────────
   const cacheKey = makeCacheKey(question)
-  if (apiKey) {
+  if (hasAiProvider) {
     const hit = await getCached(db, cacheKey).catch(() => null)
     if (hit) {
       return NextResponse.json({ ...hit.result, cached: true, cache_key: cacheKey })
@@ -392,8 +396,8 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // ── Fallback mode (no API key) ────────────────────────────────────────────────
-  if (!apiKey) {
+  // ── Fallback mode (no AI provider configured) ─────────────────────────────────
+  if (!hasAiProvider) {
     const template = matchTemplate(question)
     let rows: Record<string, unknown>[] = []
     try {
@@ -459,7 +463,6 @@ export async function POST(req: NextRequest) {
   }
 
   // ── AI mode ───────────────────────────────────────────────────────────────────
-  const anthropic = new Anthropic({ apiKey })
 
   // Build filter context for system prompt
   let filterContext = ""
@@ -485,14 +488,11 @@ export async function POST(req: NextRequest) {
   // ── Step 1: Generate MongoDB pipeline ────────────────────────────────────────
   let pipelineData: { collection: string; pipeline: Record<string, unknown>[]; explanation: string }
   try {
-    const msg = await anthropic.messages.create({
-      model:      "claude-sonnet-4-6",
-      max_tokens: 2048,
-      system:     SYSTEM_PROMPT + filterContext,
-      messages:   [{ role: "user", content: question }],
-    })
-
-    const raw = (msg.content[0] as { type: string; text: string }).text.trim()
+    const raw = (await callLLM(question, {
+      model:        "claude-sonnet-4-6",
+      maxTokens:    2048,
+      systemPrompt: SYSTEM_PROMPT + filterContext,
+    })).trim()
     const jsonStr = raw.startsWith("{") ? raw : (raw.match(/\{[\s\S]*\}/) || [""])[0]
     const parsed = JSON.parse(jsonStr)
 
@@ -547,14 +547,8 @@ export async function POST(req: NextRequest) {
   let synthesis: { summary: string; findings: string[]; columns: Record<string, string> }
   try {
     const sample = cleanRows.slice(0, 8)
-    const synthMsg = await anthropic.messages.create({
-      model:      "claude-sonnet-4-6",
-      max_tokens: 1024,
-      system: `You are a B2G sales intelligence analyst for 100X Circle (thermal fogging machine manufacturer targeting Indian government procurement).
-Provide concise, specific, actionable insights. Use Indian number formatting (Cr for crore, L for lakh).`,
-      messages: [{
-        role:    "user",
-        content: `User question: "${question}"
+    const synthRaw = (await callLLM(
+      `User question: "${question}"
 Query explanation: ${pipelineData.explanation}
 Total results: ${cleanRows.length}
 Sample data (first ${sample.length} rows): ${JSON.stringify(sample, null, 2)}
@@ -565,10 +559,13 @@ Respond with ONLY valid JSON:
   "findings": ["Specific finding 1 with data points", "Finding 2", "Finding 3", "Finding 4", "Finding 5"],
   "columns": { "field_key": "Display Name", ... }
 }`,
-      }],
-    })
-
-    const synthRaw = (synthMsg.content[0] as { type: string; text: string }).text.trim()
+      {
+        model:        "claude-sonnet-4-6",
+        maxTokens:    1024,
+        systemPrompt: `You are a B2G sales intelligence analyst for 100X Circle (thermal fogging machine manufacturer targeting Indian government procurement).
+Provide concise, specific, actionable insights. Use Indian number formatting (Cr for crore, L for lakh).`,
+      }
+    )).trim()
     const synthJson = synthRaw.startsWith("{") ? synthRaw : (synthRaw.match(/\{[\s\S]*\}/) || ["{}"])[0]
     synthesis = JSON.parse(synthJson)
   } catch {

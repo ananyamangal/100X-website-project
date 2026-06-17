@@ -15,7 +15,7 @@
  */
 
 import clientPromise from "@/lib/mongodb"
-import Anthropic from "@anthropic-ai/sdk"
+import { callLLM } from "@/lib/llm-client"
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -332,7 +332,6 @@ async function generateWithLLM(
   source: OpportunitySource,
   context: string,
 ): Promise<LpGeneratedContent> {
-  const client = new Anthropic()
 
   const sourceHint = {
     seo:         "SEO opportunity — optimise for organic search ranking and informational intent",
@@ -392,13 +391,7 @@ Requirements:
 - 2 CTAs that reduce friction to lead capture
 - Source-appropriate tone: ${sourceHint}`
 
-  const response = await client.messages.create({
-    model:      "claude-haiku-4-5-20251001",
-    max_tokens: 4096,
-    messages:   [{ role: "user", content: prompt }],
-  })
-
-  const text  = (response.content[0] as { type: string; text: string }).text?.trim() ?? ""
+  const text = (await callLLM(prompt, { model: "claude-haiku-4-5-20251001", maxTokens: 4096 })).trim()
   const clean = text.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/, "").trim()
   const parsed = JSON.parse(clean) as Omit<LpGeneratedContent, "generationMethod">
 
@@ -520,22 +513,16 @@ export async function runLandingPageFactory(
     }
   }
 
-  const hasApiKey    = !!(process.env.ANTHROPIC_API_KEY || "").trim()
-  const context      = input.sourceContext ?? await fetchSourceContext(source, opportunityId)
-  const baseline     = await captureBaseline(targetUrl, keyword)
+  const context  = input.sourceContext ?? await fetchSourceContext(source, opportunityId)
+  const baseline = await captureBaseline(targetUrl, keyword)
 
   let generatedContent: LpGeneratedContent
   let simulated = false
 
-  if (hasApiKey) {
-    try {
-      generatedContent = await generateWithLLM(keyword, targetUrl, pageType, source, context)
-    } catch (e) {
-      console.warn("[landing-page-factory] LLM failed, falling back to template:", String(e))
-      generatedContent = generateTemplate(keyword, targetUrl, pageType, source)
-      simulated = true
-    }
-  } else {
+  try {
+    generatedContent = await generateWithLLM(keyword, targetUrl, pageType, source, context)
+  } catch (e) {
+    console.warn("[landing-page-factory] All providers failed, using template:", String(e))
     generatedContent = generateTemplate(keyword, targetUrl, pageType, source)
     simulated = true
   }
