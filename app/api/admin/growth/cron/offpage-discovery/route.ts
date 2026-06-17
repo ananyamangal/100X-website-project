@@ -12,61 +12,30 @@ export async function GET(req: Request) {
     if (auth !== `Bearer ${secret}`) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const base = process.env.NEXT_PUBLIC_APP_URL || "https://www.100xcircle.com"
-  const db = (await clientPromise).db()
-  const now = new Date().toISOString()
+  const base    = process.env.NEXT_PUBLIC_APP_URL || "https://www.100xcircle.com"
+  const startMs = Date.now()
+  const now     = new Date().toISOString()
 
-  const results: Record<string, unknown> = {}
-  const errors:  Record<string, string>  = {}
-
-  // Competitor discovery
+  // Delegate to run-all which handles timing, analysis, and storage
   try {
-    const res = await fetch(`${base}/api/admin/growth/seo/offpage/discover/competitors`, {
+    const res = await fetch(`${base}/api/admin/growth/seo/offpage/discover/run-all`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ competitor: "all" }),
+      body:   JSON.stringify({ triggered_by: "cron" }),
     })
-    results.competitors = await res.json()
-  } catch (e) { errors.competitors = String(e) }
+    const data = await res.json()
 
-  // Citation discovery
-  try {
-    const res = await fetch(`${base}/api/admin/growth/seo/offpage/discover/citations`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    })
-    results.citations = await res.json()
-  } catch (e) { errors.citations = String(e) }
+    const db = (await clientPromise).db()
+    // Patch the stored run to mark triggered_by: "cron"
+    await db.collection("seo_discovery_runs").updateOne(
+      { ran_at: data.ran_at },
+      { $set: { triggered_by: "cron" } }
+    )
 
-  // GeM discovery
-  try {
-    const res = await fetch(`${base}/api/admin/growth/seo/offpage/discover/gem`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    })
-    results.gem = await res.json()
-  } catch (e) { errors.gem = String(e) }
+    console.log(`[offpage-discovery cron] ran_at=${now} status=${data.overall_status} duration=${Date.now()-startMs}ms`)
 
-  // Recalculate authority score
-  try {
-    const res = await fetch(`${base}/api/admin/growth/seo/offpage/authority-score`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    })
-    results.authority_score = await res.json()
-  } catch (e) { errors.authority_score = String(e) }
-
-  // Log run to audit
-  await db.collection("seo_offpage_audit_log").insertOne({
-    action: "cron_weekly_discovery",
-    detail: `Weekly off-page discovery cron completed. Errors: ${Object.keys(errors).length}`,
-    results,
-    errors,
-    created_at: now,
-  })
-
-  const ok = Object.keys(errors).length === 0
-
-  console.log(`[offpage-discovery cron] ran_at=${now} ok=${ok}`, { results, errors })
-
-  return NextResponse.json({ ok, results, errors, ran_at: now })
+    return NextResponse.json({ ok: data.ok, overall_status: data.overall_status, totals: data.totals, ran_at: now })
+  } catch (err) {
+    console.error("[offpage-discovery cron] fatal error:", err)
+    return NextResponse.json({ ok: false, error: String(err), ran_at: now }, { status: 500 })
+  }
 }

@@ -3,7 +3,7 @@
  * Updated: 2026-06-16 | Source: full codebase scan
  */
 
-export const PLATFORM_VERSION = "v3.1"
+export const PLATFORM_VERSION = "v3.1.1"
 
 export type CapabilityStatus =
   | "active"      // confirmed working and discoverable

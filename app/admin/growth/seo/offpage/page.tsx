@@ -36,6 +36,18 @@ interface DashboardData {
   recent_activity:{_id:string;action:string;detail:string;created_at:string}[]
 }
 
+interface PhaseReport {
+  status:"success"|"partial"|"failed"
+  label:string; summary:string; detail:string
+  counts:Record<string,number>; errors:string[]; duration_ms:number
+}
+interface DiscoveryRunResult {
+  _id?:string; ran_at:string; triggered_by?:string; overall_status:"success"|"partial"|"failed"
+  phases:Record<string,PhaseReport>
+  totals:{items_discovered:number;competitors_scanned:number;citations_checked:number;gem_opportunities:number;authority_score:number;authority_delta:number}
+  duration_ms:number
+}
+
 const BL_STAGES:{id:BacklinkStatus;label:string;color:string}[]=[
   {id:"detected",       label:"Detected",       color:"bg-gray-100 text-gray-600"},
   {id:"recommended",    label:"Recommended",    color:"bg-blue-100 text-blue-700"},
@@ -102,47 +114,181 @@ function AuthorityGauge({score,delta}:{score:number;delta:number}){
 
 // ─── Discovery Panel (Dashboard) ──────────────────────────────────────────────
 
-function DiscoveryPanel({onRunAll,discovering,lastResult}:{
-  onRunAll:()=>void; discovering:boolean
-  lastResult:{ran_at:string;results:Record<string,{discovered?:number;found?:number;from_contracts?:number}>}|null
-}){
+function StatusBadge({status}:{status:"success"|"partial"|"failed"}){
+  return status==="success"
+    ?<span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">✓ SUCCESS</span>
+    :status==="partial"
+    ?<span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">◑ PARTIAL</span>
+    :<span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-600">✗ FAILED</span>
+}
+
+function OverallBadge({status}:{status:"success"|"partial"|"failed"}){
+  return status==="success"
+    ?<span className="text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-lg">✓ SUCCESS</span>
+    :status==="partial"
+    ?<span className="text-xs font-bold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-lg">◑ PARTIAL</span>
+    :<span className="text-xs font-bold text-red-600 bg-red-100 px-2.5 py-1 rounded-lg">✗ FAILED</span>
+}
+
+function ReportCard({run}:{run:DiscoveryRunResult}){
+  const [expanded,setExpanded]=useState<string|null>(null)
+  const ORDER=["competitors","citations","gem","authority_score"]
+  const LABELS:Record<string,string>={competitors:"Competitor Discovery",citations:"Citation Scan",gem:"GeM Authority",authority_score:"Authority Score"}
+
   return(
-    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-5 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className={`px-4 py-3 flex items-center justify-between border-b ${run.overall_status==="success"?"border-green-100 bg-green-50":run.overall_status==="partial"?"border-amber-100 bg-amber-50":"border-red-100 bg-red-50"}`}>
+        <div className="flex items-center gap-2">
+          <OverallBadge status={run.overall_status}/>
+          <span className="text-xs text-gray-600 font-medium">{(run.duration_ms/1000).toFixed(1)}s</span>
+          <span className="text-[10px] text-gray-400">·</span>
+          <span className="text-[10px] text-gray-500">{new Date(run.ran_at).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</span>
+          {run.triggered_by==="cron"&&<span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">cron</span>}
+        </div>
+        <div className="flex items-center gap-3 text-[10px] text-gray-500">
+          <span><strong className="text-gray-800">{run.totals?.items_discovered??0}</strong> items</span>
+          <span><strong className="text-gray-800">{run.totals?.authority_score??0}</strong> score</span>
+          {(run.totals?.authority_delta??0)!==0&&<span className={(run.totals?.authority_delta??0)>0?"text-green-600 font-semibold":"text-red-500 font-semibold"}>{(run.totals?.authority_delta??0)>0?"↑":"↓"}{Math.abs(run.totals?.authority_delta??0)}</span>}
+        </div>
+      </div>
+      {/* Phase rows */}
+      <div className="divide-y divide-gray-50">
+        {ORDER.filter(k=>run.phases?.[k]).map(key=>{
+          const phase=run.phases[key]
+          return(
+            <div key={key}>
+              <button onClick={()=>setExpanded(e=>e===key?null:key)} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left">
+                <div className="w-[160px] shrink-0">
+                  <StatusBadge status={phase.status}/>
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-gray-800">{LABELS[key]??phase.label}</p>
+                  <p className="text-[11px] text-gray-500">{phase.summary}</p>
+                </div>
+                <span className="text-[10px] text-gray-400 shrink-0">{(phase.duration_ms/1000).toFixed(1)}s</span>
+                {expanded===key?<ChevronUp size={12} className="text-gray-400 shrink-0"/>:<ChevronDown size={12} className="text-gray-400 shrink-0"/>}
+              </button>
+              {expanded===key&&(
+                <div className="px-4 pb-3 pt-1 bg-gray-50 border-t border-gray-100 space-y-2">
+                  <p className="text-[11px] text-gray-600">{phase.detail}</p>
+                  {Object.entries(phase.counts).length>0&&(
+                    <div className="flex gap-4 flex-wrap">
+                      {Object.entries(phase.counts).map(([k,v])=>(
+                        <div key={k} className="text-[10px]">
+                          <span className="font-bold text-gray-800">{v}</span>{" "}
+                          <span className="text-gray-400">{k.replace(/_/g," ")}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {phase.errors.length>0&&(
+                    <div className="space-y-1">
+                      {phase.errors.map((e,i)=>(
+                        <p key={i} className="text-[10px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1">⚠ {e}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function HistoryRow({run}:{run:DiscoveryRunResult}){
+  const [open,setOpen]=useState(false)
+  return(
+    <div className="border border-gray-100 rounded-lg overflow-hidden">
+      <button onClick={()=>setOpen(o=>!o)} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 text-left">
+        <StatusBadge status={run.overall_status}/>
+        <span className="text-[11px] text-gray-600 flex-1">{new Date(run.ran_at).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</span>
+        <span className="text-[10px] text-gray-400">{(run.duration_ms/1000).toFixed(1)}s</span>
+        <span className="text-[10px] font-semibold text-gray-700">{run.totals?.items_discovered??0} items</span>
+        {run.triggered_by==="cron"&&<span className="text-[10px] text-gray-400">cron</span>}
+        {open?<ChevronUp size={11} className="text-gray-400"/>:<ChevronDown size={11} className="text-gray-400"/>}
+      </button>
+      {open&&run.phases&&<div className="px-3 pb-3"><ReportCard run={run}/></div>}
+    </div>
+  )
+}
+
+function DiscoveryPanel({onRunAll,discovering,lastRun,history}:{
+  onRunAll:()=>void; discovering:boolean
+  lastRun:DiscoveryRunResult|null; history:DiscoveryRunResult[]
+}){
+  const [showHistory,setShowHistory]=useState(false)
+
+  return(
+    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-5 shadow-sm space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Cpu size={15} className="text-indigo-600"/>
           <h3 className="text-sm font-bold text-indigo-900">Intelligence Engine</h3>
           <span className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">AUTO-DISCOVERY</span>
         </div>
-        <button onClick={onRunAll} disabled={discovering}
-          className="flex items-center gap-1.5 text-xs bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 font-semibold">
-          <Database size={11} className={discovering?"animate-pulse":""}/>
-          {discovering?"Running Discovery…":"Run All Discovery"}
-        </button>
+        <div className="flex items-center gap-2">
+          {history.length>0&&(
+            <button onClick={()=>setShowHistory(s=>!s)} className="text-xs text-indigo-600 border border-indigo-200 bg-white px-3 py-1.5 rounded-lg hover:bg-indigo-50">
+              {showHistory?"Hide":"View"} History ({history.length})
+            </button>
+          )}
+          <button onClick={onRunAll} disabled={discovering}
+            className="flex items-center gap-1.5 text-xs bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 font-semibold">
+            <Database size={11} className={discovering?"animate-pulse":""}/>
+            {discovering?"Running — please wait…":"Run All Discovery"}
+          </button>
+        </div>
       </div>
-      <div className="grid grid-cols-3 gap-3 mb-3">
-        {[
-          {label:"Competitor Links",icon:<Search size={12}/>,desc:"Discovers gap opportunities across 5 competitors + GeM contract data"},
-          {label:"Citation Scan",icon:<BookOpen size={12}/>,desc:"Checks IndiaMART · TradeIndia · Justdial · ExportersIndia · GeM · GBP"},
-          {label:"GeM Authority",icon:<Globe size={12}/>,desc:"Mines gem_contracts DB for 100x Circle contracts + seeds 6 baseline opportunities"},
-        ].map(({label,icon,desc})=>(
-          <div key={label} className="bg-white/70 rounded-lg p-3 border border-indigo-100">
-            <div className="flex items-center gap-1.5 mb-1 text-indigo-700 font-semibold text-xs">{icon}{label}</div>
-            <p className="text-[10px] text-indigo-600 leading-relaxed">{desc}</p>
+
+      {/* Running state — always shows previous result underneath if available */}
+      {discovering&&(
+        <div className="bg-white/80 border border-indigo-100 rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-3 h-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"/>
+            <span className="text-xs font-semibold text-indigo-700">Discovery running…</span>
           </div>
-        ))}
-      </div>
-      {lastResult&&(
-        <div className="bg-white/80 rounded-lg p-3 border border-indigo-100">
-          <p className="text-[10px] font-semibold text-indigo-700 mb-1">Last run: {fmt(lastResult.ran_at)}</p>
-          <div className="flex gap-4 flex-wrap">
-            {lastResult.results.competitors&&<span className="text-[10px] text-gray-600">Competitors: <strong>{(lastResult.results.competitors as {discovered?:number}).discovered??0} discovered</strong></span>}
-            {lastResult.results.citations&&<span className="text-[10px] text-gray-600">Citations: <strong>{(lastResult.results.citations as {found?:number}).found??0} found</strong></span>}
-            {lastResult.results.gem&&<span className="text-[10px] text-gray-600">GeM: <strong>{((lastResult.results.gem as {from_contracts?:number}).from_contracts??0)+((lastResult.results.gem as {from_baseline?:number}).from_baseline??0)} items</strong></span>}
+          <div className="grid grid-cols-4 gap-3">
+            {[{label:"Competitor Links",desc:"Scanning 5 competitors"},{label:"Citations",desc:"Checking 8 platforms"},{label:"GeM Authority",desc:"Mining gem_contracts DB"},{label:"Authority Score",desc:"Recalculating"}].map(({label,desc})=>(
+              <div key={label} className="bg-indigo-50 rounded-lg p-2.5 border border-indigo-100">
+                <div className="flex items-center gap-1 mb-1"><div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"/><span className="text-[10px] font-semibold text-indigo-700">{label}</span></div>
+                <p className="text-[9px] text-indigo-500">{desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       )}
-      <p className="text-[10px] text-indigo-500 mt-2">Weekly cron: Mondays 11:30 IST · No manual data entry required for normal operation</p>
+
+      {/* Last run report card */}
+      {!discovering&&lastRun&&(
+        <div>
+          <p className="text-[10px] text-indigo-600 font-semibold mb-2">LAST RUN RESULTS</p>
+          <ReportCard run={lastRun}/>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!discovering&&!lastRun&&(
+        <div className="bg-white/70 border border-indigo-100 rounded-xl p-5 text-center">
+          <p className="text-sm text-indigo-700 font-semibold mb-1">No discovery run yet</p>
+          <p className="text-xs text-indigo-500">Run discovery to auto-populate competitor links, citations, and GeM authority data.</p>
+          <p className="text-[10px] text-indigo-400 mt-2">Weekly cron: Mondays 11:30 IST</p>
+        </div>
+      )}
+
+      {/* Run history */}
+      {showHistory&&history.length>0&&(
+        <div className="space-y-2">
+          <p className="text-[10px] text-indigo-600 font-semibold">PREVIOUS RUNS</p>
+          {history.slice(1).map((run,i)=><HistoryRow key={run._id??i} run={run}/>)}
+        </div>
+      )}
+
+      <p className="text-[10px] text-indigo-400">Weekly cron: Mondays 11:30 IST · No manual data entry required for normal operation</p>
     </div>
   )
 }
@@ -273,17 +419,17 @@ function AttributionEditor({backlink,onSaved}:{backlink:Backlink;onSaved:()=>voi
 
 // ─── Dashboard Tab ────────────────────────────────────────────────────────────
 
-function DashboardTab({data,onCalcScore,calculating,onRunAll,discovering,lastDiscovery}:{
+function DashboardTab({data,onCalcScore,calculating,onRunAll,discovering,lastRun,runHistory}:{
   data:DashboardData|null;onCalcScore:()=>void;calculating:boolean
   onRunAll:()=>void;discovering:boolean
-  lastDiscovery:{ran_at:string;results:Record<string,unknown>}|null
+  lastRun:DiscoveryRunResult|null; runHistory:DiscoveryRunResult[]
 }){
   if(!data)return<div className="flex items-center justify-center py-20 text-gray-400 text-sm">Loading…</div>
   const as=data.authority_score
   return(
     <div className="space-y-5">
       {/* Intelligence Engine */}
-      <DiscoveryPanel onRunAll={onRunAll} discovering={discovering} lastResult={lastDiscovery as {ran_at:string;results:Record<string,{discovered?:number;found?:number;from_contracts?:number}>}|null}/>
+      <DiscoveryPanel onRunAll={onRunAll} discovering={discovering} lastRun={lastRun} history={runHistory}/>
 
       {/* Authority Score */}
       <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
@@ -1151,12 +1297,18 @@ export default function OffPageSEOPage(){
   const [loadingPR,setLoadingPR]=useState(false)
   const [calculating,setCalculating]=useState(false)
   const [discovering,setDiscovering]=useState(false)
-  const [lastDiscovery,setLastDiscovery]=useState<{ran_at:string;results:Record<string,unknown>}|null>(null)
+  const [lastRun,setLastRun]=useState<DiscoveryRunResult|null>(null)
+  const [runHistory,setRunHistory]=useState<DiscoveryRunResult[]>([])
 
   const loadDashboard=useCallback(async()=>{
     setLoadingDash(true)
-    const res=await fetch("/api/admin/growth/seo/offpage/dashboard")
-    setDashboard(await res.json())
+    const [dashRes,runsRes]=await Promise.all([
+      fetch("/api/admin/growth/seo/offpage/dashboard"),
+      fetch("/api/admin/growth/seo/offpage/discovery-runs?limit=10"),
+    ])
+    setDashboard(await dashRes.json())
+    const runs:DiscoveryRunResult[]=await runsRes.json().catch(()=>[])
+    if(Array.isArray(runs)&&runs.length>0){setLastRun(runs[0]);setRunHistory(runs)}
     setLoadingDash(false)
   },[])
 
@@ -1193,11 +1345,11 @@ export default function OffPageSEOPage(){
   const runAllDiscovery=async()=>{
     setDiscovering(true)
     const res=await fetch("/api/admin/growth/seo/offpage/discover/run-all",{method:"POST"})
-    const d=await res.json()
-    setLastDiscovery({ran_at:d.ran_at??new Date().toISOString(),results:d.results??{}})
+    const d:DiscoveryRunResult&{ok:boolean}=await res.json()
+    setLastRun(d)
+    setRunHistory(h=>[d,...h].slice(0,10))
     setDiscovering(false)
     await loadDashboard()
-    // Reload whichever data tabs have been visited
     if(competitorLinks.length>0)loadCompetitorLinks()
     if(citations.length>0)loadCitations()
     if(gemItems.length>0)loadGem()
@@ -1214,7 +1366,7 @@ export default function OffPageSEOPage(){
               <Zap size={18} className="text-brand-600"/>
               <div>
                 <h1 className="text-base font-bold text-gray-900">Off-Page SEO Authority Engine</h1>
-                <p className="text-gray-400 text-[11px]">Backlinks · Citations · Competitor Intel · GeM Authority · Digital PR — Revenue OS v3.1</p>
+                <p className="text-gray-400 text-[11px]">Backlinks · Citations · Competitor Intel · GeM Authority · Digital PR — Revenue OS v3.1.1</p>
               </div>
             </div>
           </div>
@@ -1224,7 +1376,7 @@ export default function OffPageSEOPage(){
               <Cpu size={11} className={discovering?"animate-pulse":""}/>
               {discovering?"Running…":"Run Intelligence"}
             </button>
-            <span className="text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-semibold">v3.1</span>
+            <span className="text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-semibold">v3.1.1</span>
           </div>
         </div>
       </div>
@@ -1239,7 +1391,7 @@ export default function OffPageSEOPage(){
           ))}
         </div>
 
-        {activeTab==="dashboard"&&<DashboardTab data={loadingDash?null:dashboard} onCalcScore={calcScore} calculating={calculating} onRunAll={runAllDiscovery} discovering={discovering} lastDiscovery={lastDiscovery}/>}
+        {activeTab==="dashboard"&&<DashboardTab data={loadingDash?null:dashboard} onCalcScore={calcScore} calculating={calculating} onRunAll={runAllDiscovery} discovering={discovering} lastRun={lastRun} runHistory={runHistory}/>}
         {activeTab==="backlinks"&&<BacklinksTab items={backlinks} loading={loadingBL} onRefresh={loadBacklinks}/>}
         {activeTab==="citations"&&<CitationsTab items={citations} loading={loadingCit} onRefresh={loadCitations}/>}
         {activeTab==="competitor-links"&&<CompetitorLinksTab items={competitorLinks} summary={competitorSummary} loading={loadingComp} onRefresh={loadCompetitorLinks}/>}
