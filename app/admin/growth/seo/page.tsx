@@ -445,6 +445,11 @@ export default function SEOCommandCenter() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <a href="/admin/growth/seo/offpage"
+              className="flex items-center gap-1.5 text-xs border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+              <Link2 size={12} />
+              Off-Page SEO
+            </a>
             {configured && (
               <button onClick={syncNow} disabled={syncing}
                 className="flex items-center gap-1.5 text-xs bg-brand-600 text-white px-3 py-1.5 rounded-lg hover:bg-brand-700 disabled:opacity-50">
