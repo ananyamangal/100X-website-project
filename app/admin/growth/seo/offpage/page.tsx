@@ -20,6 +20,8 @@ interface Citation { _id:string;platform:string;platform_label:string;listing_ur
 interface CompetitorLink { _id:string;competitor:string;backlink_url:string;domain:string;anchor_text:string;domain_authority:number;gap_status:string;opportunity:string }
 interface Competitor {
   _id:string; name:string; normalized_name:string; website:string; rank:number
+  competitor_type?: "oem" | "dealer"
+  dealer_network_size?: number
   sources:string[]
   gem_data:{contract_count:number;total_gmv:number;gem_id:string|null;gem_listing_url:string;departments:string[];categories:string[];states:string[]}
   procurement_data:{is_fogging:boolean;is_health:boolean;is_municipal:boolean}
@@ -764,7 +766,7 @@ function SourceBadge({src}:{src:string}){
   return<span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${MAP[src]??"bg-gray-100 text-gray-500"}`}>{LABELS[src]??src}</span>
 }
 
-// ─── Competitor Intel Tab (Dynamic v3.2) ──────────────────────────────────────
+// ─── Competitor Intel Tab (v3.2.1 — OEM-first classification) ────────────────
 
 function CompetitorLinksTab({items,summary,loading,onRefresh,competitors,loadingCompetitors,onDiscoverDynamic,discovering}:{
   items:CompetitorLink[];summary:{_id:string;total:number;gaps:number;avg_da:number}[]
@@ -772,7 +774,8 @@ function CompetitorLinksTab({items,summary,loading,onRefresh,competitors,loading
   competitors:Competitor[];loadingCompetitors:boolean
   onDiscoverDynamic:()=>void;discovering:boolean
 }){
-  const [expanded,setExpanded]=useState<string|null>(null)
+  const [expandedOem,setExpandedOem]=useState<string|null>(null)
+  const [expandedDealer,setExpandedDealer]=useState<string|null>(null)
   const [editAI,setEditAI]=useState<string|null>(null)
   const [aiForm,setAIForm]=useState({chatgpt:false,gemini:false,claude:false,perplexity:false})
   const [savingAI,setSavingAI]=useState(false)
@@ -785,192 +788,367 @@ function CompetitorLinksTab({items,summary,loading,onRefresh,competitors,loading
 
   const linkGapsFor=(comp:Competitor)=>items.filter(i=>i.competitor===comp.normalized_name)
 
-  const totalCompetitors=competitors.length
-  const totalGaps=summary.reduce((a,b)=>a+(b.gaps??0),0)
+  const oemCompetitors    = competitors.filter(c=>c.competitor_type==="oem")
+  const dealerCompetitors = competitors.filter(c=>c.competitor_type!=="oem")
+
+  const totalDealerNetwork = oemCompetitors.reduce((a,c)=>a+(c.dealer_network_size??0),0)
+  const aiVisibleOems      = oemCompetitors.filter(c=>c.ai_mentions.mention_count>0).length
+  const totalDealerGaps    = summary.reduce((a,b)=>a+(b.gaps??0),0)
+
+  function oemOpportunities(comp:Competitor){
+    const seoKeywords=[`${comp.name} alternative`,`${comp.name} vs 100x circle`,`better than ${comp.name}`,`${comp.name} price india`]
+    const aiEnginesMissed=(["chatgpt","gemini","claude","perplexity"] as const).filter(k=>!comp.ai_mentions[k])
+    const orgsWon=comp.gem_data.departments.length
+    const dealers=comp.dealer_network_size??0
+    return{seoKeywords,aiEnginesMissed,dealers,orgsWon}
+  }
 
   return(
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h3 className="text-sm font-bold text-purple-900">Dynamic Competitor Intelligence</h3>
-            <p className="text-[11px] text-purple-600">Auto-discovered from GeM contracts · Procurement intel · AI search signals · Backlink gaps</p>
-          </div>
-          <button onClick={onDiscoverDynamic} disabled={discovering}
-            className="flex items-center gap-1.5 text-xs bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 font-semibold">
-            <Database size={11} className={discovering?"animate-pulse":""}/>
-            {discovering?"Running…":"Run Dynamic Discovery"}
-          </button>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            {label:"Competitors Found",value:totalCompetitors,color:"text-purple-700"},
-            {label:"Link Gaps",value:totalGaps,color:"text-red-600"},
-            {label:"Sources",value:"5",color:"text-indigo-700"},
-          ].map(({label,value,color})=>(
-            <div key={label} className="bg-white/70 rounded-lg p-2.5 text-center border border-purple-100">
-              <p className={`text-lg font-bold ${color}`}>{value}</p>
-              <p className="text-[10px] text-gray-500">{label}</p>
+    <div className="space-y-6">
+
+      {/* SECTION 1: OEM Competitor Dashboard */}
+      <div>
+        <div className="bg-gradient-to-br from-red-50 to-orange-50 border border-red-200 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-sm font-bold text-red-900">OEM Competitor Intelligence</h3>
+              <p className="text-[11px] text-red-600">Primary competitors: manufacturers &amp; brands — not GeM resellers</p>
             </div>
-          ))}
+            <button onClick={onDiscoverDynamic} disabled={discovering}
+              className="flex items-center gap-1.5 text-xs bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-800 disabled:opacity-50 font-semibold">
+              <Database size={11} className={discovering?"animate-pulse":""}/>
+              {discovering?"Classifying…":"Run OEM Discovery"}
+            </button>
+          </div>
+          <div className="grid grid-cols-4 gap-3">
+            {[
+              {label:"OEM Brands Tracked",value:oemCompetitors.length,color:"text-red-700"},
+              {label:"Total Dealer Networks",value:totalDealerNetwork,color:"text-orange-700"},
+              {label:"AI-Visible OEMs",value:aiVisibleOems,color:"text-purple-700"},
+              {label:"Procurement Targets",value:oemCompetitors.reduce((a,c)=>a+c.gem_data.departments.length,0),color:"text-indigo-700"},
+            ].map(({label,value,color})=>(
+              <div key={label} className="bg-white/70 rounded-lg p-2.5 text-center border border-red-100">
+                <p className={`text-lg font-bold ${color}`}>{value}</p>
+                <p className="text-[10px] text-gray-500">{label}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-
-      {/* Ranked competitor list */}
-      {loadingCompetitors?(
-        <div className="py-10 text-center text-gray-400 text-sm">Loading competitor intelligence…</div>
-      ):competitors.length===0?(
-        <div className="bg-white rounded-xl border border-dashed border-gray-200 p-10 text-center">
-          <Search size={28} className="mx-auto text-gray-300 mb-2"/>
-          <p className="text-sm text-gray-500 font-medium">No competitors discovered yet</p>
-          <p className="text-xs text-gray-400 mt-1">Click "Run Dynamic Discovery" to mine gem_contracts for fogging-category competitors</p>
-        </div>
-      ):(
-        <div className="space-y-2">
-          <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wide">Top {competitors.length} Competitors — Ranked by Intelligence Score</p>
-          {competitors.map(comp=>{
-            const gaps=linkGapsFor(comp)
-            const isOpen=expanded===comp._id
-            const compSummary=summary.find(s=>String(s._id)===comp.normalized_name)
-            return(
-              <div key={comp._id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                {/* Competitor row */}
-                <button onClick={()=>setExpanded(e=>e===comp._id?null:comp._id)} className="w-full flex items-start gap-3 p-4 hover:bg-gray-50 text-left">
-                  {/* Rank badge */}
-                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${comp.rank<=3?"bg-amber-100 text-amber-700":comp.rank<=10?"bg-gray-100 text-gray-600":"bg-gray-50 text-gray-400"}`}>
-                    {comp.rank}
-                  </div>
-                  {/* Main info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="text-sm font-bold text-gray-900">{comp.name}</span>
-                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-lg ${comp.scores.total>=70?"bg-red-100 text-red-700":comp.scores.total>=40?"bg-amber-100 text-amber-700":"bg-gray-100 text-gray-500"}`}>
-                        Score {comp.scores.total}
-                      </span>
-                      {comp.sources.map(s=><SourceBadge key={s} src={s}/>)}
+        {loadingCompetitors?(
+          <div className="py-10 text-center text-gray-400 text-sm mt-4">Loading OEM intelligence…</div>
+        ):oemCompetitors.length===0?(
+          <div className="bg-white rounded-xl border border-dashed border-gray-200 p-10 text-center mt-4">
+            <Search size={28} className="mx-auto text-gray-300 mb-2"/>
+            <p className="text-sm text-gray-500 font-medium">No OEM data yet</p>
+            <p className="text-xs text-gray-400 mt-1">Click "Run OEM Discovery" to classify competitors by brand vs reseller</p>
+          </div>
+        ):(
+          <div className="space-y-2 mt-4">
+            <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wide">{oemCompetitors.length} OEM Brands — Ranked by Market Threat</p>
+            {oemCompetitors.map(comp=>{
+              const isOpen=expandedOem===comp._id
+              return(
+                <div key={comp._id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                  <button onClick={()=>setExpandedOem(e=>e===comp._id?null:comp._id)} className="w-full flex items-start gap-3 p-4 hover:bg-gray-50 text-left">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${comp.rank<=3?"bg-red-100 text-red-700":comp.rank<=6?"bg-amber-100 text-amber-700":"bg-gray-100 text-gray-500"}`}>
+                      {comp.rank}
                     </div>
-                    <div className="flex items-center gap-4 text-[10px] text-gray-500">
-                      {comp.gem_data.contract_count>0&&<span><strong className="text-gray-700">{comp.gem_data.contract_count}</strong> GeM contracts</span>}
-                      {comp.gem_data.total_gmv>0&&<span><strong className="text-gray-700">₹{(comp.gem_data.total_gmv/100000).toFixed(1)}L</strong> GMV</span>}
-                      {gaps.length>0&&<span className="text-red-600"><strong>{gaps.length}</strong> link gaps</span>}
-                      {comp.ai_mentions.mention_count>0&&<span className="text-purple-600"><strong>{comp.ai_mentions.mention_count}</strong> AI engines</span>}
-                    </div>
-                  </div>
-                  {/* Score bars (collapsed) */}
-                  <div className="hidden sm:block w-36 space-y-1 shrink-0">
-                    <ScoreBar label="GeM"         value={comp.scores.gem_visibility}    color="bg-indigo-400"/>
-                    <ScoreBar label="Revenue"     value={comp.scores.revenue_potential} color="bg-green-400"/>
-                    <ScoreBar label="Procurement" value={comp.scores.tender_visibility} color="bg-amber-400"/>
-                  </div>
-                  {isOpen?<ChevronUp size={13} className="text-gray-400 shrink-0 mt-1"/>:<ChevronDown size={13} className="text-gray-400 shrink-0 mt-1"/>}
-                </button>
-
-                {/* Expanded panel */}
-                {isOpen&&(
-                  <div className="border-t border-gray-100 bg-gray-50 p-4 space-y-4">
-                    {/* Full score breakdown */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Intelligence Scores</p>
-                        <ScoreBar label="GeM Visibility"    value={comp.scores.gem_visibility}    color="bg-indigo-400"/>
-                        <ScoreBar label="Revenue Potential" value={comp.scores.revenue_potential} color="bg-green-400"/>
-                        <ScoreBar label="Procurement"       value={comp.scores.tender_visibility} color="bg-amber-400"/>
-                        <ScoreBar label="Search Visibility" value={comp.scores.search_visibility} color="bg-teal-400"/>
-                        <ScoreBar label="AI Visibility"     value={comp.scores.ai_search_visibility} color="bg-purple-400"/>
-                        <ScoreBar label="Authority"         value={comp.scores.authority}         color="bg-blue-400"/>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                        <span className="text-sm font-bold text-gray-900">{comp.name}</span>
+                        <span className="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">OEM</span>
+                        {comp.sources.includes("known_oem")&&<span className="text-[9px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">Known Brand</span>}
+                        {comp.sources.includes("gem_intelligence")&&<SourceBadge src="gem_intelligence"/>}
+                        {comp.ai_mentions.mention_count>0&&<span className="text-[9px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full font-semibold">{comp.ai_mentions.mention_count} AI engines</span>}
                       </div>
-                      <div className="space-y-3">
-                        {/* GeM data */}
-                        {comp.gem_data.departments.length>0&&(
-                          <div>
-                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Departments Won</p>
-                            <div className="flex flex-wrap gap-1">
-                              {comp.gem_data.departments.slice(0,6).map(d=><span key={d} className="text-[9px] bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">{d}</span>)}
-                              {comp.gem_data.departments.length>6&&<span className="text-[9px] text-gray-400">+{comp.gem_data.departments.length-6} more</span>}
-                            </div>
+                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                        {[
+                          {label:"Contracts",value:comp.gem_data.contract_count||"—",color:"text-indigo-600"},
+                          {label:"GMV",value:comp.gem_data.total_gmv>0?`₹${(comp.gem_data.total_gmv/100000).toFixed(1)}L`:"—",color:"text-green-600"},
+                          {label:"Orgs Won",value:comp.gem_data.departments.length||"—",color:"text-blue-600"},
+                          {label:"States",value:comp.gem_data.states.length||"—",color:"text-teal-600"},
+                          {label:"Dealers",value:comp.dealer_network_size??0,color:"text-orange-600"},
+                          {label:"Auth Score",value:comp.scores.authority,color:comp.scores.authority>=60?"text-red-600":comp.scores.authority>=30?"text-amber-600":"text-gray-500"},
+                        ].map(({label,value,color})=>(
+                          <div key={label} className="bg-gray-50 rounded-lg px-2 py-1.5 text-center border border-gray-100">
+                            <p className={`text-sm font-bold ${color}`}>{value}</p>
+                            <p className="text-[9px] text-gray-400">{label}</p>
                           </div>
-                        )}
-                        {/* Procurement type */}
-                        <div>
-                          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Category Signals</p>
-                          <div className="flex gap-1.5 flex-wrap">
-                            {comp.procurement_data.is_fogging&&<span className="text-[9px] bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded-full">Fogging</span>}
-                            {comp.procurement_data.is_health&&<span className="text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">Health</span>}
-                            {comp.procurement_data.is_municipal&&<span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">Municipal</span>}
-                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="hidden sm:block w-36 space-y-1 shrink-0">
+                      <ScoreBar label="AI Visibility" value={comp.scores.ai_search_visibility} color="bg-purple-400"/>
+                      <ScoreBar label="Search"        value={comp.scores.search_visibility}    color="bg-teal-400"/>
+                      <ScoreBar label="Authority"     value={comp.scores.authority}            color="bg-blue-400"/>
+                    </div>
+                    {isOpen?<ChevronUp size={13} className="text-gray-400 shrink-0 mt-1"/>:<ChevronDown size={13} className="text-gray-400 shrink-0 mt-1"/>}
+                  </button>
+                  {isOpen&&(
+                    <div className="border-t border-gray-100 bg-gray-50 p-4 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Intelligence Scores</p>
+                          <ScoreBar label="GeM Visibility" value={comp.scores.gem_visibility}       color="bg-indigo-400"/>
+                          <ScoreBar label="Revenue"        value={comp.scores.revenue_potential}    color="bg-green-400"/>
+                          <ScoreBar label="Procurement"    value={comp.scores.tender_visibility}    color="bg-amber-400"/>
+                          <ScoreBar label="Search"         value={comp.scores.search_visibility}    color="bg-teal-400"/>
+                          <ScoreBar label="AI Visibility"  value={comp.scores.ai_search_visibility} color="bg-purple-400"/>
+                          <ScoreBar label="Authority"      value={comp.scores.authority}            color="bg-blue-400"/>
                         </div>
-                        {/* AI search */}
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">AI Search Presence</p>
+                        <div className="space-y-3">
+                          {comp.gem_data.categories.length>0&&(
+                            <div>
+                              <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Product Categories</p>
+                              <div className="flex flex-wrap gap-1">
+                                {comp.gem_data.categories.slice(0,5).map(c=><span key={c} className="text-[9px] bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded truncate max-w-[120px]">{c}</span>)}
+                                {comp.gem_data.categories.length>5&&<span className="text-[9px] text-gray-400">+{comp.gem_data.categories.length-5}</span>}
+                              </div>
+                            </div>
+                          )}
+                          {comp.gem_data.states.length>0&&(
+                            <div>
+                              <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">States Covered</p>
+                              <div className="flex flex-wrap gap-1">
+                                {comp.gem_data.states.slice(0,6).map(s=><span key={s} className="text-[9px] bg-teal-50 border border-teal-100 text-teal-700 px-1.5 py-0.5 rounded">{s}</span>)}
+                                {comp.gem_data.states.length>6&&<span className="text-[9px] text-gray-400">+{comp.gem_data.states.length-6}</span>}
+                              </div>
+                            </div>
+                          )}
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">AI Search Presence</p>
+                              {editAI===comp._id
+                                ?<button onClick={()=>setEditAI(null)} className="text-[9px] text-gray-400 underline">Cancel</button>
+                                :<button onClick={()=>{setEditAI(comp._id);setAIForm(comp.ai_mentions)}} className="text-[9px] text-brand-600 underline">Update</button>
+                              }
+                            </div>
                             {editAI===comp._id?(
-                              <button onClick={()=>setEditAI(null)} className="text-[9px] text-gray-400 underline">Cancel</button>
+                              <div className="space-y-2">
+                                <div className="flex gap-3 flex-wrap">
+                                  {(["chatgpt","gemini","claude","perplexity"] as const).map(k=>(
+                                    <label key={k} className="flex items-center gap-1 text-[10px] text-gray-700 cursor-pointer">
+                                      <input type="checkbox" checked={aiForm[k]} onChange={e=>setAIForm(f=>({...f,[k]:e.target.checked}))} className="w-3 h-3"/>{k}
+                                    </label>
+                                  ))}
+                                </div>
+                                <button onClick={()=>saveAI(comp._id)} disabled={savingAI} className="text-[10px] bg-brand-600 text-white px-2.5 py-1 rounded hover:bg-brand-700 disabled:opacity-50">{savingAI?"Saving…":"Save"}</button>
+                              </div>
                             ):(
-                              <button onClick={()=>{setEditAI(comp._id);setAIForm(comp.ai_mentions)}} className="text-[9px] text-brand-600 underline">Update</button>
-                            )}
-                          </div>
-                          {editAI===comp._id?(
-                            <div className="space-y-2">
-                              <div className="flex gap-3 flex-wrap">
+                              <div className="flex gap-2 flex-wrap">
                                 {(["chatgpt","gemini","claude","perplexity"] as const).map(k=>(
-                                  <label key={k} className="flex items-center gap-1 text-[10px] text-gray-700 cursor-pointer">
-                                    <input type="checkbox" checked={aiForm[k]} onChange={e=>setAIForm(f=>({...f,[k]:e.target.checked}))} className="w-3 h-3"/>
-                                    {k}
-                                  </label>
+                                  <span key={k} className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${comp.ai_mentions[k]?"bg-purple-100 text-purple-700":"bg-gray-100 text-gray-400"}`}>{k}{comp.ai_mentions[k]?" ✓":""}</span>
                                 ))}
                               </div>
-                              <button onClick={()=>saveAI(comp._id)} disabled={savingAI} className="text-[10px] bg-brand-600 text-white px-2.5 py-1 rounded hover:bg-brand-700 disabled:opacity-50">{savingAI?"Saving…":"Save"}</button>
-                            </div>
-                          ):(
-                            <div className="flex gap-2 flex-wrap">
-                              {(["chatgpt","gemini","claude","perplexity"] as const).map(k=>(
-                                <span key={k} className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${comp.ai_mentions[k]?"bg-purple-100 text-purple-700":"bg-gray-100 text-gray-400"}`}>{k}{comp.ai_mentions[k]?" ✓":""}</span>
-                              ))}
+                            )}
+                          </div>
+                          {comp.website&&(
+                            <div>
+                              <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Website</p>
+                              <a href={comp.website} target="_blank" rel="noopener noreferrer" className="text-[10px] text-brand-600 flex items-center gap-1 hover:underline">
+                                {comp.website.replace("https://www.","")}<ExternalLink size={9}/>
+                              </a>
                             </div>
                           )}
                         </div>
-                        {/* GeM listing link */}
-                        {comp.gem_data.gem_listing_url&&(
-                          <div>
-                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">GeM Profile</p>
-                            <a href={comp.gem_data.gem_listing_url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-brand-600 flex items-center gap-1 hover:underline">
-                              {comp.gem_data.gem_listing_url.slice(0,55)}…<ExternalLink size={9}/>
-                            </a>
-                          </div>
-                        )}
                       </div>
                     </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
 
-                    {/* Link gaps */}
-                    {loading?(
-                      <p className="text-[11px] text-gray-400">Loading link gaps…</p>
-                    ):gaps.length>0?(
-                      <div>
-                        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">{gaps.length} Link Gap Opportunities</p>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                          {gaps.slice(0,12).map(g=>(
-                            <div key={g._id} className="bg-white rounded-lg border border-gray-100 p-2.5">
-                              <div className="flex items-center gap-1.5 mb-0.5">
-                                <span className="text-[10px] font-semibold text-gray-700 truncate">{g.domain}</span>
-                                <span className={`text-[8px] px-1 py-0.5 rounded ${g.opportunity==="high"?"bg-orange-100 text-orange-700":g.opportunity==="medium"?"bg-blue-100 text-blue-700":"bg-gray-100 text-gray-400"}`}>{g.opportunity}</span>
-                              </div>
-                              {g.domain_authority>0&&<p className="text-[9px] text-gray-400">DA {g.domain_authority}</p>}
-                            </div>
-                          ))}
-                        </div>
-                        {gaps.length>12&&<p className="text-[10px] text-gray-400 mt-1">+{gaps.length-12} more gaps</p>}
-                      </div>
-                    ):(
-                      <p className="text-[11px] text-gray-400">No link gaps yet. Run discovery to auto-populate.</p>
-                    )}
+      {/* SECTION 2: OEM Attack Opportunities */}
+      {oemCompetitors.length>0&&(
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Zap size={14} className="text-amber-600"/>
+            <h3 className="text-sm font-bold text-gray-900">OEM Attack Opportunities</h3>
+            <span className="text-[10px] text-gray-400">4 vectors per OEM</span>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {oemCompetitors.slice(0,6).map(comp=>{
+              const opp=oemOpportunities(comp)
+              return(
+                <div key={comp._id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-gray-800">{comp.name}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${comp.scores.total>=50?"bg-red-50 text-red-700 border-red-200":comp.scores.total>=25?"bg-amber-50 text-amber-700 border-amber-200":"bg-gray-50 text-gray-500 border-gray-200"}`}>
+                      Score {comp.scores.total}
+                    </span>
                   </div>
-                )}
-              </div>
-            )
-          })}
+                  <div className="space-y-2">
+                    <div className="bg-teal-50 border border-teal-100 rounded-lg px-3 py-2">
+                      <p className="text-[9px] font-bold text-teal-600 uppercase tracking-wide mb-0.5">SEO Attack</p>
+                      <p className="text-[11px] text-teal-800">
+                        {opp.seoKeywords.slice(0,2).map(k=>`"${k}"`).join(" · ")}
+                        {opp.seoKeywords.length>2&&<span className="text-teal-500"> +{opp.seoKeywords.length-2} more</span>}
+                      </p>
+                    </div>
+                    <div className="bg-purple-50 border border-purple-100 rounded-lg px-3 py-2">
+                      <p className="text-[9px] font-bold text-purple-600 uppercase tracking-wide mb-0.5">AI Citation</p>
+                      {opp.aiEnginesMissed.length>0
+                        ?<p className="text-[11px] text-purple-800">Build citations — not in {opp.aiEnginesMissed.join(", ")}</p>
+                        :<p className="text-[11px] text-purple-600">Displace from all AI engines where they appear</p>
+                      }
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-orange-50 border border-orange-100 rounded-lg px-2.5 py-2">
+                        <p className="text-[9px] font-bold text-orange-600 uppercase tracking-wide mb-0.5">Dealer Recruit</p>
+                        <p className="text-[11px] text-orange-800">{opp.dealers>0?`${opp.dealers} dealers — recruit 2/mo`:"Identify dealers to recruit"}</p>
+                      </div>
+                      <div className="bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-2">
+                        <p className="text-[9px] font-bold text-indigo-600 uppercase tracking-wide mb-0.5">Procurement</p>
+                        <p className="text-[11px] text-indigo-800">{opp.orgsWon>0?`${opp.orgsWon} orgs to displace`:"Target GeM orgs"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
+
+      {/* SECTION 3: Dealer Network Intelligence */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Building2 size={14} className="text-gray-500"/>
+          <h3 className="text-sm font-bold text-gray-900">Dealer Network Intelligence</h3>
+          <span className="text-[10px] text-gray-400">{dealerCompetitors.length} dealers in GeM fogging category</span>
+          {totalDealerGaps>0&&<span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-semibold">{totalDealerGaps} link gaps</span>}
+        </div>
+        {loadingCompetitors&&dealerCompetitors.length===0?(
+          <div className="py-8 text-center text-gray-400 text-sm">Loading dealer network…</div>
+        ):dealerCompetitors.length===0?(
+          <div className="bg-white rounded-xl border border-dashed border-gray-200 p-8 text-center">
+            <p className="text-sm text-gray-400">No dealers found yet. Run discovery to classify GeM sellers.</p>
+          </div>
+        ):(
+          <div className="space-y-2">
+            <p className="text-[10px] text-gray-400 mb-2">GeM resellers — not OEM manufacturers. Use for backlink gap analysis and dealer recruitment intelligence.</p>
+            {dealerCompetitors.map(comp=>{
+              const gaps=linkGapsFor(comp)
+              const isOpen=expandedDealer===comp._id
+              return(
+                <div key={comp._id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                  <button onClick={()=>setExpandedDealer(e=>e===comp._id?null:comp._id)} className="w-full flex items-start gap-3 p-4 hover:bg-gray-50 text-left">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${comp.rank<=3?"bg-blue-100 text-blue-700":comp.rank<=10?"bg-gray-100 text-gray-600":"bg-gray-50 text-gray-400"}`}>
+                      {comp.rank}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="text-sm font-bold text-gray-900">{comp.name}</span>
+                        <span className="text-[9px] bg-blue-50 text-blue-600 border border-blue-100 px-1.5 py-0.5 rounded-full font-semibold">Dealer</span>
+                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-lg ${comp.scores.total>=70?"bg-red-100 text-red-700":comp.scores.total>=40?"bg-amber-100 text-amber-700":"bg-gray-100 text-gray-500"}`}>
+                          Score {comp.scores.total}
+                        </span>
+                        {comp.sources.filter(s=>s!=="gem_intelligence").map(s=><SourceBadge key={s} src={s}/>)}
+                      </div>
+                      <div className="flex items-center gap-4 text-[10px] text-gray-500">
+                        {comp.gem_data.contract_count>0&&<span><strong className="text-gray-700">{comp.gem_data.contract_count}</strong> contracts</span>}
+                        {comp.gem_data.total_gmv>0&&<span><strong className="text-gray-700">{(comp.gem_data.total_gmv/100000).toFixed(1)}L</strong> GMV</span>}
+                        {gaps.length>0&&<span className="text-amber-600"><strong>{gaps.length}</strong> link gaps</span>}
+                        {comp.ai_mentions.mention_count>0&&<span className="text-purple-600"><strong>{comp.ai_mentions.mention_count}</strong> AI engines</span>}
+                      </div>
+                    </div>
+                    <div className="hidden sm:block w-36 space-y-1 shrink-0">
+                      <ScoreBar label="GeM"     value={comp.scores.gem_visibility}    color="bg-indigo-400"/>
+                      <ScoreBar label="Revenue" value={comp.scores.revenue_potential} color="bg-green-400"/>
+                    </div>
+                    {isOpen?<ChevronUp size={13} className="text-gray-400 shrink-0 mt-1"/>:<ChevronDown size={13} className="text-gray-400 shrink-0 mt-1"/>}
+                  </button>
+                  {isOpen&&(
+                    <div className="border-t border-gray-100 bg-gray-50 p-4 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Intelligence Scores</p>
+                          <ScoreBar label="GeM Visibility" value={comp.scores.gem_visibility}       color="bg-indigo-400"/>
+                          <ScoreBar label="Revenue"        value={comp.scores.revenue_potential}    color="bg-green-400"/>
+                          <ScoreBar label="Procurement"    value={comp.scores.tender_visibility}    color="bg-amber-400"/>
+                          <ScoreBar label="Search"         value={comp.scores.search_visibility}    color="bg-teal-400"/>
+                          <ScoreBar label="AI Visibility"  value={comp.scores.ai_search_visibility} color="bg-purple-400"/>
+                          <ScoreBar label="Authority"      value={comp.scores.authority}            color="bg-blue-400"/>
+                        </div>
+                        <div className="space-y-3">
+                          {comp.gem_data.departments.length>0&&(
+                            <div>
+                              <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Departments Won</p>
+                              <div className="flex flex-wrap gap-1">
+                                {comp.gem_data.departments.slice(0,6).map(d=><span key={d} className="text-[9px] bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">{d}</span>)}
+                                {comp.gem_data.departments.length>6&&<span className="text-[9px] text-gray-400">+{comp.gem_data.departments.length-6} more</span>}
+                              </div>
+                            </div>
+                          )}
+                          <div>
+                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Category Signals</p>
+                            <div className="flex gap-1.5 flex-wrap">
+                              {comp.procurement_data.is_fogging&&<span className="text-[9px] bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded-full">Fogging</span>}
+                              {comp.procurement_data.is_health&&<span className="text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">Health</span>}
+                              {comp.procurement_data.is_municipal&&<span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">Municipal</span>}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">AI Search</p>
+                              {editAI===comp._id
+                                ?<button onClick={()=>setEditAI(null)} className="text-[9px] text-gray-400 underline">Cancel</button>
+                                :<button onClick={()=>{setEditAI(comp._id);setAIForm(comp.ai_mentions)}} className="text-[9px] text-brand-600 underline">Update</button>
+                              }
+                            </div>
+                            {editAI===comp._id?(
+                              <div className="space-y-2">
+                                <div className="flex gap-3 flex-wrap">
+                                  {(["chatgpt","gemini","claude","perplexity"] as const).map(k=>(
+                                    <label key={k} className="flex items-center gap-1 text-[10px] text-gray-700 cursor-pointer">
+                                      <input type="checkbox" checked={aiForm[k]} onChange={e=>setAIForm(f=>({...f,[k]:e.target.checked}))} className="w-3 h-3"/>{k}
+                                    </label>
+                                  ))}
+                                </div>
+                                <button onClick={()=>saveAI(comp._id)} disabled={savingAI} className="text-[10px] bg-brand-600 text-white px-2.5 py-1 rounded hover:bg-brand-700 disabled:opacity-50">{savingAI?"Saving…":"Save"}</button>
+                              </div>
+                            ):(
+                              <div className="flex gap-2 flex-wrap">
+                                {(["chatgpt","gemini","claude","perplexity"] as const).map(k=>(
+                                  <span key={k} className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${comp.ai_mentions[k]?"bg-purple-100 text-purple-700":"bg-gray-100 text-gray-400"}`}>{k}{comp.ai_mentions[k]?" ✓":""}</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          {comp.gem_data.gem_listing_url&&(
+                            <a href={comp.gem_data.gem_listing_url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-brand-600 flex items-center gap-1 hover:underline">
+                              GeM Profile<ExternalLink size={9}/>
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                      {gaps.length>0&&(
+                        <div>
+                          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">{gaps.length} Backlink Gap Opportunities</p>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            {gaps.slice(0,12).map(g=>(
+                              <div key={g._id} className="bg-white rounded-lg border border-gray-100 p-2.5">
+                                <div className="flex items-center gap-1.5 mb-0.5">
+                                  <span className="text-[10px] font-semibold text-gray-700 truncate">{g.domain}</span>
+                                  <span className={`text-[8px] px-1 py-0.5 rounded ${g.opportunity==="high"?"bg-orange-100 text-orange-700":g.opportunity==="medium"?"bg-blue-100 text-blue-700":"bg-gray-100 text-gray-400"}`}>{g.opportunity}</span>
+                                </div>
+                                {g.domain_authority>0&&<p className="text-[9px] text-gray-400">DA {g.domain_authority}</p>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -1515,7 +1693,7 @@ export default function OffPageSEOPage(){
               <Zap size={18} className="text-brand-600"/>
               <div>
                 <h1 className="text-base font-bold text-gray-900">Off-Page SEO Authority Engine</h1>
-                <p className="text-gray-400 text-[11px]">Backlinks · Citations · Competitor Intel · GeM Authority · Digital PR — Revenue OS v3.2</p>
+                <p className="text-gray-400 text-[11px]">Backlinks · Citations · OEM + Dealer Intel · GeM Authority · Digital PR — Revenue OS v3.2.1</p>
               </div>
             </div>
           </div>
@@ -1525,7 +1703,7 @@ export default function OffPageSEOPage(){
               <Cpu size={11} className={discovering?"animate-pulse":""}/>
               {discovering?"Running…":"Run Intelligence"}
             </button>
-            <span className="text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-semibold">v3.2</span>
+            <span className="text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-semibold">v3.2.1</span>
           </div>
         </div>
       </div>
