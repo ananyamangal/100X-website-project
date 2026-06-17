@@ -17,12 +17,16 @@ export const COLL_CAMPAIGN_PLANS = "ads_campaign_plans"
 export type DeploymentStatus = "pending" | "approved" | "rolled_back" | "simulated"
 
 export interface DeployedResourceNames {
-  campaignBudget:   string
-  campaign:         string
-  adGroups:         string[]
-  adGroupCriteria:  string[]
-  campaignCriteria: string[]
-  ads:              string[]
+  campaignBudget:          string
+  campaign:                string
+  adGroups:                string[]
+  adGroupCriteria:         string[]
+  campaignCriteria:        string[]
+  ads:                     string[]
+  sitelinkAssets?:         string[]
+  sitelinkCampaignAssets?: string[]
+  calloutAssets?:          string[]
+  calloutCampaignAssets?:  string[]
 }
 
 export interface AdsDeployment {
@@ -128,12 +132,16 @@ export async function rollbackDeployment(
       deployment.customerId,
       accessToken,
       {
-        ads:              deployment.resourceNames.ads,
-        adGroupCriteria:  deployment.resourceNames.adGroupCriteria,
-        campaignCriteria: deployment.resourceNames.campaignCriteria,
-        adGroups:         deployment.resourceNames.adGroups,
-        campaign:         deployment.resourceNames.campaign,
-        campaignBudget:   deployment.resourceNames.campaignBudget,
+        ads:                     deployment.resourceNames.ads,
+        adGroupCriteria:         deployment.resourceNames.adGroupCriteria,
+        campaignCriteria:        deployment.resourceNames.campaignCriteria,
+        adGroups:                deployment.resourceNames.adGroups,
+        campaign:                deployment.resourceNames.campaign,
+        campaignBudget:          deployment.resourceNames.campaignBudget,
+        sitelinkCampaignAssets:  deployment.resourceNames.sitelinkCampaignAssets,
+        calloutCampaignAssets:   deployment.resourceNames.calloutCampaignAssets,
+        sitelinkAssets:          deployment.resourceNames.sitelinkAssets,
+        calloutAssets:           deployment.resourceNames.calloutAssets,
       },
       deployment.loginCustomerId,
     )

@@ -22,6 +22,8 @@ import {
   createKeywords,
   createCampaignCriteria,
   createRSAAds,
+  createCampaignSitelinks,
+  createCampaignCallouts,
   isDeveloperTokenReady,
 } from "@/lib/google-ads-mutate"
 import {
@@ -324,12 +326,16 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
   const simulated    = !canDeploy
 
   let resourceNames: DeployedResourceNames = {
-    campaignBudget:  "",
-    campaign:        "",
-    adGroups:        [],
-    adGroupCriteria: [],
-    campaignCriteria:[],
-    ads:             [],
+    campaignBudget:          "",
+    campaign:                "",
+    adGroups:                [],
+    adGroupCriteria:         [],
+    campaignCriteria:        [],
+    ads:                     [],
+    sitelinkAssets:          [],
+    sitelinkCampaignAssets:  [],
+    calloutAssets:           [],
+    calloutCampaignAssets:   [],
   }
 
   if (!simulated) {
@@ -373,10 +379,14 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
     }
 
     // Track partial resource names so any failure below can roll back everything
-    let adGroupRns: string[] = []
-    let criteriaRns: string[] = []
-    let campaignCriteriaRns: string[] = []
-    let adsRns: string[] = []
+    let adGroupRns: string[]               = []
+    let criteriaRns: string[]              = []
+    let campaignCriteriaRns: string[]      = []
+    let adsRns: string[]                   = []
+    let sitelinkAssetRns: string[]         = []
+    let sitelinkCampaignAssetRns: string[] = []
+    let calloutAssetRns: string[]          = []
+    let calloutCampaignAssetRns: string[]  = []
 
     try {
       adGroupRns = await createAdGroups(customerId, accessToken, {
@@ -439,27 +449,58 @@ export async function runAdsCampaignFactory(): Promise<FactoryRunResult> {
         }),
         loginCustomerId: loginId,
       })
+
+      // Phase 2D extensions: sitelinks + callouts (campaign-level asset deployment)
+      const firstVariant = copyRun.variants[0]
+
+      if (firstVariant?.sitelinks?.length) {
+        const slResult = await createCampaignSitelinks(customerId, accessToken, {
+          campaignResourceName: campaignRn,
+          sitelinks: firstVariant.sitelinks.map(sl => ({ text: sl.text, finalUrl: sl.url })),
+          loginCustomerId: loginId,
+        })
+        sitelinkAssetRns          = slResult.assetResourceNames
+        sitelinkCampaignAssetRns  = slResult.campaignAssetResourceNames
+      }
+
+      if (firstVariant?.callouts?.length) {
+        const coResult = await createCampaignCallouts(customerId, accessToken, {
+          campaignResourceName: campaignRn,
+          callouts: firstVariant.callouts,
+          loginCustomerId: loginId,
+        })
+        calloutAssetRns          = coResult.assetResourceNames
+        calloutCampaignAssetRns  = coResult.campaignAssetResourceNames
+      }
     } catch (e) {
       // Roll back everything created so far (budget + campaign + any partial entities)
       const { removeDeployedEntities } = await import("@/lib/google-ads-mutate")
       await removeDeployedEntities(customerId, accessToken, {
-        ads:              adsRns,
-        adGroupCriteria:  criteriaRns,
-        campaignCriteria: campaignCriteriaRns,
-        adGroups:         adGroupRns,
-        campaign:         campaignRn,
-        campaignBudget:   budgetRn,
+        ads:                    adsRns,
+        adGroupCriteria:        criteriaRns,
+        campaignCriteria:       campaignCriteriaRns,
+        adGroups:               adGroupRns,
+        campaign:               campaignRn,
+        campaignBudget:         budgetRn,
+        sitelinkCampaignAssets: sitelinkCampaignAssetRns,
+        calloutCampaignAssets:  calloutCampaignAssetRns,
+        sitelinkAssets:         sitelinkAssetRns,
+        calloutAssets:          calloutAssetRns,
       }, loginId).catch(() => {})
       throw new Error(`Entity creation failed: ${String(e)}`)
     }
 
     resourceNames = {
-      campaignBudget:   budgetRn,
-      campaign:         campaignRn,
-      adGroups:         adGroupRns,
-      adGroupCriteria:  criteriaRns,
-      campaignCriteria: campaignCriteriaRns,
-      ads:              adsRns,
+      campaignBudget:          budgetRn,
+      campaign:                campaignRn,
+      adGroups:                adGroupRns,
+      adGroupCriteria:         criteriaRns,
+      campaignCriteria:        campaignCriteriaRns,
+      ads:                     adsRns,
+      sitelinkAssets:          sitelinkAssetRns,
+      sitelinkCampaignAssets:  sitelinkCampaignAssetRns,
+      calloutAssets:           calloutAssetRns,
+      calloutCampaignAssets:   calloutCampaignAssetRns,
     }
   }
 

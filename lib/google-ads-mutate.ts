@@ -43,6 +43,10 @@ export interface BatchMutateResult {
   adGroupCriteria: string[]
   campaignCriteria: string[]
   ads: string[]
+  sitelinkAssets: string[]
+  sitelinkCampaignAssets: string[]
+  calloutAssets: string[]
+  calloutCampaignAssets: string[]
 }
 
 interface MutateResponse {
@@ -53,6 +57,8 @@ interface MutateResponse {
     adGroupCriterionResult?: { resourceName: string }
     campaignCriterionResult?: { resourceName: string }
     adGroupAdResult?: { resourceName: string }
+    assetResult?: { resourceName: string }
+    campaignAssetResult?: { resourceName: string }
   }>
 }
 
@@ -396,8 +402,110 @@ export async function createRSAAds(
   })
 }
 
+// ── Step 7: Create campaign-level sitelink assets ───────────────────────────
+// Two-pass: first create assets, then link them to the campaign.
+
+export async function createCampaignSitelinks(
+  customerId: string,
+  accessToken: string,
+  opts: {
+    campaignResourceName: string
+    sitelinks: Array<{ text: string; finalUrl: string }>
+    loginCustomerId?: string
+  },
+): Promise<{ assetResourceNames: string[]; campaignAssetResourceNames: string[] }> {
+  if (opts.sitelinks.length === 0) return { assetResourceNames: [], campaignAssetResourceNames: [] }
+
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.100xcircle.com").replace(/\/$/, "")
+
+  // Pass 1: create sitelink assets
+  const assetOps = opts.sitelinks.map(sl => ({
+    assetOperation: {
+      create: {
+        sitelinkAsset: {
+          linkText: sl.text.slice(0, 25),
+          finalUrls: [`${siteUrl}${sl.finalUrl}`],
+        },
+      },
+    },
+  }))
+  const assetResp = await mutate(customerId, assetOps, accessToken, opts.loginCustomerId)
+  const assetRns = assetResp.mutateOperationResponses.map((r, i) => {
+    const rn = r.assetResult?.resourceName
+    if (!rn) throw new Error(`Ads mutate: no asset resourceName at sitelink index ${i}`)
+    return rn
+  })
+
+  // Pass 2: link assets to campaign
+  const linkOps = assetRns.map(assetRn => ({
+    campaignAssetOperation: {
+      create: {
+        campaign: opts.campaignResourceName,
+        asset: assetRn,
+        fieldType: "SITELINK",
+      },
+    },
+  }))
+  const linkResp = await mutate(customerId, linkOps, accessToken, opts.loginCustomerId)
+  const campaignAssetRns = linkResp.mutateOperationResponses.map((r, i) => {
+    const rn = r.campaignAssetResult?.resourceName
+    if (!rn) throw new Error(`Ads mutate: no campaignAsset resourceName at sitelink index ${i}`)
+    return rn
+  })
+
+  return { assetResourceNames: assetRns, campaignAssetResourceNames: campaignAssetRns }
+}
+
+// ── Step 8: Create campaign-level callout assets ─────────────────────────────
+
+export async function createCampaignCallouts(
+  customerId: string,
+  accessToken: string,
+  opts: {
+    campaignResourceName: string
+    callouts: string[]
+    loginCustomerId?: string
+  },
+): Promise<{ assetResourceNames: string[]; campaignAssetResourceNames: string[] }> {
+  if (opts.callouts.length === 0) return { assetResourceNames: [], campaignAssetResourceNames: [] }
+
+  // Pass 1: create callout assets (Google Ads max 25 chars each)
+  const assetOps = opts.callouts.slice(0, 20).map(text => ({
+    assetOperation: {
+      create: {
+        calloutAsset: { calloutText: text.slice(0, 25) },
+      },
+    },
+  }))
+  const assetResp = await mutate(customerId, assetOps, accessToken, opts.loginCustomerId)
+  const assetRns = assetResp.mutateOperationResponses.map((r, i) => {
+    const rn = r.assetResult?.resourceName
+    if (!rn) throw new Error(`Ads mutate: no asset resourceName at callout index ${i}`)
+    return rn
+  })
+
+  // Pass 2: link assets to campaign
+  const linkOps = assetRns.map(assetRn => ({
+    campaignAssetOperation: {
+      create: {
+        campaign: opts.campaignResourceName,
+        asset: assetRn,
+        fieldType: "CALLOUT",
+      },
+    },
+  }))
+  const linkResp = await mutate(customerId, linkOps, accessToken, opts.loginCustomerId)
+  const campaignAssetRns = linkResp.mutateOperationResponses.map((r, i) => {
+    const rn = r.campaignAssetResult?.resourceName
+    if (!rn) throw new Error(`Ads mutate: no campaignAsset resourceName at callout index ${i}`)
+    return rn
+  })
+
+  return { assetResourceNames: assetRns, campaignAssetResourceNames: campaignAssetRns }
+}
+
 // ── Rollback: remove entities in safe order ─────────────────────────────────
-// ads → criteria → ad groups → campaign → budget
+// ads → criteria → ad groups → campaign → budget → campaign assets → assets
 
 export async function removeDeployedEntities(
   customerId: string,
@@ -409,6 +517,10 @@ export async function removeDeployedEntities(
     adGroups: string[]
     campaign?: string
     campaignBudget?: string
+    sitelinkCampaignAssets?: string[]
+    calloutCampaignAssets?: string[]
+    sitelinkAssets?: string[]
+    calloutAssets?: string[]
   },
   loginCustomerId?: string,
 ): Promise<void> {
@@ -418,12 +530,26 @@ export async function removeDeployedEntities(
     await mutateRemove(customerId, resourceNames.adGroupCriteria, "adGroupCriterionOperation", accessToken, loginCustomerId)
   if (resourceNames.campaignCriteria.filter(Boolean).length)
     await mutateRemove(customerId, resourceNames.campaignCriteria.filter(Boolean), "campaignCriterionOperation", accessToken, loginCustomerId)
+  // Remove extension campaign assets before removing the campaign itself
+  const campaignAssets = [
+    ...(resourceNames.sitelinkCampaignAssets ?? []),
+    ...(resourceNames.calloutCampaignAssets ?? []),
+  ].filter(Boolean)
+  if (campaignAssets.length)
+    await mutateRemove(customerId, campaignAssets, "campaignAssetOperation", accessToken, loginCustomerId)
   if (resourceNames.adGroups.length)
     await mutateRemove(customerId, resourceNames.adGroups, "adGroupOperation", accessToken, loginCustomerId)
   if (resourceNames.campaign)
     await mutateRemove(customerId, [resourceNames.campaign], "campaignOperation", accessToken, loginCustomerId)
   if (resourceNames.campaignBudget)
     await mutateRemove(customerId, [resourceNames.campaignBudget], "campaignBudgetOperation", accessToken, loginCustomerId)
+  // Remove assets last (they're shared resources — safe to remove after campaign is gone)
+  const assets = [
+    ...(resourceNames.sitelinkAssets ?? []),
+    ...(resourceNames.calloutAssets ?? []),
+  ].filter(Boolean)
+  if (assets.length)
+    await mutateRemove(customerId, assets, "assetOperation", accessToken, loginCustomerId)
 }
 
 // ── Post-approval: enable campaign (HUMAN-ONLY path) ───────────────────────
