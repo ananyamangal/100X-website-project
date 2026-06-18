@@ -537,6 +537,7 @@ const QUICK_LINKS = [
   { href: "/admin/growth/ads/approval-queue",    label: "Approval Queue",  icon: ShieldCheck,desc: "Pending campaigns" },
   { href: "/admin/growth/ads/monitoring",        label: "Monitoring",      icon: Radio,      desc: "CTR health · metrics · recs" },
   { href: "/admin/growth/ads/director",          label: "Ads Director",    icon: TrendingUp, desc: "Recommendations · optimization" },
+  { href: "/admin/growth/diagnostics",           label: "Diagnostics",     icon: Layers,     desc: "System health · VERIFIED / BROKEN" },
 ]
 
 // ── Main page ─────────────────────────────────────────────────────────────────

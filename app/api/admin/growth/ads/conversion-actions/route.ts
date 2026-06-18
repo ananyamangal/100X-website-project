@@ -1,10 +1,11 @@
 /**
  * Conversion Actions — live sync from Google Ads + DB-backed config.
  *
- * GET  — list configured actions (DB first, fallback to placeholders)
- * POST — sync live conversion actions from Google Ads API and save to DB
+ * GET   — list configured actions (DB first, fallback to placeholders)
+ * PATCH — manually configure labels (when you know them but Google API isn't connected)
+ * POST  — sync live conversion actions from Google Ads API and save to DB
  */
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { getAdsSettings, searchAds } from "@/lib/google-ads"
 import { getValidAccessToken, getStoredTokens } from "@/lib/google-oauth"
@@ -59,6 +60,67 @@ export async function GET() {
       lastSyncedAt: saved?.syncedAt ?? null,
       actions,
     })
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 })
+  }
+}
+
+// PATCH — manually enter conversion labels (use when Google Ads API isn't connected yet)
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json() as {
+      awConversionId: string
+      actions: Array<{ name: string; conversionLabel: string }>
+    }
+
+    if (!body.awConversionId?.match(/^AW-\d+$/)) {
+      return NextResponse.json({ error: "awConversionId must match AW-XXXXXXXXX format" }, { status: 400 })
+    }
+
+    for (const a of body.actions ?? []) {
+      if (!a.name || !a.conversionLabel) continue
+      if (a.conversionLabel.includes("REPLACE")) {
+        return NextResponse.json({ error: `Label for "${a.name}" is still a placeholder` }, { status: 400 })
+      }
+    }
+
+    const db  = (await clientPromise).db()
+    const now = new Date().toISOString()
+
+    const existing = await db.collection(COLL).findOne({ _docId: "conversion-config" }) as Record<string, unknown> | null
+    const existingActions = (existing?.actions ?? []) as Array<Record<string, unknown>>
+
+    const merged = CONVERSION_ACTIONS.map(canonical => {
+      const manual   = (body.actions ?? []).find(a => a.name === canonical.name)
+      const previous = existingActions.find(e => e.name === canonical.name)
+      return {
+        name:            canonical.name,
+        conversionId:    body.awConversionId,
+        conversionLabel: manual?.conversionLabel ?? String(previous?.conversionLabel ?? canonical.conversionLabel),
+        googleAdsId:     previous?.googleAdsId   ?? null,
+        googleAdsName:   previous?.googleAdsName ?? null,
+        manualEntry:     !!manual,
+        updatedAt:       now,
+      }
+    })
+
+    await db.collection(COLL).updateOne(
+      { _docId: "conversion-config" },
+      {
+        $set: {
+          _docId:             "conversion-config",
+          awConversionId:     body.awConversionId,
+          actions:            merged,
+          manuallyConfigured: true,
+          manualConfiguredAt: now,
+          updatedAt:          now,
+        },
+      },
+      { upsert: true },
+    )
+
+    const configured = merged.filter(a => !String(a.conversionLabel).includes("REPLACE")).length
+    return NextResponse.json({ ok: true, awConversionId: body.awConversionId, configured, total: merged.length })
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 })
   }
