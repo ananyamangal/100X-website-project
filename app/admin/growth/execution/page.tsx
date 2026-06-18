@@ -2,46 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react"
 import {
-  Zap, RefreshCw, CheckCircle, AlertTriangle, XCircle,
+  Zap, RefreshCw, CheckCircle, XCircle,
   Megaphone, FileText, Layers, TrendingUp, BarChart3,
   ArrowRight, ExternalLink, Filter, Shield, ChevronDown,
-  ChevronUp, Rocket, Eye, Target,
+  ChevronUp, Rocket,
 } from "lucide-react"
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-type AssetType   = "campaign" | "seo_article" | "landing_page" | "director_rec"
-type ActionType  = "deploy" | "approve" | "publish" | "monitor" | "execute"
-type AssetSource = "ads" | "seo" | "landing" | "director"
-
-interface QueueItem {
-  assetId:        string
-  assetType:      AssetType
-  source:         AssetSource
-  title:          string
-  opportunity:    string
-  revenueImpact:  number
-  status:         string
-  requiredAction: ActionType
-  actionLabel:    string
-  actionEndpoint: string
-  actionPayload:  Record<string, unknown>
-  priority:       "critical" | "high" | "medium" | "low"
-  createdAt:      string
-  meta?:          Record<string, unknown>
-}
-
-interface Summary {
-  totalItems:         number
-  campaignsReady:     number
-  articlesReady:      number
-  pagesReady:         number
-  monitoring:         number
-  directorRecs:       number
-  totalRevenueImpact: number
-}
-
-interface ExecutionData { summary: Summary; queue: QueueItem[] }
+import type { QueueItem, Summary, ExecutionData, AssetType, ActionType } from "@/types/growth-execution"
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -55,11 +21,11 @@ const ASSET_CONFIG: Record<AssetType, {
 }
 
 const ACTION_CONFIG: Record<ActionType, { label: string; color: string; badge: string }> = {
-  deploy:  { label: "Deploy",   color: "bg-emerald-700 hover:bg-emerald-600 text-white",   badge: "bg-emerald-900/40 text-emerald-300 border-emerald-700" },
-  approve: { label: "Approve",  color: "bg-blue-700 hover:bg-blue-600 text-white",         badge: "bg-blue-900/40 text-blue-300 border-blue-700" },
-  publish: { label: "Publish",  color: "bg-teal-700 hover:bg-teal-600 text-white",         badge: "bg-teal-900/40 text-teal-300 border-teal-700" },
-  execute: { label: "Execute",  color: "bg-amber-700 hover:bg-amber-600 text-white",       badge: "bg-amber-900/40 text-amber-300 border-amber-700" },
-  monitor: { label: "Monitor",  color: "bg-gray-700 hover:bg-gray-600 text-white",         badge: "bg-gray-800 text-gray-400 border-gray-700" },
+  deploy:  { label: "Deploy",  color: "bg-emerald-700 hover:bg-emerald-600 text-white", badge: "bg-emerald-900/40 text-emerald-300 border-emerald-700" },
+  approve: { label: "Approve", color: "bg-blue-700 hover:bg-blue-600 text-white",       badge: "bg-blue-900/40 text-blue-300 border-blue-700" },
+  publish: { label: "Publish", color: "bg-teal-700 hover:bg-teal-600 text-white",       badge: "bg-teal-900/40 text-teal-300 border-teal-700" },
+  execute: { label: "View",    color: "bg-amber-700 hover:bg-amber-600 text-white",     badge: "bg-amber-900/40 text-amber-300 border-amber-700" },
+  monitor: { label: "View",    color: "bg-gray-700 hover:bg-gray-600 text-white",       badge: "bg-gray-800 text-gray-400 border-gray-700" },
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -82,12 +48,16 @@ function fmtRevenue(n: number): string {
 
 function SummaryStrip({ s }: { s: Summary }) {
   const tiles = [
-    { label: "Campaigns Ready",  value: s.campaignsReady,  action: "deploy",  color: "text-emerald-400" },
-    { label: "Articles Ready",   value: s.articlesReady,   action: "approve/publish", color: "text-blue-400" },
-    { label: "Pages Ready",      value: s.pagesReady,      action: "approve/publish", color: "text-purple-400" },
-    { label: "Monitoring",       value: s.monitoring,      action: "monitor", color: "text-gray-500" },
-    { label: "Director Recs",    value: s.directorRecs,    action: "execute", color: "text-amber-400" },
-    { label: "Revenue Pipeline", value: fmtRevenue(s.totalRevenueImpact), action: "", color: "text-brand-400" },
+    { label: "Campaigns Ready",  value: s.campaignsReady,  color: "text-emerald-400" },
+    { label: "Articles Ready",   value: s.articlesReady,   color: "text-blue-400" },
+    { label: "Pages Ready",      value: s.pagesReady,      color: "text-purple-400" },
+    { label: "Monitoring",       value: s.monitoring,      color: "text-gray-500" },
+    { label: "Director Recs",    value: s.directorRecs,    color: "text-amber-400" },
+    {
+      label: "Revenue Pipeline",
+      value: s.totalRevenueImpact > 0 ? fmtRevenue(s.totalRevenueImpact) : "—",
+      color: "text-brand-400",
+    },
   ]
   return (
     <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
@@ -113,13 +83,13 @@ function QueueCard({
   actingId:  string | null
 }) {
   const [expanded, setExpanded] = useState(false)
-  const asset  = ASSET_CONFIG[item.assetType]
-  const action = ACTION_CONFIG[item.requiredAction]
-  const AssetIcon = asset.icon
-  const isActing = actingId === item.assetId
-  const isMonitor = item.requiredAction === "monitor"
+  const asset      = ASSET_CONFIG[item.assetType]
+  const action     = ACTION_CONFIG[item.requiredAction]
+  const AssetIcon  = asset.icon
+  const isActing   = actingId === item.assetId
+  const isNavigation = item.requiredAction === "monitor" || item.requiredAction === "execute"
 
-  const moduleUrl: Record<AssetSource, string> = {
+  const moduleUrl: Record<string, string> = {
     ads:      "/admin/growth/ads/health",
     seo:      "/admin/growth/seo/execution",
     landing:  "/admin/growth/landing",
@@ -131,14 +101,11 @@ function QueueCard({
       item.priority === "critical" ? "border-red-900/60" :
       item.priority === "high"     ? "border-orange-900/40" : "border-gray-800"
     }`}>
-      {/* Main row */}
       <div className="px-5 py-3.5 flex items-center gap-4">
-        {/* Asset type icon */}
         <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 border ${asset.bg}`}>
           <AssetIcon size={15} className={asset.color} />
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-0.5">
             <span className="text-sm font-semibold text-white truncate max-w-sm">{item.title}</span>
@@ -151,16 +118,17 @@ function QueueCard({
           </div>
           <div className="flex gap-3 text-[11px] text-gray-600 flex-wrap">
             {item.opportunity && <span className="truncate max-w-48">{item.opportunity}</span>}
-            {item.revenueImpact > 0 && (
+            {item.revenueImpact > 0 ? (
               <span className="flex items-center gap-1 text-brand-500">
                 <BarChart3 size={9} />{fmtRevenue(item.revenueImpact)} impact
               </span>
+            ) : (
+              <span className="text-gray-700 italic">Revenue not yet estimated</span>
             )}
             <span className="text-gray-700">{item.status.replace(/_/g, " ")}</span>
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => setExpanded(e => !e)}
@@ -182,17 +150,17 @@ function QueueCard({
             disabled={isActing}
             className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-lg transition-colors disabled:opacity-60 ${action.color}`}
           >
-            {isActing
-              ? <><RefreshCw size={11} className="animate-spin" />Working…</>
-              : isMonitor
-              ? <><Eye size={11} />{item.actionLabel}</>
-              : <><Rocket size={11} />{item.actionLabel}</>
-            }
+            {isActing ? (
+              <><RefreshCw size={11} className="animate-spin" />Working…</>
+            ) : isNavigation ? (
+              <><ExternalLink size={11} />{item.actionLabel}</>
+            ) : (
+              <><Rocket size={11} />{item.actionLabel}</>
+            )}
           </button>
         </div>
       </div>
 
-      {/* Expanded meta */}
       {expanded && item.meta && (
         <div className="border-t border-gray-800 px-5 py-3 bg-gray-950 grid grid-cols-2 gap-x-8 gap-y-1.5 sm:grid-cols-4">
           {Object.entries(item.meta).map(([k, v]) => v != null && v !== "" && (
@@ -214,21 +182,24 @@ function QueueCard({
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function ExecutionHubPage() {
-  const [data, setData]         = useState<ExecutionData | null>(null)
-  const [loading, setLoading]   = useState(true)
-  const [actingId, setActingId] = useState<string | null>(null)
-  const [msg, setMsg]           = useState<{ type: "ok" | "error"; text: string } | null>(null)
+  const [data, setData]           = useState<ExecutionData | null>(null)
+  const [loading, setLoading]     = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [actingId, setActingId]   = useState<string | null>(null)
+  const [msg, setMsg]             = useState<{ type: "ok" | "error"; text: string } | null>(null)
   const [filterAction, setFilterAction] = useState<string>("all")
   const [filterSource, setFilterSource] = useState<string>("all")
+  const [showMonitor, setShowMonitor]   = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
+    setLoadError(null)
     try {
       const res = await fetch("/api/admin/growth/execution")
       const d   = await res.json() as ExecutionData
       setData(d)
     } catch (e) {
-      setMsg({ type: "error", text: String(e) })
+      setLoadError(String(e))
     } finally {
       setLoading(false)
     }
@@ -237,7 +208,6 @@ export default function ExecutionHubPage() {
   useEffect(() => { load() }, [load])
 
   const handleAction = async (item: QueueItem) => {
-    // Monitor = navigate to module, not an API call
     if (item.requiredAction === "monitor" || item.requiredAction === "execute") {
       window.open(
         item.source === "ads"      ? "/admin/growth/ads/health" :
@@ -276,13 +246,16 @@ export default function ExecutionHubPage() {
 
   const queue = (data?.queue ?? []).filter(item =>
     (filterAction === "all" || item.requiredAction === filterAction) &&
-    (filterSource === "all" || item.source === filterSource)
+    (filterSource === "all" || item.source === filterSource) &&
+    (showMonitor || item.requiredAction !== "monitor")
   )
 
   const actionCounts = (data?.queue ?? []).reduce((acc, i) => {
     acc[i.requiredAction] = (acc[i.requiredAction] ?? 0) + 1
     return acc
   }, {} as Record<string, number>)
+
+  const monitorCount = data?.summary.monitoring ?? 0
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -308,15 +281,15 @@ export default function ExecutionHubPage() {
           <Shield size={16} className="text-red-400 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-gray-400">
             <strong className="text-gray-300">Approval-gated.</strong>{" "}
-            Deploy and Publish buttons execute against live systems. Approve/Monitor actions are safe previews.
-            All actions are logged to <code className="text-gray-500">growth_os_logs</code>.
+            Deploy and Publish buttons execute against live systems. View actions open the specialist module.
+            All mutations are logged to <code className="text-gray-500">growth_os_logs</code>.
           </p>
         </div>
 
         {/* Summary */}
         {data?.summary && <SummaryStrip s={data.summary} />}
 
-        {/* Message */}
+        {/* Inline action feedback */}
         {msg && (
           <div className={`flex items-start gap-3 p-4 rounded-xl border text-sm ${
             msg.type === "error"
@@ -330,13 +303,28 @@ export default function ExecutionHubPage() {
           </div>
         )}
 
-        {/* ── Filters ── */}
-        {data && queue.length > 0 && (
+        {/* Error state */}
+        {!loading && loadError && !data && (
+          <div className="bg-red-950/10 border border-red-900/40 rounded-xl p-12 text-center">
+            <XCircle size={36} className="text-red-700 mx-auto mb-4" />
+            <p className="text-gray-300 font-semibold mb-1">Failed to load execution queue</p>
+            <p className="text-gray-600 text-xs mb-6">{loadError}</p>
+            <button
+              onClick={load}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-sm text-gray-200 rounded-lg transition-colors"
+            >
+              <RefreshCw size={13} />Retry
+            </button>
+          </div>
+        )}
+
+        {/* Filters */}
+        {data && (
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-1 text-[10px] text-gray-600">
               <Filter size={10} />Action
             </div>
-            {["all", "deploy", "approve", "publish", "execute", "monitor"].map(a => (
+            {(["all", "deploy", "approve", "publish", "execute"] as const).map(a => (
               <button
                 key={a}
                 onClick={() => setFilterAction(a)}
@@ -354,7 +342,7 @@ export default function ExecutionHubPage() {
             <div className="flex items-center gap-1 text-[10px] text-gray-600">
               <Filter size={10} />Source
             </div>
-            {["all", "ads", "seo", "landing", "director"].map(s => (
+            {(["all", "ads", "seo", "landing", "director"] as const).map(s => (
               <button
                 key={s}
                 onClick={() => setFilterSource(s)}
@@ -367,10 +355,25 @@ export default function ExecutionHubPage() {
                 {s === "all" ? "All Sources" : s.charAt(0).toUpperCase() + s.slice(1)}
               </button>
             ))}
+            {monitorCount > 0 && (
+              <>
+                <div className="w-px bg-gray-800 h-5" />
+                <button
+                  onClick={() => setShowMonitor(v => !v)}
+                  className={`text-[10px] px-2.5 py-1 rounded-lg border transition-colors ${
+                    showMonitor
+                      ? "border-gray-600 text-gray-300 bg-gray-800"
+                      : "border-gray-800 text-gray-600 hover:border-gray-700"
+                  }`}
+                >
+                  {showMonitor ? `Hide Monitoring (${monitorCount})` : `Show Monitoring (${monitorCount})`}
+                </button>
+              </>
+            )}
           </div>
         )}
 
-        {/* ── Queue ── */}
+        {/* Queue */}
         {queue.length > 0 && (
           <div className="space-y-2">
             <p className="text-[11px] text-gray-600 font-semibold uppercase tracking-wider">
@@ -399,6 +402,7 @@ export default function ExecutionHubPage() {
           </div>
         )}
 
+        {/* Loading skeleton */}
         {loading && (
           <div className="space-y-2">
             {[...Array(4)].map((_, i) => (
@@ -412,10 +416,10 @@ export default function ExecutionHubPage() {
           <p className="text-[10px] text-gray-600 uppercase tracking-wider font-semibold mb-3">Specialist Modules</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
-              { href: "/admin/growth/ads/health",     label: "Ads Health",         icon: Megaphone, color: "text-emerald-400" },
-              { href: "/admin/growth/seo/execution",  label: "SEO Factory",        icon: FileText,  color: "text-blue-400" },
-              { href: "/admin/growth/landing",        label: "LP Factory",         icon: Layers,    color: "text-purple-400" },
-              { href: "/admin/growth/director",       label: "Revenue Director",   icon: TrendingUp, color: "text-amber-400" },
+              { href: "/admin/growth/ads/health",    label: "Ads Health",       icon: Megaphone,  color: "text-emerald-400" },
+              { href: "/admin/growth/seo/execution", label: "SEO Factory",      icon: FileText,   color: "text-blue-400" },
+              { href: "/admin/growth/landing",       label: "LP Factory",       icon: Layers,     color: "text-purple-400" },
+              { href: "/admin/growth/director",      label: "Revenue Director", icon: TrendingUp, color: "text-amber-400" },
             ].map(({ href, label, icon: Icon, color }) => (
               <a
                 key={href}
@@ -429,6 +433,7 @@ export default function ExecutionHubPage() {
             ))}
           </div>
         </div>
+
       </div>
     </div>
   )

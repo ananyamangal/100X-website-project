@@ -1,0 +1,14 @@
+node_modules/
+.next/
+test-results/
+coverage/
+playwright-report/
+rfq-audit-screenshots/
+verify-*/
+ux-audit/
+precommit-screenshots/
+OneDriveData*
+*.png
+*.jpg
+*.jpeg
+*.webp

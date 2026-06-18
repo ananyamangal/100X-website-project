@@ -1,38 +1,8 @@
-/**
- * Execution Hub v2 API
- * Aggregates all executable assets from:
- *   - Ads Campaign Factory (ads_campaign_plans)
- *   - SEO Content Factory (seo_content_plans)
- *   - Landing Page Factory (landing_page_plans)
- *   - Revenue Director (director_recommendations)
- *
- * Returns a unified founder queue sorted by action priority + revenue impact.
- */
 import { NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import type { QueueItem, ActionType } from "@/types/growth-execution"
 
 export const dynamic = "force-dynamic"
-
-export type AssetType   = "campaign" | "seo_article" | "landing_page" | "director_rec"
-export type ActionType  = "deploy" | "approve" | "publish" | "monitor" | "execute"
-export type AssetSource = "ads" | "seo" | "landing" | "director"
-
-export interface QueueItem {
-  assetId:        string
-  assetType:      AssetType
-  source:         AssetSource
-  title:          string
-  opportunity:    string
-  revenueImpact:  number
-  status:         string
-  requiredAction: ActionType
-  actionLabel:    string
-  actionEndpoint: string
-  actionPayload:  Record<string, unknown>
-  priority:       "critical" | "high" | "medium" | "low"
-  createdAt:      string
-  meta?:          Record<string, unknown>
-}
 
 function toPriority(p: string | number | undefined): QueueItem["priority"] {
   if (p === "critical" || p === 1) return "critical"
@@ -86,7 +56,7 @@ export async function GET() {
         source:         "ads",
         title:          c.campaignName ?? c.keyword ?? "Unnamed Campaign",
         opportunity:    c.keyword ?? c.targetKeyword ?? c.funnelType ?? "",
-        revenueImpact:  Number(c.estimatedRevenue ?? 0) || 150000,
+        revenueImpact:  Number(c.estimatedRevenue ?? 0),
         status:         c.status,
         requiredAction: "deploy",
         actionLabel:    "Deploy Campaign",
@@ -118,7 +88,7 @@ export async function GET() {
         actionEndpoint = "/api/admin/growth/seo/content-factory/publish"
         actionPayload  = { planId: p.planId }
       } else {
-        requiredAction = "monitor"; actionLabel = "Check Index"
+        requiredAction = "monitor"; actionLabel = "View Index Status"
         actionEndpoint = "/api/admin/growth/seo/content-factory/index-request"
         actionPayload  = { planId: p.planId }
       }
@@ -129,7 +99,7 @@ export async function GET() {
         source:         "seo",
         title:          p.generatedContent?.h1 ?? p.keyword ?? "SEO Article",
         opportunity:    p.keyword ?? "",
-        revenueImpact:  50000,
+        revenueImpact:  0,
         status:         p.status,
         requiredAction,
         actionLabel,
@@ -173,7 +143,7 @@ export async function GET() {
         source:         "landing",
         title:          p.generatedContent?.hero?.headline ?? p.keyword ?? "Landing Page",
         opportunity:    p.keyword ?? "",
-        revenueImpact:  Number(p.performance?.revenueAttributed ?? 0) || 80000,
+        revenueImpact:  Number(p.performance?.revenueAttributed ?? 0),
         status:         p.status,
         requiredAction,
         actionLabel,
@@ -210,7 +180,6 @@ export async function GET() {
       })
     }
 
-    // Sort: by action urgency first, then revenue impact desc
     queue.sort((a, b) => {
       const oa = ACTION_ORDER[a.requiredAction] ?? 5
       const ob = ACTION_ORDER[b.requiredAction] ?? 5
