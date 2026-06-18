@@ -1,16 +1,27 @@
 ﻿"use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import {
   FORM_SUBMISSION_TYPE,
   type LandingFormBlockData,
+  type LandingFormVariant,
 } from "@/lib/seo/landing-types"
 import {
   getPersistedAttribution,
   pushDataLayer,
 } from "@/lib/gtm"
+
+// generate_lead params per variant — values in INR
+const GENERATE_LEAD_CFG: Record<LandingFormVariant, { lead_type: string; page_type: string; value: number }> = {
+  reseller:        { lead_type: "oem_authorization",  page_type: "gem_oem",    value: 1000 },
+  "tender-quote":  { lead_type: "tender_inquiry",     page_type: "tender",     value: 2000 },
+  "state-dealer":  { lead_type: "dealer_inquiry",     page_type: "dealer",     value: 5000 },
+  "guide-download":{ lead_type: "guide_download",     page_type: "guide",      value:  500 },
+  "use-case-quote":{ lead_type: "use_case_quote",     page_type: "use_case",   value: 1500 },
+}
 
 type FormFieldDef = {
   name: string
@@ -90,6 +101,7 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
   const fields = FIELDS_BY_VARIANT[block.variant]
   const submissionType = FORM_SUBMISSION_TYPE[block.variant]
   const gaEvent = block.gaEvent || `${block.variant.replace("-", "_")}_submit`
+  const router = useRouter()
 
   const [values, setValues] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -141,8 +153,21 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
         landing_slug: landingSlug,
       })
 
-      toast.success("Thanks — our team will be in touch shortly.")
+      // Fire generate_lead AFTER confirmed server response — triggers Google Ads conversion
+      const leadCfg = GENERATE_LEAD_CFG[block.variant]
+      pushDataLayer({
+        event: "generate_lead",
+        lead_type:    leadCfg.lead_type,
+        page_type:    leadCfg.page_type,
+        value:        leadCfg.value,
+        currency:     "INR",
+        variant:      block.variant,
+        landing_slug: landingSlug,
+      })
+
       setValues({})
+      toast.success("Received! Our team will contact you within 24 hours.")
+      router.push(`/thank-you?type=${leadCfg.lead_type}`)
     } catch {
       setError("Something went wrong. Please try again or contact us directly.")
       toast.error("Couldn't submit — please try again.")

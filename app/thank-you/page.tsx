@@ -25,10 +25,15 @@ const thankYouJsonLd = {
   isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL },
 }
 
-export default function ThankYouPage() {
+export default async function ThankYouPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>
+}) {
+  const { type } = await searchParams
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 via-white to-gray-50 pt-24 pb-16">
-      <ContactThankYouTracker />
+      <ContactThankYouTracker type={type} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(thankYouJsonLd) }}

@@ -4,6 +4,10 @@ import React, { useState, useEffect, useRef } from "react"
 import { X, Download, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { pushDataLayer } from "@/lib/gtm"
+
+const BROCHURE_LEAD_VALUE_INR =
+  Number(process.env.NEXT_PUBLIC_BROCHURE_LEAD_VALUE_INR) || 50000
 
 const INDIAN_STATES = [
   "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat",
@@ -102,6 +106,13 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
         setError(data.error || "Submission failed. Please try again.")
         return
       }
+      pushDataLayer({
+        event: "generate_lead",
+        lead_type: "brochure_download",
+        value: BROCHURE_LEAD_VALUE_INR,
+        currency: "INR",
+        source,
+      })
       setDone(true)
       reset()
       triggerDownload()

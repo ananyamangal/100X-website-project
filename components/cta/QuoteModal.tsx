@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Loader2, X } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -24,6 +25,7 @@ type Props = {
 const PHONE_RE = /^[0-9+\-()\s]{10,18}$/
 
 export default function QuoteModal({ open, onClose, audience, productName }: Props) {
+  const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [name, setName] = useState("")
@@ -132,9 +134,9 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
         currency: "INR",
       })
 
-      toast.success("Thanks — our team will call you shortly.")
       reset()
       onClose()
+      router.push("/thank-you?type=sticky_quote")
     } catch {
       setError("We couldn't save your request. Please try again or call us.")
       toast.error("Couldn't submit. Please try again.")
