@@ -353,7 +353,18 @@ export function computeQualityScore(records: NormalizedRecord[]): QualityScore {
   }
 }
 
-// ── Google-compliant CSV (SHA-256 hashed per Google requirements) ─────────────
+// ── Plain CSV (for Google Ads UI upload / manual review) ─────────────────────
+
+export function generatePlainCSV(records: NormalizedRecord[]): string {
+  const header   = "Email,Phone,First Name,Last Name,Country,Zip"
+  const matchable = records.filter(r => r.email || r.phone)
+  const rows = matchable.map(r =>
+    [r.email, r.phone, r.firstName, r.lastName, r.country || "IN", r.postalCode || ""].join(",")
+  )
+  return [header, ...rows].join("\r\n")
+}
+
+// ── Hashed CSV (SHA-256 per Google OfflineUserDataJob requirements) ───────────
 
 export function generateGoogleCSV(records: NormalizedRecord[]): string {
   const header  = "Email,Phone,First Name,Last Name,Country,Zip"

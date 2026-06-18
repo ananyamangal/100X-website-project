@@ -1,15 +1,9 @@
-/**
- * Customer Match Export — Google-compliant CSV download
- * GET /api/admin/growth/ads/customer-match/{audienceId}/export
- *
- * Returns SHA-256 hashed CSV (Email, Phone, First Name, Last Name, Country, Zip)
- * per Google Customer Match data format requirements.
- */
 import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { requireAuth } from "@/lib/rbac/server"
 import {
   buildAudienceRecords,
+  generatePlainCSV,
   generateGoogleCSV,
   AUDIENCE_META,
   type AudienceType,
@@ -33,24 +27,28 @@ export async function GET(
       return NextResponse.json({ error: "Unknown audience. Valid: cm_dealers, cm_crm_leads, cm_government_buyers, cm_existing_customers" }, { status: 400 })
     }
 
+    const format  = req.nextUrl.searchParams.get("format") === "hashed" ? "hashed" : "plain"
     const db      = (await clientPromise).db()
     const records = await buildAudienceRecords(audienceType, db)
-    const csv     = generateGoogleCSV(records)
+    const csv     = format === "hashed" ? generateGoogleCSV(records) : generatePlainCSV(records)
 
     const matchable = records.filter(r => r.email || r.phone).length
     const date      = new Date().toISOString().split("T")[0]
-    const filename  = `100x-customer-match-${audienceType.replace(/_/g, "-")}-${date}.csv`
+    const slug      = audienceType.replace(/_/g, "-")
+    const filename  = format === "hashed"
+      ? `customer_match_hashed_${slug}_${date}.csv`
+      : `customer_match_google_${slug}_${date}.csv`
 
-    // Log export event
     await db.collection("growth_os_logs").insertOne({
-      ts:          new Date().toISOString(),
-      agent:       "customer-match-engine",
-      action:      "csv_exported",
+      ts:               new Date().toISOString(),
+      agent:            "customer-match-engine",
+      action:           "csv_exported",
       audienceType,
-      totalRecords: records.length,
+      format,
+      totalRecords:     records.length,
       matchableRecords: matchable,
-      level:  "success",
-      module: "ads",
+      level:            "success",
+      module:           "ads",
     })
 
     return new NextResponse(csv, {
