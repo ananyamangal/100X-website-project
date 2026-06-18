@@ -41,6 +41,19 @@ export interface QualityScore {
   missingBoth:         number
   estimatedMatchRate:  number
   matchBasis:          string
+  // government_buyers extras
+  organizationsCount?: number
+  contactsExtracted?:  number
+  contractsScanned?:   number
+}
+
+export interface AudienceResult {
+  records: NormalizedRecord[]
+  extras?: {
+    contractsScanned?:   number
+    contactsExtracted?:  number
+    organizationsCount?: number
+  }
 }
 
 export interface AudienceDoc {
@@ -67,9 +80,9 @@ export const AUDIENCE_META: Record<AudienceType, {
 }> = {
   government_buyers:  {
     displayName: "Government Buyers",
-    description: "Municipal corps, health depts, and govt orgs from GeM contracts",
+    description: "Buyer contacts (email + phone) extracted from GeM contract PDFs",
     colorClass:  "blue",
-    sourceHint:  "fogging_organizations — no contact info in source; enrichment required",
+    sourceHint:  "gem_contracts — buyer_email + buyer_contact from PDF enrichment",
   },
   dealers: {
     displayName: "Dealers",
@@ -245,26 +258,71 @@ async function buildDealers(db: Db): Promise<NormalizedRecord[]> {
   return records
 }
 
-async function buildGovernmentBuyers(db: Db): Promise<NormalizedRecord[]> {
-  const orgs = await db.collection("fogging_organizations")
-    .find({ total_gmv: { $gte: 5000 } })
-    .limit(5000)
+async function buildGovernmentBuyers(db: Db): Promise<AudienceResult> {
+  // Query gem_contracts for buyer contact data extracted from PDFs.
+  // buyer_email and buyer_contact (phone) are populated by the enrichment pipeline.
+  const raw = await db.collection("gem_contracts")
+    .find({
+      $or: [
+        { buyer_email:   { $exists: true, $nin: [null, ""] } },
+        { buyer_contact: { $exists: true, $nin: [null, ""] } },
+      ],
+    })
+    .project({
+      buyer_name: 1, buyer_email: 1, buyer_contact: 1,
+      buyer_designation: 1, buyer_state: 1,
+      buyer_dept: 1, buyer_ministry: 1,
+    })
+    .limit(20000)
     .toArray()
-  return orgs.map(o => ({
-    recordId:     String(o._id),
-    firstName:    "",
-    lastName:     "",
-    email:        "",
-    phone:        "",
-    company:      String(o.organization_name || o.name || ""),
-    city:         "",
-    state:        String(o.state || o.organization_state || ""),
-    country:      "IN",
-    postalCode:   "",
-    source:       "fogging_organizations",
-    missingEmail: true,
-    missingPhone: true,
-  }))
+
+  const contractsScanned = raw.length
+  const orgs = new Set<string>()
+  let contactsExtracted = 0
+
+  const seenEmail = new Set<string>()
+  const seenPhone = new Set<string>()
+  const records: NormalizedRecord[] = []
+
+  for (const c of raw) {
+    const email = String(c.buyer_email   || "").toLowerCase().trim()
+    const phone = normalizePhone(String(c.buyer_contact || ""))
+    if (!email && !phone) continue
+
+    contactsExtracted++
+    const org = String(c.buyer_name || c.buyer_dept || c.buyer_ministry || "")
+    if (org) orgs.add(org)
+
+    // Deduplicate: email-keyed first, then phone-keyed for email-less records
+    if (email && seenEmail.has(email)) continue
+    if (!email && phone && seenPhone.has(phone)) continue
+    if (email) seenEmail.add(email)
+    if (phone) seenPhone.add(phone)
+
+    const designation = String(c.buyer_designation || "")
+    const parts = designation.split(/\s+/).filter(Boolean)
+
+    records.push({
+      recordId:     String(c._id),
+      firstName:    parts[0] || "",
+      lastName:     parts.slice(1).join(" "),
+      email,
+      phone,
+      company:      org,
+      city:         "",
+      state:        String(c.buyer_state || ""),
+      country:      "IN",
+      postalCode:   "",
+      source:       "gem_contracts",
+      missingEmail: !email,
+      missingPhone: !phone,
+    })
+  }
+
+  return {
+    records,
+    extras: { contractsScanned, contactsExtracted, organizationsCount: orgs.size },
+  }
 }
 
 async function buildExistingCustomers(db: Db): Promise<NormalizedRecord[]> {
@@ -302,29 +360,40 @@ async function buildExistingCustomers(db: Db): Promise<NormalizedRecord[]> {
 export async function buildAudienceRecords(
   audienceType: AudienceType,
   db: Db,
-): Promise<NormalizedRecord[]> {
+): Promise<AudienceResult> {
   let records: NormalizedRecord[]
+  let extras: AudienceResult["extras"]
 
-  switch (audienceType) {
-    case "crm_leads":           records = await buildCrmLeads(db);           break
-    case "dealers":             records = await buildDealers(db);            break
-    case "government_buyers":   records = await buildGovernmentBuyers(db);   break
-    case "existing_customers":  records = await buildExistingCustomers(db);  break
+  if (audienceType === "government_buyers") {
+    const result = await buildGovernmentBuyers(db)
+    records = result.records
+    extras  = result.extras
+  } else {
+    switch (audienceType) {
+      case "crm_leads":          records = await buildCrmLeads(db);          break
+      case "dealers":            records = await buildDealers(db);           break
+      case "existing_customers": records = await buildExistingCustomers(db); break
+    }
   }
 
   // Deduplicate by email; fall back to a composite key for no-email records
   const seen = new Set<string>()
-  return records.filter(r => {
+  const deduped = records!.filter(r => {
     const key = r.email || `${r.company}::${r.source}::${r.recordId}`
     if (seen.has(key)) return false
     seen.add(key)
     return true
   })
+
+  return { records: deduped, extras }
 }
 
 // ── Quality scoring ───────────────────────────────────────────────────────────
 
-export function computeQualityScore(records: NormalizedRecord[]): QualityScore {
+export function computeQualityScore(
+  records: NormalizedRecord[],
+  extras?: AudienceResult["extras"],
+): QualityScore {
   const withEmail   = records.filter(r => r.email).length
   const withPhone   = records.filter(r => r.phone).length
   const withBoth    = records.filter(r => r.email && r.phone).length
@@ -350,6 +419,9 @@ export function computeQualityScore(records: NormalizedRecord[]): QualityScore {
     missingBoth,
     estimatedMatchRate,
     matchBasis: withEmail >= withPhone ? "Email-based" : "Phone-based",
+    ...(extras?.organizationsCount !== undefined ? { organizationsCount: extras.organizationsCount } : {}),
+    ...(extras?.contactsExtracted  !== undefined ? { contactsExtracted:  extras.contactsExtracted  } : {}),
+    ...(extras?.contractsScanned   !== undefined ? { contractsScanned:   extras.contractsScanned   } : {}),
   }
 }
 

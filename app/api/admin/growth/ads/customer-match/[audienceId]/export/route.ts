@@ -27,10 +27,10 @@ export async function GET(
       return NextResponse.json({ error: "Unknown audience. Valid: cm_dealers, cm_crm_leads, cm_government_buyers, cm_existing_customers" }, { status: 400 })
     }
 
-    const format  = req.nextUrl.searchParams.get("format") === "hashed" ? "hashed" : "plain"
-    const db      = (await clientPromise).db()
-    const records = await buildAudienceRecords(audienceType, db)
-    const csv     = format === "hashed" ? generateGoogleCSV(records) : generatePlainCSV(records)
+    const format         = req.nextUrl.searchParams.get("format") === "hashed" ? "hashed" : "plain"
+    const db             = (await clientPromise).db()
+    const { records }    = await buildAudienceRecords(audienceType, db)
+    const csv            = format === "hashed" ? generateGoogleCSV(records) : generatePlainCSV(records)
 
     const matchable = records.filter(r => r.email || r.phone).length
     const date      = new Date().toISOString().split("T")[0]

@@ -94,6 +94,10 @@ type ProspectDoc = {
   gem_contracts?:   number
   is_100x_dealer?:  boolean
   competes_with_100x?: boolean
+  seller_type?:     "dealer" | "oem" | "unknown"
+  oem_brand?:       string
+  first_seen?:      string | null
+  last_seen?:       string | null
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -138,10 +142,14 @@ export async function POST(req: NextRequest) {
               needs_enrichment: p.needs_enrichment,
               notes:            p.notes,
               updated_at:       now,
-              ...(p.gem_gmv       !== undefined ? { gem_gmv:       p.gem_gmv       } : {}),
-              ...(p.gem_contracts !== undefined ? { gem_contracts: p.gem_contracts } : {}),
-              ...(p.is_100x_dealer !== undefined ? { is_100x_dealer:   p.is_100x_dealer   } : {}),
+              ...(p.gem_gmv            !== undefined ? { gem_gmv:            p.gem_gmv            } : {}),
+              ...(p.gem_contracts      !== undefined ? { gem_contracts:      p.gem_contracts      } : {}),
+              ...(p.is_100x_dealer     !== undefined ? { is_100x_dealer:     p.is_100x_dealer     } : {}),
               ...(p.competes_with_100x !== undefined ? { competes_with_100x: p.competes_with_100x } : {}),
+              ...(p.seller_type        !== undefined ? { seller_type:        p.seller_type        } : {}),
+              ...(p.oem_brand          !== undefined ? { oem_brand:          p.oem_brand          } : {}),
+              ...(p.first_seen         !== undefined ? { first_seen:         p.first_seen         } : {}),
+              ...(p.last_seen          !== undefined ? { last_seen:          p.last_seen          } : {}),
             },
           },
           upsert: true,
@@ -340,6 +348,103 @@ export async function POST(req: NextRequest) {
     await bulkUpsert(prospects, "rfq_popup_leads")
   } catch (e) { results["rfq_popup_leads"] = { processed: 0, inserted: 0, updated: 0 }; console.error("rfq_popup_leads sync:", e) }
 
+  // ── Source 6: gem_contracts — selling_as reseller classification ─────────
+  let oemSkipped     = 0
+  let resellerAdded  = 0
+  const stateCount: Record<string, number> = {}
+
+  try {
+    const RESELLER_RE = /\bReseller\b/i        // catches "Reseller" and "OEM verified Reseller"
+    const OEM_ONLY_RE = /^OEM(\s+Item)?$/i     // catches "OEM" and "OEM Item" (not Reseller)
+
+    const gemResellers = await db.collection("gem_contracts").aggregate([
+      { $match: { selling_as: { $exists: true, $nin: [null, ""] } } },
+      {
+        $group: {
+          _id: {
+            $ifNull: [
+              "$seller_gst",
+              { $concat: ["noGst::", { $ifNull: ["$seller_name_canonical", { $ifNull: ["$seller_name", "unknown"] }] }] },
+            ],
+          },
+          seller_name:    { $first: "$seller_name" },
+          seller_email:   { $first: "$seller_email" },
+          seller_phone:   { $first: "$seller_phone" },
+          seller_state:   { $first: "$seller_state" },
+          seller_address: { $first: "$seller_address" },
+          oem_name:       { $first: "$oem_name" },
+          selling_as:     { $first: "$selling_as" },
+          contracts_won:  { $sum: 1 },
+          total_value:    { $sum: "$contract_value_pdf" },
+          first_seen:     { $min: "$contract_date" },
+          last_seen:      { $max: "$contract_date" },
+        },
+      },
+    ], { allowDiskUse: true }).toArray()
+
+    const prospects: ProspectDoc[] = []
+
+    for (const c of gemResellers) {
+      const sellingAs = String(c.selling_as || "")
+
+      if (RESELLER_RE.test(sellingAs)) {
+        // Reseller or OEM verified Reseller → dealer prospect
+        const email  = String(c.seller_email  || "").toLowerCase().trim()
+        const mobile = normalizePhone(String(c.seller_phone || ""))
+        const gst    = String(c._id || "").replace(/^noGst::/, "").trim().toUpperCase()
+        const name   = String(c.seller_name   || "")
+        const state  = String(c.seller_state  || "")
+        const city   = extractCityFromAddress(String(c.seller_address || ""))
+        const score  = calcScore(email, mobile, gst.startsWith("noGst") ? "" : gst, city, "")
+        const dk     = dedupKey(email, mobile, gst.startsWith("noGst") ? "" : gst, name, city)
+
+        if (state) stateCount[state] = (stateCount[state] || 0) + 1
+        resellerAdded++
+
+        prospects.push({
+          dealer_name:      name,
+          contact_person:   "",
+          mobile,
+          email,
+          city,
+          state,
+          gst:              gst.startsWith("noGst") ? "" : gst,
+          source:           "gem_contract_reseller",
+          source_ref_id:    String(c._id),
+          dealer_score:     score,
+          status:           "new",
+          needs_enrichment: !email || !mobile,
+          dedup_key:        dk,
+          notes:            `GeM Reseller | Selling As: ${sellingAs} | OEM: ${c.oem_name || "?"} | Contracts: ${c.contracts_won}`,
+          gem_gmv:          Number(c.total_value)   || 0,
+          gem_contracts:    Number(c.contracts_won) || 0,
+          seller_type:      "dealer",
+          oem_brand:        String(c.oem_name || ""),
+          first_seen:       c.first_seen ? String(c.first_seen) : null,
+          last_seen:        c.last_seen  ? String(c.last_seen)  : null,
+          is_100x_dealer:   false,
+          competes_with_100x: true,
+          created_at:       now,
+          updated_at:       now,
+        })
+      } else if (OEM_ONLY_RE.test(sellingAs)) {
+        oemSkipped++
+      }
+      // else: unknown selling_as value — skip silently
+    }
+
+    await bulkUpsert(prospects, "gem_contract_resellers")
+  } catch (e) {
+    results["gem_contract_resellers"] = { processed: 0, inserted: 0, updated: 0 }
+    console.error("gem_contract_resellers sync:", e)
+  }
+
+  // ── Top states by reseller count ──────────────────────────────────────────
+  const topStatesByReseller = Object.entries(stateCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([state, count]) => ({ state, count }))
+
   // ── Log ───────────────────────────────────────────────────────────────────
   await db.collection("growth_os_logs").insertOne({
     ts:            now,
@@ -348,15 +453,21 @@ export async function POST(req: NextRequest) {
     totalInserted,
     totalUpdated,
     bySource:      results,
+    oemSkipped,
+    resellerAdded,
+    topStatesByReseller,
     level:         "success",
     module:        "dealers",
   })
 
   return NextResponse.json({
-    ok:            true,
+    ok:                 true,
     totalInserted,
     totalUpdated,
-    bySource:      results,
-    syncedAt:      now,
+    bySource:           results,
+    oemSkipped,
+    resellerAdded,
+    topStatesByReseller,
+    syncedAt:           now,
   })
 }

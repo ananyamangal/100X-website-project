@@ -76,8 +76,8 @@ export async function POST(
     )
 
     // ── Build records ─────────────────────────────────────────────────────────
-    const records = await buildAudienceRecords(audienceType, db)
-    const members = toGoogleMembers(records)
+    const { records } = await buildAudienceRecords(audienceType, db)
+    const members     = toGoogleMembers(records)
 
     if (members.length === 0) {
       await db.collection(COLL).updateOne(

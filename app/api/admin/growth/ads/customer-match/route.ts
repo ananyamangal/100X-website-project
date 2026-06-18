@@ -68,9 +68,9 @@ export async function POST(req: NextRequest) {
     const db  = (await clientPromise).db()
     const now = new Date().toISOString()
 
-    const records      = await buildAudienceRecords(audienceType, db)
-    const qualityScore = computeQualityScore(records)
-    const audienceId   = `cm_${audienceType}`
+    const { records, extras } = await buildAudienceRecords(audienceType, db)
+    const qualityScore        = computeQualityScore(records, extras)
+    const audienceId          = `cm_${audienceType}`
 
     await db.collection(COLL).updateOne(
       { audienceId },
@@ -98,6 +98,7 @@ export async function POST(req: NextRequest) {
       audienceType,
       recordCount:         records.length,
       estimatedMatchRate:  qualityScore.estimatedMatchRate,
+      ...extras,
       level:  "success",
       module: "ads",
     })
@@ -108,6 +109,7 @@ export async function POST(req: NextRequest) {
       audienceType,
       recordCount: records.length,
       qualityScore,
+      ...(extras ? { extras } : {}),
     })
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 })
