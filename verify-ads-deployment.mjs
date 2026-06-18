@@ -12,19 +12,21 @@ import path from "path"
 import { fileURLToPath } from "url"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-for (const line of fs.readFileSync(path.join(__dirname, ".env.local"), "utf8").split("\n")) {
-  const m = line.match(/^([^=#\s][^=]*)=(.*)$/)
-  if (m) process.env[m[1].trim()] = m[2].trim()
+
+// Load .env.local when present — missing file is fine (production tokens come from DB)
+const envPath = path.join(__dirname, ".env.local")
+if (fs.existsSync(envPath)) {
+  for (const line of fs.readFileSync(envPath, "utf8").split("\n")) {
+    const m = line.match(/^([^=#\s][^=]*)=(.*)$/)
+    if (m) process.env[m[1].trim()] = m[2].trim()
+  }
 }
 
 const CAMPAIGN_KEYWORD = "Dealer Acquisition"
 const API_VERSION      = "v24"
-const DEV_TOKEN        = process.env.GOOGLE_ADS_DEVELOPER_TOKEN
 
-if (!DEV_TOKEN) {
-  console.error("✗ GOOGLE_ADS_DEVELOPER_TOKEN not set in .env.local")
-  process.exit(1)
-}
+// Developer token: prefer env var, fall back to DB (resolved below after connecting)
+let devToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN ?? ""
 
 // ── DB: load tokens + account config ─────────────────────────────────────────
 const { MongoClient } = await import("mongodb")
@@ -75,21 +77,33 @@ if (!settingsDoc?.customerId) {
   await dbClient.close(); process.exit(1)
 }
 
-const customerId   = String(settingsDoc.customerId).replace(/-/g, "")
-const loginCustId  = settingsDoc.loginCustomerId
+const customerId  = String(settingsDoc.customerId).replace(/-/g, "")
+const loginCustId = settingsDoc.loginCustomerId
   ? String(settingsDoc.loginCustomerId).replace(/-/g, "")
   : null
 
+// Fall back to developer token stored in DB (set via Ads Setup page)
+if (!devToken && settingsDoc.developerToken) {
+  devToken = String(settingsDoc.developerToken)
+}
+
 await dbClient.close()
+
+// Info-only: missing token means API calls will fail, but we attempt anyway
+if (!devToken) {
+  console.log("  ℹ  GOOGLE_ADS_DEVELOPER_TOKEN not set locally or in DB.")
+  console.log("     API calls will proceed — Google will return 401 if the token is truly absent.")
+  console.log("     Set GOOGLE_ADS_DEVELOPER_TOKEN in .env.local or via Ads Setup to fix this.\n")
+}
 
 // ── GAQL query helper ─────────────────────────────────────────────────────────
 async function gaql(query) {
   const url     = `https://googleads.googleapis.com/${API_VERSION}/customers/${customerId}/googleAds:searchStream`
   const headers = {
-    Authorization:       `Bearer ${accessToken}`,
-    "developer-token":   DEV_TOKEN,
-    "Content-Type":      "application/json",
-    ...(loginCustId ? { "login-customer-id": loginCustId } : {}),
+    Authorization:     `Bearer ${accessToken}`,
+    "Content-Type":    "application/json",
+    ...(devToken    ? { "developer-token":    devToken    } : {}),
+    ...(loginCustId ? { "login-customer-id":  loginCustId } : {}),
   }
 
   const res = await fetch(url, { method: "POST", headers, body: JSON.stringify({ query }) })
