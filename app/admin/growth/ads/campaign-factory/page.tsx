@@ -62,6 +62,8 @@ interface CampaignPlan {
   qualityScores:       QualityScores
   execHeader:          { confidence: number; roi: string; risk: string; priority: string; recommendation: string }
   createdAt:           string
+  resourceNames?:      { campaign?: string; budget?: string; [key: string]: unknown }
+  googleCampaignId?:   string | null
 }
 
 interface Preflight {
@@ -925,17 +927,34 @@ export default function CampaignFactoryPage() {
 
             {/* Approved state */}
             {isApproved && (
-              <div className="bg-emerald-950/20 border border-emerald-800/40 rounded-xl p-5 flex items-center gap-3">
-                <CheckCircle size={20} className="text-emerald-400 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-bold text-emerald-300">
-                    {activePlan.simulated ? "Approved (simulated)" : "Deployed to Google Ads"}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {activePlan.simulated
-                      ? "Simulated approval recorded. Connect a real account and re-run to deploy."
-                      : "Campaign is ENABLED and will start serving. Monitor performance in Google Ads."}
-                  </p>
+              <div className="bg-emerald-950/20 border border-emerald-800/40 rounded-xl p-5">
+                <div className="flex items-start gap-3">
+                  <CheckCircle size={20} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-emerald-300">
+                      {activePlan.simulated ? "Approved (simulated)" : "Deployed to Google Ads"}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {activePlan.simulated
+                        ? "Simulated approval recorded. Connect a real account and re-run to deploy."
+                        : "Campaign is ENABLED and will start serving within minutes."}
+                    </p>
+                    {!activePlan.simulated && (
+                      <div className="flex items-center gap-3 mt-2 flex-wrap">
+                        {(activePlan.googleCampaignId ?? activePlan.resourceNames?.campaign) && (
+                          <span className="text-[10px] font-mono bg-gray-800 border border-gray-700 text-gray-400 px-2 py-0.5 rounded">
+                            ID: {activePlan.googleCampaignId ?? activePlan.resourceNames?.campaign?.split("/campaigns/")[1] ?? "—"}
+                          </span>
+                        )}
+                        <a href="/admin/growth/ads/monitoring" className="text-[11px] text-emerald-500 hover:text-emerald-300 underline">
+                          View Performance Monitoring →
+                        </a>
+                        <a href="/admin/growth/ads/health" className="text-[11px] text-gray-500 hover:text-gray-300 underline">
+                          Live Health Check →
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

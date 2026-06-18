@@ -535,6 +535,7 @@ const QUICK_LINKS = [
   { href: "/admin/growth/ads/dashboard",         label: "Ads Dashboard",   icon: BarChart3,  desc: "Campaigns · keywords · spend" },
   { href: "/admin/growth/ads/campaign-factory",  label: "Campaign Factory",icon: Zap,        desc: "Draft → Approve → Deploy" },
   { href: "/admin/growth/ads/approval-queue",    label: "Approval Queue",  icon: ShieldCheck,desc: "Pending campaigns" },
+  { href: "/admin/growth/ads/monitoring",        label: "Monitoring",      icon: Radio,      desc: "CTR health · metrics · recs" },
   { href: "/admin/growth/ads/director",          label: "Ads Director",    icon: TrendingUp, desc: "Recommendations · optimization" },
 ]
 
