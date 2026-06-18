@@ -419,12 +419,13 @@ export async function createCampaignSitelinks(
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.100xcircle.com").replace(/\/$/, "")
 
   // Pass 1: create sitelink assets
+  // finalUrls is a top-level Asset field (v19+); SitelinkAsset only holds linkText/description1/description2
   const assetOps = opts.sitelinks.map(sl => ({
     assetOperation: {
       create: {
+        finalUrls: [`${siteUrl}${sl.finalUrl}`],
         sitelinkAsset: {
           linkText: sl.text.slice(0, 25),
-          finalUrls: [`${siteUrl}${sl.finalUrl}`],
         },
       },
     },
