@@ -16,6 +16,7 @@ const INLINE_FIRED_TYPES = new Set([
   "guide_download",
   "use_case_quote",
   "sticky_quote",
+  "gov_rfq",
 ])
 
 interface Props {
