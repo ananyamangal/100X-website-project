@@ -6,6 +6,8 @@ import clientPromise from "@/lib/mongodb"
 import { normalizeProducts } from "@/lib/normalizeProduct"
 import GovProductCarousel, { type ProductSlim } from "@/components/gov-procurement/GovProductCarousel"
 import GovRFQForm from "@/components/gov-procurement/GovRFQForm"
+import GovPastPerformance from "@/components/gov-procurement/GovPastPerformance"
+import TenderPackLeadCapture from "@/components/gov-procurement/TenderPackLeadCapture"
 
 // ─── Metadata ───────────────────────────────────────────────────────────────
 
@@ -249,19 +251,6 @@ const CASE_STUDY = {
   slug: "Nagar-Nigam-Muzaffarpur-Bihar-mosquito-control-program",
 }
 
-const TENDER_DOCS = [
-  "IS 14855 (Part 1) compliance declaration",
-  "ISO 9001:2015 quality management certificate",
-  "MSME / UDYAM registration certificate",
-  "BIS / ISI mark certificate (applicable models)",
-  "CE Marking certificate (export-grade models)",
-  "GST registration certificate",
-  "GeM seller verification screenshot",
-  "Technical specification sheets (model-wise)",
-  "L1 quotation on company letterhead with GST",
-  "OEM Authorization Letter (for dealer-submitted bids)",
-]
-
 const GEM_STEPS = [
   {
     num: 1,
@@ -295,25 +284,44 @@ const STATES_SERVED = [
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default async function GovernmentProcurementPage() {
+  const client = await clientPromise.catch(() => null)
+  const db = client?.db()
+
   // Fetch products server-side — pass serializable slim objects to client carousel
   let products: ProductSlim[] = []
   try {
-    const client = await clientPromise
-    const raw = await client.db()
-      .collection("products")
-      .find({ isPublished: { $ne: false } })
-      .sort({ order: 1, createdAt: -1 })
-      .toArray()
-    products = normalizeProducts(JSON.parse(JSON.stringify(raw))).map((p: any) => ({
-      _id: String(p._id),
-      name: p.name ?? "",
-      slug: p.slug ?? "",
-      imageUrls: Array.isArray(p.imageUrls) ? p.imageUrls : [],
-      badges: Array.isArray(p.badges) ? p.badges : [],
-      category: p.category ?? "",
-    }))
+    if (db) {
+      const raw = await db
+        .collection("products")
+        .find({ isPublished: { $ne: false } })
+        .sort({ order: 1, createdAt: -1 })
+        .toArray()
+      products = normalizeProducts(JSON.parse(JSON.stringify(raw))).map((p: any) => ({
+        _id: String(p._id),
+        name: p.name ?? "",
+        slug: p.slug ?? "",
+        imageUrls: Array.isArray(p.imageUrls) ? p.imageUrls : [],
+        badges: Array.isArray(p.badges) ? p.badges : [],
+        category: p.category ?? "",
+      }))
+    }
   } catch {
     // Products are supplementary — page renders fine without them
+  }
+
+  // Fetch customer logos — 7 real logos in DB (no org names stored)
+  let customerLogos: string[] = []
+  try {
+    if (db) {
+      const custs = await db
+        .collection("customers")
+        .find({ isActive: { $ne: false } })
+        .sort({ order: 1 })
+        .toArray()
+      customerLogos = custs.map((c: any) => c.logo).filter(Boolean)
+    }
+  } catch {
+    // Logo wall is supplementary
   }
 
   const waTenderQuote = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(
@@ -467,6 +475,9 @@ export default async function GovernmentProcurementPage() {
           ))}
         </div>
 
+        {/* PART 2B — Trusted by Government & Public Health Institutions */}
+        <GovPastPerformance customerLogos={customerLogos} />
+
         {/* PART 3 — Case Studies */}
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Government Success Stories</h2>
         <div className="space-y-4 mb-10">
@@ -561,19 +572,8 @@ export default async function GovernmentProcurementPage() {
           ))}
         </div>
 
-        {/* Tender Documentation Pack */}
-        <div className="border border-gray-200 rounded-xl p-5 mb-10">
-          <h2 className="text-lg font-semibold text-gray-800 mb-1">Tender Documentation Pack</h2>
-          <p className="text-sm text-gray-500 mb-4">All documents at no cost. Provided within 24 hours of enquiry.</p>
-          <ul className="space-y-2">
-            {TENDER_DOCS.map(doc => (
-              <li key={doc} className="flex items-start gap-2 text-sm text-gray-700">
-                <span className="text-green-600 font-bold flex-shrink-0 mt-0.5">✓</span>
-                {doc}
-              </li>
-            ))}
-          </ul>
-        </div>
+        {/* LAYER 4 — Tender Pack Lead Capture */}
+        <TenderPackLeadCapture />
 
         {/* Prose: MSME + IS 14855 + Supply */}
         <article className="prose prose-gray max-w-none mb-10">
