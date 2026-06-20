@@ -58,6 +58,8 @@ import { CertificationsManagerTab } from "@/components/admin/CertificationsManag
 import { MediaLibraryTab } from "@/components/admin/MediaLibraryTab"
 import { SeoHealthTab } from "@/components/admin/SeoHealthTab"
 import { SchemaHealthTab } from "@/components/admin/SchemaHealthTab"
+import { GovPastPerformanceTab } from "@/components/admin/GovPastPerformanceTab"
+import { GovKPIsTab } from "@/components/admin/GovKPIsTab"
 import { ProductForm } from "@/components/admin/ProductForm"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
@@ -1117,6 +1119,28 @@ function AdminDashboardContent() {
                 Case Studies
               </button>
               <button
+                onClick={() => setActiveTab("govPastPerformance")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "govPastPerformance"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <ClipboardCheck className="mr-3" size={20} />
+                Gov Past Performance
+              </button>
+              <button
+                onClick={() => setActiveTab("govKPIs")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "govKPIs"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <BarChart3 className="mr-3" size={20} />
+                Gov KPIs
+              </button>
+              <button
                 onClick={() => setActiveTab("spareParts")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "spareParts"
@@ -1421,6 +1445,8 @@ function AdminDashboardContent() {
             {activeTab === "trustBadges" && <TrustBadgesTab />}
             {activeTab === "legalPages" && <LegalPagesTab />}
             {activeTab === "caseStudies" && <CaseStudiesTab />}
+            {activeTab === "govPastPerformance" && <GovPastPerformanceTab />}
+            {activeTab === "govKPIs" && <GovKPIsTab />}
             {activeTab === "deployments" && <DeploymentsTab />}
             {activeTab === "videos" && <VideosTab />}
             {activeTab === "leadAnalytics" && <LeadAnalyticsTab />}
@@ -4861,7 +4887,8 @@ function CustomersTab({
                   <div className="flex-1 p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Customer Logo</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{(c as any).name || "Customer Logo"}</h3>
+                        {(c as any).category && <p className="text-sm text-brand-600 mb-1">{(c as any).category}{(c as any).state ? ` · ${(c as any).state}` : ""}</p>}
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <span>Order: {c.order}</span>
                           <span>Status: {c.isActive ? 'Active' : 'Inactive'}</span>
@@ -5451,6 +5478,10 @@ function CustomerForm({
 }) {
   const [formData, setFormData] = useState({
     logo: customer?.logo || "",
+    name: (customer as any)?.name || "",
+    category: (customer as any)?.category || "Municipal Bodies",
+    state: (customer as any)?.state || "",
+    caseStudyLink: (customer as any)?.caseStudyLink || "",
     order: customer?.order !== undefined ? customer.order : undefined,
     isActive: customer?.isActive ?? true,
   })
@@ -5513,6 +5544,49 @@ function CustomerForm({
             )}
           </div>
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Client / Department Name</label>
+            <Input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="e.g. Nagar Nigam Muzaffarpur"
+            />
+            <p className="text-xs text-gray-500 mt-1">Displayed below the logo on the website</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full border border-input rounded-md px-3 py-2 text-sm bg-white"
+              >
+                {["Municipal Bodies","Health Departments","Defence","Railways","Agriculture","Other"].map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+              <Input
+                type="text"
+                value={formData.state}
+                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                placeholder="e.g. Bihar"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Case Study Link (optional)</label>
+            <Input
+              type="text"
+              value={formData.caseStudyLink}
+              onChange={(e) => setFormData({ ...formData, caseStudyLink: e.target.value })}
+              placeholder="/case-studies/nagar-nigam-muzaffarpur"
+            />
+            <p className="text-xs text-gray-500 mt-1">If set, clicking the logo on website opens this case study</p>
+          </div>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
             <Input
               type="number"
@@ -5531,7 +5605,7 @@ function CustomerForm({
               onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
               className="rounded border-gray-300"
             />
-            <label htmlFor="isActiveCustomer" className="text-sm font-medium text-gray-700">Active (visible in Our Customers bar)</label>
+            <label htmlFor="isActiveCustomer" className="text-sm font-medium text-gray-700">Active (visible on website)</label>
           </div>
           <div className="flex space-x-3">
             <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={isUploading || !formData.logo}>

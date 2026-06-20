@@ -57,6 +57,10 @@ const STATIC_ROUTES: Array<{
   { path: "/spare-parts", changeFrequency: "weekly", priority: 0.8 },
   // Deployments
   { path: "/deployments", changeFrequency: "monthly", priority: 0.7 },
+  // Government procurement trust cluster
+  { path: "/gem-approved-fogging-machine-oem", changeFrequency: "monthly", priority: 0.9 },
+  { path: "/past-performance-government", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/fogging-machine-government-procurement", changeFrequency: "monthly", priority: 0.85 },
   // Videos
   { path: "/videos", changeFrequency: "weekly", priority: 0.7 },
   // Phase C pages

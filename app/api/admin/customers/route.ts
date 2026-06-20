@@ -3,6 +3,10 @@ import clientPromise from '@/lib/mongodb';
 
 interface CustomerInput {
   logo: string;
+  name?: string;
+  category?: string;
+  state?: string;
+  caseStudyLink?: string;
   order?: number;
   isActive?: boolean;
 }

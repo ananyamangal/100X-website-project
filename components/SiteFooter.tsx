@@ -179,9 +179,26 @@ export default function SiteFooter({
                 { href: "/spare-parts", label: "Spare Parts" },
                 { href: "/case-studies", label: "Case Studies" },
                 { href: "/deployments", label: "Government Deployments" },
+                { href: "/past-performance-government", label: "Past Performance" },
+                { href: "/fogging-machine-government-procurement", label: "Government Procurement" },
                 { href: "/knowledge", label: "Knowledge Centre" },
                 { href: "/blog", label: "Blog" },
                 { href: "/contact-us", label: "Contact Us" },
+              ].map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <h4 className="text-xs font-600 text-cinema-500 uppercase tracking-widest mb-3">Government Solutions</h4>
+            <ul className="space-y-3 mb-6">
+              {[
+                { href: "/gem-approved-fogging-machine-oem", label: "GeM Approved OEM" },
+                { href: "/fogging-machine-government-procurement", label: "Government Procurement" },
+                { href: "/past-performance-government", label: "Past Performance" },
+                { href: "/gem-oem-authorization", label: "GeM OEM Authorization" },
               ].map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
@@ -194,7 +211,6 @@ export default function SiteFooter({
             <ul className="space-y-3">
               {[
                 { href: "/become-a-dealer", label: "Become a Dealer" },
-                { href: "/gem-oem-authorization", label: "GeM OEM Authorization" },
                 { href: "/gem-tender-support", label: "Tender Support" },
                 { href: "/is-14855-fogging-machine", label: "IS 14855 Machines" },
               ].map((l) => (
