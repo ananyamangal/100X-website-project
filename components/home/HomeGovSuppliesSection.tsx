@@ -38,11 +38,12 @@ function SupplyCardMini({ r }: { r: SupplyCard }) {
   )
 }
 
-export default function HomeGovSuppliesSection() {
-  const [records, setRecords] = useState<SupplyCard[]>([])
-  const [loaded, setLoaded] = useState(false)
+export default function HomeGovSuppliesSection({ initialData }: { initialData?: SupplyCard[] } = {}) {
+  const [records, setRecords] = useState<SupplyCard[]>(initialData?.slice(0, 6) ?? [])
+  const [loaded, setLoaded] = useState(!!initialData)
 
   useEffect(() => {
+    if (initialData && initialData.length > 0) return
     fetch("/api/gov-past-performance?limit=6")
       .then((r) => r.json())
       .then((data: any) => {
@@ -51,7 +52,7 @@ export default function HomeGovSuppliesSection() {
       })
       .catch(() => {})
       .finally(() => setLoaded(true))
-  }, [])
+  }, [initialData])
 
   if (!loaded || records.length === 0) return null
 

@@ -38,7 +38,7 @@ export default async function HomePage() {
   const client = await clientPromise
   const db = client.db()
 
-  const [productsRaw, bannersRaw, blogsRaw, accreditationsRaw, customersRaw, brochureDoc, homeContent, homepageSectionsRaw, sparePartsRaw, trustBadgesRaw, pageSectionsRaw] =
+  const [productsRaw, bannersRaw, blogsRaw, accreditationsRaw, customersRaw, brochureDoc, homeContent, homepageSectionsRaw, sparePartsRaw, trustBadgesRaw, pageSectionsRaw, caseStudiesRaw, govSuppliesRaw, govKpisDoc] =
     await Promise.all([
       db.collection("products").find({}).toArray(),
       db.collection("banners").find({}).toArray(),
@@ -58,6 +58,9 @@ export default async function HomePage() {
       db.collection("spare_parts").find({ isPublished: true }).sort({ order: 1 }).limit(8).toArray(),
       db.collection("trust_badges").find({ isActive: true }).sort({ order: 1 }).toArray(),
       db.collection("page_sections").find({ pageKey: "homepage" }).toArray(),
+      db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(6).toArray(),
+      db.collection("gov_past_performance").find({ isPublic: true }).limit(6).toArray(),
+      db.collection("gov_kpis").findOne({ key: "main" }),
     ])
 
   // Serialize MongoDB docs (ObjectId → hex string, Date → ISO string)
@@ -82,6 +85,9 @@ export default async function HomePage() {
   const spareParts = JSON.parse(JSON.stringify(sparePartsRaw))
   const trustBadges = JSON.parse(JSON.stringify(trustBadgesRaw))
   const pageSections = JSON.parse(JSON.stringify(pageSectionsRaw))
+  const caseStudies = JSON.parse(JSON.stringify(caseStudiesRaw)).map((s: any) => ({ ...s, _id: String(s._id) }))
+  const govSupplies = JSON.parse(JSON.stringify(govSuppliesRaw)).map((s: any) => ({ ...s, _id: String(s._id) }))
+  const govKpis = govKpisDoc ? JSON.parse(JSON.stringify(govKpisDoc)) : null
 
   return (
     <>
@@ -100,6 +106,9 @@ export default async function HomePage() {
         spareParts={spareParts}
         trustBadges={trustBadges}
         pageSections={pageSections}
+        caseStudies={caseStudies}
+        govSupplies={govSupplies}
+        govKpis={govKpis}
       />
     </>
   )

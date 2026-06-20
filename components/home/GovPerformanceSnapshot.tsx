@@ -46,15 +46,16 @@ function StatCounter({ value, suffix, label }: { value: number; suffix: string; 
   )
 }
 
-export default function GovPerformanceSnapshot() {
-  const [kpis, setKpis] = useState<KPIs | null>(null)
+export default function GovPerformanceSnapshot({ initialKpis }: { initialKpis?: KPIs | null }) {
+  const [kpis, setKpis] = useState<KPIs | null>(initialKpis ?? null)
 
   useEffect(() => {
+    if (initialKpis) return
     fetch("/api/gov-kpis")
       .then((r) => r.json())
       .then((d) => setKpis(d))
       .catch(() => {})
-  }, [])
+  }, [initialKpis])
 
   if (!kpis) return null
 

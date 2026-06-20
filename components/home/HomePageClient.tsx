@@ -72,7 +72,10 @@ interface HomePageClientProps {
   homepageSections?: any[]
   spareParts?: any[]
   trustBadges?: any[]
-  pageSections?: any[]  // raw PageSectionRecord[] from page_sections collection
+  pageSections?: any[]
+  caseStudies?: any[]
+  govSupplies?: any[]
+  govKpis?: any
 }
 
 const getYouTubeId = (url: string): string | null => {
@@ -290,6 +293,9 @@ export default function HomePageClient({
   spareParts = [],
   trustBadges = [],
   pageSections = [],
+  caseStudies = [],
+  govSupplies = [],
+  govKpis,
 }: HomePageClientProps) {
   const router = useRouter()
   const [brochureModalOpen, setBrochureModalOpen] = useState(false)
@@ -386,9 +392,9 @@ export default function HomePageClient({
     rfq_midpage: () => <RFQMidPageBlock />,
     youtube_shorts: () => <YoutubeShortsCarousel />,
     customers: () => <OurCustomersScroll customers={customers} />,
-    gov_supplies: () => <HomeGovSuppliesSection />,
-    gov_performance: () => <GovPerformanceSnapshot />,
-    gov_success: () => <HomeCaseStudiesSection />,
+    gov_supplies: () => <HomeGovSuppliesSection initialData={govSupplies.length > 0 ? govSupplies : undefined} />,
+    gov_performance: () => <GovPerformanceSnapshot initialKpis={govKpis ?? undefined} />,
+    gov_success: () => <HomeCaseStudiesSection initialData={caseStudies.length > 0 ? caseStudies : undefined} />,
     deployments: () => <HomeDeploymentsSection />,
     reviews: () => <ReviewsSection limit={4} />,
     trust_certifications: () => (
