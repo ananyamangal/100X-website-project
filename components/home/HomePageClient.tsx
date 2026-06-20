@@ -34,6 +34,9 @@ const ReviewsSection = dynamic(() => import("@/components/home/ReviewsSection"))
 const BlogBlock = dynamic(() => import("@/components/home/BlogBlock"))
 const FAQSection = dynamic(() => import("@/components/FAQSection"))
 const GovPerformanceSnapshot = dynamic(() => import("@/components/home/GovPerformanceSnapshot"))
+const HomeCaseStudiesSection = dynamic(() => import("@/components/home/HomeCaseStudiesSection"))
+const HomeDeploymentsSection = dynamic(() => import("@/components/home/HomeDeploymentsSection"))
+const HomeGovSuppliesSection = dynamic(() => import("@/components/home/HomeGovSuppliesSection"))
 
 interface Product {
   _id?: string
@@ -383,7 +386,10 @@ export default function HomePageClient({
     rfq_midpage: () => <RFQMidPageBlock />,
     youtube_shorts: () => <YoutubeShortsCarousel />,
     customers: () => <OurCustomersScroll customers={customers} />,
+    gov_supplies: () => <HomeGovSuppliesSection />,
     gov_performance: () => <GovPerformanceSnapshot />,
+    gov_success: () => <HomeCaseStudiesSection />,
+    deployments: () => <HomeDeploymentsSection />,
     reviews: () => <ReviewsSection limit={4} />,
     trust_certifications: () => (
       <>
