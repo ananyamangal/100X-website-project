@@ -25,10 +25,10 @@ interface Props {
 }
 
 const STATUS_CFG: Record<string, { label: string; dot: string; pill: string }> = {
-  Completed:   { label: "Completed",   dot: "bg-emerald-400", pill: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" },
+  Completed:   { label: "Completed",   dot: "bg-brand-400",  pill: "bg-brand-500/15 text-brand-400 border-brand-500/30" },
   Ongoing:     { label: "Ongoing",     dot: "bg-blue-400",    pill: "bg-blue-500/15 text-blue-400 border-blue-500/30" },
   "In Progress":{ label:"In Progress", dot: "bg-amber-400",   pill: "bg-amber-500/15 text-amber-400 border-amber-500/30" },
-  Pending:     { label: "Pending",     dot: "bg-slate-400",   pill: "bg-slate-500/15 text-slate-400 border-slate-500/30" },
+  Pending:     { label: "Pending",     dot: "bg-gray-400",   pill: "bg-gray-500/15 text-gray-400 border-gray-500/30" },
 }
 
 const CAT_CFG: Record<string, { header: string; icon: React.ReactNode; badge: string }> = {
@@ -42,8 +42,8 @@ const CAT_CFG: Record<string, { header: string; icon: React.ReactNode; badge: st
     ),
   },
   Health: {
-    header: "from-emerald-600 to-emerald-800",
-    badge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+    header: "from-brand-700 to-brand-900",
+    badge: "bg-brand-500/20 text-brand-300 border-brand-500/30",
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
@@ -51,8 +51,8 @@ const CAT_CFG: Record<string, { header: string; icon: React.ReactNode; badge: st
     ),
   },
   Defence: {
-    header: "from-slate-600 to-slate-800",
-    badge: "bg-slate-500/20 text-slate-300 border-slate-500/30",
+    header: "from-gray-600 to-gray-800",
+    badge: "bg-gray-500/20 text-gray-300 border-gray-500/30",
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 22s-8-4-8-10V5l8-3 8 3v7c0 6-8 10-8 10z" />
@@ -104,7 +104,7 @@ function RecordCard({ record, onClick }: { record: PastPerformanceRecord; onClic
   return (
     <button
       onClick={onClick}
-      className="group text-left bg-slate-900 border border-white/[0.06] hover:border-emerald-500/40 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/5 hover:-translate-y-0.5 w-full"
+      className="group text-left bg-gray-900 border border-white/[0.06] hover:border-brand-500/30 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-brand-500/5 hover:-translate-y-0.5 w-full"
     >
       {/* Card header */}
       <div className={`bg-gradient-to-r ${cat.header} px-5 py-4 flex items-start gap-3`}>
@@ -122,34 +122,34 @@ function RecordCard({ record, onClick }: { record: PastPerformanceRecord; onClic
 
       {/* Card body */}
       <div className="px-5 py-4">
-        <p className="text-slate-400 text-xs mb-4 truncate">{record.department}</p>
+        <p className="text-gray-400 text-xs mb-4 truncate">{record.department}</p>
 
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-slate-500 text-xs uppercase tracking-wide">Product</span>
-            <span className="text-slate-200 text-xs font-medium text-right max-w-[60%] truncate">{record.product}</span>
+            <span className="text-gray-500 text-xs uppercase tracking-wide">Product</span>
+            <span className="text-gray-200 text-xs font-medium text-right max-w-[60%] truncate">{record.product}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-slate-500 text-xs uppercase tracking-wide">Year</span>
-            <span className="text-slate-200 text-xs font-medium">{record.orderYear}</span>
+            <span className="text-gray-500 text-xs uppercase tracking-wide">Year</span>
+            <span className="text-gray-200 text-xs font-medium">{record.orderYear}</span>
           </div>
           {record.quantity && (
             <div className="flex items-center justify-between">
-              <span className="text-slate-500 text-xs uppercase tracking-wide">Quantity</span>
-              <span className="text-slate-200 text-xs font-medium">{record.quantity} units</span>
+              <span className="text-gray-500 text-xs uppercase tracking-wide">Quantity</span>
+              <span className="text-gray-200 text-xs font-medium">{record.quantity} units</span>
             </div>
           )}
           {record.orderValue && (
             <div className="flex items-center justify-between">
-              <span className="text-slate-500 text-xs uppercase tracking-wide">Order Value</span>
-              <span className="text-emerald-400 text-sm font-bold">₹{record.orderValue.toLocaleString("en-IN")}L</span>
+              <span className="text-gray-500 text-xs uppercase tracking-wide">Order Value</span>
+              <span className="text-brand-400 text-sm font-700">₹{record.orderValue.toLocaleString("en-IN")}L</span>
             </div>
           )}
         </div>
 
         <div className="mt-4 flex items-center justify-between">
           <StatusBadge status={record.status} />
-          <span className="text-slate-500 text-xs flex items-center gap-1 group-hover:text-slate-300 transition-colors">
+          <span className="text-gray-500 text-xs flex items-center gap-1 group-hover:text-gray-300 transition-colors">
             View details
             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
               <polyline points="9 18 15 12 9 6" />
@@ -171,7 +171,7 @@ function RecordDrawer({ record, onClose }: { record: PastPerformanceRecord; onCl
     >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="relative w-full sm:max-w-lg bg-slate-950 rounded-t-3xl sm:rounded-3xl border border-white/[0.08] overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="relative w-full sm:max-w-lg bg-gray-950 rounded-t-3xl sm:rounded-3xl border border-white/[0.08] overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Drawer header */}
@@ -206,41 +206,41 @@ function RecordDrawer({ record, onClose }: { record: PastPerformanceRecord; onCl
               ...(record.quantity ? [{ label: "Units Supplied", value: `${record.quantity} units` }] : []),
               ...(record.orderValue ? [{ label: "Order Value", value: `₹${record.orderValue.toLocaleString("en-IN")} Lakhs`, highlight: true }] : []),
             ].map((item: any) => (
-              <div key={item.label} className="bg-slate-900 rounded-xl p-3">
-                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">{item.label}</p>
+              <div key={item.label} className="bg-gray-900 rounded-xl p-3">
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-1">{item.label}</p>
                 {item.isStatus ? (
                   <StatusBadge status={item.value} />
                 ) : (
-                  <p className={`text-sm font-bold ${item.highlight ? "text-emerald-400" : "text-white"}`}>{item.value}</p>
+                  <p className={`text-sm font-700 ${item.highlight ? "text-brand-400" : "text-white"}`}>{item.value}</p>
                 )}
               </div>
             ))}
           </div>
 
           {/* Department */}
-          <div className="bg-slate-900 rounded-xl p-4">
-            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-2">Department</p>
-            <p className="text-slate-200 text-sm">{record.department || "—"}</p>
+          <div className="bg-gray-900 rounded-xl p-4">
+            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Department</p>
+            <p className="text-gray-200 text-sm">{record.department || "—"}</p>
           </div>
 
           {/* Product */}
-          <div className="bg-slate-900 rounded-xl p-4">
-            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-2">Product / Equipment</p>
-            <p className="text-slate-200 text-sm">{record.product || "—"}</p>
+          <div className="bg-gray-900 rounded-xl p-4">
+            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Product / Equipment</p>
+            <p className="text-gray-200 text-sm">{record.product || "—"}</p>
           </div>
 
           {/* Notes */}
           {record.notes && (
-            <div className="bg-slate-900 rounded-xl p-4">
-              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-2">Supply Details</p>
-              <p className="text-slate-400 text-sm leading-relaxed">{record.notes}</p>
+            <div className="bg-gray-900 rounded-xl p-4">
+              <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Supply Details</p>
+              <p className="text-gray-400 text-sm leading-relaxed">{record.notes}</p>
             </div>
           )}
 
           {/* Certifications note */}
-          <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
-            <p className="text-emerald-400 text-xs font-semibold mb-1">Documentation Available</p>
-            <p className="text-slate-400 text-xs leading-relaxed">
+          <div className="bg-brand-500/5 border border-brand-500/20 rounded-xl p-4">
+            <p className="text-brand-400 text-xs font-600 mb-1">Documentation Available</p>
+            <p className="text-gray-400 text-xs leading-relaxed">
               IS 14855 compliance certificate, ISO 9001:2015 certificate, MSME/UDYAM registration, and delivery documentation available on request.
             </p>
           </div>
@@ -291,7 +291,7 @@ export default function GovPerformanceCards({
         <div className="mb-6 space-y-3">
           {/* Search */}
           <div className="relative">
-            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
             </svg>
             <input
@@ -299,7 +299,7 @@ export default function GovPerformanceCards({
               placeholder="Search department, organization, state, product…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-white/[0.08] hover:border-white/[0.15] focus:border-emerald-500/50 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors"
+              className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-white/[0.08] hover:border-white/[0.15] focus:border-brand-500/50 rounded-xl text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 transition-colors"
             />
           </div>
 
@@ -314,7 +314,7 @@ export default function GovPerformanceCards({
                 key={placeholder}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="px-3 py-2.5 bg-slate-900 border border-white/[0.08] hover:border-white/[0.15] rounded-xl text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/50 transition-colors cursor-pointer"
+                className="px-3 py-2.5 bg-gray-900 border border-white/[0.08] hover:border-white/[0.15] rounded-xl text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/50 transition-colors cursor-pointer"
               >
                 <option value="">{placeholder}</option>
                 {options.map((o) => <option key={o} value={o}>{o}</option>)}
@@ -324,14 +324,14 @@ export default function GovPerformanceCards({
             {hasFilters && (
               <button
                 onClick={() => { setStateFilter(""); setCategoryFilter(""); setYearFilter(""); setSearch("") }}
-                className="px-3 py-2 text-sm text-slate-400 hover:text-white border border-white/[0.08] hover:border-white/[0.20] rounded-xl bg-slate-900 transition-colors"
+                className="px-3 py-2 text-sm text-gray-400 hover:text-white border border-white/[0.08] hover:border-white/[0.20] rounded-xl bg-gray-900 transition-colors"
               >
                 Clear filters
               </button>
             )}
 
             {filtered.length > 0 && (
-              <span className="ml-auto text-xs text-slate-500 self-center">
+              <span className="ml-auto text-xs text-gray-500 self-center">
                 {filtered.length} {filtered.length === 1 ? "record" : "records"}
               </span>
             )}
@@ -340,15 +340,15 @@ export default function GovPerformanceCards({
       )}
 
       {visible.length === 0 ? (
-        <div className="bg-slate-900 border border-white/[0.06] rounded-2xl py-16 text-center">
-          <svg className="w-10 h-10 text-slate-700 mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+        <div className="bg-gray-900 border border-white/[0.06] rounded-2xl py-16 text-center">
+          <svg className="w-10 h-10 text-gray-700 mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
             <path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
           </svg>
-          <p className="text-slate-400 font-semibold text-sm">No records match your filters</p>
+          <p className="text-gray-400 font-semibold text-sm">No records match your filters</p>
           {hasFilters && (
             <button
               onClick={() => { setStateFilter(""); setCategoryFilter(""); setYearFilter(""); setSearch("") }}
-              className="mt-3 text-xs text-emerald-400 hover:text-emerald-300 underline"
+              className="mt-3 text-xs text-brand-400 hover:text-brand-300 underline"
             >
               Clear all filters
             </button>
@@ -366,7 +366,7 @@ export default function GovPerformanceCards({
         <div className="text-center mt-8">
           <a
             href="/past-performance-government"
-            className="inline-flex items-center gap-2 px-7 py-3.5 bg-slate-900 hover:bg-slate-800 border border-white/[0.08] text-white font-semibold rounded-xl text-sm transition-all hover:border-white/20"
+            className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 hover:bg-gray-800 border border-white/[0.08] text-white font-semibold rounded-xl text-sm transition-all hover:border-white/20"
           >
             View All {filtered.length} Records
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="9 18 15 12 9 6" /></svg>

@@ -337,7 +337,7 @@ export default async function GovernmentProcurementPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }} />
 
-      <main className="max-w-3xl mx-auto px-4 py-16 pt-32">
+      <main className="max-w-3xl mx-auto px-4 py-16 pt-20">
 
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-500 mb-6">
@@ -367,12 +367,12 @@ export default async function GovernmentProcurementPage() {
         </p>
 
         {/* GeM direct purchase callout */}
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 text-sm text-green-800">
+        <div className="bg-brand-50 border border-brand-200 rounded-xl p-4 mb-6 text-sm text-brand-800">
           <strong>GeM Direct Purchase Available:</strong> Government buyers can procure 100X Circle
           fogging machines at <span className="font-medium">gem.gov.in</span> without a separate public
           tender within GeM financial limits. Search{" "}
-          <span className="font-mono bg-green-100 px-1 rounded">&quot;100X Circle&quot;</span> or{" "}
-          <span className="font-mono bg-green-100 px-1 rounded">&quot;fogging machine IS 14855&quot;</span>.
+          <span className="font-mono bg-brand-100 px-1 rounded">&quot;100X Circle&quot;</span> or{" "}
+          <span className="font-mono bg-brand-100 px-1 rounded">&quot;fogging machine IS 14855&quot;</span>.
         </div>
 
         {/* PART 6 — Trust Strip */}
@@ -458,12 +458,12 @@ export default async function GovernmentProcurementPage() {
         </p>
         <div className="grid sm:grid-cols-2 gap-3 mb-10">
           {DEPLOYMENTS.map((d, i) => (
-            <div key={i} className={`border rounded-xl p-4 ${d.verified ? "border-brand-200 bg-brand-50" : "border-gray-200"}`}>
+            <div key={i} className={`border rounded-xl p-4 ${d.verified ? "border-brand-200 bg-brand-50" : "border-gray-200 bg-white"}`}>
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
                   <span className="text-xs font-bold text-gray-800">{d.state}</span>
                   {d.verified && (
-                    <span className="ml-2 text-[10px] text-brand-700 font-semibold bg-brand-100 px-1.5 py-0.5 rounded-full">★ Verified</span>
+                    <span className="ml-2 text-[10px] text-brand-700 font-700 bg-brand-100 px-1.5 py-0.5 rounded-full">★ Verified</span>
                   )}
                 </div>
                 <span className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">{d.type}</span>
@@ -482,10 +482,10 @@ export default async function GovernmentProcurementPage() {
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Government Success Stories</h2>
         <div className="space-y-4 mb-10">
           {/* Real case study */}
-          <div className="border border-green-200 rounded-xl p-5 bg-green-50">
+          <div className="border border-brand-200 rounded-xl p-5 bg-brand-50">
             <div className="flex items-start justify-between gap-2 mb-3">
               <h3 className="font-bold text-gray-800 text-sm">{CASE_STUDY.title}</h3>
-              <span className="text-[10px] text-green-700 bg-green-100 border border-green-200 px-2 py-0.5 rounded-full flex-shrink-0 font-medium">
+              <span className="text-[10px] text-brand-700 bg-brand-100 border border-brand-200 px-2 py-0.5 rounded-full flex-shrink-0 font-600">
                 {CASE_STUDY.badge}
               </span>
             </div>

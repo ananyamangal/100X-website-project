@@ -94,25 +94,25 @@ export default function GovLogoWall({ logos }: Props) {
   const availableCats = ["All", ...CATEGORIES.slice(1).filter((c) => counts[c] > 0)]
 
   return (
-    <section className="py-20 bg-slate-950">
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
+    <section className="py-20 bg-gray-950">
+      <div className="container mx-auto px-4 md:px-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
           <div>
-            <p className="text-emerald-400 text-xs font-bold uppercase tracking-widest mb-3">Client Organisations</p>
-            <h2 className="text-3xl md:text-4xl font-black text-white">
+            <p className="eyebrow text-brand-400 mb-3">Client Organisations</p>
+            <h2 className="text-display-xs font-700 text-white">
               Trusted By Government Departments
               <br className="hidden md:block" /> Across India
             </h2>
-            <p className="text-slate-400 mt-3 text-sm max-w-lg leading-relaxed">
+            <p className="text-gray-400 mt-3 text-sm max-w-lg leading-relaxed">
               Municipal corporations, health departments, defence establishments, and public institutions
               have procured 100X Circle fogging machines through GeM, tenders, and direct supply.
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <div className="text-right">
-              <p className="text-white font-black text-3xl">{display.length}+</p>
-              <p className="text-slate-500 text-xs uppercase tracking-wide">Clients</p>
+              <p className="text-white font-700 text-3xl">{display.length}+</p>
+              <p className="text-gray-500 text-xs uppercase tracking-wide">Clients</p>
             </div>
           </div>
         </div>
@@ -124,15 +124,15 @@ export default function GovLogoWall({ logos }: Props) {
               <button
                 key={cat}
                 onClick={() => setActiveTab(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all duration-200 ${
+                className={`px-4 py-2 rounded-full text-xs font-600 border transition-all duration-200 ${
                   activeTab === cat
-                    ? "bg-white text-slate-900 border-white"
-                    : "bg-slate-900 text-slate-400 border-white/[0.08] hover:border-white/[0.20] hover:text-slate-200"
+                    ? "bg-white text-gray-900 border-white"
+                    : "bg-white/[0.04] text-gray-400 border-white/[0.08] hover:border-white/[0.20] hover:text-gray-200"
                 }`}
               >
                 {cat}
                 {counts[cat] > 0 && (
-                  <span className={`ml-1.5 ${activeTab === cat ? "text-slate-600" : "text-slate-600"}`}>
+                  <span className="ml-1.5 text-gray-600">
                     {counts[cat]}
                   </span>
                 )}
@@ -148,7 +148,7 @@ export default function GovLogoWall({ logos }: Props) {
 
             const card = (
               <div
-                className="group relative bg-slate-900 border border-white/[0.06] hover:border-white/[0.20] rounded-2xl p-4 flex flex-col items-center justify-center gap-3 hover:bg-slate-800/60 transition-all duration-300 cursor-default"
+                className="group relative glass-card rounded-2xl p-4 flex flex-col items-center justify-center gap-3 hover:bg-white/[0.06] transition-all duration-300 cursor-default"
                 style={{ minHeight: 110 }}
               >
                 {/* Logo or avatar */}
@@ -169,18 +169,18 @@ export default function GovLogoWall({ logos }: Props) {
 
                 {/* Name */}
                 <div className="text-center">
-                  <p className="text-slate-200 text-[11px] font-semibold leading-tight line-clamp-2 group-hover:text-white transition-colors">
+                  <p className="text-gray-200 text-[11px] font-600 leading-tight line-clamp-2 group-hover:text-white transition-colors">
                     {logo.name}
                   </p>
                   {logo.state && (
-                    <p className={`text-[10px] mt-1 font-medium ${textColor}`}>{logo.state}</p>
+                    <p className={`text-[10px] mt-1 font-500 ${textColor}`}>{logo.state}</p>
                   )}
                 </div>
 
                 {/* Case study link indicator */}
                 {logo.caseStudyLink && (
-                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <svg className="w-2.5 h-2.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-brand-500/20 border border-brand-500/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg className="w-2.5 h-2.5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                       <polyline points="9 18 15 12 9 6" />
                     </svg>
                   </div>
@@ -200,12 +200,12 @@ export default function GovLogoWall({ logos }: Props) {
 
         {/* Footer note */}
         <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <p className="text-slate-600 text-xs">
+          <p className="text-gray-600 text-xs">
             Supplied via GeM direct purchase, open tenders, rate contracts, and dealer procurement networks.
           </p>
           <Link
             href="/past-performance-government"
-            className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1 shrink-0 transition-colors"
+            className="text-brand-400 hover:text-brand-300 text-xs font-600 flex items-center gap-1 shrink-0 transition-colors"
           >
             View full procurement records
             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><polyline points="9 18 15 12 9 6" /></svg>
