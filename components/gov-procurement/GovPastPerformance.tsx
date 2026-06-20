@@ -87,13 +87,13 @@ export default function GovPastPerformance({ customerLogos }: Props) {
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
           {/* Verified case: Nagar Nigam Muzaffarpur */}
-          <div className="border border-green-200 bg-green-50 rounded-xl p-4 sm:col-span-2">
+          <div className="border border-brand-200 bg-brand-50 rounded-xl p-4 sm:col-span-2">
             <div className="flex items-start justify-between gap-2 mb-2">
               <div>
                 <p className="text-xs font-bold text-gray-800">Nagar Nigam Muzaffarpur</p>
                 <p className="text-[11px] text-gray-500">Bihar &middot; Municipal Corporation</p>
               </div>
-              <span className="flex-shrink-0 text-[10px] font-semibold text-green-700 bg-green-100 border border-green-200 px-2 py-0.5 rounded-full">
+              <span className="flex-shrink-0 text-[10px] font-600 text-brand-700 bg-brand-100 border border-brand-200 px-2 py-0.5 rounded-full">
                 ★ Verified
               </span>
             </div>
