@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Edit, Trash2, Save, X, Search, Eye, EyeOff } from "lucide-react"
+import { Plus, Edit, Trash2, Save, X, Search, EyeOff, Sparkles, Layers } from "lucide-react"
 
 interface PastPerformanceRecord {
   _id?: string
@@ -22,18 +22,17 @@ interface PastPerformanceRecord {
   isPublic: boolean
 }
 
+interface CaseStudyStatus {
+  caseStudyId: string
+  slug: string
+  title: string
+  published: boolean
+}
+
 const EMPTY: PastPerformanceRecord = {
-  department: "",
-  organization: "",
-  state: "",
-  product: "",
-  quantity: null,
-  orderValue: null,
-  orderYear: new Date().getFullYear(),
-  status: "Completed",
-  category: "Municipal",
-  notes: "",
-  isPublic: true,
+  department: "", organization: "", state: "", product: "",
+  quantity: null, orderValue: null, orderYear: new Date().getFullYear(),
+  status: "Completed", category: "Municipal", notes: "", isPublic: true,
 }
 
 const STATES = [
@@ -42,7 +41,6 @@ const STATES = [
   "Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Puducherry",
   "Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal",
 ]
-
 const CATEGORIES = ["Municipal", "Health", "Railways", "Defence", "Agriculture", "Other"]
 const STATUSES = ["Completed", "Ongoing", "In Progress", "Pending"]
 
@@ -54,23 +52,52 @@ export function GovPastPerformanceTab() {
   const [form, setForm] = useState<PastPerformanceRecord>(EMPTY)
   const [saving, setSaving] = useState(false)
   const [search, setSearch] = useState("")
-  const [notification, setNotification] = useState<string | null>(null)
+  const [notification, setNotification] = useState<{ msg: string; type: "success" | "error" | "info" } | null>(null)
 
-  const load = () => {
+  // Case study status map: recordId → status
+  const [caseStudyMap, setCaseStudyMap] = useState<Record<string, CaseStudyStatus>>({})
+  const [generatingId, setGeneratingId] = useState<string | null>(null)
+  const [generatingAll, setGeneratingAll] = useState(false)
+
+  const notify = (msg: string, type: "success" | "error" | "info" = "success") => {
+    setNotification({ msg, type })
+    setTimeout(() => setNotification(null), 4000)
+  }
+
+  const loadCaseStudyMap = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/case-studies")
+      const all: any[] = await res.json()
+      const map: Record<string, CaseStudyStatus> = {}
+      for (const s of all) {
+        if (s.sourceRecordId) {
+          map[s.sourceRecordId] = {
+            caseStudyId: s._id,
+            slug: s.slug,
+            title: s.title,
+            published: s.published,
+          }
+        }
+      }
+      setCaseStudyMap(map)
+    } catch {
+      // non-fatal
+    }
+  }, [])
+
+  const load = useCallback(() => {
     setLoading(true)
     fetch("/api/admin/gov-past-performance")
       .then((r) => r.json())
       .then((data) => setRecords(Array.isArray(data) ? data : []))
       .catch(() => setRecords([]))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
-  useEffect(() => { load() }, [])
-
-  const notify = (msg: string) => {
-    setNotification(msg)
-    setTimeout(() => setNotification(null), 3000)
-  }
+  useEffect(() => {
+    load()
+    loadCaseStudyMap()
+  }, [load, loadCaseStudyMap])
 
   const startAdd = () => { setForm(EMPTY); setEditing(null); setIsAdding(true) }
   const startEdit = (r: PastPerformanceRecord) => { setForm({ ...r }); setEditing(r); setIsAdding(false) }
@@ -81,25 +108,20 @@ export function GovPastPerformanceTab() {
     try {
       if (editing?._id) {
         await fetch(`/api/admin/gov-past-performance/${editing._id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(form),
+          method: "PUT", headers: { "Content-Type": "application/json" },
+          credentials: "include", body: JSON.stringify(form),
         })
-        notify("Record updated successfully")
+        notify("Record updated")
       } else {
         await fetch("/api/admin/gov-past-performance", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(form),
+          method: "POST", headers: { "Content-Type": "application/json" },
+          credentials: "include", body: JSON.stringify(form),
         })
-        notify("Record added successfully")
+        notify("Record added")
       }
-      load()
-      cancel()
+      load(); cancel()
     } catch {
-      notify("Error saving record")
+      notify("Error saving record", "error")
     } finally {
       setSaving(false)
     }
@@ -110,6 +132,54 @@ export function GovPastPerformanceTab() {
     await fetch(`/api/admin/gov-past-performance/${id}`, { method: "DELETE", credentials: "include" })
     notify("Record deleted")
     load()
+  }
+
+  // Generate single case study
+  const generateCaseStudy = async (record: PastPerformanceRecord) => {
+    if (!record._id) return
+    setGeneratingId(record._id)
+    try {
+      const res = await fetch(`/api/admin/gov-past-performance/${record._id}/generate-case-study`, {
+        method: "POST", credentials: "include",
+      })
+      const data = await res.json()
+      if (data.ok) {
+        if (data.exists) {
+          notify(`Case study already exists: "${data.title}"`, "info")
+        } else {
+          notify(`Draft created: "${data.title}" — review in Case Studies tab`, "success")
+          loadCaseStudyMap()
+        }
+      } else {
+        notify("Generation failed: " + (data.error || "unknown error"), "error")
+      }
+    } catch {
+      notify("Network error during generation", "error")
+    } finally {
+      setGeneratingId(null)
+    }
+  }
+
+  // Generate all case studies
+  const generateAll = async () => {
+    if (!confirm(`Generate draft case studies for all records that don't have one yet?\n\nDrafts will appear in the Case Studies tab for review before publishing.`)) return
+    setGeneratingAll(true)
+    try {
+      const res = await fetch("/api/admin/gov-past-performance/generate-all", {
+        method: "POST", credentials: "include",
+      })
+      const data = await res.json()
+      if (data.ok) {
+        notify(data.message || `Generated ${data.generated} drafts`, data.generated > 0 ? "success" : "info")
+        loadCaseStudyMap()
+      } else {
+        notify("Batch generation failed", "error")
+      }
+    } catch {
+      notify("Network error", "error")
+    } finally {
+      setGeneratingAll(false)
+    }
   }
 
   const filtered = records.filter((r) => {
@@ -125,24 +195,57 @@ export function GovPastPerformanceTab() {
 
   const F = (field: keyof PastPerformanceRecord, value: any) => setForm((p) => ({ ...p, [field]: value }))
 
+  // Count how many records already have case studies
+  const withCaseStudy = records.filter((r) => r._id && caseStudyMap[r._id]).length
+
   return (
     <div>
       {notification && (
-        <div className="fixed top-4 right-4 z-50 bg-green-600 text-white px-5 py-3 rounded-lg shadow-lg text-sm font-medium">
-          {notification}
+        <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-lg shadow-lg text-sm font-medium text-white ${
+          notification.type === "error" ? "bg-red-600" :
+          notification.type === "info" ? "bg-blue-600" : "bg-green-600"
+        }`}>
+          {notification.msg}
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-6">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Government Past Performance</h2>
-          <p className="text-sm text-gray-500 mt-0.5">{records.length} procurement records · displayed on website &amp; /past-performance-government</p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            {records.length} records · {withCaseStudy} with case studies · displayed on /past-performance-government
+          </p>
         </div>
-        <Button onClick={startAdd} className="gap-2 bg-green-600 hover:bg-green-700 text-white">
-          <Plus size={16} /> Add Record
-        </Button>
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            onClick={generateAll}
+            disabled={generatingAll || records.length === 0}
+            variant="outline"
+            className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50 bg-transparent text-sm"
+          >
+            <Layers size={14} />
+            {generatingAll ? "Generating…" : `Auto-Generate All Drafts`}
+          </Button>
+          <Button onClick={startAdd} className="gap-2 bg-green-600 hover:bg-green-700 text-white">
+            <Plus size={16} /> Add Record
+          </Button>
+        </div>
       </div>
 
+      {/* Auto-generate info banner */}
+      {records.length > 0 && withCaseStudy < records.length && (
+        <div className="mb-5 p-4 bg-purple-50 border border-purple-200 rounded-xl text-sm text-purple-800">
+          <strong className="block mb-1">📝 Case Study Auto-Generation</strong>
+          <p>
+            <strong>{records.length - withCaseStudy}</strong> record{records.length - withCaseStudy !== 1 ? "s" : ""} don&apos;t have case studies yet.
+            Click <strong>Auto-Generate All Drafts</strong> to create draft case studies from these records.
+            Drafts go to the <strong>Case Studies</strong> tab for review — set &apos;Published&apos; to make them live on the website.
+          </p>
+        </div>
+      )}
+
+      {/* Add / Edit Form */}
       {(isAdding || editing) && (
         <Card className="mb-6 border-brand-300">
           <CardContent className="p-5">
@@ -158,22 +261,16 @@ export function GovPastPerformanceTab() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">State *</label>
-                <select
-                  value={form.state}
-                  onChange={(e) => F("state", e.target.value)}
-                  className="w-full border border-input rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                >
+                <select value={form.state} onChange={(e) => F("state", e.target.value)}
+                  className="w-full border border-input rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-ring">
                   <option value="">Select State</option>
                   {STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Category</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => F("category", e.target.value)}
-                  className="w-full border border-input rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                >
+                <select value={form.category} onChange={(e) => F("category", e.target.value)}
+                  className="w-full border border-input rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-ring">
                   {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
@@ -195,42 +292,31 @@ export function GovPastPerformanceTab() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Status</label>
-                <select
-                  value={form.status}
-                  onChange={(e) => F("status", e.target.value)}
-                  className="w-full border border-input rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-                >
+                <select value={form.status} onChange={(e) => F("status", e.target.value)}
+                  className="w-full border border-input rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-ring">
                   {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-xs font-medium text-gray-600 mb-1">Notes / Details</label>
-                <Textarea
-                  placeholder="Additional details about this procurement…"
-                  value={form.notes}
-                  onChange={(e) => F("notes", e.target.value)}
-                  rows={3}
-                />
+                <Textarea placeholder="Additional details about this procurement…" value={form.notes} onChange={(e) => F("notes", e.target.value)} rows={3} />
               </div>
               <div className="sm:col-span-2">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.isPublic}
-                    onChange={(e) => F("isPublic", e.target.checked)}
-                    className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                  />
+                  <input type="checkbox" checked={form.isPublic} onChange={(e) => F("isPublic", e.target.checked)}
+                    className="rounded border-gray-300 text-green-600 focus:ring-green-500" />
                   <span className="text-sm text-gray-700">Show on public website</span>
                   <span className="text-xs text-gray-400">(uncheck to keep private)</span>
                 </label>
               </div>
             </div>
             <div className="flex gap-3">
-              <Button onClick={save} disabled={saving || !form.organization || !form.state || !form.product} className="bg-green-600 hover:bg-green-700 text-white gap-2">
+              <Button onClick={save} disabled={saving || !form.organization || !form.state || !form.product}
+                className="bg-green-600 hover:bg-green-700 text-white gap-2">
                 <Save size={14} />
                 {saving ? "Saving…" : "Save Record"}
               </Button>
-              <Button variant="outline" onClick={cancel}>
+              <Button variant="outline" onClick={cancel} className="bg-transparent">
                 <X size={14} className="mr-1" /> Cancel
               </Button>
             </div>
@@ -238,16 +324,14 @@ export function GovPastPerformanceTab() {
         </Card>
       )}
 
+      {/* Search */}
       <div className="relative mb-4">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-        <Input
-          placeholder="Search by organization, state, product…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
-        />
+        <Input placeholder="Search by organization, state, product…" value={search}
+          onChange={(e) => setSearch(e.target.value)} className="pl-9" />
       </div>
 
+      {/* Records list */}
       {loading ? (
         <div className="text-center py-12 text-gray-400">Loading records…</div>
       ) : filtered.length === 0 ? (
@@ -261,52 +345,88 @@ export function GovPastPerformanceTab() {
         </div>
       ) : (
         <div className="space-y-3">
-          {filtered.map((r) => (
-            <div key={r._id} className="flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span className="text-sm font-semibold text-gray-900">{r.organization}</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 font-medium">{r.category}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                    r.status === "Completed" ? "bg-green-50 text-green-700" :
-                    r.status === "Ongoing" ? "bg-blue-50 text-blue-700" : "bg-gray-100 text-gray-600"
-                  }`}>{r.status}</span>
-                  {!r.isPublic && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium flex items-center gap-1">
-                      <EyeOff size={10} /> Private
-                    </span>
-                  )}
+          {filtered.map((r) => {
+            const csStatus = r._id ? caseStudyMap[r._id] : undefined
+            const isGenerating = generatingId === r._id
+
+            return (
+              <div key={r._id} className="flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="text-sm font-semibold text-gray-900">{r.organization}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 font-medium">{r.category}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      r.status === "Completed" ? "bg-green-50 text-green-700" :
+                      r.status === "Ongoing" ? "bg-blue-50 text-blue-700" : "bg-gray-100 text-gray-600"
+                    }`}>{r.status}</span>
+                    {!r.isPublic && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium flex items-center gap-1">
+                        <EyeOff size={10} /> Private
+                      </span>
+                    )}
+                    {/* Case study status badge */}
+                    {csStatus && (
+                      <a
+                        href={`/case-studies/${csStatus.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1 ${
+                          csStatus.published
+                            ? "bg-purple-50 text-purple-700 hover:bg-purple-100"
+                            : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+                        }`}
+                      >
+                        <Sparkles size={9} />
+                        {csStatus.published ? "Case Study Live" : "Case Study Draft"}
+                      </a>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">{r.department} · {r.state} · {r.orderYear}</p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {r.product}
+                    {r.orderValue ? ` · ₹${r.orderValue}L` : ""}
+                    {r.quantity ? ` · ${r.quantity} units` : ""}
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500">{r.department} · {r.state} · {r.orderYear}</p>
-                <p className="text-xs text-gray-600 mt-1">{r.product}{r.orderValue ? ` · ₹${r.orderValue}L` : ""}{r.quantity ? ` · ${r.quantity} units` : ""}</p>
+                <div className="flex gap-2 shrink-0 flex-wrap justify-end">
+                  {/* Generate case study button — only if no case study yet */}
+                  {!csStatus && (
+                    <button
+                      onClick={() => generateCaseStudy(r)}
+                      disabled={isGenerating}
+                      title="Generate draft case study from this record"
+                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      <Sparkles size={11} />
+                      {isGenerating ? "Generating…" : "Generate Case Study"}
+                    </button>
+                  )}
+                  <button onClick={() => startEdit(r)} className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors">
+                    <Edit size={14} />
+                  </button>
+                  <button onClick={() => del(r._id!, r.organization)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-2 shrink-0">
-                <button onClick={() => startEdit(r)} className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors">
-                  <Edit size={14} />
-                </button>
-                <button onClick={() => del(r._id!, r.organization)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
+      {/* Footer info */}
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-800">
         <strong className="block mb-2">Bulk Import from Excel/CSV</strong>
-        <p className="mb-2">Export your Excel file as CSV and use the API endpoint <code className="bg-blue-100 px-1 rounded text-xs font-mono">/api/admin/gov-past-performance/import</code> (POST with <code>{"{ rows: [...] }"}</code>) to bulk-import records.</p>
+        <p className="mb-2">Export your Excel file as CSV and use <code className="bg-blue-100 px-1 rounded text-xs font-mono">/api/admin/gov-past-performance/import</code> (POST with <code>{"{ rows: [...] }"}</code>) to bulk-import records.</p>
         <p>Required columns: <strong>Organization, State</strong>. Optional: Department, Product, Order Value, Quantity, Year, Status, Category, Notes.</p>
       </div>
       <div className="mt-3 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
-        <strong>View on website:</strong>{" "}
-        <a href="/past-performance-government" target="_blank" rel="noopener noreferrer" className="underline font-medium">
-          /past-performance-government ↗
-        </a>{" "}
-        and{" "}
-        <a href="/gem-approved-fogging-machine-oem" target="_blank" rel="noopener noreferrer" className="underline font-medium">
-          /gem-approved-fogging-machine-oem ↗
-        </a>
+        <strong>Live pages: </strong>
+        <a href="/past-performance-government" target="_blank" rel="noopener noreferrer" className="underline font-medium">/past-performance-government ↗</a>
+        {" · "}
+        <a href="/gem-approved-fogging-machine-oem" target="_blank" rel="noopener noreferrer" className="underline font-medium">/gem-approved-fogging-machine-oem ↗</a>
+        {" · "}
+        <a href="/case-studies" target="_blank" rel="noopener noreferrer" className="underline font-medium">/case-studies ↗</a>
       </div>
     </div>
   )
