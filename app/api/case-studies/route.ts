@@ -10,7 +10,9 @@ export async function GET() {
       .find({ published: true })
       .sort({ createdAt: -1 })
       .toArray()
-    return NextResponse.json(docs.map((d) => ({ ...d, _id: String(d._id) })))
+    return NextResponse.json(docs.map((d) => ({ ...d, _id: String(d._id) })), {
+      headers: { "Cache-Control": "no-store" },
+    })
   } catch {
     return NextResponse.json([], { status: 500 })
   }
