@@ -74,7 +74,7 @@ function StudyCard({ study }: { study: CaseStudyCard }) {
 
         {study.results && (
           <div className="mb-4">
-            <p className="text-[11px] font-semibold text-green-600 uppercase tracking-wide mb-1">Results</p>
+            <p className="text-[11px] font-600 text-brand-600 uppercase tracking-wide mb-1">Results</p>
             <p className="text-xs text-gray-700 line-clamp-2">{study.results}</p>
           </div>
         )}

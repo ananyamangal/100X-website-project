@@ -17,6 +17,9 @@ export interface GovLogo {
 
 interface Props {
   logos: GovLogo[]
+  eyebrow?: string
+  heading?: string
+  subheading?: string
 }
 
 const CATEGORIES = [
@@ -78,7 +81,12 @@ function InitialAvatar({ name, category }: { name: string; category: string }) {
   )
 }
 
-export default function GovLogoWall({ logos }: Props) {
+export default function GovLogoWall({
+  logos,
+  eyebrow = "Client Organisations",
+  heading = "Trusted By Government Departments Across India",
+  subheading = "Municipal corporations, health departments, defence establishments, and public institutions have procured 100X Circle fogging machines through GeM, tenders, and direct supply.",
+}: Props) {
   const [activeTab, setActiveTab] = useState("All")
 
   const activeLogos = logos.filter((l) => l.isActive !== false)
@@ -99,15 +107,9 @@ export default function GovLogoWall({ logos }: Props) {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
           <div>
-            <p className="eyebrow text-brand-400 mb-3">Client Organisations</p>
-            <h2 className="text-display-xs font-700 text-white">
-              Trusted By Government Departments
-              <br className="hidden md:block" /> Across India
-            </h2>
-            <p className="text-gray-400 mt-3 text-sm max-w-lg leading-relaxed">
-              Municipal corporations, health departments, defence establishments, and public institutions
-              have procured 100X Circle fogging machines through GeM, tenders, and direct supply.
-            </p>
+            <p className="eyebrow text-brand-400 mb-3">{eyebrow}</p>
+            <h2 className="text-display-xs font-700 text-white">{heading}</h2>
+            <p className="text-gray-400 mt-3 text-sm max-w-lg leading-relaxed">{subheading}</p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <div className="text-right">
