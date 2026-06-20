@@ -61,6 +61,7 @@ const STATIC_ROUTES: Array<{
   { path: "/gem-approved-fogging-machine-oem", changeFrequency: "monthly", priority: 0.9 },
   { path: "/past-performance-government", changeFrequency: "monthly", priority: 0.85 },
   { path: "/fogging-machine-government-procurement", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/oem-authorization-letter", changeFrequency: "monthly", priority: 0.9 },
   // Videos
   { path: "/videos", changeFrequency: "weekly", priority: 0.7 },
   // Phase C pages

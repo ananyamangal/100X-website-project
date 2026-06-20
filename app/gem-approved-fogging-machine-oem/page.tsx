@@ -10,13 +10,18 @@ import GovProductCarousel, { type ProductSlim } from "@/components/gov-procureme
 import GovPastPerformanceCardsServer from "@/components/trust/GovPastPerformanceCardsServer"
 import WhoProcturesFrom from "@/components/trust/WhoProcturesFrom"
 import IndiaDeploymentMap, { type StateDeployment } from "@/components/trust/IndiaDeploymentMap"
+import OemProcessSteps from "@/components/oem/OemProcessSteps"
+import DealerBenefits from "@/components/oem/DealerBenefits"
+import TenderDocSupport from "@/components/oem/TenderDocSupport"
+import OemAuthForm from "@/components/oem/OemAuthForm"
+import FloatingCTA from "@/components/oem/FloatingCTA"
 
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: "GeM Approved Fogging Machine OEM — IS 14855, MSME, ISO 9001 | 100X Circle",
+  title: "Get OEM Authorization Letter for Government Tenders — GeM OEM IS 14855 | 100X Circle",
   description:
-    "100X Circle is an OEM manufacturer of GeM-approved IS 14855-compliant thermal fogging machines. MSME registered, ISO 9001:2015 certified. Trusted by 80+ government departments across 15+ states. Quotation, tender docs, and full OEM certification available.",
+    "Get OEM Authorization Letter from 100X Circle for government fogging machine tenders. IS 14855 certified GeM OEM. Free tender documentation pack (OEM letter, IS 14855, ISO cert, MSME cert) within 24 hours. 80+ government departments, 15+ states, 500+ orders.",
   keywords: [
     "GeM approved fogging machine OEM",
     "IS 14855 fogging machine OEM manufacturer",
@@ -219,40 +224,70 @@ export default async function GemApprovedOEMPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <main className="pt-16 min-h-screen bg-slate-950">
+        <FloatingCTA formId="oem-auth-form" />
+
         {/* ── Hero ─────────────────────────────────────────────────────────────── */}
         <section className="bg-slate-950 border-b border-white/[0.06] py-16 md:py-24">
           <div className="max-w-7xl mx-auto px-4 md:px-6">
-            <div className="max-w-3xl">
-              <div className="flex flex-wrap gap-2 mb-6">
-                {["GeM Approved OEM", "IS 14855 Compliant", "MSME Registered", "ISO 9001:2015"].map((tag) => (
-                  <span key={tag} className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-xs font-bold text-emerald-400">
-                    {tag}
-                  </span>
-                ))}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+              {/* Left */}
+              <div>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {["Free OEM Authorization", "4-Hour Response", "GeM OEM", "IS 14855 Certified"].map((tag) => (
+                    <span key={tag} className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-xs font-bold text-emerald-400">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-5">
+                  Get OEM Authorization Letter for Government Tenders
+                </h1>
+                <p className="text-lg text-slate-400 mb-6 leading-relaxed">
+                  100X Circle Pvt Ltd issues OEM Authorization Letters to dealers, resellers, and GeM partners for
+                  government fogging machine tenders — free of charge, on company letterhead, within 24 hours.
+                </p>
+                <div className="space-y-2 mb-8">
+                  {[
+                    "OEM Authorization is available — no registration fees",
+                    "100X Circle supports all government tenders nationwide",
+                    "Request authorization immediately using the form",
+                    "Simple 4-step process, response in 4 hours",
+                    "Direct path to becoming an authorized dealer",
+                  ].map((pt) => (
+                    <div key={pt} className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}><polyline points="20 6 9 17 4 12" /></svg>
+                      </div>
+                      <span className="text-slate-300 text-sm">{pt}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <a href={WA_HREF} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                    </svg>
+                    WhatsApp for Authorization
+                  </a>
+                  <Link href="/fogging-machine-government-procurement"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl text-sm transition-colors">
+                    Procurement Guide
+                  </Link>
+                  <Link href="/past-performance-government"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl text-sm transition-colors">
+                    Past Performance
+                  </Link>
+                </div>
               </div>
-              <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-5">
-                GeM Approved Fogging Machine OEM
-              </h1>
-              <p className="text-lg text-slate-400 mb-8 leading-relaxed">
-                100X Circle Pvt Ltd — MSME manufacturer of IS 14855-compliant thermal fogging machines.
-                Direct OEM supply for government tenders, GeM procurement, and institutional orders across India.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <a href={WA_HREF} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                  </svg>
-                  Request OEM Quotation
-                </a>
-                <Link href="/fogging-machine-government-procurement"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl text-sm transition-colors">
-                  Government Procurement Guide
-                </Link>
-                <Link href="/past-performance-government"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl text-sm transition-colors">
-                  Past Performance
-                </Link>
+
+              {/* Right — quick form */}
+              <div id="oem-auth-form" className="bg-slate-900 border border-white/[0.08] rounded-2xl p-6 md:p-8 lg:sticky lg:top-20">
+                <div className="mb-6">
+                  <h2 className="text-xl font-black text-white mb-1">Request OEM Authorization Letter</h2>
+                  <p className="text-slate-400 text-sm">Our team responds within <strong className="text-white">4 business hours</strong>.</p>
+                </div>
+                <OemAuthForm source="gem_oem_page" />
               </div>
             </div>
           </div>
@@ -275,6 +310,9 @@ export default async function GemApprovedOEMPage() {
             </div>
           </div>
         </section>
+
+        {/* ── Authorization Process ─────────────────────────────────────────── */}
+        <OemProcessSteps />
 
         {/* ── 2. KPI Dashboard ─────────────────────────────────────────────────── */}
         <section className="py-14 bg-slate-950">
@@ -300,6 +338,12 @@ export default async function GemApprovedOEMPage() {
 
         {/* ── 5. Who Procures ──────────────────────────────────────────────────── */}
         <WhoProcturesFrom />
+
+        {/* ── Dealer Benefits ──────────────────────────────────────────────────── */}
+        <DealerBenefits />
+
+        {/* ── Tender Document Support ───────────────────────────────────────────── */}
+        <TenderDocSupport />
 
         {/* ── 6. Past Performance Records ─────────────────────────────────────── */}
         {pastPerformance.length > 0 && (
@@ -368,29 +412,45 @@ export default async function GemApprovedOEMPage() {
           </section>
         )}
 
-        {/* ── 10. CTA ──────────────────────────────────────────────────────────── */}
-        <section className="py-20 bg-slate-950 border-t border-white/[0.06]">
-          <div className="max-w-4xl mx-auto px-4 md:px-6 text-center">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Ready to Procure via GeM or Tender?</h2>
-            <p className="text-slate-400 mb-10 text-base leading-relaxed max-w-xl mx-auto">
-              Share your tender specification or GeM bid details. We'll provide L1 quotation, full documentation pack,
-              and OEM certificates within 24 hours.
+        {/* ── OEM Authorization Form (bottom anchor) ────────────────────────────── */}
+        <section id="oem-auth-form-bottom" className="py-20 bg-slate-900 border-t border-white/[0.06]">
+          <div className="max-w-3xl mx-auto px-4 md:px-6">
+            <div className="text-center mb-10">
+              <p className="text-emerald-400 text-xs font-bold uppercase tracking-widest mb-3">OEM Authorization</p>
+              <h2 className="text-3xl font-black text-white mb-4">Request OEM Authorization Letter</h2>
+              <p className="text-slate-400 text-base">
+                Free authorization letter on company letterhead — our team responds within 4 business hours.
+              </p>
+            </div>
+            <div className="bg-slate-800/60 border border-white/[0.08] rounded-2xl p-6 md:p-8">
+              <OemAuthForm source="gem_oem_page_bottom" />
+            </div>
+            <p className="text-center text-slate-600 text-xs mt-6">
+              Need it faster? <a href={WA_HREF} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white underline">WhatsApp us directly</a>
+              {" "}or call <a href={`tel:${BUSINESS.phonePrimary}`} className="text-slate-400 hover:text-white underline">{BUSINESS.phonePrimary}</a>
             </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <a href={WA_HREF} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors">
-                WhatsApp for Quotation
-              </a>
-              <a href={`mailto:${BUSINESS.email}?subject=GeM/Tender Quotation Request`}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold rounded-xl text-sm transition-colors">
-                Email Inquiry
-              </a>
+          </div>
+        </section>
+
+        {/* ── 10. CTA ──────────────────────────────────────────────────────────── */}
+        <section className="py-16 bg-slate-950 border-t border-white/[0.06]">
+          <div className="max-w-4xl mx-auto px-4 md:px-6 text-center">
+            <h2 className="text-2xl md:text-3xl font-black text-white mb-4">More Resources for Government Procurement</h2>
+            <div className="flex flex-wrap gap-4 justify-center mt-6">
+              <Link href="/past-performance-government"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold rounded-xl text-sm transition-colors">
+                Past Performance Records
+              </Link>
               <Link href="/fogging-machine-government-procurement"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold rounded-xl text-sm transition-colors">
-                Procurement Guide
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold rounded-xl text-sm transition-colors">
+                Government Procurement Guide
+              </Link>
+              <Link href="/oem-authorization-letter"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors">
+                OEM Authorization Letter
               </Link>
             </div>
-            <div className="mt-10 flex flex-wrap justify-center gap-6 text-sm text-slate-500">
+            <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-slate-500">
               <span>{BUSINESS.phonePrimary}</span>
               <span>{BUSINESS.email}</span>
               <span>IMT Manesar, Gurugram, Haryana</span>

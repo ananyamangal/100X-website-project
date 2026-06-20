@@ -60,6 +60,7 @@ import { SeoHealthTab } from "@/components/admin/SeoHealthTab"
 import { SchemaHealthTab } from "@/components/admin/SchemaHealthTab"
 import { GovPastPerformanceTab } from "@/components/admin/GovPastPerformanceTab"
 import { GovKPIsTab } from "@/components/admin/GovKPIsTab"
+import { OemLeadsTab } from "@/components/admin/OemLeadsTab"
 import { ProductForm } from "@/components/admin/ProductForm"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
@@ -1141,6 +1142,17 @@ function AdminDashboardContent() {
                 Gov KPIs
               </button>
               <button
+                onClick={() => setActiveTab("oemLeads")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "oemLeads"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <FileText className="mr-3" size={20} />
+                OEM Leads
+              </button>
+              <button
                 onClick={() => setActiveTab("spareParts")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "spareParts"
@@ -1447,6 +1459,7 @@ function AdminDashboardContent() {
             {activeTab === "caseStudies" && <CaseStudiesTab />}
             {activeTab === "govPastPerformance" && <GovPastPerformanceTab />}
             {activeTab === "govKPIs" && <GovKPIsTab />}
+            {activeTab === "oemLeads" && <OemLeadsTab />}
             {activeTab === "deployments" && <DeploymentsTab />}
             {activeTab === "videos" && <VideosTab />}
             {activeTab === "leadAnalytics" && <LeadAnalyticsTab />}
