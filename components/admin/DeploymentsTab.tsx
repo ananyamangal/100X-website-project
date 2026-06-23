@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import MediaLibraryPicker from "@/components/admin/MediaLibraryPicker"
 
 const CLOUDINARY_CLOUD = "dhbvzugv6"
 const CLOUDINARY_PRESET = "product_uploads"
@@ -16,67 +17,6 @@ const EMPTY = {
   images: [] as string[],
   videos: [] as string[],
   description: "",
-}
-
-// ── Media Library Picker ──────────────────────────────────────────────────────
-interface MediaItem { url: string; name?: string; source?: string }
-
-function MediaLibraryPicker({ onSelect, onClose }: { onSelect: (url: string) => void; onClose: () => void }) {
-  const [items, setItems] = useState<MediaItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState("")
-
-  useEffect(() => {
-    fetch("/api/admin/media-library")
-      .then((r) => r.json())
-      .then((data) => {
-        const all: MediaItem[] = Array.isArray(data.images) ? data.images : []
-        setItems(all.filter((i) => i.url && !i.url.includes("pdf")))
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
-
-  const filtered = search
-    ? items.filter((i) => (i.name || i.url).toLowerCase().includes(search.toLowerCase()))
-    : items
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-bold text-gray-900">Select from Media Library</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 text-xl leading-none">×</button>
-        </div>
-        <div className="p-3 border-b">
-          <Input placeholder="Search images…" value={search} onChange={(e) => setSearch(e.target.value)} className="text-sm" autoFocus />
-        </div>
-        <div className="overflow-y-auto p-3 flex-1">
-          {loading ? (
-            <p className="text-center text-gray-400 py-8 text-sm">Loading…</p>
-          ) : filtered.length === 0 ? (
-            <p className="text-center text-gray-400 py-8 text-sm">No images found</p>
-          ) : (
-            <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-              {filtered.map((item, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => { onSelect(item.url); onClose() }}
-                  className="group relative aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-green-500 transition-all"
-                >
-                  <img src={item.url} alt={item.name || ""} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                  {item.source && (
-                    <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[9px] px-1 py-0.5 truncate">{item.source}</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
 }
 
 // ── Main Tab ──────────────────────────────────────────────────────────────────

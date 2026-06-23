@@ -5,70 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
-import { Search, CheckSquare, Square, Images, X } from "lucide-react"
-
-// ── Media Library Picker ──────────────────────────────────────────────────────
-
-function MediaLibraryPicker({ onSelect, onClose }: { onSelect: (url: string) => void; onClose: () => void }) {
-  const [items, setItems] = useState<{ url: string; label: string; category: string }[]>([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState("")
-
-  useEffect(() => {
-    fetch("/api/admin/media-library")
-      .then(r => r.json())
-      .then(data => setItems(Array.isArray(data) ? data.filter((i: any) => i.category !== "documents") : []))
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
-
-  const filtered = items.filter(i =>
-    !search || i.label.toLowerCase().includes(search.toLowerCase()) || i.category.toLowerCase().includes(search.toLowerCase())
-  )
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold text-gray-900">Media Library</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700"><X size={18} /></button>
-        </div>
-        <div className="p-3 border-b">
-          <Input
-            placeholder="Search images…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="text-sm"
-          />
-        </div>
-        <div className="flex-1 overflow-y-auto p-3">
-          {loading ? (
-            <p className="text-sm text-gray-500 text-center py-8">Loading…</p>
-          ) : filtered.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-8">No images found.</p>
-          ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {filtered.map((item, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => { onSelect(item.url); onClose() }}
-                  className="group relative aspect-square rounded-lg overflow-hidden border border-gray-200 hover:border-brand-500 hover:shadow-md transition-all"
-                  title={item.label}
-                >
-                  <img src={item.url} alt={item.label} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end">
-                    <p className="text-[10px] text-white bg-black/60 w-full px-1.5 py-1 truncate opacity-0 group-hover:opacity-100 transition-opacity">{item.label}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
+import { Search, CheckSquare, Square, Images } from "lucide-react"
+import MediaLibraryPicker from "@/components/admin/MediaLibraryPicker"
 
 const CLOUDINARY_CLOUD = "dhbvzugv6"
 const CLOUDINARY_PRESET = "product_uploads"
