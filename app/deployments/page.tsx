@@ -16,7 +16,7 @@ async function getDeployments() {
   try {
     const client = await clientPromise
     const db = client.db()
-    return await db.collection("deployments").find({}).sort({ createdAt: -1 }).toArray()
+    return await db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).toArray()
   } catch {
     return []
   }
@@ -154,6 +154,27 @@ export default async function DeploymentsPage() {
             >
               View Products
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Internal links */}
+      <section className="py-10 bg-white border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-4">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4 text-center">Related Pages</p>
+          <div className="flex flex-wrap gap-3 justify-center">
+            {[
+              { href: "/case-studies", label: "Case Studies" },
+              { href: "/past-performance-government", label: "Government Track Record" },
+              { href: "/fogging-machine-government-procurement", label: "Procurement Guide" },
+              { href: "/gem-approved-fogging-machine-oem", label: "Dealer Partnership" },
+              { href: "/products", label: "All Products" },
+            ].map((l) => (
+              <Link key={l.href} href={l.href}
+                className="px-4 py-2 border border-gray-200 rounded-full text-gray-600 hover:border-brand-400 hover:text-brand-700 text-xs font-medium transition-all">
+                {l.label}
+              </Link>
+            ))}
           </div>
         </div>
       </section>

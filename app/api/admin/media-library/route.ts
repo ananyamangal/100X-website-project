@@ -14,7 +14,7 @@ export async function GET() {
     const client = await clientPromise
     const db = client.db()
 
-    const [products, accreditations, badges, certifications, banners] = await Promise.all([
+    const [products, accreditations, badges, certifications, banners, caseStudies, deployments] = await Promise.all([
       db.collection('products').find({}).project({
         name: 1, imageUrl: 1, imageUrls: 1, brochureUrl: 1, heroVideoUrl: 1, createdAt: 1,
       }).toArray(),
@@ -22,6 +22,8 @@ export async function GET() {
       db.collection('product_badges').find({}).project({ name: 1, iconUrl: 1, createdAt: 1 }).toArray(),
       db.collection('certifications').find({}).project({ name: 1, logoUrl: 1, createdAt: 1 }).toArray(),
       db.collection('banners').find({}).project({ imageUrl: 1, title: 1, createdAt: 1 }).toArray(),
+      db.collection('case_studies').find({}).project({ title: 1, images: 1, createdAt: 1 }).toArray(),
+      db.collection('deployments').find({}).project({ location: 1, images: 1, createdAt: 1 }).toArray(),
     ])
 
     const items: MediaItem[] = []
@@ -98,6 +100,34 @@ export async function GET() {
           uploadedAt: b.createdAt ? new Date(b.createdAt).toISOString() : undefined,
           usageCount: 1,
         })
+      }
+    }
+
+    for (const cs of caseStudies) {
+      for (const url of (Array.isArray(cs.images) ? cs.images : [])) {
+        if (typeof url === 'string' && url.startsWith('http')) {
+          items.push({
+            url,
+            category: 'case-studies',
+            label: String(cs.title || 'Case study image'),
+            uploadedAt: cs.createdAt ? new Date(cs.createdAt).toISOString() : undefined,
+            usageCount: 1,
+          })
+        }
+      }
+    }
+
+    for (const d of deployments) {
+      for (const url of (Array.isArray(d.images) ? d.images : [])) {
+        if (typeof url === 'string' && url.startsWith('http')) {
+          items.push({
+            url,
+            category: 'deployments',
+            label: String(d.location || 'Deployment image'),
+            uploadedAt: d.createdAt ? new Date(d.createdAt).toISOString() : undefined,
+            usageCount: 1,
+          })
+        }
       }
     }
 

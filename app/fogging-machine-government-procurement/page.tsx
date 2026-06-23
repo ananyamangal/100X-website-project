@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Suspense } from "react"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
+
+export const revalidate = 60
 import clientPromise from "@/lib/mongodb"
 import { normalizeProducts } from "@/lib/normalizeProduct"
 import GovProductCarousel, { type ProductSlim } from "@/components/gov-procurement/GovProductCarousel"
@@ -306,9 +308,9 @@ export default async function GovernmentProcurementPage() {
         db.collection("products").find({ isPublished: { $ne: false } }).sort({ order: 1, createdAt: -1 }).toArray(),
         db.collection("customers").find({ isActive: { $ne: false } }).sort({ order: 1 }).toArray(),
         db.collection("gov_kpis").findOne({ key: "main" }),
-        db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(6).toArray(),
+        db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(9).toArray(),
         db.collection("gov_past_performance").find({ isPublic: true }).sort({ orderYear: -1 }).limit(9).toArray(),
-        db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).limit(4).toArray(),
+        db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).limit(6).toArray(),
       ])
 
       products = normalizeProducts(JSON.parse(JSON.stringify(rawProducts))).map((p: any) => ({
@@ -477,7 +479,7 @@ export default async function GovernmentProcurementPage() {
               <FeaturedCaseStudyCards
                 studies={caseStudies}
                 heading="Government Success Stories"
-                maxVisible={6}
+                maxVisible={9}
                 showViewAll
               />
               <div className="mt-8 text-center">
@@ -511,7 +513,7 @@ export default async function GovernmentProcurementPage() {
         {deployments.length > 0 && (
           <section className="py-16 md:py-20 bg-white border-b border-gray-100">
             <div className="container mx-auto px-4 md:px-6">
-              <FeaturedDeployments deployments={deployments} heading="Real World Deployments" maxVisible={4} showViewAll />
+              <FeaturedDeployments deployments={deployments} heading="Real World Deployments" maxVisible={6} showViewAll />
             </div>
           </section>
         )}

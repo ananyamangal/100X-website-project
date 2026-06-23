@@ -38,9 +38,9 @@ export default async function HomePage() {
   const client = await clientPromise
   const db = client.db()
 
-  const [productsRaw, bannersRaw, blogsRaw, accreditationsRaw, customersRaw, brochureDoc, homeContent, homepageSectionsRaw, sparePartsRaw, trustBadgesRaw, pageSectionsRaw, caseStudiesRaw, govSuppliesRaw, govKpisDoc] =
+  const [productsRaw, bannersRaw, blogsRaw, accreditationsRaw, customersRaw, brochureDoc, homeContent, homepageSectionsRaw, sparePartsRaw, trustBadgesRaw, pageSectionsRaw, caseStudiesRaw, govSuppliesRaw, govKpisDoc, deploymentsRaw] =
     await Promise.all([
-      db.collection("products").find({}).toArray(),
+      db.collection("products").find({ isPublished: { $ne: false } }).sort({ order: 1 }).toArray(),
       db.collection("banners").find({}).toArray(),
       db
         .collection("blogs")
@@ -61,6 +61,7 @@ export default async function HomePage() {
       db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(6).toArray(),
       db.collection("gov_past_performance").find({ isPublic: true }).limit(6).toArray(),
       db.collection("gov_kpis").findOne({ key: "main" }),
+      db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).limit(4).toArray(),
     ])
 
   // Serialize MongoDB docs (ObjectId → hex string, Date → ISO string)
@@ -88,6 +89,7 @@ export default async function HomePage() {
   const caseStudies = JSON.parse(JSON.stringify(caseStudiesRaw)).map((s: any) => ({ ...s, _id: String(s._id) }))
   const govSupplies = JSON.parse(JSON.stringify(govSuppliesRaw)).map((s: any) => ({ ...s, _id: String(s._id) }))
   const govKpis = govKpisDoc ? JSON.parse(JSON.stringify(govKpisDoc)) : null
+  const deployments = JSON.parse(JSON.stringify(deploymentsRaw)).map((d: any) => ({ ...d, _id: String(d._id) }))
 
   return (
     <>
@@ -109,6 +111,7 @@ export default async function HomePage() {
         caseStudies={caseStudies}
         govSupplies={govSupplies}
         govKpis={govKpis}
+        deployments={deployments}
       />
     </>
   )

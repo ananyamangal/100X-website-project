@@ -76,6 +76,7 @@ interface HomePageClientProps {
   caseStudies?: any[]
   govSupplies?: any[]
   govKpis?: any
+  deployments?: any[]
 }
 
 const getYouTubeId = (url: string): string | null => {
@@ -296,6 +297,7 @@ export default function HomePageClient({
   caseStudies = [],
   govSupplies = [],
   govKpis,
+  deployments = [],
 }: HomePageClientProps) {
   const router = useRouter()
   const [brochureModalOpen, setBrochureModalOpen] = useState(false)
@@ -395,7 +397,7 @@ export default function HomePageClient({
     gov_supplies: () => <HomeGovSuppliesSection initialData={govSupplies.length > 0 ? govSupplies : undefined} />,
     gov_performance: () => <GovPerformanceSnapshot initialKpis={govKpis ?? undefined} />,
     gov_success: () => <HomeCaseStudiesSection initialData={caseStudies.length > 0 ? caseStudies : undefined} />,
-    deployments: () => <HomeDeploymentsSection />,
+    deployments: () => <HomeDeploymentsSection initialData={deployments.length > 0 ? deployments : undefined} />,
     reviews: () => <ReviewsSection limit={4} />,
     trust_certifications: () => (
       <>

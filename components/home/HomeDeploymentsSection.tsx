@@ -3,11 +3,16 @@
 import { useEffect, useState } from "react"
 import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/FeaturedDeployments"
 
-export default function HomeDeploymentsSection() {
-  const [deployments, setDeployments] = useState<DeploymentRecord[]>([])
-  const [loaded, setLoaded] = useState(false)
+interface Props {
+  initialData?: DeploymentRecord[]
+}
+
+export default function HomeDeploymentsSection({ initialData }: Props = {}) {
+  const [deployments, setDeployments] = useState<DeploymentRecord[]>(initialData?.slice(0, 4) ?? [])
+  const [loaded, setLoaded] = useState(!!initialData)
 
   useEffect(() => {
+    if (initialData && initialData.length > 0) return
     fetch("/api/deployments")
       .then((r) => r.json())
       .then((data: DeploymentRecord[]) => {
@@ -16,7 +21,7 @@ export default function HomeDeploymentsSection() {
       })
       .catch(() => {})
       .finally(() => setLoaded(true))
-  }, [])
+  }, [initialData])
 
   if (!loaded || deployments.length === 0) return null
 

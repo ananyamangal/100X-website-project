@@ -1,7 +1,10 @@
 ﻿import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { SITE_URL } from "@/lib/seo/site-config"
 import clientPromise from "@/lib/mongodb"
+
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: "100X Circle Case Studies — Government & Municipal Supply Track Record",
@@ -170,28 +173,66 @@ export default async function CaseStudiesPage() {
 
         {/* Database-managed case studies (added from Admin) */}
         {dbStudies.length > 0 && (
-          <div className="mb-10 space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800">Featured Case Studies</h2>
-            <div className="grid gap-6 sm:grid-cols-2">
+          <div className="mb-12">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-1">Verified Deployments</p>
+                <h2 className="text-2xl font-bold text-gray-900">Government Success Stories</h2>
+              </div>
+              <Link href="/past-performance-government" className="text-sm text-brand-600 font-semibold hover:underline shrink-0">
+                Full track record →
+              </Link>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {dbStudies.map((s: any) => (
                 <Link
                   key={String(s._id)}
                   href={`/case-studies/${s.slug}`}
-                  className="group bg-white rounded-xl border border-brand-100 shadow-sm p-5 hover:shadow-md transition-shadow"
+                  className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-brand-300 transition-all flex flex-col"
                 >
-                  {s.isSample && (
-                    <span className="inline-block mb-2 text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
-                      Sample – Demonstration Content
-                    </span>
-                  )}
-                  <div className="flex gap-2 mb-2 flex-wrap">
-                    {s.industry && <span className="text-xs bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full">{s.industry}</span>}
-                    {s.state && <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">{s.state}</span>}
+                  {/* Image area */}
+                  <div className="relative h-44 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                    {s.images?.[0] ? (
+                      <Image
+                        src={s.images[0]}
+                        alt={s.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-4xl">🏛</div>
+                    )}
+                    {s.state && (
+                      <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-700 rounded-full">
+                        {s.state}
+                      </span>
+                    )}
+                    {s.department && (
+                      <span className="absolute top-3 right-3 px-2.5 py-1 bg-brand-600/90 text-xs font-semibold text-white rounded-full">
+                        {s.department}
+                      </span>
+                    )}
                   </div>
-                  <h3 className="font-bold text-gray-900 text-base group-hover:text-brand-700 transition-colors">{s.title}</h3>
-                  {s.customer && <p className="text-xs text-gray-500 mt-1">{s.customer}</p>}
-                  {s.problem && <p className="text-xs text-gray-600 mt-2 line-clamp-2">{s.problem}</p>}
-                  <p className="text-brand-600 text-xs font-semibold mt-3">Read full case study →</p>
+                  <div className="p-5 flex flex-col flex-1">
+                    {s.industry && (
+                      <p className="text-[10px] font-700 text-brand-600 uppercase tracking-widest mb-1.5">{s.industry}</p>
+                    )}
+                    <h3 className="font-bold text-gray-900 text-sm leading-snug mb-2 line-clamp-2 group-hover:text-brand-700 transition-colors">
+                      {s.title}
+                    </h3>
+                    {s.customer && <p className="text-xs text-gray-500 mb-2">{s.customer}</p>}
+                    {s.problem && <p className="text-xs text-gray-600 line-clamp-2 mb-3">{s.problem}</p>}
+                    <div className="mt-auto pt-3 border-t border-gray-100">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600">
+                        Read Case Study
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+                          <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
                 </Link>
               ))}
             </div>

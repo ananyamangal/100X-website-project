@@ -10,6 +10,7 @@ import FeaturedGovSupplies, { type SupplyRecord } from "@/components/trust/Featu
 import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
 import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/FeaturedDeployments"
 import PartnerApplyForm from "@/components/oem/PartnerApplyForm"
+import OemHeroVisual from "@/components/oem/OemHeroVisual"
 
 export const revalidate = 60
 
@@ -167,8 +168,8 @@ export default async function GemApprovedOEMPage() {
       db.collection("customers").find({ isActive: { $ne: false } }).sort({ order: 1 }).toArray(),
       db.collection("gov_kpis").findOne({ key: "main" }),
       db.collection("gov_past_performance").find({ isPublic: true }).sort({ orderYear: -1 }).limit(12).toArray(),
-      db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(6).toArray(),
-      db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).limit(4).toArray(),
+      db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(9).toArray(),
+      db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).limit(6).toArray(),
     ])
 
     products = normalizeProducts(JSON.parse(JSON.stringify(rawProducts))).map((p: any) => ({
@@ -245,35 +246,9 @@ export default async function GemApprovedOEMPage() {
                 </div>
               </div>
 
-              {/* RIGHT: Product visual */}
+              {/* RIGHT: Product visual carousel */}
               <div className="hidden lg:flex items-center justify-center relative">
-                {products[0]?.imageUrls?.[0] ? (
-                  <div className="relative w-full max-w-[480px]">
-                    <div className="absolute -inset-12 bg-brand-600/8 rounded-full blur-3xl pointer-events-none" />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={products[0].imageUrls[0]}
-                      alt={products[0].name || "100X Circle Fogging Machine"}
-                      className="relative w-full rounded-2xl shadow-2xl shadow-black/60 border border-white/[0.06]"
-                    />
-                    <div className="absolute top-4 right-4 bg-gray-900/80 backdrop-blur-sm border border-white/[0.12] rounded-xl px-3 py-2 text-center">
-                      <p className="text-[10px] font-700 text-brand-400 uppercase tracking-widest">GeM Registered</p>
-                      <p className="text-[10px] text-gray-500 mt-0.5">gem.gov.in Verified</p>
-                    </div>
-                    <div className="absolute bottom-4 left-4 bg-gray-900/80 backdrop-blur-sm border border-white/[0.12] rounded-xl px-3 py-2">
-                      <p className="text-[10px] font-700 text-white">{products[0].name}</p>
-                      <p className="text-[10px] text-brand-400 mt-0.5">IS 14855 Certified</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full max-w-sm aspect-[4/3] rounded-2xl bg-white/[0.03] border border-white/[0.07] flex flex-col items-center justify-center gap-4">
-                    <svg className="w-20 h-20 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={0.8}>
-                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                    </svg>
-                    <p className="text-gray-600 text-sm font-600">Thermal Fogging Machine</p>
-                    <p className="text-gray-700 text-xs">IS 14855 · GeM Registered</p>
-                  </div>
-                )}
+                <OemHeroVisual products={products} />
               </div>
             </div>
           </div>
@@ -336,7 +311,7 @@ export default async function GemApprovedOEMPage() {
           <section className="py-20 md:py-28 bg-white">
             <div className="container mx-auto px-4 md:px-6">
               <p className="eyebrow text-brand-600 mb-4">Featured Government Deployments</p>
-              <FeaturedCaseStudyCards studies={caseStudies} heading="Deployment Success Stories" maxVisible={6} showViewAll />
+              <FeaturedCaseStudyCards studies={caseStudies} heading="Deployment Success Stories" maxVisible={9} showViewAll />
             </div>
           </section>
         )}
@@ -345,7 +320,7 @@ export default async function GemApprovedOEMPage() {
         {deployments.length > 0 && (
           <section className="py-20 md:py-28 bg-gray-950 border-t border-white/[0.06]">
             <div className="container mx-auto px-4 md:px-6">
-              <FeaturedDeployments deployments={deployments} heading="Real World Deployments" maxVisible={4} showViewAll darkBg />
+              <FeaturedDeployments deployments={deployments} heading="Real World Deployments" maxVisible={6} showViewAll darkBg />
             </div>
           </section>
         )}

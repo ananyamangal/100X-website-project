@@ -11,7 +11,7 @@ export async function GET() {
       .sort({ createdAt: -1 })
       .toArray()
     return NextResponse.json(docs.map((d) => ({ ...d, _id: String(d._id) })), {
-      headers: { "Cache-Control": "no-store" },
+      headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
     })
   } catch {
     return NextResponse.json([], { status: 500 })
