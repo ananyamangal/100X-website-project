@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
+import RfqForm from "@/components/rfq/RfqForm"
 
 export const metadata: Metadata = {
   title: "IS 14855 Fogging Machine | BIS Certified Thermal Fogger for Government Tenders | 100X Circle",
@@ -106,26 +108,26 @@ const PRODUCTS = [
   {
     name: "100XDB400 — Double Barrel Vehicle-Mounted Fogger",
     spec: "Dual-output, ~100L capacity. IS 14855 compliant. For large municipal ward fogging drives.",
-    price: "~₹2,50,000",
     use: "Municipal Corporation, Nagar Nigam",
+    badge: "Heavy Duty",
   },
   {
     name: "ISI Marked Thermal Fogging Machine (HDPE Tank)",
     spec: "Portable, HDPE tank, ISI/BIS marked. IS 14855 compliant. Standard government procurement model.",
-    price: "~₹48,000",
     use: "Nagar Panchayat, Health Department",
+    badge: "Most Procured",
   },
   {
     name: "Stainless Steel Tank Thermal Fogging Machine",
     spec: "SS tank, corrosion resistant. IS 14855 compliant. For pest control operators and municipal use.",
-    price: "~₹40,000",
     use: "PCO, Municipality, Industrial Estate",
+    badge: "Premium Build",
   },
   {
     name: "100XTFS50 — Thermal and Cold Fogging Machine",
     spec: "Dual-mode thermal + ULV cold fogger. ~50L capacity. IS 14855 compliant thermal mode.",
-    price: "~₹20,000",
     use: "Municipal, Agricultural, Dual-purpose",
+    badge: "Dual Mode",
   },
 ]
 
@@ -134,14 +136,13 @@ export default function Is14855FoggingMachinePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }} />
+      <BreadcrumbJsonLd items={[
+        { name: "Home", url: "/" },
+        { name: "Products", url: "/products" },
+        { name: "IS 14855 Fogging Machine", url: "/is-14855-fogging-machine" },
+      ]} />
 
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">
         {/* Breadcrumb */}
@@ -174,12 +175,12 @@ export default function Is14855FoggingMachinePage() {
           Panchayats, health departments, and GeM procurement.
         </p>
 
-        {/* Procurement CTA */}
+        {/* Procurement CTA bar */}
         <div className="bg-brand-600 rounded-xl p-6 mb-10 text-white">
           <h2 className="font-bold text-xl mb-2">Procurement Enquiry — IS 14855 Machines</h2>
           <p className="text-brand-100 text-sm mb-4">
             Need IS 14855 compliant fogging machines for a tender or GeM bid? We provide
-            full technical documentation, compliance certificates, and competitive pricing.
+            full technical documentation, compliance certificates, and government supply pricing on request.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <a
@@ -188,13 +189,13 @@ export default function Is14855FoggingMachinePage() {
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-brand-50 transition-colors"
             >
-              WhatsApp: +91-7827229116
+              WhatsApp Sales Team
             </a>
             <a
-              href={`mailto:${BUSINESS.email}?subject=IS 14855 Fogging Machine Enquiry`}
+              href="#rfq-form"
               className="inline-flex items-center justify-center border border-brand-300 text-white font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-brand-700 transition-colors"
             >
-              Email for Quotation
+              Request Official Quotation
             </a>
           </div>
         </div>
@@ -270,24 +271,34 @@ export default function Is14855FoggingMachinePage() {
           </ul>
         </article>
 
-        {/* Product Grid */}
+        {/* Product Grid — no pricing */}
         <h2 className="text-xl font-semibold text-gray-800 mb-4 mt-8">
           IS 14855 Compliant Models
         </h2>
         <div className="space-y-4 mb-10">
           {PRODUCTS.map((p) => (
-            <div key={p.name} className="border border-gray-200 rounded-xl p-5">
+            <div key={p.name} className="border border-gray-200 rounded-xl p-5 hover:border-brand-300 transition-colors">
               <div className="flex justify-between items-start gap-4 flex-wrap">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800 mb-1">{p.name}</h3>
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h3 className="font-semibold text-gray-800">{p.name}</h3>
+                    <span className="text-[10px] font-700 text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded-full">{p.badge}</span>
+                  </div>
                   <p className="text-sm text-gray-600 mb-2">{p.spec}</p>
                   <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full border border-green-200">
                     Use: {p.use}
                   </span>
                 </div>
-                <div className="text-right flex-shrink-0">
-                  <span className="text-sm font-bold text-gray-800">{p.price}</span>
-                  <p className="text-xs text-gray-400">ex-factory</p>
+                <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                  <span className="text-xs font-700 text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg">
+                    Price on Request
+                  </span>
+                  <a
+                    href="#rfq-form"
+                    className="inline-flex items-center gap-1 text-xs font-700 text-brand-600 hover:text-brand-700 transition-colors"
+                  >
+                    Get GeM Pricing →
+                  </a>
                 </div>
               </div>
             </div>
@@ -328,6 +339,16 @@ export default function Is14855FoggingMachinePage() {
             authorized dealers. Contact us to request a complete tender documentation package.
           </p>
         </article>
+
+        {/* RFQ Form */}
+        <div id="rfq-form" className="mt-12 mb-8 scroll-mt-24">
+          <RfqForm
+            product="IS 14855 Fogging Machine"
+            source="is-14855-page"
+            heading="Request Official Government Quotation"
+            subheading="For tenders, GeM bids, and direct government supply. We respond within 2 business hours with official pricing and IS 14855 documentation."
+          />
+        </div>
 
         {/* FAQ */}
         <div className="mt-8 mb-8">
