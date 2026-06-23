@@ -11,6 +11,7 @@ import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
 import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/FeaturedDeployments"
 import PartnerApplyForm from "@/components/oem/PartnerApplyForm"
 import OemHeroVisual from "@/components/oem/OemHeroVisual"
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 
 export const revalidate = 60
 
@@ -34,7 +35,9 @@ export const metadata: Metadata = {
       "Partner with 100X Circle: IS 14855 certified OEM, GeM registered, MSME. GeM authorization support, tender documentation, technical assistance. Apply for dealership.",
     url: `${SITE_URL}/gem-approved-fogging-machine-oem`,
     type: "website",
+    images: [{ url: `${SITE_URL}/og-oem-partnership.jpg`, width: 1200, height: 630, alt: "100X Circle OEM Dealer Partnership" }],
   },
+  twitter: { card: "summary_large_image", images: [`${SITE_URL}/og-oem-partnership.jpg`] },
 }
 
 const jsonLd = {
@@ -197,6 +200,10 @@ export default async function GemApprovedOEMPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <BreadcrumbJsonLd items={[
+        { name: "Home", url: "/" },
+        { name: "OEM Dealer Partnership", url: "/gem-approved-fogging-machine-oem" },
+      ]} />
 
       <main className="pt-16 min-h-screen bg-gray-950">
 
@@ -254,7 +261,7 @@ export default async function GemApprovedOEMPage() {
           </div>
         </section>
 
-        {/* ── 2. Proven Government Procurement Experience ───────────────────────── */}
+        {/* ── 2. Government Experience ─────────────────────────────────────────── */}
         <section className="py-20 md:py-24 bg-gray-950">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mb-10">
@@ -268,8 +275,71 @@ export default async function GemApprovedOEMPage() {
           </div>
         </section>
 
-        {/* ── 3. Partner Benefits ───────────────────────────────────────────────── */}
-        <section className="py-20 md:py-28 bg-white">
+        {/* ── 3. Organizations Served ───────────────────────────────────────────── */}
+        <GovLogoWall
+          logos={govLogos}
+          eyebrow="Trusted By"
+          heading="Organizations Served"
+          subheading="Municipal corporations, health departments, and public institutions that have procured 100X Circle fogging machines across India."
+        />
+
+        {/* ── 4. Deployment Gallery ─────────────────────────────────────────────── */}
+        {deployments.length > 0 && (
+          <section className="py-20 md:py-28 bg-gray-950 border-t border-white/[0.06]">
+            <div className="container mx-auto px-4 md:px-6">
+              <FeaturedDeployments deployments={deployments} heading="Field Deployment Gallery" maxVisible={6} showViewAll darkBg />
+            </div>
+          </section>
+        )}
+
+        {/* ── 4b. Government Supply Records ────────────────────────────────────── */}
+        <section className="py-20 md:py-28 bg-gray-950 border-t border-white/[0.06]">
+          <div className="container mx-auto px-4 md:px-6">
+            <p className="eyebrow text-brand-400 mb-4">Verified Deliveries</p>
+            <FeaturedGovSupplies
+              records={supplyRecords}
+              maxVisible={6}
+              heading="Government Supply Records"
+              subheading="A cross-section of procurement orders fulfilled across India — the market you will access as a partner."
+              showViewAll
+            />
+          </div>
+        </section>
+
+        {/* ── 5. Featured Case Studies ──────────────────────────────────────────── */}
+        {caseStudies.length > 0 && (
+          <section className="py-20 md:py-28 bg-white">
+            <div className="container mx-auto px-4 md:px-6">
+              <p className="eyebrow text-brand-600 mb-4">Case Studies</p>
+              <FeaturedCaseStudyCards studies={caseStudies} heading="Deployment Success Stories" maxVisible={9} showViewAll />
+            </div>
+          </section>
+        )}
+
+        {/* ── 6. Product Portfolio ──────────────────────────────────────────────── */}
+        {products.length > 0 && (
+          <section className="py-20 md:py-28 bg-gray-50 border-t border-gray-100">
+            <div className="container mx-auto px-4 md:px-6">
+              <div className="mb-10">
+                <p className="eyebrow text-brand-600 mb-4">Product Portfolio</p>
+                <h2 className="text-display-xs font-700 text-gray-900 mb-3">Government Procurement Ready Product Portfolio</h2>
+                <p className="text-gray-500 text-base max-w-xl">
+                  IS 14855 certified, GeM registered products with full technical documentation for government procurement.
+                </p>
+              </div>
+              <GovProductCarousel products={products} />
+              <div className="mt-8 text-center">
+                <Link href="/products" className="inline-flex items-center gap-2 text-sm font-600 text-brand-600 hover:text-brand-700 transition-colors">
+                  View full product range
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="9 18 15 12 9 6" /></svg>
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── 7. Partner Benefits ───────────────────────────────────────────────── */}
+        <section className="py-20 md:py-28 bg-white border-t border-gray-100">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mb-12">
               <p className="eyebrow text-brand-600 mb-4">Partnership Benefits</p>
@@ -292,62 +362,7 @@ export default async function GemApprovedOEMPage() {
           </div>
         </section>
 
-        {/* ── 4. Featured Government Supplies ──────────────────────────────────── */}
-        <section className="py-20 md:py-28 bg-gray-950">
-          <div className="container mx-auto px-4 md:px-6">
-            <p className="eyebrow text-brand-400 mb-4">Verified Deliveries</p>
-            <FeaturedGovSupplies
-              records={supplyRecords}
-              maxVisible={6}
-              heading="Featured Government Supplies"
-              subheading="A cross-section of government procurement orders fulfilled across India — the market you will have access to as a partner."
-              showViewAll
-            />
-          </div>
-        </section>
-
-        {/* ── 5. Deployment Case Studies ────────────────────────────────────────── */}
-        {caseStudies.length > 0 && (
-          <section className="py-20 md:py-28 bg-white">
-            <div className="container mx-auto px-4 md:px-6">
-              <p className="eyebrow text-brand-600 mb-4">Featured Government Deployments</p>
-              <FeaturedCaseStudyCards studies={caseStudies} heading="Deployment Success Stories" maxVisible={9} showViewAll />
-            </div>
-          </section>
-        )}
-
-        {/* ── 5b. Real World Deployments ────────────────────────────────────────── */}
-        {deployments.length > 0 && (
-          <section className="py-20 md:py-28 bg-gray-950 border-t border-white/[0.06]">
-            <div className="container mx-auto px-4 md:px-6">
-              <FeaturedDeployments deployments={deployments} heading="Real World Deployments" maxVisible={6} showViewAll darkBg />
-            </div>
-          </section>
-        )}
-
-        {/* ── 6. Product Portfolio ──────────────────────────────────────────────── */}
-        {products.length > 0 && (
-          <section className="py-20 md:py-28 bg-white border-t border-gray-100">
-            <div className="container mx-auto px-4 md:px-6">
-              <div className="mb-10">
-                <p className="eyebrow text-brand-600 mb-4">Product Portfolio</p>
-                <h2 className="text-display-xs font-700 text-gray-900 mb-3">Government Procurement Ready Product Portfolio</h2>
-                <p className="text-gray-500 text-base max-w-xl">
-                  Products supported with technical documentation, certifications and partner assistance.
-                </p>
-              </div>
-              <GovProductCarousel products={products} />
-              <div className="mt-8 text-center">
-                <Link href="/products" className="inline-flex items-center gap-2 text-sm font-600 text-brand-600 hover:text-brand-700 transition-colors">
-                  View full product range
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="9 18 15 12 9 6" /></svg>
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ── 7. How Partnership Works ──────────────────────────────────────────── */}
+        {/* ── 8. How Partnership Works ──────────────────────────────────────────── */}
         <section className="py-20 md:py-28 bg-gray-950">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mb-12">
@@ -373,14 +388,6 @@ export default async function GemApprovedOEMPage() {
             </div>
           </div>
         </section>
-
-        {/* ── 8. Organizations Served ───────────────────────────────────────────── */}
-        <GovLogoWall
-          logos={govLogos}
-          eyebrow="Trusted By"
-          heading="Organizations Served"
-          subheading="Municipal corporations, health departments, and public institutions that have procured 100X Circle fogging machines across India."
-        />
 
         {/* ── 9. Certifications ────────────────────────────────────────────────── */}
         <section className="py-14 bg-gray-950 border-y border-white/[0.06]">

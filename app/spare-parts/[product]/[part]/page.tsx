@@ -60,6 +60,26 @@ export default async function SparePartDetailPage({
     ? await db.collection("spare_parts").find({ slug: { $in: allReferencedSlugs }, isPublished: true }).toArray()
     : []
   const referencedParts = JSON.parse(JSON.stringify(referencedPartsRaw))
+
+  // Trust graph: find related products and case studies
+  const compatibleNames: string[] = Array.isArray(part.compatibleProductNames) ? part.compatibleProductNames : []
+  const [relatedProductsRaw, relatedCaseStudiesRaw] = await Promise.all([
+    compatibleNames.length > 0
+      ? db.collection("products").find({
+          isPublished: { $ne: false },
+          name: { $regex: compatibleNames[0].split(" ").slice(0, 2).join("|"), $options: "i" },
+        }).limit(3).toArray()
+      : Promise.resolve([]),
+    db.collection("case_studies").find({
+      published: true,
+      $or: [
+        ...(compatibleNames.length > 0 ? [{ productUsed: { $regex: compatibleNames[0].split(" ").slice(0, 2).join("|"), $options: "i" } }] : []),
+        ...(part.name ? [{ productUsed: { $regex: part.name.split(" ").slice(0, 1).join(""), $options: "i" } }] : []),
+      ],
+    }).limit(3).toArray(),
+  ])
+  const relatedProducts = JSON.parse(JSON.stringify(relatedProductsRaw))
+  const relatedCaseStudies = JSON.parse(JSON.stringify(relatedCaseStudiesRaw))
   const partBySlug: Record<string, any> = {}
   for (const p of referencedParts) partBySlug[p.slug] = p
 
@@ -292,11 +312,82 @@ export default async function SparePartDetailPage({
         </section>
       )}
 
+      {/* ── TRUST GRAPH: Compatible Products ─────────────────────── */}
+      {relatedProducts.length > 0 && (
+        <section className="py-14 bg-white border-t border-gray-100">
+          <div className="container mx-auto px-4 md:px-6">
+            <p className="eyebrow text-brand-600 mb-2">Compatible Machines</p>
+            <h2 className="text-xl font-700 text-gray-900 mb-6">Machines this part fits</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedProducts.map((p: any) => {
+                const pSlug = p.slug || String(p._id)
+                const img = (Array.isArray(p.imageUrls) ? p.imageUrls[0] : null) || p.imageUrl
+                return (
+                  <Link key={p._id} href={`/products/${pSlug}`}
+                    className="group flex items-center gap-4 border border-gray-100 rounded-xl p-4 hover:border-brand-200 hover:shadow-sm transition-all">
+                    {img ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={img} alt={p.name} className="w-16 h-16 object-contain bg-gray-50 rounded-lg p-1 flex-shrink-0" loading="lazy" />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl">🔧</div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-400 mb-0.5">{p.category || "Fogging Machine"}</p>
+                      <p className="text-sm font-700 text-gray-900 group-hover:text-brand-700 transition-colors line-clamp-2">{p.name}</p>
+                      <p className="text-xs text-brand-600 mt-1 font-600">View product →</p>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── TRUST GRAPH: Related Case Studies ──────────────────────── */}
+      {relatedCaseStudies.length > 0 && (
+        <section className="py-14 bg-gray-50 border-t border-gray-100">
+          <div className="container mx-auto px-4 md:px-6">
+            <p className="eyebrow text-brand-600 mb-2">Government Deployments</p>
+            <h2 className="text-xl font-700 text-gray-900 mb-6">Government case studies using compatible machines</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedCaseStudies.map((s: any) => (
+                <Link key={s._id} href={`/case-studies/${s.slug}`}
+                  className="group border border-gray-200 rounded-xl overflow-hidden hover:border-brand-200 hover:shadow-md transition-all bg-white">
+                  {s.images?.[0] && (
+                    <div className="h-32 overflow-hidden bg-gray-100">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={s.images[0]} alt={s.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <p className="text-xs text-brand-600 font-600 mb-1">{s.state || s.department || "India"}</p>
+                    <p className="text-sm font-700 text-gray-900 line-clamp-2 group-hover:text-brand-700 transition-colors">{s.customer || s.title}</p>
+                    <p className="text-xs text-gray-400 mt-2">Read deployment story →</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-6">
+              <Link href="/case-studies" className="text-sm font-600 text-brand-600 hover:text-brand-700">
+                View all case studies →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── BACK NAV ─────────────────────────────────────────────── */}
       <div className="py-6 bg-gray-50 border-t border-gray-100">
         <div className="container mx-auto px-4 md:px-6 flex items-center gap-4 flex-wrap">
           <Link href={`/spare-parts/${productSlug}`} className="text-brand-600 hover:text-brand-700 text-sm font-500 flex items-center gap-1.5">
             ← All {productName} parts
+          </Link>
+          <Link href="/products" className="text-gray-500 hover:text-gray-700 text-sm font-500">
+            View all products
+          </Link>
+          <Link href="/case-studies" className="text-gray-500 hover:text-gray-700 text-sm font-500">
+            Government case studies
           </Link>
         </div>
       </div>

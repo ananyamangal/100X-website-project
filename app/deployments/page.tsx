@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import clientPromise from "@/lib/mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 
 export const metadata: Metadata = {
   title: "Government & Institutional Deployments | 100x Circle",
@@ -25,7 +26,23 @@ async function getDeployments() {
 export default async function DeploymentsPage() {
   const deployments = await getDeployments()
 
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Government & Institutional Fogging Machine Deployments",
+    description: "Real field deployments of 100X Circle thermal fogging machines across Indian government and institutional customers.",
+    url: `${SITE_URL}/deployments`,
+    provider: { "@type": "Organization", name: "100X Circle", url: SITE_URL },
+    numberOfItems: deployments.length,
+  }
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
+      <BreadcrumbJsonLd items={[
+        { name: "Home", url: "/" },
+        { name: "Deployments", url: "/deployments" },
+      ]} />
     <div className="min-h-screen bg-white">
       {/* Cinematic Hero */}
       <section className="bg-gray-950 pt-24 pb-14 md:pt-28 md:pb-16">
@@ -179,5 +196,6 @@ export default async function DeploymentsPage() {
         </div>
       </section>
     </div>
+    </>
   )
 }

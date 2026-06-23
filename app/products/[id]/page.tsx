@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic"
 import type { Metadata } from "next"
 import { notFound, permanentRedirect } from "next/navigation"
 import { cookies } from "next/headers"
+import Link from "next/link"
 import ProductDetailV2 from "@/components/product/ProductDetailV2"
 import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
@@ -12,6 +13,7 @@ import { PRODUCT_LANDING_MAP } from "@/lib/seo/product-landing-map"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import ProductAiSummary from "@/components/seo/ProductAiSummary"
+import clientPromise from "@/lib/mongodb"
 
 function absolutizeImages(urls: string[]): string[] {
   return urls
@@ -135,6 +137,29 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
   const url = `${SITE_URL}/products/${productSlug}`
   const imgs = absolutizeImages((product.imageUrls as string[]) || [])
   const productName = String(product.name)
+
+  // Trust graph: fetch related case studies and deployments
+  let relatedCaseStudies: any[] = []
+  let relatedDeployments: any[] = []
+  try {
+    const client = await clientPromise
+    const db = client.db();
+    [relatedCaseStudies, relatedDeployments] = await Promise.all([
+      db.collection("case_studies").find({
+        published: true,
+        $or: [
+          { linkedProductIds: rawId },
+          { productUsed: { $regex: productName.split(" ").slice(0, 3).join(" "), $options: "i" } },
+        ],
+      }).sort({ createdAt: -1 }).limit(3).toArray(),
+      db.collection("deployments").find({
+        images: { $exists: true, $ne: [] },
+        product: { $regex: productName.split(" ").slice(0, 2).join(" "), $options: "i" },
+      }).sort({ createdAt: -1 }).limit(3).toArray(),
+    ])
+    relatedCaseStudies = JSON.parse(JSON.stringify(relatedCaseStudies))
+    relatedDeployments = JSON.parse(JSON.stringify(relatedDeployments))
+  } catch { /* non-fatal — trust graph is additive */ }
   const category = typeof product.category === "string" ? product.category : undefined
   const rating = typeof product.rating === "number" ? product.rating : undefined
   const reviewsCount = typeof product.reviewsCount === "number" ? product.reviewsCount : undefined
@@ -200,6 +225,79 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
       />
       <ProductDetailV2 product={JSON.parse(JSON.stringify(product))} />
       <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
+
+      {/* Trust graph: Related Case Studies */}
+      {relatedCaseStudies.length > 0 && (
+        <section className="py-14 bg-gray-50 border-t border-gray-100">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <p className="text-xs font-700 text-brand-600 uppercase tracking-widest mb-1.5">Government Deployments</p>
+                <h2 className="text-xl font-bold text-gray-900">Case Studies using {productName}</h2>
+              </div>
+              <Link href="/case-studies" className="shrink-0 text-sm font-600 text-brand-600 hover:text-brand-700">
+                View all →
+              </Link>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {relatedCaseStudies.map((s: any) => (
+                <Link key={s._id} href={`/case-studies/${s.slug}`}
+                  className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md hover:border-brand-200 transition-all flex flex-col">
+                  <div className="relative h-40 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+                    {s.images?.[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={s.images[0]} alt={s.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-4xl">🏛</div>
+                    )}
+                    {s.state && <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 text-xs font-600 text-gray-700 rounded-full">{s.state}</span>}
+                    {s.department && <span className="absolute top-3 right-3 px-2.5 py-1 bg-brand-600/90 text-xs font-600 text-white rounded-full">{s.department}</span>}
+                  </div>
+                  <div className="p-4 flex flex-col flex-1">
+                    <h3 className="font-700 text-sm text-gray-900 mb-1 group-hover:text-brand-700 transition-colors">{s.customer || s.title}</h3>
+                    {s.problem && <p className="text-xs text-gray-500 line-clamp-2">{s.problem}</p>}
+                    <p className="mt-auto pt-3 text-xs font-600 text-brand-600">Read case study →</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Trust graph: Related Deployments */}
+      {relatedDeployments.length > 0 && (
+        <section className="py-14 bg-white border-t border-gray-100">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <p className="text-xs font-700 text-brand-600 uppercase tracking-widest mb-1.5">Field Deployments</p>
+                <h2 className="text-xl font-bold text-gray-900">Where this machine is deployed</h2>
+              </div>
+              <Link href="/deployments" className="shrink-0 text-sm font-600 text-brand-600 hover:text-brand-700">
+                View all →
+              </Link>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {relatedDeployments.map((d: any) => (
+                <div key={d._id} className="group rounded-2xl overflow-hidden border border-gray-200 hover:border-brand-300 hover:shadow-md transition-all bg-white">
+                  {d.images?.[0] && (
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={d.images[0]} alt={d.location || "Deployment"} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      {d.department && <span className="absolute top-3 left-3 px-2.5 py-1 bg-brand-600/90 text-xs font-700 text-white rounded-full">{d.department}</span>}
+                    </div>
+                  )}
+                  <div className="p-4">
+                    {d.location && <p className="text-sm font-700 text-gray-800">{d.location}</p>}
+                    {d.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{d.description}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </>
   )
 }

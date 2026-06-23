@@ -7,6 +7,7 @@ import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { getProductCanonicalUrl } from "@/lib/seo/product-landing-map"
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import { ArrowRight } from "lucide-react"
 
 async function getCaseStudy(slug: string) {
@@ -99,10 +100,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const cs = await getCaseStudy(slug)
   if (!cs) return { title: "Case Study Not Found" }
+  const title = `${cs.customer || cs.title} — ${cs.state || cs.department || "India"} | 100x Circle Case Study`
+  const description = (cs.problem || cs.solution || "").slice(0, 155)
+  const image = cs.images?.[0]
   return {
-    title: `${cs.title} | 100x Circle Case Study`,
-    description: cs.problem || cs.solution || "",
+    title,
+    description,
     alternates: { canonical: `${SITE_URL}/case-studies/${cs.slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `${SITE_URL}/case-studies/${cs.slug}`,
+      type: "article",
+      ...(image ? { images: [{ url: image, width: 1200, height: 630, alt: cs.title }] } : {}),
+    },
+    twitter: { card: "summary_large_image", title, description, ...(image ? { images: [image] } : {}) },
   }
 }
 
@@ -117,7 +129,32 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
     getRelatedDeployments(cs.state),
   ])
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: cs.title,
+    description: cs.problem || cs.solution || "",
+    image: cs.images?.[0] ? [cs.images[0]] : [],
+    datePublished: cs.createdAt ? new Date(cs.createdAt).toISOString() : undefined,
+    dateModified: cs.updatedAt ? new Date(cs.updatedAt).toISOString() : undefined,
+    author: { "@type": "Organization", name: "100X Circle", url: SITE_URL },
+    publisher: { "@type": "Organization", name: "100X Circle", url: SITE_URL, logo: { "@type": "ImageObject", url: `${SITE_URL}/logo-main.png` } },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/case-studies/${cs.slug}` },
+    about: cs.customer ? { "@type": "Organization", name: cs.customer } : undefined,
+    locationCreated: cs.state ? { "@type": "Place", name: cs.state, addressCountry: "IN" } : undefined,
+    keywords: [cs.industry, cs.state, cs.department, cs.productUsed, "thermal fogging machine", "100X Circle"].filter(Boolean).join(", "),
+  }
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "/" },
+          { name: "Case Studies", url: "/case-studies" },
+          { name: cs.customer || cs.title, url: `/case-studies/${cs.slug}` },
+        ]}
+      />
     <main className="max-w-3xl mx-auto px-4 py-16 pt-28">
       <nav className="text-sm text-gray-500 mb-6">
         <Link href="/" className="hover:text-brand-600">Home</Link>
@@ -394,5 +431,6 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
         </Link>
       </div>
     </main>
+    </>
   )
 }

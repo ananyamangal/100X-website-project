@@ -67,7 +67,7 @@ function StudyCard({ s }: { s: Study }) {
 }
 
 export default function HomeCaseStudiesSection({ initialData }: { initialData?: Study[] } = {}) {
-  const [studies, setStudies] = useState<Study[]>(initialData?.slice(0, 3) ?? [])
+  const [studies, setStudies] = useState<Study[]>(initialData?.slice(0, 6) ?? [])
   const [loaded, setLoaded] = useState(!!initialData)
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function HomeCaseStudiesSection({ initialData }: { initialData?: 
     fetch("/api/case-studies")
       .then((r) => r.json())
       .then((data: Study[]) => {
-        const visible = Array.isArray(data) ? data.slice(0, 3) : []
+        const visible = Array.isArray(data) ? data.slice(0, 6) : []
         setStudies(visible)
       })
       .catch(() => {})

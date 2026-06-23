@@ -10,6 +10,7 @@ import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
 import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/FeaturedDeployments"
 import FeaturedGovSupplies, { type SupplyRecord } from "@/components/trust/FeaturedGovSupplies"
 import GovProductCarousel, { type ProductSlim } from "@/components/gov-procurement/GovProductCarousel"
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 
 export const revalidate = 60
 
@@ -32,7 +33,9 @@ export const metadata: Metadata = {
       "Track record of government fogging machine supplies across 15+ states: municipal corporations, health departments, and public institutions.",
     url: `${SITE_URL}/past-performance-government`,
     type: "website",
+    images: [{ url: `${SITE_URL}/og-gov-procurement.jpg`, width: 1200, height: 630, alt: "100X Circle Government Past Performance" }],
   },
+  twitter: { card: "summary_large_image", images: [`${SITE_URL}/og-gov-procurement.jpg`] },
 }
 
 const jsonLd = {
@@ -119,6 +122,10 @@ export default async function PastPerformancePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <BreadcrumbJsonLd items={[
+        { name: "Home", url: "/" },
+        { name: "Government Past Performance", url: "/past-performance-government" },
+      ]} />
 
       <main className="pt-16 min-h-screen bg-gray-950">
 
