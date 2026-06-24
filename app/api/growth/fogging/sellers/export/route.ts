@@ -106,9 +106,10 @@ function rowsStatewise(docs: SellerDoc[]): Record<string, string | number>[] {
 
   return sorted.map(s => {
     globalRank++
-    if (s.seller_state !== lastState) {
+    const curState = s.seller_state ?? ""
+    if (curState !== lastState) {
       stateRank = 1
-      lastState = s.seller_state ?? ""
+      lastState = curState
     } else {
       stateRank++
     }
