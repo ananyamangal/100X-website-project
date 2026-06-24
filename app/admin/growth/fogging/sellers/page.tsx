@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Search, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
+import { Search, ChevronLeft, ChevronRight, ExternalLink, Download, FileSpreadsheet, ChevronDown } from "lucide-react"
 
 const INR = (v: number | null | undefined) => {
   if (v == null) return "—"
@@ -31,6 +31,14 @@ const SORT_OPTIONS = [
   { value: "recent",    label: "Most Recent" },
 ]
 
+const SMART_PRESETS = [
+  { preset: "top100",    label: "Top 100 by GMV" },
+  { preset: "top500",    label: "Top 500 by GMV" },
+  { preset: "instafog",  label: "Insta Fog sellers" },
+  { preset: "multioem",  label: "Multi-OEM sellers" },
+  { preset: "statewise", label: "State-wise (all states)" },
+]
+
 export default function SellersPage() {
   const router = useRouter()
   const [sellers, setSellers]   = useState<Seller[]>([])
@@ -42,6 +50,17 @@ export default function SellersPage() {
   const [filters, setFilters] = useState({
     q: "", sort: "gmv", state: "", is_100x: "", multi_oem: "", has_gst: ""
   })
+
+  const [exporting, setExporting]         = useState<string | null>(null)
+  const [smartOpen, setSmartOpen]         = useState(false)
+
+  // Close smart dropdown on outside click
+  useEffect(() => {
+    if (!smartOpen) return
+    const handler = () => setSmartOpen(false)
+    document.addEventListener("click", handler, { capture: true, once: true })
+    return () => document.removeEventListener("click", handler, true)
+  }, [smartOpen])
 
   const load = useCallback(() => {
     setLoading(true)
@@ -62,16 +81,98 @@ export default function SellersPage() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
+  const handleExport = useCallback((format: "csv" | "excel", preset = "all") => {
+    const key = `${format}-${preset}`
+    setExporting(key)
+    setSmartOpen(false)
+    const qs = new URLSearchParams({ format, preset })
+    if (preset === "all") {
+      // Pass current filters for standard exports
+      if (filters.q)         qs.set("q",        filters.q)
+      if (filters.state)     qs.set("state",     filters.state)
+      if (filters.is_100x)   qs.set("is_100x",   filters.is_100x)
+      if (filters.multi_oem) qs.set("multi_oem", filters.multi_oem)
+      if (filters.has_gst)   qs.set("has_gst",   filters.has_gst)
+      qs.set("sort", filters.sort)
+    }
+    const url = `/api/growth/fogging/sellers/export?${qs}`
+    const a = document.createElement("a")
+    a.href = url
+    a.download = ""
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setTimeout(() => setExporting(null), 3000)
+  }, [filters])
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3 w-full">
             <div>
               <h1 className="text-lg font-bold text-gray-900">Seller / Dealer Intelligence</h1>
               <div className="text-xs text-gray-400">
                 {total.toLocaleString()} sellers · Fogging Intelligence
+              </div>
+            </div>
+
+            {/* Export toolbar */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* CSV — current filters */}
+              <button
+                onClick={() => handleExport("csv")}
+                disabled={exporting !== null}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <Download size={13} />
+                {exporting === "csv-all" ? "Exporting…" : "Export CSV"}
+              </button>
+
+              {/* Excel — current filters */}
+              <button
+                onClick={() => handleExport("excel")}
+                disabled={exporting !== null}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors disabled:opacity-50"
+              >
+                <FileSpreadsheet size={13} />
+                {exporting === "excel-all" ? "Exporting…" : "Export Excel"}
+              </button>
+
+              {/* Smart presets dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setSmartOpen(o => !o)}
+                  disabled={exporting !== null}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Smart Export <ChevronDown size={12} />
+                </button>
+                {smartOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                    <div className="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-100">
+                      CSV + Excel
+                    </div>
+                    {SMART_PRESETS.map(({ preset, label }) => (
+                      <div key={preset} className="flex items-center border-b border-gray-50 last:border-0">
+                        <button
+                          onClick={() => handleExport("csv", preset)}
+                          className="flex-1 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 text-left transition-colors"
+                        >
+                          {label}
+                        </button>
+                        <button
+                          onClick={() => handleExport("excel", preset)}
+                          title="Excel"
+                          className="px-2 py-2 text-emerald-600 hover:bg-emerald-50 transition-colors"
+                        >
+                          <FileSpreadsheet size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
