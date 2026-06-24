@@ -17,16 +17,45 @@ export type AudienceType =
 
 export interface NormalizedRecord {
   recordId:     string
+  // Identity
   firstName:    string
   lastName:     string
+  fullName:     string
+  // Contact
   email:        string
+  altEmail:     string
   phone:        string
+  altMobile:    string
+  whatsapp:     string
+  // Business
   company:      string
+  designation:  string
+  department:   string
+  dealerType:   string
+  oemStatus:    string
+  gemSellerStatus: string
+  // Location
   city:         string
+  district:     string
   state:        string
   country:      string
-  postalCode:   string
-  source:       string
+  postalCode:   string  // used by Google format (Zip)
+  // GeM Intelligence
+  gemSellerId:      string
+  gemVendorName:    string
+  gemRegDate:       string
+  gemCategories:    string
+  orderCount:       string
+  totalOrderValue:  string
+  lastTenderDate:   string
+  // Marketing
+  source:           string
+  segment:          string
+  leadScore:        string
+  lastActivityDate: string
+  createdDate:      string
+  updatedDate:      string
+  // Internal flags
   missingEmail: boolean
   missingPhone: boolean
 }
@@ -122,6 +151,42 @@ export function normalizePhone(raw: string): string {
   return ""
 }
 
+// ── Company name normalization (for dedup) ────────────────────────────────────
+
+export function normalizeCompanyName(raw: string): string {
+  if (!raw) return ""
+  return raw
+    .toLowerCase()
+    .replace(/\bprivate\b/g,   "pvt")
+    .replace(/\blimited\b/g,   "ltd")
+    .replace(/\bpvt\b\s*\.\s*\bltd\b/g, "pvtltd")
+    .replace(/\bpvt\s+ltd\b/g, "pvtltd")
+    .replace(/[^a-z0-9]/g, "")  // strip all non-alphanum
+    .trim()
+}
+
+// ── Safe date formatter ───────────────────────────────────────────────────────
+
+function safeDate(raw: unknown): string {
+  if (!raw) return ""
+  try {
+    const d = new Date(String(raw))
+    return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0]
+  } catch {
+    return ""
+  }
+}
+
+// ── CSV field escaper ─────────────────────────────────────────────────────────
+
+function csvField(value: string | number | undefined | null): string {
+  const s = String(value ?? "")
+  if (s.includes(",") || s.includes('"') || s.includes("\n") || s.includes("\r")) {
+    return `"${s.replace(/"/g, '""')}"`
+  }
+  return s
+}
+
 // ── Extract contact fields from rfq_popup_leads answers object ────────────────
 
 function extractFromAnswers(answers: Record<string, unknown>): {
@@ -141,6 +206,46 @@ function extractFromAnswers(answers: Record<string, unknown>): {
   return { email, phone, name }
 }
 
+// ── Blank record factory ──────────────────────────────────────────────────────
+
+function blankRecord(overrides: Partial<NormalizedRecord> & Pick<NormalizedRecord, "recordId" | "source" | "segment">): NormalizedRecord {
+  return {
+    firstName:    "",
+    lastName:     "",
+    fullName:     "",
+    email:        "",
+    altEmail:     "",
+    phone:        "",
+    altMobile:    "",
+    whatsapp:     "",
+    company:      "",
+    designation:  "",
+    department:   "",
+    dealerType:   "",
+    oemStatus:    "",
+    gemSellerStatus: "",
+    city:         "",
+    district:     "",
+    state:        "",
+    country:      "IN",
+    postalCode:   "",
+    gemSellerId:      "",
+    gemVendorName:    "",
+    gemRegDate:       "",
+    gemCategories:    "",
+    orderCount:       "",
+    totalOrderValue:  "",
+    lastTenderDate:   "",
+    leadScore:        "",
+    lastActivityDate: "",
+    createdDate:      "",
+    updatedDate:      "",
+    missingEmail: true,
+    missingPhone: true,
+    ...overrides,
+  }
+}
+
 // ── Source builders ───────────────────────────────────────────────────────────
 
 async function buildCrmLeads(db: Db): Promise<NormalizedRecord[]> {
@@ -152,47 +257,54 @@ async function buildCrmLeads(db: Db): Promise<NormalizedRecord[]> {
   const records: NormalizedRecord[] = []
 
   for (const lead of brochure) {
-    const nameParts = String(lead.name || "").trim().split(/\s+/)
-    const email     = String(lead.email || "").toLowerCase().trim()
-    const phone     = normalizePhone(String(lead.phone || ""))
-    records.push({
+    const rawName    = String(lead.name || "").trim()
+    const nameParts  = rawName.split(/\s+/)
+    const firstName  = nameParts[0] || ""
+    const lastName   = nameParts.slice(1).join(" ")
+    const email      = String(lead.email || "").toLowerCase().trim()
+    const phone      = normalizePhone(String(lead.phone || ""))
+    const createdDate = safeDate(lead.createdAt)
+    records.push(blankRecord({
       recordId:     String(lead._id),
-      firstName:    nameParts[0] || "",
-      lastName:     nameParts.slice(1).join(" "),
+      firstName,
+      lastName,
+      fullName:     rawName || [firstName, lastName].filter(Boolean).join(" "),
       email,
       phone,
       company:      String(lead.organization || lead.company || ""),
-      city:         "",
       state:        String(lead.state || ""),
       country:      "IN",
-      postalCode:   "",
       source:       "brochure_leads",
+      segment:      "crm_leads",
+      gemSellerStatus: "CRM Lead",
+      createdDate,
       missingEmail: !email,
       missingPhone: !phone,
-    })
+    }))
   }
 
   for (const lead of rfq) {
-    const answers = (lead.answers || {}) as Record<string, unknown>
+    const answers    = (lead.answers || {}) as Record<string, unknown>
     const { email, phone, name } = extractFromAnswers(answers)
-    const nameParts = name.split(/\s+/)
-    const normPhone = normalizePhone(phone)
+    const nameParts  = name.split(/\s+/)
+    const normPhone  = normalizePhone(phone)
     if (email || normPhone) {
-      records.push({
+      const createdDate = safeDate(lead.createdAt)
+      records.push(blankRecord({
         recordId:     String(lead._id),
         firstName:    nameParts[0] || "",
         lastName:     nameParts.slice(1).join(" "),
+        fullName:     name,
         email,
         phone:        normPhone,
-        company:      "",
-        city:         "",
-        state:        "",
         country:      "IN",
-        postalCode:   "",
         source:       "rfq_popup_leads",
+        segment:      "crm_leads",
+        gemSellerStatus: "CRM Lead",
+        createdDate,
         missingEmail: !email,
         missingPhone: !normPhone,
-      })
+      }))
     }
   }
 
@@ -200,7 +312,6 @@ async function buildCrmLeads(db: Db): Promise<NormalizedRecord[]> {
 }
 
 async function buildDealers(db: Db): Promise<NormalizedRecord[]> {
-  // Primary: dealer_prospects (real contacts from acquisition engine)
   const [prospects, crmDealers] = await Promise.all([
     db.collection("dealer_prospects")
       .find({ status: { $ne: "rejected" } })
@@ -212,36 +323,50 @@ async function buildDealers(db: Db): Promise<NormalizedRecord[]> {
   const records: NormalizedRecord[] = []
 
   for (const d of prospects) {
-    const nameParts = String(d.contact_person || d.dealer_name || "").trim().split(/\s+/)
+    const rawName   = String(d.contact_person || d.dealer_name || "").trim()
+    const nameParts = rawName.split(/\s+/)
+    const firstName = nameParts[0] || ""
+    const lastName  = nameParts.slice(1).join(" ")
     const email     = String(d.email  || "").toLowerCase().trim()
     const phone     = normalizePhone(String(d.mobile || ""))
-    records.push({
+    const createdDate = safeDate(d.created_at)
+    records.push(blankRecord({
       recordId:     String(d._id),
-      firstName:    nameParts[0] || "",
-      lastName:     nameParts.slice(1).join(" "),
+      firstName,
+      lastName,
+      fullName:     rawName || [firstName, lastName].filter(Boolean).join(" "),
       email,
       phone,
       company:      String(d.dealer_name || ""),
       city:         String(d.city  || ""),
       state:        String(d.state || ""),
       country:      "IN",
-      postalCode:   "",
+      postalCode:   String(d.pincode || ""),
+      gemSellerId:  String(d.gst || ""),
       source:       "dealer_prospects",
+      segment:      "dealers",
+      dealerType:   String(d.dealer_type || d.source || ""),
+      leadScore:    d.dealer_score != null ? String(d.dealer_score) : "",
+      gemSellerStatus: "Dealer Prospect",
+      createdDate,
       missingEmail: !email,
       missingPhone: !phone,
-    })
+    }))
   }
 
-  // Supplement with any crm_dealers records that have contact data
   for (const d of crmDealers) {
-    const email = String(d.email || "").toLowerCase().trim()
-    const phone = normalizePhone(String(d.phone || ""))
-    if (!email && !phone) continue  // skip pipeline-only records
-    const nameParts = String(d.name || "").trim().split(/\s+/)
-    records.push({
+    const email   = String(d.email || "").toLowerCase().trim()
+    const phone   = normalizePhone(String(d.phone || ""))
+    if (!email && !phone) continue
+    const rawName   = String(d.name || "").trim()
+    const nameParts = rawName.split(/\s+/)
+    const firstName = nameParts[0] || ""
+    const lastName  = nameParts.slice(1).join(" ")
+    records.push(blankRecord({
       recordId:     String(d._id),
-      firstName:    nameParts[0] || "",
-      lastName:     nameParts.slice(1).join(" "),
+      firstName,
+      lastName,
+      fullName:     rawName || [firstName, lastName].filter(Boolean).join(" "),
       email,
       phone,
       company:      String(d.company || ""),
@@ -250,17 +375,18 @@ async function buildDealers(db: Db): Promise<NormalizedRecord[]> {
       country:      "IN",
       postalCode:   String(d.pincode || ""),
       source:       "crm_dealers",
+      segment:      "dealers",
+      dealerType:   String(d.dealer_type || ""),
+      gemSellerStatus: "Dealer (CRM)",
       missingEmail: !email,
       missingPhone: !phone,
-    })
+    }))
   }
 
   return records
 }
 
 async function buildGovernmentBuyers(db: Db): Promise<AudienceResult> {
-  // Query gem_contracts for buyer contact data extracted from PDFs.
-  // buyer_email and buyer_contact (phone) are populated by the enrichment pipeline.
   const raw = await db.collection("gem_contracts")
     .find({
       $or: [
@@ -272,6 +398,7 @@ async function buildGovernmentBuyers(db: Db): Promise<AudienceResult> {
       buyer_name: 1, buyer_email: 1, buyer_contact: 1,
       buyer_designation: 1, buyer_state: 1,
       buyer_dept: 1, buyer_ministry: 1,
+      gem_order_id: 1, contract_date: 1, order_value: 1,
     })
     .limit(20000)
     .toArray()
@@ -293,7 +420,6 @@ async function buildGovernmentBuyers(db: Db): Promise<AudienceResult> {
     const org = String(c.buyer_name || c.buyer_dept || c.buyer_ministry || "")
     if (org) orgs.add(org)
 
-    // Deduplicate: email-keyed first, then phone-keyed for email-less records
     if (email && seenEmail.has(email)) continue
     if (!email && phone && seenPhone.has(phone)) continue
     if (email) seenEmail.add(email)
@@ -301,22 +427,28 @@ async function buildGovernmentBuyers(db: Db): Promise<AudienceResult> {
 
     const designation = String(c.buyer_designation || "")
     const parts = designation.split(/\s+/).filter(Boolean)
+    const rawName = String(c.buyer_name || "").trim()
+    const contractDate = safeDate(c.contract_date)
 
-    records.push({
+    records.push(blankRecord({
       recordId:     String(c._id),
       firstName:    parts[0] || "",
       lastName:     parts.slice(1).join(" "),
+      fullName:     rawName || designation,
       email,
       phone,
       company:      org,
-      city:         "",
       state:        String(c.buyer_state || ""),
       country:      "IN",
-      postalCode:   "",
+      designation,
+      department:   String(c.buyer_dept || ""),
       source:       "gem_contracts",
+      segment:      "government_buyers",
+      gemSellerStatus: "Government Buyer",
+      lastActivityDate: contractDate,
       missingEmail: !email,
       missingPhone: !phone,
-    })
+    }))
   }
 
   return {
@@ -336,21 +468,19 @@ async function buildExistingCustomers(db: Db): Promise<NormalizedRecord[]> {
     const company = String(c.buyer_display_name || c.buyer_canonical || "")
     if (!company || seen.has(company)) continue
     seen.add(company)
-    records.push({
+    const contractDate = safeDate(c.contract_date)
+    records.push(blankRecord({
       recordId:     String(c._id),
-      firstName:    "",
-      lastName:     "",
-      email:        "",
-      phone:        "",
       company,
-      city:         "",
       state:        String(c.buyer_state || ""),
       country:      "IN",
-      postalCode:   "",
       source:       "fogging_contracts",
+      segment:      "existing_customers",
+      gemSellerStatus: "Existing Customer",
+      lastActivityDate: contractDate,
       missingEmail: true,
       missingPhone: true,
-    })
+    }))
   }
   return records
 }
@@ -376,12 +506,29 @@ export async function buildAudienceRecords(
     }
   }
 
-  // Deduplicate by email; fall back to a composite key for no-email records
-  const seen = new Set<string>()
+  // Priority deduplication: email → phone → company (normalized)
+  const seenEmails    = new Set<string>()
+  const seenPhones    = new Set<string>()
+  const seenCompanies = new Set<string>()
+
   const deduped = records!.filter(r => {
-    const key = r.email || `${r.company}::${r.source}::${r.recordId}`
-    if (seen.has(key)) return false
-    seen.add(key)
+    if (r.email) {
+      if (seenEmails.has(r.email)) return false
+      seenEmails.add(r.email)
+      if (r.phone) seenPhones.add(r.phone)
+      return true
+    }
+    if (r.phone) {
+      if (seenPhones.has(r.phone)) return false
+      seenPhones.add(r.phone)
+      return true
+    }
+    if (r.company) {
+      const normalized = normalizeCompanyName(r.company)
+      if (normalized && seenCompanies.has(normalized)) return false
+      if (normalized) seenCompanies.add(normalized)
+      return true
+    }
     return true
   })
 
@@ -401,7 +548,6 @@ export function computeQualityScore(
   const missingPhone = records.filter(r => !r.phone).length
   const missingBoth  = records.filter(r => !r.email && !r.phone).length
 
-  // Google matching: ~50% of valid emails, ~35% of valid phones
   const emailMatch  = withEmail * 0.50
   const phoneMatch  = withPhone * 0.35
   const unionMatch  = emailMatch + phoneMatch - (withBoth * 0.40)
@@ -425,7 +571,59 @@ export function computeQualityScore(
   }
 }
 
-// ── Plain CSV (for Google Ads UI upload / manual review) ─────────────────────
+// ── Full CSV (all enrichment fields for internal use / CRM import) ────────────
+
+export function generateFullCSV(records: NormalizedRecord[]): string {
+  const header = [
+    "Full Name", "First Name", "Last Name", "Company Name",
+    "Email", "Alternate Email", "Mobile Number", "Alternate Mobile Number", "WhatsApp Number",
+    "Organization", "Designation", "Department", "Dealer Type", "OEM Status", "GeM Seller Status",
+    "City", "District", "State", "Country", "Pincode",
+    "GeM Seller ID", "GeM Vendor Name", "GeM Registration Date", "GeM Categories",
+    "Order Count", "Total Order Value", "Last Tender Activity",
+    "Source", "Segment", "Lead Score", "Last Activity Date", "Created Date", "Updated Date",
+  ].map(csvField).join(",")
+
+  const rows = records.map(r => [
+    r.fullName      || [r.firstName, r.lastName].filter(Boolean).join(" "),
+    r.firstName,
+    r.lastName,
+    r.company,
+    r.email,
+    r.altEmail,
+    r.phone,
+    r.altMobile,
+    r.whatsapp,
+    r.company,          // Organization = Company for now
+    r.designation,
+    r.department,
+    r.dealerType,
+    r.oemStatus,
+    r.gemSellerStatus,
+    r.city,
+    r.district,
+    r.state,
+    r.country || "IN",
+    r.postalCode,
+    r.gemSellerId,
+    r.gemVendorName,
+    r.gemRegDate,
+    r.gemCategories,
+    r.orderCount,
+    r.totalOrderValue,
+    r.lastTenderDate,
+    r.source,
+    r.segment,
+    r.leadScore,
+    r.lastActivityDate,
+    r.createdDate,
+    r.updatedDate,
+  ].map(csvField).join(","))
+
+  return [header, ...rows].join("\r\n")
+}
+
+// ── Google Customer Match CSV (6 fields, for Google Ads UI upload) ────────────
 
 export function generatePlainCSV(records: NormalizedRecord[]): string {
   const header   = "Email,Phone,First Name,Last Name,Country,Zip"

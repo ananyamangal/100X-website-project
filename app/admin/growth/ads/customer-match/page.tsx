@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react"
 import {
   Users, Mail, Phone, Upload, Download, RefreshCw,
   CheckCircle, AlertCircle, Clock, XCircle,
-  Building2, BarChart2, Loader2, Info, ChevronRight, ChevronDown,
+  Building2, BarChart2, Loader2, Info, ChevronRight,
 } from "lucide-react"
 import type { AudienceType, AudienceDoc, QualityScore } from "@/lib/growth-os/customer-match-engine"
 
@@ -302,8 +302,7 @@ export default function CustomerMatchPage() {
   const [selected,     setSelected]     = useState<AudienceType>("crm_leads")
   const [loading,      setLoading]      = useState(true)
   const [building,          setBuilding]          = useState<AudienceType | null>(null)
-  const [exporting,         setExporting]         = useState(false)
-  const [exportDropdownOpen, setExportDropdownOpen] = useState(false)
+  const [exporting,         setExporting]         = useState<"full" | "google" | "hashed" | null>(null)
   const [uploading,         setUploading]         = useState(false)
   const [msg,          setMsg]          = useState<{ text: string; type: "ok" | "err" } | null>(null)
 
@@ -346,9 +345,8 @@ export default function CustomerMatchPage() {
     }
   }
 
-  async function handleExport(audienceId: string, format: "plain" | "hashed" = "plain") {
-    setExporting(true)
-    setExportDropdownOpen(false)
+  async function handleExport(audienceId: string, format: "full" | "google" | "hashed") {
+    setExporting(format)
     try {
       const res = await fetch(`/api/admin/growth/ads/customer-match/${audienceId}/export?format=${format}`)
       if (!res.ok) { flash("Export failed", "err"); return }
@@ -357,17 +355,20 @@ export default function CustomerMatchPage() {
       const a    = document.createElement("a")
       a.href     = url
       const date = new Date().toISOString().split("T")[0]
-      a.download = format === "hashed"
-        ? `customer_match_hashed_${audienceId}_${date}.csv`
-        : `customer_match_google_${audienceId}_${date}.csv`
+      a.download = format === "full"
+        ? `customer_match_full_${audienceId}_${date}.csv`
+        : format === "hashed"
+          ? `customer_match_hashed_${audienceId}_${date}.csv`
+          : `customer_match_google_${audienceId}_${date}.csv`
       a.click()
       URL.revokeObjectURL(url)
-      flash(format === "hashed"
-        ? "Hashed CSV downloaded — for Google Ads API upload only"
-        : "CSV downloaded — ready for Google Ads UI upload or manual review"
+      flash(
+        format === "full"    ? "Full CSV downloaded — all fields for CRM import or analysis" :
+        format === "hashed"  ? "Hashed CSV downloaded — for Google Ads API upload only" :
+                               "Google Customer Match CSV downloaded — upload via Google Ads UI"
       )
     } finally {
-      setExporting(false)
+      setExporting(null)
     }
   }
 
@@ -502,42 +503,31 @@ export default function CustomerMatchPage() {
                   {building === selected ? "Building..." : "Rebuild Audience"}
                 </button>
 
-                {/* Export dropdown */}
-                {exportDropdownOpen && (
-                  <div className="fixed inset-0 z-10" onClick={() => setExportDropdownOpen(false)} />
-                )}
-                <div className="relative">
-                  <button
-                    onClick={() => setExportDropdownOpen(v => !v)}
-                    disabled={!qs || exporting}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
-                  >
-                    {exporting
-                      ? <Loader2 size={14} className="animate-spin" />
-                      : <Download size={14} />
-                    }
-                    <span className="flex-1 text-left">Export</span>
-                    <ChevronDown size={13} className={`transition-transform duration-150 ${exportDropdownOpen ? "rotate-180" : ""}`} />
-                  </button>
-                  {exportDropdownOpen && (
-                    <div className="absolute top-full mt-1 left-0 right-0 z-20 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
-                      <button
-                        onClick={() => handleExport(currentAudience?.audienceId ?? `cm_${selected}`, "plain")}
-                        className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100"
-                      >
-                        <div className="text-sm font-medium text-gray-900">Export Google UI Format</div>
-                        <div className="text-[11px] text-gray-500 mt-0.5">Readable CSV — upload via Google Ads UI</div>
-                      </button>
-                      <button
-                        onClick={() => handleExport(currentAudience?.audienceId ?? `cm_${selected}`, "hashed")}
-                        className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="text-sm font-medium text-gray-900">Export Hashed API Format</div>
-                        <div className="text-[11px] text-gray-500 mt-0.5">SHA-256 hashed — for API uploads only</div>
-                      </button>
-                    </div>
-                  )}
-                </div>
+                {/* Export CSV — all fields */}
+                <button
+                  onClick={() => handleExport(currentAudience?.audienceId ?? `cm_${selected}`, "full")}
+                  disabled={!qs || exporting !== null}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                >
+                  {exporting === "full"
+                    ? <Loader2 size={14} className="animate-spin" />
+                    : <Download size={14} />
+                  }
+                  Export CSV
+                </button>
+
+                {/* Export Google Customer Match CSV — 6-field format */}
+                <button
+                  onClick={() => handleExport(currentAudience?.audienceId ?? `cm_${selected}`, "google")}
+                  disabled={!qs || exporting !== null}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  {exporting === "google"
+                    ? <Loader2 size={14} className="animate-spin" />
+                    : <Download size={14} />
+                  }
+                  Export Google Customer Match CSV
+                </button>
 
                 <button
                   onClick={() => handleUpload(currentAudience?.audienceId ?? `cm_${selected}`)}
@@ -553,9 +543,9 @@ export default function CustomerMatchPage() {
               </div>
 
               <div className="mt-4 pt-4 border-t border-gray-100 space-y-1.5 text-[11px] text-gray-500">
-                <p>• <strong>Google UI Format</strong> — readable CSV for manual review and Google Ads UI upload</p>
-                <p>• <strong>Hashed API Format</strong> — SHA-256 hashed, for programmatic API uploads only</p>
-                <p>• <strong>Create Audience</strong> uploads directly via Google Ads API (requires connected account)</p>
+                <p>• <strong>Export CSV</strong> — all fields: name, email, phone, company, state, designation, source, etc.</p>
+                <p>• <strong>Google Customer Match CSV</strong> — 6 fields for Google Ads UI upload</p>
+                <p>• <strong>Create Audience</strong> — direct API upload (requires connected Google Ads account)</p>
                 <p>• Google processes uploaded lists within <strong>6–48 hours</strong></p>
               </div>
             </div>
@@ -621,9 +611,13 @@ export default function CustomerMatchPage() {
             <Info size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
             <div className="text-[12px] text-blue-700 space-y-1">
               <p>
-                <strong>Export Google UI Format</strong> downloads a readable CSV you can review and upload
-                directly through the Google Ads UI — Google hashes the data automatically on their end.
-                Use <strong>Export Hashed API Format</strong> only for programmatic API uploads.
+                <strong>Export CSV</strong> downloads all available fields (name, company, email, phone, state,
+                designation, GeM status, lead score, etc.) — suitable for CRM import, analysis, or sharing.
+              </p>
+              <p>
+                <strong>Export Google Customer Match CSV</strong> downloads a 6-field CSV
+                (Email, Phone, First Name, Last Name, Country, Zip) formatted for direct upload via the Google Ads UI.
+                Google hashes the data automatically on their end.
               </p>
               <p>
                 Audiences with <strong>only organization names</strong> (Government Buyers, Existing Customers)

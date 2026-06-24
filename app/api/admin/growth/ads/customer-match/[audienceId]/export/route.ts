@@ -5,6 +5,7 @@ import {
   buildAudienceRecords,
   generatePlainCSV,
   generateGoogleCSV,
+  generateFullCSV,
   AUDIENCE_META,
   type AudienceType,
 } from "@/lib/growth-os/customer-match-engine"
@@ -20,24 +21,43 @@ export async function GET(
 
   try {
     const { audienceId } = await params
-    // audienceId format: "cm_dealers" → strip "cm_" prefix
     const audienceType = audienceId.replace(/^cm_/, "") as AudienceType
 
     if (!AUDIENCE_META[audienceType]) {
       return NextResponse.json({ error: "Unknown audience. Valid: cm_dealers, cm_crm_leads, cm_government_buyers, cm_existing_customers" }, { status: 400 })
     }
 
-    const format         = req.nextUrl.searchParams.get("format") === "hashed" ? "hashed" : "plain"
+    const rawFormat    = req.nextUrl.searchParams.get("format") ?? "google"
+    const format       = (["full", "plain", "hashed", "google"].includes(rawFormat) ? rawFormat : "google") as
+      "full" | "plain" | "hashed" | "google"
+
     const db             = (await clientPromise).db()
     const { records }    = await buildAudienceRecords(audienceType, db)
-    const csv            = format === "hashed" ? generateGoogleCSV(records) : generatePlainCSV(records)
+
+    let csv: string
+    let filenamePrefix: string
+
+    switch (format) {
+      case "full":
+        csv = generateFullCSV(records)
+        filenamePrefix = "customer_match_full"
+        break
+      case "hashed":
+        csv = generateGoogleCSV(records)
+        filenamePrefix = "customer_match_hashed"
+        break
+      case "plain":
+      case "google":
+      default:
+        csv = generatePlainCSV(records)
+        filenamePrefix = "customer_match_google"
+        break
+    }
 
     const matchable = records.filter(r => r.email || r.phone).length
     const date      = new Date().toISOString().split("T")[0]
     const slug      = audienceType.replace(/_/g, "-")
-    const filename  = format === "hashed"
-      ? `customer_match_hashed_${slug}_${date}.csv`
-      : `customer_match_google_${slug}_${date}.csv`
+    const filename  = `${filenamePrefix}_${slug}_${date}.csv`
 
     await db.collection("growth_os_logs").insertOne({
       ts:               new Date().toISOString(),
