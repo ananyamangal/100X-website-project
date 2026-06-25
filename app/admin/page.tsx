@@ -32,6 +32,7 @@ import {
   Activity,
   ClipboardCheck,
   Search,
+  Copy,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -207,6 +208,8 @@ function AdminDashboardContent() {
   const [editingAccreditation, setEditingAccreditation] = useState<Accreditation | null>(null)
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null)
+  const [pendingDuplicate, setPendingDuplicate] = useState<Product | null>(null)
+  const [duplicating, setDuplicating] = useState(false)
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [uploadingBrochure, setUploadingBrochure] = useState(false)
@@ -404,6 +407,42 @@ function AdminDashboardContent() {
       const updatedProducts = products.filter(p => p.id !== productId)
       setProducts(updatedProducts)
       fetch("/api/admin/categories").then(r => r.json()).then(d => { if (Array.isArray(d)) setCategories(d) }).catch(() => {})
+    }
+  }
+
+  // Duplicate product — called after user confirms the dialog
+  const handleDuplicateProduct = async () => {
+    if (!pendingDuplicate) return
+    setDuplicating(true)
+    try {
+      const sourceId = pendingDuplicate.id ?? pendingDuplicate._id
+      const res = await fetch(`/api/admin/products/${sourceId}/duplicate`, {
+        method: "POST",
+        credentials: "include",
+      })
+      if (!res.ok) throw new Error(await res.text())
+      const created = await res.json()
+      const normalized: Product = {
+        ...created,
+        id: created._id,
+        image: created.imageUrl || created.imageUrls?.[0] || "",
+        price: created.priceRange,
+        reviews: created.reviewsCount,
+        description: created.shortDescription,
+        whatsappText: created.whatsappMessageText,
+      }
+      setProducts(prev => [...prev, normalized])
+      setPendingDuplicate(null)
+      // Open the edit form for the newly created draft so user can rename/adjust before saving
+      setEditingProduct(normalized)
+      setActiveTab("products")
+      setNotification({ type: "success", message: `✅ "${created.name}" created as draft. Edit and save to publish.` })
+      setTimeout(() => setNotification(null), 6000)
+    } catch {
+      setNotification({ type: "error", message: "❌ Failed to duplicate product. Please try again." })
+      setTimeout(() => setNotification(null), 6000)
+    } finally {
+      setDuplicating(false)
     }
   }
 
@@ -834,6 +873,63 @@ function AdminDashboardContent() {
               <X size={20} />
             )}
             <span className="font-medium">{notification.message}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Duplicate Product Confirmation Dialog */}
+      {pendingDuplicate && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                <Copy size={20} className="text-blue-600" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">Duplicate product?</h2>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4 mb-5 space-y-2 text-sm">
+              <div className="flex items-center space-x-2 text-gray-600">
+                <span className="font-medium shrink-0">Original:</span>
+                <span className="text-gray-800 font-semibold truncate">{pendingDuplicate.name}</span>
+              </div>
+              <div className="flex items-center space-x-2 text-gray-500">
+                <span>↓</span>
+              </div>
+              <div className="flex items-center space-x-2 text-gray-600">
+                <span className="font-medium shrink-0">New draft:</span>
+                <span className="text-gray-800 font-semibold truncate">{pendingDuplicate.name} (Copy)</span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mb-5">
+              All content, images, and settings are copied. The duplicate opens immediately as a draft so you can rename and adjust before publishing.
+            </p>
+            <div className="flex space-x-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setPendingDuplicate(null)}
+                disabled={duplicating}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={handleDuplicateProduct}
+                disabled={duplicating}
+              >
+                {duplicating ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin mr-2" />
+                    Duplicating…
+                  </>
+                ) : (
+                  <>
+                    <Copy size={14} className="mr-2" />
+                    Duplicate
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       )}
@@ -1371,6 +1467,7 @@ function AdminDashboardContent() {
                 onAddProduct={handleAddProduct}
                 onUpdateProduct={handleUpdateProduct}
                 onDeleteProduct={handleDeleteProduct}
+                onDuplicateProduct={setPendingDuplicate}
                 onAddCategory={handleAddCategory}
                 isAddingProduct={isAddingProduct}
                 setIsAddingProduct={setIsAddingProduct}
@@ -1594,6 +1691,7 @@ function ProductsTab({
   onAddProduct,
   onUpdateProduct,
   onDeleteProduct,
+  onDuplicateProduct,
   onAddCategory,
   isAddingProduct,
   setIsAddingProduct,
@@ -1607,6 +1705,7 @@ function ProductsTab({
   onAddProduct: (product: Omit<Product, "id" | "createdAt" | "updatedAt" | "_id">) => void
   onUpdateProduct: (product: Product) => void
   onDeleteProduct: (id: string) => void
+  onDuplicateProduct: (product: Product) => void
   onAddCategory: (category: string) => void
   isAddingProduct: boolean
   setIsAddingProduct: (value: boolean) => void
@@ -1711,6 +1810,7 @@ function ProductsTab({
                     size="sm"
                     onClick={() => setExpandedProduct(expandedProduct === (product.id ?? "") ? null : (product.id ?? null))}
                     className="bg-transparent"
+                    title="Expand details"
                   >
                     {expandedProduct === (product.id ?? "") ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </Button>
@@ -1719,14 +1819,25 @@ function ProductsTab({
                     size="sm"
                     onClick={() => setEditingProduct(product)}
                     className="bg-transparent"
+                    title="Edit product"
                   >
                     <Edit size={16} />
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
+                    onClick={() => onDuplicateProduct(product)}
+                    className="bg-transparent text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    title="Duplicate product"
+                  >
+                    <Copy size={16} />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => onDeleteProduct(product.id ?? product._id ?? "")}
                     className="bg-transparent text-red-600 hover:text-red-700 hover:bg-red-50"
+                    title="Delete product"
                   >
                     <Trash2 size={16} />
                   </Button>
