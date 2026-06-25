@@ -3,8 +3,52 @@ import { useState, useEffect, useCallback } from "react"
 import {
   Brain, RefreshCw, TrendingUp, MapPin, DollarSign,
   Target, Zap, ChevronRight, AlertCircle, BarChart2,
+  Database, Search, ShoppingBag, Users,
 } from "lucide-react"
 import type { MarketIntelligenceRun, ProductOpportunity, StateOpportunity, CampaignBudgetScore } from "@/lib/growth-os/agents/market-intelligence"
+import IntelligenceStatus from "@/components/growth-os/IntelligenceStatus"
+
+// Snapshot type returned by /api/admin/growth/market-intelligence/snapshot
+interface MISnapshot {
+  isSnapshot:      boolean
+  generatedAt:     string
+  processingTimeMs: number
+  sources: {
+    procurement: { active: boolean; records: number }
+    gem:         { active: boolean; records: number }
+    gsc:         { active: boolean; records: number; lastSync: string | null }
+    crm:         { active: boolean; records: number }
+    sellers:     { active: boolean; records: number }
+  }
+  procurement: {
+    totalContracts: number
+    totalGmvCr:     number
+    firstDate:      string
+    lastDate:       string
+    topStates:      { state: string; contracts: number; gmvCr: number }[]
+    topOems:        { oem: string; contracts: number; gmvCr: number }[]
+    topBuyers:      { buyer: string; state: string; contracts: number }[]
+  }
+  gem: { totalContracts: number; stateCount: number; topStates: { state: string; count: number }[] }
+  search: {
+    totalQueries:   number
+    totalClicks:    number
+    totalImpressions: number
+    lastSync:       string | null
+    topQueries:     { query: string; clicks: number; impressions: number }[]
+  }
+  crm: { dealerProspects: number; rfqLeads: number; brochureLeads: number }
+  founderBrief: {
+    whatToSell:    string
+    whereToSell:   string
+    whoToTarget:   string
+    whichCampaignNeedsBudget: string
+    topActionThisWeek: string
+    confidenceLevel: string
+    dataQualityNote: string
+  }
+  meta: { confidenceScore: number; coveragePct: number; health: "healthy" | "degraded" | "stale" | "error"; refreshFrequency: string }
+}
 
 type ModelTier = "haiku" | "sonnet" | "opus"
 
@@ -45,12 +89,25 @@ const MOMENTUM_COLOR: Record<string, string> = {
 
 export default function MarketIntelligencePage() {
   const [run, setRun]         = useState<MarketIntelligenceRun | null>(null)
+  const [snapshot, setSnapshot] = useState<MISnapshot | null>(null)
   const [history, setHistory] = useState<MarketIntelligenceRun[]>([])
   const [loading, setLoading] = useState(false)
+  const [snapshotLoading, setSnapshotLoading] = useState(true)
   const [model, setModel]     = useState<ModelTier>("sonnet")
   const [dateRange, setDateRange] = useState(90)
   const [activeTab, setActiveTab] = useState<"briefing" | "products" | "states" | "campaigns">("briefing")
   const [error, setError]     = useState("")
+
+  const loadSnapshot = useCallback(async () => {
+    setSnapshotLoading(true)
+    try {
+      const res  = await fetch("/api/admin/growth/market-intelligence/snapshot")
+      const data = await res.json()
+      if (res.ok) setSnapshot(data)
+    } finally {
+      setSnapshotLoading(false)
+    }
+  }, [])
 
   const loadHistory = useCallback(async () => {
     const res  = await fetch("/api/admin/growth/agents/market-intelligence")
@@ -58,7 +115,7 @@ export default function MarketIntelligencePage() {
     if (Array.isArray(data)) setHistory(data)
   }, [])
 
-  useEffect(() => { loadHistory() }, [loadHistory])
+  useEffect(() => { loadHistory(); loadSnapshot() }, [loadHistory, loadSnapshot])
 
   async function runAnalysis() {
     setLoading(true)
@@ -333,22 +390,177 @@ export default function MarketIntelligencePage() {
           )}
         </div>
       ) : (
-        /* Empty state */
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-10 text-center space-y-3">
-          <Brain size={32} className="text-gray-700 mx-auto" />
-          <div>
-            <p className="text-white font-medium">No intelligence report yet</p>
-            <p className="text-sm text-gray-500 mt-1">
-              Run analysis to get founder-level market intelligence from your leads, ads, and search data.
-            </p>
-          </div>
-          <button
-            onClick={runAnalysis}
-            disabled={loading}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-sm rounded-lg transition-colors mt-2"
-          >
-            <Brain size={14} />Run First Analysis
-          </button>
+        /* Fallback: Live data snapshot — never show "Insufficient Data" */
+        <div className="space-y-4">
+          {/* IntelligenceStatus */}
+          {snapshot && (
+            <IntelligenceStatus
+              module="market-intelligence"
+              lastUpdated={snapshot.generatedAt}
+              refreshFrequency={snapshot.meta.refreshFrequency}
+              autoRefresh={false}
+              confidenceScore={snapshot.meta.confidenceScore}
+              coveragePct={snapshot.meta.coveragePct}
+              health={snapshot.meta.health}
+              processingTimeMs={snapshot.processingTimeMs}
+              sources={[
+                { name: "Procurement",    active: snapshot.sources.procurement.active, recordCount: snapshot.sources.procurement.records },
+                { name: "GeM Contracts",  active: snapshot.sources.gem.active,         recordCount: snapshot.sources.gem.records },
+                { name: "Search Console", active: snapshot.sources.gsc.active,         recordCount: snapshot.sources.gsc.records },
+                { name: "CRM / Leads",    active: snapshot.sources.crm.active,         recordCount: snapshot.sources.crm.records },
+                { name: "Seller Intel",   active: snapshot.sources.sellers.active,     recordCount: snapshot.sources.sellers.records },
+                { name: "Google Ads",     active: false },
+                { name: "Analytics",      active: false },
+              ]}
+              totalRecords={
+                snapshot.sources.procurement.records +
+                snapshot.sources.gem.records +
+                snapshot.sources.gsc.records
+              }
+              onRefresh={loadSnapshot}
+              refreshing={snapshotLoading}
+            />
+          )}
+
+          {snapshot && (
+            <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+              {/* Snapshot header */}
+              <div className="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Database size={14} className="text-brand-400" />
+                  <span className="text-sm font-semibold text-white">Live Market Snapshot</span>
+                  <span className="text-[10px] px-2 py-0.5 bg-amber-500/15 text-amber-400 border border-amber-500/25 rounded-full">
+                    Rules-based · {snapshot.founderBrief.confidenceLevel} confidence
+                  </span>
+                </div>
+                <button
+                  onClick={runAnalysis}
+                  disabled={loading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white text-xs rounded-lg transition-colors"
+                >
+                  <Brain size={12} />
+                  {loading ? "Analysing…" : "Upgrade to AI Analysis"}
+                </button>
+              </div>
+
+              {/* Stat tiles */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-px bg-gray-800">
+                {[
+                  { label: "Fogging Contracts", value: snapshot.procurement.totalContracts, icon: ShoppingBag, color: "text-blue-400" },
+                  { label: "Total GMV",          value: `₹${snapshot.procurement.totalGmvCr} Cr`, icon: DollarSign, color: "text-green-400" },
+                  { label: "GeM Contracts",      value: snapshot.gem.totalContracts, icon: Database, color: "text-purple-400" },
+                  { label: "Search Queries",     value: snapshot.search.totalQueries, icon: Search, color: "text-cyan-400" },
+                  { label: "CRM Prospects",      value: snapshot.crm.dealerProspects + snapshot.crm.rfqLeads, icon: Users, color: "text-amber-400" },
+                ].map(({ label, value, icon: Icon, color }) => (
+                  <div key={label} className="bg-gray-900 p-4">
+                    <Icon size={14} className={`${color} mb-1.5`} />
+                    <div className="text-xl font-bold text-white">{value}</div>
+                    <div className="text-[10px] text-gray-500 mt-0.5">{label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Founder Brief (rules-based) */}
+              <div className="p-5 space-y-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-semibold text-amber-400 uppercase tracking-wide">
+                    {snapshot.founderBrief.confidenceLevel} confidence
+                  </span>
+                  <span className="text-gray-700">·</span>
+                  <span className="text-xs text-gray-500">{snapshot.founderBrief.dataQualityNote}</span>
+                </div>
+
+                {[
+                  { q: "What to sell?",                icon: TrendingUp,  answer: snapshot.founderBrief.whatToSell },
+                  { q: "Where to sell?",               icon: MapPin,      answer: snapshot.founderBrief.whereToSell },
+                  { q: "Who to target?",               icon: Target,      answer: snapshot.founderBrief.whoToTarget },
+                  { q: "Which campaign needs budget?", icon: DollarSign,  answer: snapshot.founderBrief.whichCampaignNeedsBudget },
+                ].map(({ q, icon: Icon, answer }) => (
+                  <div key={q} className="border border-gray-800 rounded-xl p-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 font-medium mb-2">
+                      <Icon size={12} className="text-brand-400" />
+                      {q}
+                    </div>
+                    <p className="text-sm text-white leading-relaxed">{answer}</p>
+                  </div>
+                ))}
+
+                <div className="bg-brand-600/10 border border-brand-500/25 rounded-xl p-4">
+                  <div className="flex items-center gap-2 text-xs text-brand-400 font-semibold mb-2">
+                    <Zap size={12} />TOP ACTION THIS WEEK
+                  </div>
+                  <p className="text-sm text-white leading-relaxed">{snapshot.founderBrief.topActionThisWeek}</p>
+                </div>
+              </div>
+
+              {/* Top States + Products side-by-side */}
+              <div className="grid sm:grid-cols-2 gap-px bg-gray-800 border-t border-gray-800">
+                {/* Top States by Procurement */}
+                <div className="bg-gray-900 p-4">
+                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                    <MapPin size={10} />Top States · Procurement
+                    <span className="ml-auto text-gray-700 normal-case font-normal text-[10px]">Source: fogging_contracts</span>
+                  </p>
+                  <div className="space-y-2">
+                    {snapshot.procurement.topStates.map((s, i) => (
+                      <div key={s.state} className="flex items-center gap-2">
+                        <span className="text-[10px] text-gray-600 w-4">{i + 1}</span>
+                        <span className="text-xs text-gray-300 flex-1 truncate">{s.state || "Unknown"}</span>
+                        <span className="text-[10px] text-gray-500">{s.contracts} c</span>
+                        <span className="text-[10px] text-green-400 font-mono">₹{s.gmvCr}Cr</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Top OEMs / Products */}
+                <div className="bg-gray-900 p-4">
+                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                    <TrendingUp size={10} />Top Products · Procurement
+                    <span className="ml-auto text-gray-700 normal-case font-normal text-[10px]">Source: fogging_contracts</span>
+                  </p>
+                  <div className="space-y-2">
+                    {snapshot.procurement.topOems.map((o, i) => (
+                      <div key={o.oem} className="flex items-center gap-2">
+                        <span className="text-[10px] text-gray-600 w-4">{i + 1}</span>
+                        <span className="text-xs text-gray-300 flex-1 truncate">{o.oem || "Unknown"}</span>
+                        <span className="text-[10px] text-gray-500">{o.contracts} c</span>
+                        <span className="text-[10px] text-green-400 font-mono">₹{o.gmvCr}Cr</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Top Search Queries */}
+              {snapshot.search.totalQueries > 0 && (
+                <div className="border-t border-gray-800 p-4">
+                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                    <Search size={10} />Top Search Queries
+                    <span className="ml-auto text-gray-700 normal-case font-normal text-[10px]">
+                      Source: Google Search Console · {snapshot.search.totalClicks.toLocaleString()} total clicks
+                    </span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {snapshot.search.topQueries.map(q => (
+                      <div key={q.query} className="flex items-center gap-1.5 bg-gray-800 rounded-lg px-2.5 py-1.5">
+                        <span className="text-xs text-gray-300">{q.query}</span>
+                        <span className="text-[10px] text-blue-400">{q.clicks} clicks</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Loading state for snapshot */}
+          {snapshotLoading && !snapshot && (
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 flex items-center justify-center gap-3 text-gray-500">
+              <RefreshCw size={16} className="animate-spin text-brand-400" />
+              <span className="text-sm">Loading live market data…</span>
+            </div>
+          )}
         </div>
       )}
 
