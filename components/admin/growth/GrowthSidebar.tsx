@@ -11,7 +11,7 @@ import {
   Globe, Flame, ClipboardCheck, ChevronDown, ChevronRight,
   Building2, Inbox, Key, Brain, Factory, DollarSign,
   RotateCcw, Calendar, Rocket, Database, Target,
-  BookOpen, MessageSquare, Layers,
+  BookOpen, MessageSquare, Layers, Package,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
@@ -83,7 +83,9 @@ const NAV_MODULES: NavModule[] = [
   { section: "market_intel", href: "/admin/growth/geo",         label: "GEO / AI Search",      icon: Bot,         permission: "geo.view" },
 
   // ── ACQUIRE ──────────────────────────────────────────────────────────────
-  { section: "acquire", href: "/admin/growth/categories", label: "Category Manager", icon: Layers, permission: "procurement.view", badge: "NEW" },
+  { section: "acquire", href: "/admin/growth/categories",                   label: "Category Manager",       icon: Layers,   permission: "procurement.view", badge: "NEW" },
+  { section: "acquire", href: "/admin/growth/categories/fogging-machines",  label: "↳ Fogging Machines",     icon: Package,  permission: "procurement.view", sub: true },
+  { section: "acquire", href: "/admin/growth/categories?filter=pending",    label: "↳ Import Queue",         icon: Database, permission: "procurement.view", sub: true },
 
   // ── CRM ──────────────────────────────────────────────────────────────────
   { section: "crm", href: "/admin/growth/crm/dealers",       label: "Dealer Pipeline",      icon: Users,       permission: "dealer.view",         badge: "NEW" },
