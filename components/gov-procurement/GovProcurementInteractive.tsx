@@ -281,7 +281,7 @@ export function InstitutionalBuyerTabs({ buyers }: { buyers: BuyerTypeDef[] }) {
 type ProductSlimRef = { _id: string; name: string; slug: string; imageUrls: string[]; badges: string[]; category: string }
 
 interface CatalogueItem {
-  id: string; name: string; slug: string
+  id: string; name: string; href: string
   buyerIcon: string; buyerType: string; buyerBg: string
   is14855: boolean; gem: boolean
   applications: string[]; specs: string[]; delivery: string
@@ -290,7 +290,8 @@ interface CatalogueItem {
 
 const INSTITUTIONAL_CATALOGUE: CatalogueItem[] = [
   {
-    id: "double-barrel", name: "Double Barrel Vehicle-Mounted Fogger", slug: "double-barrel-fogging-machine",
+    id: "double-barrel", name: "Double Barrel Vehicle-Mounted Fogger",
+    href: "/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
     buyerIcon: "🏛", buyerType: "Municipal Corporations", buyerBg: "bg-blue-600/20 text-blue-300 border-blue-500/30",
     is14855: true, gem: true,
     applications: ["Ward-level mosquito drives", "Dengue & malaria campaigns", "City-wide vector control"],
@@ -298,7 +299,8 @@ const INSTITUTIONAL_CATALOGUE: CatalogueItem[] = [
     delivery: "5–10 working days", matchTerms: ["double barrel", "vehicle-mounted", "vehicle mounted"],
   },
   {
-    id: "hdpe", name: "ISI Marked HDPE Tank Thermal Fogger", slug: "isi-marked-hdpe-thermal-fogging-machine",
+    id: "hdpe", name: "ISI Marked HDPE Tank Thermal Fogger",
+    href: "/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde",
     buyerIcon: "🏥", buyerType: "Health Departments", buyerBg: "bg-green-600/20 text-green-300 border-green-500/30",
     is14855: true, gem: true,
     applications: ["Emergency outbreak response", "NVBDCP programmes", "District health operations"],
@@ -306,7 +308,8 @@ const INSTITUTIONAL_CATALOGUE: CatalogueItem[] = [
     delivery: "5–10 working days", matchTerms: ["hdpe", "isi marked", "isi mark"],
   },
   {
-    id: "stainless", name: "Stainless Steel Heavy-Duty Fogger", slug: "stainless-steel-fogging-machine",
+    id: "stainless", name: "Stainless Steel Heavy-Duty Fogger",
+    href: "/thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
     buyerIcon: "🌿", buyerType: "Panchayats & Forest Depts", buyerBg: "bg-emerald-600/20 text-emerald-300 border-emerald-500/30",
     is14855: true, gem: true,
     applications: ["Long-service deployments", "Harsh-environment operations", "Pest control programmes"],
@@ -314,7 +317,8 @@ const INSTITUTIONAL_CATALOGUE: CatalogueItem[] = [
     delivery: "5–10 working days", matchTerms: ["stainless", "ss tank", "heavy duty", "heavy-duty"],
   },
   {
-    id: "bf150", name: "BF-150 Petrol Portable Fogger", slug: "bf-150-fogging-machine",
+    id: "bf150", name: "BF-150 Petrol Portable Fogger",
+    href: "/products/100x-thermal-fogger-bf150",
     buyerIcon: "🛡", buyerType: "Defence & Cantonment Boards", buyerBg: "bg-violet-600/20 text-violet-300 border-violet-500/30",
     is14855: true, gem: true,
     applications: ["Cantonment hygiene ops", "Indoor vector control", "Rapid portable deployment"],
@@ -322,7 +326,8 @@ const INSTITUTIONAL_CATALOGUE: CatalogueItem[] = [
     delivery: "5–10 working days", matchTerms: ["bf-150", "bf150", "portable", "petrol"],
   },
   {
-    id: "bf400", name: "BF-400 High-Capacity Fogger", slug: "bf-400-fogging-machine",
+    id: "bf400", name: "BF-400 High-Capacity Fogger",
+    href: "/products/100x-heavy-duty-thermal-fogger-bf400",
     buyerIcon: "✈️", buyerType: "Airports & Port Authorities", buyerBg: "bg-amber-600/20 text-amber-300 border-amber-500/30",
     is14855: true, gem: true,
     applications: ["Airport perimeter fogging", "Cargo area sanitisation", "High-coverage operations"],
@@ -330,7 +335,8 @@ const INSTITUTIONAL_CATALOGUE: CatalogueItem[] = [
     delivery: "7–10 working days", matchTerms: ["bf-400", "bf400", "high capacity"],
   },
   {
-    id: "cold-fogger", name: "Thermal + Cold ULV Fogging Machine", slug: "cold-fogging-machine",
+    id: "cold-fogger", name: "Thermal + Cold ULV Fogging Machine",
+    href: "/thermal-and-cold-fogging-machine-100xtfs50",
     buyerIcon: "🌾", buyerType: "Agriculture & State Depts", buyerBg: "bg-teal-600/20 text-teal-300 border-teal-500/30",
     is14855: true, gem: true,
     applications: ["Agricultural pest control", "Indoor & outdoor use", "NHM programme supply"],
@@ -441,7 +447,7 @@ export function GovInstitutionalProductCards({ products }: { products: ProductSl
 
                 {/* CTAs */}
                 <div className="flex gap-2 mt-auto">
-                  <a href={`/${item.slug}`}
+                  <a href={item.href}
                     className="flex-1 inline-flex items-center justify-center text-xs font-semibold bg-white/[0.05] hover:bg-white/[0.10] border border-white/[0.10] text-gray-200 px-3 py-2.5 rounded-xl transition-colors">
                     View Details
                   </a>
