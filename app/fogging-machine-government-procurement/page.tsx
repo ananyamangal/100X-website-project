@@ -15,6 +15,13 @@ import GovKPIStrip from "@/components/trust/GovKPIStrip"
 import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
 import FeaturedGovSupplies, { type SupplyRecord } from "@/components/trust/FeaturedGovSupplies"
 import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/FeaturedDeployments"
+import {
+  StickyProcurementCTA,
+  ProcurementLifecycleTimeline,
+  ProcurementReadinessScore,
+  InstitutionalBuyerTabs,
+  type BuyerTypeDef,
+} from "@/components/gov-procurement/GovProcurementInteractive"
 
 // ─── Metadata ───────────────────────────────────────────────────────────────
 
@@ -165,13 +172,15 @@ const TRUST_STATS = [
   { value: "10", label: "Tender Docs Ready" },
 ]
 
-const BUYER_TYPES = [
+const BUYER_TYPES: BuyerTypeDef[] = [
   {
     icon: "🏛",
     type: "Municipal Corporations & Nagar Nigams",
     use: "Ward-level mosquito control drives, dengue/malaria fogging campaigns",
     products: "Vehicle-mounted foggers, double-barrel foggers",
     route: "Open tender or GeM bid",
+    typical: "5–20 units per procurement cycle, often vehicle-mounted for ward coverage",
+    recommended: "Double Barrel Vehicle-Mounted Fogger, IS 14855 Heavy-Duty Series",
   },
   {
     icon: "🏥",
@@ -179,6 +188,8 @@ const BUYER_TYPES = [
     use: "Emergency vector control, outbreak response, NVBDCP programmes",
     products: "Thermal foggers, vehicle-mounted systems",
     route: "GeM direct purchase or district health office tender",
+    typical: "2–10 units for district-level deployment, portable preferred for rapid response",
+    recommended: "ISI Marked Portable Thermal Fogger, IS 14855 Petrol Series",
   },
   {
     icon: "🌿",
@@ -186,6 +197,8 @@ const BUYER_TYPES = [
     use: "Local mosquito control, seasonal fogging drives",
     products: "Portable thermal foggers, ISI-marked models",
     route: "GeM direct purchase — no tender below threshold",
+    typical: "1–5 units, portable models, GeM direct purchase under financial limit",
+    recommended: "ISI Marked HDPE Tank Fogger, Petrol Portable Series",
   },
   {
     icon: "🛡",
@@ -193,6 +206,26 @@ const BUYER_TYPES = [
     use: "Cantonment hygiene, vector control in military facilities",
     products: "Portable and vehicle-mounted foggers",
     route: "Direct inquiry, rate contract, or DGS&D route",
+    typical: "3–15 units for cantonment coverage, robust construction required",
+    recommended: "Heavy-Duty Vehicle-Mounted Fogger, IS 14855 Defence Grade",
+  },
+  {
+    icon: "🌾",
+    type: "Agriculture & Forest Departments",
+    use: "Pest control in agricultural settings, forestry vector management",
+    products: "Portable thermal foggers, backpack foggers",
+    route: "Open tender or state DGS&D rate contract",
+    typical: "10–50 units for district-level pest management programmes",
+    recommended: "IS 14855 Agricultural Series, Portable Thermal Fogger",
+  },
+  {
+    icon: "✈️",
+    type: "Airport & Port Authorities",
+    use: "Vector control within airport perimeter and cargo areas",
+    products: "Vehicle-mounted foggers, portable IS 14855 units",
+    route: "Direct inquiry or AAI/port trust tender",
+    typical: "2–8 units for perimeter fogging and cargo area sanitation",
+    recommended: "Double Barrel Vehicle-Mounted, High-Capacity IS 14855",
   },
 ]
 
@@ -255,7 +288,6 @@ const CASE_STUDY = {
   challenge: "Large urban area requiring comprehensive mosquito control across multiple wards under Swachh Bharat Mission. Single-barrel machines insufficient for required coverage speed.",
   solution: "100X Circle supplied Double Barrel Thermal Fogging Machine (vehicle-mounted). Dual output delivers twice the fogging coverage compared to single-barrel units. GeM-listed OEM product with full OEM certification and after-sales documentation.",
   outcome: "Expanded ward coverage per fogging session. Vehicle-mounted configuration enabled mobility across narrow lanes and major roads. Full IS 14855 compliance for Swachh Bharat procurement.",
-  slug: "Nagar-Nigam-Muzaffarpur-Bihar-mosquito-control-program",
 }
 
 const GEM_STEPS = [
@@ -286,6 +318,104 @@ const STATES_SERVED = [
   "Gujarat","Rajasthan","Punjab","Himachal Pradesh",
   "Madhya Pradesh","Karnataka","Tamil Nadu","West Bengal",
   "Odisha","Jharkhand",
+]
+
+const PROCUREMENT_MODELS = [
+  {
+    icon: "🛒",
+    title: "GeM Direct Purchase",
+    badge: "No Tender Needed",
+    badgeColor: "bg-green-100 text-green-700",
+    desc: "Below GeM financial limit — any government buyer purchases 100X Circle products directly on gem.gov.in without floating a separate public tender.",
+    steps: ["Log in to gem.gov.in", "Search 100X Circle", "Place order directly"],
+    speed: "Same day",
+  },
+  {
+    icon: "⚡",
+    title: "GeM Competitive Bid",
+    badge: "Price Discovery",
+    badgeColor: "bg-blue-100 text-blue-700",
+    desc: "Above direct purchase threshold. Buyer floats a GeM bid with technical specifications. 100X Circle participates and competes on price.",
+    steps: ["Buyer creates GeM bid", "We submit bid", "L1 selected"],
+    speed: "3–10 days",
+  },
+  {
+    icon: "📋",
+    title: "Open Tender / NIT",
+    badge: "Large Quantities",
+    badgeColor: "bg-violet-100 text-violet-700",
+    desc: "For large municipal requirements. NIT published, 100X Circle submits technical + financial bid. IS 14855 compliance and MSME status qualify us in most tenders.",
+    steps: ["NIT published", "We submit bid + docs", "Award on L1"],
+    speed: "3–8 weeks",
+  },
+  {
+    icon: "📄",
+    title: "Annual Rate Contract",
+    badge: "Repeat Supply",
+    badgeColor: "bg-amber-100 text-amber-700",
+    desc: "Annual contract at agreed rate — department can draw off-takes throughout the year without re-tendering. Preferred by large municipal corporations and state health departments.",
+    steps: ["Rate contract tender", "Annual rate agreed", "Draw-offs as needed"],
+    speed: "As needed",
+  },
+  {
+    icon: "🤝",
+    title: "DGS&D / NIC Route",
+    badge: "Central Govt",
+    badgeColor: "bg-indigo-100 text-indigo-700",
+    desc: "Central government ministries and departments can procure through DGS&D rate contracts or NIC empanelment. 100X Circle supports DGS&D inquiry routing.",
+    steps: ["Ministry inquiry", "Rate contract reference", "Order issued"],
+    speed: "Per contract",
+  },
+  {
+    icon: "🏪",
+    title: "Dealer-Assisted Supply",
+    badge: "Local Presence",
+    badgeColor: "bg-teal-100 text-teal-700",
+    desc: "Local authorized dealers submit bids using 100X Circle OEM Authorization. Government still receives 100X Circle products with OEM warranty and after-sales support.",
+    steps: ["Local dealer bids", "OEM auth issued", "Supply + OEM warranty"],
+    speed: "Per dealer SLA",
+  },
+]
+
+const DOCUMENTATION_ITEMS = [
+  { icon: "📋", title: "IS 14855 (Part 1) Technical Spec Sheet", desc: "BIS Indian Standard compliance document", pages: "2 pages", category: "Compliance" },
+  { icon: "🏆", title: "BIS / ISI Mark Certificate", desc: "Bureau of Indian Standards certification", pages: "1 page", category: "Compliance" },
+  { icon: "🌐", title: "ISO 9001:2015 Certificate", desc: "Quality Management System certification", pages: "1 page", category: "Quality" },
+  { icon: "🏢", title: "MSME / UDYAM Certificate", desc: "Ministry of MSME registration", pages: "1 page", category: "Registration" },
+  { icon: "🛒", title: "GeM Seller Verification Letter", desc: "gem.gov.in OEM seller verification", pages: "1 page", category: "Registration" },
+  { icon: "📊", title: "GST Registration Certificate", desc: "With HSN 8424 classification", pages: "1 page", category: "Registration" },
+  { icon: "🏭", title: "Company Profile & OEM Credentials", desc: "Factory, capabilities, history", pages: "4 pages", category: "Company" },
+  { icon: "📦", title: "Full Tender Documentation Pack", desc: "All documents in one package", pages: "12+ pages", category: "Tender", highlight: true },
+  { icon: "💰", title: "L1 Quotation Template", desc: "On company letterhead with GST breakdown", pages: "2 pages", category: "Commercial" },
+  { icon: "🔧", title: "AMC Terms & Conditions", desc: "Annual Maintenance Contract template", pages: "3 pages", category: "Support" },
+]
+
+const EXPANDED_FAQ = [
+  { q: "Can we procure directly on GeM without issuing a public tender?", a: "Yes. Within GeM direct purchase financial limits, government bodies can purchase directly from 100X Circle on gem.gov.in without a separate public tender. For higher amounts, initiate a GeM bid or public tender — we participate in both. Contact us before tender floating for spec alignment." },
+  { q: "What is your delivery commitment for tender-awarded orders?", a: "Standard: 5–10 working days from purchase order for in-stock models. Bulk or custom orders: 15–25 working days depending on quantity. Written delivery commitment provided on request before tender submission. Call +91-7827229116." },
+  { q: "Are demo units available for evaluation before bulk procurement?", a: "Yes. Demo units are available for serious institutional inquiries. Contact us with your department details and location. Demonstrations available at your office or municipal facility in select cities." },
+  { q: "Do you provide an AMC (Annual Maintenance Contract) for government buyers?", a: "Yes. AMC available for bulk government procurement — covers annual servicing, spare parts, operator training refresher, and priority call support. Contact us for AMC terms when placing bulk orders." },
+  { q: "Can our authorized dealer submit the bid using your OEM authorization?", a: "Yes. If a local dealer is bidding as a GeM reseller, we issue an OEM Authorization Letter and GeM authorization code. The government body still receives 100X Circle products at OEM-backed quality and after-sales service." },
+  { q: "What are the GeM product listing IDs for 100X Circle foggers?", a: "Our GeM product listings are searchable on gem.gov.in by searching '100X Circle' or 'fogging machine IS 14855'. Filter by MSME seller for preference application. Contact us for current GeM listing IDs to cite in your procurement documentation." },
+  { q: "Do you participate in GeM reverse auctions (RA)?", a: "Yes. 100X Circle participates in GeM Reverse Auctions where our products are included in the buyer's product category. We are prepared for RA-based price discovery. Contact us before floating RA to ensure our product is mapped to your category." },
+  { q: "What is the minimum order quantity for government procurement?", a: "There is no minimum quantity for government orders. Single-unit GeM direct purchases are accepted. For orders of 5+ units, contact us directly for volume pricing and priority dispatch scheduling." },
+  { q: "Can we visit the Gurugram manufacturing facility?", a: "Yes. Factory visits are welcome for serious institutional buyers. Our facility is at UG-398, Sector 7, IMT Manesar, Gurugram — 40 km from Delhi. Schedule via email (100xcircle@gmail.com) or WhatsApp (+91-7827229116)." },
+  { q: "Do you provide operator training with bulk government supply?", a: "Yes. Operator training is included for orders of 5+ units. We provide on-site training at your facility covering machine operation, fuel handling, maintenance, and IS 14855 safety protocols. Training can also be conducted at our Gurugram factory." },
+  { q: "How do you handle defective units under government warranty?", a: "All units carry a 12-month manufacturer warranty from date of delivery. For government buyers, we provide priority replacement or repair within 48–72 hours of defect reporting. Contact our service line at +91-7827229116." },
+  { q: "What payment terms are accepted for government orders?", a: "Government standard payment terms apply — 30/60/90 days credit against verified purchase order, or payment on delivery for GeM orders. Bank transfer (RTGS/NEFT) and PFMS (Public Financial Management System) routing accepted." },
+  { q: "Are spare parts covered under the government supply contract?", a: "Core spare parts (nozzles, filters, fuel caps) are available for purchase post-supply. For AMC contracts, a critical spares kit is included. Spare parts are available nationally via our dealer network." },
+  { q: "Can specifications be customized for specific tender requirements?", a: "Within IS 14855 compliance parameters, yes. Tank size, fuel type, nozzle configuration, and mounting options can be adjusted. Contact us before tender drafting — we assist with spec alignment to ensure our product qualifies." },
+  { q: "What certifications does the vehicle-mounted fogger carry?", a: "Vehicle-mounted models carry IS 14855 (Part 1) compliance, ISI mark on applicable components, and ISO 9001:2015 quality certification. Mounting hardware is designed for compatibility with standard Indian commercial vehicles (Mahindra, TATA, Piaggio 3-wheelers)." },
+  { q: "How is the MSME L1 preference applied in competitive bids?", a: "Under GoI Public Procurement Policy for MSMEs: if our bid is within 15% of the L1 price from a non-MSME, we may be considered for the order at the L1 price. State-specific policies may vary. Check the MSME preference clause in your tender document." },
+  { q: "Do you supply under NVBDCP (National Vector Borne Disease Control Programme)?", a: "Yes. Our products are used in NVBDCP-supported fogging programmes at the district level via state health departments. We provide IS 14855-compliant documentation and NVBDCP-aligned specifications on request." },
+  { q: "What is the HSN code for fogging machines for GST purposes?", a: "HSN Code: 8424 — 'Mechanical appliances for projecting, dispersing or spraying liquids or powders.' GST rate: 18%. All invoices include HSN 8424 with GST breakdown for your accounts and audit records." },
+  { q: "Is an EMD (Earnest Money Deposit) required for tenders?", a: "100X Circle as an MSME/UDYAM registered company is exempt from EMD requirements under GoI Public Procurement Policy for MSME orders. For tenders where EMD exemption needs to be invoked, we provide the MSME/UDYAM certificate as documentary evidence." },
+  { q: "Can 100X Circle supply to NHM (National Health Mission) programmes?", a: "Yes. 100X Circle supplies to state NHM programmes via state health departments and district health officers. NHM-funded procurement typically follows state health department tender procedures or GeM direct purchase. Contact us with your district and requirement." },
+  { q: "What is the warranty on IS 14855 certified models?", a: "12-month comprehensive manufacturer warranty covering manufacturing defects. Engine warranty follows OEM engine manufacturer terms. Free replacement/repair within warranty period. Extended warranty available for AMC contract holders." },
+  { q: "Do you supply under Swachh Bharat Mission procurement?", a: "Yes. Several of our municipal corporation customers procure for Swachh Bharat Mission vector control activities. We have a verified case study from Nagar Nigam Muzaffarpur, Bihar under Swachh Bharat. IS 14855 compliance satisfies Swachh Bharat technical specifications." },
+  { q: "Can we get a pre-bid technical meeting with your team?", a: "Yes. We strongly recommend pre-bid technical meetings before floatation for large tenders. Our team can participate online or in person at your location. This helps align specifications with our product range and avoid bid disqualification on technical grounds." },
+  { q: "What documents are required to register 100X Circle as a vendor in our system?", a: "Standard government vendor registration documents: GST certificate, MSME/UDYAM certificate, PAN, cancelled cheque, ISO 9001 certificate, GeM seller ID, and company incorporation certificate. Contact us for a complete vendor registration pack — shareable within 24 hours." },
+  { q: "Do you supply refurbished or used machines?", a: "No. All government supply is new machines directly from our Gurugram manufacturing facility. We do not supply refurbished or used equipment. Each unit ships with a factory quality inspection report." },
 ]
 
 // ─── Page ────────────────────────────────────────────────────────────────────
@@ -356,9 +486,17 @@ export default async function GovernmentProcurementPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }} />
 
+      {/* Sticky procurement CTA */}
+      <StickyProcurementCTA
+        waTenderQuote={waTenderQuote}
+        waOemTeam={waOemTeam}
+        phonePrimary={BUSINESS.phonePrimary}
+        email={BUSINESS.email}
+      />
+
       <main className="min-h-screen bg-white pt-16">
 
-        {/* ── 1. Hero — full-width, 2-column ───────────────────────────────────── */}
+        {/* ── 1. Hero ───────────────────────────────────────────────────────────── */}
         <section className="bg-gray-950 py-16 md:py-24 overflow-hidden">
           <div className="container mx-auto px-4 md:px-6">
             <nav className="flex items-center gap-2 text-xs text-gray-600 mb-10">
@@ -372,7 +510,7 @@ export default async function GovernmentProcurementPage() {
               <div>
                 <div className="flex flex-wrap gap-2 mb-5">
                   {["IS 14855", "GeM Direct Purchase", "MSME OEM", "Tender Ready", "Pan-India Supply"].map(t => (
-                    <span key={t} className="text-xs bg-white/[0.07] border border-white/[0.10] text-gray-300 px-2.5 py-1 rounded-full font-600">{t}</span>
+                    <span key={t} className="text-xs bg-white/[0.07] border border-white/[0.10] text-gray-300 px-2.5 py-1 rounded-full font-semibold">{t}</span>
                   ))}
                 </div>
                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
@@ -392,43 +530,68 @@ export default async function GovernmentProcurementPage() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <a href={waTenderQuote} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-700 px-7 py-3.5 rounded-full text-sm transition-colors">
+                    className="inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors">
                     WhatsApp: Request Tender Quote
                   </a>
                   <a href="#gov-rfq-form"
-                    className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] text-white font-600 px-7 py-3.5 rounded-full text-sm transition-colors">
+                    className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-colors">
                     Fill RFQ Form ↓
                   </a>
                 </div>
               </div>
 
-              {/* RIGHT: Product visual */}
-              <div className="hidden lg:flex items-center justify-center relative">
-                {products[0]?.imageUrls?.[0] ? (
-                  <div className="relative w-full max-w-[480px]">
-                    <div className="absolute -inset-12 bg-brand-600/8 rounded-full blur-3xl pointer-events-none" />
+              {/* RIGHT: Procurement Intelligence Dashboard */}
+              <div className="hidden lg:block">
+                <div className="glass-card rounded-2xl overflow-hidden">
+                  <div className="px-5 py-3.5 border-b border-white/[0.06] flex items-center justify-between">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Procurement Intelligence</p>
+                    <span className="flex items-center gap-1.5 text-[10px] text-brand-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-brand-400 inline-block animate-pulse" />
+                      Live
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-px bg-white/[0.04]">
+                    {[
+                      { label: "States Covered", value: "15+", sub: "Active government supply" },
+                      { label: "Govt Orders", value: "500+", sub: "Fulfilled to date" },
+                      { label: "Dispatch Time", value: "5–10", sub: "Working days from Gurugram" },
+                      { label: "Tender Docs", value: "10", sub: "Ready to share instantly" },
+                      { label: "IS Standard", value: "14855", sub: "Part 1 certified" },
+                      { label: "Response SLA", value: "24h", sub: "L1 quotation turnaround" },
+                    ].map((w, i) => (
+                      <div key={i} className="bg-gray-900/60 px-4 py-4">
+                        <p className="text-xl font-black text-white">{w.value}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mt-0.5">{w.label}</p>
+                        <p className="text-[10px] text-gray-600 mt-0.5">{w.sub}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="px-5 py-3 bg-white/[0.02] flex flex-wrap items-center gap-3 text-[10px] text-gray-500">
+                    {["IS 14855", "ISO 9001", "MSME", "GeM OEM"].map(c => (
+                      <span key={c} className="flex items-center gap-1">
+                        <svg className="w-2.5 h-2.5 text-brand-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}><polyline points="20 6 9 17 4 12"/></svg>
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                {products[0]?.imageUrls?.[0] && (
+                  <div className="relative mt-4 w-full">
+                    <div className="absolute -inset-6 bg-brand-600/6 rounded-full blur-3xl pointer-events-none" />
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={products[0].imageUrls[0]}
                       alt={products[0].name || "100X Circle Government Fogging Machine"}
                       className="relative w-full rounded-2xl shadow-2xl shadow-black/60 border border-white/[0.06]"
                     />
-                    <div className="absolute top-4 right-4 bg-gray-900/80 backdrop-blur-sm border border-white/[0.12] rounded-xl px-3 py-2 text-center">
-                      <p className="text-[10px] font-700 text-brand-400 uppercase tracking-widest">IS 14855</p>
+                    <div className="absolute top-3 right-3 bg-gray-900/80 backdrop-blur-sm border border-white/[0.12] rounded-xl px-3 py-2 text-center">
+                      <p className="text-[10px] font-bold text-brand-400 uppercase tracking-widest">IS 14855</p>
                       <p className="text-[10px] text-gray-500 mt-0.5">BIS Certified</p>
                     </div>
-                    <div className="absolute bottom-4 left-4 bg-gray-900/80 backdrop-blur-sm border border-white/[0.12] rounded-xl px-3 py-2">
-                      <p className="text-[10px] font-700 text-white">GeM OEM Seller</p>
+                    <div className="absolute bottom-3 left-3 bg-gray-900/80 backdrop-blur-sm border border-white/[0.12] rounded-xl px-3 py-2">
+                      <p className="text-[10px] font-bold text-white">GeM OEM Seller</p>
                       <p className="text-[10px] text-brand-400 mt-0.5">gem.gov.in Verified</p>
                     </div>
-                  </div>
-                ) : (
-                  <div className="w-full max-w-sm aspect-[4/3] rounded-2xl bg-white/[0.03] border border-white/[0.07] flex flex-col items-center justify-center gap-4">
-                    <svg className="w-20 h-20 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={0.8}>
-                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                    </svg>
-                    <p className="text-gray-600 text-sm font-600">Thermal Fogging Machine</p>
-                    <p className="text-gray-700 text-xs">IS 14855 · GeM Registered</p>
                   </div>
                 )}
               </div>
@@ -436,25 +599,52 @@ export default async function GovernmentProcurementPage() {
           </div>
         </section>
 
-        {/* ── 2. KPI strip ──────────────────────────────────────────────────────── */}
-        <section className="py-14 md:py-18 bg-white border-b border-gray-100">
+        {/* ── 2. KPI strip — dark section so glass-card and white text render correctly ── */}
+        <section className="bg-gray-950 border-b border-white/[0.06] py-10 md:py-14">
           <div className="container mx-auto px-4 md:px-6">
-            <div className="mb-8">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Certifications &amp; Registrations</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-6">
-                {TRUST_CERTS.map(c => (
-                  <div key={c.label} className={`rounded-lg px-3 py-2 text-center border ${c.highlight ? "border-brand-200 bg-brand-50" : "border-gray-200 bg-white"}`}>
-                    <p className={`text-xs font-bold ${c.highlight ? "text-brand-700" : "text-gray-800"}`}>{c.label}</p>
-                    <p className="text-[11px] text-gray-500 mt-0.5">{c.sub}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
             <GovKPIStrip kpis={govKpis} />
           </div>
         </section>
 
-        {/* ── 3. Customer Logos ────────────────────────────────────────────────── */}
+        {/* ── 3. Procurement Readiness Score ───────────────────────────────────── */}
+        <section className="py-14 md:py-20 bg-white border-b border-gray-100">
+          <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+            <div className="mb-8">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Government Procurement Readiness</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Procurement Readiness Score</h2>
+              <p className="text-gray-500 text-sm max-w-2xl">
+                Every certification and credential that government tender evaluation committees check.
+                100X Circle is fully compliant across all standard government procurement requirements.
+              </p>
+            </div>
+            <ProcurementReadinessScore />
+          </div>
+        </section>
+
+        {/* ── 4. Certifications strip ───────────────────────────────────────────── */}
+        <section className="py-10 bg-gray-50 border-b border-gray-100">
+          <div className="container mx-auto px-4 md:px-6">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4 text-center">Certifications &amp; Registrations</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 max-w-4xl mx-auto">
+              {TRUST_CERTS.map(c => (
+                <div key={c.label} className={`rounded-xl px-3 py-3 text-center border ${c.highlight ? "border-brand-200 bg-brand-50 shadow-sm" : "border-gray-200 bg-white"}`}>
+                  <p className={`text-xs font-bold ${c.highlight ? "text-brand-700" : "text-gray-800"}`}>{c.label}</p>
+                  <p className="text-[11px] text-gray-500 mt-0.5">{c.sub}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap justify-center gap-8 mt-8">
+              {TRUST_STATS.map(s => (
+                <div key={s.label} className="text-center">
+                  <p className="text-2xl font-black text-gray-900">{s.value}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5. Customer Logos ────────────────────────────────────────────────── */}
         {govLogos.length > 0 ? (
           <GovLogoWall
             logos={govLogos}
@@ -465,14 +655,14 @@ export default async function GovernmentProcurementPage() {
         ) : customerLogos.length > 0 ? (
           <section className="py-16 bg-gray-50 border-b border-gray-100">
             <div className="container mx-auto px-4 md:px-6">
-              <p className="eyebrow text-brand-600 text-center mb-3">Trusted By</p>
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide text-center mb-3">Trusted By</p>
               <h2 className="text-2xl font-bold text-gray-800 text-center mb-8">Government &amp; Public Health Institutions</h2>
               <GovPastPerformance customerLogos={customerLogos} />
             </div>
           </section>
         ) : null}
 
-        {/* ── 4. Government Success Stories (CMS case studies) ─────────────────── */}
+        {/* ── 6. Government Success Stories (CMS) ──────────────────────────────── */}
         {caseStudies.length > 0 && (
           <section className="py-16 md:py-20 bg-white border-b border-gray-100">
             <div className="container mx-auto px-4 md:px-6">
@@ -484,7 +674,7 @@ export default async function GovernmentProcurementPage() {
               />
               <div className="mt-8 text-center">
                 <Link href="/past-performance-government"
-                  className="inline-flex items-center gap-2 text-sm font-600 text-brand-600 hover:text-brand-700 transition-colors">
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors">
                   View Full Past Performance Record
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="9 18 15 12 9 6" /></svg>
                 </Link>
@@ -493,11 +683,44 @@ export default async function GovernmentProcurementPage() {
           </section>
         )}
 
-        {/* ── 4b. Past Performance Cards ───────────────────────────────────────── */}
+        {/* Static verified case study */}
+        <section className="py-14 bg-gray-50 border-b border-gray-100">
+          <div className="container mx-auto px-4 md:px-6 max-w-4xl">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Verified Case Study</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Government Procurement in Action</h2>
+            <div className="border border-brand-200 rounded-2xl overflow-hidden">
+              <div className="px-6 py-5 bg-brand-600">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🏛</span>
+                  <div>
+                    <span className="inline-block bg-white/20 text-white text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full mb-1">{CASE_STUDY.badge}</span>
+                    <h3 className="text-white font-bold text-lg">{CASE_STUDY.title}</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-brand-100 bg-brand-50">
+                <div className="px-5 py-5">
+                  <p className="text-[10px] font-bold text-brand-700 uppercase tracking-wider mb-2">Challenge</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{CASE_STUDY.challenge}</p>
+                </div>
+                <div className="px-5 py-5">
+                  <p className="text-[10px] font-bold text-brand-700 uppercase tracking-wider mb-2">Solution</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{CASE_STUDY.solution}</p>
+                </div>
+                <div className="px-5 py-5">
+                  <p className="text-[10px] font-bold text-brand-700 uppercase tracking-wider mb-2">Outcome</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{CASE_STUDY.outcome}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Past Performance (CMS) */}
         {supplyRecords.length > 0 && (
-          <section className="py-16 md:py-20 bg-gray-50 border-b border-gray-100">
+          <section className="py-16 md:py-20 bg-white border-b border-gray-100">
             <div className="container mx-auto px-4 md:px-6">
-              <p className="eyebrow text-brand-600 mb-4">Procurement Track Record</p>
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide mb-4">Procurement Track Record</p>
               <FeaturedGovSupplies
                 records={supplyRecords}
                 maxVisible={9}
@@ -509,16 +732,75 @@ export default async function GovernmentProcurementPage() {
           </section>
         )}
 
-        {/* ── 4c. Real World Deployments ───────────────────────────────────────── */}
+        {/* Real World Deployments (CMS) */}
         {deployments.length > 0 && (
-          <section className="py-16 md:py-20 bg-white border-b border-gray-100">
+          <section className="py-16 md:py-20 bg-gray-50 border-b border-gray-100">
             <div className="container mx-auto px-4 md:px-6">
               <FeaturedDeployments deployments={deployments} heading="Real World Deployments" maxVisible={6} showViewAll />
             </div>
           </section>
         )}
 
-        {/* ── 5. Verified Deployment Highlights ───────────────────────────────── */}
+        {/* ── 7. Institutional Buyer Types ─────────────────────────────────────── */}
+        <section className="py-14 md:py-20 bg-white border-b border-gray-100">
+          <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Government Buyer Categories</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Institutional Buyers We Serve</h2>
+            <p className="text-gray-500 text-sm mb-8 max-w-2xl">
+              Every government buyer category has different procurement routes, unit requirements, and product preferences.
+              Select your institution type to see the procurement path we recommend.
+            </p>
+            <InstitutionalBuyerTabs buyers={BUYER_TYPES} />
+          </div>
+        </section>
+
+        {/* ── 8. Procurement Lifecycle Timeline ───────────────────────────────── */}
+        <section className="py-14 md:py-20 bg-gray-50 border-b border-gray-100">
+          <div className="container mx-auto px-4 md:px-6 max-w-3xl">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Procurement Process</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Government Procurement Lifecycle</h2>
+            <p className="text-gray-500 text-sm mb-8">
+              12 stages from requirement identification to post-supply support. Click any stage to expand.
+            </p>
+            <ProcurementLifecycleTimeline />
+          </div>
+        </section>
+
+        {/* ── 9. Procurement Models ────────────────────────────────────────────── */}
+        <section className="py-14 md:py-20 bg-white border-b border-gray-100">
+          <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">How to Buy</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">6 Government Procurement Routes</h2>
+            <p className="text-gray-500 text-sm mb-8 max-w-2xl">
+              Choose the procurement model that matches your institution&apos;s financial limits and tender requirements.
+            </p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {PROCUREMENT_MODELS.map((m, i) => (
+                <div key={i} className="border border-gray-200 rounded-xl p-5 bg-white hover:border-gray-300 hover:shadow-sm transition-all">
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <span className="text-2xl">{m.icon}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${m.badgeColor}`}>{m.badge}</span>
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2 text-sm">{m.title}</h3>
+                  <p className="text-xs text-gray-600 mb-3 leading-relaxed">{m.desc}</p>
+                  <div className="space-y-1 mb-3">
+                    {m.steps.map((step, j) => (
+                      <div key={j} className="flex items-center gap-2 text-xs text-gray-500">
+                        <span className="w-4 h-4 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-[9px] font-bold flex-shrink-0">{j+1}</span>
+                        {step}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-gray-400 border-t border-gray-100 pt-2">
+                    <span className="font-medium">Timeline:</span> {m.speed}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 10. Geographic Coverage ──────────────────────────────────────────── */}
         <section className="py-14 bg-gray-50 border-b border-gray-100">
           <div className="container mx-auto px-4 md:px-6 max-w-4xl">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Geographic Coverage</p>
@@ -534,7 +816,7 @@ export default async function GovernmentProcurementPage() {
                     <div>
                       <span className="text-xs font-bold text-gray-800">{d.state}</span>
                       {d.verified && (
-                        <span className="ml-2 text-[10px] text-brand-700 font-700 bg-brand-100 px-1.5 py-0.5 rounded-full">★ Verified</span>
+                        <span className="ml-2 text-[10px] text-brand-700 font-bold bg-brand-100 px-1.5 py-0.5 rounded-full">★ Verified</span>
                       )}
                     </div>
                     <span className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">{d.type}</span>
@@ -548,7 +830,60 @@ export default async function GovernmentProcurementPage() {
           </div>
         </section>
 
-        {/* ── 6. Primary CTA ───────────────────────────────────────────────────── */}
+        {/* ── 11. Product Carousel ─────────────────────────────────────────────── */}
+        {products.length > 0 && (
+          <section className="py-14 md:py-20 bg-white border-b border-gray-100">
+            <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">GeM Catalogue</p>
+              <h2 className="text-xl font-semibold text-gray-800 mb-1">Government Procurement Models</h2>
+              <p className="text-sm text-gray-500 mb-6">
+                GeM-listed, IS 14855-compliant models prioritised for municipal and government procurement.
+              </p>
+              <Suspense fallback={<div className="h-40 bg-gray-50 rounded-xl animate-pulse" />}>
+                <GovProductCarousel products={products} />
+              </Suspense>
+            </div>
+          </section>
+        )}
+
+        {/* ── 12. Documentation Centre ─────────────────────────────────────────── */}
+        <section className="py-14 md:py-20 bg-gray-50 border-b border-gray-100">
+          <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Documentation Ready</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Procurement Documentation Centre</h2>
+            <p className="text-gray-500 text-sm mb-8 max-w-2xl">
+              All documents required for government tender submissions are pre-prepared and shareable within 24 hours.
+              Request via WhatsApp or email — we respond on the same business day.
+            </p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+              {DOCUMENTATION_ITEMS.map((doc, i) => (
+                <div key={i} className={`border rounded-xl p-4 flex items-start gap-3 ${(doc as any).highlight ? "border-brand-300 bg-brand-50 shadow-sm" : "border-gray-200 bg-white"}`}>
+                  <span className="text-xl flex-shrink-0">{doc.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-xs font-semibold leading-tight ${(doc as any).highlight ? "text-brand-800" : "text-gray-800"}`}>{doc.title}</p>
+                    <p className="text-[11px] text-gray-500 mt-0.5">{doc.desc}</p>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${(doc as any).highlight ? "bg-brand-100 text-brand-700" : "bg-gray-100 text-gray-500"}`}>{doc.category}</span>
+                      <span className="text-[10px] text-gray-400">{doc.pages}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+              <a href={waTenderQuote} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-gray-900 text-white font-semibold px-6 py-3 rounded-xl text-sm hover:bg-gray-800 transition-colors">
+                Request Full Documentation Pack
+              </a>
+              <a href={`mailto:${BUSINESS.email}?subject=Tender Documentation Request — Fogging Machines`}
+                className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-xl text-sm hover:bg-gray-100 transition-colors">
+                Email Documentation Request
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 13. Primary CTA ───────────────────────────────────────────────────── */}
         <section className="py-10 bg-brand-600">
           <div className="container mx-auto px-4 md:px-6 max-w-4xl">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -572,41 +907,8 @@ export default async function GovernmentProcurementPage() {
           </div>
         </section>
 
-        {/* ── Content sections: max-w-4xl centered ────────────────────────────── */}
+        {/* ── Content sections ─────────────────────────────────────────────────── */}
         <div className="container mx-auto px-4 md:px-6 max-w-4xl py-12 space-y-12">
-
-          {/* Government Buyer Types */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Government Buyer Types Served</h2>
-            <div className="space-y-3">
-              {BUYER_TYPES.map(b => (
-                <div key={b.type} className="border border-gray-200 rounded-xl p-4">
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl flex-shrink-0 mt-0.5">{b.icon}</span>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-800 text-sm mb-1">{b.type}</h3>
-                      <p className="text-xs text-gray-600 mb-1"><span className="font-medium">Use:</span> {b.use}</p>
-                      <p className="text-xs text-gray-600 mb-1"><span className="font-medium">Products:</span> {b.products}</p>
-                      <p className="text-xs text-gray-500"><span className="font-medium">Procurement route:</span> {b.route}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Product Carousel */}
-          {products.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 mb-1">Government Procurement Models</h2>
-              <p className="text-sm text-gray-500 mb-4">
-                GeM-listed, IS 14855-compliant models prioritised for municipal and government procurement.
-              </p>
-              <Suspense fallback={<div className="h-40 bg-gray-50 rounded-xl animate-pulse" />}>
-                <GovProductCarousel products={products} />
-              </Suspense>
-            </div>
-          )}
 
           {/* RFQ Form */}
           <div id="gov-rfq-form" className="border border-brand-200 rounded-xl p-6 bg-brand-50">
@@ -679,19 +981,19 @@ export default async function GovernmentProcurementPage() {
             <p className="text-xs text-gray-500 mt-3">Supply to all states. Above reflects documented government buyer distribution.</p>
           </div>
 
-          {/* FAQ */}
+          {/* FAQ — 25 questions */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">FAQ — Government Procurement Officers</h2>
-            <div className="space-y-3">
-              {[
-                { q: "Can we procure directly on GeM without issuing a public tender?", a: "Yes. Within GeM direct purchase financial limits, government bodies can purchase directly from 100X Circle on gem.gov.in without a separate public tender. For higher amounts, initiate a GeM bid or public tender — we participate in both. Contact us before tender floating for spec alignment." },
-                { q: "What is your delivery commitment for tender-awarded orders?", a: "Standard: 5–10 working days from purchase order for in-stock models. Bulk or custom orders: 15–25 working days depending on quantity. Written delivery commitment provided on request before tender submission. Call +91-7827229116." },
-                { q: "Are demo units available for evaluation before bulk procurement?", a: "Yes. Demo units are available for serious institutional inquiries. Contact us with your department details and location. Demonstrations available at your office or municipal facility in select cities." },
-                { q: "Do you provide an AMC (Annual Maintenance Contract) for government buyers?", a: "Yes. AMC available for bulk government procurement — covers annual servicing, spare parts, operator training refresher, and priority call support. Contact us for AMC terms when placing bulk orders." },
-                { q: "Can our authorized dealer submit the bid using your OEM authorization?", a: "Yes. If a local dealer is bidding as a GeM reseller, we issue an OEM Authorization Letter and GeM authorization code. The government body still receives 100X Circle products at OEM-backed quality and after-sales service." },
-              ].map(({ q, a }) => (
-                <details key={q} className="border border-gray-200 rounded-xl">
-                  <summary className="p-4 font-medium text-gray-800 cursor-pointer text-sm">{q}</summary>
+            <h2 className="text-xl font-semibold text-gray-800 mb-1">FAQ — Government Procurement Officers</h2>
+            <p className="text-sm text-gray-500 mb-5">
+              Answers to the most common questions from procurement officers, municipal finance teams, and tender committees.
+            </p>
+            <div className="space-y-2">
+              {EXPANDED_FAQ.map(({ q, a }) => (
+                <details key={q} className="border border-gray-200 rounded-xl group">
+                  <summary className="p-4 font-medium text-gray-800 cursor-pointer text-sm flex items-center justify-between gap-3 list-none [&::-webkit-details-marker]:hidden">
+                    <span>{q}</span>
+                    <svg className="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="6 9 12 15 18 9"/></svg>
+                  </summary>
                   <p className="px-4 pb-4 text-sm text-gray-600 leading-relaxed">{a}</p>
                 </details>
               ))}
