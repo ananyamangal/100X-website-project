@@ -96,6 +96,7 @@ export default function WhatsAppFloatingButton({
 
   return (
     <div
+      id="whatsapp-float-btn"
       ref={containerRef}
       className={cn(
         "group fixed bottom-6 right-6 z-[70] hidden md:flex md:flex-col items-end gap-2",

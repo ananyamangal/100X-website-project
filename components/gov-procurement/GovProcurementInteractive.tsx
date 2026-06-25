@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { BUSINESS } from "@/lib/seo/site-config"
 
 // ─── Sticky Floating CTA ─────────────────────────────────────────────────────
 
@@ -16,6 +17,16 @@ export function StickyProcurementCTA({ waTenderQuote, waOemTeam, phonePrimary, e
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
+
+  // Hide global WhatsApp button when Procurement Desk is visible — eliminates
+  // any potential overlap; Desk already contains WhatsApp CTAs
+  useEffect(() => {
+    const waBtn = document.getElementById("whatsapp-float-btn")
+    if (!waBtn) return
+    waBtn.style.opacity = visible ? "0" : "1"
+    waBtn.style.pointerEvents = visible ? "none" : "auto"
+    waBtn.style.transition = "opacity 0.3s ease"
+  }, [visible])
 
   if (!visible) return null
 
@@ -259,6 +270,209 @@ export function InstitutionalBuyerTabs({ buyers }: { buyers: BuyerTypeDef[] }) {
         </div>
         <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
           <p className="text-xs text-gray-500"><span className="font-medium">Products available:</span> {b.products}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Institutional Product Cards ─────────────────────────────────────────────
+
+type ProductSlimRef = { _id: string; name: string; slug: string; imageUrls: string[]; badges: string[]; category: string }
+
+interface CatalogueItem {
+  id: string; name: string; slug: string
+  buyerIcon: string; buyerType: string; buyerBg: string
+  is14855: boolean; gem: boolean
+  applications: string[]; specs: string[]; delivery: string
+  matchTerms: string[]
+}
+
+const INSTITUTIONAL_CATALOGUE: CatalogueItem[] = [
+  {
+    id: "double-barrel", name: "Double Barrel Vehicle-Mounted Fogger", slug: "double-barrel-fogging-machine",
+    buyerIcon: "🏛", buyerType: "Municipal Corporations", buyerBg: "bg-blue-600/20 text-blue-300 border-blue-500/30",
+    is14855: true, gem: true,
+    applications: ["Ward-level mosquito drives", "Dengue & malaria campaigns", "City-wide vector control"],
+    specs: ["Dual-output nozzles", "Vehicle-mountable", "IS 14855 (Part 1)"],
+    delivery: "5–10 working days", matchTerms: ["double barrel", "vehicle-mounted", "vehicle mounted"],
+  },
+  {
+    id: "hdpe", name: "ISI Marked HDPE Tank Thermal Fogger", slug: "isi-marked-hdpe-thermal-fogging-machine",
+    buyerIcon: "🏥", buyerType: "Health Departments", buyerBg: "bg-green-600/20 text-green-300 border-green-500/30",
+    is14855: true, gem: true,
+    applications: ["Emergency outbreak response", "NVBDCP programmes", "District health operations"],
+    specs: ["ISI mark (BIS certified)", "IS 14855 (Part 1)", "HDPE tank"],
+    delivery: "5–10 working days", matchTerms: ["hdpe", "isi marked", "isi mark"],
+  },
+  {
+    id: "stainless", name: "Stainless Steel Heavy-Duty Fogger", slug: "stainless-steel-fogging-machine",
+    buyerIcon: "🌿", buyerType: "Panchayats & Forest Depts", buyerBg: "bg-emerald-600/20 text-emerald-300 border-emerald-500/30",
+    is14855: true, gem: true,
+    applications: ["Long-service deployments", "Harsh-environment operations", "Pest control programmes"],
+    specs: ["Stainless steel tank", "Heavy-duty build", "IS 14855 compliant"],
+    delivery: "5–10 working days", matchTerms: ["stainless", "ss tank", "heavy duty", "heavy-duty"],
+  },
+  {
+    id: "bf150", name: "BF-150 Petrol Portable Fogger", slug: "bf-150-fogging-machine",
+    buyerIcon: "🛡", buyerType: "Defence & Cantonment Boards", buyerBg: "bg-violet-600/20 text-violet-300 border-violet-500/30",
+    is14855: true, gem: true,
+    applications: ["Cantonment hygiene ops", "Indoor vector control", "Rapid portable deployment"],
+    specs: ["Petrol-powered engine", "IS 14855 (Part 1)", "GeM direct purchase"],
+    delivery: "5–10 working days", matchTerms: ["bf-150", "bf150", "portable", "petrol"],
+  },
+  {
+    id: "bf400", name: "BF-400 High-Capacity Fogger", slug: "bf-400-fogging-machine",
+    buyerIcon: "✈️", buyerType: "Airports & Port Authorities", buyerBg: "bg-amber-600/20 text-amber-300 border-amber-500/30",
+    is14855: true, gem: true,
+    applications: ["Airport perimeter fogging", "Cargo area sanitisation", "High-coverage operations"],
+    specs: ["High-capacity output", "IS 14855 certified", "Professional-grade"],
+    delivery: "7–10 working days", matchTerms: ["bf-400", "bf400", "high capacity"],
+  },
+  {
+    id: "cold-fogger", name: "Thermal + Cold ULV Fogging Machine", slug: "cold-fogging-machine",
+    buyerIcon: "🌾", buyerType: "Agriculture & State Depts", buyerBg: "bg-teal-600/20 text-teal-300 border-teal-500/30",
+    is14855: true, gem: true,
+    applications: ["Agricultural pest control", "Indoor & outdoor use", "NHM programme supply"],
+    specs: ["Dual mode: thermal + cold", "IS 14855 aligned", "Multi-chemical compatible"],
+    delivery: "5–10 working days", matchTerms: ["cold", "ulv", "dual mode"],
+  },
+]
+
+export function GovInstitutionalProductCards({ products }: { products: ProductSlimRef[] }) {
+  function matchImage(item: CatalogueItem): string | null {
+    const matched = products.find(p =>
+      item.matchTerms.some(t => p.name.toLowerCase().includes(t))
+    )
+    return matched?.imageUrls?.[0] ?? products[0]?.imageUrls?.[0] ?? null
+  }
+
+  return (
+    <div>
+      {/* Section header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+        <div>
+          <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-2">GeM Registered OEM · IS 14855 Certified</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
+            Government Procurement Product Catalogue
+          </h2>
+          <p className="text-gray-400 text-sm mt-2 max-w-xl leading-relaxed">
+            All models GeM-listed, IS 14855 (Part 1) certified, and ready for direct purchase or tender submission.
+            L1 quotation available within 24 hours.
+          </p>
+        </div>
+        <a
+          href={`https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent("Hi, I am a government procurement officer and need the full product catalogue and L1 quotations for IS 14855 fogging machines.")}`}
+          target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors whitespace-nowrap flex-shrink-0"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Request Full Catalogue
+        </a>
+      </div>
+
+      {/* Cards grid */}
+      <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
+        {INSTITUTIONAL_CATALOGUE.map((item) => {
+          const img = matchImage(item)
+          const waText = `Hi, I am a government procurement officer interested in the ${item.name} for tender/GeM procurement. Please share IS 14855 documentation, GeM listing ID, and L1 quotation.`
+          const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waText)}`
+
+          return (
+            <div key={item.id} className="bg-gray-900 border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col hover:border-white/[0.16] transition-all duration-200 hover:shadow-xl hover:shadow-black/40">
+              {/* Compliance badges */}
+              <div className="flex items-center gap-2 px-4 pt-4">
+                <span className="text-[10px] font-bold bg-green-900/50 text-green-400 border border-green-700/40 px-2 py-0.5 rounded-full uppercase tracking-wide">IS 14855</span>
+                <span className="text-[10px] font-bold bg-blue-900/50 text-blue-400 border border-blue-700/40 px-2 py-0.5 rounded-full uppercase tracking-wide">GeM Listed</span>
+                <span className="text-[10px] font-bold bg-white/[0.05] text-gray-500 border border-white/[0.08] px-2 py-0.5 rounded-full uppercase tracking-wide ml-auto">OEM Direct</span>
+              </div>
+
+              {/* Product image */}
+              <div className="mx-4 mt-3 rounded-xl overflow-hidden bg-[#f5f7fa]" style={{ aspectRatio: "4/3" }}>
+                {img ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={img} alt={item.name}
+                    className="w-full h-full object-contain p-4 transition-transform duration-500 hover:scale-[1.04]"
+                    loading="lazy" decoding="async" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center flex-col gap-2">
+                    <svg className="w-10 h-10 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span className="text-[10px] text-gray-400">Product image on request</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 flex flex-col p-4 pt-3">
+                {/* Buyer type tag */}
+                <div className="flex items-center gap-1.5 mb-2">
+                  <span className="text-sm leading-none">{item.buyerIcon}</span>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${item.buyerBg}`}>{item.buyerType}</span>
+                </div>
+
+                {/* Name */}
+                <h3 className="text-white font-bold text-[0.9375rem] leading-snug mb-3">{item.name}</h3>
+
+                {/* Applications */}
+                <div className="mb-3">
+                  <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest mb-1.5">Applications</p>
+                  <ul className="space-y-1">
+                    {item.applications.map((a, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-xs text-gray-400">
+                        <svg className="w-2.5 h-2.5 text-brand-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}><polyline points="20 6 9 17 4 12"/></svg>
+                        {a}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Quick specs chips */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {item.specs.map((s, i) => (
+                    <span key={i} className="text-[10px] bg-white/[0.05] text-gray-400 border border-white/[0.07] px-2 py-0.5 rounded-full">{s}</span>
+                  ))}
+                </div>
+
+                {/* Delivery */}
+                <div className="flex items-center gap-1.5 mb-4">
+                  <svg className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                  <span className="text-xs text-gray-500">Delivery: <span className="text-gray-300 font-medium">{item.delivery}</span></span>
+                </div>
+
+                {/* CTAs */}
+                <div className="flex gap-2 mt-auto">
+                  <a href={`/${item.slug}`}
+                    className="flex-1 inline-flex items-center justify-center text-xs font-semibold bg-white/[0.05] hover:bg-white/[0.10] border border-white/[0.10] text-gray-200 px-3 py-2.5 rounded-xl transition-colors">
+                    View Details
+                  </a>
+                  <a href={waHref} target="_blank" rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-xl transition-colors">
+                    <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    Tender Quote
+                  </a>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Bottom CTA strip */}
+      <div className="mt-8 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <p className="text-sm text-gray-300 font-medium">Don&apos;t see the exact model you need?</p>
+          <p className="text-xs text-gray-500 mt-0.5">We manufacture custom configurations within IS 14855 parameters.</p>
+        </div>
+        <div className="flex gap-3">
+          <a href="#gov-rfq-form"
+            className="inline-flex items-center gap-2 border border-white/[0.12] text-gray-200 hover:bg-white/[0.06] font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">
+            Fill RFQ Form
+          </a>
+          <a href={`https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent("Hi, I need a custom fogging machine specification for a government tender. Please advise.")}`}
+            target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">
+            Discuss Custom Requirements
+          </a>
         </div>
       </div>
     </div>

@@ -20,9 +20,9 @@ import {
   ProcurementLifecycleTimeline,
   ProcurementReadinessScore,
   InstitutionalBuyerTabs,
+  GovInstitutionalProductCards,
   type BuyerTypeDef,
 } from "@/components/gov-procurement/GovProcurementInteractive"
-import OemHeroVisual from "@/components/oem/OemHeroVisual"
 
 // ─── Metadata ───────────────────────────────────────────────────────────────
 
@@ -506,7 +506,7 @@ export default async function GovernmentProcurementPage() {
               <span className="text-gray-400">Government Procurement</span>
             </nav>
 
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="grid md:grid-cols-[1fr_320px] lg:grid-cols-2 gap-8 md:gap-10 lg:gap-14 items-start">
               {/* LEFT: Content */}
               <div>
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -542,7 +542,7 @@ export default async function GovernmentProcurementPage() {
               </div>
 
               {/* RIGHT: Procurement Intelligence Dashboard */}
-              <div className="hidden lg:block">
+              <div className="hidden md:block">
                 <div className="glass-card rounded-2xl overflow-hidden">
                   <div className="px-5 py-3.5 border-b border-white/[0.06] flex items-center justify-between">
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Procurement Intelligence</p>
@@ -607,60 +607,12 @@ export default async function GovernmentProcurementPage() {
           </div>
         </section>
 
-        {/* ── 2b. Institutional Product Showcase ───────────────────────────────── */}
-        {products.length > 0 && (
-          <section className="bg-gray-950 border-b border-white/[0.06] py-12 md:py-16">
-            <div className="container mx-auto px-4 md:px-6">
-              <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-                {/* Left: institutional framing */}
-                <div>
-                  <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-3">GeM Registered OEM Catalogue</p>
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
-                    IS 14855-Compliant Fogging Machines for Government Procurement
-                  </h2>
-                  <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                    All models are GeM-listed, IS 14855 (Part 1) certified, and ready for government tender submissions.
-                    Available for direct purchase on gem.gov.in or via open tender/rate contract.
-                  </p>
-                  <div className="space-y-3 mb-6">
-                    {[
-                      { icon: "🏛", title: "Double Barrel Vehicle-Mounted", tag: "Municipal Corps", spec: "Dual-output · Ward-level city coverage" },
-                      { icon: "🏥", title: "ISI Marked HDPE Tank Fogger", tag: "Health Depts", spec: "IS 14855 · Portable · Rapid deployment" },
-                      { icon: "🌿", title: "Stainless Steel Tank Fogger", tag: "Panchayats", spec: "Heavy-duty · IS 14855 · Long service life" },
-                      { icon: "🛡", title: "Petrol-Powered Portable Series", tag: "Multi-use", spec: "GeM direct purchase · ISI Mark · Easy operation" },
-                    ].map((item) => (
-                      <div key={item.title} className="flex items-start gap-3 py-3 px-4 glass-card rounded-xl">
-                        <span className="text-xl flex-shrink-0 mt-0.5">{item.icon}</span>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm font-semibold text-white">{item.title}</p>
-                            <span className="text-[10px] bg-brand-600/20 text-brand-400 border border-brand-500/30 px-1.5 py-0.5 rounded-full font-medium">{item.tag}</span>
-                          </div>
-                          <p className="text-xs text-gray-500 mt-0.5">{item.spec}</p>
-                        </div>
-                        <svg className="w-4 h-4 text-gray-600 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="9 18 15 12 9 6"/></svg>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <a href={waTenderQuote} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">
-                      Request Procurement Quote
-                    </a>
-                    <a href="#gov-rfq-form"
-                      className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">
-                      Fill RFQ Form
-                    </a>
-                  </div>
-                </div>
-                {/* Right: rotating product visual */}
-                <div className="flex items-center justify-center">
-                  <OemHeroVisual products={products} />
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+        {/* ── 2b. Institutional Product Catalogue (static-first, always visible) ── */}
+        <section className="bg-gray-950 border-b border-white/[0.06] py-14 md:py-20">
+          <div className="container mx-auto px-4 md:px-6">
+            <GovInstitutionalProductCards products={products} />
+          </div>
+        </section>
 
         {/* ── 3. Procurement Readiness Score ───────────────────────────────────── */}
         <section className="py-14 md:py-20 bg-white border-b border-gray-100">
