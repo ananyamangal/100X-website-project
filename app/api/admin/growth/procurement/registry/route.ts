@@ -28,7 +28,6 @@ export async function GET() {
     buyerCount,
     oemCount,
     officeCount,
-    dupCheck,
     monthlyVolume,
     lastLog,
   ] = await Promise.all([
@@ -158,7 +157,7 @@ export async function GET() {
       state:  { count: missingState,  pct: missingStatePct },
     },
     pipeline,
-    monthlyVolume: monthlyVolume.map(m => ({
+    monthlyVolume: (monthlyVolume as Array<{ _id: { year?: number; month?: number }; contracts: number; gmv: number }>).map(m => ({
       label:     `${m._id.month ?? "?"}/${String(m._id.year ?? "").slice(2)}`,
       year:      m._id.year,
       month:     m._id.month,

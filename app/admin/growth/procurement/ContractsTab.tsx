@@ -48,12 +48,14 @@ interface Filters {
   valueMax: string
   status:   string
   gemc:     string
+  msme:     boolean
+  country:  string
 }
 
 const EMPTY: Filters = {
   q: "", seller: "", dept: "", ministry: "", product: "",
   state: "", dateFrom: "", dateTo: "", valueMin: "", valueMax: "",
-  status: "", gemc: "",
+  status: "", gemc: "", msme: false, country: "",
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -78,16 +80,17 @@ function truncate(s: string | null | undefined, len = 40) {
 }
 
 function activeFilterCount(f: Filters): number {
-  return Object.values(f).filter(v => v !== "").length
+  return Object.entries(f).filter(([, v]) => v !== "" && v !== false).length
 }
 
 const INPUT = "w-full text-xs bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-brand-400"
 
 // ─── Filter panel ──────────────────────────────────────────────────────────────
 
-function FilterPanel({ f, set, clear }: {
+function FilterPanel({ f, set, setB, clear }: {
   f: Filters
   set: (k: keyof Filters, v: string) => void
+  setB: (k: keyof Filters, v: boolean) => void
   clear: () => void
 }) {
   return (
@@ -145,6 +148,17 @@ function FilterPanel({ f, set, clear }: {
             <option value="Completed">Completed</option>
             <option value="Cancelled">Cancelled</option>
           </select>
+        </div>
+        <div>
+          <label className="text-[10px] text-gray-400 uppercase tracking-wide">Country of Origin</label>
+          <input placeholder="e.g. India, China…" value={f.country} onChange={e => set("country", e.target.value)} className={INPUT} />
+        </div>
+        <div className="flex items-end pb-1">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={f.msme} onChange={e => setB("msme", e.target.checked)}
+              className="w-3.5 h-3.5 rounded border-gray-300 text-brand-600" />
+            <span className="text-[10px] text-gray-400 uppercase tracking-wide">MSME Only</span>
+          </label>
         </div>
       </div>
       <div className="flex justify-end">
@@ -223,6 +237,8 @@ export function ContractsTab() {
     if (f.valueMax) sp.set("valueMax", f.valueMax)
     if (f.status)   sp.set("status",   f.status)
     if (f.gemc)     sp.set("gemc",     f.gemc)
+    if (f.country)  sp.set("country",  f.country)
+    if (f.msme)     sp.set("msme",     "true")
     if (extra)      sp.set("export",   extra)
     return `/api/admin/procurement/search?${sp.toString()}`
   }, [])
@@ -257,7 +273,8 @@ export function ContractsTab() {
     }
   }
 
-  const setFilter = (k: keyof Filters, v: string) => setFilters(prev => ({ ...prev, [k]: v }))
+  const setFilter  = (k: keyof Filters, v: string)  => setFilters(prev => ({ ...prev, [k]: v }))
+  const setFilterB = (k: keyof Filters, v: boolean) => setFilters(prev => ({ ...prev, [k]: v }))
   const clearFilters = () => { setFilters(EMPTY); setPage(1) }
   const goPage = (p: number) => { setPage(p); load(p, filters) }
 
@@ -314,7 +331,7 @@ export function ContractsTab() {
       </div>
 
       {/* Filters */}
-      {showFilters && <FilterPanel f={filters} set={setFilter} clear={clearFilters} />}
+      {showFilters && <FilterPanel f={filters} set={setFilter} setB={setFilterB} clear={clearFilters} />}
 
       {/* Table */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">

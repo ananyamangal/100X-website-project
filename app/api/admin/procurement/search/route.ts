@@ -61,7 +61,7 @@ function buildFilter(searchParams: URLSearchParams): Filter<Document> {
   if (dept) conditions.push({ dept_name: { $regex: escapeRegex(dept), $options: "i" } })
 
   const ministry = searchParams.get("ministry")?.trim()
-  if (ministry) conditions.push({ ministry })
+  if (ministry) conditions.push({ ministry: { $regex: escapeRegex(ministry), $options: "i" } })
 
   const product = searchParams.get("product")?.trim()
   if (product) conditions.push({ product_name: { $regex: escapeRegex(product), $options: "i" } })
@@ -95,6 +95,12 @@ function buildFilter(searchParams: URLSearchParams): Filter<Document> {
 
   const gemc = searchParams.get("gemc")?.trim()
   if (gemc) conditions.push({ gemc_no: gemc })
+
+  const msme = searchParams.get("msme")
+  if (msme === "true") conditions.push({ seller_msme_category: { $nin: [null, ""] } })
+
+  const country = searchParams.get("country")?.trim()
+  if (country) conditions.push({ country_of_origin: { $regex: escapeRegex(country), $options: "i" } })
 
   if (conditions.length === 1) return conditions[0]
   if (conditions.length > 1) filter.$and = conditions
