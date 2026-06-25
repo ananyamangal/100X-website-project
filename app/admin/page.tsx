@@ -1740,10 +1740,10 @@ function ProductsTab({
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-3">Features</h4>
                       <ul className="space-y-1">
-                        {product.features.map((feature, index) => (
+                        {(product.features ?? []).map((feature: any, index: number) => (
                           <li key={index} className="text-sm text-gray-600 flex items-center">
                             <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
-                            {feature}
+                            {typeof feature === "string" ? feature : (feature?.title || feature?.value || "")}
                           </li>
                         ))}
                       </ul>
@@ -1751,9 +1751,9 @@ function ProductsTab({
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-3">Specifications</h4>
                       <ul className="space-y-1">
-                        {product.specifications.slice(0, 3).map((spec, index) => (
+                        {(product.specifications ?? []).slice(0, 3).map((spec: any, index: number) => (
                           <li key={index} className="text-sm text-gray-600">
-                            {spec}
+                            {typeof spec === "string" ? spec : (spec?.label && spec?.value ? `${spec.label}: ${spec.value}` : spec?.label || spec?.value || "")}
                           </li>
                         ))}
                       </ul>
@@ -1761,10 +1761,10 @@ function ProductsTab({
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-3">Applications</h4>
                       <ul className="space-y-1">
-                        {product.applications.slice(0, 3).map((app, index) => (
+                        {(product.applications ?? []).slice(0, 3).map((app: any, index: number) => (
                           <li key={index} className="text-sm text-gray-600 flex items-center">
                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></div>
-                            {app}
+                            {typeof app === "string" ? app : (app?.title || app?.description || "")}
                           </li>
                         ))}
                       </ul>
