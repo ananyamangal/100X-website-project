@@ -19,7 +19,7 @@ import type { Permission } from "@/lib/rbac/permissions"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type SectionId = "founder" | "marketing" | "market_intel" | "crm" | "admin" | "advanced"
+type SectionId = "founder" | "marketing" | "market_intel" | "acquire" | "crm" | "admin" | "advanced"
 
 interface NavModule {
   section: SectionId
@@ -36,13 +36,14 @@ interface NavModule {
 const SECTION_META: Record<SectionId, { label: string; founderOnly: boolean }> = {
   founder:      { label: "FOUNDER",             founderOnly: false },
   marketing:    { label: "MARKETING",            founderOnly: true },
-  market_intel: { label: "INTELLIGENCE",           founderOnly: true },
+  market_intel: { label: "INTELLIGENCE",         founderOnly: true },
+  acquire:      { label: "ACQUIRE",              founderOnly: true },
   crm:          { label: "CRM",                  founderOnly: true },
   admin:        { label: "ADMINISTRATION",        founderOnly: true },
   advanced:     { label: "ADVANCED TOOLS",        founderOnly: true },
 }
 
-const SECTION_ORDER: SectionId[] = ["founder", "marketing", "market_intel", "crm", "admin", "advanced"]
+const SECTION_ORDER: SectionId[] = ["founder", "marketing", "market_intel", "acquire", "crm", "admin", "advanced"]
 
 const NAV_MODULES: NavModule[] = [
   // ── FOUNDER ──────────────────────────────────────────────────────────────
@@ -81,6 +82,9 @@ const NAV_MODULES: NavModule[] = [
   { section: "market_intel", href: "/admin/growth/procurement", label: "Procurement Intel",    icon: ShoppingBag, permission: "procurement.view" },
   { section: "market_intel", href: "/admin/growth/geo",         label: "GEO / AI Search",      icon: Bot,         permission: "geo.view" },
 
+  // ── ACQUIRE ──────────────────────────────────────────────────────────────
+  { section: "acquire", href: "/admin/growth/categories", label: "Category Manager", icon: Layers, permission: "procurement.view", badge: "NEW" },
+
   // ── CRM ──────────────────────────────────────────────────────────────────
   { section: "crm", href: "/admin/growth/crm/dealers",       label: "Dealer Pipeline",      icon: Users,       permission: "dealer.view",         badge: "NEW" },
   { section: "crm", href: "/admin/growth/crm/opportunities", label: "Opportunity Pipeline", icon: Target,      permission: "opportunities.view",  badge: "NEW" },
@@ -114,7 +118,7 @@ const SECTIONS_KEY     = "growth:sidebar:sections"
 
 const DEFAULT_SECTIONS: Record<SectionId, boolean> = {
   founder: true, marketing: true, market_intel: true,
-  crm: true, admin: true, advanced: false,
+  acquire: true, crm: true, admin: true, advanced: false,
 }
 
 // ─── Badge colors ─────────────────────────────────────────────────────────────
