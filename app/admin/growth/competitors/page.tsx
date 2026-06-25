@@ -3,9 +3,10 @@ import { useEffect, useState, useCallback } from "react"
 import {
   Radar, ExternalLink, RefreshCw, ChevronDown, ChevronRight,
   AlertTriangle, TrendingUp, Globe, Brain, Shield, ShoppingBag,
-  Search, Bot, Building2, Users, Zap,
+  Search, Bot, Building2, Users, Zap, BarChart3, Activity, Play, RotateCw,
 } from "lucide-react"
 import IntelligenceStatus from "@/components/growth-os/IntelligenceStatus"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -326,6 +327,26 @@ function CompetitorCard({ c }: { c: Competitor }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
+interface CompetitorSnapshot {
+  date:    string
+  metrics: {
+    totalTracked:  number
+    highThreat:    number
+    mediumThreat:  number
+    lowThreat:     number
+    aiVisible:     number
+    avgThreatScore:number
+  }
+}
+
+interface CrawlStatus {
+  crawlResults: Array<{
+    id: string; name: string; website: string; date: string
+    reachable: boolean; title?: string; hasChanges: boolean; changes: unknown[]
+  }>
+  totalCrawled: number
+}
+
 export default function CompetitorIntelligencePage() {
   const [competitors, setCompetitors] = useState<Competitor[]>([])
   const [meta,        setMeta]        = useState<Meta | null>(null)
@@ -335,6 +356,36 @@ export default function CompetitorIntelligencePage() {
   const [typeFilter,  setTypeFilter]  = useState("all")
   const [levelFilter, setLevelFilter] = useState("all")
   const [q,           setQ]           = useState("")
+  const [snapshots,   setSnapshots]   = useState<CompetitorSnapshot[]>([])
+  const [crawlData,   setCrawlData]   = useState<CrawlStatus | null>(null)
+  const [crawling,    setCrawling]    = useState(false)
+  const [crawlResult, setCrawlResult] = useState<string | null>(null)
+  const [showTrends,  setShowTrends]  = useState(false)
+
+  useEffect(() => {
+    fetch("/api/admin/growth/snapshots?module=competitors&days=90")
+      .then(r => r.json())
+      .then(d => setSnapshots(d.competitors ?? []))
+      .catch(() => {})
+
+    fetch("/api/admin/growth/competitors/crawl")
+      .then(r => r.json())
+      .then(d => setCrawlData(d))
+      .catch(() => {})
+  }, [])
+
+  const runCrawl = async () => {
+    setCrawling(true)
+    setCrawlResult(null)
+    try {
+      const r = await fetch("/api/admin/growth/competitors/crawl", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ limit: 10, filter: "oem" }) })
+      const d = await r.json()
+      setCrawlResult(d.summary ?? "Crawl complete")
+      fetch("/api/admin/growth/competitors/crawl").then(r => r.json()).then(d => setCrawlData(d)).catch(() => {})
+    } finally {
+      setCrawling(false)
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -428,6 +479,90 @@ export default function CompetitorIntelligencePage() {
               <p className="text-[11px] text-gray-500 mt-0.5">{card.label}</p>
             </button>
           ))}
+        </div>
+
+        {/* Historical Trends + Crawl Status */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <button
+            className="w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+            onClick={() => setShowTrends(v => !v)}
+          >
+            <BarChart3 size={14} className="text-brand-600" />
+            <span className="text-xs font-semibold text-gray-700">Threat Trends &amp; Website Crawler</span>
+            {snapshots.length < 2 && <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Collecting data — 1 snapshot</span>}
+            {snapshots.length >= 2 && <span className="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">{snapshots.length} days of history</span>}
+            {showTrends ? <ChevronDown size={13} className="ml-auto text-gray-400" /> : <ChevronRight size={13} className="ml-auto text-gray-400" />}
+          </button>
+
+          {showTrends && (
+            <div className="border-t border-gray-100 p-4 space-y-5">
+              {/* Trend chart */}
+              <div>
+                <p className="text-[11px] font-semibold text-gray-700 mb-3">Threat Level History</p>
+                {snapshots.length < 2 ? (
+                  <div className="bg-gray-50 rounded-lg border border-dashed border-gray-200 p-6 text-center">
+                    <Activity size={24} className="text-gray-300 mx-auto mb-2" />
+                    <p className="text-xs text-gray-400">Trend charts activate after 2+ daily snapshots.</p>
+                    <p className="text-[11px] text-gray-400 mt-1">Snapshots are created daily. First chart will appear tomorrow.</p>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={180}>
+                    <LineChart data={snapshots.slice().reverse().map(s => ({
+                      date:   s.date.slice(5),
+                      High:   s.metrics.highThreat,
+                      Medium: s.metrics.mediumThreat,
+                      AI:     s.metrics.aiVisible,
+                    }))}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="date" tick={{ fontSize: 9 }} />
+                      <YAxis tick={{ fontSize: 9 }} />
+                      <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
+                      <Legend iconSize={10} wrapperStyle={{ fontSize: 10 }} />
+                      <Line type="monotone" dataKey="High"   stroke="#ef4444" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="Medium" stroke="#f59e0b" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="AI"     stroke="#8b5cf6" strokeWidth={2} dot={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+
+              {/* Website crawler */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[11px] font-semibold text-gray-700">Website Crawler</p>
+                  <button
+                    onClick={runCrawl}
+                    disabled={crawling}
+                    className="flex items-center gap-1.5 text-[10px] font-medium bg-brand-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors"
+                  >
+                    {crawling ? <RotateCw size={9} className="animate-spin" /> : <Play size={9} />}
+                    {crawling ? "Crawling…" : "Crawl OEM Sites"}
+                  </button>
+                </div>
+                {crawlResult && (
+                  <div className="mb-3 text-[11px] text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200">{crawlResult}</div>
+                )}
+                {crawlData && crawlData.totalCrawled > 0 ? (
+                  <div className="space-y-1.5">
+                    {crawlData.crawlResults.slice(0, 8).map(r => (
+                      <div key={r.id} className={`flex items-center gap-3 px-3 py-2 rounded-lg border text-[11px] ${r.hasChanges ? "border-amber-200 bg-amber-50" : "border-gray-100 bg-gray-50"}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${r.reachable ? "bg-emerald-400" : "bg-red-400"}`} />
+                        <span className="font-medium text-gray-700 w-36 truncate">{r.name}</span>
+                        <span className="text-gray-400 flex-1 truncate">{r.title ?? (r.reachable ? "No title found" : "Unreachable")}</span>
+                        {r.hasChanges && <span className="text-amber-600 font-semibold shrink-0">{r.changes.length} change{r.changes.length > 1 ? "s" : ""}</span>}
+                        <span className="text-gray-400 shrink-0">{r.date}</span>
+                      </div>
+                    ))}
+                    <p className="text-[10px] text-gray-400 pt-1">{crawlData.totalCrawled} sites in crawl history</p>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 rounded-lg border border-dashed border-gray-200 p-4 text-center">
+                    <p className="text-[11px] text-gray-400">Click "Crawl OEM Sites" to fetch competitor website metadata and detect changes.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Filters */}

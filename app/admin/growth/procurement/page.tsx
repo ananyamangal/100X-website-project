@@ -19,6 +19,7 @@ import { ProductDiscoveryTab }  from "./ProductDiscoveryTab"
 import { RelationshipTab }      from "./RelationshipTab"
 import { AlertsBell, AlertsPanel, useAlertCount } from "./AlertsPanel"
 import { GovernanceStrip }      from "./GovernanceStrip"
+import { RegistryPanel }        from "./RegistryPanel"
 import { CopilotTab }           from "./CopilotTab"
 import { CollectionHealthTab }  from "./CollectionHealthTab"
 import { BuyerIntelTab }        from "./BuyerIntelTab"
@@ -945,6 +946,9 @@ export default function ProcurementIntelligence() {
       </div>
 
       <div className="px-4 py-4 max-w-[1600px] space-y-3 overflow-x-hidden">
+        {/* Intelligence Registry — collapsible stats header */}
+        <RegistryPanel />
+
         {/* Governance strip — single-line health bar */}
         <GovernanceStrip />
 

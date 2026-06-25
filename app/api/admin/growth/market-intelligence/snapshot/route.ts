@@ -35,27 +35,27 @@ export async function GET() {
       { $group: {
         _id:      null,
         total:    { $sum: 1 },
-        totalGmv: { $sum: "$contract_value" },
+        totalGmv: { $sum: "$contract_value_num" },
         minDate:  { $min: "$contract_date" },
         maxDate:  { $max: "$contract_date" },
       }},
     ]).toArray(),
 
     db.collection("fogging_contracts").aggregate([
-      { $group: { _id: "$buyer_state", contracts: { $sum: 1 }, gmv: { $sum: "$contract_value" } } },
+      { $group: { _id: "$buyer_state", contracts: { $sum: 1 }, gmv: { $sum: "$contract_value_num" } } },
       { $sort: { gmv: -1 } },
       { $limit: 8 },
     ]).toArray(),
 
     db.collection("fogging_contracts").aggregate([
-      { $group: { _id: "$oem_canonical", contracts: { $sum: 1 }, gmv: { $sum: "$contract_value" } } },
+      { $group: { _id: "$oem_canonical", contracts: { $sum: 1 }, gmv: { $sum: "$contract_value_num" } } },
       { $sort: { gmv: -1 } },
       { $limit: 8 },
       { $match: { _id: { $ne: null, $ne: "" } } },
     ]).toArray(),
 
     db.collection("fogging_contracts").aggregate([
-      { $group: { _id: "$buyer_name_display", contracts: { $sum: 1 }, gmv: { $sum: "$contract_value" }, state: { $first: "$buyer_state" } } },
+      { $group: { _id: "$buyer_display_name", contracts: { $sum: 1 }, gmv: { $sum: "$contract_value_num" }, state: { $first: "$buyer_state" } } },
       { $sort: { contracts: -1 } },
       { $limit: 5 },
     ]).toArray(),
