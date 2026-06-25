@@ -69,6 +69,18 @@ const nextConfig = {
       { source: '/products/100xdb400',                                     destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400',        permanent: true },
       { source: '/products/db400',                                         destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400',        permanent: true },
 
+      // ── Gov-procurement page: invented slug cleanup ──────────────────────
+      // Commit 01bc013 briefly linked 6 invented slugs from the Institutional
+      // Product Catalogue. These were always accessible via the [slug] catch-all
+      // fuzzy name-matcher (returning 200 + noindex). 301s here convert them to
+      // hard redirects to their canonical product URLs, eliminating duplicates.
+      { source: '/double-barrel-fogging-machine',          destination: '/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400', permanent: true },
+      { source: '/isi-marked-hdpe-thermal-fogging-machine', destination: '/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde', permanent: true },
+      { source: '/stainless-steel-fogging-machine',        destination: '/thermal-fogging-machine-with-stainless-steel-tank-100xssma20',       permanent: true },
+      { source: '/bf-150-fogging-machine',                 destination: '/products/100x-thermal-fogger-bf150',                                 permanent: true },
+      { source: '/bf-400-fogging-machine',                 destination: '/products/100x-heavy-duty-thermal-fogger-bf400',                      permanent: true },
+      { source: '/cold-fogging-machine',                   destination: '/thermal-and-cold-fogging-machine-100xtfs50',                         permanent: true },
+
       // ── Catch-all: model-code regex — future legacy URL variations ────────
       // Any /products/<slug> that contains a canonical model identifier is
       // redirected to that product's SEO landing page. Specific redirects
