@@ -22,6 +22,7 @@ import {
   InstitutionalBuyerTabs,
   type BuyerTypeDef,
 } from "@/components/gov-procurement/GovProcurementInteractive"
+import OemHeroVisual from "@/components/oem/OemHeroVisual"
 
 // ─── Metadata ───────────────────────────────────────────────────────────────
 
@@ -497,9 +498,9 @@ export default async function GovernmentProcurementPage() {
       <main className="min-h-screen bg-white pt-16">
 
         {/* ── 1. Hero ───────────────────────────────────────────────────────────── */}
-        <section className="bg-gray-950 py-16 md:py-24 overflow-hidden">
+        <section className="bg-gray-950 py-10 md:py-16 overflow-hidden">
           <div className="container mx-auto px-4 md:px-6">
-            <nav className="flex items-center gap-2 text-xs text-gray-600 mb-10">
+            <nav className="flex items-center gap-2 text-xs text-gray-600 mb-5">
               <Link href="/" className="hover:text-gray-400 transition-colors">Home</Link>
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="9 18 15 12 9 6" /></svg>
               <span className="text-gray-400">Government Procurement</span>
@@ -508,23 +509,23 @@ export default async function GovernmentProcurementPage() {
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               {/* LEFT: Content */}
               <div>
-                <div className="flex flex-wrap gap-2 mb-5">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {["IS 14855", "GeM Direct Purchase", "MSME OEM", "Tender Ready", "Pan-India Supply"].map(t => (
                     <span key={t} className="text-xs bg-white/[0.07] border border-white/[0.10] text-gray-300 px-2.5 py-1 rounded-full font-semibold">{t}</span>
                   ))}
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
                   Government Procurement Ready Fogging Machines
                 </h1>
-                <p className="text-gray-400 text-sm mb-3">
+                <p className="text-gray-500 text-xs mb-2">
                   100X Circle Pvt Ltd · MSME OEM Manufacturer · IS 14855 (Part 1) · ISO 9001:2015 · GeM Seller · IMT Manesar, Gurugram
                 </p>
-                <p className="text-gray-300 text-lg mb-8 leading-relaxed">
+                <p className="text-gray-300 text-base md:text-lg mb-5 leading-relaxed">
                   India&apos;s MSME-registered OEM manufacturer of IS 14855-compliant thermal fogging machines —
                   supplying municipal corporations, health departments, and Panchayats via GeM direct purchase
                   and tenders. Full documentation pack, L1 quotations, and pan-India supply within 5–10 working days.
                 </p>
-                <div className="bg-brand-600/15 border border-brand-500/30 rounded-xl p-4 mb-8 text-sm text-brand-300">
+                <div className="bg-brand-600/15 border border-brand-500/30 rounded-xl p-3.5 mb-5 text-sm text-brand-300">
                   <strong className="text-brand-200">GeM Direct Purchase Available:</strong> Government buyers can procure 100X Circle
                   fogging machines at gem.gov.in without a separate public tender within GeM financial limits.
                 </div>
@@ -605,6 +606,61 @@ export default async function GovernmentProcurementPage() {
             <GovKPIStrip kpis={govKpis} />
           </div>
         </section>
+
+        {/* ── 2b. Institutional Product Showcase ───────────────────────────────── */}
+        {products.length > 0 && (
+          <section className="bg-gray-950 border-b border-white/[0.06] py-12 md:py-16">
+            <div className="container mx-auto px-4 md:px-6">
+              <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                {/* Left: institutional framing */}
+                <div>
+                  <p className="text-xs font-semibold text-brand-400 uppercase tracking-widest mb-3">GeM Registered OEM Catalogue</p>
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
+                    IS 14855-Compliant Fogging Machines for Government Procurement
+                  </h2>
+                  <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+                    All models are GeM-listed, IS 14855 (Part 1) certified, and ready for government tender submissions.
+                    Available for direct purchase on gem.gov.in or via open tender/rate contract.
+                  </p>
+                  <div className="space-y-3 mb-6">
+                    {[
+                      { icon: "🏛", title: "Double Barrel Vehicle-Mounted", tag: "Municipal Corps", spec: "Dual-output · Ward-level city coverage" },
+                      { icon: "🏥", title: "ISI Marked HDPE Tank Fogger", tag: "Health Depts", spec: "IS 14855 · Portable · Rapid deployment" },
+                      { icon: "🌿", title: "Stainless Steel Tank Fogger", tag: "Panchayats", spec: "Heavy-duty · IS 14855 · Long service life" },
+                      { icon: "🛡", title: "Petrol-Powered Portable Series", tag: "Multi-use", spec: "GeM direct purchase · ISI Mark · Easy operation" },
+                    ].map((item) => (
+                      <div key={item.title} className="flex items-start gap-3 py-3 px-4 glass-card rounded-xl">
+                        <span className="text-xl flex-shrink-0 mt-0.5">{item.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-semibold text-white">{item.title}</p>
+                            <span className="text-[10px] bg-brand-600/20 text-brand-400 border border-brand-500/30 px-1.5 py-0.5 rounded-full font-medium">{item.tag}</span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-0.5">{item.spec}</p>
+                        </div>
+                        <svg className="w-4 h-4 text-gray-600 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="9 18 15 12 9 6"/></svg>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <a href={waTenderQuote} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">
+                      Request Procurement Quote
+                    </a>
+                    <a href="#gov-rfq-form"
+                      className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] text-white font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">
+                      Fill RFQ Form
+                    </a>
+                  </div>
+                </div>
+                {/* Right: rotating product visual */}
+                <div className="flex items-center justify-center">
+                  <OemHeroVisual products={products} />
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── 3. Procurement Readiness Score ───────────────────────────────────── */}
         <section className="py-14 md:py-20 bg-white border-b border-gray-100">
@@ -830,14 +886,14 @@ export default async function GovernmentProcurementPage() {
           </div>
         </section>
 
-        {/* ── 11. Product Carousel ─────────────────────────────────────────────── */}
+        {/* ── 11. Product Catalogue (detailed cards) ───────────────────────────── */}
         {products.length > 0 && (
           <section className="py-14 md:py-20 bg-white border-b border-gray-100">
             <div className="container mx-auto px-4 md:px-6 max-w-5xl">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">GeM Catalogue</p>
-              <h2 className="text-xl font-semibold text-gray-800 mb-1">Government Procurement Models</h2>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Detailed Specifications</p>
+              <h2 className="text-xl font-semibold text-gray-800 mb-1">Government Procurement Product Specifications</h2>
               <p className="text-sm text-gray-500 mb-6">
-                GeM-listed, IS 14855-compliant models prioritised for municipal and government procurement.
+                Full specifications, compliance certifications, and procurement routes for each model.
               </p>
               <Suspense fallback={<div className="h-40 bg-gray-50 rounded-xl animate-pulse" />}>
                 <GovProductCarousel products={products} />

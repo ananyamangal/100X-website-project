@@ -20,8 +20,8 @@ export function StickyProcurementCTA({ waTenderQuote, waOemTeam, phonePrimary, e
   if (!visible) return null
 
   return (
-    <div className="fixed bottom-6 right-5 z-50 flex flex-col gap-2 items-end">
-      <div className="bg-gray-950/95 backdrop-blur-md border border-white/10 rounded-2xl p-3 shadow-2xl flex flex-col gap-2 min-w-[200px]">
+    <div className="fixed bottom-6 left-5 z-50 flex flex-col gap-2 items-start">
+      <div className="bg-gray-950/95 backdrop-blur-md border border-white/10 rounded-2xl p-3 shadow-2xl flex flex-col gap-2 min-w-[200px] max-w-[220px]">
         <p className="text-[10px] text-gray-500 uppercase tracking-widest px-1 font-semibold">Procurement Desk</p>
         <a href={waTenderQuote} target="_blank" rel="noopener noreferrer"
           className="flex items-center gap-2.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-colors">
