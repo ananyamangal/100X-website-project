@@ -28,6 +28,7 @@ import { SellerProfilesTab }       from "./SellerProfilesTab"
 import { ContractAnalyticsTab }    from "./ContractAnalyticsTab"
 import { CollectDataTab }       from "./CollectDataTab"
 import { ArchiveTab }           from "./ArchiveTab"
+import { CoveragePanel }        from "./CoveragePanel"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -952,7 +953,10 @@ export default function ProcurementIntelligence() {
         {/* Governance strip — single-line health bar */}
         <GovernanceStrip />
 
-        {/* Filter bar — collapsed by default */}
+        {/* Dataset Coverage — explains what is searchable and scope limitations */}
+        <CoveragePanel />
+
+        {/* AI Analyst Scope (formerly Filter / Scope) — affects AI Analyst tab only */}
         <FilterBar filter={filter} onChange={setFilter} />
 
         {/* 2-level grouped navigation */}

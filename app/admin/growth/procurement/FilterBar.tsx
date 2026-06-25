@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { SlidersHorizontal, X, ChevronDown, ChevronUp } from "lucide-react"
+import { SlidersHorizontal, X, ChevronDown, ChevronUp, Sparkles } from "lucide-react"
 
 export interface ProcFilter {
   dateFrom:          string
@@ -63,10 +63,11 @@ export function FilterBar({ filter, onChange }: Props) {
         onClick={() => setOpen(v => !v)}
         className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal size={13} className={count > 0 ? "text-brand-600" : "text-gray-400"} />
+          <Sparkles size={13} className={count > 0 ? "text-brand-600" : "text-gray-400"} />
           <span className="text-xs font-medium text-gray-700">
-            Filter / Scope
+            AI Analyst Scope
           </span>
+          <span className="text-[9px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">Applies to AI Analyst tab only</span>
           {count > 0 && (
             <span className="text-[10px] font-bold bg-brand-600 text-white rounded-full px-1.5 py-0.5">
               {count}
@@ -104,6 +105,11 @@ export function FilterBar({ filter, onChange }: Props) {
       {/* Expanded filters */}
       {open && (
         <div className="px-4 pb-4 pt-1 border-t border-gray-100">
+          <p className="text-[10px] text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-3 py-2 mb-3 flex items-center gap-1.5">
+            <Sparkles size={10} className="text-indigo-500 shrink-0" />
+            These filters pre-scope the <strong>AI Analyst</strong> context window and analysis queries.
+            To filter contract search results, use the <strong>Contract Search Filters</strong> inside the Contracts tab.
+          </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             <Field label="Date From">
               <input type="date" value={filter.dateFrom} onChange={e => set("dateFrom", e.target.value)}

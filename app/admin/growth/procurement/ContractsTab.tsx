@@ -282,6 +282,17 @@ export function ContractsTab() {
 
   return (
     <div className="space-y-3">
+      {/* Dataset scope notice */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 flex items-start gap-2 text-[10px] text-blue-800">
+        <Search size={10} className="text-blue-500 shrink-0 mt-0.5" />
+        <span>
+          <strong>Searching: Imported Contract Archive (gem_contracts)</strong> — all harvested categories.{" "}
+          Non-fogging products may return limited results if not yet imported from the GeM archive.
+          Product search only works for contracts where enrichment is complete (product name available).
+          For fogging-specific analysis, use the <strong>AI Analyst</strong> or <strong>Analytics</strong> tabs.
+        </span>
+      </div>
+
       {/* Summary bar */}
       <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 flex flex-wrap items-center gap-3 shadow-sm">
         <div className="flex items-center gap-4 text-xs">
@@ -307,7 +318,7 @@ export function ContractsTab() {
                 ? "bg-brand-50 border-brand-200 text-brand-700"
                 : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
             }`}>
-            <SlidersHorizontal size={11} />Filters
+            <SlidersHorizontal size={11} />Contract Search Filters
             {activeCount > 0 && (
               <span className="bg-brand-600 text-white text-[9px] font-bold rounded-full px-1.5">{activeCount}</span>
             )}
