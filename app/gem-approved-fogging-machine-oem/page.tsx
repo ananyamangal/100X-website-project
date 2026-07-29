@@ -412,10 +412,10 @@ export default async function GemApprovedOEMPage() {
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-10">
-                <p className="eyebrow text-brand-400 mb-4">Apply Now</p>
-                <h2 className="text-display-xs font-700 text-white mb-4">Apply for Partnership</h2>
+                <p className="eyebrow text-brand-400 mb-4">Get Started</p>
+                <h2 className="text-display-xs font-700 text-white mb-4">Request a Quote or Apply for Partnership</h2>
                 <p className="text-gray-400 text-base">
-                  Tell us about your business and operating region. Our partnership team responds within 1 business day.
+                  Tell us what you need — a quote, a dealership, or both. Our team responds within 1 business day.
                 </p>
               </div>
               <div className="glass-card rounded-2xl p-6 md:p-8">

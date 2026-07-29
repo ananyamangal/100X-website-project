@@ -2,6 +2,8 @@
 
 import { useState, useRef } from "react"
 import { BUSINESS } from "@/lib/seo/site-config"
+import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
+import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
 
 const INDIA_STATES = [
   "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat",
@@ -10,6 +12,15 @@ const INDIA_STATES = [
   "Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal",
   "Delhi","Jammu & Kashmir","Ladakh","Puducherry","Chandigarh","Andaman & Nicobar",
 ]
+
+// Matches the value DealerApplicationForm (app/dealer-program) already uses for
+// the same "dealer inquiry" lead type — kept in sync intentionally.
+const DEALER_LEAD_VALUE_INR = 5000
+
+const MOBILE_RE = /^\+?[\d\s\-]{10,15}$/
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+type Intent = "quote" | "dealer" | "both"
 
 interface Props {
   source?: string
@@ -20,36 +31,95 @@ export default function PartnerApplyForm({ source = "partner_application", compa
   const [sending, setSending] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
+  const [wantsQuote, setWantsQuote] = useState(true)
+  const [wantsDealer, setWantsDealer] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
 
-  const waText = `Hi 100X Circle, I'm interested in becoming an authorized dealer/supply partner. Please share partnership details.`
+  const waText = `Hi 100X Circle, I'm interested in a quote / becoming an authorized dealer. Please share details.`
   const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waText)}`
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setSending(true)
     setError("")
-    const fd = new FormData(e.currentTarget)
-    const body = {
-      source,
-      name: fd.get("name"),
-      company: fd.get("company"),
-      mobile: fd.get("mobile"),
-      email: fd.get("email"),
-      state: fd.get("state"),
-      message: fd.get("message"),
+
+    if (!wantsQuote && !wantsDealer) {
+      setError("Please select at least one: Requesting a Quote or Applying to Become a Dealer.")
+      return
     }
+
+    const fd = new FormData(e.currentTarget)
+    const honeypot = String(fd.get("company_website") ?? "").trim()
+    if (honeypot) {
+      setError("Please try again.")
+      return
+    }
+
+    const name = String(fd.get("name") ?? "").trim()
+    const company = String(fd.get("company") ?? "").trim()
+    const mobile = String(fd.get("mobile") ?? "").trim()
+    const email = String(fd.get("email") ?? "").trim()
+    const state = String(fd.get("state") ?? "").trim()
+    const message = String(fd.get("message") ?? "").trim()
+
+    if (!name || !company || !mobile || !state) {
+      setError("Please fill in all required fields.")
+      return
+    }
+    if (!MOBILE_RE.test(mobile)) {
+      setError("Please enter a valid mobile number (10–15 digits).")
+      return
+    }
+    if (email && !EMAIL_RE.test(email)) {
+      setError("Please enter a valid email address (or leave it blank).")
+      return
+    }
+
+    const intent: Intent = wantsQuote && wantsDealer ? "both" : wantsDealer ? "dealer" : "quote"
+
+    setSending(true)
     try {
-      const res = await fetch("/api/oem-leads", {
+      const res = await fetch("/api/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          type: "partner_application",
+          source,
+          name,
+          company,
+          mobile,
+          email: email || undefined,
+          state,
+          message: message || undefined,
+          intent,
+          wantsQuote,
+          wantsDealer,
+          attribution: getPersistedAttribution(),
+          form_page_url: typeof window !== "undefined" ? window.location.href : "",
+          form_page_path: typeof window !== "undefined" ? window.location.pathname : "",
+          company_website: honeypot,
+        }),
       })
-      if (!res.ok) throw new Error("Server error")
+
+      if (!res.ok) throw new Error(`Server error ${res.status}`)
+
+      // Fire generate_lead only AFTER the server confirms the save — never on
+      // click alone. "Request quote" in Google Ads listens on this event.
+      pushDataLayer({
+        event: "generate_lead",
+        lead_type: "gem_oem_partnership",
+        page_type: "gem_oem_partnership",
+        intent,
+        value: intent === "quote" ? QUOTE_LEAD_VALUE_INR : DEALER_LEAD_VALUE_INR,
+        currency: "INR",
+        state,
+      })
+
       setSuccess(true)
       formRef.current?.reset()
+      setWantsQuote(true)
+      setWantsDealer(false)
     } catch {
-      setError("Something went wrong. Please WhatsApp us directly.")
+      setError("We couldn't save your request due to a connection issue. Please try again, or WhatsApp us directly and we'll respond right away.")
     } finally {
       setSending(false)
     }
@@ -63,8 +133,15 @@ export default function PartnerApplyForm({ source = "partner_application", compa
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </div>
-        <p className="text-white font-700 mb-1">Application Received</p>
+        <p className="text-white font-700 mb-1">Request Received</p>
         <p className="text-gray-400 text-sm mb-4">Our team will contact you within 1 business day.</p>
+        <button
+          type="button"
+          onClick={() => setSuccess(false)}
+          className="text-gray-500 hover:text-gray-300 text-xs underline underline-offset-2 mb-4 block mx-auto"
+        >
+          Submit another request
+        </button>
         <a
           href={waHref}
           target="_blank" rel="noopener noreferrer"
@@ -82,6 +159,36 @@ export default function PartnerApplyForm({ source = "partner_application", compa
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+      {/* Honeypot */}
+      <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+        <label htmlFor="partner-apply-hp">Company website</label>
+        <input id="partner-apply-hp" name="company_website" type="text" tabIndex={-1} autoComplete="off" />
+      </div>
+
+      <div>
+        <label className={labelCls}>I&apos;m interested in *</label>
+        <div className="space-y-2">
+          <label className="flex items-center gap-2.5 cursor-pointer bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.16] rounded-xl px-4 py-3 transition-colors">
+            <input
+              type="checkbox"
+              checked={wantsQuote}
+              onChange={(e) => setWantsQuote(e.target.checked)}
+              className="w-4 h-4 accent-brand-600 rounded shrink-0"
+            />
+            <span className="text-sm text-white font-500">Requesting a Quote</span>
+          </label>
+          <label className="flex items-center gap-2.5 cursor-pointer bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.16] rounded-xl px-4 py-3 transition-colors">
+            <input
+              type="checkbox"
+              checked={wantsDealer}
+              onChange={(e) => setWantsDealer(e.target.checked)}
+              className="w-4 h-4 accent-brand-600 rounded shrink-0"
+            />
+            <span className="text-sm text-white font-500">Applying to Become a Dealer</span>
+          </label>
+        </div>
+      </div>
+
       <div className={compact ? "grid grid-cols-1 sm:grid-cols-2 gap-4" : "space-y-4"}>
         <div>
           <label className={labelCls}>Your Name *</label>
@@ -101,17 +208,17 @@ export default function PartnerApplyForm({ source = "partner_application", compa
         </div>
         <div className={compact ? "sm:col-span-2" : ""}>
           <label className={labelCls}>State *</label>
-          <select name="state" required className={inputCls + " appearance-none cursor-pointer"}>
-            <option value="" disabled selected>Select your state</option>
+          <select name="state" required defaultValue="" className={inputCls + " appearance-none cursor-pointer"}>
+            <option value="" disabled>Select your state</option>
             {INDIA_STATES.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <div className={compact ? "sm:col-span-2" : ""}>
-          <label className={labelCls}>Tell us about your business</label>
+          <label className={labelCls}>Tell us about your requirement / business</label>
           <textarea
             name="message"
             rows={3}
-            placeholder="Brief overview of your business, existing customers, area of operation..."
+            placeholder="Product interest, quantity, existing business, area of operation..."
             className={inputCls + " resize-none"}
           />
         </div>
@@ -125,7 +232,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
           disabled={sending}
           className="flex-1 inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-700 text-sm px-6 py-3 rounded-full transition-colors"
         >
-          {sending ? "Sending…" : "Apply for Partnership"}
+          {sending ? "Sending…" : "Submit Request"}
         </button>
         <a
           href={waHref}
@@ -138,7 +245,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
       </div>
 
       <p className="text-gray-600 text-[11px] text-center">
-        No fees. No commitment. Evaluation call within 1 business day.
+        No fees. No commitment. Response within 1 business day.
       </p>
     </form>
   )
