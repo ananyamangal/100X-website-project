@@ -2,6 +2,12 @@
 
 import { useState } from "react"
 import { BUSINESS } from "@/lib/seo/site-config"
+import { pushDataLayer } from "@/lib/gtm"
+
+// High-value Funnel A signal -- matches the value already assigned to this
+// lead type in lib/growth-os/conversion-tracking.ts's (currently unwired)
+// OEM Authorization conversion action.
+const OEM_AUTH_LEAD_VALUE_INR = 5000
 
 const STATES = [
   "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh",
@@ -67,6 +73,19 @@ export default function OemAuthForm({ source = "oem_authorization", compact = fa
         body: JSON.stringify({ ...form, source }),
       })
       if (!res.ok) throw new Error("Submission failed")
+
+      // Fire generate_lead only AFTER the server confirms the save --
+      // matches the pattern used by PartnerApplyForm. This form previously
+      // had zero tracking despite being a real, high-value lead type.
+      pushDataLayer({
+        event: "generate_lead",
+        lead_type: "oem_authorization",
+        page_type: "oem_authorization",
+        value: OEM_AUTH_LEAD_VALUE_INR,
+        currency: "INR",
+        state: form.state,
+      })
+
       setSuccess(true)
       setForm(EMPTY)
     } catch {
