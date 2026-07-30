@@ -34,6 +34,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
   const [wantsQuote, setWantsQuote] = useState(true)
   const [wantsDealer, setWantsDealer] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
+  const mountedAtRef = useRef(Date.now())
 
   const waText = `Hi 100X Circle, I'm interested in a quote / becoming an authorized dealer. Please share details.`
   const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waText)}`
@@ -47,12 +48,18 @@ export default function PartnerApplyForm({ source = "partner_application", compa
       return
     }
 
-    const fd = new FormData(e.currentTarget)
-    const honeypot = String(fd.get("company_website") ?? "").trim()
-    if (honeypot) {
+    // Time-based bot gate: real users take more than a couple seconds to read
+    // and fill the form. Deliberately not gating on the hidden honeypot field's
+    // value — it was observed getting a phantom value on genuine manual
+    // submissions (likely browser/extension autofill matching its name), which
+    // blocked real leads. This check is immune to that since it never reads
+    // the field's value.
+    if (Date.now() - mountedAtRef.current < 2000) {
       setError("Please try again.")
       return
     }
+
+    const fd = new FormData(e.currentTarget)
 
     const name = String(fd.get("name") ?? "").trim()
     const company = String(fd.get("company") ?? "").trim()
@@ -96,7 +103,6 @@ export default function PartnerApplyForm({ source = "partner_application", compa
           attribution: getPersistedAttribution(),
           form_page_url: typeof window !== "undefined" ? window.location.href : "",
           form_page_path: typeof window !== "undefined" ? window.location.pathname : "",
-          company_website: honeypot,
         }),
       })
 
@@ -159,12 +165,6 @@ export default function PartnerApplyForm({ source = "partner_application", compa
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-      {/* Honeypot */}
-      <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-        <label htmlFor="partner-apply-hp">Company website</label>
-        <input id="partner-apply-hp" name="company_website" type="text" tabIndex={-1} autoComplete="off" />
-      </div>
-
       <div>
         <label className={labelCls}>I&apos;m interested in *</label>
         <div className="space-y-2">
@@ -208,7 +208,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
         </div>
         <div className={compact ? "sm:col-span-2" : ""}>
           <label className={labelCls}>State *</label>
-          <select name="state" required defaultValue="" className={inputCls + " appearance-none cursor-pointer"}>
+          <select name="state" required defaultValue="" className={inputCls + " cursor-pointer"}>
             <option value="" disabled>Select your state</option>
             {INDIA_STATES.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
