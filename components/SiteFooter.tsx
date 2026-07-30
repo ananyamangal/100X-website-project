@@ -55,6 +55,12 @@ const WA_HREF = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponen
   "Hi 100X Circle, I'd like to know more about your fogging machines."
 )}`
 
+// GMB profile URL resolves to a session-bound Google search knowledge-panel
+// link with no stable place/CID redirect -- this maps-search query is the
+// stable, non-expiring fallback for the same address.
+const GMB_MAPS_URL =
+  "https://www.google.com/maps/search/?api=1&query=100X+Circle+Pvt+Ltd+UG+398+Sector+7+IMT+Manesar+Gurugram+Haryana+122050"
+
 const DEFAULT_TRUST_BADGES = [
   { label: "OEM Manufacturer", icon: "✓" },
   { label: "Made in India", icon: "🇮🇳" },
@@ -248,9 +254,30 @@ export default function SiteFooter({
               <li>
                 <div className="flex items-start gap-3 text-cinema-400">
                   <MapPin size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
-                  <address className="not-italic text-sm leading-relaxed">
-                    UG, 398, Sector 7, IMT Manesar,<br />Gurugram, Haryana 122050
-                  </address>
+                  <div>
+                    <address className="not-italic text-sm leading-relaxed">
+                      UG, 398, Sector 7, IMT Manesar,<br />Gurugram, Haryana 122050
+                    </address>
+                    <a
+                      href={GMB_MAPS_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group mt-3 flex items-center gap-2 w-fit"
+                    >
+                      <Image
+                        src="/footer-map-pin.svg"
+                        alt="Map location of 100X Circle Pvt Ltd — UG 398, Sector 7, IMT Manesar, Gurugram, Haryana 122050"
+                        width={72}
+                        height={48}
+                        loading="lazy"
+                        unoptimized
+                        className="w-16 h-11 rounded-md border border-white/10 shrink-0 group-hover:border-white/20 transition-colors"
+                      />
+                      <span className="text-xs text-cinema-500 group-hover:text-brand-400 underline decoration-dotted underline-offset-2 transition-colors">
+                        View on Google Maps
+                      </span>
+                    </a>
+                  </div>
                 </div>
               </li>
             </ul>
