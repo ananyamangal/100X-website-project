@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import React, { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, ChevronLeft, ChevronRight, MessageCircle, Play } from "lucide-react"
 
@@ -180,18 +181,16 @@ export default function HeroBlock({ heroSlides }: Props) {
         aria-label={`Slide ${currentSlide + 1} of ${slideCount || 1}: ${desktopAlt}`}
       >
         <div className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing" {...swipeHandlers("ltr")}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             key={`desktop-${desktopSrc}`}
             src={desktopSrc}
             alt={desktopAlt}
-            width={1920}
-            height={1080}
-            fetchPriority="high"
+            fill
+            sizes="100vw"
+            unoptimized
             decoding="async"
-            loading="eager"
             draggable={false}
-            className="hero-ken-burns w-full h-full object-cover pointer-events-none select-none transition-opacity duration-700"
+            className="hero-ken-burns object-cover pointer-events-none select-none transition-opacity duration-700"
             style={{ objectPosition: `${desktopFocalX}% ${desktopFocalY}%`, backgroundImage: `url("${HERO_BLUR_DATA_URL}")`, backgroundSize: "cover" }}
           />
           <div
@@ -234,8 +233,7 @@ export default function HeroBlock({ heroSlides }: Props) {
       <div className="hidden md:block lg:hidden">
         <div className="relative aspect-[1200/900] overflow-hidden" aria-roledescription="slide" aria-label={`Slide ${currentSlide + 1} of ${slideCount || 1}: ${tabletAlt}`}>
           <div className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing" {...swipeHandlers("ltr")}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img key={`tablet-${tabletSrc}`} src={tabletSrc} alt={tabletAlt} width={1200} height={900} fetchPriority="high" decoding="async" loading="eager" draggable={false} className="hero-ken-burns w-full h-full object-cover pointer-events-none select-none" style={{ objectPosition: `${tabletFocalX}% ${tabletFocalY}%`, backgroundImage: `url("${HERO_BLUR_DATA_URL}")`, backgroundSize: "cover" }} />
+            <Image key={`tablet-${tabletSrc}`} src={tabletSrc} alt={tabletAlt} fill sizes="100vw" unoptimized decoding="async" draggable={false} className="hero-ken-burns object-cover pointer-events-none select-none" style={{ objectPosition: `${tabletFocalX}% ${tabletFocalY}%`, backgroundImage: `url("${HERO_BLUR_DATA_URL}")`, backgroundSize: "cover" }} />
           </div>
           {slideCount > 1 && <>
             <button type="button" aria-label="Previous banner" onClick={() => setCurrentSlide((p) => (p - 1 + slideCount) % slideCount)} className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 focus-visible:ring-2 focus-visible:ring-brand-500 text-gray-900 p-2.5 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronLeft size={20} /></button>
@@ -254,8 +252,7 @@ export default function HeroBlock({ heroSlides }: Props) {
       <div className="md:hidden">
         <div className="relative aspect-[800/1200]" aria-roledescription="slide" aria-label={`Slide ${currentSlide + 1} of ${slideCount || 1}: ${mobileAlt}`}>
           <div className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing" {...swipeHandlers("ltr")}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img key={`mobile-${mobileSrc}`} src={mobileSrc} alt={mobileAlt} width={800} height={1200} fetchPriority="high" decoding="async" loading="eager" draggable={false} className="hero-ken-burns w-full h-full object-cover pointer-events-none select-none" style={{ objectPosition: `${mobileFocalX}% ${mobileFocalY}%`, backgroundImage: `url("${HERO_BLUR_DATA_URL}")`, backgroundSize: "cover" }} />
+            <Image key={`mobile-${mobileSrc}`} src={mobileSrc} alt={mobileAlt} fill sizes="100vw" unoptimized decoding="async" draggable={false} className="hero-ken-burns object-cover pointer-events-none select-none" style={{ objectPosition: `${mobileFocalX}% ${mobileFocalY}%`, backgroundImage: `url("${HERO_BLUR_DATA_URL}")`, backgroundSize: "cover" }} />
           </div>
           {slideCount > 1 && <>
             <button type="button" aria-label="Previous banner" onClick={() => setCurrentSlide((p) => (p - 1 + slideCount) % slideCount)} className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 focus-visible:ring-2 focus-visible:ring-brand-500 text-gray-800 p-2.5 rounded-full transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"><ChevronLeft size={18} /></button>
