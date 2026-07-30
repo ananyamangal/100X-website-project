@@ -36,15 +36,18 @@ export default function RFQFloatingRibbon() {
 
   return (
     <>
-      {/* Vertical ribbon — visible on all viewports. Mobile gets a shorter
-          "RFQ" label; desktop expands to "RFQ / Tender Inquiry". MobileCtaBar
-          sits at the bottom so this ribbon at the mid-left doesn't collide. */}
+      {/* Mobile: vertical ribbon pinned mid-left (MobileCtaBar occupies the
+          full-width bottom strip on mobile, so this avoids colliding with it).
+          Desktop (md+): repositioned to a bottom-left corner pill so it never
+          overlaps scrolled mid-page content regardless of scroll position,
+          and sits opposite WhatsAppFloatingButton (bottom-right, desktop-only)
+          instead of on top of it. */}
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Submit RFQ / Tender inquiry"
         data-gtm="rfq_ribbon_open"
-        className="flex fixed left-0 top-1/2 -translate-y-1/2 z-[60] rotate-180 [writing-mode:vertical-rl] items-center gap-1.5 md:gap-2 px-2 md:px-3 py-3 md:py-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold tracking-wide shadow-lg rounded-tr-xl rounded-br-xl text-xs md:text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-700"
+        className="flex fixed left-0 top-1/2 -translate-y-1/2 rotate-180 [writing-mode:vertical-rl] md:left-6 md:right-auto md:top-auto md:bottom-6 md:translate-y-0 md:rotate-0 md:[writing-mode:horizontal-tb] z-[60] items-center gap-1.5 md:gap-2 px-2 md:px-4 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold tracking-wide shadow-lg rounded-tr-xl rounded-br-xl md:rounded-full text-xs md:text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-700"
       >
         <FileText size={14} aria-hidden="true" className="md:hidden" />
         <FileText size={16} aria-hidden="true" className="hidden md:block" />
