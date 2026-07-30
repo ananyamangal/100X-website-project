@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation"
 import { X, Paperclip } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { BUSINESS } from "@/lib/seo/site-config"
+import { pushDataLayer } from "@/lib/gtm"
+import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
 
 interface Question {
   id: string
@@ -203,11 +205,20 @@ export default function RFQPopup() {
     // so popup blockers don't interfere.
     const waNumber = (config?.notificationWhatsapp || "").replace(/[^0-9]/g, "") || BUSINESS.whatsappE164
     const waMessage = buildWaMessage(answers)
-    window.open(
-      `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`,
-      "_blank",
-      "noopener,noreferrer",
-    )
+    const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`
+    window.open(waUrl, "_blank", "noopener,noreferrer")
+
+    // This is a window.open(), not an <a href>, so the site-wide click
+    // tracker in app/layout.tsx (which only listens for <a>/<button> clicks)
+    // never sees it -- fire the same whatsapp_click shape it would have.
+    pushDataLayer({
+      event: "whatsapp_click",
+      ga4_event: "contact",
+      whatsapp_url: waUrl,
+      value: 500,
+      currency: "INR",
+      link_location: "rfq_popup",
+    })
 
     setSubmitting(true)
     try {
@@ -241,6 +252,16 @@ export default function RFQPopup() {
       })
       if (!res.ok) {
         console.error("RFQ popup submit failed:", await res.text())
+      } else {
+        // Fire generate_lead only AFTER the server confirms the save --
+        // matches the pattern used by PartnerApplyForm.
+        pushDataLayer({
+          event: "generate_lead",
+          lead_type: "rfq_popup",
+          page_type: "rfq_popup",
+          value: QUOTE_LEAD_VALUE_INR,
+          currency: "INR",
+        })
       }
 
       // Persist submission so popup never shows again (if configured)
