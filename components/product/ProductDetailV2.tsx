@@ -83,18 +83,20 @@ function groupSpecs(specs: string[]): Record<string, string[]> {
 
 // ── Gallery V2 — vertical thumb strip on desktop, horizontal below on mobile ──
 
-type MI = { kind: 'image'; url: string } | { kind: 'yt'; videoId: string; thumb: string }
+type MI = { kind: 'image'; url: string; isHighlight?: boolean } | { kind: 'yt'; videoId: string; thumb: string }
 
-function GalleryV2({ images, videoId, name }: { images: string[]; videoId: string | null; name: string }) {
+function GalleryV2({ images, highlightImages = [], videoId, name }: { images: string[]; highlightImages?: string[]; videoId: string | null; name: string }) {
   const [idx, setIdx]       = useState(0)
   const [playing, setPlaying] = useState(false)
   const [zoomed, setZoomed] = useState(false)
   const [origin, setOrigin] = useState('center center')
-  const touchX = useRef<number | null>(null)
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
+  const isTouchDevice = useRef(false)
 
   const ytThumb = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null
   const items: MI[] = [
     ...images.map((url): MI => ({ kind: 'image', url })),
+    ...highlightImages.map((url): MI => ({ kind: 'image', url, isHighlight: true })),
     ...(videoId && ytThumb ? [{ kind: 'yt' as const, videoId, thumb: ytThumb }] : []),
   ]
   const n   = items.length
@@ -141,20 +143,30 @@ function GalleryV2({ images, videoId, name }: { images: string[]; videoId: strin
 
       {/* Main viewer */}
       <div
-        className="order-1 lg:order-2 flex-1 aspect-square relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 select-none"
+        className="order-1 lg:order-2 flex-1 aspect-square relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 select-none touch-pan-y"
         onMouseMove={e => {
-          if (cur?.kind !== 'image') return
+          // Touch devices fire a synthetic mousemove after tap-release; without this
+          // guard that ghost event was reopening the hover-zoom right after a tap,
+          // making mobile taps look like they triggered zoom instead of navigating.
+          if (isTouchDevice.current || cur?.kind !== 'image') return
           const r = e.currentTarget.getBoundingClientRect()
           setOrigin(`${((e.clientX - r.left) / r.width * 100).toFixed(1)}% ${((e.clientY - r.top) / r.height * 100).toFixed(1)}%`)
           setZoomed(true)
         }}
         onMouseLeave={() => setZoomed(false)}
-        onTouchStart={e => { touchX.current = e.touches[0].clientX }}
+        onTouchStart={e => {
+          isTouchDevice.current = true
+          touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+        }}
         onTouchEnd={e => {
-          if (touchX.current === null) return
-          const diff = touchX.current - e.changedTouches[0].clientX
-          if (Math.abs(diff) > 40) go(idx + (diff > 0 ? 1 : -1))
-          touchX.current = null
+          if (!touchStart.current) return
+          const dx = touchStart.current.x - e.changedTouches[0].clientX
+          const dy = touchStart.current.y - e.changedTouches[0].clientY
+          // Only treat it as a swipe-navigate if the gesture was clearly more
+          // horizontal than vertical, so a vertical page scroll started on the
+          // gallery doesn't get misread as a slide change.
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(idx + (dx > 0 ? 1 : -1))
+          touchStart.current = null
         }}
       >
         {!cur && (
@@ -683,6 +695,16 @@ export default function ProductDetailV2({ product }: Props) {
   const videoId      = ytId(s(product.heroVideoUrl || product.youtubeLink))
   const chapters     = (Array.isArray(product.filmChapters) ? product.filmChapters as any[] : []).filter(c => c?.title).slice(0, 3)
   const ugcImages    = arr(product.ugcImages).filter(u => u.startsWith('http') || u.startsWith('/'))
+  // Highlight images for the main gallery: one photo per film chapter first
+  // (story/credibility content), then deployment/UGC photos fill any
+  // remaining slots, capped at 5 total so the busiest product (currently 8
+  // combined chapter+UGC images) doesn't overwhelm the gallery.
+  const chapterImages = (Array.isArray(product.filmChapters) ? product.filmChapters as any[] : [])
+    .map(c => s(c?.imageUrl))
+    .filter(u => u.startsWith('http') || u.startsWith('/'))
+  const highlightImages = [...chapterImages, ...ugcImages]
+    .filter(u => !images.includes(u))
+    .slice(0, 5)
   const productId    = s(product._id)
   const productSlug  = s(product.slug) || productId
   const youtubeLink  = s(product.heroVideoUrl || product.youtubeLink)
@@ -712,8 +734,8 @@ export default function ProductDetailV2({ product }: Props) {
 
           {/* LEFT — gallery, sticky on desktop */}
           <div className="lg:sticky lg:top-20 lg:self-start">
-            {images.length > 0 || videoId
-              ? <GalleryV2 images={images} videoId={videoId} name={name} />
+            {images.length > 0 || highlightImages.length > 0 || videoId
+              ? <GalleryV2 images={images} highlightImages={highlightImages} videoId={videoId} name={name} />
               : <div className="aspect-square rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-300 text-sm">No image available</div>
             }
           </div>
