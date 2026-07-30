@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import React, { useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, MessageCircle, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -57,14 +58,15 @@ export default function HeroVideoBlock({ youtubeId = HERO_VIDEO_ID }: Props) {
               data-gtm="hero_video_open"
               className="group relative block w-full aspect-video focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={posterSrc}
                 alt=""
                 aria-hidden="true"
-                loading="lazy"
+                fill
+                sizes="100vw"
+                unoptimized
                 decoding="async"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               />
               <span className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               <span className="absolute inset-0 grid place-items-center">

@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, Calendar, User } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -43,8 +44,7 @@ export default function BlogBlock({ posts, hasApiPosts }: Props) {
               key={post.id || post._id || post.slug || index}
               className="overflow-hidden hover:shadow-xl transition-all duration-300"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} width={480} height={192} className="w-full h-48 object-cover" loading="lazy" decoding="async" />
+              <Image src={post.topImage || post.image || "/placeholder.svg"} alt={post.title} width={480} height={192} className="w-full h-48 object-cover" decoding="async" />
 
 
               <CardContent className="p-5">

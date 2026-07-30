@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import ScrollReveal from '@/components/cinematic/ScrollReveal'
 
 interface Review {
@@ -41,8 +42,7 @@ function ReviewCard({ review }: { review: Review }) {
       <p className="text-gray-700 text-sm leading-relaxed flex-1 italic">"{review.review}"</p>
       <div className="flex items-center gap-3 pt-3 border-t border-gray-50">
         {review.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={review.imageUrl} alt={review.customerName || 'Customer'} className="w-10 h-10 rounded-full object-cover shrink-0" />
+          <Image src={review.imageUrl} alt={review.customerName || 'Customer'} width={40} height={40} className="w-10 h-10 rounded-full object-cover shrink-0" />
         ) : (
           <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
             <span className="text-brand-700 font-700 text-sm">{(review.customerName || '?').charAt(0).toUpperCase()}</span>

@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import ScrollReveal from '@/components/cinematic/ScrollReveal'
 import { Package } from 'lucide-react'
 
@@ -25,12 +26,12 @@ export default function WhatsInTheBox({ items, productName }: { items: BoxItem[]
             <ScrollReveal key={i} animation="fade-up" delay={i * 50}>
               <div className="group flex flex-col items-center text-center bg-gray-50 hover:bg-brand-50 border border-gray-100 hover:border-brand-200 rounded-2xl p-5 transition-all duration-300 h-full">
                 {item.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={item.imageUrl}
                     alt={item.item}
+                    width={64}
+                    height={64}
                     className="w-16 h-16 object-contain mb-3"
-                    loading="lazy"
                   />
                 ) : (
                   <div className="w-14 h-14 rounded-xl bg-brand-100 group-hover:bg-brand-200 flex items-center justify-center mb-3 transition-colors">

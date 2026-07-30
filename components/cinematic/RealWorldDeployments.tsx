@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, MapPin, Building2 } from 'lucide-react'
 import ScrollReveal from '@/components/cinematic/ScrollReveal'
@@ -41,13 +42,15 @@ export default function RealWorldDeployments({ productId, productName }: Props) 
                 className="group block bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg hover:border-brand-200 hover:-translate-y-0.5 transition-all duration-300"
               >
                 {cs.images?.[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={cs.images[0]}
-                    alt={cs.title}
-                    className="w-full aspect-video object-cover group-hover:scale-[1.02] transition-transform duration-500"
-                    loading="lazy"
-                  />
+                  <div className="relative w-full aspect-video overflow-hidden">
+                    <Image
+                      src={cs.images[0]}
+                      alt={cs.title}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                    />
+                  </div>
                 ) : (
                   <div className="w-full aspect-video bg-gradient-to-br from-brand-900 to-cinema-800 flex items-center justify-center">
                     <Building2 size={36} className="text-brand-400/50" />

@@ -1,7 +1,7 @@
 ﻿"use client"
 
 import React from "react"
-
+import Image from "next/image"
 import { CheckCircle } from "lucide-react"
 import { DEFAULT_HOME_CONTENT, type HomeContent } from "@/lib/homeContentTypes"
 
@@ -39,13 +39,13 @@ export default function ManufacturerIntroBlock({ content }: Props) {
 
           <div className="order-1 md:order-2 relative">
             <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 shadow-md aspect-[4/3]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={c.imageUrl}
                 alt={c.imageAlt}
-                loading="lazy"
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
                 decoding="async"
-                className="absolute inset-0 w-full h-full object-cover"
+                className="object-cover"
               />
             </div>
             <div className="absolute -bottom-4 -left-4 hidden sm:flex flex-col items-start gap-0.5 rounded-xl bg-white shadow-lg ring-1 ring-gray-200 px-4 py-3">

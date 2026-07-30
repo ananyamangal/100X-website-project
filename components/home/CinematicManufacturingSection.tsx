@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Image from "next/image"
 import ScrollReveal from "@/components/cinematic/ScrollReveal"
 import CinematicStatCounter from "@/components/cinematic/CinematicStatCounter"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
@@ -97,14 +98,12 @@ export default function CinematicManufacturingSection({ content }: Props) {
             <ScrollReveal animation="fade-left">
               <div className="relative rounded-2xl overflow-hidden bg-cinema-800 aspect-[4/3]">
                 {content?.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={content.imageUrl}
                     alt="100X Circle manufacturing facility"
-                    width={640}
-                    height={480}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover"
                     decoding="async"
                   />
                 ) : (
