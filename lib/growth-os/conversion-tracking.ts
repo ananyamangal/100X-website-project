@@ -1,6 +1,21 @@
 /**
  * Growth OS — Google Ads Conversion Tracking Configuration.
  *
+ * ⚠️ PARKED / NOT LIVE CONFIG (as of 2026-07-30) ⚠️
+ * Nothing in this file is wired into the real site. AW_CONVERSION_ID and
+ * every CONVERSION_LABEL below are still literal placeholder strings, and
+ * this registry is never imported or read by any live code path -- the
+ * one conversion action that actually works in production ("Ads - Request
+ * Quote") was wired ad hoc directly in the relevant form components
+ * (see components/oem/PartnerApplyForm.tsx, components/RFQPopup.tsx,
+ * components/oem/OemAuthForm.tsx -- search for pushDataLayer + generate_lead)
+ * rather than through this registry. Treat this file as a design proposal /
+ * reference for what COULD be set up in Google Ads, not as documentation of
+ * what currently exists. Note its OEM Authorization entry's gtmPageFilter
+ * ("/gem-oem-authorization") is also stale -- the real form lives at
+ * /oem-authorization-letter -- so do not wire this file up as-is without
+ * fixing that first.
+ *
  * This module defines the canonical conversion action registry.
  * It maps existing dataLayer events (already firing in production)
  * to Google Ads conversion actions via GTM.

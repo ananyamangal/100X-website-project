@@ -99,12 +99,6 @@ export default function ContactSection({
         form_page_url: window.location.href,
       })
 
-      pushDataLayer({
-        event: "contact_form_success",
-        lead_type: "contact_form",
-        product: "contact_form",
-      })
-
       form.reset()
       router.push("/thank-you")
     } catch {
