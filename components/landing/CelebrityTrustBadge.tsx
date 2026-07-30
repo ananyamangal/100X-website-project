@@ -22,42 +22,40 @@ interface CelebrityTrustBadgeProps {
 }
 
 const THEME = {
-  light: { text: "text-gray-600 group-hover:text-brand-700", ring: "ring-gray-200" },
-  dark: { text: "text-gray-400 group-hover:text-brand-400", ring: "ring-white/10" },
+  light: { card: "bg-brand-50/70 border-brand-100 group-hover:border-brand-300", eyebrow: "text-brand-600", name: "text-gray-500" },
+  dark: { card: "bg-white/[0.04] border-white/10 group-hover:border-white/20", eyebrow: "text-brand-400", name: "text-gray-500" },
 } as const
 
 /**
- * Compact trust badge for landing pages — a small circular photo + one line
- * of endorsement text, linking to the full celebrity section on the
- * homepage. Deliberately not a reuse of CelebritySectionsBlock: this is
- * sized and weighted like a testimonial avatar / certification badge, not
- * a standalone page section.
+ * Trust card for landing pages — a face-forward photo + "As seen on TV &
+ * film" hook, linking to the full celebrity section on the homepage.
+ * Deliberately not a reuse of CelebritySectionsBlock: this is sized and
+ * weighted like a certification card, not a standalone page section.
  */
 export default function CelebrityTrustBadge({ theme = "light", className = "" }: CelebrityTrustBadgeProps) {
   const tc = THEME[theme]
   return (
     <a
       href={CELEBRITY_SECTION_HREF}
-      className={`group inline-flex items-center gap-3 ${className}`}
+      className={`group flex items-center gap-4 rounded-xl border p-3 transition-colors ${tc.card} ${className}`}
     >
       <Image
         // Cloudinary already does the face-crop + format/quality transform
         // (source is a tall 3115x4672 portrait, not a headshot) — Next's
         // optimizer can't do gravity-aware cropping, so `unoptimized` skips
-        // a redundant re-encode of an already-128x128 image.
-        src={cloudinaryAvatarUrl(CELEBRITY_IMAGE_URL, 64)}
+        // a redundant re-encode of an already-square image.
+        src={cloudinaryAvatarUrl(CELEBRITY_IMAGE_URL, 112)}
         alt="Mushtaq Khan"
-        width={64}
-        height={64}
+        width={112}
+        height={112}
         loading="lazy"
         unoptimized
-        className={`w-16 h-16 rounded-full object-cover ring-2 shrink-0 ${tc.ring}`}
+        className="w-24 h-24 md:w-28 md:h-28 rounded-xl object-cover shrink-0"
       />
-      <span className={`text-sm font-medium leading-snug transition-colors ${tc.text}`}>
-        Trusted &amp; Recommended by
-        <br />
-        <span className="font-semibold">Mushtaq Khan</span>
-      </span>
+      <div className="min-w-0">
+        <p className={`eyebrow ${tc.eyebrow}`}>As Seen on TV &amp; Film</p>
+        <p className={`text-xs mt-1 ${tc.name}`}>Mushtaq Khan</p>
+      </div>
     </a>
   )
 }

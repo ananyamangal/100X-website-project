@@ -928,10 +928,10 @@ export default async function GovernmentProcurementPage() {
             <p className="text-xs text-brand-600 mb-5">
               We respond within 24 hours with L1 quotation + complete tender documentation pack.
             </p>
-            <GovRFQForm />
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mb-6">
               <CelebrityTrustBadge theme="light" />
             </div>
+            <GovRFQForm />
           </div>
 
           {/* GeM Steps */}

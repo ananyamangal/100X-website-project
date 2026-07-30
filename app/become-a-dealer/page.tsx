@@ -211,6 +211,10 @@ export default function BecomeADealerPage() {
           direct-from-factory pricing.
         </p>
 
+        <div className="flex justify-center mb-6">
+          <CelebrityTrustBadge theme="light" />
+        </div>
+
         {/* CTA */}
         <div className="bg-brand-600 rounded-xl p-6 mb-10 text-white">
           <h2 className="font-bold text-xl mb-2">Apply for Dealership</h2>
@@ -232,10 +236,6 @@ export default function BecomeADealerPage() {
               Call: {BUSINESS.phonePrimary}
             </a>
           </div>
-        </div>
-
-        <div className="flex justify-center mb-10 -mt-4">
-          <CelebrityTrustBadge theme="light" />
         </div>
 
         {/* Benefits */}

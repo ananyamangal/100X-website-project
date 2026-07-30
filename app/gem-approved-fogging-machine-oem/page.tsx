@@ -419,11 +419,11 @@ export default async function GemApprovedOEMPage() {
                   Tell us what you need — a quote, a dealership, or both. Our team responds within 1 business day.
                 </p>
               </div>
+              <div className="flex justify-center mb-6">
+                <CelebrityTrustBadge theme="dark" />
+              </div>
               <div className="glass-card rounded-2xl p-6 md:p-8">
                 <PartnerApplyForm source="partner_application" />
-              </div>
-              <div className="flex justify-center mt-6">
-                <CelebrityTrustBadge theme="dark" />
               </div>
               <p className="text-center text-gray-600 text-xs mt-6">
                 Prefer a call?{" "}
