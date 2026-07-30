@@ -538,7 +538,43 @@ function SparePartsSection({ productId, productName }: { productId: string; prod
       .then(r => r.json()).then(d => { if (Array.isArray(d)) setParts(d); setLoaded(true) })
       .catch(() => setLoaded(true))
   }, [productId])
-  if (!loaded || !parts.length) return null
+
+  // While the fetch is in flight this section previously returned null,
+  // which reserves zero height -- the instant the fetch resolved, the
+  // section snapped into existence and shoved everything below it (FAQ,
+  // Related Products) down by ~888px in a single frame. Anyone who clicked
+  // in that region at the wrong instant had their target yanked out from
+  // under their cursor. Rendering a same-shaped skeleton keeps the box's
+  // height stable from first paint, so nothing shifts once real data
+  // arrives -- only the skeleton's contents swap in.
+  if (!loaded) {
+    return (
+      <section className="py-16 bg-gray-50 border-t border-gray-100" aria-hidden="true">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-2">Genuine OEM Parts</p>
+              <h2 className="text-2xl font-bold text-gray-900">Spare Parts for {productName}</h2>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-100 overflow-hidden animate-pulse">
+                <div className="aspect-square bg-gray-100" />
+                <div className="p-3 space-y-2">
+                  <div className="h-2.5 w-1/2 bg-gray-100 rounded" />
+                  <div className="h-3 w-3/4 bg-gray-100 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (!parts.length) return null
+
   return (
     <section className="py-16 bg-gray-50 border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
