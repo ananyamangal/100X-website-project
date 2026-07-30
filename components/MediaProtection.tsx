@@ -44,18 +44,18 @@ export default function MediaProtection() {
     }
 
     // ── Disable picture-in-picture on all videos ──────────────────────
-    const disablePip = () => {
-      document.querySelectorAll<HTMLVideoElement>("video").forEach((v) => {
-        v.disablePictureInPicture = true
-        // Prevent keyboard shortcut PiP where supported
-        v.addEventListener("enterpictureinpicture", (ev) => ev.preventDefault(), { once: false })
-      })
+    // Each video is protected exactly once (tracked via WeakSet) so the
+    // enterpictureinpicture listener can never be stacked more than once
+    // per element, no matter how many times the observer below fires.
+    const pipProtected = new WeakSet<HTMLVideoElement>()
+    const protectVideo = (v: HTMLVideoElement) => {
+      if (pipProtected.has(v)) return
+      pipProtected.add(v)
+      v.disablePictureInPicture = true
+      // Prevent keyboard shortcut PiP where supported
+      v.addEventListener("enterpictureinpicture", (ev) => ev.preventDefault())
     }
-    disablePip()
-
-    // Re-run disablePip when new videos are added (lazy-loaded content)
-    const observer = new MutationObserver(disablePip)
-    observer.observe(document.body, { childList: true, subtree: true })
+    document.querySelectorAll<HTMLVideoElement>("video").forEach(protectVideo)
 
     document.addEventListener("contextmenu", blockContext)
     document.addEventListener("dragstart", blockDrag)
@@ -119,32 +119,48 @@ export default function MediaProtection() {
     }
 
     // ── Apply watermarked-image-wrap to product gallery containers ────
-    const wrapProductImages = () => {
-      const selectors = [
-        ".product-gallery img",
-        "[data-gallery] img",
-        ".deployment-image img",
-        ".case-study-image img",
-      ]
-      selectors.forEach((sel) => {
-        document.querySelectorAll<HTMLImageElement>(sel).forEach((img) => {
-          if (img.parentElement?.classList.contains("watermarked-image-wrap")) return
-          const wrap = document.createElement("div")
-          wrap.className = "watermarked-image-wrap"
-          img.parentNode?.insertBefore(wrap, img)
-          wrap.appendChild(img)
-        })
-      })
+    const gallerySelectors = [
+      ".product-gallery img",
+      "[data-gallery] img",
+      ".deployment-image img",
+      ".case-study-image img",
+    ]
+    const wrapImage = (img: HTMLImageElement) => {
+      if (img.parentElement?.classList.contains("watermarked-image-wrap")) return
+      if (!gallerySelectors.some((sel) => img.matches(sel))) return
+      const wrap = document.createElement("div")
+      wrap.className = "watermarked-image-wrap"
+      img.parentNode?.insertBefore(wrap, img)
+      wrap.appendChild(img)
     }
-    wrapProductImages()
-    const wrapObserver = new MutationObserver(wrapProductImages)
-    wrapObserver.observe(document.body, { childList: true, subtree: true })
+    gallerySelectors.forEach((sel) => {
+      document.querySelectorAll<HTMLImageElement>(sel).forEach(wrapImage)
+    })
+
+    // ── Watch for lazily-added videos/gallery images only ─────────────
+    // Inspects just each mutation's addedNodes instead of re-querying the
+    // whole document on every DOM change anywhere on the page (e.g. the
+    // homepage hero swapping slides every few seconds). Combined with the
+    // WeakSet dedup above, this is what previously caused unbounded
+    // listener/scan accumulation — and eventual freezing — on tabs left
+    // open for several minutes.
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        mutation.addedNodes.forEach((node) => {
+          if (!(node instanceof HTMLElement)) return
+          if (node instanceof HTMLVideoElement) protectVideo(node)
+          node.querySelectorAll<HTMLVideoElement>("video").forEach(protectVideo)
+          if (node instanceof HTMLImageElement) wrapImage(node)
+          node.querySelectorAll<HTMLImageElement>("img").forEach(wrapImage)
+        })
+      }
+    })
+    observer.observe(document.body, { childList: true, subtree: true })
 
     return () => {
       document.removeEventListener("contextmenu", blockContext)
       document.removeEventListener("dragstart", blockDrag)
       observer.disconnect()
-      wrapObserver.disconnect()
       document.getElementById("__media-protection")?.remove()
     }
   }, [])
