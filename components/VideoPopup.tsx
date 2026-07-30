@@ -54,10 +54,13 @@ export default function VideoPopup() {
         })
       })
       .catch(() => {
+        // Fail closed, matching the server route's own fetch-failure handling --
+        // a fetch error here (network blip, timeout, cold start) shouldn't force
+        // the popup to show regardless of what's actually configured in the DB.
         setConfig({
           youtubeUrl: FALLBACK_VIDEO_URL,
           orientation: "portrait",
-          enabled: true,
+          enabled: false,
           delayMs: 5000,
           sessionOnce: true,
           showOnMobile: true,
