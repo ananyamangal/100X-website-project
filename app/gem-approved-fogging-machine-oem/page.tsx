@@ -10,7 +10,7 @@ import FeaturedGovSupplies, { type SupplyRecord } from "@/components/trust/Featu
 import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
 import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/FeaturedDeployments"
 import PartnerApplyForm from "@/components/oem/PartnerApplyForm"
-import CelebrityTrustBadge from "@/components/landing/CelebrityTrustBadge"
+import CelebritySectionsBlock, { type HomepageSection } from "@/components/home/CelebritySectionsBlock"
 import OemHeroVisual from "@/components/oem/OemHeroVisual"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 
@@ -165,15 +165,17 @@ export default async function GemApprovedOEMPage() {
   let deployments: DeploymentRecord[] = []
   let kpis = { totalOrders: 500, statesServed: 15, departmentsServed: 80, unitsSupplied: 2000, yearsExperience: 12 }
   let supplyRecords: SupplyRecord[] = []
+  let celebrityHomepageSections: HomepageSection[] = []
 
   if (db) {
-    const [rawProducts, rawCustomers, rawKpis, rawPP, rawCaseStudies, rawDeployments] = await Promise.all([
+    const [rawProducts, rawCustomers, rawKpis, rawPP, rawCaseStudies, rawDeployments, rawCelebritySections] = await Promise.all([
       db.collection("products").find({ isPublished: { $ne: false } }).sort({ order: 1 }).limit(12).toArray(),
       db.collection("customers").find({ isActive: { $ne: false } }).sort({ order: 1 }).toArray(),
       db.collection("gov_kpis").findOne({ key: "main" }),
       db.collection("gov_past_performance").find({ isPublic: true }).sort({ orderYear: -1 }).limit(12).toArray(),
       db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(9).toArray(),
       db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).limit(6).toArray(),
+      db.collection("homepage_sections").find({ sectionKey: "celebrity-solution-mushtaq", enabled: true }).toArray(),
     ])
 
     products = normalizeProducts(JSON.parse(JSON.stringify(rawProducts))).map((p: any) => ({
@@ -196,6 +198,7 @@ export default async function GemApprovedOEMPage() {
       state: r.state, product: r.product, category: r.category,
       status: r.status, orderYear: r.orderYear, verified: r.verified || false,
     }))
+    celebrityHomepageSections = JSON.parse(JSON.stringify(rawCelebritySections))
   }
 
   return (
@@ -261,6 +264,11 @@ export default async function GemApprovedOEMPage() {
             </div>
           </div>
         </section>
+
+        <CelebritySectionsBlock
+          sections={celebrityHomepageSections}
+          placement={celebrityHomepageSections[0]?.placement ?? "after-hero"}
+        />
 
         {/* ── 2. Government Experience ─────────────────────────────────────────── */}
         <section className="py-20 md:py-24 bg-gray-950">
@@ -418,9 +426,6 @@ export default async function GemApprovedOEMPage() {
                 <p className="text-gray-400 text-base">
                   Tell us what you need — a quote, a dealership, or both. Our team responds within 1 business day.
                 </p>
-              </div>
-              <div className="flex justify-center mb-6">
-                <CelebrityTrustBadge theme="dark" />
               </div>
               <div className="glass-card rounded-2xl p-6 md:p-8">
                 <PartnerApplyForm source="partner_application" />

@@ -2,8 +2,16 @@
 
 import React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { optimizeCloudinary } from "@/lib/cloudinaryUrl"
+
+// Source celebrity photos are tall cutout portraits (~3115x4672, ratio 1:1.5).
+// Actual per-image aspect varies by CMS upload, but this is only used as
+// next/image's intrinsic-size hint for CLS reservation -- the visible size is
+// still fully controlled by each usage's height + object-contain className.
+const CUTOUT_RATIO = 1.5
+const cutoutHeight = (width: number) => Math.round(width * CUTOUT_RATIO)
 
 export interface HomepageSection {
   _id: string
@@ -177,10 +185,13 @@ function CutoutImage({ s, maxH = 480 }: { s: HomepageSection; maxH?: number }) {
   const src = optimizeCloudinary(s.imageUrl, 640)
   return (
     <div className="flex items-end justify-center h-full">
-      <img
+      <Image
         src={src}
         alt={s.imageAlt || s.headline}
-        className="w-full object-contain drop-shadow-2xl select-none pointer-events-none"
+        width={640}
+        height={cutoutHeight(640)}
+        unoptimized
+        className="w-full h-auto object-contain drop-shadow-2xl select-none pointer-events-none"
         style={{ maxHeight: `${maxH}px` }}
         loading="lazy"
         draggable={false}
@@ -263,10 +274,13 @@ function ComparisonLayout({ s }: { s: HomepageSection }) {
         {/* Mobile image (always at top for comparison layout) */}
         {hasImage && imageRight && (
           <div className="lg:hidden flex justify-center mt-6">
-            <img
+            <Image
               src={optimizeCloudinary(s.imageUrl!, 360)}
               alt={s.imageAlt || s.headline}
-              className="h-48 object-contain drop-shadow-xl"
+              width={360}
+              height={cutoutHeight(360)}
+              unoptimized
+              className="h-48 w-auto object-contain drop-shadow-xl"
               loading="lazy"
             />
           </div>
@@ -330,10 +344,13 @@ function PillarsLayout({ s }: { s: HomepageSection }) {
         {/* Mobile image */}
         {hasImage && (
           <div className="lg:hidden flex justify-center mt-8">
-            <img
+            <Image
               src={optimizeCloudinary(s.imageUrl!, 320)}
               alt={s.imageAlt || s.headline}
-              className="h-56 object-contain drop-shadow-xl"
+              width={320}
+              height={cutoutHeight(320)}
+              unoptimized
+              className="h-56 w-auto object-contain drop-shadow-xl"
               loading="lazy"
             />
           </div>
@@ -397,10 +414,13 @@ function GridCardsLayout({ s }: { s: HomepageSection }) {
         {/* Optional celebrity image above grid */}
         {hasImage && (
           <div className="flex justify-center mb-10">
-            <img
+            <Image
               src={optimizeCloudinary(s.imageUrl!, 320)}
               alt={s.imageAlt || s.headline}
-              className="h-52 object-contain drop-shadow-xl"
+              width={320}
+              height={cutoutHeight(320)}
+              unoptimized
+              className="h-52 w-auto object-contain drop-shadow-xl"
               loading="lazy"
             />
           </div>
@@ -467,7 +487,15 @@ function SplitLayout({ s }: { s: HomepageSection }) {
 
         {hasImage && (
           <div className="lg:hidden flex justify-center mt-8">
-            <img src={optimizeCloudinary(s.imageUrl!, 300)} alt={s.imageAlt || s.headline} className="h-48 object-contain drop-shadow-xl" loading="lazy" />
+            <Image
+              src={optimizeCloudinary(s.imageUrl!, 300)}
+              alt={s.imageAlt || s.headline}
+              width={300}
+              height={cutoutHeight(300)}
+              unoptimized
+              className="h-48 w-auto object-contain drop-shadow-xl"
+              loading="lazy"
+            />
           </div>
         )}
       </div>
@@ -486,7 +514,15 @@ function CenteredLayout({ s }: { s: HomepageSection }) {
       <div className="max-w-3xl mx-auto px-4">
         {s.imageUrl && (
           <div className="flex justify-center mb-8">
-            <img src={optimizeCloudinary(s.imageUrl, 280)} alt={s.imageAlt || s.headline} className="h-56 object-contain drop-shadow-xl" loading="lazy" />
+            <Image
+            src={optimizeCloudinary(s.imageUrl, 280)}
+            alt={s.imageAlt || s.headline}
+            width={280}
+            height={cutoutHeight(280)}
+            unoptimized
+            className="h-56 w-auto object-contain drop-shadow-xl"
+            loading="lazy"
+          />
           </div>
         )}
         <Badge text={s.badge || ""} cls={tc.badge} />

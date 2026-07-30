@@ -8,7 +8,7 @@ import clientPromise from "@/lib/mongodb"
 import { normalizeProducts } from "@/lib/normalizeProduct"
 import GovProductCarousel, { type ProductSlim } from "@/components/gov-procurement/GovProductCarousel"
 import GovRFQForm from "@/components/gov-procurement/GovRFQForm"
-import CelebrityTrustBadge from "@/components/landing/CelebrityTrustBadge"
+import CelebritySectionsBlock, { type HomepageSection } from "@/components/home/CelebritySectionsBlock"
 import GovPastPerformance from "@/components/gov-procurement/GovPastPerformance"
 import TenderPackLeadCapture from "@/components/gov-procurement/TenderPackLeadCapture"
 import GovLogoWall, { type GovLogo } from "@/components/trust/GovLogoWall"
@@ -433,16 +433,18 @@ export default async function GovernmentProcurementPage() {
   let caseStudies: any[] = []
   let supplyRecords: SupplyRecord[] = []
   let deployments: DeploymentRecord[] = []
+  let celebrityHomepageSections: HomepageSection[] = []
 
   if (db) {
     try {
-      const [rawProducts, rawCustomers, rawKpis, rawCaseStudies, rawPP, rawDeployments] = await Promise.all([
+      const [rawProducts, rawCustomers, rawKpis, rawCaseStudies, rawPP, rawDeployments, rawCelebritySections] = await Promise.all([
         db.collection("products").find({ isPublished: { $ne: false } }).sort({ order: 1, createdAt: -1 }).toArray(),
         db.collection("customers").find({ isActive: { $ne: false } }).sort({ order: 1 }).toArray(),
         db.collection("gov_kpis").findOne({ key: "main" }),
         db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(9).toArray(),
         db.collection("gov_past_performance").find({ isPublic: true }).sort({ orderYear: -1 }).limit(9).toArray(),
         db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).limit(6).toArray(),
+        db.collection("homepage_sections").find({ sectionKey: "celebrity-solution-mushtaq", enabled: true }).toArray(),
       ])
 
       products = normalizeProducts(JSON.parse(JSON.stringify(rawProducts))).map((p: any) => ({
@@ -470,6 +472,7 @@ export default async function GovernmentProcurementPage() {
         status: r.status, orderYear: r.orderYear, verified: r.verified || false,
       }))
       deployments = JSON.parse(JSON.stringify(rawDeployments)).map((d: any) => ({ ...d, _id: String(d._id) }))
+      celebrityHomepageSections = JSON.parse(JSON.stringify(rawCelebritySections))
     } catch {
       // Supplementary data — page renders without it
     }
@@ -600,6 +603,11 @@ export default async function GovernmentProcurementPage() {
             </div>
           </div>
         </section>
+
+        <CelebritySectionsBlock
+          sections={celebrityHomepageSections}
+          placement={celebrityHomepageSections[0]?.placement ?? "after-hero"}
+        />
 
         {/* ── 2. KPI strip — dark section so glass-card and white text render correctly ── */}
         <section className="bg-gray-950 border-b border-white/[0.06] py-10 md:py-14">
@@ -928,9 +936,6 @@ export default async function GovernmentProcurementPage() {
             <p className="text-xs text-brand-600 mb-5">
               We respond within 24 hours with L1 quotation + complete tender documentation pack.
             </p>
-            <div className="flex justify-center mb-6">
-              <CelebrityTrustBadge theme="light" />
-            </div>
             <GovRFQForm />
           </div>
 
