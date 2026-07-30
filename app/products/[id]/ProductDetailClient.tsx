@@ -1,5 +1,6 @@
 ﻿'use client';
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import {
   ChevronDown, ChevronLeft, ChevronRight, Download, MessageCircle, Play,
   Star, Wrench, ShieldCheck, Building2, ArrowRight, CheckCircle2, Zap,
@@ -138,11 +139,12 @@ function Gallery({ images, videoId, name }: { images: string[]; videoId: string 
         )}
 
         {cur?.kind === 'image' && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={(cur as any).url} alt={name} fetchPriority="high"
-            width={600} height={600}
-            className="absolute inset-0 w-full h-full object-contain p-8 transition-transform duration-150"
+          <Image
+            src={(cur as any).url} alt={name}
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            priority
+            className="object-contain p-8 transition-transform duration-150"
             style={{ transform: zoomed ? 'scale(2.2)' : 'scale(1)', transformOrigin: origin }}
             draggable={false} onContextMenu={e => e.preventDefault()}
           />

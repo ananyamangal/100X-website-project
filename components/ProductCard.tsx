@@ -1,4 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -90,12 +91,13 @@ export default function ProductCard({
         className="block relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-inset"
       >
         <div className="relative w-full aspect-[4/3] overflow-hidden bg-white">
-          <img
+          <Image
             src={images[currentImageIndex]}
             alt={product.name}
-            loading="lazy"
+            fill
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
             decoding="async"
-            className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-[1.02]"
+            className="object-contain p-4 transition-transform duration-500 group-hover:scale-[1.02]"
           />
         </div>
         {images.length > 1 && (

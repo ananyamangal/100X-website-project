@@ -1,5 +1,6 @@
 ﻿'use client'
 import React, { useState, useMemo } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Download, MessageCircle, Star } from 'lucide-react'
 import ScrollReveal from '@/components/cinematic/ScrollReveal'
@@ -53,17 +54,15 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
     <div className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg hover:border-brand-200 transition-all duration-300 hover:-translate-y-1 flex flex-col">
       {/* Image area */}
       <Link href={productUrl} className="block relative overflow-hidden bg-gray-50 aspect-[4/3]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={images[imgIdx]}
           alt={product.name}
-          width={400}
-          height={300}
-          loading="lazy"
+          fill
+          sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           decoding="async"
-          className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-[1.03]"
+          className="object-contain p-4 transition-transform duration-500 group-hover:scale-[1.03]"
           onContextMenu={(e) => e.preventDefault()}
-          draggable="false"
+          draggable={false}
         />
         {/* Badges */}
         {product.badges?.slice(0, 2).map((rawBadge: string, i: number) => {

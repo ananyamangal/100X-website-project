@@ -1,5 +1,6 @@
 ﻿'use client';
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, MessageCircle, Star, CheckCircle, Play, Shield, Download, Package, Wrench, FileText, HelpCircle, Layers, Award, ChevronDown, Building2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -635,11 +636,13 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
                                         </button>
                                     )
                                 ) : (
-                                    <img
+                                    <Image
                                         src={safeStr((mediaItems[currentIdx] as any)?.url) || '/placeholder.svg'}
                                         alt={productName}
-                                        fetchPriority="high"
-                                        className="max-h-[480px] w-full object-contain transition-transform duration-200"
+                                        width={800}
+                                        height={600}
+                                        priority
+                                        className="max-h-[480px] w-full h-auto object-contain transition-transform duration-200"
                                         style={{ transform: isZoomed ? 'scale(2)' : 'scale(1)', transformOrigin }}
                                         draggable={false}
                                         onContextMenu={e => e.preventDefault()}
