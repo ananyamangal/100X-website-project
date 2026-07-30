@@ -4,6 +4,7 @@ import { Plus, Edit, Trash2, Save, X, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageUploadField } from "./ImageUploadField"
 
 interface Review {
   _id?: string
@@ -96,8 +97,15 @@ export function ReviewsTab() {
             {field("location", "Location (City, State)")}
             {field("product", "Product (optional — filters to product page)")}
             {field("rating", "Rating (1-5)", "number")}
-            {field("imageUrl", "Photo URL (optional)")}
             {field("order", "Display Order", "number")}
+          </div>
+          <div className="mb-4">
+            <label className="block text-xs font-medium text-gray-600 mb-1">Customer Photo (optional)</label>
+            <ImageUploadField
+              value={editItem.imageUrl || ""}
+              onChange={(url) => setEditItem((p) => p ? { ...p, imageUrl: url } : p)}
+              standards="JPG/PNG/WebP — a headshot or business photo works best"
+            />
           </div>
           <div className="mb-4">
             <label className="block text-xs font-medium text-gray-600 mb-1">Review Text *</label>
