@@ -368,6 +368,24 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
 
   const productId = product?._id || product?.id
 
+  // Mirrors the highlight-image selection in components/product/ProductDetailV2.tsx:
+  // the public gallery appends chapter images, then UGC images, deduped against
+  // imageUrls and capped at 5, after the primary product photos. Admins editing
+  // "Product Images" otherwise have no visibility into these — surfaced here
+  // read-only so they know what's actually showing without duplicating the edit
+  // controls that already live in the Advanced (chapters) and Marketing (UGC) tabs.
+  const isValidImageUrl = (u: unknown): u is string => typeof u === "string" && (u.startsWith("http") || u.startsWith("/"))
+  const galleryChapterCandidates = (Array.isArray(formData.filmChapters) ? formData.filmChapters : [])
+    .filter((c: any) => isValidImageUrl(c?.imageUrl))
+    .map((c: any) => ({ url: c.imageUrl as string, label: c?.title || "", source: "Chapter" as const }))
+  const galleryUgcCandidates = (Array.isArray(formData.ugcImages) ? formData.ugcImages : [])
+    .filter(isValidImageUrl)
+    .map((u: string) => ({ url: u, label: "", source: "UGC" as const }))
+  const galleryHighlightCandidates = [...galleryChapterCandidates, ...galleryUgcCandidates]
+    .filter(c => !(formData.imageUrls || []).includes(c.url))
+  const galleryHighlights = galleryHighlightCandidates.slice(0, 5)
+  const galleryHiddenCount = galleryHighlightCandidates.length - galleryHighlights.length
+
   return (
     <Card>
       <CardHeader className="pb-0">
@@ -671,6 +689,54 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
                   max={5}
                   standards="JPG/PNG/WebP · max 2MB each · recommended 800×800px square"
                 />
+              </div>
+
+              {/* Read-only preview: what the public gallery also pulls in from Chapters + UGC */}
+              <div className="p-4 rounded-lg border border-dashed border-gray-300 bg-gray-50/60">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-gray-700">Also Showing in Public Gallery</label>
+                  <span className="text-xs text-gray-400">read-only</span>
+                </div>
+                <p className="text-xs text-gray-500 mb-3">
+                  The public gallery appends up to 5 highlight photos (chapters first, then deployment/UGC) after
+                  the images above. Edit these in the Advanced or Marketing tabs — shown here just so it's visible
+                  in context.
+                </p>
+                {galleryHighlights.length === 0 ? (
+                  <p className="text-xs text-gray-400 italic">
+                    No chapter or UGC images currently qualify (none added yet, or all already used above).
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-3">
+                    {galleryHighlights.map((h, i) => (
+                      <button
+                        type="button"
+                        key={`${h.source}-${h.url}-${i}`}
+                        onClick={() => setActiveTab(h.source === "Chapter" ? "advanced" : "marketing")}
+                        className="group w-20 text-left"
+                        title={`Edit in ${h.source === "Chapter" ? "Advanced" : "Marketing"} tab`}
+                      >
+                        <div className="relative">
+                          <img src={h.url} alt="" className="w-20 h-20 object-cover rounded-lg border border-gray-200 group-hover:opacity-80" />
+                          <span
+                            className={cn(
+                              "absolute top-1 left-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                              h.source === "Chapter" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
+                            )}
+                          >
+                            {h.source}
+                          </span>
+                        </div>
+                        {h.label && <p className="text-[10px] text-gray-500 mt-1 truncate">{h.label}</p>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {galleryHiddenCount > 0 && (
+                  <p className="text-xs text-amber-600 mt-2">
+                    +{galleryHiddenCount} more chapter/UGC image{galleryHiddenCount === 1 ? "" : "s"} not shown — the gallery caps highlights at 5.
+                  </p>
+                )}
               </div>
 
               {/* Brochure */}
