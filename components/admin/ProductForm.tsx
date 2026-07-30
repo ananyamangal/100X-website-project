@@ -141,6 +141,7 @@ interface ProductData {
   warrantyDescription?: string
   warrantyIcon?: string
   ugcImages?: string[] | any
+  galleryExcludedImageUrls?: string[] | any
   slug?: string
   seoTitle?: string
   metaDescription?: string
@@ -220,6 +221,7 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
     warrantyDescription: product?.warrantyDescription || "",
     warrantyIcon: product?.warrantyIcon || "",
     ugcImages: toStringArray(product?.ugcImages),
+    galleryExcludedImageUrls: toStringArray(product?.galleryExcludedImageUrls),
     slug: product?.slug || "",
     seoTitle: product?.seoTitle || "",
     metaDescription: product?.metaDescription || "",
@@ -262,6 +264,7 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
     performanceMetrics: toStringArray(formData.performanceMetrics),
     productFaqs: Array.isArray(formData.productFaqs) ? formData.productFaqs : [],
     ugcImages: Array.isArray(formData.ugcImages) ? formData.ugcImages : toStringArray(formData.ugcImages as any),
+    galleryExcludedImageUrls: Array.isArray(formData.galleryExcludedImageUrls) ? formData.galleryExcludedImageUrls : toStringArray(formData.galleryExcludedImageUrls as any),
     badges: toStringArray(formData.badges),
     family: formData.family || undefined,
     inStock: formData.inStock,
@@ -383,8 +386,15 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
     .map((u: string) => ({ url: u, label: "", source: "UGC" as const }))
   const galleryHighlightCandidates = [...galleryChapterCandidates, ...galleryUgcCandidates]
     .filter(c => !(formData.imageUrls || []).includes(c.url))
-  const galleryHighlights = galleryHighlightCandidates.slice(0, 5)
-  const galleryHiddenCount = galleryHighlightCandidates.length - galleryHighlights.length
+  const galleryExcludedSet = new Set<string>(formData.galleryExcludedImageUrls || [])
+  const galleryActiveCandidates = galleryHighlightCandidates.filter(c => !galleryExcludedSet.has(c.url))
+  const galleryExcludedCandidates = galleryHighlightCandidates.filter(c => galleryExcludedSet.has(c.url))
+  const galleryHighlights = galleryActiveCandidates.slice(0, 5)
+  const galleryHiddenCount = galleryActiveCandidates.length - galleryHighlights.length
+  const excludeFromGallery = (url: string) =>
+    set("galleryExcludedImageUrls", [...(formData.galleryExcludedImageUrls || []), url])
+  const restoreToGallery = (url: string) =>
+    set("galleryExcludedImageUrls", (formData.galleryExcludedImageUrls || []).filter((u: string) => u !== url))
 
   return (
     <Card>
@@ -699,36 +709,45 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
                 </div>
                 <p className="text-xs text-gray-500 mb-3">
                   The public gallery appends up to 5 highlight photos (chapters first, then deployment/UGC) after
-                  the images above. Edit these in the Advanced or Marketing tabs — shown here just so it's visible
-                  in context.
+                  the images above. Use × to hide a photo from the public gallery without deleting it — it stays
+                  intact in the Advanced/Marketing tab where it came from. Click a thumbnail to edit it there.
                 </p>
                 {galleryHighlights.length === 0 ? (
                   <p className="text-xs text-gray-400 italic">
-                    No chapter or UGC images currently qualify (none added yet, or all already used above).
+                    No chapter or UGC images currently qualify (none added yet, all excluded, or all already used above).
                   </p>
                 ) : (
                   <div className="flex flex-wrap gap-3">
                     {galleryHighlights.map((h, i) => (
-                      <button
-                        type="button"
-                        key={`${h.source}-${h.url}-${i}`}
-                        onClick={() => setActiveTab(h.source === "Chapter" ? "advanced" : "marketing")}
-                        className="group w-20 text-left"
-                        title={`Edit in ${h.source === "Chapter" ? "Advanced" : "Marketing"} tab`}
-                      >
+                      <div key={`${h.source}-${h.url}-${i}`} className="group w-20">
                         <div className="relative">
-                          <img src={h.url} alt="" className="w-20 h-20 object-cover rounded-lg border border-gray-200 group-hover:opacity-80" />
-                          <span
-                            className={cn(
-                              "absolute top-1 left-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-                              h.source === "Chapter" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
-                            )}
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab(h.source === "Chapter" ? "advanced" : "marketing")}
+                            className="block w-full text-left"
+                            title={`Edit in ${h.source === "Chapter" ? "Advanced" : "Marketing"} tab`}
                           >
-                            {h.source}
-                          </span>
+                            <img src={h.url} alt="" className="w-20 h-20 object-cover rounded-lg border border-gray-200 group-hover:opacity-80" />
+                            <span
+                              className={cn(
+                                "absolute top-1 left-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                                h.source === "Chapter" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
+                              )}
+                            >
+                              {h.source}
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => excludeFromGallery(h.url)}
+                            title="Remove from public gallery (keeps the source image intact)"
+                            className="absolute top-1 right-1 w-4 h-4 flex items-center justify-center rounded-full bg-white/90 text-gray-500 border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-2.5 h-2.5" />
+                          </button>
                         </div>
                         {h.label && <p className="text-[10px] text-gray-500 mt-1 truncate">{h.label}</p>}
-                      </button>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -736,6 +755,37 @@ export function ProductForm({ product, categories, onAddCategory, onSave, onCanc
                   <p className="text-xs text-amber-600 mt-2">
                     +{galleryHiddenCount} more chapter/UGC image{galleryHiddenCount === 1 ? "" : "s"} not shown — the gallery caps highlights at 5.
                   </p>
+                )}
+                {galleryExcludedCandidates.length > 0 && (
+                  <details className="mt-3">
+                    <summary className="text-xs text-gray-500 cursor-pointer select-none hover:text-gray-700">
+                      {galleryExcludedCandidates.length} excluded from public gallery
+                    </summary>
+                    <div className="flex flex-wrap gap-3 mt-2">
+                      {galleryExcludedCandidates.map((h, i) => (
+                        <div key={`excluded-${h.source}-${h.url}-${i}`} className="w-20">
+                          <div className="relative">
+                            <img src={h.url} alt="" className="w-20 h-20 object-cover rounded-lg border border-gray-200 opacity-50" />
+                            <span
+                              className={cn(
+                                "absolute top-1 left-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                                h.source === "Chapter" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
+                              )}
+                            >
+                              {h.source}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => restoreToGallery(h.url)}
+                            className="mt-1 w-full text-[10px] text-green-700 hover:text-green-800 hover:underline flex items-center justify-center gap-0.5"
+                          >
+                            <RotateCcw className="w-2.5 h-2.5" /> Restore
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
                 )}
               </div>
 

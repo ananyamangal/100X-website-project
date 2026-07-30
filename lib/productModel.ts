@@ -109,6 +109,8 @@ export interface Product {
   family?: string;
   // UGC / deployment carousel images
   ugcImages?: string[];
+  // Chapter/UGC image URLs excluded from the public gallery merge (source content untouched)
+  galleryExcludedImageUrls?: string[];
   // SEO overrides
   seoTitle?: string;
   metaDescription?: string;

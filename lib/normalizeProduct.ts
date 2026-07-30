@@ -103,6 +103,8 @@ export function normalizeProduct(raw: any): any {
     linkedCaseStudyIds: toObjectArray(raw.linkedCaseStudyIds),
     // UGC deployment carousel
     ugcImages: toStringArray(raw.ugcImages),
+    // Chapter/UGC images excluded from the public gallery merge
+    galleryExcludedImageUrls: toStringArray(raw.galleryExcludedImageUrls),
     // Image URLs — unified
     imageUrls,
   }

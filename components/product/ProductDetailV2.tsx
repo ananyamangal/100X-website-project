@@ -702,8 +702,9 @@ export default function ProductDetailV2({ product }: Props) {
   const chapterImages = (Array.isArray(product.filmChapters) ? product.filmChapters as any[] : [])
     .map(c => s(c?.imageUrl))
     .filter(u => u.startsWith('http') || u.startsWith('/'))
+  const galleryExcluded = arr(product.galleryExcludedImageUrls)
   const highlightImages = [...chapterImages, ...ugcImages]
-    .filter(u => !images.includes(u))
+    .filter(u => !images.includes(u) && !galleryExcluded.includes(u))
     .slice(0, 5)
   const productId    = s(product._id)
   const productSlug  = s(product.slug) || productId
