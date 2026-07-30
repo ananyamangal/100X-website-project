@@ -60,14 +60,14 @@ export default async function RelatedProductsSection({
                   href={getProductCanonicalUrl(p.slug || p.id)}
                   className="group block bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                 >
-                  <div className="aspect-[4/3] bg-gray-100 overflow-hidden">
+                  <div className="aspect-[4/3] bg-white overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={img}
                       alt={p.name}
                       loading="lazy"
                       decoding="async"
-                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                      className="w-full h-full object-contain p-4 group-hover:scale-[1.02] transition-transform duration-300"
                     />
                   </div>
                   <div className="p-4">
