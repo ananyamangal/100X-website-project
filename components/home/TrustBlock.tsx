@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import React, { useState, useEffect } from "react"
+import Image from "next/image"
 import useEmblaCarousel from "embla-carousel-react"
 import { ChevronLeft, ChevronRight, Quote, ShieldCheck, MapPin, Building2, Globe2, Factory, BadgeCheck } from "lucide-react"
 
@@ -79,11 +80,12 @@ function ReviewsCarousel() {
                   "{review.review}"
                 </p>
                 <div className="mt-6 flex items-center gap-3 border-t border-gray-100 pt-5">
-                  <img
+                  <Image
                     src={review.avatar}
                     alt=""
                     aria-hidden="true"
-                    loading="lazy"
+                    width={44}
+                    height={44}
                     decoding="async"
                     className="w-11 h-11 rounded-full object-cover border border-gray-200 shrink-0"
                   />

@@ -1,4 +1,5 @@
-﻿import Link from "next/link"
+﻿import Image from "next/image"
+import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { getRelatedProducts } from "@/lib/productsQuery"
 import { getProductCanonicalUrl } from "@/lib/seo/product-landing-map"
@@ -60,14 +61,15 @@ export default async function RelatedProductsSection({
                   href={getProductCanonicalUrl(p.slug || p.id)}
                   className="group block bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                 >
-                  <div className="aspect-[4/3] bg-white overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                  <div className="aspect-[4/3] bg-white overflow-hidden relative">
+                    <Image
                       src={img}
                       alt={p.name}
-                      loading="lazy"
+                      fill
+                      sizes="(min-width: 1024px) 25vw, 50vw"
+                      unoptimized
                       decoding="async"
-                      className="w-full h-full object-contain p-4 group-hover:scale-[1.02] transition-transform duration-300"
+                      className="object-contain p-4 group-hover:scale-[1.02] transition-transform duration-300"
                     />
                   </div>
                   <div className="p-4">

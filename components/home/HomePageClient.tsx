@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { Download, MessageCircle, Star, ChevronRight, ChevronLeft, X, CheckCircle, Loader2 } from "lucide-react"
@@ -369,8 +370,8 @@ export default function HomePageClient({
               <a key={part._id} href={buildPartUrl(part)}
                 className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/8 hover:border-brand-500/30 transition-all">
                 {part.images?.[0] ? (
-                  <div className="aspect-square overflow-hidden bg-gray-900">
-                    <img src={part.images[0]} alt={part.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                  <div className="aspect-square overflow-hidden bg-gray-900 relative">
+                    <Image src={part.images[0]} alt={part.name} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                   </div>
                 ) : (
                   <div className="aspect-square bg-gray-800 flex items-center justify-center">

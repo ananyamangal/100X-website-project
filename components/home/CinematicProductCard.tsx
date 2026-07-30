@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, MessageCircle } from "lucide-react"
 import { BUSINESS } from "@/lib/seo/site-config"
@@ -43,14 +44,12 @@ export default function CinematicProductCard({ product, index = 0, onBrochureDow
     >
       {/* Image — no overlapping overlays, clean aspect ratio */}
       <Link href={productUrl} className="block relative overflow-hidden bg-gray-50/60 aspect-[4/3]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={img}
           alt={product.name}
-          width={400}
-          height={300}
-          className="w-full h-full object-contain p-5 transition-transform duration-700 group-hover:scale-[1.04]"
-          loading="lazy"
+          fill
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          className="object-contain p-5 transition-transform duration-700 group-hover:scale-[1.04]"
           decoding="async"
         />
         {/* 100X brand badge — replaces vendor watermark */}

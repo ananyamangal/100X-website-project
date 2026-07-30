@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import React, { useState, useRef } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import {
   Flame,
@@ -199,12 +200,12 @@ export default function TechnologyBlock({ content }: Props) {
 
                         {/* Per-step media */}
                         {step.mediaUrl && step.mediaType === "image" && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
                             src={step.mediaUrl}
                             alt={step.mediaAlt || step.title}
-                            className="mt-3 rounded-xl w-full max-h-48 object-cover ring-1 ring-gray-200"
-                            loading="lazy"
+                            width={800}
+                            height={400}
+                            className="mt-3 rounded-xl w-full h-auto max-h-48 object-cover ring-1 ring-gray-200"
                             decoding="async"
                           />
                         )}
