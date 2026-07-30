@@ -149,8 +149,12 @@ export default function VideoPopup() {
 
   return (
     <div
-      className="fixed right-6 z-[49] flex flex-col items-end gap-1"
-      style={{ bottom: "7rem" }}
+      // Mobile: clears MobileCtaBar via the same --mobile-cta-bar-h CSS var
+      // MobileCtaBar itself maintains, instead of a fixed offset that could
+      // silently start overlapping it if the bar ever grows taller (wrapped
+      // labels on tiny viewports). Desktop: bottom-28 (7rem) clears
+      // WhatsAppFloatingButton, which doesn't render on mobile.
+      className="fixed right-6 z-[49] flex flex-col items-end gap-1 bottom-[calc(var(--mobile-cta-bar-h)+1rem)] md:bottom-28"
     >
       {/* Close + mute controls */}
       <div className="flex items-center gap-1.5 -mb-1 z-10">
