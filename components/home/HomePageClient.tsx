@@ -398,7 +398,7 @@ export default function HomePageClient({
     gov_performance: () => <GovPerformanceSnapshot initialKpis={govKpis ?? undefined} />,
     gov_success: () => <HomeCaseStudiesSection initialData={caseStudies.length > 0 ? caseStudies : undefined} />,
     deployments: () => <HomeDeploymentsSection initialData={deployments.length > 0 ? deployments : undefined} />,
-    reviews: () => <ReviewsSection limit={4} />,
+    reviews: () => <ReviewsSection />,
     trust_certifications: () => (
       <>
         <CelebritySectionsBlock sections={homepageSections} placement="before-trust" />
