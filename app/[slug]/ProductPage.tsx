@@ -246,15 +246,31 @@ function SparePartsTabContent({ productId }: { productId: string }) {
     const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
-        if (loaded || !productId) return;
-        setLoaded(true);
+        if (!productId) return;
         fetch(`/api/spare-parts?product=${productId}`)
             .then(r => r.json())
             .then(data => setParts(Array.isArray(data) ? data : []))
-            .catch(() => {});
-    }, [productId, loaded]);
+            .catch(() => {})
+            .finally(() => setLoaded(true));
+    }, [productId]);
 
-    if (!parts.length && !loaded) return <p className="text-sm text-gray-400">Loading compatible parts…</p>;
+    // Same-shaped skeleton while the fetch is in flight -- swapping straight
+    // from "no parts listed" text (with its own link) to the real grid once
+    // data arrives would replace whatever's under the user's cursor at the
+    // wrong instant, same class of bug fixed in ProductDetailV2 today.
+    if (!loaded) return (
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4" aria-hidden="true">
+            {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex gap-3 p-3.5 bg-gray-50 rounded-xl border border-gray-100 animate-pulse">
+                    <div className="w-14 h-14 bg-gray-200 rounded-lg shrink-0" />
+                    <div className="min-w-0 flex-1 space-y-2 py-1">
+                        <div className="h-2.5 w-1/3 bg-gray-200 rounded" />
+                        <div className="h-3 w-3/4 bg-gray-200 rounded" />
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
     if (!parts.length) return (
         <div className="text-center py-6">
             <p className="text-sm text-gray-500 mb-3">No spare parts listed yet for this product.</p>
