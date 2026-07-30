@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
     const result = await db.collection('submissions').insertOne(submission);
     return NextResponse.json({ ...submission, _id: result.insertedId }, { status: 201 });
   } catch (error) {
+    console.error('[api/submissions] POST failed', error);
     return NextResponse.json({ error: 'Failed to save submission' }, { status: 500 });
   }
 }

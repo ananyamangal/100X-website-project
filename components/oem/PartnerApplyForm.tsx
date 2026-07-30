@@ -41,6 +41,14 @@ export default function PartnerApplyForm({ source = "partner_application", compa
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+
+    // TEMP DEBUG: tracing intermittent submit failures — remove once resolved.
+    console.log("[PartnerApplyForm] submit attempt", { sending, elapsedMs: Date.now() - mountedAtRef.current })
+    if (sending) {
+      console.log("[PartnerApplyForm] blocked re-entrant submit while a request is already in flight")
+      return
+    }
+
     setError("")
 
     if (!wantsQuote && !wantsDealer) {
@@ -54,7 +62,9 @@ export default function PartnerApplyForm({ source = "partner_application", compa
     // submissions (likely browser/extension autofill matching its name), which
     // blocked real leads. This check is immune to that since it never reads
     // the field's value.
-    if (Date.now() - mountedAtRef.current < 2000) {
+    const elapsed = Date.now() - mountedAtRef.current
+    if (elapsed < 2000) {
+      console.log("[PartnerApplyForm] time gate rejected submit", { elapsedMs: elapsed })
       setError("Please try again.")
       return
     }
@@ -106,7 +116,10 @@ export default function PartnerApplyForm({ source = "partner_application", compa
         }),
       })
 
-      if (!res.ok) throw new Error(`Server error ${res.status}`)
+      const resBodyText = await res.clone().text()
+      console.log("[PartnerApplyForm] /api/submissions response", { status: res.status, ok: res.ok, body: resBodyText })
+
+      if (!res.ok) throw new Error(`Server error ${res.status}: ${resBodyText}`)
 
       // Fire generate_lead only AFTER the server confirms the save — never on
       // click alone. "Request quote" in Google Ads listens on this event.
@@ -124,7 +137,8 @@ export default function PartnerApplyForm({ source = "partner_application", compa
       formRef.current?.reset()
       setWantsQuote(true)
       setWantsDealer(false)
-    } catch {
+    } catch (err) {
+      console.log("[PartnerApplyForm] submit failed", { name: err instanceof Error ? err.name : typeof err, message: err instanceof Error ? err.message : String(err) })
       setError("We couldn't save your request due to a connection issue. Please try again, or WhatsApp us directly and we'll respond right away.")
     } finally {
       setSending(false)
@@ -208,9 +222,15 @@ export default function PartnerApplyForm({ source = "partner_application", compa
         </div>
         <div className={compact ? "sm:col-span-2" : ""}>
           <label className={labelCls}>State *</label>
-          <select name="state" required defaultValue="" className={inputCls + " cursor-pointer"}>
-            <option value="" disabled>Select your state</option>
-            {INDIA_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+          <select
+            name="state"
+            required
+            defaultValue=""
+            className={inputCls + " cursor-pointer"}
+            style={{ colorScheme: "dark" }}
+          >
+            <option value="" disabled className="bg-gray-900 text-gray-500">Select your state</option>
+            {INDIA_STATES.map(s => <option key={s} value={s} className="bg-gray-900 text-white">{s}</option>)}
           </select>
         </div>
         <div className={compact ? "sm:col-span-2" : ""}>
