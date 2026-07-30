@@ -202,7 +202,7 @@ function ComparisonLayout({ s }: { s: HomepageSection }) {
   const rows = Math.max(bad.length, good.length)
 
   return (
-    <section className={cn("py-14 md:py-20 overflow-hidden", tc.section)}>
+    <section id={s.sectionKey} className={cn("py-14 md:py-20 overflow-hidden", tc.section)}>
       <SectionJsonLd s={s} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header — always full width */}
@@ -286,7 +286,7 @@ function PillarsLayout({ s }: { s: HomepageSection }) {
   const half = Math.ceil(bullets.length / 2)
 
   return (
-    <section className={cn("py-14 md:py-20 overflow-hidden relative", tc.section)}>
+    <section id={s.sectionKey} className={cn("py-14 md:py-20 overflow-hidden relative", tc.section)}>
       <SectionJsonLd s={s} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className={cn("grid gap-10 items-center", hasImage ? "lg:grid-cols-[1fr_1fr]" : "")}>
@@ -383,7 +383,7 @@ function GridCardsLayout({ s }: { s: HomepageSection }) {
   const hasImage = !!s.imageUrl
 
   return (
-    <section className={cn("py-14 md:py-20", tc.section)}>
+    <section id={s.sectionKey} className={cn("py-14 md:py-20", tc.section)}>
       <SectionJsonLd s={s} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
@@ -433,7 +433,7 @@ function SplitLayout({ s }: { s: HomepageSection }) {
   const imageLeft = s.imagePosition === "left"
 
   return (
-    <section className={cn("py-14 md:py-20 overflow-hidden", tc.section)}>
+    <section id={s.sectionKey} className={cn("py-14 md:py-20 overflow-hidden", tc.section)}>
       <SectionJsonLd s={s} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className={cn("grid gap-10 items-center", hasImage ? "lg:grid-cols-2" : "")}>
@@ -481,7 +481,7 @@ function CenteredLayout({ s }: { s: HomepageSection }) {
   const tc = T[s.theme] || T.light
 
   return (
-    <section className={cn("py-16 md:py-24 text-center overflow-hidden", tc.section)}>
+    <section id={s.sectionKey} className={cn("py-16 md:py-24 text-center overflow-hidden", tc.section)}>
       <SectionJsonLd s={s} />
       <div className="max-w-3xl mx-auto px-4">
         {s.imageUrl && (

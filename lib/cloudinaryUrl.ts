@@ -24,6 +24,20 @@ export function optimizeCloudinary(
 }
 
 /**
+ * Face-cropped square avatar transform, for small circular headshots (e.g.
+ * testimonial/trust-badge photos) cut from a full-body or portrait source
+ * image. `size` is the CSS display size in px — requested at 2x for
+ * retina/dpr_auto. No-ops for non-Cloudinary URLs.
+ */
+export function cloudinaryAvatarUrl(url: string | undefined | null, size = 64): string {
+  if (!url) return ""
+  if (!url.includes("res.cloudinary.com")) return url
+  const px = Math.round(size) * 2
+  const parts = ["f_auto", "q_auto", `w_${px}`, `h_${px}`, "c_fill", "g_face", "dpr_auto"]
+  return url.replace("/upload/", `/upload/${parts.join(",")}/`)
+}
+
+/**
  * Generate a tiny LQIP (Low Quality Image Placeholder) Cloudinary URL.
  * Used as blur placeholders while the full image loads.
  */

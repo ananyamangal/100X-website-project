@@ -10,6 +10,7 @@ import FeaturedGovSupplies, { type SupplyRecord } from "@/components/trust/Featu
 import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
 import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/FeaturedDeployments"
 import PartnerApplyForm from "@/components/oem/PartnerApplyForm"
+import CelebrityTrustBadge from "@/components/landing/CelebrityTrustBadge"
 import OemHeroVisual from "@/components/oem/OemHeroVisual"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 
@@ -420,6 +421,9 @@ export default async function GemApprovedOEMPage() {
               </div>
               <div className="glass-card rounded-2xl p-6 md:p-8">
                 <PartnerApplyForm source="partner_application" />
+              </div>
+              <div className="flex justify-center mt-6">
+                <CelebrityTrustBadge theme="dark" />
               </div>
               <p className="text-center text-gray-600 text-xs mt-6">
                 Prefer a call?{" "}

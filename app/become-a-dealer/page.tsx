@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
+import CelebrityTrustBadge from "@/components/landing/CelebrityTrustBadge"
 
 export const metadata: Metadata = {
   title: "Become an Authorized 100X Circle Dealer | Fogging Machine Distributor India",
@@ -231,6 +232,10 @@ export default function BecomeADealerPage() {
               Call: {BUSINESS.phonePrimary}
             </a>
           </div>
+        </div>
+
+        <div className="flex justify-center mb-10 -mt-4">
+          <CelebrityTrustBadge theme="light" />
         </div>
 
         {/* Benefits */}

@@ -8,6 +8,7 @@ import clientPromise from "@/lib/mongodb"
 import { normalizeProducts } from "@/lib/normalizeProduct"
 import GovProductCarousel, { type ProductSlim } from "@/components/gov-procurement/GovProductCarousel"
 import GovRFQForm from "@/components/gov-procurement/GovRFQForm"
+import CelebrityTrustBadge from "@/components/landing/CelebrityTrustBadge"
 import GovPastPerformance from "@/components/gov-procurement/GovPastPerformance"
 import TenderPackLeadCapture from "@/components/gov-procurement/TenderPackLeadCapture"
 import GovLogoWall, { type GovLogo } from "@/components/trust/GovLogoWall"
@@ -928,6 +929,9 @@ export default async function GovernmentProcurementPage() {
               We respond within 24 hours with L1 quotation + complete tender documentation pack.
             </p>
             <GovRFQForm />
+            <div className="flex justify-center mt-6">
+              <CelebrityTrustBadge theme="light" />
+            </div>
           </div>
 
           {/* GeM Steps */}
