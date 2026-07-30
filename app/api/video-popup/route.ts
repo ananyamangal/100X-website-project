@@ -16,7 +16,7 @@ export async function GET() {
     return NextResponse.json({
       youtubeUrl: doc?.youtubeUrl ?? '',
       orientation: doc?.orientation === 'landscape' ? 'landscape' : 'portrait',
-      enabled: doc?.enabled !== false,
+      enabled: doc?.enabled === true,
       delayMs: typeof doc?.delayMs === 'number' ? doc.delayMs : 5000,
       sessionOnce: doc?.sessionOnce !== false,
       showOnMobile: doc?.showOnMobile !== false,
@@ -25,6 +25,6 @@ export async function GET() {
       hideOnPaths: Array.isArray(doc?.hideOnPaths) ? doc.hideOnPaths : [],
     });
   } catch {
-    return NextResponse.json({ youtubeUrl: '', orientation: 'portrait', enabled: true, delayMs: 5000, sessionOnce: true, showOnMobile: true, showOnDesktop: true, autoCloseMs: 0, hideOnPaths: [] });
+    return NextResponse.json({ youtubeUrl: '', orientation: 'portrait', enabled: false, delayMs: 5000, sessionOnce: true, showOnMobile: true, showOnDesktop: true, autoCloseMs: 0, hideOnPaths: [] });
   }
 }
