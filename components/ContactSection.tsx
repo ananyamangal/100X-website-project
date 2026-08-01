@@ -100,7 +100,7 @@ export default function ContactSection({
       })
 
       form.reset()
-      router.push("/thank-you")
+      router.push("/thank-you?type=contact")
     } catch {
       setError("We could not send your inquiry. Please try again or call us directly.")
     } finally {
