@@ -5,7 +5,7 @@ const organization = {
   "@type": ["Organization", "Manufacturer"],
   "@id": `${SITE_URL}/#organization`,
   name: SITE_NAME_LEGAL,
-  alternateName: [SITE_NAME, "100X", "Instafog", "100 X Circle"],
+  alternateName: [SITE_NAME, "100X", "100 X Circle"],
   legalName: "100X Circle Private Limited",
   url: SITE_URL,
   logo: {
@@ -72,7 +72,7 @@ const organization = {
     },
   },
   description:
-    "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines for municipal vector control and agricultural use. GeM-listed, ISO 9001 certified, MSME/UDYAM registered. Factory at IMT Manesar, Gurgaon. Brands: 100X, Instafog. Distributed across 50+ Indian locations. Export to South Asia, Africa, and the Middle East.",
+    "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines for municipal vector control and agricultural use. GeM-listed, ISO 9001 certified, MSME/UDYAM registered. Factory at IMT Manesar, Gurgaon. Brand: 100X. Distributed across 50+ Indian locations. Export to South Asia, Africa, and the Middle East.",
   knowsAbout: [
     "Pulse-jet thermal fogging technology",
     "Vector-borne disease control — dengue, malaria, chikungunya",

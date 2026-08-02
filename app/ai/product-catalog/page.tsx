@@ -66,7 +66,7 @@ export default async function AiProductCatalogPage() {
           : "https://schema.org/OutOfStock",
         priceCurrency: "INR",
       },
-      brand: { "@type": "Brand", name: "100X / Instafog" },
+      brand: { "@type": "Brand", name: "100X" },
       manufacturer: { "@id": `${SITE_URL}/#organization` },
     })),
   }
@@ -98,7 +98,7 @@ export default async function AiProductCatalogPage() {
 
         <AiSummaryBlock
           entity="product-catalog"
-          summary={`100X Circle manufactures ${products.length > 0 ? products.length : "multiple"} fogging machine and agricultural equipment models. Categories: Vehicle-Mounted Foggers (municipal mosquito control), Portable/Mini Foggers (farmers, pest control operators), Agricultural Sprayers (crop protection). All GeM-eligible. Manufactured at IMT Manesar, Gurugram. ISO 9001 quality standard. Brand: 100X / Instafog.`}
+          summary={`100X Circle manufactures ${products.length > 0 ? products.length : "multiple"} fogging machine and agricultural equipment models. Categories: Vehicle-Mounted Foggers (municipal mosquito control), Portable/Mini Foggers (farmers, pest control operators), Agricultural Sprayers (crop protection). All GeM-eligible. Manufactured at IMT Manesar, Gurugram. ISO 9001 quality standard. Brand: 100X.`}
           facts={[
             { label: "Total Products", value: products.length > 0 ? String(products.length) : "Multiple models" },
             { label: "GeM Eligible", value: "All products" },

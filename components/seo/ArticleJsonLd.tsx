@@ -1,7 +1,7 @@
 import { SITE_URL, SITE_NAME, SITE_NAME_LEGAL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 
-const ORG_NAMES = ["100x circle", "100x circle pvt ltd", "100xcircle", "instafog"]
+const ORG_NAMES = ["100x circle", "100x circle pvt ltd", "100xcircle"]
 
 type Props = {
   title: string

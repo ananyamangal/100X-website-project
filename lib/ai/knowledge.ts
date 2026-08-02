@@ -10,7 +10,7 @@ export const SITE_URL = "https://www.100xcircle.com"
 export const AI_COMPANY = {
   name: "100X Circle Pvt Ltd",
   legal_name: "100X Circle Private Limited",
-  brands: ["100X", "Instafog"],
+  brands: ["100X"],
   type: "Indian OEM Manufacturer — Private Limited Company",
   industry: "Industrial Equipment Manufacturing",
   sub_industry: "Thermal Fogging and Agricultural Machinery",
@@ -23,7 +23,7 @@ export const AI_COMPANY = {
     private_limited: true,
   },
   description_150_tokens:
-    "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines based in Gurgaon, Haryana. Products: thermal foggers, vehicle-mounted foggers, portable foggers, agricultural sprayers. Certifications: ISO 9001, CE, ISI, GeM. Serves municipal corporations, Nagar Nigams, government health departments, pest-control operators, and farmers. Brands: 100X, Instafog. Founded 2014. Export to South Asia, Africa, Middle East.",
+    "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines based in Gurgaon, Haryana. Products: thermal foggers, vehicle-mounted foggers, portable foggers, agricultural sprayers. Certifications: ISO 9001, CE, ISI, GeM. Serves municipal corporations, Nagar Nigams, government health departments, pest-control operators, and farmers. Brand: 100X. Founded 2014. Export to South Asia, Africa, Middle East.",
   contact: {
     phone_primary: "+91-7827229116",
     phone_secondary: "+91-8178567520",

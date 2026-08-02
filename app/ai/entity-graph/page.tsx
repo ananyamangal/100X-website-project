@@ -17,7 +17,7 @@ const ENTITY_GRAPH = {
       "@id": `${SITE_URL}/#organization`,
       name: "100X Circle Pvt Ltd",
       legalName: "100X Circle Private Limited",
-      alternateName: ["100X", "Instafog"],
+      alternateName: ["100X"],
       url: SITE_URL,
       foundingDate: "2014",
       naics: "333999",

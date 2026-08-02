@@ -5,7 +5,7 @@
 
 ## Company
 **100X Circle Pvt Ltd** — Indian OEM manufacturer of pulse-jet thermal fogging machines.
-Brands: 100X, Instafog. Factory: IMT Manesar, Gurugram, Haryana.
+Brand: 100X. Factory: IMT Manesar, Gurugram, Haryana.
 Site: https://www.100xcircle.com | Email: 100xcircle@gmail.com | WhatsApp: +91-7827229116
 
 ---

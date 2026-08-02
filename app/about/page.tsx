@@ -66,12 +66,12 @@ const aboutJsonLd = {
     "@type": ["Organization", "Manufacturer"],
     name: SITE_NAME_LEGAL,
     legalName: "100X Circle Private Limited",
-    alternateName: ["100X", "Instafog", "100X Circle"],
+    alternateName: ["100X", "100X Circle"],
     url: SITE_URL,
     logo: `${defaultOgImage}`,
     foundingDate: "2014",
     description:
-      "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines. Established 2014. ISO 9001:2015 certified, CE marked, ISI marked, MSME/UDYAM registered, and GeM-approved seller for direct government procurement. Factory at IMT Manesar, Gurugram, Haryana. Brands: 100X, Instafog.",
+      "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines. Established 2014. ISO 9001:2015 certified, CE marked, ISI marked, MSME/UDYAM registered, and GeM-approved seller for direct government procurement. Factory at IMT Manesar, Gurugram, Haryana. Brand: 100X.",
     address: {
       "@type": "PostalAddress",
       streetAddress: "UG, 398, Sector 7, Industrial Model Township",
