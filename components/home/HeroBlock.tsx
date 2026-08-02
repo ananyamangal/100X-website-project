@@ -6,7 +6,7 @@ import Link from "next/link"
 import { ArrowRight, ChevronLeft, ChevronRight, MessageCircle, Play } from "lucide-react"
 
 import { BUSINESS } from "@/lib/seo/site-config"
-import { optimizeCloudinary, HERO_BLUR_DATA_URL } from "@/lib/cloudinaryUrl"
+import { optimizeCloudinary, cloudinaryLqip } from "@/lib/cloudinaryUrl"
 import { pushDataLayer } from "@/lib/gtm"
 
 interface HeroSlide {
@@ -69,8 +69,25 @@ interface Props {
 
 export default function HeroBlock({ heroSlides }: Props) {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [breakpoint, setBreakpoint] = useState<"mobile" | "tablet" | "desktop" | null>(null)
   const bannerTouchStartX = useRef<number | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
+
+  // Determine the actually-rendering breakpoint so `priority` is only set on
+  // the visible <Image> — the others stay lazy so their (CSS-hidden) siblings
+  // don't compete for bandwidth with the real LCP candidate.
+  useEffect(() => {
+    const mqTablet = window.matchMedia("(min-width: 768px)")
+    const mqDesktop = window.matchMedia("(min-width: 1024px)")
+    const update = () => setBreakpoint(mqDesktop.matches ? "desktop" : mqTablet.matches ? "tablet" : "mobile")
+    update()
+    mqTablet.addEventListener("change", update)
+    mqDesktop.addEventListener("change", update)
+    return () => {
+      mqTablet.removeEventListener("change", update)
+      mqDesktop.removeEventListener("change", update)
+    }
+  }, [])
 
   const slideCount = heroSlides.length
   const currentSlideData = slideCount > 0 ? heroSlides[Math.min(currentSlide, slideCount - 1)] : null
@@ -127,6 +144,10 @@ export default function HeroBlock({ heroSlides }: Props) {
   const tabletSrc = optimizeCloudinary(pickTabletSrc(currentSlideData), 1200)
   const mobileSrc = optimizeCloudinary(pickMobileSrc(currentSlideData), 800)
 
+  const desktopLqip = cloudinaryLqip(pickDesktopSrc(currentSlideData))
+  const tabletLqip = cloudinaryLqip(pickTabletSrc(currentSlideData))
+  const mobileLqip = cloudinaryLqip(pickMobileSrc(currentSlideData))
+
   const desktopFocalX = currentSlideData?.desktopFocalX ?? 50
   const desktopFocalY = currentSlideData?.desktopFocalY ?? 50
   const tabletFocalX = currentSlideData?.tabletFocalX ?? 50
@@ -174,6 +195,12 @@ export default function HeroBlock({ heroSlides }: Props) {
         }
       `}</style>
 
+      {/* Native media-conditional preload: browser fetches only the hero
+          image matching the current viewport, before any JS runs. */}
+      <link rel="preload" as="image" href={desktopSrc} media="(min-width: 1024px)" />
+      <link rel="preload" as="image" href={tabletSrc} media="(min-width: 768px) and (max-width: 1023px)" />
+      <link rel="preload" as="image" href={mobileSrc} media="(max-width: 767px)" />
+
       {/* DESKTOP (lg+) */}
       <div
         className="hidden lg:block relative w-full h-screen min-h-[600px] overflow-hidden"
@@ -188,10 +215,11 @@ export default function HeroBlock({ heroSlides }: Props) {
             fill
             sizes="100vw"
             unoptimized
+            priority={breakpoint === "desktop"}
             decoding="async"
             draggable={false}
             className="hero-ken-burns object-cover pointer-events-none select-none transition-opacity duration-700"
-            style={{ objectPosition: `${desktopFocalX}% ${desktopFocalY}%`, backgroundImage: `url("${HERO_BLUR_DATA_URL}")`, backgroundSize: "cover" }}
+            style={{ objectPosition: `${desktopFocalX}% ${desktopFocalY}%`, backgroundImage: `url("${desktopLqip}")`, backgroundSize: "cover" }}
           />
           <div
             className="absolute inset-0 pointer-events-none"
@@ -233,7 +261,7 @@ export default function HeroBlock({ heroSlides }: Props) {
       <div className="hidden md:block lg:hidden">
         <div className="relative aspect-[1200/900] overflow-hidden" aria-roledescription="slide" aria-label={`Slide ${currentSlide + 1} of ${slideCount || 1}: ${tabletAlt}`}>
           <div className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing" {...swipeHandlers("ltr")}>
-            <Image key={`tablet-${tabletSrc}`} src={tabletSrc} alt={tabletAlt} fill sizes="100vw" unoptimized decoding="async" draggable={false} className="hero-ken-burns object-cover pointer-events-none select-none" style={{ objectPosition: `${tabletFocalX}% ${tabletFocalY}%`, backgroundImage: `url("${HERO_BLUR_DATA_URL}")`, backgroundSize: "cover" }} />
+            <Image key={`tablet-${tabletSrc}`} src={tabletSrc} alt={tabletAlt} fill sizes="100vw" unoptimized priority={breakpoint === "tablet"} decoding="async" draggable={false} className="hero-ken-burns object-cover pointer-events-none select-none" style={{ objectPosition: `${tabletFocalX}% ${tabletFocalY}%`, backgroundImage: `url("${tabletLqip}")`, backgroundSize: "cover" }} />
           </div>
           {slideCount > 1 && <>
             <button type="button" aria-label="Previous banner" onClick={() => setCurrentSlide((p) => (p - 1 + slideCount) % slideCount)} className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 focus-visible:ring-2 focus-visible:ring-brand-500 text-gray-900 p-2.5 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronLeft size={20} /></button>
@@ -252,7 +280,7 @@ export default function HeroBlock({ heroSlides }: Props) {
       <div className="md:hidden">
         <div className="relative aspect-[800/1200]" aria-roledescription="slide" aria-label={`Slide ${currentSlide + 1} of ${slideCount || 1}: ${mobileAlt}`}>
           <div className="absolute inset-0 touch-pan-y cursor-grab active:cursor-grabbing" {...swipeHandlers("ltr")}>
-            <Image key={`mobile-${mobileSrc}`} src={mobileSrc} alt={mobileAlt} fill sizes="100vw" unoptimized decoding="async" draggable={false} className="hero-ken-burns object-cover pointer-events-none select-none" style={{ objectPosition: `${mobileFocalX}% ${mobileFocalY}%`, backgroundImage: `url("${HERO_BLUR_DATA_URL}")`, backgroundSize: "cover" }} />
+            <Image key={`mobile-${mobileSrc}`} src={mobileSrc} alt={mobileAlt} fill sizes="100vw" unoptimized priority={breakpoint === "mobile"} decoding="async" draggable={false} className="hero-ken-burns object-cover pointer-events-none select-none" style={{ objectPosition: `${mobileFocalX}% ${mobileFocalY}%`, backgroundImage: `url("${mobileLqip}")`, backgroundSize: "cover" }} />
           </div>
           {slideCount > 1 && <>
             <button type="button" aria-label="Previous banner" onClick={() => setCurrentSlide((p) => (p - 1 + slideCount) % slideCount)} className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 focus-visible:ring-2 focus-visible:ring-brand-500 text-gray-800 p-2.5 rounded-full transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"><ChevronLeft size={18} /></button>
