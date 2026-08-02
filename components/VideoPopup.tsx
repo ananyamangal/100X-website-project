@@ -35,6 +35,13 @@ export default function VideoPopup() {
   const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Track explicit user dismissal — once dismissed, never reopen until page reload
   const userDismissedRef = useRef(false)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  // True when a real clickable card grid (related products / spare parts)
+  // is geometrically under this fixed-position popup right now. Being
+  // fixed, it stays pinned to the same screen corner regardless of scroll,
+  // so any grid that scrolls into that corner gets its cards covered and
+  // unclickable underneath. Checked against actual rects, not guessed.
+  const [yielding, setYielding] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -131,6 +138,53 @@ export default function VideoPopup() {
     return () => document.removeEventListener("keydown", onKey)
   }, [visible])
 
+  // Collision detection — while visible, re-check on every scroll/resize
+  // whether this popup's own screen rect overlaps a marked clickable grid's
+  // current rect. Both rects come from getBoundingClientRect(), which is
+  // always viewport-relative, so this works regardless of scroll position,
+  // breakpoint, or how many columns a given grid renders.
+  useEffect(() => {
+    if (!visible) {
+      setYielding(false)
+      return
+    }
+    let raf: number | null = null
+    const checkCollision = () => {
+      raf = null
+      const el = containerRef.current
+      if (!el) return
+      const popupRect = el.getBoundingClientRect()
+      const grids = document.querySelectorAll<HTMLElement>("[data-clickable-grid]")
+      let overlap = false
+      for (const grid of grids) {
+        const r = grid.getBoundingClientRect()
+        if (r.bottom < 0 || r.top > window.innerHeight) continue
+        const intersects =
+          r.right > popupRect.left &&
+          r.left < popupRect.right &&
+          r.bottom > popupRect.top &&
+          r.top < popupRect.bottom
+        if (intersects) {
+          overlap = true
+          break
+        }
+      }
+      setYielding(overlap)
+    }
+    checkCollision()
+    const onScrollOrResize = () => {
+      if (raf !== null) return
+      raf = requestAnimationFrame(checkCollision)
+    }
+    window.addEventListener("scroll", onScrollOrResize, { passive: true })
+    window.addEventListener("resize", onScrollOrResize)
+    return () => {
+      window.removeEventListener("scroll", onScrollOrResize)
+      window.removeEventListener("resize", onScrollOrResize)
+      if (raf !== null) cancelAnimationFrame(raf)
+    }
+  }, [visible])
+
   if (loading || !config || !visible) return null
 
   const dismiss = () => {
@@ -149,12 +203,21 @@ export default function VideoPopup() {
 
   return (
     <div
+      ref={containerRef}
       // Mobile: clears MobileCtaBar via the same --mobile-cta-bar-h CSS var
       // MobileCtaBar itself maintains, instead of a fixed offset that could
       // silently start overlapping it if the bar ever grows taller (wrapped
       // labels on tiny viewports). Desktop: bottom-28 (7rem) clears
       // WhatsAppFloatingButton, which doesn't render on mobile.
-      className="fixed right-6 z-[49] flex flex-col items-end gap-1 bottom-[calc(var(--mobile-cta-bar-h)+1rem)] md:bottom-28"
+      //
+      // When a clickable card grid scrolls under this fixed corner, yield:
+      // fade out and drop pointer-events so the grid underneath becomes
+      // clickable again. Stays mounted (no iframe reload) so it reappears
+      // instantly once the grid scrolls back out.
+      className={`fixed right-6 z-[49] flex flex-col items-end gap-1 bottom-[calc(var(--mobile-cta-bar-h)+1rem)] md:bottom-28 transition-opacity duration-150 ${
+        yielding ? "opacity-0 pointer-events-none" : "opacity-100"
+      }`}
+      aria-hidden={yielding}
     >
       {/* Close + mute controls */}
       <div className="flex items-center gap-1.5 -mb-1 z-10">

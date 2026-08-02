@@ -279,7 +279,7 @@ function SparePartsTabContent({ productId }: { productId: string }) {
     );
     return (
         <div>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+            <div data-clickable-grid className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                 {parts.map((part) => (
                     <a key={part._id} href={(() => {
                             const n = part.compatibleProductNames?.[0];

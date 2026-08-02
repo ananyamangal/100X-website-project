@@ -599,7 +599,7 @@ function SparePartsSection({ productId, productName }: { productId: string; prod
             View all <ArrowRight size={13} />
           </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div data-clickable-grid className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {parts.slice(0, 10).map(part => {
             const n2 = part.compatibleProductNames?.[0]
             const seg = n2

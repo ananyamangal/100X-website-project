@@ -99,7 +99,15 @@ export default function WhatsAppFloatingButton({
       id="whatsapp-float-btn"
       ref={containerRef}
       className={cn(
-        "group fixed bottom-6 right-6 z-[70] hidden md:flex md:flex-col items-end gap-2",
+        // pointer-events-none on the wrapper: this is a flex column whose
+        // reserved space includes the hover tooltip above the button, which
+        // stays invisible (opacity-0) until hover. Without this, that empty
+        // reserved space still hit-tests as this div and silently swallows
+        // clicks meant for whatever card sits underneath it. Interactive
+        // children re-enable pointer-events explicitly (CSS inherits this
+        // property), so the button stays clickable and the tooltip becomes
+        // interactive only once its own hover/focus classes reveal it.
+        "group fixed bottom-6 right-6 z-[70] hidden md:flex md:flex-col items-end gap-2 pointer-events-none",
         "max-w-[calc(100vw-3rem)]",
         className,
       )}
@@ -129,7 +137,7 @@ export default function WhatsAppFloatingButton({
       <button
         type="button"
         className={cn(
-          "flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white shadow-xl",
+          "pointer-events-auto flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white shadow-xl",
           "transition-all duration-200 hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
         )}
         style={{ backgroundColor: "#25D366" }}

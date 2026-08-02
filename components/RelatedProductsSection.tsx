@@ -52,7 +52,7 @@ export default async function RelatedProductsSection({
           </Link>
         </div>
 
-        <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 list-none">
+        <ul data-clickable-grid className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 list-none">
           {items.map((p) => {
             const img = p.imageUrls?.[0] || PLACEHOLDER
             return (
