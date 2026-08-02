@@ -11,6 +11,7 @@ import RelatedPostsSection from "@/components/RelatedPostsSection"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { getBlogBySlug } from "@/lib/blogsQuery"
 import { blogPostSlug } from "@/lib/blogSlug"
+import { getTranslation } from "@/lib/i18n/translations"
 import { SITE_URL, defaultOgImage } from "@/lib/seo/site-config"
 import {
   blogStr,
@@ -45,9 +46,9 @@ function resolveCoverImage(topImage: unknown): string {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string; locale: string }>
 }): Promise<Metadata> {
-  const { slug: rawSlug } = await params
+  const { slug: rawSlug, locale } = await params
 
   // Defensive: getBlogBySlug shouldn't throw, but if the DB is dark we
   // must still emit a valid Metadata object — never let metadata
@@ -65,26 +66,36 @@ export async function generateMetadata({
       robots: { index: false, follow: true },
     }
   }
-  const rawTitle    = blogStr(blog.title, "Blog post")
+  const translated = blog._id ? await getTranslation("blog", String(blog._id), locale) : null
+  const rawTitle    = translated?.title || blogStr(blog.title, "Blog post")
   const metaTitle   = blogOptStr((blog as { metaTitle?: unknown }).metaTitle)
   const metaDesc    = blogOptStr((blog as { metaDescription?: unknown }).metaDescription)
   const seoTitle    = metaTitle || rawTitle
-  const fallbackDesc = plainTextFromHtml(blogStr(blog.excerpt)).slice(0, 155)
+  const fallbackDesc = plainTextFromHtml(translated?.excerpt || blogStr(blog.excerpt)).slice(0, 155)
   const desc        = metaDesc || fallbackDesc || "Industry insights from 100x Circle."
   const slug = blogPostSlug(blog) || rawSlug
-  const url = `${SITE_URL}/blog/${slug}`
+  const path = locale === "en" ? `/blog/${slug}` : `/${locale}/blog/${slug}`
+  const url = `${SITE_URL}${path}`
   const img = resolveCoverImage(blog.topImage)
 
   return {
     title: metaTitle ? metaTitle : `${rawTitle} | 100x Circle`,
     description: desc,
-    alternates: { canonical: `/blog/${slug}` },
+    alternates: {
+      canonical: path,
+      languages: {
+        "x-default": `/blog/${slug}`,
+        en: `/blog/${slug}`,
+        hi: `/hi/blog/${slug}`,
+        id: `/id/blog/${slug}`,
+      },
+    },
     openGraph: {
       title: seoTitle,
       description: desc,
       url,
       siteName: "100x Circle",
-      locale: "en_IN",
+      locale: locale === "hi" ? "hi_IN" : locale === "id" ? "id_ID" : "en_IN",
       type: "article",
       images: [{ url: img, alt: seoTitle }],
     },
@@ -97,8 +108,8 @@ export async function generateMetadata({
   }
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug: rawSlug } = await params
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string; locale: string }> }) {
+  const { slug: rawSlug, locale } = await params
 
   // Hard guard around the DB read.
   let blog: Record<string, unknown> | null = null
@@ -109,12 +120,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   }
   if (!blog) notFound()
 
+  // Translated fields (if any exist for this locale) override the English
+  // source; untranslated locales fall back to English, never a 404.
+  const translated = blog._id ? await getTranslation("blog", String(blog._id), locale) : null
+
   // All field reads go through guards. Mongo can return any of these
   // as undefined, an object, or a non-string primitive — none of which
   // is allowed as a React child.
-  const title = blogStr(blog.title, "Blog post")
-  const excerpt = blogStr(blog.excerpt)
-  const content = blogStr(blog.content)
+  const title = translated?.title || blogStr(blog.title, "Blog post")
+  const excerpt = translated?.excerpt || blogStr(blog.excerpt)
+  const content = translated?.content || blogStr(blog.content)
   const author = blogStr(blog.author, "100x Circle")
   const category = blogStr(blog.category)
   const publishedAtStr = blogOptStr(blog.publishedAt)

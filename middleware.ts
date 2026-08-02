@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
+import createIntlMiddleware from "next-intl/middleware"
 import { verifyJWT, SESSION_COOKIE } from "@/lib/rbac/jwt"
+import { routing } from "@/i18n/routing"
+import { isLocaleManagedPathname } from "@/lib/i18n/locale-routes"
 
 const OID_PATTERN = /^[a-f0-9]{24}$/i
 
@@ -17,6 +20,16 @@ const AUTH_WHITELIST = new Set([
   "/api/admin/gsc/oauth/callback",
   "/api/admin/rbac/seed",
 ])
+
+const intlMiddleware = createIntlMiddleware(routing)
+
+// pathname here is the raw incoming request path, which may still carry a
+// "/hi" or "/id" prefix — isLocaleManagedPathname alone only recognizes the
+// locale-agnostic form, so prefixed paths are checked separately.
+function isLocaleManagedPath(pathname: string): boolean {
+  if (pathname.startsWith("/hi") || pathname.startsWith("/id")) return true
+  return isLocaleManagedPathname(pathname)
+}
 
 async function isAuthenticated(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get(SESSION_COOKIE)?.value
@@ -105,6 +118,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // ── i18n: only for routes moved under app/[locale]/ (Phase 1 slice) ─────────
+  // Everything else (all other static/marketing pages) is untouched by design.
+  if (isLocaleManagedPath(pathname)) {
+    return intlMiddleware(request)
+  }
+
   // ── Legacy product ObjectId → slug redirect ──────────────────────────────────
   const match = pathname.match(/^\/products\/([a-f0-9]{24})$/i)
   if (!match) return NextResponse.next()
@@ -137,5 +156,21 @@ export const config = {
     "/api/admin/:path*",
     "/api/submissions",
     "/admin/:path*",
+    // i18n (Phase 1) — locale-managed content only
+    "/blog",
+    "/blog/:path*",
+    "/hi",
+    "/hi/:path*",
+    "/id",
+    "/id/:path*",
+    "/thermal-and-cold-fogging-machine-100xtfs50",
+    "/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+    "/gem-approved-fogging-machine-oem",
+    "/fogging-machine-supplier-in-uttar-pradesh",
+    "/fogging-machine-supplier-in-bihar",
+    "/dengue-control-fogging-machine",
+    "/thermal-vs-cold-fogging-machine",
+    "/fogging-machine-buying-guide",
+    "/thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
   ],
 }

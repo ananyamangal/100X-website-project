@@ -33,15 +33,24 @@ function resolveOgImage(def: LandingPageDef | undefined): string {
   return `${SITE_URL}${raw.startsWith("/") ? "" : "/"}${raw}`
 }
 
-export async function productLandingMetadata(slug: string): Promise<Metadata> {
-  const def = await getMergedLandingPage(slug) ?? undefined
+// Phase 1 locales served under this route. 'en' has no URL prefix
+// (localePrefix: 'as-needed' in i18n/routing.ts) — everything else does.
+const OG_LOCALE: Record<string, string> = { en: "en_IN", hi: "hi_IN", id: "id_ID" }
+
+function localizedPath(slug: string, locale: string): string {
+  return locale === "en" ? `/${slug}` : `/${locale}/${slug}`
+}
+
+export async function productLandingMetadata(slug: string, locale: string = "en"): Promise<Metadata> {
+  const def = await getMergedLandingPage(slug, locale) ?? undefined
   const title       = def?.metadata.title       ?? "Product | 100x Circle"
   const description = def?.metadata.description ??
     "Thermal fogging machines and agricultural equipment from 100x Circle, India."
   const ogTitle       = def?.metadata.ogTitle       || title
   const ogDescription = def?.metadata.ogDescription || description
   const keywords = def?.metadata.keywords
-  const url      = `${SITE_URL}/${slug}`
+  const path     = localizedPath(slug, locale)
+  const url      = `${SITE_URL}${path}`
   const ogImage  = resolveOgImage(def)
   return {
     title,
@@ -51,14 +60,20 @@ export async function productLandingMetadata(slug: string): Promise<Metadata> {
     // serve a stale 200. Noindex the fallback so Google ignores any such ghost response.
     ...(!def && { robots: { index: false, follow: true } }),
     alternates: {
-      canonical: `/${slug}`,
+      canonical: path,
+      languages: {
+        "x-default": `/${slug}`,
+        en: `/${slug}`,
+        hi: `/hi/${slug}`,
+        id: `/id/${slug}`,
+      },
     },
     openGraph: {
       title:       ogTitle,
       description: ogDescription,
       url,
       siteName: "100x Circle",
-      locale:   "en_IN",
+      locale:   OG_LOCALE[locale] ?? "en_IN",
       type:     "website",
       images:   [{ url: ogImage }],
     },
