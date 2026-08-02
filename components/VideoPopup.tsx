@@ -150,7 +150,6 @@ export default function VideoPopup() {
     }
     let raf: number | null = null
     const checkCollision = () => {
-      raf = null
       const el = containerRef.current
       if (!el) return
       const popupRect = el.getBoundingClientRect()
@@ -172,9 +171,20 @@ export default function VideoPopup() {
       setYielding(overlap)
     }
     checkCollision()
+    // Run the check synchronously on every scroll/resize event (leading
+    // edge), not only on the next animation frame. An instant/programmatic
+    // scroll (scrollIntoView, anchor jump) immediately followed by a click
+    // can otherwise land inside the one-frame gap before the deferred rAF
+    // check has run, leaving `yielding` stale for that frame. Still keep a
+    // trailing rAF check to catch the final rect after continuous scroll
+    // momentum settles.
     const onScrollOrResize = () => {
-      if (raf !== null) return
-      raf = requestAnimationFrame(checkCollision)
+      checkCollision()
+      if (raf !== null) cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        raf = null
+        checkCollision()
+      })
     }
     window.addEventListener("scroll", onScrollOrResize, { passive: true })
     window.addEventListener("resize", onScrollOrResize)
