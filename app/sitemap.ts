@@ -6,6 +6,7 @@ import { getAllLandingPages } from "@/lib/seo/landing-pages"
 import { DEFAULT_SITEMAP_BY_TYPE } from "@/lib/seo/landing-types"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { PRODUCT_LANDING_MAP } from "@/lib/seo/product-landing-map"
+import { getAvailableLocales, buildLocalizedSitemapEntries } from "@/lib/seo/hreflang"
 
 /**
  * Static, hand-curated routes that are always present in the sitemap.
@@ -128,14 +129,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: r.priority,
   }))
 
+  // Every registered landing page is locale-managed (see
+  // lib/i18n/locale-routes.ts) — one <url> entry per locale that actually
+  // has translated content for that slug, each carrying the full reciprocal
+  // hreflang set. Today that's just "en" everywhere (zero translations
+  // seeded yet), so this is byte-equivalent to the single-entry form until
+  // content gets seeded.
   for (const def of getAllLandingPages()) {
     const fallback = DEFAULT_SITEMAP_BY_TYPE[def.type]
-    entries.push({
-      url: `${SITE_URL}/${def.slug}`,
-      lastModified: now,
-      changeFrequency: def.sitemap?.changeFrequency ?? fallback.changeFrequency,
-      priority: def.sitemap?.priority ?? fallback.priority,
-    })
+    const availableLocales = await getAvailableLocales("landing", def.slug)
+    entries.push(
+      ...buildLocalizedSitemapEntries({
+        canonicalPath: `/${def.slug}`,
+        availableLocales,
+        lastModified: now,
+        changeFrequency: def.sitemap?.changeFrequency ?? fallback.changeFrequency,
+        priority: def.sitemap?.priority ?? fallback.priority,
+      }),
+    )
   }
 
   const [blogs, products] = await Promise.all([
@@ -148,12 +159,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (!slug) continue
     const lastModified =
       toDate(typeof blog.publishedAt === "string" ? blog.publishedAt : undefined) ?? now
-    entries.push({
-      url: `${SITE_URL}/blog/${slug}`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    })
+    const blogId = typeof blog._id === "string" ? blog._id : blog._id ? String(blog._id) : null
+    const availableLocales = blogId ? await getAvailableLocales("blog", blogId) : ["en"]
+    entries.push(
+      ...buildLocalizedSitemapEntries({
+        canonicalPath: `/blog/${slug}`,
+        availableLocales,
+        lastModified,
+        changeFrequency: "monthly",
+        priority: 0.7,
+      }),
+    )
   }
 
   for (const product of products) {

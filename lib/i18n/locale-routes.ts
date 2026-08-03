@@ -20,3 +20,12 @@ export function isLocaleManagedPathname(pathname: string): boolean {
   if (pathname === "/blog" || pathname.startsWith("/blog/")) return true
   return LOCALE_MANAGED_SLUGS.has(pathname.slice(1))
 }
+
+// The blog index (app/[locale]/blog/page.tsx) has static UI copy (hero
+// heading, empty-state text, etc.) rather than per-post DB content, so its
+// hreflang can't be gated by a translation-collection lookup the way
+// landing pages and blog posts are. Kept as an explicit list here — bump it
+// only once that page's copy is actually translated in messages/*.json
+// under the "BlogIndex" namespace, so hreflang never advertises a locale
+// that still renders English chrome.
+export const BLOG_INDEX_TRANSLATED_LOCALES = ["en"]

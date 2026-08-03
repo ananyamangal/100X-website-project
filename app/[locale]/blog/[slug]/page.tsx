@@ -12,6 +12,7 @@ import { plainTextFromHtml } from "@/lib/rich-text"
 import { getBlogBySlug } from "@/lib/blogsQuery"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { getTranslation } from "@/lib/i18n/translations"
+import { getAvailableLocales, buildPageAlternates } from "@/lib/seo/hreflang"
 import { SITE_URL, defaultOgImage } from "@/lib/seo/site-config"
 import {
   blogStr,
@@ -66,30 +67,26 @@ export async function generateMetadata({
       robots: { index: false, follow: true },
     }
   }
-  const translated = blog._id ? await getTranslation("blog", String(blog._id), locale) : null
+  const slug = blogPostSlug(blog) || rawSlug
+  const [translated, availableLocales] = await Promise.all([
+    blog._id ? getTranslation("blog", String(blog._id), locale) : Promise.resolve(null),
+    blog._id ? getAvailableLocales("blog", String(blog._id)) : Promise.resolve(["en"]),
+  ])
   const rawTitle    = translated?.title || blogStr(blog.title, "Blog post")
   const metaTitle   = blogOptStr((blog as { metaTitle?: unknown }).metaTitle)
   const metaDesc    = blogOptStr((blog as { metaDescription?: unknown }).metaDescription)
   const seoTitle    = metaTitle || rawTitle
   const fallbackDesc = plainTextFromHtml(translated?.excerpt || blogStr(blog.excerpt)).slice(0, 155)
   const desc        = metaDesc || fallbackDesc || "Industry insights from 100x Circle."
-  const slug = blogPostSlug(blog) || rawSlug
-  const path = locale === "en" ? `/blog/${slug}` : `/${locale}/blog/${slug}`
+  const canonicalPath = `/blog/${slug}`
+  const path = locale === "en" ? canonicalPath : `/${locale}${canonicalPath}`
   const url = `${SITE_URL}${path}`
   const img = resolveCoverImage(blog.topImage)
 
   return {
     title: metaTitle ? metaTitle : `${rawTitle} | 100x Circle`,
     description: desc,
-    alternates: {
-      canonical: path,
-      languages: {
-        "x-default": `/blog/${slug}`,
-        en: `/blog/${slug}`,
-        hi: `/hi/blog/${slug}`,
-        id: `/id/blog/${slug}`,
-      },
-    },
+    alternates: buildPageAlternates({ canonicalPath, currentLocale: locale, availableLocales }),
     openGraph: {
       title: seoTitle,
       description: desc,

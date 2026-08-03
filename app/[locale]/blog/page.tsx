@@ -12,31 +12,48 @@ import {
   blogImageSrc,
 } from "@/lib/blogFieldGuards"
 import { SITE_URL, SITE_NAME, defaultOgImage } from "@/lib/seo/site-config"
+import { buildPageAlternates } from "@/lib/seo/hreflang"
+import { BLOG_INDEX_TRANSLATED_LOCALES } from "@/lib/i18n/locale-routes"
 
 export const revalidate = 120
 
-export const metadata = {
-  title: "Knowledge & Industry Insights | 100x Circle",
-  description:
-    "Practical tips, maintenance guides, and industry insights from 100x Circle — thermal fogging machine manufacturer serving customers across India.",
-  alternates: { canonical: "/blog" },
-  openGraph: {
-    title: `Industry Insights | ${SITE_NAME}`,
+const OG_LOCALE: Record<string, string> = { en: "en_IN", hi: "hi_IN", id: "id_ID" }
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const path = locale === "en" ? "/blog" : `/${locale}/blog`
+
+  return {
+    title: "Knowledge & Industry Insights | 100x Circle",
     description:
-      "Fogging machine maintenance, safety, and application guides from a leading Indian manufacturer.",
-    url: `${SITE_URL}/blog`,
-    siteName: SITE_NAME,
-    locale: "en_IN",
-    type: "website",
-    images: [{ url: defaultOgImage }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `Industry Insights | ${SITE_NAME}`,
-    description: "Thermal fogging insights and equipment guides from 100x Circle.",
-    images: [defaultOgImage],
-  },
-} satisfies Metadata
+      "Practical tips, maintenance guides, and industry insights from 100x Circle — thermal fogging machine manufacturer serving customers across India.",
+    alternates: buildPageAlternates({
+      canonicalPath: "/blog",
+      currentLocale: locale,
+      availableLocales: BLOG_INDEX_TRANSLATED_LOCALES,
+    }),
+    openGraph: {
+      title: `Industry Insights | ${SITE_NAME}`,
+      description:
+        "Fogging machine maintenance, safety, and application guides from a leading Indian manufacturer.",
+      url: `${SITE_URL}${path}`,
+      siteName: SITE_NAME,
+      locale: OG_LOCALE[locale] ?? "en_IN",
+      type: "website",
+      images: [{ url: defaultOgImage }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Industry Insights | ${SITE_NAME}`,
+      description: "Thermal fogging insights and equipment guides from 100x Circle.",
+      images: [defaultOgImage],
+    },
+  }
+}
 
 function formatDate(value: unknown) {
   const s = blogOptStr(value)

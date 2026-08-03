@@ -7,17 +7,32 @@ import { productLandingMetadata } from "@/lib/seo/product-landing-meta"
 import { getLandingPage } from "@/lib/seo/landing-pages"
 import { getProductBySlug } from "@/lib/productsQuery"
 
+// type:"product" landing pages (TFS50, DB400, SSMA20) render via
+// LandingRenderer's product branch, which pulls body content straight from
+// the live Mongo product document — not from any translatable field. There
+// is no mechanism to localize that body today, so serving them under a
+// locale prefix would just be English content at a second URL: duplicate
+// content, not a translation. 404 for non-English locales until product-doc
+// translation is built, rather than silently duplicating.
+function isUntranslatableProductLanding(slug: string, locale: string): boolean {
+  return getLandingPage(slug)?.type === "product" && locale !== "en"
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string; locale: string }>
 }) {
   const { slug, locale } = await params
+  if (isUntranslatableProductLanding(slug, locale)) {
+    return { title: "Not Found", robots: { index: false, follow: false } }
+  }
   return productLandingMetadata(slug, locale)
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string; locale: string }> }) {
   const { slug, locale } = await params
+  if (isUntranslatableProductLanding(slug, locale)) notFound()
   // Registered SEO landing page wins (custom content via landing-pages.ts).
   // Translated fields (if any exist for this locale) are merged in by
   // LandingRenderer via getMergedLandingPage(slug, locale); untranslated

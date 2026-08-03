@@ -5,6 +5,7 @@ import {
   type LandingPageDef,
 } from "./landing-pages"
 import { getMergedLandingPage } from "./get-merged-landing-page"
+import { getAvailableLocales, buildPageAlternates, localizedPath } from "./hreflang"
 
 /**
  * @deprecated Read from `LANDING_PAGES[slug].metadata` directly.
@@ -33,23 +34,21 @@ function resolveOgImage(def: LandingPageDef | undefined): string {
   return `${SITE_URL}${raw.startsWith("/") ? "" : "/"}${raw}`
 }
 
-// Phase 1 locales served under this route. 'en' has no URL prefix
-// (localePrefix: 'as-needed' in i18n/routing.ts) — everything else does.
 const OG_LOCALE: Record<string, string> = { en: "en_IN", hi: "hi_IN", id: "id_ID" }
 
-function localizedPath(slug: string, locale: string): string {
-  return locale === "en" ? `/${slug}` : `/${locale}/${slug}`
-}
-
 export async function productLandingMetadata(slug: string, locale: string = "en"): Promise<Metadata> {
-  const def = await getMergedLandingPage(slug, locale) ?? undefined
+  const canonicalPath = `/${slug}`
+  const [def, availableLocales] = await Promise.all([
+    getMergedLandingPage(slug, locale).then((d) => d ?? undefined),
+    getAvailableLocales("landing", slug),
+  ])
   const title       = def?.metadata.title       ?? "Product | 100x Circle"
   const description = def?.metadata.description ??
     "Thermal fogging machines and agricultural equipment from 100x Circle, India."
   const ogTitle       = def?.metadata.ogTitle       || title
   const ogDescription = def?.metadata.ogDescription || description
   const keywords = def?.metadata.keywords
-  const path     = localizedPath(slug, locale)
+  const path     = localizedPath(canonicalPath, locale)
   const url      = `${SITE_URL}${path}`
   const ogImage  = resolveOgImage(def)
   return {
@@ -59,15 +58,7 @@ export async function productLandingMetadata(slug: string, locale: string = "en"
     // Slug not in the landing-page registry → page calls notFound(), but ISR may
     // serve a stale 200. Noindex the fallback so Google ignores any such ghost response.
     ...(!def && { robots: { index: false, follow: true } }),
-    alternates: {
-      canonical: path,
-      languages: {
-        "x-default": `/${slug}`,
-        en: `/${slug}`,
-        hi: `/hi/${slug}`,
-        id: `/id/${slug}`,
-      },
-    },
+    alternates: buildPageAlternates({ canonicalPath, currentLocale: locale, availableLocales }),
     openGraph: {
       title:       ogTitle,
       description: ogDescription,
