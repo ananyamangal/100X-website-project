@@ -7,13 +7,8 @@ import { usePathname, useRouter } from '@/i18n/navigation'
 import { routing, type AppLocale } from '@/i18n/routing'
 import { isLocaleManagedPathname } from '@/lib/i18n/locale-routes'
 import { isUntranslatableProductLanding } from '@/lib/seo/landing-pages'
+import { LOCALE_LABELS } from '@/lib/i18n/locale-labels'
 import { cn } from '@/lib/utils'
-
-const LOCALE_LABELS: Record<AppLocale, string> = {
-  en: 'English',
-  hi: 'हिंदी',
-  id: 'Bahasa Indonesia',
-}
 
 interface LanguageSwitcherProps {
   triggerClassName?: string

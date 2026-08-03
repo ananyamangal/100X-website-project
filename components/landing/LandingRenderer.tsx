@@ -11,9 +11,12 @@ import {
 import { getMergedLandingPage } from "@/lib/seo/get-merged-landing-page"
 import { getProductBySlug } from "@/lib/productsQuery"
 import { toDisplayStrings } from "@/lib/normalizeProduct"
+import { getAvailableLocales } from "@/lib/seo/hreflang"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import type { FaqEntry, LandingPageDef, LandingSection } from "@/lib/seo/landing-types"
+import type { AppLocale } from "@/i18n/routing"
+import LocaleSuggestionBanner from "@/components/LocaleSuggestionBanner"
 
 import LandingThemeProvider from "./LandingThemeProvider"
 import BreadcrumbNav from "./BreadcrumbNav"
@@ -256,11 +259,24 @@ export default async function LandingRenderer({ slug, locale = "en" }: Props) {
   const audience = AUDIENCE_BY_TYPE[def.type]
   const sections = def.sections ?? []
   const hasInlineFaq = sectionsIncludeFaq(sections)
+  // Real-content-gated, unlike next-intl's blanket Link-header hreflang for
+  // this branch — feeds LocaleSuggestionBanner only, so it never offers a
+  // language that has no actual translated copy behind it.
+  const availableLocales = await getAvailableLocales("landing", def.slug)
 
   return (
     <>
       <BreadcrumbJsonLd items={breadcrumb} />
       <MobileCtaOverride audience={audience} productName={getLandingDisplayName(def.slug)} />
+      {/* This branch has no other top clearance until HeroBlock's own
+          pt-20/24 — which renders after this — so the banner needs its own
+          offset to clear the fixed header (~73px) when it's actually shown. */}
+      <LocaleSuggestionBanner
+        currentLocale={locale as AppLocale}
+        canonicalPath={`/${def.slug}`}
+        availableLocales={availableLocales}
+        topOffsetClassName="mt-20"
+      />
       <LandingThemeProvider theme={theme}>
         <BreadcrumbNav items={breadcrumb} />
         {def.hero ? <HeroBlock hero={def.hero} theme={theme} /> : null}

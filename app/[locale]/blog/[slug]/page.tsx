@@ -14,6 +14,8 @@ import { blogPostSlug } from "@/lib/blogSlug"
 import { getTranslation } from "@/lib/i18n/translations"
 import { getAvailableLocales, buildPageAlternates } from "@/lib/seo/hreflang"
 import { SITE_URL, defaultOgImage } from "@/lib/seo/site-config"
+import type { AppLocale } from "@/i18n/routing"
+import LocaleSuggestionBanner from "@/components/LocaleSuggestionBanner"
 import {
   blogStr,
   blogOptStr,
@@ -119,7 +121,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   // Translated fields (if any exist for this locale) override the English
   // source; untranslated locales fall back to English, never a 404.
-  const translated = blog._id ? await getTranslation("blog", String(blog._id), locale) : null
+  const [translated, availableLocales] = await Promise.all([
+    blog._id ? getTranslation("blog", String(blog._id), locale) : Promise.resolve(null),
+    blog._id ? getAvailableLocales("blog", String(blog._id)) : Promise.resolve(["en"]),
+  ])
 
   // All field reads go through guards. Mongo can return any of these
   // as undefined, an object, or a non-string primitive — none of which
@@ -142,6 +147,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className="pt-20 min-h-screen bg-gray-50">
+      <LocaleSuggestionBanner
+        currentLocale={locale as AppLocale}
+        canonicalPath={`/blog/${slug}`}
+        availableLocales={availableLocales}
+      />
       {/* AI-readable sr-only summary — gives crawlers structured article facts */}
       <aside
         data-ai-entity="blog-article"
