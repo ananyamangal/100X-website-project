@@ -9,6 +9,7 @@ import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import RelatedProductsSection from "@/components/RelatedProductsSection"
 import { getProductBySlugOrId } from "@/lib/productsQuery"
+import { toDisplayStrings } from "@/lib/normalizeProduct"
 import { PRODUCT_LANDING_MAP } from "@/lib/seo/product-landing-map"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
@@ -165,7 +166,7 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
   const reviewsCount = typeof product.reviewsCount === "number" ? product.reviewsCount : undefined
   const priceRange = typeof product.priceRange === "string" ? product.priceRange : undefined
   const inStock = product.inStock !== false
-  const features = Array.isArray(product.features) ? (product.features as string[]) : []
+  const features = toDisplayStrings(product.features)
   const badges = Array.isArray(product.badges) ? (product.badges as string[]) : []
   const shortDescription = plainTextFromHtml(product.shortDescription || product.detailedDescription || "")
 

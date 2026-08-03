@@ -10,6 +10,7 @@ import {
 } from "@/lib/seo/landing-pages"
 import { getMergedLandingPage } from "@/lib/seo/get-merged-landing-page"
 import { getProductBySlug } from "@/lib/productsQuery"
+import { toDisplayStrings } from "@/lib/normalizeProduct"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import type { FaqEntry, LandingPageDef, LandingSection } from "@/lib/seo/landing-types"
@@ -180,7 +181,7 @@ export default async function LandingRenderer({ slug, locale = "en" }: Props) {
     const reviewsCount     = typeof product.reviewsCount === "number" ? product.reviewsCount : undefined
     const priceRange       = typeof product.priceRange === "string" ? product.priceRange : undefined
     const inStock          = product.inStock !== false
-    const features         = Array.isArray(product.features) ? (product.features as string[]) : []
+    const features         = toDisplayStrings(product.features)
     const badges           = Array.isArray(product.badges) ? (product.badges as string[]) : []
     const shortDescription = plainTextFromHtml(
       String(product.shortDescription || product.detailedDescription || "")

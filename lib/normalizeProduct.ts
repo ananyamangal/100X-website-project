@@ -31,6 +31,33 @@ function isStructuredArray(val: unknown): boolean {
   return val.some((item) => item !== null && typeof item === "object" && !Array.isArray(item))
 }
 
+/**
+ * normalizeProduct() deliberately leaves features/specifications/applications as
+ * structured {title,value} objects (see FeaturesManager's FeatureItem shape) so
+ * renderers can show title and value separately. Any consumer that just needs
+ * flat display strings (AI-facing summaries, plain-text exports) must extract
+ * through this instead of casting the array straight to string[] — casting
+ * silently produces "[object Object]" once .join()'d.
+ */
+function structuredItemToDisplayString(item: unknown): string {
+  if (typeof item === "string") return item
+  if (item && typeof item === "object") {
+    const o = item as Record<string, unknown>
+    if (typeof o.title === "string") return o.value ? `${o.title}: ${o.value}` : o.title
+    if (typeof o.label === "string") return o.value ? `${o.label}: ${o.value}` : o.label
+    if (typeof o.name === "string") return o.value ? `${o.name}: ${o.value}` : o.name
+  }
+  return ""
+}
+
+/** Coerce a possibly-structured array/string field into flat display strings. */
+export function toDisplayStrings(val: unknown): string[] {
+  if (!val) return []
+  if (Array.isArray(val)) return val.map(structuredItemToDisplayString).filter(Boolean)
+  if (typeof val === "string") return val.split(/\r?\n/).map((s) => s.trim()).filter(Boolean)
+  return []
+}
+
 /** Coerce any value into a typed object array (filmChapters, boxContents, etc.). */
 export function toObjectArray(val: unknown): any[] {
   if (Array.isArray(val)) return val

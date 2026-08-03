@@ -13,27 +13,14 @@ import { MobileCtaOverride } from '@/components/cta/MobileCtaContext'
 import BrochureLeadModal from '@/components/BrochureLeadModal'
 import RFQForm from '@/components/forms/RFQForm'
 import { plainTextFromHtml } from '@/lib/rich-text'
+import { toDisplayStrings } from '@/lib/normalizeProduct'
 
 // ── Utilities ──────────────────────────────────────────────────────────────────
 
 function s(v: unknown): string {
   return typeof v === 'string' ? v : v == null ? '' : String(v)
 }
-function arr(v: unknown): string[] {
-  if (!v) return []
-  if (Array.isArray(v)) return v.map(x => {
-    if (typeof x === 'string') return x
-    if (x && typeof x === 'object') {
-      const o = x as Record<string, unknown>
-      if (typeof o.title === 'string') return o.value ? `${o.title}: ${o.value}` : o.title
-      if (typeof o.label === 'string') return o.value ? `${o.label}: ${o.value}` : o.label
-      if (typeof o.name  === 'string') return o.value ? `${o.name}: ${o.value}`  : o.name
-    }
-    return ''
-  }).filter(Boolean)
-  if (typeof v === 'string') return v.split(/\r?\n/).map(x => x.trim()).filter(Boolean)
-  return []
-}
+const arr = toDisplayStrings
 function ytId(url: string): string | null {
   const m = s(url).match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/)
   return m ? m[1] : null
