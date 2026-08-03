@@ -6,6 +6,7 @@ import { Globe } from 'lucide-react'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { routing, type AppLocale } from '@/i18n/routing'
 import { isLocaleManagedPathname } from '@/lib/i18n/locale-routes'
+import { isUntranslatableProductLanding } from '@/lib/seo/landing-pages'
 import { cn } from '@/lib/utils'
 
 const LOCALE_LABELS: Record<AppLocale, string> = {
@@ -40,6 +41,31 @@ export default function LanguageSwitcher({ triggerClassName }: LanguageSwitcherP
   // English-only, so there's nothing to switch to.
   if (!isLocaleManagedPathname(pathname)) return null
 
+  // Within that slice, the 3 "type":"product" landing pages (TFS50/DB400/
+  // SSMA20) render body content straight from the live Mongo product doc,
+  // which has no translation mechanism — hi/id 404 for them (see
+  // isUntranslatableProductLanding). Everywhere else in LOCALE_MANAGED_SLUGS
+  // this filters down to all 3 locales unchanged.
+  const slug = pathname.replace(/^\//, '')
+  const availableLocales = routing.locales.filter((l) => !isUntranslatableProductLanding(slug, l))
+
+  if (availableLocales.length <= 1) {
+    // Nothing to switch to on this page — a static label, not a dropdown
+    // trigger with one dead option that 404s. Strip interaction-affordance
+    // classes (hover/focus/transition) from the shared trigger styling so it
+    // doesn't visually invite a click it can't act on.
+    const staticClassName = triggerClassName
+      ?.split(' ')
+      .filter((c) => !c.startsWith('hover:') && !c.startsWith('focus-visible:') && !c.startsWith('focus:') && c !== 'transition-colors')
+      .join(' ')
+    return (
+      <span className={cn(staticClassName, 'cursor-default')}>
+        <Globe size={18} aria-hidden="true" />
+        <span className="hidden md:inline">{LOCALE_LABELS[locale]}</span>
+      </span>
+    )
+  }
+
   return (
     <div ref={ref} className="relative">
       <button
@@ -58,7 +84,7 @@ export default function LanguageSwitcher({ triggerClassName }: LanguageSwitcherP
           role="menu"
           className="absolute right-0 mt-2 w-44 rounded-lg border border-gray-200 bg-white py-1 shadow-lg z-50"
         >
-          {routing.locales.map((l) => (
+          {availableLocales.map((l) => (
             <button
               key={l}
               type="button"
