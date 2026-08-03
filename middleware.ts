@@ -24,10 +24,18 @@ const AUTH_WHITELIST = new Set([
 const intlMiddleware = createIntlMiddleware(routing)
 
 // pathname here is the raw incoming request path, which may still carry a
-// "/hi" or "/id" prefix — isLocaleManagedPathname alone only recognizes the
-// locale-agnostic form, so prefixed paths are checked separately.
+// "/hi", "/id", or explicit "/en" prefix — isLocaleManagedPathname alone
+// only recognizes the locale-agnostic form, so prefixed paths are checked
+// separately. "/en" must be included even though it's the default locale:
+// next-intl's client router always force-prefixes an explicit locale switch
+// (see i18n/navigation.ts / next-intl's createNavigation), so "switch to
+// English" from /hi or /id lands on "/en/<slug>" — without this middleware
+// running for it, next-intl's own "as-needed" redirect (stripping the
+// redundant default-locale prefix back to the bare canonical URL) never
+// fires, and "/en/<slug>" renders live at 200 instead of 307ing to "/<slug>".
 function isLocaleManagedPath(pathname: string): boolean {
   if (pathname.startsWith("/hi") || pathname.startsWith("/id")) return true
+  if (pathname === "/en" || pathname.startsWith("/en/")) return true
   return isLocaleManagedPathname(pathname)
 }
 
@@ -224,6 +232,14 @@ export const config = {
     "/hi/:path*",
     "/id",
     "/id/:path*",
+    // Explicit default-locale prefix — never a canonical/linked URL, but
+    // reachable via LanguageSwitcher's forced-prefix client navigation (see
+    // isLocaleManagedPath's comment above). Must be matched so next-intl's
+    // own "as-needed" redirect strips it back to the bare canonical URL
+    // instead of this middleware being skipped and the App Router serving
+    // it live at 200.
+    "/en",
+    "/en/:path*",
     "/thermal-and-cold-fogging-machine-100xtfs50",
     "/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
     "/gem-approved-fogging-machine-oem",
