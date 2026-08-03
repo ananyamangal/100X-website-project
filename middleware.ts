@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import createIntlMiddleware from "next-intl/middleware"
 import { verifyJWT, SESSION_COOKIE } from "@/lib/rbac/jwt"
 import { routing } from "@/i18n/routing"
-import { isLocaleManagedPathname } from "@/lib/i18n/locale-routes"
+import { isLocaleManagedPathname, UNTRANSLATABLE_PRODUCT_SLUGS } from "@/lib/i18n/locale-routes"
 
 const OID_PATTERN = /^[a-f0-9]{24}$/i
 
@@ -121,7 +121,68 @@ export async function middleware(request: NextRequest) {
   // ── i18n: only for routes moved under app/[locale]/ (Phase 1 slice) ─────────
   // Everything else (all other static/marketing pages) is untouched by design.
   if (isLocaleManagedPath(pathname)) {
-    return intlMiddleware(request)
+    const intlResponse = await intlMiddleware(request)
+    // Redirects (rare — e.g. URL normalization) skip rendering entirely, so
+    // there's no <html lang> to fix; pass through unchanged.
+    if (intlResponse.headers.get("location")) return intlResponse
+
+    // x-locale-managed tells RootLayout (which wraps every route, including
+    // the ~400 untouched pages outside app/[locale]/) that this specific
+    // request is for one of the 9 locale-managed pages and should use the
+    // resolved next-intl locale for <html lang>. Without this flag,
+    // RootLayout can't tell "en because this genuinely is a locale-managed
+    // page in English" apart from "en because getLocale() just falls back
+    // to its default on an untouched page" — and it must not: every other
+    // page needs to keep lang="en-IN" exactly as before Phase 1.
+    //
+    // next-intl's own response already carries its own request-header
+    // override (x-next-intl-locale) via the same x-middleware-override-headers
+    // / x-middleware-request-* mechanism NextResponse.next({request}) uses.
+    // Blindly copying intlResponse.headers onto a second, independently
+    // constructed override response clobbers that manifest instead of
+    // merging it — Next then only decodes whichever manifest wrote last, and
+    // the other header is left as an undecoded raw x-middleware-request-*
+    // entry. So decode next-intl's manifest first and fold it into the same
+    // Headers object our own override is built from, producing one manifest
+    // that lists both headers.
+    const cloned = new Headers(request.headers)
+    const intlOverrideManifest = intlResponse.headers.get("x-middleware-override-headers")
+    if (intlOverrideManifest) {
+      for (const name of intlOverrideManifest.split(",").map((s) => s.trim())) {
+        const value = intlResponse.headers.get(`x-middleware-request-${name}`)
+        if (value !== null) cloned.set(name, value)
+      }
+    }
+    cloned.set("x-locale-managed", "1")
+
+    // For the default locale under "as-needed" prefixing, next-intl issues
+    // an internal rewrite (bare "/slug" -> "/en/slug") so the App Router can
+    // resolve app/[locale]/[slug] at all — without it, Next has no literal
+    // page matching the un-rewritten external pathname and 404s (this broke
+    // every locale-managed page's canonical English URL except the one slug
+    // that still happened to have a leftover non-locale route folder masking
+    // it). Rebuilding via NextResponse.next() below discards that rewrite
+    // destination, so it has to be read off intlResponse and reapplied.
+    const rewriteUrl = intlResponse.headers.get("x-middleware-rewrite")
+    const response = rewriteUrl
+      ? NextResponse.rewrite(new URL(rewriteUrl), { request: { headers: cloned } })
+      : NextResponse.next({ request: { headers: cloned } })
+    intlResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie))
+    intlResponse.headers.forEach((value, key) => {
+      if (!key.toLowerCase().startsWith("x-middleware-")) response.headers.set(key, value)
+    })
+
+    // Bug B fix: next-intl's alternateLinks Link header advertises every
+    // configured locale (en/hi/id) for any locale-managed path, with no idea
+    // TFS50/DB400/SSMA20 have no hi/id content and 404 there. Drop it for
+    // these 3 slugs specifically (all locale variants — the header is the
+    // same reciprocal set regardless of which variant was requested) rather
+    // than turning alternateLinks off globally, which would also silence
+    // hreflang for the other 6 pages that genuinely have hi/id content.
+    const slug = pathname.replace(/^\/(hi|id)(?=\/|$)/, "").replace(/^\//, "")
+    if (UNTRANSLATABLE_PRODUCT_SLUGS.has(slug)) response.headers.delete("link")
+
+    return response
   }
 
   // ── Legacy product ObjectId → slug redirect ──────────────────────────────────

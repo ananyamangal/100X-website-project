@@ -16,6 +16,15 @@ export const routing = defineRouting({
   // switching stays available, just explicit (LanguageSwitcher / a direct
   // /hi or /id link) rather than guessed from a header.
   localeDetection: false,
+  // Stays on (the default): next-intl's automatic Link header is what
+  // actually delivers hreflang today for the 6 genuinely-translated
+  // locale-managed pages — generateMetadata's own alternates
+  // (lib/seo/hreflang.ts's buildPageAlternates) never make it into the
+  // response as either a header or <link> tags, a separate pre-existing gap.
+  // Turning this off entirely would silently kill hreflang for those 6 pages
+  // too. middleware.ts strips this header specifically for the 3
+  // untranslatable product landing pages (TFS50/DB400/SSMA20) instead, since
+  // this blanket header has no idea those don't have hi/id content.
 })
 
 export type AppLocale = (typeof routing.locales)[number]

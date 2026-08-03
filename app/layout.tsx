@@ -143,6 +143,15 @@ export default async function RootLayout({
   const [locale, messages] = await Promise.all([getLocale(), getMessages()])
   const dir = locale === "ur" || locale === "ar" ? "rtl" : "ltr"
 
+  // getLocale() falls back to "en" for EVERY untouched page too (there's no
+  // way to tell "genuinely locale-managed and resolved to en" from "not
+  // locale-managed at all" from the locale value alone) — x-locale-managed
+  // is set by middleware only for the 9 actual locale-managed pages, so only
+  // those get <html lang={locale}>. Every other page keeps lang="en-IN"
+  // exactly as it was before Phase 1.
+  const isLocaleManaged = headersList.get("x-locale-managed") === "1"
+  const htmlLang = isLocaleManaged ? locale : "en-IN"
+
   // Run both DB calls in parallel to minimize layout TTFB
   const [brandAssets, hasBrochure, trustBadges] = await Promise.all([
     getBrandAssets(),
@@ -177,7 +186,7 @@ export default async function RootLayout({
   ])
 
   return (
-    <html lang={locale} dir={dir} className={inter.variable}>
+    <html lang={htmlLang} dir={isLocaleManaged ? dir : undefined} className={inter.variable}>
       <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
