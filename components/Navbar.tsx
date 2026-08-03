@@ -26,7 +26,6 @@ const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/products', label: 'Products' },
   { href: '/spare-parts', label: 'Spare Parts' },
-  { href: '/knowledge', label: 'Knowledge Hub' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
   { href: '/contact-us', label: 'Contact' },
