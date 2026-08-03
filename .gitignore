@@ -50,3 +50,6 @@ OneDriveDataSULABH2018E*/audit/gsc-exports/
 
 # Local PDF archive (development only — production uses Vercel Blob)
 /archive-local/
+
+# Autonomous-session scratch status file (survives crashes, never committed)
+/.claude-session-status.md

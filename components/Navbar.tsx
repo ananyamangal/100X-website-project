@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { BUSINESS } from '@/lib/seo/site-config';
 import BrochureLeadModal from '@/components/BrochureLeadModal';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const YT_ICON = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -108,6 +109,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
         <MessageCircle size={18} aria-hidden="true" />
         <span className="hidden md:inline text-sm font-semibold">WhatsApp Us</span>
       </a>
+      <LanguageSwitcher triggerClassName={cn(iconClass, 'text-sm font-semibold')} />
     </div>
   )
 

@@ -30,7 +30,7 @@ import RichTextBlock from "./RichTextBlock"
 import LandingFormBlock from "./LandingFormBlock"
 import VideoBlock from "./VideoBlock"
 
-type Props = { slug: string }
+type Props = { slug: string; locale?: string }
 
 const AUDIENCE_BY_TYPE: Record<
   NonNullable<LandingPageDef["type"]>,
@@ -158,8 +158,8 @@ function sectionsIncludeFaq(sections: LandingSection[] | undefined): boolean {
   return !!sections?.some((s) => s.kind === "faq")
 }
 
-export default async function LandingRenderer({ slug }: Props) {
-  const def = await getMergedLandingPage(slug)
+export default async function LandingRenderer({ slug, locale = "en" }: Props) {
+  const def = await getMergedLandingPage(slug, locale)
   if (!def) return null
 
   const theme = getLandingTheme(def)

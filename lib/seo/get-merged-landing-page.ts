@@ -91,20 +91,28 @@ function applyOverride(def: LandingPageDef, ov: Overrides): LandingPageDef {
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
- * Returns the merged landing page definition for `slug`.
+ * Returns the merged landing page definition for `slug`, in `locale`.
  *
- * Flow: Registry → Override Lookup → Zod Validation → Merge
+ * Flow: Registry → English CMS Override → Locale Translation → Merge
+ *
+ * `locale` translations are stored the same shape as English CMS overrides
+ * (landing_page_translations, keyed by {slug, locale}) and merged on top of
+ * the already-CMS-merged English def via the same applyOverride() used for
+ * CMS overrides — one proven merge path, not a parallel one.
  *
  * Failure contract (never throws, never returns 500):
- *   • Mongo unavailable → console.warn → return static def
- *   • Override doc missing → return static def
- *   • Zod validation fails → console.warn → return static def
+ *   • Mongo unavailable → console.warn → return static/English def
+ *   • Override/translation doc missing → return the next layer down
+ *   • Zod validation fails → console.warn → return the next layer down
+ *   • No translation for `locale` yet → return the English-merged def
+ *     (graceful fallback — translated URL still renders, just in English)
  *   • Returns null only if slug is not in the registry at all
  */
-export async function getMergedLandingPage(slug: string): Promise<LandingPageDef | null> {
+export async function getMergedLandingPage(slug: string, locale: string = "en"): Promise<LandingPageDef | null> {
   const def = getLandingPage(slug)
   if (!def) return null
 
+  let englishMerged = def
   try {
     const client = await clientPromise
     const db = client.db()
@@ -113,23 +121,52 @@ export async function getMergedLandingPage(slug: string): Promise<LandingPageDef
       .collection("landing_page_overrides")
       .findOne({ slug }, { projection: { overrides: 1, _id: 0 } })
 
-    if (!row?.overrides) return def
-
-    const parsed = OverridesSchema.safeParse(row.overrides)
-    if (!parsed.success) {
-      console.warn(
-        `[CMS] Override Zod validation failed for slug="${slug}" — rendering static page.`,
-        parsed.error.issues.slice(0, 3),
-      )
-      return def
+    if (row?.overrides) {
+      const parsed = OverridesSchema.safeParse(row.overrides)
+      if (parsed.success) {
+        englishMerged = applyOverride(def, parsed.data)
+      } else {
+        console.warn(
+          `[CMS] Override Zod validation failed for slug="${slug}" — rendering static page.`,
+          parsed.error.issues.slice(0, 3),
+        )
+      }
     }
-
-    return applyOverride(def, parsed.data)
   } catch (err) {
     console.warn(
       `[CMS] DB unavailable for slug="${slug}" — rendering static page.`,
       (err as Error).message,
     )
-    return def
+    return englishMerged
+  }
+
+  if (locale === "en") return englishMerged
+
+  try {
+    const client = await clientPromise
+    const db = client.db()
+
+    const row = await db
+      .collection("landing_page_translations")
+      .findOne({ slug, locale }, { projection: { overrides: 1, _id: 0 } })
+
+    if (!row?.overrides) return englishMerged
+
+    const parsed = OverridesSchema.safeParse(row.overrides)
+    if (!parsed.success) {
+      console.warn(
+        `[i18n] Translation Zod validation failed for slug="${slug}" locale="${locale}" — falling back to English.`,
+        parsed.error.issues.slice(0, 3),
+      )
+      return englishMerged
+    }
+
+    return applyOverride(englishMerged, parsed.data)
+  } catch (err) {
+    console.warn(
+      `[i18n] DB unavailable fetching translation for slug="${slug}" locale="${locale}" — falling back to English.`,
+      (err as Error).message,
+    )
+    return englishMerged
   }
 }

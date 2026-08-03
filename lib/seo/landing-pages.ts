@@ -768,6 +768,17 @@ export function getLandingPage(slug: string): LandingPageDef | undefined {
   return LANDING_PAGES[slug]
 }
 
+// type:"product" landing pages (TFS50, DB400, SSMA20) render via
+// LandingRenderer's product branch, which pulls body content straight from
+// the live Mongo product document — not from any translatable field. There
+// is no mechanism to localize that body today, so serving them under a
+// locale prefix would just be English content at a second URL: duplicate
+// content, not a translation. 404 for non-English locales until product-doc
+// translation is built, rather than silently duplicating.
+export function isUntranslatableProductLanding(slug: string, locale: string): boolean {
+  return getLandingPage(slug)?.type === "product" && locale !== "en"
+}
+
 export function getLandingSlugs(): string[] {
   return Object.keys(LANDING_PAGES)
 }

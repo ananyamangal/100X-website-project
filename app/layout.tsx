@@ -7,6 +7,8 @@ import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import { Suspense } from 'react'
 import { headers } from 'next/headers'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale, getMessages } from 'next-intl/server'
 import './globals.css'
 import Navbar from '../components/Navbar'
 import SiteFooter from '@/components/SiteFooter'
@@ -135,6 +137,21 @@ export default async function RootLayout({
     )
   }
 
+  // i18n: resolves to the request's locale for pages under app/[locale]/
+  // (Phase 1: en/hi/id), and to the 'en' default everywhere else — untouched
+  // pages never run the intl middleware so this always falls back safely.
+  const [locale, messages] = await Promise.all([getLocale(), getMessages()])
+  const dir = locale === "ur" || locale === "ar" ? "rtl" : "ltr"
+
+  // getLocale() falls back to "en" for EVERY untouched page too (there's no
+  // way to tell "genuinely locale-managed and resolved to en" from "not
+  // locale-managed at all" from the locale value alone) — x-locale-managed
+  // is set by middleware only for the 9 actual locale-managed pages, so only
+  // those get <html lang={locale}>. Every other page keeps lang="en-IN"
+  // exactly as it was before Phase 1.
+  const isLocaleManaged = headersList.get("x-locale-managed") === "1"
+  const htmlLang = isLocaleManaged ? locale : "en-IN"
+
   // Run both DB calls in parallel to minimize layout TTFB
   const [brandAssets, hasBrochure, trustBadges] = await Promise.all([
     getBrandAssets(),
@@ -169,7 +186,7 @@ export default async function RootLayout({
   ])
 
   return (
-    <html lang="en-IN" className={inter.variable}>
+    <html lang={htmlLang} dir={isLocaleManaged ? dir : undefined} className={inter.variable}>
       <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -195,6 +212,7 @@ export default async function RootLayout({
         <link rel="preload" as="image" href="/banner-desktop.jpg" media="(min-width: 1024px)" />
       </head>
       <body className="min-h-screen antialiased">
+      <NextIntlClientProvider locale={locale} messages={messages}>
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-5JMGCKRW"
@@ -233,6 +251,7 @@ export default async function RootLayout({
           phoneDigitsForEvents="7827229116"
         />
         <Toaster richColors position="top-right" closeButton />
+      </NextIntlClientProvider>
       </body>
     </html>
   )
