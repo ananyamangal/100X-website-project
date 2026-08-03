@@ -228,7 +228,11 @@ async function handleTool(name: string, args: Record<string, any>): Promise<obje
       try {
         const client = await clientPromise
         const db = client.db()
-        const raw = await db.collection("products").find({}).sort({ order: 1 }).toArray()
+        const raw = await db
+          .collection("products")
+          .find({ isPublished: { $ne: false } })
+          .sort({ order: 1 })
+          .toArray()
         const products = raw.map((p) => ({
           id: p._id?.toString(),
           name: p.name,
@@ -275,6 +279,7 @@ async function handleTool(name: string, args: Record<string, any>): Promise<obje
         const client = await clientPromise
         const db = client.db()
         const product = await db.collection("products").findOne({
+          isPublished: { $ne: false },
           $or: [
             { name: { $regex: product_name, $options: "i" } },
             { shortDescription: { $regex: product_name, $options: "i" } },
