@@ -21,7 +21,11 @@ export const metadata: Metadata = {
 
 export default async function AllProductsPage() {
   const client = await clientPromise
-  const productsRaw = await client.db().collection("products").find({}).toArray()
+  const productsRaw = await client
+    .db()
+    .collection("products")
+    .find({ isPublished: { $ne: false } })
+    .toArray()
   const products = JSON.parse(JSON.stringify(productsRaw))
     .map((p: any) => ({
       ...p,
