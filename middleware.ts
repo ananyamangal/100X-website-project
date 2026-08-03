@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import createIntlMiddleware from "next-intl/middleware"
 import { verifyJWT, SESSION_COOKIE } from "@/lib/rbac/jwt"
 import { routing } from "@/i18n/routing"
-import { isLocaleManagedPathname, UNTRANSLATABLE_PRODUCT_SLUGS } from "@/lib/i18n/locale-routes"
+import { isLocaleManagedPathname, UNTRANSLATABLE_PRODUCT_SLUGS, LOCALE_MANAGED_SLUGS } from "@/lib/i18n/locale-routes"
 
 const OID_PATTERN = /^[a-f0-9]{24}$/i
 
@@ -23,19 +23,23 @@ const AUTH_WHITELIST = new Set([
 
 const intlMiddleware = createIntlMiddleware(routing)
 
-// pathname here is the raw incoming request path, which may still carry a
-// "/hi", "/id", or explicit "/en" prefix — isLocaleManagedPathname alone
-// only recognizes the locale-agnostic form, so prefixed paths are checked
-// separately. "/en" must be included even though it's the default locale:
-// next-intl's client router always force-prefixes an explicit locale switch
-// (see i18n/navigation.ts / next-intl's createNavigation), so "switch to
-// English" from /hi or /id lands on "/en/<slug>" — without this middleware
-// running for it, next-intl's own "as-needed" redirect (stripping the
-// redundant default-locale prefix back to the bare canonical URL) never
+// pathname here is the raw incoming request path, which may still carry an
+// explicit locale prefix ("/hi", "/id", "/en", ...) — isLocaleManagedPathname
+// alone only recognizes the locale-agnostic form, so prefixed paths are
+// checked separately, generically over every configured locale (including
+// the default "en"). "en" must be included even though it's the default
+// locale: next-intl's client router always force-prefixes an explicit
+// locale switch (see i18n/navigation.ts / next-intl's createNavigation), so
+// "switch to English" from /hi or /id lands on "/en/<slug>" — without this
+// middleware running for it, next-intl's own "as-needed" redirect (stripping
+// the redundant default-locale prefix back to the bare canonical URL) never
 // fires, and "/en/<slug>" renders live at 200 instead of 307ing to "/<slug>".
+// Adding a locale to routing.locales is the only change this function ever
+// needs again — see the matching config.matcher generation below.
 function isLocaleManagedPath(pathname: string): boolean {
-  if (pathname.startsWith("/hi") || pathname.startsWith("/id")) return true
-  if (pathname === "/en" || pathname.startsWith("/en/")) return true
+  for (const locale of routing.locales) {
+    if (pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)) return true
+  }
   return isLocaleManagedPathname(pathname)
 }
 
@@ -219,35 +223,27 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next()
 }
 
+// Generated from routing.locales so adding a language there is the only
+// change middleware.ts ever needs — no more hand-adding "/xx", "/xx/:path*"
+// pairs per locale (that gap is exactly what let "/en" slip through
+// unmatched for a while: see isLocaleManagedPath's comment above).
+const LOCALE_PREFIX_MATCHERS = routing.locales.flatMap((locale) => [`/${locale}`, `/${locale}/:path*`])
+
+// Generated from LOCALE_MANAGED_SLUGS (lib/i18n/locale-routes.ts) so the two
+// lists can't drift — this used to be a second hand-maintained copy of the
+// same slugs.
+const LOCALE_MANAGED_SLUG_MATCHERS = Array.from(LOCALE_MANAGED_SLUGS).map((slug) => `/${slug}`)
+
 export const config = {
   matcher: [
     "/products/:path*",
     "/api/admin/:path*",
     "/api/submissions",
     "/admin/:path*",
-    // i18n (Phase 1) — locale-managed content only
+    // i18n — locale-managed content only
     "/blog",
     "/blog/:path*",
-    "/hi",
-    "/hi/:path*",
-    "/id",
-    "/id/:path*",
-    // Explicit default-locale prefix — never a canonical/linked URL, but
-    // reachable via LanguageSwitcher's forced-prefix client navigation (see
-    // isLocaleManagedPath's comment above). Must be matched so next-intl's
-    // own "as-needed" redirect strips it back to the bare canonical URL
-    // instead of this middleware being skipped and the App Router serving
-    // it live at 200.
-    "/en",
-    "/en/:path*",
-    "/thermal-and-cold-fogging-machine-100xtfs50",
-    "/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
-    "/gem-approved-fogging-machine-oem",
-    "/fogging-machine-supplier-in-uttar-pradesh",
-    "/fogging-machine-supplier-in-bihar",
-    "/dengue-control-fogging-machine",
-    "/thermal-vs-cold-fogging-machine",
-    "/fogging-machine-buying-guide",
-    "/thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
+    ...LOCALE_PREFIX_MATCHERS,
+    ...LOCALE_MANAGED_SLUG_MATCHERS,
   ],
 }
