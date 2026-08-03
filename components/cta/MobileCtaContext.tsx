@@ -68,20 +68,32 @@ type OverrideProps = {
  * Renders nothing; cleans up on unmount so other routes are not affected.
  */
 export function MobileCtaOverride(props: OverrideProps) {
-  const ctx = useContext(MobileCtaCtx)
+  // Depend on setOverride/clearOverride themselves (stable — useCallback
+  // with [] deps in the provider), not the whole `ctx` object. `ctx` is
+  // re-memoized every time `value` changes, and `value` changes every time
+  // this effect calls setOverride — depending on `ctx` as a whole made the
+  // effect its own trigger: setOverride -> new value -> new ctx -> deps
+  // changed -> cleanup + re-run -> setOverride again, forever. Confirmed via
+  // a live repro (Playwright + console instrumentation): this fired 19-26x
+  // on a single page load even before any locale-switching was involved,
+  // so it predates i18n Phase 1 — the new client-side locale-only
+  // navigation just made it dramatically worse (more re-render triggers on
+  // top of the same flaw) and surfaced it as a full, visible hang instead
+  // of a barely-noticeable console blip.
+  const { setOverride, clearOverride } = useContext(MobileCtaCtx) ?? {}
   const { audience, productName, whatsappMessage, anchorFormId } = props
 
   useEffect(() => {
-    if (!ctx) return
+    if (!setOverride || !clearOverride) return
     const partial: Partial<MobileCtaContextValue> = {}
     if (audience) partial.audience = audience
     if (productName) partial.productName = productName
     if (whatsappMessage) partial.whatsappMessage = whatsappMessage
     if (anchorFormId) partial.anchorFormId = anchorFormId
     if (Object.keys(partial).length === 0) return
-    ctx.setOverride(partial)
-    return () => ctx.clearOverride()
-  }, [ctx, audience, productName, whatsappMessage, anchorFormId])
+    setOverride(partial)
+    return () => clearOverride()
+  }, [setOverride, clearOverride, audience, productName, whatsappMessage, anchorFormId])
 
   return null
 }
