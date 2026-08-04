@@ -8,11 +8,14 @@ export type LocalizedContentKind = "landing" | "blog"
 /**
  * Locales with real translated content for one piece of content — always
  * includes "en" (the source content). A locale is only included if a
- * translation row actually exists in Mongo; this is what keeps hreflang
- * from ever advertising a locale that would silently render English
- * fallback content (a duplicate-content signal to search engines), and it's
- * what lets Phase 2 languages appear in hreflang/sitemap automatically the
- * moment their content is seeded, with zero per-page code changes.
+ * REVIEWED translation row actually exists in Mongo (landing:
+ * `reviewed: true`; blog: `status: "approved"`) — an unreviewed row is
+ * treated as not existing. This is what keeps hreflang from ever
+ * advertising a locale that would silently render English fallback content
+ * (a duplicate-content signal to search engines) or, worse, unreviewed
+ * machine-translated content, and it's what lets Phase 2 languages appear
+ * in hreflang/sitemap automatically the moment their content is seeded AND
+ * reviewed, with zero per-page code changes.
  */
 export async function getAvailableLocales(kind: LocalizedContentKind, key: string): Promise<string[]> {
   const found = new Set<string>(["en"])
@@ -20,7 +23,10 @@ export async function getAvailableLocales(kind: LocalizedContentKind, key: strin
     const client = await clientPromise
     const db = client.db()
     const collection = kind === "landing" ? "landing_page_translations" : "translations"
-    const filter = kind === "landing" ? { slug: key } : { contentType: "blog", contentId: key }
+    const filter =
+      kind === "landing"
+        ? { slug: key, reviewed: true }
+        : { contentType: "blog", contentId: key, status: "approved" }
     const rows: unknown[] = await db.collection(collection).distinct("locale", filter)
     for (const l of rows) {
       if (typeof l === "string" && (routing.locales as readonly string[]).includes(l)) found.add(l)
