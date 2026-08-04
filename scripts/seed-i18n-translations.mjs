@@ -5,6 +5,15 @@
 // lib/seo/get-merged-landing-page.ts / OverridesSchema) and translations
 // (shape consumed by lib/i18n/translations.ts, for blog posts).
 //
+// New rows default to reviewed: false — seeding is NOT publishing. Re-seeding
+// an EXISTING row (content fix, re-run) leaves its reviewed flag untouched —
+// $setOnInsert only applies on first insert, so already-published rows stay
+// published across reseeds. Unreviewed rows are invisible to
+// getMergedLandingPage()/getAvailableLocales() (they behave as if they don't
+// exist). Use scripts/publish-i18n-translation.mjs to explicitly flip a
+// specific slug+locale to reviewed: true once its content has actually been
+// checked.
+//
 // Deliberately excludes thermal-and-cold-fogging-machine-100xtfs50,
 // double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400, and
 // thermal-fogging-machine-with-stainless-steel-tank-100xssma20 — see
@@ -247,7 +256,10 @@ async function main() {
       const overrides = entry[locale]
       await col.updateOne(
         { slug: entry.slug, locale },
-        { $set: { slug: entry.slug, locale, overrides, seededAt: new Date().toISOString() } },
+        {
+          $set: { slug: entry.slug, locale, overrides, seededAt: new Date().toISOString() },
+          $setOnInsert: { reviewed: false },
+        },
         { upsert: true },
       )
       count++

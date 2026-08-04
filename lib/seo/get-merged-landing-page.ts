@@ -100,9 +100,15 @@ function applyOverride(def: LandingPageDef, ov: Overrides): LandingPageDef {
  * the already-CMS-merged English def via the same applyOverride() used for
  * CMS overrides — one proven merge path, not a parallel one.
  *
+ * Only rows with `reviewed: true` are read — an unreviewed row behaves
+ * exactly as if it doesn't exist yet (falls through to English). This is
+ * the publish gate: seeding writes `reviewed: false` by default, and a
+ * separate explicit action (scripts/publish-i18n-translation.mjs) flips it.
+ *
  * Failure contract (never throws, never returns 500):
  *   • Mongo unavailable → console.warn → return static/English def
- *   • Override/translation doc missing → return the next layer down
+ *   • Override/translation doc missing, or not yet reviewed → return the
+ *     next layer down
  *   • Zod validation fails → console.warn → return the next layer down
  *   • No translation for `locale` yet → return the English-merged def
  *     (graceful fallback — translated URL still renders, just in English)
@@ -148,7 +154,7 @@ export async function getMergedLandingPage(slug: string, locale: string = "en"):
 
     const row = await db
       .collection("landing_page_translations")
-      .findOne({ slug, locale }, { projection: { overrides: 1, _id: 0 } })
+      .findOne({ slug, locale, reviewed: true }, { projection: { overrides: 1, _id: 0 } })
 
     if (!row?.overrides) return englishMerged
 

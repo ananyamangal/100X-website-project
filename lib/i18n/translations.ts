@@ -33,8 +33,10 @@ const COLLECTION = "translations"
 
 /**
  * Returns the translated field map for one piece of content, or null if no
- * translation exists yet (caller falls back to the English source — never
- * blocks rendering). Never throws.
+ * REVIEWED translation exists yet (caller falls back to the English source
+ * — never blocks rendering). Only `status: "approved"` rows are read — this
+ * is the publish gate: `status` starts at "pending" on write, and moving to
+ * "approved" is a separate, explicit action. Never throws.
  */
 export async function getTranslation(
   contentType: TranslationDoc["contentType"],
@@ -47,7 +49,7 @@ export async function getTranslation(
     const db = client.db()
     const row = await db
       .collection(COLLECTION)
-      .findOne({ contentType, contentId, locale }, { projection: { fields: 1, _id: 0 } })
+      .findOne({ contentType, contentId, locale, status: "approved" }, { projection: { fields: 1, _id: 0 } })
     return row?.fields ?? null
   } catch (err) {
     console.warn(

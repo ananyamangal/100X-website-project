@@ -1,10 +1,10 @@
 import { defineRouting } from "next-intl/routing"
 
-// Phase 1 bellwether pair. Phase 2 adds the remaining 10 Indian regional
-// languages; Phase 3 adds the remaining export-market languages. See
-// project memory for the full planned list.
+// Phase 1 bellwether pair (en/hi/id). Phase 2 adds the remaining 11 Indian
+// regional languages below; Phase 3 adds the remaining export-market
+// languages. See project memory for the full planned list.
 export const routing = defineRouting({
-  locales: ["en", "hi", "id"],
+  locales: ["en", "hi", "id", "bn", "mr", "te", "ta", "gu", "ur", "kn", "or", "ml", "pa", "as"],
   defaultLocale: "en",
   localePrefix: "as-needed",
   // Off deliberately: with this on, next-intl auto-redirects (307) an

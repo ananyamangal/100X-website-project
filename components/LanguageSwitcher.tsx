@@ -5,8 +5,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Globe } from 'lucide-react'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { routing, type AppLocale } from '@/i18n/routing'
-import { isLocaleManagedPathname } from '@/lib/i18n/locale-routes'
-import { isUntranslatableProductLanding } from '@/lib/seo/landing-pages'
+import { isLocaleManagedPathname, BLOG_INDEX_TRANSLATED_LOCALES } from '@/lib/i18n/locale-routes'
 import { LOCALE_LABELS } from '@/lib/i18n/locale-labels'
 import { cn } from '@/lib/utils'
 
@@ -21,6 +20,10 @@ export default function LanguageSwitcher({ triggerClassName }: LanguageSwitcherP
   const t = useTranslations('LanguageSwitcher')
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  // Starts as English-only (the safe minimum) until the real, reviewed-
+  // content-gated list loads — never briefly renders a locale that turns
+  // out to have no actual translation behind it.
+  const [availableLocales, setAvailableLocales] = useState<AppLocale[]>(['en'])
 
   useEffect(() => {
     if (!open) return
@@ -34,15 +37,41 @@ export default function LanguageSwitcher({ triggerClassName }: LanguageSwitcherP
   // Only the Phase 1 slice of routes actually has locale variants (see
   // lib/i18n/locale-routes.ts) — everywhere else on the site stays
   // English-only, so there's nothing to switch to.
-  if (!isLocaleManagedPathname(pathname)) return null
+  const managed = isLocaleManagedPathname(pathname)
 
-  // Within that slice, the 3 "type":"product" landing pages (TFS50/DB400/
-  // SSMA20) render body content straight from the live Mongo product doc,
-  // which has no translation mechanism — hi/id 404 for them (see
-  // isUntranslatableProductLanding). Everywhere else in LOCALE_MANAGED_SLUGS
-  // this filters down to all 3 locales unchanged.
-  const slug = pathname.replace(/^\//, '')
-  const availableLocales = routing.locales.filter((l) => !isUntranslatableProductLanding(slug, l))
+  useEffect(() => {
+    if (!managed) return
+    if (pathname === '/blog') {
+      // Static UI copy, not DB content — no per-post lookup needed/possible.
+      setAvailableLocales(BLOG_INDEX_TRANSLATED_LOCALES as AppLocale[])
+      return
+    }
+    let cancelled = false
+    // Fetches the same reviewed-content-gated list hreflang/sitemap use
+    // (lib/seo/hreflang.ts's getAvailableLocales) — this client component
+    // has no direct DB access and lives in the global Navbar, outside any
+    // per-page server component that already computed this. Resets to the
+    // safe English-only default first so a slow/failed fetch never leaves
+    // a stale, wrong locale list from the previous page up.
+    setAvailableLocales(['en'])
+    fetch(`/api/i18n/available-locales?pathname=${encodeURIComponent(pathname)}`)
+      .then((r) => r.json())
+      .then((data: { locales?: unknown }) => {
+        if (cancelled || !Array.isArray(data.locales)) return
+        const valid = data.locales.filter((l): l is AppLocale =>
+          (routing.locales as readonly string[]).includes(l as string),
+        )
+        setAvailableLocales(valid.length > 0 ? valid : ['en'])
+      })
+      .catch(() => {
+        if (!cancelled) setAvailableLocales(['en'])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [pathname, managed])
+
+  if (!managed) return null
 
   if (availableLocales.length <= 1) {
     // Nothing to switch to on this page — a static label, not a dropdown
