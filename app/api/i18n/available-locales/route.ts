@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAvailableLocales } from "@/lib/seo/hreflang"
-import { isUntranslatableProductLanding } from "@/lib/seo/landing-pages"
+import { isUntranslatableProductLanding } from "@/lib/seo/locale-gate"
 import { isLocaleManagedPathname, BLOG_INDEX_TRANSLATED_LOCALES } from "@/lib/i18n/locale-routes"
 import { getBlogBySlug } from "@/lib/blogsQuery"
 
@@ -40,8 +40,12 @@ export async function GET(request: NextRequest) {
   }
 
   const slug = pathname.slice(1)
-  const locales = (await getAvailableLocales("landing", slug)).filter(
-    (l) => !isUntranslatableProductLanding(slug, l),
-  )
+  const candidates = await getAvailableLocales("landing", slug)
+  // isUntranslatableProductLanding is now async (it may need a DB lookup for
+  // non-registered products) — resolve all candidates' gate checks in
+  // parallel first, then filter, rather than filtering with an async
+  // predicate (which silently never awaits and keeps everything).
+  const gated = await Promise.all(candidates.map((l) => isUntranslatableProductLanding(slug, l)))
+  const locales = candidates.filter((_, i) => !gated[i])
   return NextResponse.json({ locales })
 }
