@@ -117,6 +117,19 @@ export default function LanguageSwitcher({ triggerClassName }: LanguageSwitcherP
               onClick={() => {
                 setOpen(false)
                 router.replace(pathname, { locale: l })
+                // NextIntlClientProvider lives in the true root layout
+                // (app/layout.tsx), above the [locale] segment — a soft
+                // client-side nav only re-renders the segments whose params
+                // actually changed, so the root layout (and anything reading
+                // its ambient locale/messages: this switcher's own active-
+                // locale label, LandingFormBlock's field labels, SiteFooter's
+                // getTranslations()) gets preserved from the Router Cache and
+                // stays on the PREVIOUS locale. router.refresh() forces Next
+                // to invalidate that cache and re-run the root layout fresh
+                // for the new locale. Content sourced from the {locale} route
+                // param directly (page body/hero/FAQ) was never affected —
+                // this is purely for the ambient next-intl context.
+                router.refresh()
               }}
               className={cn(
                 'flex w-full items-center px-3 py-2 text-sm text-left transition-colors hover:bg-brand-50 hover:text-brand-700',
