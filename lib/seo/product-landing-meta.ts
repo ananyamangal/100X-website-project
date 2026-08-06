@@ -53,7 +53,7 @@ export async function productLandingMetadata(slug: string, locale: string = "en"
   const path     = localizedPath(canonicalPath, locale)
   const url      = `${SITE_URL}${path}`
   const ogImage  = resolveOgImage(def)
-  return {
+  const result: Metadata = {
     title,
     description,
     keywords,
@@ -76,4 +76,6 @@ export async function productLandingMetadata(slug: string, locale: string = "en"
       description: ogDescription,
     },
   }
+  console.log(`[METADATA-DEBUG] productLandingMetadata RETURN slug="${slug}" locale="${locale}" -> ${JSON.stringify({ title: result.title, description: result.description, ogTitle: (result.openGraph as any)?.title, ogDescription: (result.openGraph as any)?.description, twitterTitle: (result.twitter as any)?.title })}`)
+  return result
 }
