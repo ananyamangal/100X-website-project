@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import createIntlMiddleware from "next-intl/middleware"
 import { verifyJWT, SESSION_COOKIE } from "@/lib/rbac/jwt"
 import { routing } from "@/i18n/routing"
-import { isLocaleManagedPathname, UNTRANSLATABLE_PRODUCT_SLUGS } from "@/lib/i18n/locale-routes"
+import { isLocaleManagedPathname } from "@/lib/i18n/locale-routes"
 
 const OID_PATTERN = /^[a-f0-9]{24}$/i
 
@@ -184,16 +184,10 @@ export async function middleware(request: NextRequest) {
       if (!key.toLowerCase().startsWith("x-middleware-")) response.headers.set(key, value)
     })
 
-    // Bug B fix: next-intl's alternateLinks Link header advertises every
-    // configured locale (en/hi/id) for any locale-managed path, with no idea
-    // TFS50/DB400/SSMA20 have no hi/id content and 404 there. Drop it for
-    // these 3 slugs specifically (all locale variants — the header is the
-    // same reciprocal set regardless of which variant was requested) rather
-    // than turning alternateLinks off globally, which would also silence
-    // hreflang for the other 6 pages that genuinely have hi/id content.
-    const slug = pathname.replace(/^\/(hi|id)(?=\/|$)/, "").replace(/^\//, "")
-    if (UNTRANSLATABLE_PRODUCT_SLUGS.has(slug)) response.headers.delete("link")
-
+    // next-intl's alternateLinks Link header (formerly worked around here
+    // per-slug for TFS50/DB400/SSMA20) is now off globally in
+    // i18n/routing.ts — see that file's comment. next-intl never sets this
+    // header anymore, for any slug, so there's nothing left to delete here.
     return response
   }
 

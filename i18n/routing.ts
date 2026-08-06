@@ -16,15 +16,30 @@ export const routing = defineRouting({
   // switching stays available, just explicit (LanguageSwitcher / a direct
   // /hi or /id link) rather than guessed from a header.
   localeDetection: false,
-  // Stays on (the default): next-intl's automatic Link header is what
-  // actually delivers hreflang today for the 6 genuinely-translated
-  // locale-managed pages — generateMetadata's own alternates
-  // (lib/seo/hreflang.ts's buildPageAlternates) never make it into the
-  // response as either a header or <link> tags, a separate pre-existing gap.
-  // Turning this off entirely would silently kill hreflang for those 6 pages
-  // too. middleware.ts strips this header specifically for the 3
-  // untranslatable product landing pages (TFS50/DB400/SSMA20) instead, since
-  // this blanket header has no idea those don't have hi/id content.
+  // Off, as of 2026-08-06 (was on). next-intl's automatic Link header
+  // advertises every entry in `locales` above unconditionally — it has no
+  // concept of lib/seo/hreflang.ts's reviewed-content gate, so it was
+  // advertising hi/id/all 11 Phase 2 locales as hreflang alternates on every
+  // locale-managed page regardless of whether a REVIEWED translation
+  // actually existed (confirmed via curl against the live Link header — see
+  // project memory "hreflang-locale-gate-bug"). The previous version of
+  // this comment claimed generateMetadata's own alternates
+  // (lib/seo/hreflang.ts's buildPageAlternates, wired in via
+  // lib/seo/product-landing-meta.ts's productLandingMetadata) "never make
+  // it into the response" and kept this header on as the only working
+  // mechanism — that claim doesn't hold up: the SAME alternates object's
+  // `canonical` key demonstrably reaches the response (verified live,
+  // <link rel="canonical"> correctly shows the page-specific URL, not the
+  // root layout's competing `alternates: {canonical: '/'}` — proving
+  // page-level `generateMetadata` alternates do win the merge), and
+  // `languages` is a sibling key on the exact same object processed by the
+  // exact same Next.js metadata pipeline. buildPageAlternates() already
+  // correctly gates on reviewed content via getAvailableLocales() and is
+  // the sole hreflang mechanism now. middleware.ts's old per-slug Link-
+  // header-delete workaround for the 3 untranslatable product pages
+  // (TFS50/DB400/SSMA20) is gone too — with this off, next-intl never sets
+  // that header for anything, so there was nothing left to delete.
+  alternateLinks: false,
 })
 
 export type AppLocale = (typeof routing.locales)[number]
