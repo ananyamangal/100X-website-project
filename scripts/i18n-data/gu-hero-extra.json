@@ -1,0 +1,53 @@
+{
+  "locale": "gu",
+  "hero": {
+    "gem-approved-fogging-machine-oem": {
+      "eyebrow": "GeM Q2 કેટેગરી — ફોગિંગ મશીનો",
+      "headline": [
+        { "text": "ફોગિંગ મશીનો વેચો" },
+        { "text": "GeM પોર્ટલ પર", "accent": "green" },
+        { "text": "અને" },
+        { "text": "માન્ય OEM સપોર્ટ", "accent": "yellow" }
+      ],
+      "primary": { "label": "રિસેલર તરીકે નોંધણી કરો" },
+      "secondary": { "label": "અમને વોટ્સએપ કરો" }
+    },
+    "fogging-machine-supplier-in-uttar-pradesh": {
+      "eyebrow": "ઉત્તર પ્રદેશ સપ્લાય નેટવર્ક",
+      "headline": "ઉત્તર પ્રદેશમાં ફોગિંગ મશીન સપ્લાયર",
+      "primary": { "label": "UP ટેન્ડર ભાવપત્રક મેળવો" },
+      "secondary": { "label": "હમણાં અમને કૉલ કરો" }
+    },
+    "fogging-machine-supplier-in-bihar": {
+      "eyebrow": "બિહાર અને પૂર્વ ભારત સપ્લાય નેટવર્ક",
+      "headline": "બિહારમાં ફોગિંગ મશીન સપ્લાયર",
+      "primary": { "label": "બિહાર ટેન્ડર ભાવપત્રક મેળવો" },
+      "secondary": { "label": "હમણાં અમને કૉલ કરો" }
+    },
+    "dengue-control-fogging-machine": {
+      "eyebrow": "વેક્ટર નિયંત્રણ — ડેંગ્યુ અને ચિકનગુનિયા",
+      "headline": [
+        { "text": "ડેંગ્યુને રોકો" },
+        { "text": "તેના મૂળ સ્ત્રોત પર", "accent": "green" },
+        { "text": "સાબિત ફોગિંગ મશીનોથી" }
+      ],
+      "primary": { "label": "ડેંગ્યુ નિયંત્રણ ભાવપત્રક મેળવો" },
+      "secondary": { "label": "ટીમને વોટ્સએપ કરો" }
+    },
+    "thermal-vs-cold-fogging-machine": {
+      "eyebrow": "ખરીદદાર સરખામણી",
+      "headline": [
+        { "text": "થર્મલ વિરુદ્ધ કોલ્ડ ફોગિંગ:" },
+        { "text": "તમારા ઉપયોગ માટે કયું બંધબેસે છે?", "accent": "green" }
+      ],
+      "primary": { "label": "નિષ્ણાત સાથે વાત કરો" },
+      "secondary": { "label": "વોટ્સએપ પર પ્રશ્ન પૂછો" }
+    },
+    "fogging-machine-buying-guide": {
+      "eyebrow": "ખરીદદાર માર્ગદર્શિકા",
+      "headline": "ભારત માટે ફોગિંગ મશીન ખરીદી માર્ગદર્શિકા",
+      "primary": { "label": "ઈમેલ દ્વારા ચેકલિસ્ટ મેળવો" },
+      "secondary": { "label": "ઉત્પાદનો બ્રાઉઝ કરો" }
+    }
+  }
+}

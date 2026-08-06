@@ -1,5 +1,88 @@
 {
   "LanguageSwitcher": {
     "label": "ભાષા"
+  },
+  "LandingForm": {
+    "common": {
+      "selectPlaceholder": "પસંદ કરો…",
+      "submitting": "મોકલી રહ્યા છીએ…",
+      "submit": "સબમિટ કરો",
+      "privacyNote": "તમારી વિગતો ખાનગી રહે છે — અમે તૃતીય પક્ષો સાથે શેર કરતા નથી.",
+      "requiredPrefix": "કૃપા કરીને જરૂરી ભરો:"
+    },
+    "fields": {
+      "reseller": {
+        "company": { "label": "કંપની / પેઢીનું નામ", "placeholder": "તમારી નોંધાયેલ કંપનીનું નામ" },
+        "name": { "label": "તમારું નામ", "placeholder": "સંપર્ક વ્યક્તિનું નામ" },
+        "mobile": { "label": "મોબાઈલ નંબર", "placeholder": "+91 XXXXX XXXXX" },
+        "city": { "label": "શહેર / રાજ્ય", "placeholder": "દા.ત. લખનૌ, UP" },
+        "gem_seller_id": { "label": "GeM સેલર ID", "placeholder": "તમારો GeM પોર્ટલ સેલર ID" },
+        "gst": { "label": "GST નંબર", "placeholder": "15-અંકનો GSTIN" },
+        "capacity": {
+          "label": "માસિક ઓર્ડર ક્ષમતા",
+          "options": ["1-5 મશીન/મહિને", "5-20 મશીન/મહિને", "20-50 મશીન/મહિને", "50+ મશીન/મહિને"]
+        }
+      },
+      "tender-quote": {
+        "organization": { "label": "સંસ્થા / વિભાગ", "placeholder": "નગરપાલિકા નિગમ, આરોગ્ય વિભાગ, વગેરે" },
+        "name": { "label": "તમારું નામ" },
+        "designation": { "label": "હોદ્દો", "placeholder": "પ્રોક્યોરમેન્ટ ઓફિસર" },
+        "mobile": { "label": "મોબાઈલ નંબર" },
+        "email": { "label": "ઈમેલ" },
+        "state": { "label": "ડિલિવરી રાજ્ય" },
+        "requirement": { "label": "જરૂરિયાત", "placeholder": "મશીનનો પ્રકાર, જથ્થો, ટેન્ડર ID જો કોઈ હોય તો" }
+      },
+      "state-dealer": {
+        "name": { "label": "તમારું નામ" },
+        "mobile": { "label": "મોબાઈલ નંબર" },
+        "company": { "label": "કંપનીનું નામ (જો કોઈ હોય તો)" },
+        "city": { "label": "શહેર" },
+        "state": { "label": "રાજ્ય" },
+        "current_business": { "label": "વર્તમાન વ્યવસાય", "placeholder": "પેસ્ટ કંટ્રોલ, કૃષિ પુરવઠો, વગેરે" },
+        "monthly_volume": {
+          "label": "અપેક્ષિત માસિક વોલ્યુમ",
+          "options": ["1-5 મશીન", "5-20 મશીન", "20-50 મશીન", "50+ મશીન"]
+        }
+      },
+      "guide-download": {
+        "name": { "label": "તમારું નામ" },
+        "email": { "label": "ઈમેલ" },
+        "mobile": { "label": "મોબાઈલ (વૈકલ્પિક)" },
+        "role": { "label": "ભૂમિકા", "placeholder": "પ્રોક્યોરમેન્ટ, ડીલર, ફાર્મ માલિક..." }
+      },
+      "use-case-quote": {
+        "name": { "label": "તમારું નામ" },
+        "mobile": { "label": "મોબાઈલ નંબર" },
+        "organization": { "label": "સંસ્થા (વૈકલ્પિક)" },
+        "scale": { "label": "ઓપરેશનનું સ્કેલ", "placeholder": "દૈનિક આવરી લેવાયેલ વિસ્તાર, ટોળાનું કદ, વગેરે" },
+        "location": { "label": "સ્થાન", "placeholder": "શહેર, રાજ્ય" }
+      }
+    }
+  },
+  "Footer": {
+    "brandDescription": "જાહેર આરોગ્ય, નગરપાલિકાઓ, કૃષિ અને ઔદ્યોગિક પેસ્ટ કંટ્રોલ માટે થર્મલ ફોગિંગ મશીનોના ભારતના વિશ્વસનીય ઉત્પાદક.",
+    "columns": {
+      "products": "ઉત્પાદનો",
+      "company": "કંપની",
+      "governmentSolutions": "સરકારી સોલ્યુશન્સ",
+      "forDealers": "ડીલરો માટે",
+      "getInTouch": "સંપર્કમાં રહો"
+    },
+    "links": {
+      "spareParts": "સ્પેર પાર્ટ્સ",
+      "viewAllProducts": "તમામ ઉત્પાદનો જુઓ →"
+    },
+    "companyLinks": [
+      "100X Circle વિશે", "પ્રોડક્ટ કેટલોગ", "સ્પેર પાર્ટ્સ", "કેસ સ્ટડીઝ", "સરકારી ડિપ્લોયમેન્ટ",
+      "ભૂતકાળનું પ્રદર્શન", "સરકારી પ્રોક્યોરમેન્ટ", "નોલેજ સેન્ટર", "બ્લોગ", "અમારો સંપર્ક કરો"
+    ],
+    "governmentLinks": [
+      "GeM માન્ય OEM", "સરકારી પ્રોક્યોરમેન્ટ", "ભૂતકાળનું પ્રદર્શન", "GeM OEM ઓથોરાઇઝેશન"
+    ],
+    "dealerLinks": ["ડીલર બનો", "ટેન્ડર સપોર્ટ", "IS 14855 મશીનો"],
+    "bottomLinks": ["ગોપનીયતા નીતિ", "શરતો", "રિટર્ન", "વોરંટી", "અસ્વીકરણ"],
+    "whatsappCta": "અમને વોટ્સએપ કરો",
+    "viewOnMaps": "Google Maps પર જુઓ",
+    "copyright": "© 2026 100X Circle Pvt Ltd. બધા હકો સુરક્ષિત. ભારતમાં ઉત્પાદિત."
   }
 }

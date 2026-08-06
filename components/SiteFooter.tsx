@@ -1,5 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
+import { getTranslations } from "next-intl/server"
 import { Mail, MapPin, Phone } from "lucide-react"
 import { getAllLandingPages, getLandingDisplayName } from "@/lib/seo/landing-pages"
 import { BUSINESS } from "@/lib/seo/site-config"
@@ -74,15 +75,53 @@ interface SiteFooterProps {
   logoUrl?: string
   logoAlt?: string
   trustBadges?: Array<{ label: string; icon?: string; description?: string }>
+  /** Caller (app/layout.tsx) already resolves this to "en" on every page
+   * that isn't locale-managed — the footer itself never guesses. */
+  locale?: string
 }
 
-export default function SiteFooter({
+const COMPANY_LINK_HREFS = [
+  "/about", "/products", "/spare-parts", "/case-studies", "/deployments",
+  "/past-performance-government", "/fogging-machine-government-procurement",
+  "/knowledge", "/blog", "/contact-us",
+]
+const GOV_LINK_HREFS = [
+  "/gem-approved-fogging-machine-oem", "/fogging-machine-government-procurement",
+  "/past-performance-government", "/gem-oem-authorization",
+]
+const DEALER_LINK_HREFS = ["/become-a-dealer", "/gem-tender-support", "/is-14855-fogging-machine"]
+const BOTTOM_LINK_HREFS = ["/privacy-policy", "/terms-and-conditions", "/return-policy", "/warranty-policy", "/disclaimer"]
+
+export default async function SiteFooter({
   logoUrl = "/logo-main.png",
   logoAlt = "100X Circle — Thermal Fogging Machine Manufacturer",
   trustBadges,
+  locale = "en",
 }: SiteFooterProps) {
   const landingPages = getAllLandingPages()
   const badges = trustBadges && trustBadges.length > 0 ? trustBadges : DEFAULT_TRUST_BADGES
+  const t = await getTranslations({ locale, namespace: "Footer" })
+
+  // Raw string / string-array lookup with graceful fallback to the English
+  // literal already hardcoded below — same pattern as LandingFormBlock's
+  // tOptions(), so a locale with no Footer messages yet renders correctly
+  // in English rather than throwing or going blank.
+  const tr = (key: string, fallback: string) => (t.has(key) ? t(key) : fallback)
+  const trArr = (key: string, fallback: string[]) => {
+    if (!t.has(key)) return fallback
+    const raw = t.raw(key)
+    return Array.isArray(raw) && raw.length === fallback.length ? (raw as string[]) : fallback
+  }
+
+  const companyLinkLabels = trArr("companyLinks", [
+    "About 100X Circle", "Product Catalogue", "Spare Parts", "Case Studies", "Government Deployments",
+    "Past Performance", "Government Procurement", "Knowledge Centre", "Blog", "Contact Us",
+  ])
+  const govLinkLabels = trArr("governmentLinks", [
+    "GeM Approved OEM", "Government Procurement", "Past Performance", "GeM OEM Authorization",
+  ])
+  const dealerLinkLabels = trArr("dealerLinks", ["Become a Dealer", "Tender Support", "IS 14855 Machines"])
+  const bottomLinkLabels = trArr("bottomLinks", ["Privacy Policy", "Terms", "Returns", "Warranty", "Disclaimer"])
 
   return (
     <footer className="bg-cinema-900 text-white">
@@ -116,7 +155,7 @@ export default function SiteFooter({
               <Image src={logoUrl} alt={logoAlt} width={160} height={40} className="h-10 w-auto" draggable={false} />
             </Link>
             <p className="text-cinema-400 text-sm leading-relaxed mb-6 max-w-xs">
-              India's trusted manufacturer of thermal fogging machines for public health, municipalities, agriculture, and industrial pest control.
+              {tr("brandDescription", "India's trusted manufacturer of thermal fogging machines for public health, municipalities, agriculture, and industrial pest control.")}
             </p>
 
             {/* Social icons */}
@@ -150,7 +189,7 @@ export default function SiteFooter({
 
           {/* Column 2: Products */}
           <div>
-            <h4 className="text-sm font-600 text-white uppercase tracking-widest mb-6">Products</h4>
+            <h4 className="text-sm font-600 text-white uppercase tracking-widest mb-6">{tr("columns.products", "Products")}</h4>
             <ul className="space-y-3">
               {landingPages.map((def) => (
                 <li key={def.slug}>
@@ -164,12 +203,12 @@ export default function SiteFooter({
               ))}
               <li>
                 <Link href="/spare-parts" className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
-                  Spare Parts
+                  {tr("links.spareParts", "Spare Parts")}
                 </Link>
               </li>
               <li className="pt-1">
                 <Link href="/products" className="text-brand-400 hover:text-brand-300 text-sm font-600 transition-colors">
-                  View all products →
+                  {tr("links.viewAllProducts", "View all products →")}
                 </Link>
               </li>
             </ul>
@@ -177,52 +216,32 @@ export default function SiteFooter({
 
           {/* Column 3: Company + Dealers */}
           <div>
-            <h4 className="text-sm font-600 text-white uppercase tracking-widest mb-6">Company</h4>
+            <h4 className="text-sm font-600 text-white uppercase tracking-widest mb-6">{tr("columns.company", "Company")}</h4>
             <ul className="space-y-3 mb-6">
-              {[
-                { href: "/about", label: "About 100X Circle" },
-                { href: "/products", label: "Product Catalogue" },
-                { href: "/spare-parts", label: "Spare Parts" },
-                { href: "/case-studies", label: "Case Studies" },
-                { href: "/deployments", label: "Government Deployments" },
-                { href: "/past-performance-government", label: "Past Performance" },
-                { href: "/fogging-machine-government-procurement", label: "Government Procurement" },
-                { href: "/knowledge", label: "Knowledge Centre" },
-                { href: "/blog", label: "Blog" },
-                { href: "/contact-us", label: "Contact Us" },
-              ].map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
-                    {l.label}
+              {COMPANY_LINK_HREFS.map((href, i) => (
+                <li key={href}>
+                  <Link href={href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
+                    {companyLinkLabels[i]}
                   </Link>
                 </li>
               ))}
             </ul>
-            <h4 className="text-xs font-600 text-cinema-500 uppercase tracking-widest mb-3">Government Solutions</h4>
+            <h4 className="text-xs font-600 text-cinema-500 uppercase tracking-widest mb-3">{tr("columns.governmentSolutions", "Government Solutions")}</h4>
             <ul className="space-y-3 mb-6">
-              {[
-                { href: "/gem-approved-fogging-machine-oem", label: "GeM Approved OEM" },
-                { href: "/fogging-machine-government-procurement", label: "Government Procurement" },
-                { href: "/past-performance-government", label: "Past Performance" },
-                { href: "/gem-oem-authorization", label: "GeM OEM Authorization" },
-              ].map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
-                    {l.label}
+              {GOV_LINK_HREFS.map((href, i) => (
+                <li key={href}>
+                  <Link href={href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
+                    {govLinkLabels[i]}
                   </Link>
                 </li>
               ))}
             </ul>
-            <h4 className="text-xs font-600 text-cinema-500 uppercase tracking-widest mb-3">For Dealers</h4>
+            <h4 className="text-xs font-600 text-cinema-500 uppercase tracking-widest mb-3">{tr("columns.forDealers", "For Dealers")}</h4>
             <ul className="space-y-3">
-              {[
-                { href: "/become-a-dealer", label: "Become a Dealer" },
-                { href: "/gem-tender-support", label: "Tender Support" },
-                { href: "/is-14855-fogging-machine", label: "IS 14855 Machines" },
-              ].map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
-                    {l.label}
+              {DEALER_LINK_HREFS.map((href, i) => (
+                <li key={href}>
+                  <Link href={href} className="text-cinema-400 hover:text-brand-400 text-sm transition-colors">
+                    {dealerLinkLabels[i]}
                   </Link>
                 </li>
               ))}
@@ -231,7 +250,7 @@ export default function SiteFooter({
 
           {/* Column 4: Contact */}
           <div>
-            <h4 className="text-sm font-600 text-white uppercase tracking-widest mb-6">Get in Touch</h4>
+            <h4 className="text-sm font-600 text-white uppercase tracking-widest mb-6">{tr("columns.getInTouch", "Get in Touch")}</h4>
             <ul className="space-y-4 mb-8">
               <li>
                 <a
@@ -274,7 +293,7 @@ export default function SiteFooter({
                         className="w-16 h-11 rounded-md border border-white/10 shrink-0 group-hover:border-white/20 transition-colors"
                       />
                       <span className="text-xs text-cinema-500 group-hover:text-brand-400 underline decoration-dotted underline-offset-2 transition-colors">
-                        View on Google Maps
+                        {tr("viewOnMaps", "View on Google Maps")}
                       </span>
                     </a>
                   </div>
@@ -292,7 +311,7 @@ export default function SiteFooter({
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
               </svg>
-              WhatsApp Us
+              {tr("whatsappCta", "WhatsApp Us")}
             </a>
           </div>
         </div>
@@ -303,18 +322,12 @@ export default function SiteFooter({
         <div className="container mx-auto px-4 md:px-6 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-cinema-500 text-xs">
-              &copy; 2026 100X Circle Pvt Ltd. All rights reserved. Manufactured in India.
+              {tr("copyright", "© 2026 100X Circle Pvt Ltd. All rights reserved. Manufactured in India.")}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-              {[
-                { href: "/privacy-policy", label: "Privacy Policy" },
-                { href: "/terms-and-conditions", label: "Terms" },
-                { href: "/return-policy", label: "Returns" },
-                { href: "/warranty-policy", label: "Warranty" },
-                { href: "/disclaimer", label: "Disclaimer" },
-              ].map((l) => (
-                <Link key={l.href} href={l.href} className="text-cinema-600 hover:text-cinema-400 text-xs transition-colors">
-                  {l.label}
+              {BOTTOM_LINK_HREFS.map((href, i) => (
+                <Link key={href} href={href} className="text-cinema-600 hover:text-cinema-400 text-xs transition-colors">
+                  {bottomLinkLabels[i]}
                 </Link>
               ))}
               <a href="/admin" className="text-cinema-700 hover:text-cinema-500 text-xs transition-colors">

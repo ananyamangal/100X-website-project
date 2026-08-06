@@ -1,0 +1,53 @@
+{
+  "locale": "pa",
+  "hero": {
+    "gem-approved-fogging-machine-oem": {
+      "eyebrow": "GeM Q2 ਸ਼੍ਰੇਣੀ — ਫੌਗਿੰਗ ਮਸ਼ੀਨਾਂ",
+      "headline": [
+        { "text": "ਫੌਗਿੰਗ ਮਸ਼ੀਨਾਂ ਵੇਚੋ" },
+        { "text": "GeM ਪੋਰਟਲ 'ਤੇ", "accent": "green" },
+        { "text": "ਅਤੇ" },
+        { "text": "ਪ੍ਰਵਾਨਿਤ OEM ਸਹਾਇਤਾ ਨਾਲ", "accent": "yellow" }
+      ],
+      "primary": { "label": "ਰੀਸੈਲਰ ਵਜੋਂ ਰਜਿਸਟਰ ਕਰੋ" },
+      "secondary": { "label": "ਸਾਨੂੰ ਵਟਸਐਪ ਕਰੋ" }
+    },
+    "fogging-machine-supplier-in-uttar-pradesh": {
+      "eyebrow": "ਉੱਤਰ ਪ੍ਰਦੇਸ਼ ਸਪਲਾਈ ਨੈੱਟਵਰਕ",
+      "headline": "ਉੱਤਰ ਪ੍ਰਦੇਸ਼ ਵਿੱਚ ਫੌਗਿੰਗ ਮਸ਼ੀਨ ਸਪਲਾਇਰ",
+      "primary": { "label": "UP ਟੈਂਡਰ ਕੋਟੇਸ਼ਨ ਪ੍ਰਾਪਤ ਕਰੋ" },
+      "secondary": { "label": "ਹੁਣੇ ਕਾਲ ਕਰੋ" }
+    },
+    "fogging-machine-supplier-in-bihar": {
+      "eyebrow": "ਬਿਹਾਰ ਅਤੇ ਪੂਰਬੀ ਭਾਰਤ ਸਪਲਾਈ ਨੈੱਟਵਰਕ",
+      "headline": "ਬਿਹਾਰ ਵਿੱਚ ਫੌਗਿੰਗ ਮਸ਼ੀਨ ਸਪਲਾਇਰ",
+      "primary": { "label": "ਬਿਹਾਰ ਟੈਂਡਰ ਕੋਟੇਸ਼ਨ ਪ੍ਰਾਪਤ ਕਰੋ" },
+      "secondary": { "label": "ਹੁਣੇ ਕਾਲ ਕਰੋ" }
+    },
+    "dengue-control-fogging-machine": {
+      "eyebrow": "ਵੈਕਟਰ ਕੰਟਰੋਲ — ਡੇਂਗੂ ਅਤੇ ਚਿਕਨਗੁਨੀਆ",
+      "headline": [
+        { "text": "ਡੇਂਗੂ ਨੂੰ ਰੋਕੋ" },
+        { "text": "ਸ੍ਰੋਤ 'ਤੇ", "accent": "green" },
+        { "text": "ਸਾਬਤ ਹੋਈਆਂ ਫੌਗਿੰਗ ਮਸ਼ੀਨਾਂ ਨਾਲ" }
+      ],
+      "primary": { "label": "ਡੇਂਗੂ ਕੰਟਰੋਲ ਕੋਟੇਸ਼ਨ ਪ੍ਰਾਪਤ ਕਰੋ" },
+      "secondary": { "label": "ਟੀਮ ਨੂੰ ਵਟਸਐਪ ਕਰੋ" }
+    },
+    "thermal-vs-cold-fogging-machine": {
+      "eyebrow": "ਖਰੀਦਦਾਰ ਤੁਲਨਾ",
+      "headline": [
+        { "text": "ਥਰਮਲ ਬਨਾਮ ਕੋਲਡ ਫੌਗਿੰਗ:" },
+        { "text": "ਤੁਹਾਡੀ ਵਰਤੋਂ ਲਈ ਕਿਹੜੀ ਢੁਕਵੀਂ ਹੈ?", "accent": "green" }
+      ],
+      "primary": { "label": "ਮਾਹਿਰ ਨਾਲ ਗੱਲ ਕਰੋ" },
+      "secondary": { "label": "ਵਟਸਐਪ 'ਤੇ ਸਵਾਲ ਪੁੱਛੋ" }
+    },
+    "fogging-machine-buying-guide": {
+      "eyebrow": "ਖਰੀਦਦਾਰ ਗਾਈਡ",
+      "headline": "ਭਾਰਤ ਲਈ ਫੌਗਿੰਗ ਮਸ਼ੀਨ ਖਰੀਦ ਗਾਈਡ",
+      "primary": { "label": "ਈਮੇਲ ਰਾਹੀਂ ਚੈੱਕਲਿਸਟ ਪ੍ਰਾਪਤ ਕਰੋ" },
+      "secondary": { "label": "ਉਤਪਾਦ ਬ੍ਰਾਊਜ਼ ਕਰੋ" }
+    }
+  }
+}

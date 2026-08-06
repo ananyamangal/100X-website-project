@@ -49,8 +49,19 @@ export default function LocaleSuggestionBanner({
         navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language]
       ).map((l) => l.toLowerCase().split('-')[0])
 
+      // Stop scanning once we reach the visitor's current locale in their own
+      // browser-preference order — a candidate only counts if it's a stronger
+      // preference than what they're already viewing, not merely "present
+      // somewhere in the list" (see locale-suggestion-banner-logic-bug).
+      const currentIdx = browserLangs.indexOf(currentLocale)
+      const scanUpTo = currentIdx === -1 ? browserLangs.length : currentIdx
+
       let match: AppLocale | null = null
-      for (const lang of browserLangs) {
+      for (const lang of browserLangs.slice(0, scanUpTo)) {
+        // English is the universal fallback every page already renders by
+        // default — it's never a meaningful "discovered preference" worth
+        // promoting, so it's never a valid suggestion target.
+        if (lang === 'en') continue
         const candidate = routing.locales.find((l) => l === lang)
         if (candidate && candidate !== currentLocale && availableLocales.includes(candidate)) {
           match = candidate

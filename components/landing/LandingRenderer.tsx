@@ -69,7 +69,7 @@ function defaultBreadcrumb(def: LandingPageDef): BreadcrumbItem[] {
  * block is itself a Server Component (or, in the LandingFormBlock case,
  * a Client Component already marked "use client").
  */
-function renderSection(section: LandingSection, def: LandingPageDef, idx: number) {
+function renderSection(section: LandingSection, def: LandingPageDef, idx: number, locale: string) {
   switch (section.kind) {
     case "rich-text":
       return <RichTextBlock key={idx} h2={section.h2} paragraphs={section.paragraphs} />
@@ -146,7 +146,7 @@ function renderSection(section: LandingSection, def: LandingPageDef, idx: number
       )
     }
     case "form":
-      return <LandingFormBlock key={idx} block={section} landingSlug={def.slug} />
+      return <LandingFormBlock key={idx} block={section} landingSlug={def.slug} locale={locale} />
     case "cta-band":
       return <CtaBandBlock key={idx} band={section.band} />
     case "video":
@@ -281,7 +281,7 @@ export default async function LandingRenderer({ slug, locale = "en" }: Props) {
         <BreadcrumbNav items={breadcrumb} />
         {def.hero ? <HeroBlock hero={def.hero} theme={theme} /> : null}
         {sections.map((s, i) => {
-          try { return renderSection(s, def, i) } catch { return null }
+          try { return renderSection(s, def, i, locale) } catch { return null }
         })}
 
         {/* Auto-append an FAQ section when faqs are declared but the

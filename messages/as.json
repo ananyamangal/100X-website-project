@@ -1,5 +1,88 @@
 {
   "LanguageSwitcher": {
     "label": "ভাষা"
+  },
+  "LandingForm": {
+    "common": {
+      "selectPlaceholder": "বাছনি কৰক…",
+      "submitting": "পঠিওৱা হৈছে…",
+      "submit": "দাখিল কৰক",
+      "privacyNote": "আপোনাৰ বিৱৰণ গোপনীয় থাকে — আমি তৃতীয় পক্ষৰ সৈতে শ্বেয়াৰ নকৰোঁ।",
+      "requiredPrefix": "অনুগ্ৰহ কৰি প্ৰয়োজনীয় পূৰণ কৰক:"
+    },
+    "fields": {
+      "reseller": {
+        "company": { "label": "কোম্পানী / প্ৰতিষ্ঠানৰ নাম", "placeholder": "আপোনাৰ পঞ্জীয়নভুক্ত কোম্পানীৰ নাম" },
+        "name": { "label": "আপোনাৰ নাম", "placeholder": "যোগাযোগ ব্যক্তিৰ নাম" },
+        "mobile": { "label": "ম'বাইল নম্বৰ", "placeholder": "+৯১ XXXXX XXXXX" },
+        "city": { "label": "চহৰ / ৰাজ্য", "placeholder": "উদাহৰণ: লক্ষ্ণৌ, উত্তৰ প্ৰদেশ" },
+        "gem_seller_id": { "label": "GeM বিক্ৰেতা ID", "placeholder": "আপোনাৰ GeM পোর্টেল বিক্ৰেতা ID" },
+        "gst": { "label": "GST নম্বৰ", "placeholder": "১৫-অংকৰ GSTIN" },
+        "capacity": {
+          "label": "মাহেকীয়া অৰ্ডাৰ ক্ষমতা",
+          "options": ["১–৫ মেচিন/মাহ", "৫–২০ মেচিন/মাহ", "২০–৫০ মেচিন/মাহ", "৫০+ মেচিন/মাহ"]
+        }
+      },
+      "tender-quote": {
+        "organization": { "label": "প্ৰতিষ্ঠান / বিভাগ", "placeholder": "পৌৰনিগম, স্বাস্থ্য বিভাগ, আদি" },
+        "name": { "label": "আপোনাৰ নাম" },
+        "designation": { "label": "পদবী", "placeholder": "ক্ৰয় বিষয়া" },
+        "mobile": { "label": "ম'বাইল নম্বৰ" },
+        "email": { "label": "ইমেইল" },
+        "state": { "label": "ডেলিভাৰী ৰাজ্য" },
+        "requirement": { "label": "প্ৰয়োজনীয়তা", "placeholder": "মেচিনৰ প্ৰকাৰ, পৰিমাণ, দৰপত্ৰ ID (যদি থাকে)" }
+      },
+      "state-dealer": {
+        "name": { "label": "আপোনাৰ নাম" },
+        "mobile": { "label": "ম'বাইল নম্বৰ" },
+        "company": { "label": "কোম্পানীৰ নাম (যদি থাকে)" },
+        "city": { "label": "চহৰ" },
+        "state": { "label": "ৰাজ্য" },
+        "current_business": { "label": "বৰ্তমানৰ ব্যৱসায়", "placeholder": "পেষ্ট কণ্ট্ৰল, কৃষি সামগ্ৰী, আদি" },
+        "monthly_volume": {
+          "label": "প্ৰত্যাশিত মাহেকীয়া পৰিমাণ",
+          "options": ["১–৫ মেচিন", "৫–২০ মেচিন", "২০–৫০ মেচিন", "৫০+ মেচিন"]
+        }
+      },
+      "guide-download": {
+        "name": { "label": "আপোনাৰ নাম" },
+        "email": { "label": "ইমেইল" },
+        "mobile": { "label": "ম'বাইল (বৈকল্পিক)" },
+        "role": { "label": "ভূমিকা", "placeholder": "ক্ৰয়, ডিলাৰ, খেতিয়ক..." }
+      },
+      "use-case-quote": {
+        "name": { "label": "আপোনাৰ নাম" },
+        "mobile": { "label": "ম'বাইল নম্বৰ" },
+        "organization": { "label": "প্ৰতিষ্ঠান (বৈকল্পিক)" },
+        "scale": { "label": "কাৰ্যকলাপৰ পৰিসৰ", "placeholder": "দৈনিক কভাৰ কৰা অঞ্চল, জাকৰ আকাৰ, আদি" },
+        "location": { "label": "স্থান", "placeholder": "চহৰ, ৰাজ্য" }
+      }
+    }
+  },
+  "Footer": {
+    "brandDescription": "ৰাজহুৱা স্বাস্থ্য, পৌৰসভা, কৃষি, আৰু ঔদ্যোগিক পেষ্ট কণ্ট্ৰলৰ বাবে থাৰ্মেল ফগিং মেচিনৰ ভাৰতৰ বিশ্বাসযোগ্য নিৰ্মাতা।",
+    "columns": {
+      "products": "উৎপাদন",
+      "company": "কোম্পানী",
+      "governmentSolutions": "চৰকাৰী সমাধান",
+      "forDealers": "ডিলাৰসকলৰ বাবে",
+      "getInTouch": "যোগাযোগ কৰক"
+    },
+    "links": {
+      "spareParts": "যাতায়াতী পুৰ্জা",
+      "viewAllProducts": "সকলো উৎপাদন চাওক →"
+    },
+    "companyLinks": [
+      "100X Circle ৰ বিষয়ে", "উৎপাদন কেটালগ", "যাতায়াতী পুৰ্জা", "কেছ ষ্টাডি", "চৰকাৰী প্ৰয়োগ",
+      "অতীত কাৰ্যদক্ষতা", "চৰকাৰী ক্ৰয়", "জ্ঞান কেন্দ্ৰ", "ব্লগ", "যোগাযোগ কৰক"
+    ],
+    "governmentLinks": [
+      "GeM অনুমোদিত OEM", "চৰকাৰী ক্ৰয়", "অতীত কাৰ্যদক্ষতা", "GeM OEM প্ৰাধিকাৰ"
+    ],
+    "dealerLinks": ["এজন ডিলাৰ হওক", "দৰপত্ৰ সহায়তা", "IS 14855 মেচিন"],
+    "bottomLinks": ["গোপনীয়তা নীতি", "চৰ্তাৱলী", "ঘূৰাই দিয়া", "ৱাৰেণ্টি", "অস্বীকাৰোক্তি"],
+    "whatsappCta": "আমাক হোৱাটছএপ কৰক",
+    "viewOnMaps": "গুগল মেপত চাওক",
+    "copyright": "© ২০২৬ 100X Circle Pvt Ltd. সকলো অধিকাৰ সংৰক্ষিত। ভাৰততে নিৰ্মিত।"
   }
 }

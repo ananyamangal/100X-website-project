@@ -1,5 +1,188 @@
 {
   "LanguageSwitcher": {
     "label": "زبان"
+  },
+  "LandingForm": {
+    "common": {
+      "selectPlaceholder": "منتخب کریں…",
+      "submitting": "بھیجا جا رہا ہے…",
+      "submit": "جمع کروائیں",
+      "privacyNote": "آپ کی تفصیلات نجی رہتی ہیں — ہم انہیں کسی تیسرے فریق کے ساتھ شیئر نہیں کرتے۔",
+      "requiredPrefix": "براہ کرم درکار معلومات پُر کریں:"
+    },
+    "fields": {
+      "reseller": {
+        "company": {
+          "label": "کمپنی / فرم کا نام",
+          "placeholder": "آپ کی رجسٹرڈ کمپنی کا نام"
+        },
+        "name": {
+          "label": "آپ کا نام",
+          "placeholder": "رابطہ کار کا نام"
+        },
+        "mobile": {
+          "label": "موبائل نمبر",
+          "placeholder": "+91-XXXXX-XXXXX"
+        },
+        "city": {
+          "label": "شہر / ریاست",
+          "placeholder": "مثال کے طور پر لکھنؤ، یوپی"
+        },
+        "gem_seller_id": {
+          "label": "GeM سیلر آئی ڈی",
+          "placeholder": "آپ کا GeM پورٹل سیلر آئی ڈی"
+        },
+        "gst": {
+          "label": "GST نمبر",
+          "placeholder": "15 ہندسوں کا GSTIN"
+        },
+        "capacity": {
+          "label": "ماہانہ آرڈر گنجائش",
+          "options": [
+            "1–5 مشینیں/ماہ",
+            "5–20 مشینیں/ماہ",
+            "20–50 مشینیں/ماہ",
+            "50+ مشینیں/ماہ"
+          ]
+        }
+      },
+      "tender-quote": {
+        "organization": {
+          "label": "ادارہ / محکمہ",
+          "placeholder": "میونسپل کارپوریشن، محکمہ صحت وغیرہ"
+        },
+        "name": {
+          "label": "آپ کا نام"
+        },
+        "designation": {
+          "label": "عہدہ",
+          "placeholder": "پروکیورمنٹ آفیسر"
+        },
+        "mobile": {
+          "label": "موبائل نمبر"
+        },
+        "email": {
+          "label": "ای میل"
+        },
+        "state": {
+          "label": "ترسیل کی ریاست"
+        },
+        "requirement": {
+          "label": "ضرورت",
+          "placeholder": "مشین کی قسم، تعداد، اگر کوئی ٹینڈر آئی ڈی ہو"
+        }
+      },
+      "state-dealer": {
+        "name": {
+          "label": "آپ کا نام"
+        },
+        "mobile": {
+          "label": "موبائل نمبر"
+        },
+        "company": {
+          "label": "کمپنی کا نام (اگر کوئی ہو)"
+        },
+        "city": {
+          "label": "شہر"
+        },
+        "state": {
+          "label": "ریاست"
+        },
+        "current_business": {
+          "label": "موجودہ کاروبار",
+          "placeholder": "پیسٹ کنٹرول، زرعی سامان وغیرہ"
+        },
+        "monthly_volume": {
+          "label": "متوقع ماہانہ حجم",
+          "options": [
+            "1–5 مشینیں",
+            "5–20 مشینیں",
+            "20–50 مشینیں",
+            "50+ مشینیں"
+          ]
+        }
+      },
+      "guide-download": {
+        "name": {
+          "label": "آپ کا نام"
+        },
+        "email": {
+          "label": "ای میل"
+        },
+        "mobile": {
+          "label": "موبائل (اختیاری)"
+        },
+        "role": {
+          "label": "کردار",
+          "placeholder": "پروکیورمنٹ، ڈیلر، فارم مالک..."
+        }
+      },
+      "use-case-quote": {
+        "name": {
+          "label": "آپ کا نام"
+        },
+        "mobile": {
+          "label": "موبائل نمبر"
+        },
+        "organization": {
+          "label": "ادارہ (اختیاری)"
+        },
+        "scale": {
+          "label": "آپریشن کا پیمانہ",
+          "placeholder": "روزانہ کور کیا گیا رقبہ، مویشیوں کی تعداد وغیرہ"
+        },
+        "location": {
+          "label": "مقام",
+          "placeholder": "شہر، ریاست"
+        }
+      }
+    }
+  },
+  "Footer": {
+    "brandDescription": "بھارت کا معتبر تھرمل فوگنگ مشین مینوفیکچرر — صحتِ عامہ، میونسپلٹیز، زراعت، اور صنعتی پیسٹ کنٹرول کے لیے۔",
+    "columns": {
+      "products": "پروڈکٹس",
+      "company": "کمپنی",
+      "governmentSolutions": "سرکاری حل",
+      "forDealers": "ڈیلرز کے لیے",
+      "getInTouch": "رابطہ کریں"
+    },
+    "links": {
+      "spareParts": "اسپیئر پارٹس",
+      "viewAllProducts": "تمام پروڈکٹس دیکھیں →"
+    },
+    "companyLinks": [
+      "100X Circle کے بارے میں",
+      "پروڈکٹ کیٹلاگ",
+      "اسپیئر پارٹس",
+      "کیس اسٹڈیز",
+      "سرکاری تعیناتیاں",
+      "ماضی کی کارکردگی",
+      "سرکاری خریداری",
+      "نالج سینٹر",
+      "بلاگ",
+      "ہم سے رابطہ کریں"
+    ],
+    "governmentLinks": [
+      "GeM سے منظور شدہ OEM",
+      "سرکاری خریداری",
+      "ماضی کی کارکردگی",
+      "GeM OEM آتھورائزیشن"
+    ],
+    "dealerLinks": [
+      "ڈیلر بنیں",
+      "ٹینڈر سپورٹ",
+      "IS 14855 مشینیں"
+    ],
+    "bottomLinks": [
+      "پرائیویسی پالیسی",
+      "شرائط",
+      "واپسی",
+      "وارنٹی",
+      "دستبرداری"
+    ],
+    "whatsappCta": "ہمیں واٹس ایپ کریں",
+    "viewOnMaps": "گوگل میپس پر دیکھیں",
+    "copyright": "© 2026 100X Circle Pvt Ltd۔ جملہ حقوق محفوظ ہیں۔ بھارت میں تیار کردہ۔"
   }
 }

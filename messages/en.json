@@ -1,5 +1,88 @@
 {
   "LanguageSwitcher": {
     "label": "Language"
+  },
+  "LandingForm": {
+    "common": {
+      "selectPlaceholder": "Select…",
+      "submitting": "Sending…",
+      "submit": "Submit",
+      "privacyNote": "Your details stay private — we don't share with third parties.",
+      "requiredPrefix": "Please fill required:"
+    },
+    "fields": {
+      "reseller": {
+        "company": { "label": "Company / Firm Name", "placeholder": "Your registered company name" },
+        "name": { "label": "Your Name", "placeholder": "Contact person name" },
+        "mobile": { "label": "Mobile Number", "placeholder": "+91 XXXXX XXXXX" },
+        "city": { "label": "City / State", "placeholder": "e.g. Lucknow, UP" },
+        "gem_seller_id": { "label": "GeM Seller ID", "placeholder": "Your GeM portal seller ID" },
+        "gst": { "label": "GST Number", "placeholder": "15-digit GSTIN" },
+        "capacity": {
+          "label": "Monthly Order Capacity",
+          "options": ["1–5 machines/month", "5–20 machines/month", "20–50 machines/month", "50+ machines/month"]
+        }
+      },
+      "tender-quote": {
+        "organization": { "label": "Organization / Department", "placeholder": "Municipal Corporation, Health Dept, etc." },
+        "name": { "label": "Your Name" },
+        "designation": { "label": "Designation", "placeholder": "Procurement Officer" },
+        "mobile": { "label": "Mobile Number" },
+        "email": { "label": "Email" },
+        "state": { "label": "Delivery State" },
+        "requirement": { "label": "Requirement", "placeholder": "Machine type, quantity, tender ID if any" }
+      },
+      "state-dealer": {
+        "name": { "label": "Your Name" },
+        "mobile": { "label": "Mobile Number" },
+        "company": { "label": "Company Name (if any)" },
+        "city": { "label": "City" },
+        "state": { "label": "State" },
+        "current_business": { "label": "Current Business", "placeholder": "Pest control, agri supplies, etc." },
+        "monthly_volume": {
+          "label": "Expected Monthly Volume",
+          "options": ["1–5 machines", "5–20 machines", "20–50 machines", "50+ machines"]
+        }
+      },
+      "guide-download": {
+        "name": { "label": "Your Name" },
+        "email": { "label": "Email" },
+        "mobile": { "label": "Mobile (optional)" },
+        "role": { "label": "Role", "placeholder": "Procurement, dealer, farm owner..." }
+      },
+      "use-case-quote": {
+        "name": { "label": "Your Name" },
+        "mobile": { "label": "Mobile Number" },
+        "organization": { "label": "Organization (optional)" },
+        "scale": { "label": "Scale of Operation", "placeholder": "Daily area covered, herd size, etc." },
+        "location": { "label": "Location", "placeholder": "City, State" }
+      }
+    }
+  },
+  "Footer": {
+    "brandDescription": "India's trusted manufacturer of thermal fogging machines for public health, municipalities, agriculture, and industrial pest control.",
+    "columns": {
+      "products": "Products",
+      "company": "Company",
+      "governmentSolutions": "Government Solutions",
+      "forDealers": "For Dealers",
+      "getInTouch": "Get in Touch"
+    },
+    "links": {
+      "spareParts": "Spare Parts",
+      "viewAllProducts": "View all products →"
+    },
+    "companyLinks": [
+      "About 100X Circle", "Product Catalogue", "Spare Parts", "Case Studies", "Government Deployments",
+      "Past Performance", "Government Procurement", "Knowledge Centre", "Blog", "Contact Us"
+    ],
+    "governmentLinks": [
+      "GeM Approved OEM", "Government Procurement", "Past Performance", "GeM OEM Authorization"
+    ],
+    "dealerLinks": ["Become a Dealer", "Tender Support", "IS 14855 Machines"],
+    "bottomLinks": ["Privacy Policy", "Terms", "Returns", "Warranty", "Disclaimer"],
+    "whatsappCta": "WhatsApp Us",
+    "viewOnMaps": "View on Google Maps",
+    "copyright": "© 2026 100X Circle Pvt Ltd. All rights reserved. Manufactured in India."
   }
 }

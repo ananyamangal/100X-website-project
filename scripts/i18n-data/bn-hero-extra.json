@@ -1,0 +1,53 @@
+{
+  "locale": "bn",
+  "hero": {
+    "gem-approved-fogging-machine-oem": {
+      "eyebrow": "GeM Q2 বিভাগ — ফগিং মেশিন",
+      "headline": [
+        { "text": "ফগিং মেশিন বিক্রি করুন" },
+        { "text": "GeM পোর্টালে", "accent": "green" },
+        { "text": "সাথে" },
+        { "text": "অনুমোদিত OEM সহায়তায়", "accent": "yellow" }
+      ],
+      "primary": { "label": "রিসেলার হিসেবে নিবন্ধন করুন" },
+      "secondary": { "label": "আমাদের হোয়াটসঅ্যাপ করুন" }
+    },
+    "fogging-machine-supplier-in-uttar-pradesh": {
+      "eyebrow": "উত্তরপ্রদেশ সরবরাহ নেটওয়ার্ক",
+      "headline": "উত্তরপ্রদেশে ফগিং মেশিন সরবরাহকারী",
+      "primary": { "label": "উত্তরপ্রদেশ টেন্ডার কোটেশন নিন" },
+      "secondary": { "label": "এখনই কল করুন" }
+    },
+    "fogging-machine-supplier-in-bihar": {
+      "eyebrow": "বিহার ও পূর্ব ভারত সরবরাহ নেটওয়ার্ক",
+      "headline": "বিহারে ফগিং মেশিন সরবরাহকারী",
+      "primary": { "label": "বিহার টেন্ডার কোটেশন নিন" },
+      "secondary": { "label": "এখনই কল করুন" }
+    },
+    "dengue-control-fogging-machine": {
+      "eyebrow": "ভেক্টর নিয়ন্ত্রণ — ডেঙ্গু ও চিকুনগুনিয়া",
+      "headline": [
+        { "text": "প্রমাণিত ফগিং মেশিন দিয়ে" },
+        { "text": "উৎসেই", "accent": "green" },
+        { "text": "ডেঙ্গু বন্ধ করুন" }
+      ],
+      "primary": { "label": "ডেঙ্গু নিয়ন্ত্রণ কোটেশন নিন" },
+      "secondary": { "label": "দলের সাথে হোয়াটসঅ্যাপ করুন" }
+    },
+    "thermal-vs-cold-fogging-machine": {
+      "eyebrow": "ক্রেতা তুলনা",
+      "headline": [
+        { "text": "থার্মাল বনাম কোল্ড ফগিং:" },
+        { "text": "কোনটি আপনার প্রয়োজনের সাথে মানানসই?", "accent": "green" }
+      ],
+      "primary": { "label": "একজন বিশেষজ্ঞের সাথে কথা বলুন" },
+      "secondary": { "label": "হোয়াটসঅ্যাপে প্রশ্ন করুন" }
+    },
+    "fogging-machine-buying-guide": {
+      "eyebrow": "ক্রেতা গাইড",
+      "headline": "ভারতের জন্য ফগিং মেশিন কেনার গাইড",
+      "primary": { "label": "ইমেইলে চেকলিস্ট পান" },
+      "secondary": { "label": "পণ্য ব্রাউজ করুন" }
+    }
+  }
+}
