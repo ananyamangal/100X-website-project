@@ -242,7 +242,12 @@ export default async function RootLayout({
           <main id="main-content" tabIndex={-1}>
             {children}
           </main>
-          <SiteFooter logoUrl={brandAssets.footerLogoUrl} logoAlt={brandAssets.logoAlt} trustBadges={trustBadges} />
+          <SiteFooter
+            logoUrl={brandAssets.footerLogoUrl}
+            logoAlt={brandAssets.logoAlt}
+            trustBadges={trustBadges}
+            locale={isLocaleManaged ? locale : "en"}
+          />
           <MobileCtaBar />
         </MobileCtaProvider>
         <WhatsAppFloatingButton

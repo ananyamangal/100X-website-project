@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import {
@@ -95,13 +96,34 @@ type Props = {
   block: LandingFormBlockData
   /** Slug of the landing page — added to the submission for analytics. */
   landingSlug: string
+  /** Current locale — field labels/placeholders/options are translated via
+   * the `LandingForm` message namespace; English literals in
+   * FIELDS_BY_VARIANT above remain the source of truth and the fallback
+   * whenever a translation key is missing for a given locale. */
+  locale?: string
 }
 
-export default function LandingFormBlock({ block, landingSlug }: Props) {
+export default function LandingFormBlock({ block, landingSlug, locale = "en" }: Props) {
   const fields = FIELDS_BY_VARIANT[block.variant]
   const submissionType = FORM_SUBMISSION_TYPE[block.variant]
   const gaEvent = block.gaEvent || `${block.variant.replace("-", "_")}_submit`
   const router = useRouter()
+  const t = useTranslations("LandingForm")
+
+  // Translated string with graceful fallback to the English literal already
+  // present in FIELDS_BY_VARIANT — never throws, never renders blank on a
+  // missing key (e.g. a language whose LandingForm messages aren't seeded yet).
+  const tf = (fieldName: string, key: "label" | "placeholder", fallback?: string) => {
+    const msgKey = `fields.${block.variant}.${fieldName}.${key}`
+    return t.has(msgKey) ? t(msgKey) : fallback
+  }
+  const tOptions = (fieldName: string, fallback: string[]) => {
+    const msgKey = `fields.${block.variant}.${fieldName}.options`
+    if (!t.has(msgKey)) return fallback
+    const raw = t.raw(msgKey)
+    return Array.isArray(raw) && raw.length === fallback.length ? (raw as string[]) : fallback
+  }
+  const tc = (key: string, fallback: string) => (t.has(`common.${key}`) ? t(`common.${key}`) : fallback)
 
   const [values, setValues] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -116,7 +138,8 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
 
     const missing = fields.filter((f) => f.required && !(values[f.name] || "").trim())
     if (missing.length > 0) {
-      setError(`Please fill required: ${missing.map((m) => m.label).join(", ")}`)
+      const labels = missing.map((m) => tf(m.name, "label", m.label)).join(", ")
+      setError(`${tc("requiredPrefix", "Please fill required:")} ${labels}`)
       return
     }
 
@@ -179,6 +202,7 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
   return (
     <section
       id="landing-form"
+      data-locale={locale}
       className="py-16 md:py-20 border-y border-gray-200 bg-gradient-to-br from-green-50/60 via-white to-white [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:from-green-500/[0.06] [[data-theme=dark-industrial]_&]:via-[#0e2040]/80 [[data-theme=dark-industrial]_&]:to-[#0e2040]/80"
     >
       <div className="container mx-auto px-4 max-w-5xl grid md:grid-cols-2 gap-10 md:gap-14 items-start">
@@ -232,7 +256,7 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
                   htmlFor={id}
                   className="text-[11px] font-semibold uppercase tracking-wider text-gray-600 [[data-theme=dark-industrial]_&]:text-slate-400"
                 >
-                  {f.label}
+                  {tf(f.name, "label", f.label)}
                   {f.required ? <span aria-hidden="true" className="text-brand-700"> *</span> : null}
                 </label>
                 {f.type === "select" ? (
@@ -245,9 +269,9 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
                     disabled={submitting}
                     className="rounded-md border border-gray-300 bg-white px-3.5 py-3 text-base text-gray-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-green-200 disabled:opacity-60 [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:bg-white/5 [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:focus:border-green-500 [[data-theme=dark-industrial]_&]:focus:ring-brand-500/30"
                   >
-                    <option value="">Select…</option>
-                    {f.options?.map((o) => (
-                      <option key={o} value={o}>
+                    <option value="">{tc("selectPlaceholder", "Select…")}</option>
+                    {tOptions(f.name, f.options || []).map((o, i) => (
+                      <option key={f.options?.[i] || o} value={f.options?.[i] || o}>
                         {o}
                       </option>
                     ))}
@@ -259,7 +283,7 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
                     type={f.type}
                     inputMode={f.inputMode}
                     autoComplete={f.autoComplete}
-                    placeholder={f.placeholder}
+                    placeholder={tf(f.name, "placeholder", f.placeholder)}
                     required={f.required}
                     value={values[f.name] || ""}
                     onChange={(e) => update(f.name, e.target.value)}
@@ -286,14 +310,14 @@ export default function LandingFormBlock({ block, landingSlug }: Props) {
             {submitting ? (
               <>
                 <Loader2 className="animate-spin" size={18} aria-hidden="true" />
-                Sending…
+                {tc("submitting", "Sending…")}
               </>
             ) : (
-              <>Submit</>
+              <>{tc("submit", "Submit")}</>
             )}
           </button>
           <p className="col-span-2 text-center text-[11px] text-gray-500 [[data-theme=dark-industrial]_&]:text-slate-400">
-            🔒 Your details stay private — we don't share with third parties.
+            🔒 {tc("privacyNote", "Your details stay private — we don't share with third parties.")}
           </p>
         </form>
       </div>
