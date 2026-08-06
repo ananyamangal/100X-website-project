@@ -1,0 +1,53 @@
+{
+  "locale": "ml",
+  "hero": {
+    "gem-approved-fogging-machine-oem": {
+      "eyebrow": "GeM Q2 വിഭാഗം — ഫോഗിംഗ് മെഷീനുകൾ",
+      "headline": [
+        { "text": "ഫോഗിംഗ് മെഷീനുകൾ വിൽക്കൂ" },
+        { "text": "GeM പോർട്ടലിൽ", "accent": "green" },
+        { "text": "ഒപ്പം" },
+        { "text": "അംഗീകൃത OEM പിന്തുണ", "accent": "yellow" }
+      ],
+      "primary": { "label": "റീസെല്ലറായി രജിസ്റ്റർ ചെയ്യുക" },
+      "secondary": { "label": "വാട്സ്ആപ്പ് ചെയ്യുക" }
+    },
+    "fogging-machine-supplier-in-uttar-pradesh": {
+      "eyebrow": "ഉത്തർപ്രദേശ് വിതരണ ശൃംഖല",
+      "headline": "ഉത്തർപ്രദേശിലെ ഫോഗിംഗ് മെഷീൻ സപ്ലയർ",
+      "primary": { "label": "UP ടെൻഡർ ക്വോട്ട് നേടൂ" },
+      "secondary": { "label": "ഇപ്പോൾ വിളിക്കൂ" }
+    },
+    "fogging-machine-supplier-in-bihar": {
+      "eyebrow": "ബീഹാർ & കിഴക്കൻ ഇന്ത്യ വിതരണ ശൃംഖല",
+      "headline": "ബീഹാറിലെ ഫോഗിംഗ് മെഷീൻ സപ്ലയർ",
+      "primary": { "label": "ബീഹാർ ടെൻഡർ ക്വോട്ട് നേടൂ" },
+      "secondary": { "label": "ഇപ്പോൾ വിളിക്കൂ" }
+    },
+    "dengue-control-fogging-machine": {
+      "eyebrow": "വെക്ടർ നിയന്ത്രണം — ഡെങ്കി & ചിക്കുൻഗുനിയ",
+      "headline": [
+        { "text": "ഡെങ്കിയെ തടയൂ" },
+        { "text": "ഉറവിടത്തിൽ തന്നെ", "accent": "green" },
+        { "text": "തെളിയിക്കപ്പെട്ട ഫോഗിംഗ് മെഷീനുകൾ ഉപയോഗിച്ച്" }
+      ],
+      "primary": { "label": "ഡെങ്കി നിയന്ത്രണ ക്വോട്ട് നേടൂ" },
+      "secondary": { "label": "ടീമിനെ വാട്സ്ആപ്പ് ചെയ്യൂ" }
+    },
+    "thermal-vs-cold-fogging-machine": {
+      "eyebrow": "വാങ്ങുന്നവർക്കുള്ള താരതമ്യം",
+      "headline": [
+        { "text": "തെർമൽ vs കോൾഡ് ഫോഗിംഗ്:" },
+        { "text": "നിങ്ങളുടെ ആവശ്യത്തിന് ഏതാണ് അനുയോജ്യം?", "accent": "green" }
+      ],
+      "primary": { "label": "ഒരു വിദഗ്ധനോട് സംസാരിക്കുക" },
+      "secondary": { "label": "വാട്സ്ആപ്പ് വഴി ചോദിക്കൂ" }
+    },
+    "fogging-machine-buying-guide": {
+      "eyebrow": "വാങ്ങൽ ഗൈഡ്",
+      "headline": "ഇന്ത്യക്കായുള്ള ഫോഗിംഗ് മെഷീൻ വാങ്ങൽ ഗൈഡ്",
+      "primary": { "label": "ഇമെയിൽ വഴി ചെക്ക്‌ലിസ്റ്റ് നേടൂ" },
+      "secondary": { "label": "ഉൽപ്പന്നങ്ങൾ ബ്രൗസ് ചെയ്യൂ" }
+    }
+  }
+}

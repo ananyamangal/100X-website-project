@@ -1,0 +1,99 @@
+{
+  "locale": "or",
+  "hero": {
+    "gem-approved-fogging-machine-oem": {
+      "eyebrow": "GeM Q2 ବର୍ଗ — ଫଗିଂ ମେସିନ୍",
+      "headline": [
+        {
+          "text": "ଫଗିଂ ମେସିନ୍ ବିକ୍ରୟ କରନ୍ତୁ"
+        },
+        {
+          "text": "GeM ପୋର୍ଟାଲରେ",
+          "accent": "green"
+        },
+        {
+          "text": "ସହିତ"
+        },
+        {
+          "text": "ଅନୁମୋଦିତ OEM ସହାୟତା",
+          "accent": "yellow"
+        }
+      ],
+      "primary": {
+        "label": "ରିସେଲର ଭାବେ ପଞ୍ଜୀକରଣ କରନ୍ତୁ"
+      },
+      "secondary": {
+        "label": "ଆମକୁ ୱାଟସ୍ଆପ୍ କରନ୍ତୁ"
+      }
+    },
+    "fogging-machine-supplier-in-uttar-pradesh": {
+      "eyebrow": "ଉତ୍ତର ପ୍ରଦେଶ ଯୋଗାଣ ନେଟୱାର୍କ",
+      "headline": "ଉତ୍ତର ପ୍ରଦେଶରେ ଫଗିଂ ମେସିନ୍ ସପ୍ଲାୟର",
+      "primary": {
+        "label": "UP ଟେଣ୍ଡର କୋଟେସନ ପାଆନ୍ତୁ"
+      },
+      "secondary": {
+        "label": "ବର୍ତ୍ତମାନ ଆମକୁ କଲ୍ କରନ୍ତୁ"
+      }
+    },
+    "fogging-machine-supplier-in-bihar": {
+      "eyebrow": "ବିହାର ଓ ପୂର୍ବ ଭାରତ ଯୋଗାଣ ନେଟୱାର୍କ",
+      "headline": "ବିହାରରେ ଫଗିଂ ମେସିନ୍ ସପ୍ଲାୟର",
+      "primary": {
+        "label": "ବିହାର ଟେଣ୍ଡର କୋଟେସନ ପାଆନ୍ତୁ"
+      },
+      "secondary": {
+        "label": "ବର୍ତ୍ତମାନ ଆମକୁ କଲ୍ କରନ୍ତୁ"
+      }
+    },
+    "dengue-control-fogging-machine": {
+      "eyebrow": "ବାହକ ନିୟନ୍ତ୍ରଣ — ଡେଙ୍ଗୁ ଓ ଚିକୁନଗୁନିଆ",
+      "headline": [
+        {
+          "text": "ଡେଙ୍ଗୁକୁ ତାହାର"
+        },
+        {
+          "text": "ମୂଳ",
+          "accent": "green"
+        },
+        {
+          "text": "ଠାରୁ ରୋକନ୍ତୁ, ପ୍ରମାଣିତ ଫଗିଂ ମେସିନ୍ ସହିତ"
+        }
+      ],
+      "primary": {
+        "label": "ଡେଙ୍ଗୁ ନିୟନ୍ତ୍ରଣ କୋଟେସନ ପାଆନ୍ତୁ"
+      },
+      "secondary": {
+        "label": "ଟିମ୍‌କୁ ୱାଟସ୍ଆପ୍ କରନ୍ତୁ"
+      }
+    },
+    "thermal-vs-cold-fogging-machine": {
+      "eyebrow": "କ୍ରେତା ତୁଳନା",
+      "headline": [
+        {
+          "text": "ଥର୍ମାଲ ବନାମ କୋଲ୍ଡ ଫଗିଂ:"
+        },
+        {
+          "text": "ଆପଣଙ୍କ ବ୍ୟବହାର ପାଇଁ କେଉଁଟି ଉପଯୁକ୍ତ?",
+          "accent": "green"
+        }
+      ],
+      "primary": {
+        "label": "ଏକ ବିଶେଷଜ୍ଞଙ୍କ ସହିତ କଥା ହୁଅନ୍ତୁ"
+      },
+      "secondary": {
+        "label": "ୱାଟସ୍ଆପ୍‌ରେ ପ୍ରଶ୍ନ କରନ୍ତୁ"
+      }
+    },
+    "fogging-machine-buying-guide": {
+      "eyebrow": "କ୍ରେତା ଗାଇଡ୍",
+      "headline": "ଭାରତ ପାଇଁ ଫଗିଂ ମେସିନ୍ ଖରିଦ ଗାଇଡ୍",
+      "primary": {
+        "label": "ଇମେଲ ମାଧ୍ୟମରେ ଚେକଲିଷ୍ଟ ପାଆନ୍ତୁ"
+      },
+      "secondary": {
+        "label": "ଉତ୍ପାଦ ବ୍ରାଉଜ୍ କରନ୍ତୁ"
+      }
+    }
+  }
+}
