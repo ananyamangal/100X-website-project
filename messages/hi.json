@@ -1,5 +1,88 @@
 {
   "LanguageSwitcher": {
     "label": "भाषा"
+  },
+  "LandingForm": {
+    "common": {
+      "selectPlaceholder": "चुनें…",
+      "submitting": "भेजा जा रहा है…",
+      "submit": "सबमिट करें",
+      "privacyNote": "आपकी जानकारी निजी रहती है — हम इसे किसी तीसरे पक्ष के साथ साझा नहीं करते।",
+      "requiredPrefix": "कृपया आवश्यक जानकारी भरें:"
+    },
+    "fields": {
+      "reseller": {
+        "company": { "label": "कंपनी / फर्म का नाम", "placeholder": "आपकी पंजीकृत कंपनी का नाम" },
+        "name": { "label": "आपका नाम", "placeholder": "संपर्क व्यक्ति का नाम" },
+        "mobile": { "label": "मोबाइल नंबर", "placeholder": "+91 XXXXX XXXXX" },
+        "city": { "label": "शहर / राज्य", "placeholder": "उदाहरण: लखनऊ, उत्तर प्रदेश" },
+        "gem_seller_id": { "label": "GeM विक्रेता ID", "placeholder": "आपकी GeM पोर्टल विक्रेता ID" },
+        "gst": { "label": "GST नंबर", "placeholder": "15-अंकों की GSTIN" },
+        "capacity": {
+          "label": "मासिक ऑर्डर क्षमता",
+          "options": ["1–5 मशीनें/माह", "5–20 मशीनें/माह", "20–50 मशीनें/माह", "50+ मशीनें/माह"]
+        }
+      },
+      "tender-quote": {
+        "organization": { "label": "संगठन / विभाग", "placeholder": "नगर निगम, स्वास्थ्य विभाग आदि" },
+        "name": { "label": "आपका नाम" },
+        "designation": { "label": "पदनाम", "placeholder": "खरीद अधिकारी" },
+        "mobile": { "label": "मोबाइल नंबर" },
+        "email": { "label": "ईमेल" },
+        "state": { "label": "डिलीवरी राज्य" },
+        "requirement": { "label": "आवश्यकता", "placeholder": "मशीन प्रकार, मात्रा, यदि कोई निविदा ID हो तो" }
+      },
+      "state-dealer": {
+        "name": { "label": "आपका नाम" },
+        "mobile": { "label": "मोबाइल नंबर" },
+        "company": { "label": "कंपनी का नाम (यदि कोई हो)" },
+        "city": { "label": "शहर" },
+        "state": { "label": "राज्य" },
+        "current_business": { "label": "वर्तमान व्यवसाय", "placeholder": "कीट नियंत्रण, कृषि आपूर्ति आदि" },
+        "monthly_volume": {
+          "label": "अपेक्षित मासिक मात्रा",
+          "options": ["1–5 मशीनें", "5–20 मशीनें", "20–50 मशीनें", "50+ मशीनें"]
+        }
+      },
+      "guide-download": {
+        "name": { "label": "आपका नाम" },
+        "email": { "label": "ईमेल" },
+        "mobile": { "label": "मोबाइल (वैकल्पिक)" },
+        "role": { "label": "भूमिका", "placeholder": "खरीद, डीलर, फार्म मालिक..." }
+      },
+      "use-case-quote": {
+        "name": { "label": "आपका नाम" },
+        "mobile": { "label": "मोबाइल नंबर" },
+        "organization": { "label": "संगठन (वैकल्पिक)" },
+        "scale": { "label": "संचालन का पैमाना", "placeholder": "दैनिक कवर क्षेत्र, पशुधन संख्या आदि" },
+        "location": { "label": "स्थान", "placeholder": "शहर, राज्य" }
+      }
+    }
+  },
+  "Footer": {
+    "brandDescription": "सार्वजनिक स्वास्थ्य, नगरपालिकाओं, कृषि और औद्योगिक कीट नियंत्रण के लिए थर्मल फॉगिंग मशीनों का भारत का भरोसेमंद निर्माता।",
+    "columns": {
+      "products": "उत्पाद",
+      "company": "कंपनी",
+      "governmentSolutions": "सरकारी समाधान",
+      "forDealers": "डीलरों के लिए",
+      "getInTouch": "संपर्क करें"
+    },
+    "links": {
+      "spareParts": "स्पेयर पार्ट्स",
+      "viewAllProducts": "सभी उत्पाद देखें →"
+    },
+    "companyLinks": [
+      "100X Circle के बारे में", "उत्पाद कैटलॉग", "स्पेयर पार्ट्स", "केस स्टडी", "सरकारी तैनाती",
+      "पूर्व प्रदर्शन", "सरकारी खरीद", "नॉलेज सेंटर", "ब्लॉग", "संपर्क करें"
+    ],
+    "governmentLinks": [
+      "GeM अनुमोदित OEM", "सरकारी खरीद", "पूर्व प्रदर्शन", "GeM OEM प्राधिकरण"
+    ],
+    "dealerLinks": ["डीलर बनें", "निविदा सहायता", "IS 14855 मशीनें"],
+    "bottomLinks": ["गोपनीयता नीति", "नियम व शर्तें", "रिटर्न", "वारंटी", "अस्वीकरण"],
+    "whatsappCta": "व्हाट्सऐप करें",
+    "viewOnMaps": "गूगल मैप्स पर देखें",
+    "copyright": "© 2026 100X Circle Pvt Ltd. सर्वाधिकार सुरक्षित। भारत में निर्मित।"
   }
 }

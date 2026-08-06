@@ -1,5 +1,188 @@
 {
   "LanguageSwitcher": {
     "label": "भाषा"
+  },
+  "LandingForm": {
+    "common": {
+      "selectPlaceholder": "निवडा…",
+      "submitting": "पाठवत आहे…",
+      "submit": "सबमिट करा",
+      "privacyNote": "तुमचे तपशील गोपनीय राहतात — आम्ही ते तृतीय पक्षांसोबत शेअर करत नाही.",
+      "requiredPrefix": "कृपया आवश्यक माहिती भरा:"
+    },
+    "fields": {
+      "reseller": {
+        "company": {
+          "label": "कंपनी / फर्मचे नाव",
+          "placeholder": "तुमच्या नोंदणीकृत कंपनीचे नाव"
+        },
+        "name": {
+          "label": "तुमचे नाव",
+          "placeholder": "संपर्क व्यक्तीचे नाव"
+        },
+        "mobile": {
+          "label": "मोबाइल क्रमांक",
+          "placeholder": "+91 XXXXX XXXXX"
+        },
+        "city": {
+          "label": "शहर / राज्य",
+          "placeholder": "उदा. लखनौ, उत्तर प्रदेश"
+        },
+        "gem_seller_id": {
+          "label": "GeM विक्रेता ID",
+          "placeholder": "तुमचा GeM पोर्टल विक्रेता ID"
+        },
+        "gst": {
+          "label": "GST क्रमांक",
+          "placeholder": "15-अंकी GSTIN"
+        },
+        "capacity": {
+          "label": "मासिक ऑर्डर क्षमता",
+          "options": [
+            "1–5 मशीन्स/महिना",
+            "5–20 मशीन्स/महिना",
+            "20–50 मशीन्स/महिना",
+            "50+ मशीन्स/महिना"
+          ]
+        }
+      },
+      "tender-quote": {
+        "organization": {
+          "label": "संस्था / विभाग",
+          "placeholder": "महानगरपालिका, आरोग्य विभाग इ."
+        },
+        "name": {
+          "label": "तुमचे नाव"
+        },
+        "designation": {
+          "label": "पदनाम",
+          "placeholder": "खरेदी अधिकारी"
+        },
+        "mobile": {
+          "label": "मोबाइल क्रमांक"
+        },
+        "email": {
+          "label": "ईमेल"
+        },
+        "state": {
+          "label": "वितरण राज्य"
+        },
+        "requirement": {
+          "label": "गरज",
+          "placeholder": "मशीनचा प्रकार, प्रमाण, निविदा ID असल्यास"
+        }
+      },
+      "state-dealer": {
+        "name": {
+          "label": "तुमचे नाव"
+        },
+        "mobile": {
+          "label": "मोबाइल क्रमांक"
+        },
+        "company": {
+          "label": "कंपनीचे नाव (असल्यास)"
+        },
+        "city": {
+          "label": "शहर"
+        },
+        "state": {
+          "label": "राज्य"
+        },
+        "current_business": {
+          "label": "सध्याचा व्यवसाय",
+          "placeholder": "कीटक नियंत्रण, कृषी पुरवठा इ."
+        },
+        "monthly_volume": {
+          "label": "अपेक्षित मासिक प्रमाण",
+          "options": [
+            "1–5 मशीन्स",
+            "5–20 मशीन्स",
+            "20–50 मशीन्स",
+            "50+ मशीन्स"
+          ]
+        }
+      },
+      "guide-download": {
+        "name": {
+          "label": "तुमचे नाव"
+        },
+        "email": {
+          "label": "ईमेल"
+        },
+        "mobile": {
+          "label": "मोबाइल (पर्यायी)"
+        },
+        "role": {
+          "label": "भूमिका",
+          "placeholder": "खरेदी, डीलर, शेत मालक..."
+        }
+      },
+      "use-case-quote": {
+        "name": {
+          "label": "तुमचे नाव"
+        },
+        "mobile": {
+          "label": "मोबाइल क्रमांक"
+        },
+        "organization": {
+          "label": "संस्था (पर्यायी)"
+        },
+        "scale": {
+          "label": "कामकाजाचे प्रमाण",
+          "placeholder": "दैनंदिन व्यापलेले क्षेत्र, कळपाचा आकार इ."
+        },
+        "location": {
+          "label": "स्थान",
+          "placeholder": "शहर, राज्य"
+        }
+      }
+    }
+  },
+  "Footer": {
+    "brandDescription": "सार्वजनिक आरोग्य, महानगरपालिका, कृषी आणि औद्योगिक कीटक नियंत्रणासाठी थर्मल फॉगिंग मशीन्सचा भारतातील विश्वासार्ह उत्पादक.",
+    "columns": {
+      "products": "उत्पादने",
+      "company": "कंपनी",
+      "governmentSolutions": "सरकारी उपाययोजना",
+      "forDealers": "डीलर्ससाठी",
+      "getInTouch": "संपर्क साधा"
+    },
+    "links": {
+      "spareParts": "सुटे भाग",
+      "viewAllProducts": "सर्व उत्पादने पाहा →"
+    },
+    "companyLinks": [
+      "100X Circle बद्दल",
+      "उत्पादन कॅटलॉग",
+      "सुटे भाग",
+      "केस स्टडीज",
+      "सरकारी तैनाती",
+      "मागील कामगिरी",
+      "सरकारी खरेदी",
+      "माहिती केंद्र",
+      "ब्लॉग",
+      "संपर्क करा"
+    ],
+    "governmentLinks": [
+      "GeM मंजूर OEM",
+      "सरकारी खरेदी",
+      "मागील कामगिरी",
+      "GeM OEM अधिकृतता"
+    ],
+    "dealerLinks": [
+      "डीलर बना",
+      "निविदा सहाय्य",
+      "IS 14855 मशीन्स"
+    ],
+    "bottomLinks": [
+      "गोपनीयता धोरण",
+      "अटी",
+      "परतावा",
+      "वॉरंटी",
+      "अस्वीकरण"
+    ],
+    "whatsappCta": "आम्हाला व्हॉट्सअ‍ॅप करा",
+    "viewOnMaps": "Google Maps वर पहा",
+    "copyright": "© 2026 100X Circle Pvt Ltd. सर्व हक्क राखीव. भारतात उत्पादित."
   }
 }

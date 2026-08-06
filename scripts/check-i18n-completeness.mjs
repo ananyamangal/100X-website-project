@@ -84,7 +84,12 @@ function headlineTexts(headline) {
 
 function checkLeaf(enVal, trVal) {
   if (typeof enVal !== "string" || enVal.length === 0) return null // not applicable
+  // Content with no letters at all (comparison-table "—" not-applicable cells,
+  // pure numeric/format examples like "+91 XXXXX XXXXX", stat codes) has
+  // nothing to translate — required to be non-empty, not required to differ.
+  const hasLetters = /\p{L}/u.test(enVal)
   if (typeof trVal !== "string" || trVal.trim().length === 0) return "missing/empty"
+  if (!hasLetters) return "ok"
   if (trVal === enVal) return "identical to English (untranslated)"
   return "ok"
 }
@@ -99,7 +104,7 @@ function checkPage(enPage, trPage) {
       const trTexts = headlineTexts(trPage.hero?.headline)
       enTexts.forEach((enVal, i) => {
         const status = checkLeaf(enVal, trTexts[i])
-        if (status) results.topLevel.push({ path: `hero.headline[${i}]`, status })
+        if (status && status !== "ok") results.topLevel.push({ path: `hero.headline[${i}]`, status })
       })
       continue
     }
@@ -107,7 +112,7 @@ function checkPage(enPage, trPage) {
     const trVals = getByPath(trPage, path)
     enVals.forEach((enVal, i) => {
       const status = checkLeaf(enVal, trVals[i])
-      if (status) results.topLevel.push({ path: `${path}[${i}]`, status })
+      if (status && status !== "ok") results.topLevel.push({ path: `${path}[${i}]`, status })
     })
   }
 
@@ -126,7 +131,7 @@ function checkPage(enPage, trPage) {
         const trVals = getByPath(trSec, path)
         enVals.forEach((enVal, i) => {
           const status = checkLeaf(enVal, trVals[i])
-          if (status) leaves.push({ path: `sections[${idx}].${path}[${i}]`, status })
+          if (status && status !== "ok") leaves.push({ path: `sections[${idx}].${path}[${i}]`, status })
         })
       }
     }
