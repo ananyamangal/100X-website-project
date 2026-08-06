@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import createIntlMiddleware from "next-intl/middleware"
 import { verifyJWT, SESSION_COOKIE } from "@/lib/rbac/jwt"
 import { routing } from "@/i18n/routing"
-import { isLocaleManagedPathname, UNTRANSLATABLE_PRODUCT_SLUGS, LOCALE_MANAGED_SLUGS } from "@/lib/i18n/locale-routes"
+import { isLocaleManagedPathname, UNTRANSLATABLE_PRODUCT_SLUGS } from "@/lib/i18n/locale-routes"
 
 const OID_PATTERN = /^[a-f0-9]{24}$/i
 
@@ -223,17 +223,33 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next()
 }
 
-// Generated from routing.locales so adding a language there is the only
-// change middleware.ts ever needs — no more hand-adding "/xx", "/xx/:path*"
-// pairs per locale (that gap is exactly what let "/en" slip through
-// unmatched for a while: see isLocaleManagedPath's comment above).
-const LOCALE_PREFIX_MATCHERS = routing.locales.flatMap((locale) => [`/${locale}`, `/${locale}/:path*`])
-
-// Generated from LOCALE_MANAGED_SLUGS (lib/i18n/locale-routes.ts) so the two
-// lists can't drift — this used to be a second hand-maintained copy of the
-// same slugs.
-const LOCALE_MANAGED_SLUG_MATCHERS = Array.from(LOCALE_MANAGED_SLUGS).map((slug) => `/${slug}`)
-
+// NOTE ON WHY THIS IS HARDCODED, NOT GENERATED:
+// This used to be `...routing.locales.flatMap(...)` / `...Array.from(LOCALE_MANAGED_SLUGS).map(...)`
+// spread directly into config.matcher below — generated at module-eval time from
+// routing.locales (i18n/routing.ts) and LOCALE_MANAGED_SLUGS (lib/i18n/locale-routes.ts)
+// so the two lists could never drift. That broke the production build: Next.js
+// statically analyzes `export const config = { matcher: [...] }` at build time (it has
+// to, since middleware config is read before any JS runs, e.g. by the Edge routing
+// layer) and REJECTS anything in that array that isn't a literal string — no spread
+// operators, no computed/imported variables, no function calls. "Unsupported spread
+// operator in the Array Expression at config.matcher" is exactly that check firing.
+//
+// So the entries below are the RESOLVED OUTPUT of that generation logic, computed and
+// hardcoded as of 2026-08-06 (verified by running the exact same flatMap/map logic —
+// see scripts/verify-locale-matchers.mjs), not hand-typed guesses:
+//   - one `/${locale}`, `/${locale}/:path*` pair per entry in routing.locales (14
+//     locales today: en, hi, id, bn, mr, te, ta, gu, ur, kn, or, ml, pa, as)
+//   - one `/${slug}` per entry in LOCALE_MANAGED_SLUGS (9 slugs today)
+//
+// DRIFT RISK — READ BEFORE EDITING routing.locales OR LOCALE_MANAGED_SLUGS:
+// If a locale is added/removed in i18n/routing.ts, or a slug is added/removed in
+// lib/i18n/locale-routes.ts, this array does NOT update itself anymore and must be
+// manually regenerated to match. Run `node scripts/verify-locale-matchers.mjs` after
+// any such change — it recomputes both lists from the live source of truth and diffs
+// them against this hardcoded array, so drift is caught instead of silently shipping
+// stale matcher patterns. Do NOT "fix" this back into a spread over routing.locales /
+// LOCALE_MANAGED_SLUGS — that reintroduces the exact build failure this comment exists
+// to prevent (Next.js's static analyzer will reject it again, every time).
 export const config = {
   matcher: [
     "/products/:path*",
@@ -243,7 +259,44 @@ export const config = {
     // i18n — locale-managed content only
     "/blog",
     "/blog/:path*",
-    ...LOCALE_PREFIX_MATCHERS,
-    ...LOCALE_MANAGED_SLUG_MATCHERS,
+    // --- locale-prefix matchers (routing.locales, 14 locales x 2 patterns) ---
+    "/en",
+    "/en/:path*",
+    "/hi",
+    "/hi/:path*",
+    "/id",
+    "/id/:path*",
+    "/bn",
+    "/bn/:path*",
+    "/mr",
+    "/mr/:path*",
+    "/te",
+    "/te/:path*",
+    "/ta",
+    "/ta/:path*",
+    "/gu",
+    "/gu/:path*",
+    "/ur",
+    "/ur/:path*",
+    "/kn",
+    "/kn/:path*",
+    "/or",
+    "/or/:path*",
+    "/ml",
+    "/ml/:path*",
+    "/pa",
+    "/pa/:path*",
+    "/as",
+    "/as/:path*",
+    // --- locale-managed-slug matchers (LOCALE_MANAGED_SLUGS, 9 slugs) ---
+    "/thermal-and-cold-fogging-machine-100xtfs50",
+    "/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
+    "/gem-approved-fogging-machine-oem",
+    "/fogging-machine-supplier-in-uttar-pradesh",
+    "/fogging-machine-supplier-in-bihar",
+    "/dengue-control-fogging-machine",
+    "/thermal-vs-cold-fogging-machine",
+    "/fogging-machine-buying-guide",
+    "/thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
   ],
 }
