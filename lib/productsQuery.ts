@@ -1,3 +1,4 @@
+import { cache } from "react"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { isObjectId } from "@/lib/productSlug"
@@ -114,8 +115,16 @@ export async function productExistsBySlug(slug: string): Promise<boolean> {
 /**
  * Fetch a fully-normalized product by URL slug.
  * Returns null if not found. Used server-side in app/[slug]/page.tsx.
+ *
+ * Wrapped in React's cache() — as of the /[locale]/[slug] locale-gate fix
+ * (isUntranslatableProductLanding in lib/seo/landing-pages.ts), this same
+ * slug can now be looked up up to 3x per request (layout's gate check,
+ * generateMetadata's gate check, and the page body's own render call).
+ * cache() dedupes those into a single DB round-trip per request, the
+ * standard Next.js pattern for exactly this "same fetch, multiple call
+ * sites" shape.
  */
-export async function getProductBySlug(slug: string): Promise<Record<string, unknown> | null> {
+export const getProductBySlug = cache(async (slug: string): Promise<Record<string, unknown> | null> => {
   try {
     const client = await clientPromise
     const db = client.db()
@@ -137,7 +146,7 @@ export async function getProductBySlug(slug: string): Promise<Record<string, unk
   } catch {
     return null
   }
-}
+})
 
 export async function getAllProductIds(): Promise<string[]> {
   try {

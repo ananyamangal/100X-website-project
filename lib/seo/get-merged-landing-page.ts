@@ -13,6 +13,27 @@ const FaqSchema = z.object({
   a: z.string(),
 })
 
+// Mirrors HeroHeadlinePart / HeroCta in lib/seo/landing-types.ts exactly.
+// PITFALL (caused a live bug 2026-08-06): z.object() at the top level rejects
+// the WHOLE overrides doc if any one field's *type* doesn't match — headline
+// being a string here when a translation row actually stored the two-tone
+// array-of-parts shape (added by the hero-extra seeding pass) failed
+// .safeParse() for hero AND metadata AND faqs AND sections together, since
+// they all live under one `parsed.success` check below. That silently
+// dropped every override on that row back to English, not just the one
+// field that didn't fit — so this schema must track HeroBlock's real shape,
+// not a simplified guess at it.
+const HeroHeadlinePartSchema = z.object({
+  text:   z.string(),
+  accent: z.enum(["default", "green", "yellow"]).optional(),
+})
+
+const HeroCtaSchema = z.object({
+  label: z.string().optional(),
+  href:  z.string().optional(),
+  track: z.string().optional(),
+})
+
 const OverridesSchema = z.object({
   metadata: z
     .object({
@@ -25,14 +46,12 @@ const OverridesSchema = z.object({
     .optional(),
   hero: z
     .object({
-      headline: z.string().optional(),
+      eyebrow:  z.string().optional(),
+      navBadge: z.string().optional(),
+      headline: z.union([z.string(), z.array(HeroHeadlinePartSchema)]).optional(),
       sub:      z.string().optional(),
-      primary:  z
-        .object({
-          label: z.string().optional(),
-          href:  z.string().optional(),
-        })
-        .optional(),
+      primary:   HeroCtaSchema.optional(),
+      secondary: HeroCtaSchema.optional(),
     })
     .optional(),
   faqs:                z.array(FaqSchema).optional(),
@@ -63,18 +82,21 @@ function applyOverride(def: LandingPageDef, ov: Overrides): LandingPageDef {
 
   if (ov.hero !== undefined && def.hero !== undefined) {
     merged.hero = { ...def.hero }
+    if (ov.hero.eyebrow  !== undefined) merged.hero.eyebrow  = ov.hero.eyebrow
+    if (ov.hero.navBadge !== undefined) merged.hero.navBadge = ov.hero.navBadge
     if (ov.hero.headline !== undefined) merged.hero.headline = ov.hero.headline
     if (ov.hero.sub      !== undefined) merged.hero.sub      = ov.hero.sub
-    if (ov.hero.primary !== undefined) {
-      if (def.hero.primary) {
-        merged.hero.primary = { ...def.hero.primary }
-        if (ov.hero.primary.label !== undefined) merged.hero.primary.label = ov.hero.primary.label
-        if (ov.hero.primary.href  !== undefined) merged.hero.primary.href  = ov.hero.primary.href
-      } else if (ov.hero.primary.label && ov.hero.primary.href) {
-        merged.hero.primary = {
-          label: ov.hero.primary.label,
-          href:  ov.hero.primary.href,
-        }
+    for (const cta of ["primary", "secondary"] as const) {
+      const ovCta = ov.hero[cta]
+      if (ovCta === undefined) continue
+      const defCta = def.hero[cta]
+      if (defCta) {
+        merged.hero[cta] = { ...defCta }
+        if (ovCta.label !== undefined) merged.hero[cta]!.label = ovCta.label
+        if (ovCta.href  !== undefined) merged.hero[cta]!.href  = ovCta.href
+        if (ovCta.track !== undefined) merged.hero[cta]!.track = ovCta.track
+      } else if (ovCta.label && ovCta.href) {
+        merged.hero[cta] = { label: ovCta.label, href: ovCta.href, ...(ovCta.track ? { track: ovCta.track } : {}) }
       }
     }
   }

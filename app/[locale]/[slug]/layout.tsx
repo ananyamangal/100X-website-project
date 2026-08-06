@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { isUntranslatableProductLanding } from "@/lib/seo/landing-pages"
+import { isUntranslatableProductLanding } from "@/lib/seo/locale-gate"
 
 // This check lives here rather than in page.tsx on purpose: this segment's
 // loading.tsx wraps page.tsx (and everything below it) in a Suspense
@@ -18,6 +18,6 @@ export default async function ProductSlugLayout({
   params: Promise<{ slug: string; locale: string }>
 }) {
   const { slug, locale } = await params
-  if (isUntranslatableProductLanding(slug, locale)) notFound()
+  if (await isUntranslatableProductLanding(slug, locale)) notFound()
   return children
 }

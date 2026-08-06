@@ -768,16 +768,13 @@ export function getLandingPage(slug: string): LandingPageDef | undefined {
   return LANDING_PAGES[slug]
 }
 
-// type:"product" landing pages (TFS50, DB400, SSMA20) render via
-// LandingRenderer's product branch, which pulls body content straight from
-// the live Mongo product document — not from any translatable field. There
-// is no mechanism to localize that body today, so serving them under a
-// locale prefix would just be English content at a second URL: duplicate
-// content, not a translation. 404 for non-English locales until product-doc
-// translation is built, rather than silently duplicating.
-export function isUntranslatableProductLanding(slug: string, locale: string): boolean {
-  return getLandingPage(slug)?.type === "product" && locale !== "en"
-}
+// isUntranslatableProductLanding (the /[locale]/[slug] locale-availability
+// gate) used to live here, but it needs getProductBySlug (lib/productsQuery.ts
+// → mongodb), and this file is also imported by ProductPage.tsx, a client
+// component — pulling mongodb into that client bundle broke the dev server
+// ("Module not found: Can't resolve 'net'"). Moved to ./locale-gate.ts,
+// which only server-only call sites (RSC layouts/pages, route handlers)
+// import. See that file's header comment for the full rationale.
 
 export function getLandingSlugs(): string[] {
   return Object.keys(LANDING_PAGES)
