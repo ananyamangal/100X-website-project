@@ -37,11 +37,13 @@ function resolveOgImage(def: LandingPageDef | undefined): string {
 const OG_LOCALE: Record<string, string> = { en: "en_IN", hi: "hi_IN", id: "id_ID" }
 
 export async function productLandingMetadata(slug: string, locale: string = "en"): Promise<Metadata> {
+  console.log(`[METADATA-DEBUG] productLandingMetadata ENTRY slug="${slug}" locale=${JSON.stringify(locale)} typeof locale="${typeof locale}"`)
   const canonicalPath = `/${slug}`
   const [def, availableLocales] = await Promise.all([
     getMergedLandingPage(slug, locale).then((d) => d ?? undefined),
     getAvailableLocales("landing", slug),
   ])
+  console.log(`[METADATA-DEBUG] productLandingMetadata: after getMergedLandingPage, slug="${slug}" locale="${locale}" -> def.metadata.title="${def?.metadata.title}"`)
   const title       = def?.metadata.title       ?? "Product | 100x Circle"
   const description = def?.metadata.description ??
     "Thermal fogging machines and agricultural equipment from 100x Circle, India."

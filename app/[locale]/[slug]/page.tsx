@@ -13,14 +13,18 @@ export async function generateMetadata({
   params: Promise<{ slug: string; locale: string }>
 }) {
   const { slug, locale } = await params
+  console.log(`[METADATA-DEBUG] generateMetadata ENTRY: raw params slug="${slug}" locale=${JSON.stringify(locale)} typeof locale="${typeof locale}"`)
   if (isUntranslatableProductLanding(slug, locale)) {
+    console.log(`[METADATA-DEBUG] generateMetadata: isUntranslatableProductLanding=true for slug="${slug}" locale="${locale}" -> Not Found branch`)
     return { title: "Not Found", robots: { index: false, follow: false } }
   }
+  console.log(`[METADATA-DEBUG] generateMetadata: calling productLandingMetadata(slug="${slug}", locale="${locale}")`)
   return productLandingMetadata(slug, locale)
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string; locale: string }> }) {
   const { slug, locale } = await params
+  console.log(`[METADATA-DEBUG] Page (body) ENTRY: raw params slug="${slug}" locale=${JSON.stringify(locale)} typeof locale="${typeof locale}"`)
   // The untranslatable-locale 404 itself is handled one level up, in
   // layout.tsx — this segment's loading.tsx wraps this page in a Suspense
   // boundary, and Next.js commits the response status once that boundary's

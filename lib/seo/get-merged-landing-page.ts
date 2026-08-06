@@ -115,8 +115,12 @@ function applyOverride(def: LandingPageDef, ov: Overrides): LandingPageDef {
  *   • Returns null only if slug is not in the registry at all
  */
 export async function getMergedLandingPage(slug: string, locale: string = "en"): Promise<LandingPageDef | null> {
+  console.log(`[METADATA-DEBUG] getMergedLandingPage ENTRY slug="${slug}" locale="${JSON.stringify(locale)}" typeof locale="${typeof locale}"`)
   const def = getLandingPage(slug)
-  if (!def) return null
+  if (!def) {
+    console.log(`[METADATA-DEBUG] getMergedLandingPage: no registry def for slug="${slug}" -> returning null`)
+    return null
+  }
 
   let englishMerged = def
   try {
@@ -143,10 +147,14 @@ export async function getMergedLandingPage(slug: string, locale: string = "en"):
       `[CMS] DB unavailable for slug="${slug}" — rendering static page.`,
       (err as Error).message,
     )
+    console.log(`[METADATA-DEBUG] getMergedLandingPage: CMS overrides DB error, slug="${slug}" locale="${locale}" -> returning englishMerged (title="${englishMerged.metadata.title}")`)
     return englishMerged
   }
 
-  if (locale === "en") return englishMerged
+  if (locale === "en") {
+    console.log(`[METADATA-DEBUG] getMergedLandingPage: locale==="en" branch, slug="${slug}" -> returning englishMerged (title="${englishMerged.metadata.title}")`)
+    return englishMerged
+  }
 
   try {
     const client = await clientPromise
@@ -156,7 +164,12 @@ export async function getMergedLandingPage(slug: string, locale: string = "en"):
       .collection("landing_page_translations")
       .findOne({ slug, locale, reviewed: true }, { projection: { overrides: 1, _id: 0 } })
 
-    if (!row?.overrides) return englishMerged
+    console.log(`[METADATA-DEBUG] getMergedLandingPage: translation query {slug:"${slug}", locale:"${locale}", reviewed:true} -> row found=${!!row}, has overrides=${!!row?.overrides}`)
+
+    if (!row?.overrides) {
+      console.log(`[METADATA-DEBUG] getMergedLandingPage: no translation row/overrides, slug="${slug}" locale="${locale}" -> returning englishMerged (title="${englishMerged.metadata.title}")`)
+      return englishMerged
+    }
 
     const parsed = OverridesSchema.safeParse(row.overrides)
     if (!parsed.success) {
@@ -164,15 +177,19 @@ export async function getMergedLandingPage(slug: string, locale: string = "en"):
         `[i18n] Translation Zod validation failed for slug="${slug}" locale="${locale}" — falling back to English.`,
         parsed.error.issues.slice(0, 3),
       )
+      console.log(`[METADATA-DEBUG] getMergedLandingPage: Zod validation FAILED, slug="${slug}" locale="${locale}" issues=${JSON.stringify(parsed.error.issues.slice(0, 5))} -> returning englishMerged`)
       return englishMerged
     }
 
-    return applyOverride(englishMerged, parsed.data)
+    const merged = applyOverride(englishMerged, parsed.data)
+    console.log(`[METADATA-DEBUG] getMergedLandingPage: SUCCESS, slug="${slug}" locale="${locale}" -> returning translated merge (title="${merged.metadata.title}")`)
+    return merged
   } catch (err) {
     console.warn(
       `[i18n] DB unavailable fetching translation for slug="${slug}" locale="${locale}" — falling back to English.`,
       (err as Error).message,
     )
+    console.log(`[METADATA-DEBUG] getMergedLandingPage: translation DB query THREW, slug="${slug}" locale="${locale}" error="${(err as Error).message}" -> returning englishMerged`)
     return englishMerged
   }
 }

@@ -163,7 +163,9 @@ function sectionsIncludeFaq(sections: LandingSection[] | undefined): boolean {
 }
 
 export default async function LandingRenderer({ slug, locale = "en" }: Props) {
+  console.log(`[METADATA-DEBUG] LandingRenderer ENTRY: prop slug="${slug}" locale=${JSON.stringify(locale)} typeof locale="${typeof locale}"`)
   const def = await getMergedLandingPage(slug, locale)
+  console.log(`[METADATA-DEBUG] LandingRenderer: after getMergedLandingPage, slug="${slug}" locale="${locale}" -> def.metadata.title="${def?.metadata.title}"`)
   if (!def) return null
 
   const theme = getLandingTheme(def)
