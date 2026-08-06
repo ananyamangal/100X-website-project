@@ -1,0 +1,53 @@
+{
+  "locale": "kn",
+  "hero": {
+    "gem-approved-fogging-machine-oem": {
+      "eyebrow": "GeM Q2 ವರ್ಗ — ಫಾಗಿಂಗ್ ಯಂತ್ರಗಳು",
+      "headline": [
+        { "text": "ಫಾಗಿಂಗ್ ಯಂತ್ರಗಳನ್ನು ಮಾರಾಟ ಮಾಡಿ" },
+        { "text": "GeM ಪೋರ್ಟಲ್‌ನಲ್ಲಿ", "accent": "green" },
+        { "text": "ಜೊತೆಗೆ" },
+        { "text": "ಅನುಮೋದಿತ OEM ಬೆಂಬಲ", "accent": "yellow" }
+      ],
+      "primary": { "label": "ಮರುಮಾರಾಟಗಾರರಾಗಿ ನೋಂದಾಯಿಸಿ" },
+      "secondary": { "label": "ನಮಗೆ WhatsApp ಮಾಡಿ" }
+    },
+    "fogging-machine-supplier-in-uttar-pradesh": {
+      "eyebrow": "ಉತ್ತರ ಪ್ರದೇಶ ಪೂರೈಕೆ ಜಾಲ",
+      "headline": "ಉತ್ತರ ಪ್ರದೇಶದಲ್ಲಿ ಫಾಗಿಂಗ್ ಯಂತ್ರ ಪೂರೈಕೆದಾರರು",
+      "primary": { "label": "UP ಟೆಂಡರ್ ಉಲ್ಲೇಖ ಪಡೆಯಿರಿ" },
+      "secondary": { "label": "ಈಗಲೇ ಕರೆ ಮಾಡಿ" }
+    },
+    "fogging-machine-supplier-in-bihar": {
+      "eyebrow": "ಬಿಹಾರ ಮತ್ತು ಪೂರ್ವ ಭಾರತ ಪೂರೈಕೆ ಜಾಲ",
+      "headline": "ಬಿಹಾರದಲ್ಲಿ ಫಾಗಿಂಗ್ ಯಂತ್ರ ಪೂರೈಕೆದಾರರು",
+      "primary": { "label": "ಬಿಹಾರ ಟೆಂಡರ್ ಉಲ್ಲೇಖ ಪಡೆಯಿರಿ" },
+      "secondary": { "label": "ಈಗಲೇ ಕರೆ ಮಾಡಿ" }
+    },
+    "dengue-control-fogging-machine": {
+      "eyebrow": "ವಾಹಕ ನಿಯಂತ್ರಣ — ಡೆಂಗ್ಯೂ ಮತ್ತು ಚಿಕುನ್‌ಗುನ್ಯಾ",
+      "headline": [
+        { "text": "ಡೆಂಗ್ಯೂವನ್ನು ತಡೆಯಿರಿ" },
+        { "text": "ಮೂಲದಲ್ಲೇ", "accent": "green" },
+        { "text": "ಸಾಬೀತಾದ ಫಾಗಿಂಗ್ ಯಂತ್ರಗಳಿಂದ" }
+      ],
+      "primary": { "label": "ಡೆಂಗ್ಯೂ ನಿಯಂತ್ರಣ ಉಲ್ಲೇಖ ಪಡೆಯಿರಿ" },
+      "secondary": { "label": "ತಂಡಕ್ಕೆ WhatsApp ಮಾಡಿ" }
+    },
+    "thermal-vs-cold-fogging-machine": {
+      "eyebrow": "ಖರೀದಿದಾರರ ಹೋಲಿಕೆ",
+      "headline": [
+        { "text": "ಥರ್ಮಲ್ ವರ್ಸಸ್ ಕೋಲ್ಡ್ ಫಾಗಿಂಗ್:" },
+        { "text": "ನಿಮ್ಮ ಬಳಕೆಗೆ ಯಾವುದು ಸೂಕ್ತ?", "accent": "green" }
+      ],
+      "primary": { "label": "ತಜ್ಞರೊಂದಿಗೆ ಮಾತನಾಡಿ" },
+      "secondary": { "label": "WhatsApp ಮೂಲಕ ಪ್ರಶ್ನೆ ಕೇಳಿ" }
+    },
+    "fogging-machine-buying-guide": {
+      "eyebrow": "ಖರೀದಿದಾರರ ಮಾರ್ಗದರ್ಶಿ",
+      "headline": "ಭಾರತಕ್ಕಾಗಿ ಫಾಗಿಂಗ್ ಯಂತ್ರ ಖರೀದಿ ಮಾರ್ಗದರ್ಶಿ",
+      "primary": { "label": "ಇಮೇಲ್ ಮೂಲಕ ಪರಿಶೀಲನಾ ಪಟ್ಟಿ ಪಡೆಯಿರಿ" },
+      "secondary": { "label": "ಉತ್ಪನ್ನಗಳನ್ನು ವೀಕ್ಷಿಸಿ" }
+    }
+  }
+}

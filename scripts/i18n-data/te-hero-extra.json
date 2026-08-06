@@ -1,0 +1,53 @@
+{
+  "locale": "te",
+  "hero": {
+    "gem-approved-fogging-machine-oem": {
+      "eyebrow": "GeM Q2 కేటగిరీ — ఫాగింగ్ మెషిన్లు",
+      "headline": [
+        { "text": "ఫాగింగ్ మెషిన్లను విక్రయించండి" },
+        { "text": "GeM పోర్టల్‌లో", "accent": "green" },
+        { "text": "తో" },
+        { "text": "ఆమోదించబడిన OEM మద్దతు", "accent": "yellow" }
+      ],
+      "primary": { "label": "రీసెల్లర్‌గా నమోదు చేసుకోండి" },
+      "secondary": { "label": "మాకు వాట్సాప్ చేయండి" }
+    },
+    "fogging-machine-supplier-in-uttar-pradesh": {
+      "eyebrow": "ఉత్తర ప్రదేశ్ సరఫరా నెట్‌వర్క్",
+      "headline": "ఉత్తర ప్రదేశ్‌లో ఫాగింగ్ మెషిన్ సరఫరాదారు",
+      "primary": { "label": "UP టెండర్ కోట్ పొందండి" },
+      "secondary": { "label": "ఇప్పుడే మాకు కాల్ చేయండి" }
+    },
+    "fogging-machine-supplier-in-bihar": {
+      "eyebrow": "బీహార్ & తూర్పు భారతదేశ సరఫరా నెట్‌వర్క్",
+      "headline": "బీహార్‌లో ఫాగింగ్ మెషిన్ సరఫరాదారు",
+      "primary": { "label": "బీహార్ టెండర్ కోట్ పొందండి" },
+      "secondary": { "label": "ఇప్పుడే మాకు కాల్ చేయండి" }
+    },
+    "dengue-control-fogging-machine": {
+      "eyebrow": "వెక్టర్ నియంత్రణ — డెంగ్యూ & చికున్‌గున్యా",
+      "headline": [
+        { "text": "డెంగ్యూను అరికట్టండి" },
+        { "text": "మూలం వద్దే", "accent": "green" },
+        { "text": "నిరూపితమైన ఫాగింగ్ మెషిన్లతో" }
+      ],
+      "primary": { "label": "డెంగ్యూ నియంత్రణ కోట్ పొందండి" },
+      "secondary": { "label": "బృందానికి వాట్సాప్ చేయండి" }
+    },
+    "thermal-vs-cold-fogging-machine": {
+      "eyebrow": "కొనుగోలుదారు పోలిక",
+      "headline": [
+        { "text": "థర్మల్ vs కోల్డ్ ఫాగింగ్:" },
+        { "text": "మీ అవసరానికి ఏది సరిపోతుంది?", "accent": "green" }
+      ],
+      "primary": { "label": "స్పెషలిస్ట్‌తో మాట్లాడండి" },
+      "secondary": { "label": "వాట్సాప్ ద్వారా ప్రశ్న అడగండి" }
+    },
+    "fogging-machine-buying-guide": {
+      "eyebrow": "కొనుగోలుదారు గైడ్",
+      "headline": "భారతదేశం కోసం ఫాగింగ్ మెషిన్ కొనుగోలు గైడ్",
+      "primary": { "label": "ఇమెయిల్ ద్వారా చెక్‌లిస్ట్ పొందండి" },
+      "secondary": { "label": "ఉత్పత్తులను బ్రౌజ్ చేయండి" }
+    }
+  }
+}

@@ -1,5 +1,88 @@
 {
   "LanguageSwitcher": {
     "label": "ਭਾਸ਼ਾ"
+  },
+  "LandingForm": {
+    "common": {
+      "selectPlaceholder": "ਚੁਣੋ…",
+      "submitting": "ਭੇਜਿਆ ਜਾ ਰਿਹਾ ਹੈ…",
+      "submit": "ਜਮ੍ਹਾਂ ਕਰੋ",
+      "privacyNote": "ਤੁਹਾਡੇ ਵੇਰਵੇ ਨਿੱਜੀ ਰਹਿੰਦੇ ਹਨ — ਅਸੀਂ ਤੀਜੀ ਧਿਰ ਨਾਲ ਸਾਂਝੇ ਨਹੀਂ ਕਰਦੇ।",
+      "requiredPrefix": "ਕਿਰਪਾ ਕਰਕੇ ਲੋੜੀਂਦੇ ਖੇਤਰ ਭਰੋ:"
+    },
+    "fields": {
+      "reseller": {
+        "company": { "label": "ਕੰਪਨੀ / ਫਰਮ ਦਾ ਨਾਮ", "placeholder": "ਤੁਹਾਡੀ ਰਜਿਸਟਰਡ ਕੰਪਨੀ ਦਾ ਨਾਮ" },
+        "name": { "label": "ਤੁਹਾਡਾ ਨਾਮ", "placeholder": "ਸੰਪਰਕ ਵਿਅਕਤੀ ਦਾ ਨਾਮ" },
+        "mobile": { "label": "ਮੋਬਾਈਲ ਨੰਬਰ", "placeholder": "+91 XXXXX XXXXX" },
+        "city": { "label": "ਸ਼ਹਿਰ / ਰਾਜ", "placeholder": "ਜਿਵੇਂ ਕਿ ਲਖਨਊ, UP" },
+        "gem_seller_id": { "label": "GeM ਸੈਲਰ ID", "placeholder": "ਤੁਹਾਡਾ GeM ਪੋਰਟਲ ਸੈਲਰ ID" },
+        "gst": { "label": "GST ਨੰਬਰ", "placeholder": "15-ਅੰਕਾਂ ਦਾ GSTIN" },
+        "capacity": {
+          "label": "ਮਹੀਨਾਵਾਰ ਆਰਡਰ ਸਮਰੱਥਾ",
+          "options": ["1–5 ਮਸ਼ੀਨਾਂ/ਮਹੀਨਾ", "5–20 ਮਸ਼ੀਨਾਂ/ਮਹੀਨਾ", "20–50 ਮਸ਼ੀਨਾਂ/ਮਹੀਨਾ", "50+ ਮਸ਼ੀਨਾਂ/ਮਹੀਨਾ"]
+        }
+      },
+      "tender-quote": {
+        "organization": { "label": "ਸੰਸਥਾ / ਵਿਭਾਗ", "placeholder": "ਨਗਰ ਨਿਗਮ, ਸਿਹਤ ਵਿਭਾਗ, ਆਦਿ।" },
+        "name": { "label": "ਤੁਹਾਡਾ ਨਾਮ" },
+        "designation": { "label": "ਅਹੁਦਾ", "placeholder": "ਖਰੀਦ ਅਧਿਕਾਰੀ" },
+        "mobile": { "label": "ਮੋਬਾਈਲ ਨੰਬਰ" },
+        "email": { "label": "ਈਮੇਲ" },
+        "state": { "label": "ਡਿਲੀਵਰੀ ਰਾਜ" },
+        "requirement": { "label": "ਲੋੜ", "placeholder": "ਮਸ਼ੀਨ ਦੀ ਕਿਸਮ, ਮਾਤਰਾ, ਜੇ ਕੋਈ ਟੈਂਡਰ ID ਹੋਵੇ" }
+      },
+      "state-dealer": {
+        "name": { "label": "ਤੁਹਾਡਾ ਨਾਮ" },
+        "mobile": { "label": "ਮੋਬਾਈਲ ਨੰਬਰ" },
+        "company": { "label": "ਕੰਪਨੀ ਦਾ ਨਾਮ (ਜੇ ਕੋਈ ਹੋਵੇ)" },
+        "city": { "label": "ਸ਼ਹਿਰ" },
+        "state": { "label": "ਰਾਜ" },
+        "current_business": { "label": "ਮੌਜੂਦਾ ਕਾਰੋਬਾਰ", "placeholder": "ਪੈਸਟ ਕੰਟਰੋਲ, ਖੇਤੀ ਸਪਲਾਈ, ਆਦਿ।" },
+        "monthly_volume": {
+          "label": "ਸੰਭਾਵਿਤ ਮਹੀਨਾਵਾਰ ਵਾਲੀਅਮ",
+          "options": ["1–5 ਮਸ਼ੀਨਾਂ", "5–20 ਮਸ਼ੀਨਾਂ", "20–50 ਮਸ਼ੀਨਾਂ", "50+ ਮਸ਼ੀਨਾਂ"]
+        }
+      },
+      "guide-download": {
+        "name": { "label": "ਤੁਹਾਡਾ ਨਾਮ" },
+        "email": { "label": "ਈਮੇਲ" },
+        "mobile": { "label": "ਮੋਬਾਈਲ (ਵਿਕਲਪਿਕ)" },
+        "role": { "label": "ਭੂਮਿਕਾ", "placeholder": "ਖਰੀਦ, ਡੀਲਰ, ਫਾਰਮ ਮਾਲਕ..." }
+      },
+      "use-case-quote": {
+        "name": { "label": "ਤੁਹਾਡਾ ਨਾਮ" },
+        "mobile": { "label": "ਮੋਬਾਈਲ ਨੰਬਰ" },
+        "organization": { "label": "ਸੰਸਥਾ (ਵਿਕਲਪਿਕ)" },
+        "scale": { "label": "ਸੰਚਾਲਨ ਦਾ ਪੱਧਰ", "placeholder": "ਰੋਜ਼ਾਨਾ ਕਵਰ ਕੀਤਾ ਖੇਤਰ, ਪਸ਼ੂ ਸਮੂਹ ਦਾ ਆਕਾਰ, ਆਦਿ।" },
+        "location": { "label": "ਸਥਾਨ", "placeholder": "ਸ਼ਹਿਰ, ਰਾਜ" }
+      }
+    }
+  },
+  "Footer": {
+    "brandDescription": "ਜਨਤਕ ਸਿਹਤ, ਨਗਰ ਨਿਗਮਾਂ, ਖੇਤੀਬਾੜੀ, ਅਤੇ ਉਦਯੋਗਿਕ ਪੈਸਟ ਕੰਟਰੋਲ ਲਈ ਥਰਮਲ ਫੌਗਿੰਗ ਮਸ਼ੀਨਾਂ ਦਾ ਭਾਰਤ ਦਾ ਭਰੋਸੇਯੋਗ ਨਿਰਮਾਤਾ।",
+    "columns": {
+      "products": "ਉਤਪਾਦ",
+      "company": "ਕੰਪਨੀ",
+      "governmentSolutions": "ਸਰਕਾਰੀ ਹੱਲ",
+      "forDealers": "ਡੀਲਰਾਂ ਲਈ",
+      "getInTouch": "ਸੰਪਰਕ ਕਰੋ"
+    },
+    "links": {
+      "spareParts": "ਸਪੇਅਰ ਪਾਰਟਸ",
+      "viewAllProducts": "ਸਾਰੇ ਉਤਪਾਦ ਵੇਖੋ →"
+    },
+    "companyLinks": [
+      "100X Circle ਬਾਰੇ", "ਉਤਪਾਦ ਕੈਟਾਲਾਗ", "ਸਪੇਅਰ ਪਾਰਟਸ", "ਕੇਸ ਸਟੱਡੀਜ਼", "ਸਰਕਾਰੀ ਤਾਇਨਾਤੀਆਂ",
+      "ਪਿਛਲਾ ਪ੍ਰਦਰਸ਼ਨ", "ਸਰਕਾਰੀ ਖਰੀਦ", "ਜਾਣਕਾਰੀ ਕੇਂਦਰ", "ਬਲੌਗ", "ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ"
+    ],
+    "governmentLinks": [
+      "GeM ਪ੍ਰਵਾਨਿਤ OEM", "ਸਰਕਾਰੀ ਖਰੀਦ", "ਪਿਛਲਾ ਪ੍ਰਦਰਸ਼ਨ", "GeM OEM ਅਥਾਰਾਈਜ਼ੇਸ਼ਨ"
+    ],
+    "dealerLinks": ["ਡੀਲਰ ਬਣੋ", "ਟੈਂਡਰ ਸਹਾਇਤਾ", "IS 14855 ਮਸ਼ੀਨਾਂ"],
+    "bottomLinks": ["ਪਰਾਈਵੇਸੀ ਨੀਤੀ", "ਸ਼ਰਤਾਂ", "ਰਿਟਰਨ", "ਵਾਰੰਟੀ", "ਬੇਦਾਅਵਾ"],
+    "whatsappCta": "ਸਾਨੂੰ ਵਟਸਐਪ ਕਰੋ",
+    "viewOnMaps": "ਗੂਗਲ ਮੈਪਸ 'ਤੇ ਵੇਖੋ",
+    "copyright": "© 2026 100X Circle Pvt Ltd. ਸਾਰੇ ਹੱਕ ਰਾਖਵੇਂ ਹਨ। ਭਾਰਤ ਵਿੱਚ ਨਿਰਮਿਤ।"
   }
 }

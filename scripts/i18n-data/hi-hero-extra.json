@@ -1,0 +1,53 @@
+{
+  "locale": "hi",
+  "hero": {
+    "gem-approved-fogging-machine-oem": {
+      "eyebrow": "GeM Q2 श्रेणी — फॉगिंग मशीन",
+      "headline": [
+        { "text": "फॉगिंग मशीनें बेचें" },
+        { "text": "GeM पोर्टल पर", "accent": "green" },
+        { "text": "साथ ही" },
+        { "text": "अनुमोदित OEM सहायता", "accent": "yellow" }
+      ],
+      "primary": { "label": "रीसेलर के रूप में पंजीकरण करें" },
+      "secondary": { "label": "व्हाट्सऐप करें" }
+    },
+    "fogging-machine-supplier-in-uttar-pradesh": {
+      "eyebrow": "उत्तर प्रदेश आपूर्ति नेटवर्क",
+      "headline": "उत्तर प्रदेश में फॉगिंग मशीन आपूर्तिकर्ता",
+      "primary": { "label": "उत्तर प्रदेश निविदा कोटेशन पाएं" },
+      "secondary": { "label": "अभी कॉल करें" }
+    },
+    "fogging-machine-supplier-in-bihar": {
+      "eyebrow": "बिहार और पूर्वी भारत आपूर्ति नेटवर्क",
+      "headline": "बिहार में फॉगिंग मशीन आपूर्तिकर्ता",
+      "primary": { "label": "बिहार निविदा कोटेशन पाएं" },
+      "secondary": { "label": "अभी कॉल करें" }
+    },
+    "dengue-control-fogging-machine": {
+      "eyebrow": "वेक्टर नियंत्रण — डेंगू और चिकनगुनिया",
+      "headline": [
+        { "text": "डेंगू को रोकें" },
+        { "text": "स्रोत पर ही", "accent": "green" },
+        { "text": "सिद्ध फॉगिंग मशीनों से" }
+      ],
+      "primary": { "label": "डेंगू नियंत्रण कोटेशन पाएं" },
+      "secondary": { "label": "टीम को व्हाट्सऐप करें" }
+    },
+    "thermal-vs-cold-fogging-machine": {
+      "eyebrow": "खरीदार तुलना",
+      "headline": [
+        { "text": "थर्मल बनाम कोल्ड फॉगिंग:" },
+        { "text": "आपके उपयोग के लिए कौन-सा सही है?", "accent": "green" }
+      ],
+      "primary": { "label": "विशेषज्ञ से बात करें" },
+      "secondary": { "label": "व्हाट्सऐप पर सवाल पूछें" }
+    },
+    "fogging-machine-buying-guide": {
+      "eyebrow": "खरीदार गाइड",
+      "headline": "भारत के लिए फॉगिंग मशीन खरीद गाइड",
+      "primary": { "label": "ईमेल द्वारा चेकलिस्ट प्राप्त करें" },
+      "secondary": { "label": "उत्पाद देखें" }
+    }
+  }
+}

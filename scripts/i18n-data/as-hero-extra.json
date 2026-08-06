@@ -1,0 +1,53 @@
+{
+  "locale": "as",
+  "hero": {
+    "gem-approved-fogging-machine-oem": {
+      "eyebrow": "GeM Q2 শ্ৰেণী — ফগিং মেচিন",
+      "headline": [
+        { "text": "ফগিং মেচিন বিক্ৰী কৰক" },
+        { "text": "GeM পোর্টেলত", "accent": "green" },
+        { "text": "লগত" },
+        { "text": "অনুমোদিত OEM সহায়তাৰ", "accent": "yellow" }
+      ],
+      "primary": { "label": "ৰিছেলাৰ হিচাপে পঞ্জীয়ন কৰক" },
+      "secondary": { "label": "আমাক হোৱাটছএপ কৰক" }
+    },
+    "fogging-machine-supplier-in-uttar-pradesh": {
+      "eyebrow": "উত্তৰ প্ৰদেশ যোগান নেটৱৰ্ক",
+      "headline": "উত্তৰ প্ৰদেশত ফগিং মেচিন সৰবৰাহকাৰী",
+      "primary": { "label": "উত্তৰ প্ৰদেশ দৰপত্ৰ কোটেশ্যন লাভ কৰক" },
+      "secondary": { "label": "এতিয়াই আমাক কল কৰক" }
+    },
+    "fogging-machine-supplier-in-bihar": {
+      "eyebrow": "বিহাৰ আৰু পূৱ ভাৰত যোগান নেটৱৰ্ক",
+      "headline": "বিহাৰত ফগিং মেচিন সৰবৰাহকাৰী",
+      "primary": { "label": "বিহাৰ দৰপত্ৰ কোটেশ্যন লাভ কৰক" },
+      "secondary": { "label": "এতিয়াই আমাক কল কৰক" }
+    },
+    "dengue-control-fogging-machine": {
+      "eyebrow": "বাহক নিয়ন্ত্ৰণ — ডেংগু আৰু চিকুনগুনিয়া",
+      "headline": [
+        { "text": "ডেংগুক ৰোধ কৰক" },
+        { "text": "উৎসতে", "accent": "green" },
+        { "text": "প্ৰমাণিত ফগিং মেচিনৰে" }
+      ],
+      "primary": { "label": "ডেংগু নিয়ন্ত্ৰণ কোটেশ্যন লাভ কৰক" },
+      "secondary": { "label": "দলক হোৱাটছএপ কৰক" }
+    },
+    "thermal-vs-cold-fogging-machine": {
+      "eyebrow": "ক্ৰেতাৰ তুলনা",
+      "headline": [
+        { "text": "থাৰ্মেল বনাম কল্ড ফগিং:" },
+        { "text": "কোনটো আপোনাৰ প্ৰয়োজনৰ বাবে উপযুক্ত?", "accent": "green" }
+      ],
+      "primary": { "label": "এজন বিশেষজ্ঞৰ সৈতে কথা পাতক" },
+      "secondary": { "label": "প্ৰশ্ন হোৱাটছএপ কৰক" }
+    },
+    "fogging-machine-buying-guide": {
+      "eyebrow": "ক্ৰেতাৰ নিৰ্দেশিকা",
+      "headline": "ভাৰতৰ বাবে ফগিং মেচিন ক্ৰয় নিৰ্দেশিকা",
+      "primary": { "label": "ইমেইলৰ জৰিয়তে চেকলিষ্ট লাভ কৰক" },
+      "secondary": { "label": "উৎপাদন ব্ৰাউজ কৰক" }
+    }
+  }
+}
