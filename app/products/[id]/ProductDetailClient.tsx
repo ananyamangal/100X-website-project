@@ -38,8 +38,30 @@ function arr(v: unknown): string[] {
   if (typeof v === 'string') return v.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
   return [];
 }
+// Extracts the 11-char YouTube video ID from any well-formed YouTube URL.
+// Parses with the URL API first so query-param order doesn't matter — a
+// naive `watch?v=` regex fails on YouTube's mobile Share-button URLs, which
+// put a `si=` share token before `v=` (`watch?si=TOKEN&v=ID`). Falls back to
+// the old regex only for inputs `new URL()` can't parse at all.
 function ytId(url: string): string | null {
-  const m = s(url).match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+  const str = s(url).trim();
+  if (!str) return null;
+  try {
+    const u = new URL(str);
+    const host = u.hostname.replace(/^www\./, '');
+    if (host === 'youtu.be') {
+      const id = u.pathname.slice(1).split('/')[0];
+      if (/^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
+    } else if (host === 'youtube.com' || host === 'm.youtube.com') {
+      const v = u.searchParams.get('v');
+      if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+      const pathMatch = u.pathname.match(/\/(?:embed|shorts)\/([a-zA-Z0-9_-]{11})/);
+      if (pathMatch) return pathMatch[1];
+    }
+  } catch {
+    // Malformed URL — fall through to the regex fallback below.
+  }
+  const m = str.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
   return m ? m[1] : null;
 }
 
