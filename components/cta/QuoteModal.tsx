@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, X } from "lucide-react"
 import { toast } from "sonner"
@@ -31,11 +31,17 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [message, setMessage] = useState("")
+  // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) --
+  // see the same note in BrochureLeadModal.tsx. Re-armed on every open, not
+  // just first mount, since this modal can be opened/closed/reopened
+  // without remounting.
+  const mountedAtRef = useRef<number>(Date.now())
 
   const copy = CTA_COPY[audience]
 
   useEffect(() => {
     if (!open) return
+    mountedAtRef.current = Date.now()
     const prev = document.body.style.overflow
     document.body.style.overflow = "hidden"
     const onKey = (e: KeyboardEvent) => {
@@ -69,8 +75,6 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
     const trimmedName = name.trim()
     const trimmedPhone = phone.trim()
     const trimmedMessage = message.trim()
-    const honeypot =
-      (e.currentTarget.elements.namedItem("company_website") as HTMLInputElement | null)?.value ?? ""
 
     if (!trimmedName || !trimmedPhone) {
       setError("Please enter your name and phone number.")
@@ -79,6 +83,11 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
     const digits = trimmedPhone.replace(/[^0-9]/g, "")
     if (!PHONE_RE.test(trimmedPhone) || digits.length < 10 || digits.length > 15) {
       setError("Please enter a valid phone number (10–15 digits).")
+      return
+    }
+    // Time-gate: see mountedAtRef comment above.
+    if (Date.now() - mountedAtRef.current < 2000) {
+      setError("Please try again.")
       return
     }
 
@@ -104,7 +113,6 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
           attribution: getPersistedAttribution(),
           form_page_url: typeof window !== "undefined" ? location.href : "",
           form_page_path: typeof window !== "undefined" ? location.pathname : "",
-          company_website: honeypot,
         }),
       })
 
