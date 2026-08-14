@@ -45,8 +45,8 @@ const FIELDS_BY_VARIANT: Record<LandingFormBlockData["variant"], FormFieldDef[]>
     { name: "name", label: "Your Name", type: "text", required: true, placeholder: "Contact person name", autoComplete: "name", colSpan: 1 },
     { name: "mobile", label: "Mobile Number", type: "tel", required: true, placeholder: "+91 XXXXX XXXXX", autoComplete: "tel", inputMode: "tel", colSpan: 1 },
     { name: "city", label: "City / State", type: "text", required: true, placeholder: "e.g. Lucknow, UP", autoComplete: "address-level1", colSpan: 1 },
-    { name: "gem_seller_id", label: "GeM Seller ID", type: "text", required: true, placeholder: "Your GeM portal seller ID", colSpan: 1 },
-    { name: "gst", label: "GST Number", type: "text", required: true, placeholder: "15-digit GSTIN" },
+    { name: "gem_seller_id", label: "GeM Seller ID", type: "text", placeholder: "Your GeM portal seller ID (if you have one)", colSpan: 1 },
+    { name: "gst", label: "GST Number", type: "text", placeholder: "15-digit GSTIN (if registered)" },
     {
       name: "capacity",
       label: "Monthly Order Capacity",
@@ -273,6 +273,15 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
                   {f.required ? <span aria-hidden="true" className="text-brand-700"> *</span> : null}
                 </label>
                 {f.type === "select" ? (
+                  // Native <option> popups render with each browser's own opaque
+                  // chrome — a translucent [[data-theme=dark-industrial]_&]:bg-white/5
+                  // on the closed <select> (correct, shows the dark page through it)
+                  // does NOT carry into that popup, so the inherited
+                  // [[data-theme=dark-industrial]_&]:text-white left the open dropdown's
+                  // options rendering white-on-white (same bug already fixed once in
+                  // PartnerApplyForm, commit cd441f0). Fix mirrors that one: explicit
+                  // opaque bg/text per theme on every <option>, plus color-scheme so
+                  // the popup's own default chrome matches.
                   <select
                     id={id}
                     name={f.name}
@@ -280,11 +289,17 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
                     value={values[f.name] || ""}
                     onChange={(e) => update(f.name, e.target.value)}
                     disabled={submitting}
-                    className="rounded-md border border-gray-300 bg-white px-3.5 py-3 text-base text-gray-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-green-200 disabled:opacity-60 [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:bg-white/5 [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:focus:border-green-500 [[data-theme=dark-industrial]_&]:focus:ring-brand-500/30"
+                    className="rounded-md border border-gray-300 bg-white px-3.5 py-3 text-base text-gray-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-green-200 disabled:opacity-60 [color-scheme:light] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:bg-white/5 [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:focus:border-green-500 [[data-theme=dark-industrial]_&]:focus:ring-brand-500/30 [[data-theme=dark-industrial]_&]:[color-scheme:dark]"
                   >
-                    <option value="">{tc("selectPlaceholder", "Select…")}</option>
+                    <option value="" className="bg-white text-gray-900 [[data-theme=dark-industrial]_&]:bg-slate-900 [[data-theme=dark-industrial]_&]:text-white">
+                      {tc("selectPlaceholder", "Select…")}
+                    </option>
                     {tOptions(f.name, f.options || []).map((o, i) => (
-                      <option key={f.options?.[i] || o} value={f.options?.[i] || o}>
+                      <option
+                        key={f.options?.[i] || o}
+                        value={f.options?.[i] || o}
+                        className="bg-white text-gray-900 [[data-theme=dark-industrial]_&]:bg-slate-900 [[data-theme=dark-industrial]_&]:text-white"
+                      >
                         {o}
                       </option>
                     ))}
