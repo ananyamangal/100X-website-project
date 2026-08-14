@@ -33,6 +33,7 @@ import {
   ClipboardCheck,
   Search,
   Copy,
+  Link2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -51,6 +52,7 @@ import { BrochureLeadsTab } from "@/components/admin/BrochureLeadsTab"
 import { SparePartsTab } from "@/components/admin/SparePartsTab"
 import { ReviewsTab } from "@/components/admin/ReviewsTab"
 import { SiteSettingsTab } from "@/components/admin/SiteSettingsTab"
+import { RedirectsTab } from "@/components/admin/RedirectsTab"
 import { ProductExperienceTab } from "@/components/admin/ProductExperienceTab"
 import { ProcurementTab } from "@/components/admin/ProcurementTab"
 import { AdminUserMenu, AdminSignOutButton } from "@/components/admin/AdminUserMenu"
@@ -1106,6 +1108,17 @@ function AdminDashboardContent() {
                 Our Customers
               </button>
               <button
+                onClick={() => setActiveTab("redirects")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "redirects"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Link2 className="mr-3" size={20} />
+                Redirects
+              </button>
+              <button
                 onClick={() => setActiveTab("aboutUs")}
                 className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === "aboutUs"
@@ -1565,6 +1578,7 @@ function AdminDashboardContent() {
             {activeTab === "spareParts" && <SparePartsTab />}
             {activeTab === "reviews" && <ReviewsTab />}
             {activeTab === "siteSettings" && <SiteSettingsTab />}
+            {activeTab === "redirects" && <RedirectsTab />}
             {activeTab === "settings" && <SettingsTab />}
             {activeTab === "procurement" && <ProcurementTab />}
             {activeTab === "productBadges" && <ProductBadgesTab />}
