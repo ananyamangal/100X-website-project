@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse, NextFetchEvent } from "next/server"
 import createIntlMiddleware from "next-intl/middleware"
 import { verifyJWT, SESSION_COOKIE } from "@/lib/rbac/jwt"
 import { routing } from "@/i18n/routing"
@@ -43,6 +43,75 @@ function isLocaleManagedPath(pathname: string): boolean {
   return isLocaleManagedPathname(pathname)
 }
 
+// ── URL redirects: in-memory cache, refreshed periodically ──────────────────
+// Manual redirect rules (admin-managed, `url_redirects` collection) and the
+// /products/ prefix auto-fallback (any bare top-level slug that matches a
+// published product) both need a lookup on effectively every page request
+// once the generic catch-all matcher entry (bottom of config.matcher below)
+// starts running middleware broadly. Querying
+// Mongo directly per-request would be a real latency/cost regression on a
+// marketing site, and this middleware isn't guaranteed to run on a Node
+// runtime (same reason the legacy ObjectId→slug redirect further down calls
+// an internal API route instead of importing the Mongo driver) — so instead
+// we poll a small internal endpoint (/api/redirects/active) into a
+// module-level Map/Set cache that Vercel's warm isolates reuse across
+// requests. Steady state: every request is an O(1) in-memory lookup, with a
+// DB round-trip only once per REDIRECT_CACHE_TTL_MS, off the request path.
+const REDIRECT_CACHE_TTL_MS = 60_000
+
+let redirectCache: {
+  redirects: Map<string, { destination: string; type: 301 | 302 }>
+  productSlugs: Set<string>
+} = { redirects: new Map(), productSlugs: new Set() }
+let redirectCacheLoadedAt = 0
+let redirectCacheRefreshing: Promise<void> | null = null
+
+async function refreshRedirectCache(origin: string): Promise<void> {
+  try {
+    const res = await fetch(`${origin}/api/redirects/active`, {
+      headers: { "x-middleware-internal": "1" },
+    })
+    if (!res.ok) return
+    const data = await res.json()
+    const redirects = new Map<string, { destination: string; type: 301 | 302 }>()
+    for (const r of data.redirects ?? []) {
+      if (r?.source && r?.destination) {
+        redirects.set(r.source, { destination: r.destination, type: r.type === 302 ? 302 : 301 })
+      }
+    }
+    redirectCache = { redirects, productSlugs: new Set(data.productSlugs ?? []) }
+    redirectCacheLoadedAt = Date.now()
+  } catch {
+    // Network/DB hiccup — keep serving whatever is already cached (or the
+    // empty cache on a cold instance) rather than letting this block routing.
+  }
+}
+
+/**
+ * Returns a promise to await ONLY when this request must not proceed without
+ * fresh data (cache never loaded on this isolate yet) — otherwise kicks off
+ * a background refresh via `event.waitUntil` (if stale) and returns null so
+ * the current request uses the existing cache immediately.
+ */
+function ensureRedirectCacheFresh(origin: string, event: NextFetchEvent): Promise<void> | null {
+  const isStale = Date.now() - redirectCacheLoadedAt > REDIRECT_CACHE_TTL_MS
+  if (!isStale) return null
+  if (!redirectCacheRefreshing) {
+    redirectCacheRefreshing = refreshRedirectCache(origin).finally(() => {
+      redirectCacheRefreshing = null
+    })
+  }
+  if (redirectCacheLoadedAt === 0) {
+    // Cold instance, nothing cached yet — this request has to wait or it
+    // would silently skip every redirect rule.
+    return redirectCacheRefreshing
+  }
+  // Warm cache just past its TTL — serve this request from the (slightly
+  // stale, still valid) existing cache and refresh in the background.
+  event.waitUntil(redirectCacheRefreshing)
+  return null
+}
+
 async function isAuthenticated(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get(SESSION_COOKIE)?.value
   if (!token) return false
@@ -50,7 +119,7 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
   return payload !== null
 }
 
-export async function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest, event: NextFetchEvent) {
   const { pathname, origin } = request.nextUrl
 
   // ── Admin page routes: inject x-is-admin + enforce unified auth ─────────────
@@ -193,25 +262,60 @@ export async function middleware(request: NextRequest) {
 
   // ── Legacy product ObjectId → slug redirect ──────────────────────────────────
   const match = pathname.match(/^\/products\/([a-f0-9]{24})$/i)
-  if (!match) return NextResponse.next()
-
-  const id = match[1]
-  if (!OID_PATTERN.test(id)) return NextResponse.next()
-
-  try {
-    const res = await fetch(`${origin}/api/product-slug?id=${id}`, {
-      headers: { "x-middleware-internal": "1" },
-    })
-    if (!res.ok) return NextResponse.next()
-
-    const data = await res.json()
-    if (data.resolvedBy === "id" && data.slug && data.slug !== id) {
-      const url = request.nextUrl.clone()
-      url.pathname = `/products/${data.slug}`
-      return NextResponse.redirect(url, { status: 308 })
+  if (match && OID_PATTERN.test(match[1])) {
+    const id = match[1]
+    try {
+      const res = await fetch(`${origin}/api/product-slug?id=${id}`, {
+        headers: { "x-middleware-internal": "1" },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.resolvedBy === "id" && data.slug && data.slug !== id) {
+          const url = request.nextUrl.clone()
+          url.pathname = `/products/${data.slug}`
+          return NextResponse.redirect(url, { status: 308 })
+        }
+      }
+    } catch {
+      // Let the page handle it normally
     }
-  } catch {
-    // Let the page handle it normally
+    // Falls through to the generic redirect resolution below — harmless
+    // here since this pathname is under /products/, so neither the manual
+    // redirect map nor the /products/ auto-fallback will match it.
+  }
+
+  // ── URL redirects: manual entries + /products/ prefix auto-fallback ─────────
+  // Manual, admin-managed redirects (checked first) take priority over the
+  // structural auto-fallback. Both read from the module-level cache above —
+  // never a per-request DB call.
+  const coldStartWait = ensureRedirectCacheFresh(origin, event)
+  if (coldStartWait) await coldStartWait
+
+  const manual = redirectCache.redirects.get(pathname)
+  if (manual) {
+    try {
+      const destUrl = new URL(manual.destination, origin)
+      const url = request.nextUrl.clone()
+      url.pathname = destUrl.pathname
+      url.search = destUrl.search
+      return NextResponse.redirect(url, { status: manual.type })
+    } catch {
+      // Malformed destination stored somehow — don't hard-fail the request.
+    }
+  }
+
+  // Structural fallback: a bare top-level slug that would otherwise 404
+  // redirects to its canonical /products/<slug> URL if a published product
+  // owns that slug. Product slugs are auto-generated (name + 6 hex chars of
+  // the Mongo _id — see lib/productSlug.ts), so a collision with an
+  // unrelated static page slug is not realistically possible.
+  if (!pathname.startsWith("/products/") && pathname !== "/products") {
+    const bareSlug = pathname.replace(/^\//, "")
+    if (bareSlug && redirectCache.productSlugs.has(bareSlug)) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/products/${bareSlug}`
+      return NextResponse.redirect(url, { status: 301 })
+    }
   }
 
   return NextResponse.next()
@@ -292,5 +396,14 @@ export const config = {
     "/thermal-vs-cold-fogging-machine",
     "/fogging-machine-buying-guide",
     "/thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
+    // --- generic catch-all: URL-redirect resolution (manual + /products/ fallback) ---
+    // NOT part of the generated locale/slug sets above — scripts/verify-locale-matchers.mjs
+    // only checks those, so it won't flag or touch this entry. Runs last in
+    // middleware(), after every route-specific branch above has already
+    // returned; excludes API routes, _next internals, and static-asset
+    // extensions, none of which ever need redirect resolution. See the
+    // "URL redirects: in-memory cache" comment above middleware() for how
+    // this stays cheap despite matching effectively every page request.
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|mjs|woff|woff2|ttf|map|txt|xml|json|pdf)$).*)",
   ],
 }
