@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Loader2 } from "lucide-react"
@@ -128,6 +128,15 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
   const [values, setValues] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) —
+  // NOT a value-check on the hidden field below. A visually-hidden-but-
+  // DOM-present input named "company_website" sitting next to a real
+  // "Company / Firm Name" field gets autofilled by real browsers often
+  // enough that a value-based honeypot silently rejects genuine leads (this
+  // exact bug already cost PartnerApplyForm real submissions once). The
+  // hidden input stays in the DOM as a decoy but its value is intentionally
+  // never sent to the server.
+  const mountedAtRef = useRef<number>(Date.now())
 
   const update = (name: string, val: string) =>
     setValues((prev) => ({ ...prev, [name]: val }))
@@ -143,8 +152,13 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
       return
     }
 
-    const honeypot =
-      (e.currentTarget.elements.namedItem("company_website") as HTMLInputElement | null)?.value ?? ""
+    // Time-gate: real users take more than 2s to notice the form and fill
+    // it in; bots submit near-instantly. See mountedAtRef comment above —
+    // this replaces relying on the hidden company_website field's value.
+    if (Date.now() - mountedAtRef.current < 2000) {
+      setError("Please try again.")
+      return
+    }
 
     pushDataLayer({
       event: `${gaEvent}_attempt`,
@@ -165,7 +179,6 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
           attribution: getPersistedAttribution(),
           form_page_url: typeof window !== "undefined" ? location.href : "",
           form_page_path: typeof window !== "undefined" ? location.pathname : "",
-          company_website: honeypot,
         }),
       })
       if (!res.ok) throw new Error(`Status ${res.status}`)
