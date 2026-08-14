@@ -53,6 +53,12 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
   // opened/closed/reopened without remounting.
   const mountedAtRef = useRef<number>(Date.now())
 
+  // Reset/mount-timing effect — deliberately keyed on `open` alone. This
+  // must NOT re-run when `submitting` flips (e.g. true -> false right after
+  // a successful POST): it calls setDone(false), which would immediately
+  // stomp the setDone(true) that handleSubmit just set, reverting the
+  // success panel back to a blank (already reset()) form before the user
+  // can register it. See commit fixing "no confirmation shown after submit".
   useEffect(() => {
     if (!open) return
     mountedAtRef.current = Date.now()
@@ -61,12 +67,18 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
     setTimeout(() => nameRef.current?.focus(), 80)
     const prev = document.body.style.overflow
     document.body.style.overflow = "hidden"
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape" && !submitting) onClose() }
-    document.addEventListener("keydown", onKey)
     return () => {
       document.body.style.overflow = prev
-      document.removeEventListener("keydown", onKey)
     }
+  }, [open])
+
+  // Escape-key handling is split into its own effect so it can safely track
+  // the latest `submitting`/`onClose` without re-arming the reset logic above.
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape" && !submitting) onClose() }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
   }, [open, submitting, onClose])
 
   if (!open) return null
