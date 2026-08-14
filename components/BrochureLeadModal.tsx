@@ -42,9 +42,20 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
   const [error, setError] = useState("")
   const [done, setDone] = useState(false)
   const nameRef = useRef<HTMLInputElement>(null)
+  // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) --
+  // NOT a value-check on the hidden honeypot input below. The server's
+  // /api/brochure-leads previously treated any non-empty value in that
+  // input as proof of a bot and returned a FAKE {ok:true} -- so a real user
+  // whose browser autofilled the visually-hidden-but-DOM-present
+  // "company_website" field (it sits right next to real Organization/State
+  // fields) saw a success state while their lead was silently never saved.
+  // Re-armed on every open, not just first mount, since this modal can be
+  // opened/closed/reopened without remounting.
+  const mountedAtRef = useRef<number>(Date.now())
 
   useEffect(() => {
     if (!open) return
+    mountedAtRef.current = Date.now()
     setError("")
     setDone(false)
     setTimeout(() => nameRef.current?.focus(), 80)
@@ -77,12 +88,16 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
     e.preventDefault()
     setError("")
 
-    const hp = (e.currentTarget.elements.namedItem("company_website") as HTMLInputElement | null)?.value ?? ""
-
     const trimPhone = phone.replace(/\D/g, "")
     if (!name.trim()) { setError("Name is required."); return }
     if (!PHONE_RE.test(trimPhone)) { setError("Enter a valid 10-digit Indian mobile number (starting 6–9)."); return }
     if (!EMAIL_RE.test(email.trim())) { setError("Enter a valid email address."); return }
+
+    // Time-gate: see mountedAtRef comment above.
+    if (Date.now() - mountedAtRef.current < 2000) {
+      setError("Please try again.")
+      return
+    }
 
     setSubmitting(true)
     try {
@@ -98,7 +113,6 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
           source,
           brochureType: brochureUrl ? "product" : "main",
           pageUrl: typeof window !== "undefined" ? window.location.href : "",
-          company_website: hp,
         }),
       })
       const data = await res.json()

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { pushDataLayer } from "@/lib/gtm"
 import { useRouter } from "next/navigation"
 
@@ -48,6 +48,9 @@ export default function GovRFQForm() {
   const [form, setForm] = useState<FormState>(EMPTY)
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle")
   const [errorMsg, setErrorMsg] = useState("")
+  // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) --
+  // see the same note in TenderPackLeadCapture.tsx / BrochureLeadModal.tsx.
+  const mountedAtRef = useRef<number>(Date.now())
 
   const set = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -55,6 +58,14 @@ export default function GovRFQForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (status === "submitting") return
+
+    // Time-gate: see mountedAtRef comment above.
+    if (Date.now() - mountedAtRef.current < 2000) {
+      setStatus("error")
+      setErrorMsg("Please try again.")
+      return
+    }
+
     setStatus("submitting")
     setErrorMsg("")
 
@@ -79,7 +90,6 @@ export default function GovRFQForm() {
           description,
           gemAuthRequired: false,
           dealerInquiry: false,
-          company_website: form.company_website,
           form_page_url: window.location.href,
           form_page_path: window.location.pathname,
           location_label: "gov_procurement_rfq",
