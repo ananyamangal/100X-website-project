@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { pushDataLayer } from "@/lib/gtm"
 import { BUSINESS } from "@/lib/seo/site-config"
 
@@ -31,6 +31,12 @@ export default function TenderPackLeadCapture() {
   const [form, setForm] = useState<FormState>(EMPTY)
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle")
   const [errorMsg, setErrorMsg] = useState("")
+  // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) --
+  // see the same note in BrochureLeadModal.tsx. /api/rfq-submit rejects any
+  // request whose company_website field is non-empty; that field is a
+  // controlled input tied to form state below, but its value is
+  // intentionally never forwarded to the server (see handleSubmit).
+  const mountedAtRef = useRef<number>(Date.now())
 
   const set = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -42,6 +48,14 @@ export default function TenderPackLeadCapture() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (status === "submitting" || status === "success") return
+
+    // Time-gate: see mountedAtRef comment above.
+    if (Date.now() - mountedAtRef.current < 2000) {
+      setStatus("error")
+      setErrorMsg("Please try again.")
+      return
+    }
+
     setStatus("submitting")
     setErrorMsg("")
 
@@ -58,7 +72,6 @@ export default function TenderPackLeadCapture() {
           description: "Requested complete tender documentation pack for government procurement.",
           gemAuthRequired: false,
           dealerInquiry: false,
-          company_website: form.company_website,
           form_page_url: typeof window !== "undefined" ? window.location.href : "",
           location_label: "tender_pack_request",
         }),
