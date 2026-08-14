@@ -4,6 +4,8 @@ import { SITE_URL, SITE_NAME, defaultOgImage } from '@/lib/seo/site-config'
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd'
 import RFQForm from '@/components/forms/RFQForm'
 
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: 'Power Tiller in Delhi | 100x Circle',
   description:

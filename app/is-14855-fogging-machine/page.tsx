@@ -4,6 +4,8 @@ import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import RfqForm from "@/components/rfq/RfqForm"
 
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: "IS 14855 Fogging Machine | BIS Certified Thermal Fogger for Government Tenders | 100X Circle",
   description:

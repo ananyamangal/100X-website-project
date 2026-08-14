@@ -8,6 +8,16 @@ import { blogPostSlug } from "@/lib/blogSlug"
 import { PRODUCT_LANDING_MAP } from "@/lib/seo/product-landing-map"
 import { getAvailableLocales, buildLocalizedSitemapEntries } from "@/lib/seo/hreflang"
 
+// Unlike the 14 hardcoded landing pages fixed alongside this (see their own
+// revalidate additions), this route genuinely reads from Mongo on every
+// build (products, landing pages, blogs) — so without a revalidate export it
+// is fully static and only regenerates on a new deploy. That already caused
+// a real incident: commit cb3a91b was a no-op "trigger redeploy" needed
+// purely to refresh this file after DB state changed. 1 hour balances
+// picking up publish/unpublish changes reasonably fast against the cost of
+// re-running these DB queries on every request.
+export const revalidate = 3600
+
 /**
  * Static, hand-curated routes that are always present in the sitemap.
  * SEO landing pages and dynamic product/blog routes are appended below.

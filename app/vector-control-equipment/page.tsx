@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: "Vector Control Equipment India — Fogging Machines for Mosquito & Pest Control | 100X Circle",
   description:
