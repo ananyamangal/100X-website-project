@@ -3,6 +3,8 @@ import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import OemAuthForm from "@/components/oem/OemAuthForm"
 
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: "OEM Authorization Letter for Government Tenders — Free | 100X Circle",
   description:

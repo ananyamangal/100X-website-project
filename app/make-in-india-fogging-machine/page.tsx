@@ -3,6 +3,8 @@ import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import RFQForm from "@/components/forms/RFQForm"
 
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: "Make in India Fogging Machine — Atmanirbhar Bharat OEM Manufacturer | 100X Circle",
   description:
