@@ -112,6 +112,9 @@ export default function RFQForm({
   const [showOptional, setShowOptional] = useState(false)
   const fileInputRef   = useRef<HTMLInputElement>(null)
   const startFiredRef  = useRef(false)
+  // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) --
+  // see the same note in BrochureLeadModal.tsx / TenderPackLeadCapture.tsx.
+  const mountedAtRef   = useRef<number>(Date.now())
 
   const handleFormFocus = useCallback(() => {
     if (startFiredRef.current) return
@@ -172,8 +175,11 @@ export default function RFQForm({
       return
     }
 
-    const honeypot =
-      (e.currentTarget.elements.namedItem("company_website") as HTMLInputElement | null)?.value ?? ""
+    // Time-gate: see mountedAtRef comment above.
+    if (Date.now() - mountedAtRef.current < 2000) {
+      setError("Please try again.")
+      return
+    }
 
     setSubmitting(true)
     pushDataLayer({ event: "rfq_form_submit_attempt", location, product })
@@ -222,7 +228,6 @@ export default function RFQForm({
           form_page_url: typeof window !== "undefined" ? window.location.href : "",
           form_page_path: typeof window !== "undefined" ? window.location.pathname : "",
           location_label: location,
-          company_website: honeypot,
         }),
       })
       // We don't gate the user's flow on the response body — WhatsApp is
