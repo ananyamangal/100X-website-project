@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Mail, MapPin, Phone, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -29,6 +29,15 @@ export default function ContactSection({
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) --
+  // see the same note in BrochureLeadModal.tsx. This REPLACES a client-side
+  // value-check on the hidden company_website field that had the identical
+  // false-positive risk as the server's own check in app/api/submissions'
+  // stripBotFields() (untouched -- shared by several other forms): a real
+  // user whose browser autofilled that visually-hidden field (it sits right
+  // next to a real Organization field) was rejected with "Something went
+  // wrong" and never told why.
+  const mountedAtRef = useRef<number>(Date.now())
 
   const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -40,7 +49,6 @@ export default function ContactSection({
     const phone = String(formData.get("phone") ?? "").trim()
     const organization = String(formData.get("organization") ?? "").trim()
     const requirement = String(formData.get("requirement") ?? "").trim()
-    const hp = String(formData.get("company_website") ?? "").trim()
 
     if (!name) {
       setError("Please enter your name.")
@@ -50,8 +58,8 @@ export default function ContactSection({
       setError("Please enter a valid mobile number (10–15 digits).")
       return
     }
-    if (hp) {
-      setError("Something went wrong. Please try again.")
+    if (Date.now() - mountedAtRef.current < 2000) {
+      setError("Please try again.")
       return
     }
 
@@ -77,7 +85,6 @@ export default function ContactSection({
           attribution,
           form_page_url: window.location.href,
           form_page_path: window.location.pathname,
-          company_website: hp,
         }),
       })
 
