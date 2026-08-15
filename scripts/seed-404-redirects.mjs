@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Seeds manual redirects for two confirmed 404 gaps found in the SEO 404
+// Seeds manual redirects for confirmed 404 gaps found in the SEO 404
 // investigation (fix/seo-404-investigation, follow-up after merge 4306101):
-// the auto-fallback middleware has nothing to redirect to for either path
-// because no product exists at that exact bare slug — both have a real
+// the auto-fallback middleware has nothing to redirect to for these paths
+// because no product exists at that exact bare slug — each has a real
 // published product at a *different* slug, so these are genuine manual
 // redirects, not something the structural fallback can infer.
 //
@@ -13,6 +13,12 @@
 //   /isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20
 //     -> /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde
 //        (canonical product page carries a "-fcbbde" suffix the old URL lacks,
+//        confirmed live 200)
+//
+//   /small-mini-fogger-100xkb200
+//     -> /products/mini-fogger-100xbf102-2d9887
+//        (KB200 confirmed by the site owner as a real, now-discontinued
+//        product; BF102 is the closest current equivalent — destination
 //        confirmed live 200)
 //
 // Idempotent: safe to re-run, skips any source that already has a redirect.
@@ -34,6 +40,10 @@ const REDIRECTS = [
   {
     source: "/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20",
     destination: "/products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde",
+  },
+  {
+    source: "/small-mini-fogger-100xkb200",
+    destination: "/products/mini-fogger-100xbf102-2d9887",
   },
 ]
 
