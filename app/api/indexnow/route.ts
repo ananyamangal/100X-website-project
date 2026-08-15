@@ -53,7 +53,6 @@ const STATIC_URLS = [
   "/compare/iso-certified-fogging-machines-india",
   "/compare/make-in-india-fogging-machines",
   "/compare/msme-fogging-machine-manufacturers-india",
-  "/compare/fogging-machine-for-malaria-control-india",
 
   // Knowledge Hub
   "/knowledge",

@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { COMPARISONS } from "@/lib/comparisons/data"
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 
 export const metadata: Metadata = {
   title: "Fogging Machine Comparisons & Buyer Guides — 100X Circle",
@@ -34,6 +35,12 @@ export default function CompareHubPage() {
 
   return (
     <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: SITE_URL },
+          { name: "Compare", url: `${SITE_URL}/compare` },
+        ]}
+      />
       {/* Cinematic hero */}
       <section className="bg-gray-950 pt-24 pb-12 md:pt-28 md:pb-14">
         <div className="container mx-auto px-4 md:px-6">

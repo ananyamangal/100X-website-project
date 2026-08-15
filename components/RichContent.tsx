@@ -12,13 +12,23 @@ type RichContentProps = {
 export function RichContent({ html, className }: RichContentProps) {
   const safe = typeof html === "string" ? html : html == null ? "" : String(html)
   if (!safe) return null
+  // Applied on both branches (and inherited by every RichContent consumer —
+  // blog excerpts, product short descriptions, About page copy) so a long
+  // unbroken token (pasted URL, SKU/model code, no-space string) can't
+  // overflow its container. Previously this was only patched in ad hoc at a
+  // single call site (the blog article body), leaving every other consumer
+  // exposed.
   if (!isProbablyRichHtml(safe)) {
-    return <div className={cn("whitespace-pre-wrap", className)}>{safe}</div>
+    return (
+      <div className={cn("whitespace-pre-wrap [overflow-wrap:anywhere] [word-break:break-word]", className)}>
+        {safe}
+      </div>
+    )
   }
   return (
     <div
       className={cn(
-        "rich-html max-w-none leading-relaxed",
+        "rich-html max-w-none leading-relaxed [overflow-wrap:anywhere] [word-break:break-word]",
         // Paragraphs
         "[&_p]:mb-4 [&_p:last-child]:mb-0",
         // Headings with clear hierarchy

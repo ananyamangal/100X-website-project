@@ -865,7 +865,12 @@ export default function ProductDetailClient({ productId, initialProduct, pageSec
 
             {/* Short description */}
             {shortDesc && (
-              <div className="text-sm text-gray-600 leading-relaxed prose prose-sm max-w-none">
+              <div className="text-sm text-gray-600 leading-relaxed">
+                {/* prose/prose-sm removed — @tailwindcss/typography isn't
+                    installed (see tailwind.config.ts), so those classes were
+                    dead CSS providing no typography/wrapping protection.
+                    RichContent now applies its own overflow-wrap/word-break
+                    and max-w-none directly. */}
                 <RichContent html={shortDesc} />
               </div>
             )}

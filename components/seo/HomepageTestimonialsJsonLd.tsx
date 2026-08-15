@@ -27,9 +27,15 @@ const TESTIMONIALS = [
   },
 ]
 
+// Derived from TESTIMONIALS so it can never drift from the Review nodes
+// Google cross-checks it against — round to 1 decimal, schema.org's
+// convention for AggregateRating.ratingValue.
+const averageRating =
+  TESTIMONIALS.reduce((sum, t) => sum + t.reviewRating, 0) / TESTIMONIALS.length
+
 const aggregateRating = {
   "@type": "AggregateRating",
-  ratingValue: 4.8,
+  ratingValue: Math.round(averageRating * 10) / 10,
   reviewCount: TESTIMONIALS.length,
   bestRating: 5,
   worstRating: 1,
