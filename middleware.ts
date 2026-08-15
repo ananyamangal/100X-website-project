@@ -260,10 +260,21 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     return response
   }
 
+  // ── URL redirects: manual entries + /products/ prefix auto-fallback ─────────
+  // Manual, admin-managed redirects (checked first, below) take priority over
+  // the structural auto-fallback. Both read from the module-level cache
+  // above — never a per-request DB call. Warmed here, before the
+  // legacy-ObjectId check below, so that check can consult the same
+  // manual-redirect cache as a fallback instead of assuming there's nothing
+  // to look up.
+  const coldStartWait = ensureRedirectCacheFresh(origin, event)
+  if (coldStartWait) await coldStartWait
+
   // ── Legacy product ObjectId → slug redirect ──────────────────────────────────
   const match = pathname.match(/^\/products\/([a-f0-9]{24})$/i)
   if (match && OID_PATTERN.test(match[1])) {
     const id = match[1]
+    let confirmedMissing = false
     try {
       const res = await fetch(`${origin}/api/product-slug?id=${id}`, {
         headers: { "x-middleware-internal": "1" },
@@ -275,21 +286,48 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
           url.pathname = `/products/${data.slug}`
           return NextResponse.redirect(url, { status: 308 })
         }
+        // Found by id but with no slug to redirect to — the product still
+        // exists, the page's own lookup will render it normally. Not a 404.
+      } else if (res.status === 404) {
+        confirmedMissing = true // No product exists under this ID anymore
       }
     } catch {
-      // Let the page handle it normally
+      // Network hiccup on the internal fetch — unknown state, not a
+      // confirmed miss. Don't chase a manual redirect on a guess; let the
+      // page's own lookup make the final call, same as before this change.
     }
-    // Falls through to the generic redirect resolution below — harmless
-    // here since this pathname is under /products/, so neither the manual
-    // redirect map nor the /products/ auto-fallback will match it.
-  }
 
-  // ── URL redirects: manual entries + /products/ prefix auto-fallback ─────────
-  // Manual, admin-managed redirects (checked first) take priority over the
-  // structural auto-fallback. Both read from the module-level cache above —
-  // never a per-request DB call.
-  const coldStartWait = ensureRedirectCacheFresh(origin, event)
-  if (coldStartWait) await coldStartWait
+    // The live DB lookup came back definitively empty for this ID — before
+    // letting this 404, check whether an admin has already registered a
+    // manual redirect for this exact URL (same `url_redirects`
+    // collection/cache the admin panel manages — see
+    // /api/redirects/active). This is how a discontinued product's old
+    // indexed URL gets pointed at its replacement. If no rule exists,
+    // there's genuinely nothing to redirect to — but log it so the miss is
+    // visible in server logs instead of disappearing silently, so a
+    // *future* dead ObjectId shows up somewhere instead of just being a
+    // mystery 404 in Search Console.
+    if (confirmedMissing) {
+      const manualForId = redirectCache.redirects.get(pathname)
+      if (manualForId) {
+        try {
+          const destUrl = new URL(manualForId.destination, origin)
+          const url = request.nextUrl.clone()
+          url.pathname = destUrl.pathname
+          url.search = destUrl.search
+          return NextResponse.redirect(url, { status: manualForId.type })
+        } catch {
+          // Malformed destination stored somehow — don't hard-fail the request.
+        }
+      } else {
+        console.warn(`[middleware] legacy product ObjectId 404, no manual redirect registered: ${pathname}`)
+      }
+    }
+    // No live product, no manual redirect (or an unresolved fetch hiccup) —
+    // let the request proceed; app/products/[id]/page.tsx makes the final
+    // call and, on a genuine miss, calls notFound().
+    return NextResponse.next()
+  }
 
   const manual = redirectCache.redirects.get(pathname)
   if (manual) {

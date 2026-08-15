@@ -1,8 +1,9 @@
 ﻿import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { SITE_URL } from "@/lib/seo/site-config"
+import { SITE_URL, defaultOgImage } from "@/lib/seo/site-config"
 import { getComparison, getAllComparisonSlugs, COMPARISONS } from "@/lib/comparisons/data"
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 
 export async function generateStaticParams() {
   return getAllComparisonSlugs().map((slug) => ({ slug }))
@@ -41,6 +42,12 @@ export default async function ComparisonPage({
     headline: c.h1,
     description: c.metaDescription,
     url,
+    // No per-comparison hero image exists in the Comparison data model —
+    // falls back to the same site default ArticleJsonLd.tsx uses for blog
+    // posts without a cover image, so Google Discover eligibility (flagged
+    // by schemaHealthAuditor.ts's validateArticle) isn't blocked by a
+    // missing field.
+    image: [defaultOgImage],
     datePublished: "2026-01-01",
     dateModified: "2026-05-30",
     author: { "@type": "Organization", name: "100X Circle Pvt Ltd", url: SITE_URL },
@@ -70,6 +77,13 @@ export default async function ComparisonPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: SITE_URL },
+          { name: "Compare", url: `${SITE_URL}/compare` },
+          { name: c.h1, url },
+        ]}
       />
       {faqJsonLd && (
         <script

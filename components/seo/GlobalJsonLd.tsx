@@ -239,21 +239,18 @@ const website = {
   },
 }
 
-const breadcrumbSitewide = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    {
-      "@type": "ListItem",
-      position: 1,
-      name: "Home",
-      item: SITE_URL,
-    },
-  ],
-}
+// NOTE: there used to be a sitewide 1-item "Home" BreadcrumbList here,
+// emitted on every page via this component in app/layout.tsx. It provided
+// no real signal on its own (a single-item breadcrumb doesn't express a
+// hierarchy) and duplicated the @type "BreadcrumbList" on every page that
+// already renders a real, page-specific one via <BreadcrumbJsonLd> — which
+// schemaHealthAuditor.ts flags as a duplicateTypes warning. Removed rather
+// than made conditional: pages with their own BreadcrumbJsonLd keep it
+// (now un-duplicated), and pages that had neither (e.g. /compare/*) need a
+// real page-specific breadcrumb added directly, not this stub restored.
 
 export default function GlobalJsonLd() {
-  const payload = [organization, localBusiness, website, breadcrumbSitewide]
+  const payload = [organization, localBusiness, website]
   return (
     <script
       type="application/ld+json"

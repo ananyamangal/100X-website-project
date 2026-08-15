@@ -247,7 +247,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             {/* Excerpt as lead paragraph */}
             {excerpt ? (
-              <div className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed font-medium border-l-4 border-green-500 pl-5 py-1">
+              <div className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed font-medium border-l-4 border-green-500 pl-5 py-1 [overflow-wrap:anywhere] [word-break:break-word]">
                 <RichContent html={excerpt} />
               </div>
             ) : null}
