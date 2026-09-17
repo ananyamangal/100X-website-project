@@ -243,6 +243,14 @@ export type LandingPageDef = {
   metadata: LandingMetadata
 
   /**
+   * Link/breadcrumb label (footer landing links, related-landing cards,
+   * BreadcrumbList). Defaults to the meta title minus its brand suffix — set
+   * it explicitly when a meta-title change must not rewrite internal anchor
+   * text across the site.
+   */
+  displayName?: string
+
+  /**
    * Hero is required for new section-style landings. Existing product
    * landings (back-compat) may omit it — the renderer synthesises a
    * minimal hero from `metadata.title` in that case.

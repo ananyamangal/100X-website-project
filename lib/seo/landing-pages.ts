@@ -55,6 +55,9 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
       keywords:
         "buy thermal and cold fogging machine, fogging machine price in india, thermal cold fogger manufacturer india, industrial thermal cold fogging machine supplier, mosquito fogging machine price, order thermal fogging machine",
     },
+    // The Sept 2026 meta-title change must not rewrite this page's footer /
+    // related-card / breadcrumb label site-wide — keep the label it always had.
+    displayName: "Buy Thermal and Cold Fogging Machine",
     // Agency on-page SEO copy (Sept 2026). English source only.
     productPage: {
       h1: "Thermal & Cold Fogging Machine — 100XTFS50",
@@ -841,6 +844,7 @@ export function getAllLandingPages(): LandingPageDef[] {
 export function getLandingDisplayName(slug: string): string | undefined {
   const def = LANDING_PAGES[slug]
   if (!def) return undefined
+  if (def.displayName) return def.displayName
   const [head] = def.metadata.title.split("|")
   return (head || def.metadata.title).trim()
 }
