@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import clientPromise from "@/lib/mongodb"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
+import { buildOfferNode } from "@/lib/seo/offers"
 import ScrollReveal from "@/components/cinematic/ScrollReveal"
 import ShareButtons from "@/components/cinematic/ShareButtons"
 import { Download, MessageCircle, CheckCircle2, Wrench, ArrowRight } from "lucide-react"
@@ -98,18 +99,21 @@ export default async function SparePartDetailPage({
   const waText = `Hi, I need the spare part "${part.name}" for my ${productName}. Please share pricing.`
   const waHref = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waText)}`
 
-  // Product schema for this spare part
+  // Product schema for this spare part. `offers` comes from the shared
+  // generator: the admin's free-text priceRange ("Price on Request", "₹450")
+  // must never reach `price` verbatim — see lib/seo/offers.ts.
+  const partUrl = `${SITE_URL}/spare-parts/${productSlug}/${partSlug}`
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": `${partUrl}#product`,
     name: part.name,
     description: part.description || `Genuine OEM spare part for ${productName} by 100X Circle`,
-    sku: part.sku || partSlug,
+    sku: String(part.sku || partSlug).trim(),
+    url: partUrl,
     brand: { "@type": "Brand", name: "100X Circle" },
     image: part.images?.[0] ? [part.images[0]] : [],
-    offers: part.priceRange
-      ? { "@type": "Offer", priceCurrency: "INR", priceSpecification: { "@type": "UnitPriceSpecification", price: part.priceRange } }
-      : undefined,
+    offers: buildOfferNode({ url: partUrl, priceText: part.priceRange, inStock: part.inStock }),
     isRelatedTo: part.compatibleProductNames?.map((n: string) => ({ "@type": "Product", name: n })),
   }
 

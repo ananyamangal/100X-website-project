@@ -111,9 +111,15 @@ const jsonLd = {
     { "@type": "AdministrativeArea", name: "Uttar Pradesh, India" },
     { "@type": "AdministrativeArea", name: "Bihar, India" },
     { "@type": "AdministrativeArea", name: "Punjab, India" },
-    { "@type": "Product", name: "100XDB400 Double Barrel Thermal Fogging Machine", manufacturer: { "@id": `${SITE_URL}/#organization` } },
-    { "@type": "Product", name: "100XTFS50 Thermal and Cold Fogging Machine", manufacturer: { "@id": `${SITE_URL}/#organization` } },
-    { "@type": "Product", name: "100XKB200 Mini Portable Fogging Machine", manufacturer: { "@id": `${SITE_URL}/#organization` } },
+    // Products are REFERENCED by the @id of the complete Product node on their
+    // canonical page (components/seo/ProductJsonLd) — a name-only "Product"
+    // here is a second, incomplete Product that GSC reports as invalid
+    // ("Either offers, review, or aggregateRating must be specified").
+    { "@id": `${SITE_URL}/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400#product`, name: "100XDB400 Double Barrel Thermal Fogging Machine" },
+    { "@id": `${SITE_URL}/thermal-and-cold-fogging-machine-100xtfs50#product`, name: "100XTFS50 Thermal and Cold Fogging Machine" },
+    // 100XKB200 is discontinued and has no product page to reference, so the
+    // mention is kept as a named Thing rather than a purchasable Product.
+    { "@type": "Thing", name: "100XKB200 Mini Portable Fogging Machine" },
   ],
   hasPart: CASE_STUDIES.map((cs) => ({
     "@type": "Article",

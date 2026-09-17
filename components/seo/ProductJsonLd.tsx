@@ -121,6 +121,10 @@ export function ProductJsonLd({
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
+    // Stable node id so pages that merely mention this product (case
+    // studies, compliance pages) can reference it instead of emitting a
+    // second, incomplete Product.
+    "@id": `${absolutize(url)}#product`,
     name,
     description: cleanDescription,
     image: validImages,

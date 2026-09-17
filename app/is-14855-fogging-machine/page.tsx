@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
+import { buildOfferNode } from "@/lib/seo/offers"
 import RfqForm from "@/components/rfq/RfqForm"
 
 export const revalidate = 60
@@ -80,6 +81,7 @@ const jsonLdFaq = {
 const jsonLdProduct = {
   "@context": "https://schema.org",
   "@type": "Product",
+  "@id": `${SITE_URL}/is-14855-fogging-machine#product`,
   name: "IS 14855 Compliant Thermal Fogging Machine",
   description:
     "Pulse-jet thermal fogging machine manufactured in compliance with IS 14855 (Part 1) — the Bureau of Indian Standards specification for power-operated fogging machines. For municipal vector control, government procurement, and GeM tender supply.",
@@ -87,6 +89,9 @@ const jsonLdProduct = {
   manufacturer: { "@id": `${SITE_URL}/#organization` },
   countryOfOrigin: "IN",
   url: `${SITE_URL}/is-14855-fogging-machine`,
+  // This page quotes on request (no published price), so the Offer carries
+  // availability/condition/seller but no `price` — see lib/seo/offers.ts.
+  offers: buildOfferNode({ url: "/is-14855-fogging-machine", priceText: "Price on Request" }),
   additionalProperty: [
     {
       "@type": "PropertyValue",
