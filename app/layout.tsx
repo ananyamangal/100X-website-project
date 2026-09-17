@@ -21,6 +21,7 @@ import MobileCtaBar from '@/components/cta/MobileCtaBar'
 import { SITE_URL, SITE_NAME } from '@/lib/seo/site-config'
 import { getBrandAssets } from '@/lib/brandAssets'
 import { getSocialLinks, pickVisibleSocialLinks } from '@/lib/socialLinks'
+import { getHasMainBrochure, getActiveTrustBadges } from '@/lib/layoutData'
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton'
 import ClientOnlyPopups from '@/components/ClientOnlyPopups'
 
@@ -153,38 +154,13 @@ export default async function RootLayout({
   const isLocaleManaged = headersList.get("x-locale-managed") === "1"
   const htmlLang = isLocaleManaged ? locale : "en-IN"
 
-  // Run both DB calls in parallel to minimize layout TTFB
+  // All four reads are Data-Cache backed (see lib/layoutData.ts) — this layout
+  // wraps every on-demand-rendered route, so they must not hit MongoDB per view.
   const [brandAssets, socialLinks, hasBrochure, trustBadges] = await Promise.all([
     getBrandAssets(),
     getSocialLinks(),
-    (async () => {
-      try {
-        const { default: clientPromise } = await import('@/lib/mongodb')
-        const client = await clientPromise
-        const count = await client
-          .db()
-          .collection('brochures.files')
-          .countDocuments({ filename: 'main-brochure.pdf' })
-        return count > 0
-      } catch {
-        return false
-      }
-    })(),
-    (async () => {
-      try {
-        const { default: clientPromise } = await import('@/lib/mongodb')
-        const client = await clientPromise
-        const raw = await client
-          .db()
-          .collection('trust_badges')
-          .find({ isActive: true })
-          .sort({ order: 1 })
-          .toArray()
-        return JSON.parse(JSON.stringify(raw))
-      } catch {
-        return []
-      }
-    })(),
+    getHasMainBrochure(),
+    getActiveTrustBadges(),
   ])
 
   return (

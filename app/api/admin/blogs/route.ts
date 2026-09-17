@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { BlogInput } from '@/lib/blogModel';
 import { serializeBlog, serializeBlogs } from '@/lib/blogSerialize';
+import { revalidateTag } from 'next/cache';
+import { BLOGS_CACHE_TAG } from '@/lib/blogsQuery';
 
 // GET - Fetch all blog posts
 export async function GET() {
@@ -52,6 +54,8 @@ export async function POST(request: NextRequest) {
     }
     
     const result = await db.collection('blogs').insertOne(newBlog);
+    // Public blog reads are tag-cached (lib/blogsQuery) — publish the new post now.
+    revalidateTag(BLOGS_CACHE_TAG);
     
     const inserted = {
       ...newBlog,

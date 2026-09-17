@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { GridFSBucket } from "mongodb"
+import { revalidateTag } from "next/cache"
+import { LAYOUT_DATA_TAG } from "@/lib/layoutData"
 
 export const dynamic = "force-dynamic"
 
@@ -52,6 +54,7 @@ export async function POST(request: NextRequest) {
       { $set: { key: "main", mainBrochureUrl: internalUrl, gridfsId: fileId, updatedAt: new Date() } },
       { upsert: true },
     )
+    revalidateTag(LAYOUT_DATA_TAG)
 
     return NextResponse.json({ ok: true, fileId, url: internalUrl })
   } catch (err) {

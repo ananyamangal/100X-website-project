@@ -2,6 +2,7 @@
 // Content changes (banners, products) go live within 1 minute max.
 export const revalidate = 60
 
+import { unstable_cache } from "next/cache"
 import clientPromise from "@/lib/mongodb"
 import { getHomeContent } from "@/lib/homeContent"
 import { serializeBlogs } from "@/lib/blogSerialize"
@@ -34,62 +35,90 @@ function BannerPreloads({ banners }: { banners: any[] }) {
   )
 }
 
+// Every collection read for the homepage, already JSON-serialized. The page
+// renders on demand, so without this the 14 queries below ran on every view;
+// they are now served from the Data Cache and refreshed every 60 s — the same
+// "live within 1 minute" window `revalidate` above has always promised.
+// A DB error throws (and is therefore never cached).
+const getHomePageData = unstable_cache(
+  async () => {
+    const client = await clientPromise
+    const db = client.db()
+
+    const [productsRaw, bannersRaw, blogsRaw, accreditationsRaw, customersRaw, brochureDoc, homepageSectionsRaw, sparePartsRaw, trustBadgesRaw, pageSectionsRaw, caseStudiesRaw, govSuppliesRaw, govKpisDoc, deploymentsRaw] =
+      await Promise.all([
+        db.collection("products").find({ isPublished: { $ne: false } }).sort({ order: 1 }).toArray(),
+        db.collection("banners").find({}).toArray(),
+        db
+          .collection("blogs")
+          .aggregate([
+            { $match: { isPublished: true } },
+            { $addFields: { orderSort: { $ifNull: ["$order", 999999] } } },
+            { $sort: { orderSort: 1, publishedAt: -1 } },
+            // BlogBlock renders the first 3 cards and never the article body —
+            // without this, every post's full HTML was serialized into the
+            // homepage's client payload (~700 KB).
+            { $limit: 3 },
+            { $project: { content: 0 } },
+          ])
+          .toArray(),
+        db.collection("accreditations").find({}).sort({ order: 1 }).toArray(),
+        db.collection("customers").find({}).sort({ order: 1 }).toArray(),
+        db.collection("brochure").findOne({ key: "main" }),
+        db.collection("homepage_sections").find({ enabled: true }).sort({ order: 1 }).toArray(),
+        db.collection("spare_parts").find({ isPublished: true }).sort({ order: 1 }).limit(8).toArray(),
+        db.collection("trust_badges").find({ isActive: true }).sort({ order: 1 }).toArray(),
+        db.collection("page_sections").find({ pageKey: "homepage" }).toArray(),
+        db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(6).toArray(),
+        db.collection("gov_past_performance").find({ isPublic: true }).limit(6).toArray(),
+        db.collection("gov_kpis").findOne({ key: "main" }),
+        db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).limit(4).toArray(),
+      ])
+
+    // Serialize MongoDB docs (ObjectId → hex string, Date → ISO string)
+    const products = (JSON.parse(JSON.stringify(productsRaw)) as any[])
+      .map((p: any) => ({
+        ...p,
+        imageUrls: Array.isArray(p.imageUrls) ? p.imageUrls : p.imageUrl ? [p.imageUrl] : [],
+      }))
+      .sort((a: any, b: any) => {
+        const orderA = a.order !== undefined ? a.order : Infinity
+        const orderB = b.order !== undefined ? b.order : Infinity
+        if (orderA !== orderB) return orderA - orderB
+        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      })
+
+    const banners = JSON.parse(JSON.stringify(bannersRaw))
+    const blogPosts = JSON.parse(JSON.stringify(serializeBlogs(blogsRaw)))
+    const accreditations = JSON.parse(JSON.stringify(accreditationsRaw))
+    const customers = JSON.parse(JSON.stringify(customersRaw))
+    const mainBrochureUrl: string | null = brochureDoc ? (brochureDoc as any).mainBrochureUrl ?? null : null
+    const homepageSections = JSON.parse(JSON.stringify(homepageSectionsRaw))
+    const spareParts = JSON.parse(JSON.stringify(sparePartsRaw))
+    const trustBadges = JSON.parse(JSON.stringify(trustBadgesRaw))
+    const pageSections = JSON.parse(JSON.stringify(pageSectionsRaw))
+    const caseStudies = JSON.parse(JSON.stringify(caseStudiesRaw)).map((s: any) => ({ ...s, _id: String(s._id) }))
+    const govSupplies = JSON.parse(JSON.stringify(govSuppliesRaw)).map((s: any) => ({ ...s, _id: String(s._id) }))
+    const govKpis = govKpisDoc ? JSON.parse(JSON.stringify(govKpisDoc)) : null
+    const deployments = JSON.parse(JSON.stringify(deploymentsRaw)).map((d: any) => ({ ...d, _id: String(d._id) }))
+
+    return {
+      products, banners, blogPosts, accreditations, customers, mainBrochureUrl,
+      homepageSections, spareParts, trustBadges, pageSections, caseStudies,
+      govSupplies, govKpis, deployments,
+    }
+  },
+  ["home-page-data-v1"],
+  { revalidate: 60, tags: ["home-page-data"] },
+)
+
 export default async function HomePage() {
-  const client = await clientPromise
-  const db = client.db()
-
-  const [productsRaw, bannersRaw, blogsRaw, accreditationsRaw, customersRaw, brochureDoc, homeContent, homepageSectionsRaw, sparePartsRaw, trustBadgesRaw, pageSectionsRaw, caseStudiesRaw, govSuppliesRaw, govKpisDoc, deploymentsRaw] =
-    await Promise.all([
-      db.collection("products").find({ isPublished: { $ne: false } }).sort({ order: 1 }).toArray(),
-      db.collection("banners").find({}).toArray(),
-      db
-        .collection("blogs")
-        .aggregate([
-          { $match: { isPublished: true } },
-          { $addFields: { orderSort: { $ifNull: ["$order", 999999] } } },
-          { $sort: { orderSort: 1, publishedAt: -1 } },
-        ])
-        .toArray(),
-      db.collection("accreditations").find({}).sort({ order: 1 }).toArray(),
-      db.collection("customers").find({}).sort({ order: 1 }).toArray(),
-      db.collection("brochure").findOne({ key: "main" }),
-      getHomeContent(),
-      db.collection("homepage_sections").find({ enabled: true }).sort({ order: 1 }).toArray(),
-      db.collection("spare_parts").find({ isPublished: true }).sort({ order: 1 }).limit(8).toArray(),
-      db.collection("trust_badges").find({ isActive: true }).sort({ order: 1 }).toArray(),
-      db.collection("page_sections").find({ pageKey: "homepage" }).toArray(),
-      db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(6).toArray(),
-      db.collection("gov_past_performance").find({ isPublic: true }).limit(6).toArray(),
-      db.collection("gov_kpis").findOne({ key: "main" }),
-      db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).limit(4).toArray(),
-    ])
-
-  // Serialize MongoDB docs (ObjectId → hex string, Date → ISO string)
-  const products = (JSON.parse(JSON.stringify(productsRaw)) as any[])
-    .map((p: any) => ({
-      ...p,
-      imageUrls: Array.isArray(p.imageUrls) ? p.imageUrls : p.imageUrl ? [p.imageUrl] : [],
-    }))
-    .sort((a: any, b: any) => {
-      const orderA = a.order !== undefined ? a.order : Infinity
-      const orderB = b.order !== undefined ? b.order : Infinity
-      if (orderA !== orderB) return orderA - orderB
-      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-    })
-
-  const banners = JSON.parse(JSON.stringify(bannersRaw))
-  const blogPosts = serializeBlogs(blogsRaw)
-  const accreditations = JSON.parse(JSON.stringify(accreditationsRaw))
-  const customers = JSON.parse(JSON.stringify(customersRaw))
-  const mainBrochureUrl: string | null = brochureDoc ? (brochureDoc as any).mainBrochureUrl ?? null : null
-  const homepageSections = JSON.parse(JSON.stringify(homepageSectionsRaw))
-  const spareParts = JSON.parse(JSON.stringify(sparePartsRaw))
-  const trustBadges = JSON.parse(JSON.stringify(trustBadgesRaw))
-  const pageSections = JSON.parse(JSON.stringify(pageSectionsRaw))
-  const caseStudies = JSON.parse(JSON.stringify(caseStudiesRaw)).map((s: any) => ({ ...s, _id: String(s._id) }))
-  const govSupplies = JSON.parse(JSON.stringify(govSuppliesRaw)).map((s: any) => ({ ...s, _id: String(s._id) }))
-  const govKpis = govKpisDoc ? JSON.parse(JSON.stringify(govKpisDoc)) : null
-  const deployments = JSON.parse(JSON.stringify(deploymentsRaw)).map((d: any) => ({ ...d, _id: String(d._id) }))
+  const [data, homeContent] = await Promise.all([getHomePageData(), getHomeContent()])
+  const {
+    products, banners, blogPosts, accreditations, customers, mainBrochureUrl,
+    homepageSections, spareParts, trustBadges, pageSections, caseStudies,
+    govSupplies, govKpis, deployments,
+  } = data
 
   return (
     <>

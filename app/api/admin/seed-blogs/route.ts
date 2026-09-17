@@ -12,6 +12,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { requireAuth } from "@/lib/rbac/server"
+import { revalidateTag } from "next/cache"
+import { BLOGS_CACHE_TAG } from "@/lib/blogsQuery"
 
 const SEED_POSTS = [
   {
@@ -369,6 +371,7 @@ export async function POST(request: NextRequest) {
 
     const inserted = results.filter((r) => r.status === "inserted").length
     const skipped = results.filter((r) => r.status === "skipped").length
+    if (inserted > 0) revalidateTag(BLOGS_CACHE_TAG)
 
     return NextResponse.json({
       message: `Seeded ${inserted} blog post(s). Skipped ${skipped} (already exist).`,

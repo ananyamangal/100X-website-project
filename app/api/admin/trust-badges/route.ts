@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { revalidateTag } from 'next/cache';
+import { LAYOUT_DATA_TAG } from '@/lib/layoutData';
 
 export async function GET() {
   try {
@@ -29,6 +31,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date(),
     };
     const result = await db.collection('trust_badges').insertOne(badge);
+    revalidateTag(LAYOUT_DATA_TAG);
     return NextResponse.json({ ...badge, _id: result.insertedId });
   } catch {
     return NextResponse.json({ error: 'Failed to create trust badge' }, { status: 500 });
@@ -45,6 +48,7 @@ export async function PUT(request: NextRequest) {
       { _id: new ObjectId(_id) },
       { $set: { ...rest, updatedAt: new Date() } }
     );
+    revalidateTag(LAYOUT_DATA_TAG);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'Failed to update trust badge' }, { status: 500 });
@@ -59,6 +63,7 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
     await db.collection('trust_badges').deleteOne({ _id: new ObjectId(id) });
+    revalidateTag(LAYOUT_DATA_TAG);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'Failed to delete trust badge' }, { status: 500 });

@@ -1,5 +1,7 @@
 import { cache } from "react"
+import { unstable_cache } from "next/cache"
 import clientPromise from "@/lib/mongodb"
+import { LAYOUT_DATA_TAG, LAYOUT_DATA_REVALIDATE_SECONDS } from "@/lib/layoutData"
 import { DEFAULT_SOCIAL_LINKS, normalizeSocialLinks, type SocialLinks } from "@/lib/socialLinksShared"
 
 /**
@@ -15,11 +17,20 @@ import { DEFAULT_SOCIAL_LINKS, normalizeSocialLinks, type SocialLinks } from "@/
  */
 export * from "@/lib/socialLinksShared"
 
-export const getSocialLinks = cache(async (): Promise<SocialLinks> => {
-  try {
+// Throws on DB errors so a hiccup is never cached as the defaults — see lib/layoutData.ts.
+const fetchSocialLinks = unstable_cache(
+  async (): Promise<SocialLinks> => {
     const client = await clientPromise
     const doc = await client.db().collection("site_settings").findOne({ key: "main" })
     return normalizeSocialLinks(doc?.social)
+  },
+  ["social-links-v1"],
+  { tags: [LAYOUT_DATA_TAG], revalidate: LAYOUT_DATA_REVALIDATE_SECONDS },
+)
+
+export const getSocialLinks = cache(async (): Promise<SocialLinks> => {
+  try {
+    return await fetchSocialLinks()
   } catch {
     return DEFAULT_SOCIAL_LINKS
   }

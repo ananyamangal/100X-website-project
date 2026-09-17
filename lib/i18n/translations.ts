@@ -1,3 +1,4 @@
+import { cache } from "react"
 import clientPromise from "@/lib/mongodb"
 
 /**
@@ -37,8 +38,11 @@ const COLLECTION = "translations"
  * — never blocks rendering). Only `status: "approved"` rows are read — this
  * is the publish gate: `status` starts at "pending" on write, and moving to
  * "approved" is a separate, explicit action. Never throws.
+ *
+ * Wrapped in React `cache()` — request-scoped only, so generateMetadata and
+ * the page body share one lookup; nothing is reused across requests.
  */
-export async function getTranslation(
+export const getTranslation = cache(async function getTranslation(
   contentType: TranslationDoc["contentType"],
   contentId: string,
   locale: string
@@ -58,7 +62,7 @@ export async function getTranslation(
     )
     return null
   }
-}
+})
 
 export async function upsertTranslation(doc: Omit<TranslationDoc, "_id">): Promise<void> {
   const client = await clientPromise

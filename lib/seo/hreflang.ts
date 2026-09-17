@@ -1,4 +1,5 @@
 import type { Metadata, MetadataRoute } from "next"
+import { cache } from "react"
 import clientPromise from "@/lib/mongodb"
 import { routing } from "@/i18n/routing"
 import { SITE_URL } from "@/lib/seo/site-config"
@@ -17,7 +18,12 @@ export type LocalizedContentKind = "landing" | "blog"
  * in hreflang/sitemap automatically the moment their content is seeded AND
  * reviewed, with zero per-page code changes.
  */
-export async function getAvailableLocales(kind: LocalizedContentKind, key: string): Promise<string[]> {
+// React `cache()` is request-scoped only: generateMetadata and the page body
+// share one lookup, and the reviewed gate is still re-read on every request.
+export const getAvailableLocales = cache(async function getAvailableLocales(
+  kind: LocalizedContentKind,
+  key: string,
+): Promise<string[]> {
   const found = new Set<string>(["en"])
   try {
     const client = await clientPromise
@@ -39,7 +45,7 @@ export async function getAvailableLocales(kind: LocalizedContentKind, key: strin
   }
   // Order follows routing.locales so output is stable and always English-first.
   return routing.locales.filter((l) => found.has(l))
-}
+})
 
 /** `canonicalPath` is the locale-agnostic path, e.g. "/blog/my-post" or "/some-slug". */
 export function localizedPath(canonicalPath: string, locale: string): string {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { revalidatePath } from "next/cache"
+import { revalidatePath, revalidateTag } from "next/cache"
 import clientPromise from "@/lib/mongodb"
+import { LAYOUT_DATA_TAG } from "@/lib/layoutData"
 import { normalizeSocialLinks } from "@/lib/socialLinks"
 
 export async function GET() {
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
   // The root layout bakes social links into the header, footer and
   // Organization JSON-LD of every static/ISR page, so a save has to
   // invalidate the whole tree for "Save All" to reach the live site.
+  revalidateTag(LAYOUT_DATA_TAG)
   revalidatePath("/", "layout")
   revalidatePath("/api/site-settings")
   return NextResponse.json({ success: true })

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { revalidateTag } from 'next/cache';
+import { LAYOUT_DATA_TAG } from '@/lib/layoutData';
 
 const KEY = 'main';
 
@@ -29,6 +31,7 @@ export async function PUT(request: NextRequest) {
       { $set: { key: KEY, mainBrochureUrl, updatedAt: new Date() } },
       { upsert: true }
     );
+    revalidateTag(LAYOUT_DATA_TAG);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error saving brochure:', error);

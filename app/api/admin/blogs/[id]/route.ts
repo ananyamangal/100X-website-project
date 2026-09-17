@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 import { serializeBlog } from '@/lib/blogSerialize';
+import { revalidateTag } from 'next/cache';
+import { BLOGS_CACHE_TAG } from '@/lib/blogsQuery';
 
 interface BlogUpdate {
   order?: number;
@@ -47,7 +49,9 @@ export async function PUT(
     if (result.matchedCount === 0) {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
-    
+    // Public blog reads are tag-cached (lib/blogsQuery) — publish the edit now.
+    revalidateTag(BLOGS_CACHE_TAG);
+
     const blog = await db.collection('blogs').findOne({ _id: new ObjectId(params.id) });
     if (!blog) {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
@@ -75,7 +79,8 @@ export async function DELETE(
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
-    
+    revalidateTag(BLOGS_CACHE_TAG);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting blog:', error);

@@ -1,5 +1,7 @@
 import { cache } from 'react'
+import { unstable_cache } from 'next/cache'
 import clientPromise from '@/lib/mongodb'
+import { LAYOUT_DATA_TAG, LAYOUT_DATA_REVALIDATE_SECONDS } from '@/lib/layoutData'
 
 export interface BrandAssets {
   logoUrl: string
@@ -17,8 +19,9 @@ const DEFAULTS: BrandAssets = {
   footerLogoUrl: '/logo-main.png',
 }
 
-export const getBrandAssets = cache(async (): Promise<BrandAssets> => {
-  try {
+// Throws on DB errors so a hiccup is never cached as DEFAULTS — see lib/layoutData.ts.
+const fetchBrandAssets = unstable_cache(
+  async (): Promise<BrandAssets> => {
     const client = await clientPromise
     const db = client.db()
     const doc = await db.collection('brand_assets').findOne({ key: 'main' })
@@ -30,6 +33,14 @@ export const getBrandAssets = cache(async (): Promise<BrandAssets> => {
       ogImageUrl: doc.ogImageUrl || DEFAULTS.ogImageUrl,
       footerLogoUrl: doc.footerLogoUrl || DEFAULTS.footerLogoUrl,
     }
+  },
+  ['brand-assets-v1'],
+  { tags: [LAYOUT_DATA_TAG], revalidate: LAYOUT_DATA_REVALIDATE_SECONDS },
+)
+
+export const getBrandAssets = cache(async (): Promise<BrandAssets> => {
+  try {
+    return await fetchBrandAssets()
   } catch {
     return DEFAULTS
   }

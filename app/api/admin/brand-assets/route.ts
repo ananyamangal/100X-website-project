@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
+import { revalidateTag } from 'next/cache'
+import { LAYOUT_DATA_TAG } from '@/lib/layoutData'
 
 const KEY = 'main'
 
@@ -44,6 +46,7 @@ export async function PUT(request: NextRequest) {
       { $set: update },
       { upsert: true }
     )
+    revalidateTag(LAYOUT_DATA_TAG)
     return NextResponse.json(update)
   } catch (error) {
     console.error('Error saving brand assets:', error)
