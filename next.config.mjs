@@ -186,6 +186,9 @@ const nextConfig = {
 
   // Experimental: faster builds and better tree-shaking
   experimental: {
+    // Opt-in cap on static-generation workers for low-RAM dev machines
+    // (`NEXT_BUILD_CPUS=2 npm run build`). Unset on Vercel → Next's default.
+    ...(process.env.NEXT_BUILD_CPUS ? { cpus: Number(process.env.NEXT_BUILD_CPUS) } : {}),
     optimizePackageImports: [
       'lucide-react',
       '@radix-ui/react-accordion',
