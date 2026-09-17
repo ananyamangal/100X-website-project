@@ -20,6 +20,7 @@ import { MobileCtaProvider } from '@/components/cta/MobileCtaContext'
 import MobileCtaBar from '@/components/cta/MobileCtaBar'
 import { SITE_URL, SITE_NAME } from '@/lib/seo/site-config'
 import { getBrandAssets } from '@/lib/brandAssets'
+import { getSocialLinks, pickVisibleSocialLinks } from '@/lib/socialLinks'
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton'
 import ClientOnlyPopups from '@/components/ClientOnlyPopups'
 
@@ -153,8 +154,9 @@ export default async function RootLayout({
   const htmlLang = isLocaleManaged ? locale : "en-IN"
 
   // Run both DB calls in parallel to minimize layout TTFB
-  const [brandAssets, hasBrochure, trustBadges] = await Promise.all([
+  const [brandAssets, socialLinks, hasBrochure, trustBadges] = await Promise.all([
     getBrandAssets(),
+    getSocialLinks(),
     (async () => {
       try {
         const { default: clientPromise } = await import('@/lib/mongodb')
@@ -222,7 +224,7 @@ export default async function RootLayout({
             title="Google Tag Manager"
           />
         </noscript>
-        <GlobalJsonLd />
+        <GlobalJsonLd socialLinks={socialLinks} />
         <SeoSchemaOverrideInjector />
         <Suspense fallback={null}>
           <UtmPersist />
@@ -238,7 +240,13 @@ export default async function RootLayout({
           {`(function(){window.dataLayer=window.dataLayer||[];function gtmCtx(){var a={};try{a=JSON.parse(sessionStorage.getItem('attribution_v1')||'{}')||{};}catch(e){}return Object.assign({page_path:location.pathname,page_url:location.href,timestamp_iso:new Date().toISOString()},a);}document.addEventListener('click',function(e){var el=e.target&&e.target.closest&&e.target.closest('a[href], button[type="submit"]');if(!el)return;var lw=e.target&&e.target.closest&&e.target.closest('[data-gtm-location]');var ll=(lw&&lw.getAttribute('data-gtm-location'))||'';var href=(el.getAttribute&&el.getAttribute('href'))||'';var h=String(href).toLowerCase();if(h.indexOf('tel:')===0){var tp=Object.assign(gtmCtx(),{event:'phone_click',ga4_event:'call_click',link_url:href,phone_number:href.replace('tel:',''),value:500,currency:'INR'});if(ll)tp.link_location=ll;window.dataLayer.push(tp);return;}if(h.indexOf('mailto:')===0){var mp=Object.assign(gtmCtx(),{event:'email_click',link_url:href});if(ll)mp.link_location=ll;window.dataLayer.push(mp);return;}if(h.indexOf('wa.me')!==-1||h.indexOf('whatsapp')!==-1){var wp=Object.assign(gtmCtx(),{event:'whatsapp_click',ga4_event:'contact',whatsapp_url:href,value:500,currency:'INR'});if(ll)wp.link_location=ll;window.dataLayer.push(wp);return;}if(h.indexOf('.pdf')!==-1||(el.getAttribute&&el.getAttribute('data-download'))){window.dataLayer.push(Object.assign(gtmCtx(),{event:'file_download',ga4_event:'file_download',file_name:href.split('/').pop()||'brochure',file_extension:'pdf',link_url:href}));return;}if(h.indexOf('gem.gov.in')!==-1){window.dataLayer.push(Object.assign(gtmCtx(),{event:'gem_click',link_url:href}));}},true);document.addEventListener('submit',function(e){var f=e.target;if(!f||f.tagName!=='FORM')return;var fi=f.id||'';var ic=fi.indexOf('contact')!==-1||(f.getAttribute&&f.getAttribute('data-form-type')==='contact');var ir=fi.indexOf('rfq')!==-1||(f.getAttribute&&f.getAttribute('data-form-type')==='rfq');window.dataLayer.push(Object.assign(gtmCtx(),{event:ic?'contact_form_submit':ir?'rfq_form_submit_attempt':'form_submit_attempt',form_id:fi,form_action:f.action||''}));},true);(function(){var ts=[25,50,75,100],fired={};function os(){var s=(window.scrollY+window.innerHeight)/document.documentElement.scrollHeight*100;ts.forEach(function(t){if(!fired[t]&&s>=t){fired[t]=true;window.dataLayer.push(Object.assign(gtmCtx(),{event:'scroll_depth',scroll_threshold:t,percent_scrolled:t}));}});}window.addEventListener('scroll',os,{passive:true});})();(function(){[30000,60000].forEach(function(ms){setTimeout(function(){window.dataLayer.push(Object.assign(gtmCtx(),{event:'user_engagement',engagement_time_msec:ms,engaged_seconds:ms/1000}));},ms);});})();window.gtag=window.gtag||function(){window.dataLayer.push(arguments);};window.gtag_report_conversion=window.gtag_report_conversion||function(url){window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:'legacy_conversion_call',conversion_url:url||''});if(url)window.location=url;return false;};})();`}
         </Script>
         <MobileCtaProvider>
-          <Navbar logoUrl={brandAssets.logoUrl} logoAlt={brandAssets.logoAlt} hasBrochure={hasBrochure} />
+          <Navbar
+            logoUrl={brandAssets.logoUrl}
+            logoAlt={brandAssets.logoAlt}
+            hasBrochure={hasBrochure}
+            // WhatsApp is excluded: the navbar already has a permanent "WhatsApp Us" button.
+            socialLinks={pickVisibleSocialLinks(socialLinks, "showInHeader").filter((s) => s.key !== "whatsapp")}
+          />
           <main id="main-content" tabIndex={-1}>
             {children}
           </main>
@@ -247,6 +255,8 @@ export default async function RootLayout({
             logoAlt={brandAssets.logoAlt}
             trustBadges={trustBadges}
             locale={isLocaleManaged ? locale : "en"}
+            socialLinks={pickVisibleSocialLinks(socialLinks, "showInFooter")}
+            whatsappUrl={socialLinks.whatsapp.url}
           />
           <MobileCtaBar />
         </MobileCtaProvider>

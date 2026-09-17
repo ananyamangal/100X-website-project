@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Mail, MapPin, Phone, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,26 @@ import {
   pushDataLayer,
   setContactLeadContext,
 } from "@/lib/gtm"
+import { normalizeSocialLinks, pickVisibleSocialLinks, type VisibleSocialLink } from "@/lib/socialLinksShared"
+import { SOCIAL_ICONS } from "@/components/seo/SocialIcons"
+
+function useContactPageSocialLinks(): VisibleSocialLink[] {
+  const [links, setLinks] = useState<VisibleSocialLink[]>([])
+  useEffect(() => {
+    let cancelled = false
+    fetch("/api/site-settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return
+        setLinks(pickVisibleSocialLinks(normalizeSocialLinks(data?.social), "showOnContactPage"))
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+  return links
+}
 
 const PHONE_DIGITS_RE = /\D/g
 
@@ -27,6 +47,7 @@ export default function ContactSection({
   id?: string
 }) {
   const router = useRouter()
+  const socialLinks = useContactPageSocialLinks()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) --
@@ -169,6 +190,26 @@ export default function ContactSection({
                   <p className="font-500 text-gray-700 text-sm leading-relaxed">UG, 398, Sector 7, IMT Manesar,<br />Gurugram, Haryana 122050</p>
                 </div>
               </div>
+
+              {socialLinks.length > 0 && (
+                <div className="flex items-center gap-3 p-5">
+                  <p className="text-xs font-600 text-gray-400 uppercase tracking-wide">Follow us</p>
+                  <div className="flex items-center gap-2">
+                    {socialLinks.map((s) => (
+                      <a
+                        key={s.key}
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`100X Circle on ${s.label}`}
+                        className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 text-gray-500 hover:text-brand-600 hover:bg-brand-50 transition-colors"
+                      >
+                        {SOCIAL_ICONS[s.key]}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

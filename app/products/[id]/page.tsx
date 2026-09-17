@@ -15,6 +15,7 @@ import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import ProductAiSummary from "@/components/seo/ProductAiSummary"
 import clientPromise from "@/lib/mongodb"
+import { getSocialLinks, pickVisibleSocialLinks } from "@/lib/socialLinks"
 
 function absolutizeImages(urls: string[]): string[] {
   return urls
@@ -246,7 +247,10 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
           { name: productName, url: `/products/${productSlug}` },
         ]}
       />
-      <ProductDetailV2 product={JSON.parse(JSON.stringify(product))} />
+      <ProductDetailV2
+        product={JSON.parse(JSON.stringify(product))}
+        socialLinks={pickVisibleSocialLinks(await getSocialLinks(), "showOnProductPages")}
+      />
       <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
 
       {/* Trust graph: Related Case Studies */}

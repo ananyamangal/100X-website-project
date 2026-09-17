@@ -1,6 +1,8 @@
 import { BUSINESS, SITE_NAME, SITE_NAME_LEGAL, SITE_URL, defaultOgImage } from "@/lib/seo/site-config"
+import { DEFAULT_SOCIAL_LINKS, socialLinksToSameAs, type SocialLinks } from "@/lib/socialLinksShared"
 
-const organization = {
+function buildOrganization(socialLinks?: SocialLinks) {
+  return {
   "@context": "https://schema.org",
   "@type": ["Organization", "Manufacturer"],
   "@id": `${SITE_URL}/#organization`,
@@ -37,7 +39,7 @@ const organization = {
     },
   ],
   sameAs: [
-    BUSINESS.youtube,
+    ...socialLinksToSameAs(socialLinks ?? DEFAULT_SOCIAL_LINKS),
     "https://gem.gov.in",
     "https://udyamregistration.gov.in",
     "https://www.100xcircle.com/ai/about-100x",
@@ -180,6 +182,7 @@ const organization = {
   naics: "333999",
   isicV4: "2819",
   slogan: "100X your productivity with Indian-made fogging technology",
+  }
 }
 
 const localBusiness = {
@@ -249,8 +252,8 @@ const website = {
 // (now un-duplicated), and pages that had neither (e.g. /compare/*) need a
 // real page-specific breadcrumb added directly, not this stub restored.
 
-export default function GlobalJsonLd() {
-  const payload = [organization, localBusiness, website]
+export default function GlobalJsonLd({ socialLinks }: { socialLinks?: SocialLinks }) {
+  const payload = [buildOrganization(socialLinks), localBusiness, website]
   return (
     <script
       type="application/ld+json"

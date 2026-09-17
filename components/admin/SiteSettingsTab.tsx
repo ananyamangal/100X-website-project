@@ -42,14 +42,14 @@ const EMPTY: Record<string, any> = {
   workingHours: "Monday–Saturday, 9:00 AM – 6:00 PM IST",
   // Social
   social: {
-    youtube:   { url: "https://www.youtube.com/@100Xcircle",         header: true, footer: true, contact: true, products: false },
-    facebook:  { url: "https://www.facebook.com/100xcircle",         header: false, footer: true, contact: true, products: false },
-    instagram: { url: "https://www.instagram.com/100xcircle",        header: true, footer: true, contact: false, products: false },
-    linkedin:  { url: "https://www.linkedin.com/company/100xcircle", header: false, footer: true, contact: false, products: false },
-    twitter:   { url: "https://x.com/100xcircle",                    header: false, footer: true, contact: false, products: false },
-    whatsapp:  { url: "https://wa.me/917827229116",                  header: false, footer: true, contact: true,  products: true },
-    telegram:  { url: "",                                            header: false, footer: false, contact: false, products: false },
-    googleBiz: { url: "",                                            header: false, footer: false, contact: true,  products: false },
+    youtube:   { url: "https://www.youtube.com/@100Xcircle",         showInHeader: true, showInFooter: true, showOnContactPage: true, showOnProductPages: false },
+    facebook:  { url: "https://www.facebook.com/100xcircle",         showInHeader: false, showInFooter: true, showOnContactPage: true, showOnProductPages: false },
+    instagram: { url: "https://www.instagram.com/100xcircle",        showInHeader: true, showInFooter: true, showOnContactPage: false, showOnProductPages: false },
+    linkedin:  { url: "https://www.linkedin.com/company/100xcircle", showInHeader: false, showInFooter: true, showOnContactPage: false, showOnProductPages: false },
+    twitter:   { url: "https://x.com/100xcircle",                    showInHeader: false, showInFooter: true, showOnContactPage: false, showOnProductPages: false },
+    whatsapp:  { url: "https://wa.me/917827229116",                  showInHeader: false, showInFooter: true, showOnContactPage: true,  showOnProductPages: true },
+    telegram:  { url: "",                                            showInHeader: false, showInFooter: false, showOnContactPage: false, showOnProductPages: false },
+    googleBiz: { url: "",                                            showInHeader: false, showInFooter: false, showOnContactPage: true,  showOnProductPages: false },
   },
   // Credentials
   gstNumber: "",
@@ -215,10 +215,10 @@ export function SiteSettingsTab() {
                 </div>
                 <div className="flex flex-wrap gap-x-5 gap-y-2 ml-28 text-xs">
                   {[
-                    { key: "header", label: "Show in Header" },
-                    { key: "footer", label: "Show in Footer" },
-                    { key: "contact", label: "Show on Contact Page" },
-                    { key: "products", label: "Show on Product Pages" },
+                    { key: "showInHeader", label: "Show in Header" },
+                    { key: "showInFooter", label: "Show in Footer" },
+                    { key: "showOnContactPage", label: "Show on Contact Page" },
+                    { key: "showOnProductPages", label: "Show on Product Pages" },
                   ].map(opt => (
                     <label key={opt.key} className="flex items-center gap-1.5 cursor-pointer text-gray-600 hover:text-gray-900">
                       <input

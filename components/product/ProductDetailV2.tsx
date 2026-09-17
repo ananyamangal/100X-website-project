@@ -9,6 +9,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { BUSINESS } from '@/lib/seo/site-config'
+import type { VisibleSocialLink } from '@/lib/socialLinksShared'
+import { SOCIAL_ICONS } from '@/components/seo/SocialIcons'
 import { MobileCtaOverride } from '@/components/cta/MobileCtaContext'
 import BrochureLeadModal from '@/components/BrochureLeadModal'
 import RFQForm from '@/components/forms/RFQForm'
@@ -678,9 +680,12 @@ function FAQSection({ faqs }: { faqs: Array<{ q: string; a: string }> }) {
 
 // ── Main export ────────────────────────────────────────────────────────────────
 
-interface Props { product: Record<string, unknown> }
+interface Props {
+  product: Record<string, unknown>
+  socialLinks?: VisibleSocialLink[]
+}
 
-export default function ProductDetailV2({ product }: Props) {
+export default function ProductDetailV2({ product, socialLinks = [] }: Props) {
   const [brochureOpen, setBrochureOpen] = useState(false)
   const [showFullDesc, setShowFullDesc]   = useState(false)
 
@@ -874,6 +879,23 @@ export default function ProductDetailV2({ product }: Props) {
                 >
                   Request Formal Quote
                 </a>
+                {socialLinks.length > 0 && (
+                  <div className="flex items-center justify-center gap-2 pt-1">
+                    <span className="text-xs text-gray-400">Follow us:</span>
+                    {socialLinks.map((soc) => (
+                      <a
+                        key={soc.key}
+                        href={soc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`100X Circle on ${soc.label}`}
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:text-brand-600 hover:bg-brand-50 transition-colors"
+                      >
+                        {SOCIAL_ICONS[soc.key]}
+                      </a>
+                    ))}
+                  </div>
+                )}
                 {brochureUrl && (
                   <button
                     onClick={() => setBrochureOpen(true)}
