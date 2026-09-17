@@ -150,7 +150,16 @@ export type CtaBandData = {
 
 export type LandingSection =
   /** Headline + paragraphs — back-compat shape for the existing 3 entries. */
-  | { kind: "rich-text"; h2: string; paragraphs: string[] }
+  | {
+      kind: "rich-text"
+      h2: string
+      /** Accept inline `[label](/path)` links and `**bold**` (components/landing/InlineText). */
+      paragraphs: string[]
+      /** Bullet list rendered after paragraph number `after` (1-based). */
+      list?: { after: number; items: string[] }
+      /** Closing call-to-action link, e.g. to the page's own form anchor. */
+      cta?: { label: string; href: string }
+    }
   | { kind: "trust-strip"; metrics: TrustMetric[] }
   | { kind: "video"; url: string; title?: string; description?: string }
   | {
@@ -263,6 +272,23 @@ export type LandingPageDef = {
   sitemap?: {
     priority?: number
     changeFrequency?: NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>
+  }
+
+  /**
+   * On-page copy for `type: "product"` landings. Their body is rendered by
+   * ProductDetailV2 straight from the Mongo product document, so landing-
+   * specific (SEO) copy that must NOT leak onto the generic product record
+   * lives here instead. English source only. Every field is additive except
+   * `h1`, which replaces the product-name H1 on this landing URL.
+   */
+  productPage?: {
+    h1?: string
+    /** Rendered directly below the H1 (above the product's own tagline). */
+    subhead?: string
+    /** Paragraph rendered above the CTA buttons. */
+    intro?: string
+    /** H2 sections rendered right after the purchase area. Inline markup allowed. */
+    sections?: { h2: string; paragraphs: string[] }[]
   }
 
   // ─── Back-compat fields for the existing 3 product landings ─────────────

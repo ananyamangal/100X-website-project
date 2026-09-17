@@ -187,7 +187,7 @@ export default function ProductsPageClient({ products }: { products: any[] }) {
           <div className="max-w-3xl">
             <p className="eyebrow text-brand-400 mb-4">Complete Product Catalogue</p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-800 text-white mb-5 leading-tight text-balance">
-              Fogging machines for every application.
+              Fogger Machine — Complete Range for Every Application
             </h1>
             <p className="text-cinema-300 text-lg leading-relaxed max-w-2xl">
               OEM-manufactured thermal fogging machines, vehicle-mounted foggers, cold ULV foggers, and agricultural equipment — engineered for India's public health and agriculture sectors.
@@ -213,6 +213,11 @@ export default function ProductsPageClient({ products }: { products: any[] }) {
       {/* Category Filter + Grid */}
       <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4 md:px-6">
+          {/* Range intro — agency on-page SEO copy (Sept 2026): below the stats bar, above the filter tabs */}
+          <p className="max-w-4xl text-gray-600 text-base leading-relaxed mb-10">
+            Whether you're running a municipal vector-control drive or setting up pest management for a large facility, finding the right fogger machine comes down to matching the technology to the job. Our range covers thermal foggers for outdoor and large-area fumigation, cold ULV foggers for occupied indoor spaces, and vehicle-mounted units built for city-scale operations. Every fogger machine we manufacture is ISI marked and built to IS 14855 standards, and we're a GeM-registered OEM with over 500 completed government orders across India. If you're unsure which model fits your requirement, our team can help you shortlist one based on area coverage, chemical compatibility, and budget.
+          </p>
+
           {/* Filter bar */}
           {categories.length > 1 && (
             <div className="flex flex-wrap gap-2 mb-10">

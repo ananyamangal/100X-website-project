@@ -683,16 +683,27 @@ function FAQSection({ faqs }: { faqs: Array<{ q: string; a: string }> }) {
 interface Props {
   product: Record<string, unknown>
   socialLinks?: VisibleSocialLink[]
+  // Landing-page (SEO) copy from the landing registry's `productPage` block —
+  // only set when this component renders a /<landing-slug> URL. All optional
+  // and additive; with none of them set the output is unchanged.
+  /** Replaces the product-name H1 on that landing URL. */
+  h1Override?: string
+  /** Rendered directly below the H1, above the product's own tagline. */
+  subhead?: string
+  /** Paragraph rendered just above the CTA buttons. */
+  intro?: string
+  /** Server-rendered sections placed right after the purchase area. */
+  afterPurchaseArea?: React.ReactNode
 }
 
-export default function ProductDetailV2({ product, socialLinks = [] }: Props) {
+export default function ProductDetailV2({ product, socialLinks = [], h1Override, subhead, intro, afterPurchaseArea }: Props) {
   const [brochureOpen, setBrochureOpen] = useState(false)
   const [showFullDesc, setShowFullDesc]   = useState(false)
 
   // Data extraction
   const name         = s(product.name)
   const rawH1        = s(product.h1Title)
-  const h1           = rawH1.includes(' ') ? rawH1 : name
+  const h1           = h1Override || (rawH1.includes(' ') ? rawH1 : name)
   const tagline      = s(product.tagline)
   const price        = s(product.priceRange)
   const shortDesc    = plainTextFromHtml(product.shortDescription || product.detailedDescription)
@@ -788,6 +799,7 @@ export default function ProductDetailV2({ product, socialLinks = [] }: Props) {
               {/* H1 — product name lives here (no separate cinematic hero above) */}
               <div>
                 <h1 className="text-2xl md:text-3xl lg:text-[1.85rem] font-black text-gray-900 leading-tight tracking-tight">{h1}</h1>
+                {subhead && <p className="text-base text-gray-700 mt-2 leading-snug">{subhead}</p>}
                 {tagline && <p className="text-sm text-gray-500 mt-1.5 italic">{tagline}</p>}
               </div>
 
@@ -862,6 +874,9 @@ export default function ProductDetailV2({ product, socialLinks = [] }: Props) {
                 </div>
               )}
 
+              {/* Landing-page intro (registry productPage.intro) */}
+              {intro && <p className="text-sm text-gray-600 leading-relaxed">{intro}</p>}
+
               {/* CTAs */}
               <div className="flex flex-col gap-3 pt-1">
                 <a
@@ -917,6 +932,9 @@ export default function ProductDetailV2({ product, socialLinks = [] }: Props) {
       </div>
 
       {/* ══ BELOW-FOLD SECTIONS ════════════════════════════════════════════════ */}
+
+      {/* Landing-page sections (registry productPage.sections) */}
+      {afterPurchaseArea ? <div className="border-t border-gray-100">{afterPurchaseArea}</div> : null}
 
       {/* Full specs */}
       {specs.length > 0 && (

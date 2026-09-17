@@ -12,6 +12,7 @@ import { getMergedLandingPage } from "@/lib/seo/get-merged-landing-page"
 import { getProductBySlug } from "@/lib/productsQuery"
 import { toDisplayStrings } from "@/lib/normalizeProduct"
 import { getAvailableLocales } from "@/lib/seo/hreflang"
+import { getSocialLinks, pickVisibleSocialLinks } from "@/lib/socialLinks"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import type { FaqEntry, LandingPageDef, LandingSection } from "@/lib/seo/landing-types"
@@ -72,7 +73,15 @@ function defaultBreadcrumb(def: LandingPageDef): BreadcrumbItem[] {
 function renderSection(section: LandingSection, def: LandingPageDef, idx: number, locale: string) {
   switch (section.kind) {
     case "rich-text":
-      return <RichTextBlock key={idx} h2={section.h2} paragraphs={section.paragraphs} />
+      return (
+        <RichTextBlock
+          key={idx}
+          h2={section.h2}
+          paragraphs={section.paragraphs}
+          list={section.list}
+          cta={section.cta}
+        />
+      )
     case "trust-strip":
       return <TrustStripBlock key={idx} metrics={section.metrics} />
     case "benefits-grid":
@@ -249,7 +258,21 @@ export default async function LandingRenderer({ slug, locale = "en" }: Props) {
           />
         )}
         <BreadcrumbJsonLd items={breadcrumb} />
-        <ProductDetailV2 product={JSON.parse(JSON.stringify(product))} />
+        <ProductDetailV2
+          product={JSON.parse(JSON.stringify(product))}
+          // Same admin-driven "Show on Product Pages" links as /products/[id].
+          socialLinks={pickVisibleSocialLinks(await getSocialLinks(), "showOnProductPages")}
+          h1Override={def.productPage?.h1}
+          subhead={def.productPage?.subhead}
+          intro={def.productPage?.intro}
+          afterPurchaseArea={
+            def.productPage?.sections?.length
+              ? def.productPage.sections.map((sec, i) => (
+                  <RichTextBlock key={i} h2={sec.h2} paragraphs={sec.paragraphs} />
+                ))
+              : undefined
+          }
+        />
         <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
       </>
     )

@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
+import FaqBlock from "@/components/landing/FaqBlock"
+import type { FaqEntry } from "@/lib/seo/landing-types"
 
 export const revalidate = 60
 
@@ -32,28 +34,46 @@ const jsonLd = {
   url: `${SITE_URL}/nhm-fogging-machine`,
 }
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "Can NHM state societies procure fogging machines on GeM?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. National Health Mission (NHM) state societies are eligible government buyers on GeM and can procure fogging machines directly from GeM-listed MSME OEM sellers like 100X Circle without a separate tender for amounts within GeM purchase thresholds. NHM flexible pool budgets are commonly used for vector control equipment under NVBDCP-NHM convergence.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What fogging machines are recommended for NHM vector control?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "For NHM vector control operations, portable thermal fogging machines (18–50 litre capacity) are standard for district and block-level operations. Vehicle-mounted units are used for large-scale municipal fogging. All machines should comply with IS 14855 (Part 1). 100X Circle supplies IS 14855-compliant machines with full tender documentation to NHM procurement units.",
-      },
-    },
-  ],
-}
+// Single source for the visible FAQ accordion AND the FAQPage JSON-LD (FaqBlock
+// renders both). The first two entries are the Q&As this page previously
+// carried in a schema-only FAQPage block (now also visible on the page); the
+// rest is the agency's on-page SEO copy (Sept 2026).
+const NHM_FAQS: FaqEntry[] = [
+  {
+    q: "Can NHM state societies procure fogging machines on GeM?",
+    a: "Yes. National Health Mission (NHM) state societies are eligible government buyers on GeM and can procure fogging machines directly from GeM-listed MSME OEM sellers like 100X Circle without a separate tender for amounts within GeM purchase thresholds. NHM flexible pool budgets are commonly used for vector control equipment under NVBDCP-NHM convergence.",
+  },
+  {
+    q: "What fogging machines are recommended for NHM vector control?",
+    a: "For NHM vector control operations, portable thermal fogging machines (18–50 litre capacity) are standard for district and block-level operations. Vehicle-mounted units are used for large-scale municipal fogging. All machines should comply with IS 14855 (Part 1). 100X Circle supplies IS 14855-compliant machines with full tender documentation to NHM procurement units.",
+  },
+  {
+    q: "Can NHM state societies buy fogging machines directly without a tender?",
+    a: "Yes. NHM state societies are registered on GeM and can purchase [fogging machines](/) directly from GeM-listed sellers within the GeM direct purchase threshold, without going through a separate tender.",
+  },
+  {
+    q: "What documents are needed to buy an NHM fogging machine?",
+    a: "IS 14855 (Part 1) compliance certificate, ISO 9001:2015 certificate, MSME/UDYAM registration, GeM seller verification, and GST documents. We provide all of these within 1–2 working days.",
+  },
+  {
+    q: "Which NHM programmes fund fogging machine purchases?",
+    a: "NVBDCP-NHM convergence, Urban Health Mission, District Health Action Plan, State PIP, and Ayushman Bharat Health Infrastructure funds can all be used to procure fogging machines.",
+  },
+  {
+    q: "Is the NHM fogging machine GeM listed?",
+    a: "Yes, our machines are listed on GeM under our [OEM profile](/gem-approved-fogging-machine-oem), so state societies and district health units can order directly.",
+  },
+  {
+    q: "How fast can NHM fogging machines be delivered?",
+    a: "Delivery timelines depend on quantity and location — share your requirement and we'll confirm a schedule along with your quote.",
+  },
+]
+
+const ORDER_STEPS = [
+  "Share your NHM programme name and the quantity you need",
+  "We send you GeM listing details along with IS 14855 documentation",
+  "Place your order directly on GeM, or confirm via WhatsApp / email",
+]
 
 const NHM_PROGRAMMES = [
   { programme: "NVBDCP-NHM Convergence", use: "Malaria, dengue, kala-azar vector control", budget: "NHM flexible pool — vector control" },
@@ -69,7 +89,6 @@ export default function NhmFoggingMachinePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">
@@ -91,9 +110,9 @@ export default function NhmFoggingMachinePage() {
           100X Circle Pvt Ltd · MSME OEM · IS 14855 (Part 1) · ISO 9001:2015 · GeM Listed
         </p>
         <p className="text-gray-600 text-lg mb-8 leading-relaxed">
-          Thermal fogging machines for National Health Mission (NHM) procurement — state
-          societies, district health units, and NVBDCP-NHM convergence programmes. IS 14855
-          compliant. Available on GeM for direct purchase without separate tender.
+          100X Circle Private Limited supplies NHM fogging machines to state societies, district
+          health units, and NVBDCP-NHM convergence programmes across India. IS 14855 compliant and
+          available on GeM for direct purchase, without needing a separate tender.
         </p>
 
         <div className="bg-brand-600 rounded-xl p-6 mb-10 text-white">
@@ -154,6 +173,11 @@ export default function NhmFoggingMachinePage() {
             <li>GST registration documents</li>
           </ul>
           <p>All documentation provided within 1–2 working days.</p>
+
+          <h2>How to Order an NHM Fogging Machine?</h2>
+          <ol>
+            {ORDER_STEPS.map((step) => <li key={step}>{step}</li>)}
+          </ol>
         </article>
 
         <div className="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-5">
@@ -161,6 +185,8 @@ export default function NhmFoggingMachinePage() {
           <p className="text-sm text-gray-600 mb-3">Phone / WhatsApp: <a href={`tel:${BUSINESS.phonePrimary}`} className="text-brand-600">{BUSINESS.phonePrimary}</a></p>
           <p className="text-sm text-gray-600">Email: <a href={`mailto:${BUSINESS.email}`} className="text-brand-600">{BUSINESS.email}</a></p>
         </div>
+
+        <FaqBlock eyebrow="" title="NHM Fogging Machine FAQs" faqs={NHM_FAQS} />
 
         <div className="mt-8 border-t border-gray-200 pt-8">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Related</h2>

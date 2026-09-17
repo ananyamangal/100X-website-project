@@ -49,11 +49,36 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
     slug: "thermal-and-cold-fogging-machine-100xtfs50",
     type: "product",
     metadata: {
-      title: "Buy Thermal and Cold Fogging Machine | 100x Circle",
+      title: "Thermal & Cold Fogging Machine – 100XTFS50 | 100X Circle",
       description:
-        "Buy thermal and cold fogging machines from 100x Circle. High-performance, durable foggers for mosquito control and industrial use across India. Contact us today!",
+        "One machine, two modes — thermal fog for outdoor coverage, cold fog for safe indoor use. GeM approved, ISO certified. Get pricing today.",
       keywords:
         "buy thermal and cold fogging machine, fogging machine price in india, thermal cold fogger manufacturer india, industrial thermal cold fogging machine supplier, mosquito fogging machine price, order thermal fogging machine",
+    },
+    // Agency on-page SEO copy (Sept 2026). English source only.
+    productPage: {
+      h1: "Thermal & Cold Fogging Machine — 100XTFS50",
+      subhead:
+        "One machine, two fogging modes — thermal for outdoor vector control, cold for safe indoor disinfection.",
+      intro:
+        "The 100XTFS50 is a thermal and cold fogging machine built for teams that don't want to buy two separate units. Thermal mode delivers a dense, far-reaching fog suited to outdoor mosquito and pest control over large areas. Cold mode produces a fine mist that's safe to use indoors — hospitals, warehouses, food facilities — without the heat or smoke of thermal fogging. Both run off the same 12V battery-powered unit.",
+      sections: [
+        {
+          h2: "Thermal Fogging: Built for Large-Area Outdoor Coverage",
+          paragraphs: [
+            "Thermal mode is what municipal and district health teams reach for during dengue and malaria drives — it produces a visible, far-carrying fog that covers open ground fast, which is exactly what large-scale outdoor vector control needs.",
+          ],
+        },
+        {
+          h2: "Thermal vs Cold — Which Mode Do You Need?",
+          paragraphs: [
+            "Choosing between thermal and cold fogging isn't about which one is \"better\" — it's about where you're spraying and what you're spraying around.",
+            "**Go thermal when you're working outdoors.** A thermal fogging machine heats the chemical solution to produce a dense, visible fog that carries across open ground — streets, drains, parks, agricultural fields, and construction sites. That reach and visibility is exactly what makes thermal fogging the standard choice for municipal dengue and malaria control drives, where the goal is covering a large outdoor area quickly and confirming the spray has actually reached every corner.",
+            "**Go cold when you're working indoors or around people.** A cold fogging machine skips the heat entirely and uses mechanical pressure to produce a much finer mist. There's no smoke, no strong heat signature, and the droplets stay suspended in the air longer for even coverage — which is why cold fogging is the safer, more practical option for hospitals, food processing units, warehouses, poultry sheds, and any occupied indoor space where a thick visible fog would be impractical or unwelcome.",
+            "**Still not sure which one your job needs?** As a rough rule: if you can picture the space open to the sky, thermal is usually right. If you're picturing walls, ceilings, or people working nearby, cold is the safer call. And if your operation genuinely needs both — which is common for pest control companies handling a mix of municipal and facility contracts — that's exactly the gap the 100XTFS50 is built to close, running thermal and cold fogging from the same 12V unit instead of asking you to carry two machines.",
+          ],
+        },
+      ],
     },
     content1: {
       h2: "Thermal and Cold Fogging in One Machine — How the 100XTFS50 Works",
@@ -149,6 +174,29 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
           { value: "Pan India", label: "Supply & support" },
         ],
       },
+      // Agency on-page SEO copy (Sept 2026) — sits between the hero band and
+      // "Why partner with us". English source only.
+      {
+        kind: "rich-text",
+        h2: "What Does \"OEM\" Actually Mean on GeM?",
+        paragraphs: [
+          "If you've been searching around GeM and keep seeing the word OEM everywhere, here's the simple version.",
+          "On the Government e-Marketplace, an OEM is the actual manufacturer of a product — not a trader, not a distributor. When you're an OEM for fogging machines, it means GeM has verified that you make the machines yourself, and your listings carry that manufacturer status.",
+          "There's also something called a \"deemed OEM\" on GeM. This applies when a company doesn't manufacture the product itself but has a signed authorization from the real OEM to sell on their behalf — basically, GeM \"deems\" them the OEM for listing purposes, based on that authorization letter. This is exactly how our reseller program works: we're the actual OEM, and once we authorize you, you're treated as a deemed OEM on your own GeM seller account for our fogging machines.",
+          "To register as an OEM (or get OEM authorization from one), GeM usually asks for:",
+          "Once approved, you get an OEM authorization certificate — this is the document GeM (and buyers) use to confirm your listing is genuine. If a reseller ever wants to check whether their OEM authorization certificate is valid, they can usually verify it on their GeM seller dashboard under the OEM/authorization section, or simply ask the OEM (in our case, us) to confirm it directly.",
+          "Want to skip the paperwork hassle? We handle the OEM authorization process for you — you get a valid OEM reseller code and can start listing our fogging machines on GeM without figuring out the registration steps yourself.",
+        ],
+        list: {
+          after: 4,
+          items: [
+            "A valid GeM seller registration and GSTIN",
+            "Company and manufacturing details (for actual OEMs), or a signed OEM authorization letter (for resellers/deemed OEMs)",
+            "Basic KYC documents",
+          ],
+        },
+        cta: { label: "Register as Reseller →", href: "#landing-form" },
+      },
       {
         kind: "benefits-grid",
         eyebrow: "Why partner with us",
@@ -204,6 +252,11 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
       { q: "Do I need to be a registered GeM seller before applying for OEM code?", a: "Yes. You'll need an active GeM Seller ID and a valid GSTIN before we can issue the OEM Reseller Authorization. If you're new to GeM, we can guide you to the registration flow but the seller account itself has to be in your name." },
       { q: "Is there any fee to become an authorized GeM reseller?", a: "No — there is no joining fee. We earn through the wholesale rate we offer; you earn the difference between our rate and your GeM listing price." },
       { q: "How quickly will I receive the OEM authorization after I register?", a: "Typically within 24–48 hours of receiving your registration. Our team verifies your GeM seller profile, GST status, and basic KYC before issuing the OEM code." },
+      // Agency on-page SEO copy (Sept 2026) — appended, nothing above changed.
+      { q: "How do I become an OEM on GeM?", a: "You register on the GeM portal as a seller, complete your company and GST verification, and submit your manufacturing details for approval. If you're not the original manufacturer, you can instead become a \"deemed OEM\" by getting an authorization letter from an actual OEM — that's the route most fogging machine resellers take, and it's what we help with." },
+      { q: "What is deemed OEM in GeM?", a: "It's when GeM treats you as the OEM for listing purposes because a real manufacturer has formally authorized you to sell their product, even though you don't manufacture it yourself. You'll need a valid OEM authorization letter/code from that manufacturer to get this status." },
+      { q: "Is there a separate GeM OEM panel registration process?", a: "Yes, GeM has a dedicated OEM registration flow separate from regular seller registration, where you submit manufacturing or authorization details for verification. For fogging machines specifically, we manage this part for our resellers so you don't have to navigate it alone." },
+      { q: "Can I sell fogging machines on the GeM portal without being the manufacturer?", a: "Yes — as long as you have a valid OEM authorization code from a certified manufacturer like 100x Circle, you can list and sell fogging machines on GeM as a deemed OEM." },
     ],
     relatedLandingSlugs: [
       "thermal-and-cold-fogging-machine-100xtfs50",

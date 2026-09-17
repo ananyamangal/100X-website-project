@@ -1,6 +1,7 @@
 ﻿import { ChevronDown } from "lucide-react"
 import type { FaqEntry } from "@/lib/seo/landing-types"
 import SectionHeader from "./SectionHeader"
+import InlineText, { inlineToPlainText } from "./InlineText"
 
 type Props = {
   eyebrow?: string
@@ -33,7 +34,8 @@ export default function FaqBlock({
       name: f.q,
       acceptedAnswer: {
         "@type": "Answer",
-        text: f.a,
+        // Same string as the visible answer, minus [label](/path) / **bold** markup.
+        text: inlineToPlainText(f.a),
       },
     })),
   }
@@ -57,7 +59,7 @@ export default function FaqBlock({
                 />
               </summary>
               <p className="mt-3 leading-relaxed text-gray-700 [[data-theme=dark-industrial]_&]:text-slate-300">
-                {f.a}
+                <InlineText text={f.a} />
               </p>
             </details>
           ))}
