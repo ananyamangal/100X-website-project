@@ -12,7 +12,7 @@ import {
   blogImageSrc,
 } from "@/lib/blogFieldGuards"
 import { SITE_URL, SITE_NAME, defaultOgImage } from "@/lib/seo/site-config"
-import { buildPageAlternates } from "@/lib/seo/hreflang"
+import { buildPageAlternates, isUnreviewedLocale } from "@/lib/seo/hreflang"
 import { BLOG_INDEX_TRANSLATED_LOCALES } from "@/lib/i18n/locale-routes"
 
 export const revalidate = 120
@@ -31,6 +31,10 @@ export async function generateMetadata({
     title: "Knowledge & Industry Insights | 100x Circle",
     description:
       "Practical tips, maintenance guides, and industry insights from 100x Circle — thermal fogging machine manufacturer serving customers across India.",
+    // The blog index UI copy is English-only (BLOG_INDEX_TRANSLATED_LOCALES),
+    // so /<locale>/blog is the English page at a second URL — keep it out of
+    // the index (canonical → /blog, below). Never applies to locale "en".
+    ...(isUnreviewedLocale(locale, BLOG_INDEX_TRANSLATED_LOCALES) && { robots: { index: false, follow: true } }),
     alternates: buildPageAlternates({
       canonicalPath: "/blog",
       currentLocale: locale,

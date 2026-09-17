@@ -25,6 +25,7 @@ export const getAvailableLocales = cache(async function getAvailableLocales(
   key: string,
 ): Promise<string[]> {
   const found = new Set<string>(["en"])
+  let lookupFailed = false
   try {
     const client = await clientPromise
     const db = client.db()
@@ -42,10 +43,34 @@ export const getAvailableLocales = cache(async function getAvailableLocales(
       `[i18n] Could not resolve available locales for ${kind}/${key} — hreflang will only include English.`,
       (err as Error).message,
     )
+    lookupFailed = true
   }
   // Order follows routing.locales so output is stable and always English-first.
-  return routing.locales.filter((l) => found.has(l))
+  const result = routing.locales.filter((l) => found.has(l))
+  if (lookupFailed) UNRESOLVED_LOOKUPS.add(result)
+  return result
 })
+
+// Results of lookups that errored. "Only en" from a DB hiccup must never be
+// mistaken for "no reviewed translation exists" — see isUnreviewedLocale.
+const UNRESOLVED_LOOKUPS = new WeakSet<string[]>()
+
+/**
+ * True when a page is being rendered under a non-English locale prefix that
+ * has NO reviewed translation for this content — i.e. the visitor gets the
+ * English source at a second URL. Such a page is kept out of the index
+ * (noindex + canonical to the English URL); it was already excluded from
+ * hreflang and the sitemap by getAvailableLocales.
+ *
+ * Never true for "en", and fails OPEN: if the availability lookup itself
+ * errored, nothing is gated, so a transient DB error can never put a noindex
+ * on a genuinely reviewed translation.
+ */
+export function isUnreviewedLocale(currentLocale: string, availableLocales: string[]): boolean {
+  if (currentLocale === "en") return false
+  if (UNRESOLVED_LOOKUPS.has(availableLocales)) return false
+  return !availableLocales.includes(currentLocale)
+}
 
 /** `canonicalPath` is the locale-agnostic path, e.g. "/blog/my-post" or "/some-slug". */
 export function localizedPath(canonicalPath: string, locale: string): string {
@@ -54,11 +79,13 @@ export function localizedPath(canonicalPath: string, locale: string): string {
 
 /**
  * Builds the Metadata `alternates` block for one rendered page. Each locale
- * variant canonicalizes to itself (standard hreflang practice) — this does
- * NOT force canonical back to English; that's a separate, deliberate
- * decision from the English-stays-default routing behavior (see
- * i18n/routing.ts's localeDetection:false). x-default and the language map
- * always resolve to whichever locales actually have content.
+ * variant with REVIEWED content canonicalizes to itself (standard hreflang
+ * practice) — this does NOT force canonical back to English; that's a
+ * separate, deliberate decision from the English-stays-default routing
+ * behavior (see i18n/routing.ts's localeDetection:false). The one exception
+ * is an unreviewed locale (see isUnreviewedLocale): that URL only renders
+ * the English source, so it canonicalizes to the English URL. x-default and
+ * the language map always resolve to whichever locales actually have content.
  */
 export function buildPageAlternates(opts: {
   canonicalPath: string
@@ -66,7 +93,10 @@ export function buildPageAlternates(opts: {
   availableLocales: string[]
 }): Metadata["alternates"] {
   const { canonicalPath, currentLocale, availableLocales } = opts
-  const canonical = localizedPath(canonicalPath, currentLocale)
+  const canonical = localizedPath(
+    canonicalPath,
+    isUnreviewedLocale(currentLocale, availableLocales) ? "en" : currentLocale,
+  )
 
   // No genuine alternate exists yet (only "en" has content) — omit the
   // languages map entirely rather than emitting self-referencing hreflang

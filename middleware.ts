@@ -112,6 +112,34 @@ function ensureRedirectCacheFresh(origin: string, event: NextFetchEvent): Promis
   return null
 }
 
+/**
+ * Response for an admin-managed redirect whose source is exactly `pathname`,
+ * or null. Expects the redirect cache to have been warmed by the caller.
+ * Request paths arrive percent-encoded, while the admin panel stores sources
+ * as typed (spaces, commas, ...), so the decoded form is tried as a fallback.
+ */
+function manualRedirectFor(request: NextRequest, pathname: string, origin: string): NextResponse | null {
+  let manual = redirectCache.redirects.get(pathname)
+  if (!manual && pathname.includes("%")) {
+    try {
+      manual = redirectCache.redirects.get(decodeURIComponent(pathname))
+    } catch {
+      // Malformed escape sequence — nothing to match.
+    }
+  }
+  if (!manual) return null
+  try {
+    const destUrl = new URL(manual.destination, origin)
+    const url = request.nextUrl.clone()
+    url.pathname = destUrl.pathname
+    url.search = destUrl.search
+    return NextResponse.redirect(url, { status: manual.type })
+  } catch {
+    // Malformed destination stored somehow — don't hard-fail the request.
+    return null
+  }
+}
+
 async function isAuthenticated(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get(SESSION_COOKIE)?.value
   if (!token) return false
@@ -202,6 +230,17 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
   // ── i18n: only for routes moved under app/[locale]/ (Phase 1 slice) ─────────
   // Everything else (all other static/marketing pages) is untouched by design.
   if (isLocaleManagedPath(pathname)) {
+    // Admin-managed redirects apply to every path. This branch returns before
+    // the general redirect lookup further down, so without this check a
+    // redirect whose source is under /blog or a locale prefix could never
+    // fire (GSC: /blog/audit-test-f71082 kept returning 404 despite an active
+    // rule). Only exact manual rules are consulted here — the /products/
+    // structural fallback stays out of locale-managed routing.
+    const intlColdStartWait = ensureRedirectCacheFresh(origin, event)
+    if (intlColdStartWait) await intlColdStartWait
+    const intlManualRedirect = manualRedirectFor(request, pathname, origin)
+    if (intlManualRedirect) return intlManualRedirect
+
     const intlResponse = await intlMiddleware(request)
     // Redirects (rare — e.g. URL normalization) skip rendering entirely, so
     // there's no <html lang> to fix; pass through unchanged.
@@ -329,18 +368,8 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     return NextResponse.next()
   }
 
-  const manual = redirectCache.redirects.get(pathname)
-  if (manual) {
-    try {
-      const destUrl = new URL(manual.destination, origin)
-      const url = request.nextUrl.clone()
-      url.pathname = destUrl.pathname
-      url.search = destUrl.search
-      return NextResponse.redirect(url, { status: manual.type })
-    } catch {
-      // Malformed destination stored somehow — don't hard-fail the request.
-    }
-  }
+  const manualRedirect = manualRedirectFor(request, pathname, origin)
+  if (manualRedirect) return manualRedirect
 
   // Structural fallback: a bare top-level slug that would otherwise 404
   // redirects to its canonical /products/<slug> URL if a published product

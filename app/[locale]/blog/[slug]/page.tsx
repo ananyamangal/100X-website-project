@@ -12,7 +12,7 @@ import { plainTextFromHtml } from "@/lib/rich-text"
 import { getBlogBySlug } from "@/lib/blogsQuery"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { getTranslation } from "@/lib/i18n/translations"
-import { getAvailableLocales, buildPageAlternates } from "@/lib/seo/hreflang"
+import { getAvailableLocales, buildPageAlternates, isUnreviewedLocale } from "@/lib/seo/hreflang"
 import { SITE_URL, defaultOgImage } from "@/lib/seo/site-config"
 import type { AppLocale } from "@/i18n/routing"
 import LocaleSuggestionBanner from "@/components/LocaleSuggestionBanner"
@@ -88,6 +88,9 @@ export async function generateMetadata({
   return {
     title: metaTitle ? metaTitle : `${rawTitle} | 100x Circle`,
     description: desc,
+    // Locale prefix with no APPROVED translation → this URL only renders the
+    // English post; keep it out of the index (canonical → English URL, below).
+    ...(isUnreviewedLocale(locale, availableLocales) && { robots: { index: false, follow: true } }),
     alternates: buildPageAlternates({ canonicalPath, currentLocale: locale, availableLocales }),
     openGraph: {
       title: seoTitle,

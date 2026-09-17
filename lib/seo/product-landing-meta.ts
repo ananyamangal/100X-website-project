@@ -5,7 +5,7 @@ import {
   type LandingPageDef,
 } from "./landing-pages"
 import { getMergedLandingPage } from "./get-merged-landing-page"
-import { getAvailableLocales, buildPageAlternates, localizedPath } from "./hreflang"
+import { getAvailableLocales, buildPageAlternates, localizedPath, isUnreviewedLocale } from "./hreflang"
 
 /**
  * @deprecated Read from `LANDING_PAGES[slug].metadata` directly.
@@ -58,6 +58,10 @@ export async function productLandingMetadata(slug: string, locale: string = "en"
     // Slug not in the landing-page registry → page calls notFound(), but ISR may
     // serve a stale 200. Noindex the fallback so Google ignores any such ghost response.
     ...(!def && { robots: { index: false, follow: true } }),
+    // Locale prefix with no REVIEWED translation → this URL only renders the
+    // English source. Keep it out of the index (buildPageAlternates points its
+    // canonical at the English URL). Never applies to locale "en".
+    ...(isUnreviewedLocale(locale, availableLocales) && { robots: { index: false, follow: true } }),
     alternates: buildPageAlternates({ canonicalPath, currentLocale: locale, availableLocales }),
     openGraph: {
       title:       ogTitle,
