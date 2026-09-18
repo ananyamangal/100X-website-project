@@ -1,5 +1,5 @@
 ﻿import { cn } from "@/lib/utils"
-import { isProbablyRichHtml, sanitizeRichHtml } from "@/lib/rich-text"
+import { isProbablyRichHtml, normalizeNbsp, sanitizeRichHtml } from "@/lib/rich-text"
 
 type RichContentProps = {
   html: string
@@ -10,7 +10,7 @@ type RichContentProps = {
  * Renders admin-authored HTML safely, or plain text (legacy) with preserved line breaks.
  */
 export function RichContent({ html, className }: RichContentProps) {
-  const safe = typeof html === "string" ? html : html == null ? "" : String(html)
+  const safe = normalizeNbsp(html)
   if (!safe) return null
   // Plain-text branch has no child elements to scope a break-anywhere rule
   // to, so it keeps the blanket overflow-wrap as a safety net for a raw

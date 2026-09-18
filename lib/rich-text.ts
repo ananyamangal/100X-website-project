@@ -32,6 +32,20 @@ const SANITIZE: sanitizeHtml.IOptions = {
   allowProtocolRelative: false,
 }
 
+/**
+ * Admin content pasted from Word/Docs arrives with every space as U+00A0, not
+ * U+0020 — sampled live articles have thousands of NBSP and literally zero
+ * regular spaces. NBSP is not a line-break opportunity, so a paragraph of it is
+ * one unbreakable token: it renders as a single line thousands of px wide and
+ * gets clipped by the article column's overflow-x:hidden, cutting text off
+ * mid-sentence (worst on phone widths). Normalizing to a real space here is the
+ * only thing that restores ordinary wrapping — CSS can only paper over it with
+ * break-anywhere, which splits real words mid-character instead.
+ */
+export function normalizeNbsp(html: string | unknown): string {
+  return asHtmlInput(html).replace(/\u00a0/g, " ").replace(/&nbsp;/gi, " ")
+}
+
 export function sanitizeRichHtml(html: string | unknown): string {
   const str = asHtmlInput(html)
   if (!str) return ""
