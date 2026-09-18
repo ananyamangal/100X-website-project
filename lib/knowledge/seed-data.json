@@ -1,0 +1,1897 @@
+[
+  {
+    "slug": "how-thermal-fogging-works",
+    "title": "How Thermal Fogging Works: Pulse-Jet Technology Explained",
+    "metaTitle": "How Thermal Fogging Works: Pulse-Jet Technology Explained | 100X Circle",
+    "metaDescription": "Technical explanation of thermal fogging: pulse-jet combustion cycle, heat vaporization, sub-50-micron droplet formation, and why thermal fog reaches where sprays cannot.",
+    "ogTitle": "How Thermal Fogging Works: Pulse-Jet Technology Explained",
+    "ogDescription": "Pulse-jet engine ignites fuel-air mix at high frequency; heat vaporizes chemical solution; vapor cools at nozzle forming sub-50-micron droplets that penetrate vegetation and voids.",
+    "tags": [
+      "Technology",
+      "Pulse-Jet",
+      "Physics"
+    ],
+    "byline": {
+      "author": "100X Circle Pvt Ltd",
+      "readTime": "6 min read",
+      "updatedLabel": "Updated May 2026"
+    },
+    "breadcrumbLabel": "How Thermal Fogging Works",
+    "maxWidth": "3xl",
+    "h1": "How Thermal Fogging Works: Pulse-Jet Technology Explained",
+    "heroCallout": {
+      "type": "callout",
+      "variant": "keyfact",
+      "label": "Key fact",
+      "text": "Thermal fogging produces droplets of 1–50 microns — so small they stay airborne for minutes and penetrate dense vegetation, reaching mosquitoes hiding in foliage where sprayers cannot."
+    },
+    "blocks": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "What Is Thermal Fogging?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Thermal fogging is a pest control technique that uses intense heat to vaporize a mixture of insecticide and carrier oil, producing a dense cloud of ultra-fine droplets. The fog carries pesticide deep into vegetation, voids, drains, and dense vegetation canopies — environments where conventional compression sprayers fail to penetrate."
+      },
+      {
+        "type": "paragraph",
+        "text": "Used globally since the 1940s for mosquito vector control, thermal fogging remains the primary tool for municipal mosquito control drives in India, Southeast Asia, Africa, and Latin America. The WHO endorses thermal ULV and thermal fogging as two of three recommended adult mosquito control methods."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The Pulse-Jet Engine: Core Technology"
+      },
+      {
+        "type": "paragraph",
+        "text": "Unlike rotary compressors, a pulse-jet engine has no moving parts. It operates on the principle of resonant combustion — fuel ignites and pressure waves propagate through a resonance chamber and tailpipe at high frequency (40–100 Hz)."
+      },
+      {
+        "type": "paragraph",
+        "text": "The cycle in a thermal fogger pulse-jet engine:"
+      },
+      {
+        "type": "list",
+        "ordered": true,
+        "items": [
+          "**Intake:** Fuel-air mixture is drawn into the combustion chamber through a reed valve or venturi intake.",
+          "**Combustion:** A spark plug ignites the mixture. Combustion pressure closes the intake valve, forcing hot gases out the jet tube.",
+          "**Resonance:** The pressure wave reflects off the closed end of the tailpipe and returns as a rarefaction wave, drawing in fresh air-fuel mixture. The cycle repeats — self-sustaining after ignition.",
+          "**Heat generation:** Continuous combustion raises the jet tube temperature to 400–600°C. A stainless steel heat exchanger surrounds the jet tube."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "From Liquid to Fog: Vaporization and Condensation"
+      },
+      {
+        "type": "paragraph",
+        "text": "The insecticide-oil solution is metered by a pump and injected into the hot zone around the jet tube. At 400–600°C, the carrier oil and insecticide vaporize instantly."
+      },
+      {
+        "type": "paragraph",
+        "text": "The vapor then travels through a nozzle and exits the fogger at high velocity into ambient air. As the vapor contacts cooler outdoor air, it condenses into extremely fine droplets — typically 1–50 microns median volume diameter (MVD)."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Droplet Physics: Why Size Matters"
+      },
+      {
+        "type": "table",
+        "columns": [
+          {
+            "text": "Particle Type"
+          },
+          {
+            "text": "Size (microns)",
+            "align": "right"
+          },
+          {
+            "text": "Behavior"
+          }
+        ],
+        "rows": [
+          [
+            "Raindrop",
+            "2,000",
+            "Falls immediately"
+          ],
+          [
+            "Conventional spray",
+            "200–500",
+            "Settles in seconds"
+          ],
+          [
+            "Fine mist spray",
+            "50–200",
+            "Settles in 1–2 min"
+          ],
+          [
+            "Thermal fog (100X)",
+            "1–50",
+            "Airborne 5–15 min, penetrates foliage"
+          ],
+          [
+            "WHO recommendation",
+            "10–30",
+            "Optimal for adult mosquito contact"
+          ]
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Particles below 50 microns follow air currents, entering spaces that spray droplets cannot. This is the key advantage of thermal fogging for adult mosquito control: the fog reaches mosquitoes resting in dense grass, shrubs, drains, and tree canopy."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Chemical Requirements"
+      },
+      {
+        "type": "paragraph",
+        "text": "Thermal foggers require **oil-based formulations** designed for thermal application. The carrier oil (typically mineral oil or vegetable oil) must have the right viscosity and vaporization temperature. Water-based formulations should not be used — water boils at 100°C (far below the jet tube temperature) and does not condense the same way, producing uneven droplets and potentially damaging components."
+      },
+      {
+        "type": "paragraph",
+        "text": "Common active ingredients for thermal fogging:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Pyrethroids: deltamethrin (1.25%), cypermethrin (10%), permethrin (50%)",
+          "Organophosphates: malathion (96%), temephos (50%)",
+          "Synergists: piperonyl butoxide (PBO) added to enhance pyrethroid activity"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Vehicle-Mounted vs Portable Foggers"
+      },
+      {
+        "type": "paragraph",
+        "text": "**Vehicle-mounted foggers** (like 100X Circle's municipal models) run the same pulse-jet principle but on a larger scale. The engine mounts on a vehicle frame, the chemical tank is 20–100 liters, and the fog is directed by a swivel nozzle for directional coverage as the vehicle moves through wards."
+      },
+      {
+        "type": "paragraph",
+        "text": "**Portable pulse-jet foggers** are carried by a single operator. The engine is smaller, the chemical tank is 5–10 liters, and the operator walks through the area to be treated. Used for farms, housing societies, hospitals, and small municipal wards."
+      }
+    ],
+    "faqs": [
+      {
+        "question": "What is thermal fogging?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Thermal fogging uses a pulse-jet engine to heat insecticide-oil solution to 400–600°C, vaporizing it into dense fog of sub-50-micron droplets that penetrate vegetation and remain airborne for minutes — reaching adult mosquitoes where sprays cannot.",
+        "schemaAnswer": "Thermal fogging is a pest control technique that uses a pulse-jet engine to heat a mixture of insecticide and carrier oil to high temperature, vaporizing it into a dense visible fog of sub-50-micron droplets. These tiny particles remain airborne, penetrate vegetation, and reach insects in voids and dense foliage where conventional sprays cannot reach."
+      },
+      {
+        "question": "How does a pulse-jet engine work in a thermal fogger?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "A pulse-jet operates without moving parts — fuel-air combustion creates pressure waves in a resonance chamber at 40–100 Hz. Continuous combustion heats the jet tube to 400–600°C. The insecticide solution injected around the jet tube vaporizes instantly, then condenses into ultra-fine droplets as it exits the nozzle into ambient air.",
+        "schemaAnswer": "A pulse-jet engine operates without a conventional rotary compressor. It uses a resonance chamber where fuel-air mixture ignites repeatedly at 40–100 times per second. Each combustion pulse expels exhaust gases at high velocity through a jet tube. The heat from continuous combustion (400–600°C at the jet tube) vaporizes the insecticide-oil solution injected near the nozzle."
+      },
+      {
+        "question": "What droplet size does thermal fogging produce?",
+        "safety": false,
+        "reviewPending": false,
+        "visibleAnswer": "1–50 microns MVD (median volume diameter). WHO recommends 10–30 microns for adult mosquito control. Droplets below 50 microns remain airborne for extended periods and penetrate dense vegetation. For comparison, a raindrop is 2,000 microns and conventional sprayers produce 200–500 microns.",
+        "schemaAnswer": "1–50 microns MVD (median volume diameter). WHO recommends 10–30 microns for adult mosquito control. Droplets below 50 microns remain airborne for extended periods and penetrate dense vegetation. For comparison, a raindrop is 2,000 microns and conventional sprayers produce 200–500 microns."
+      },
+      {
+        "question": "What chemicals can be used in a thermal fogger?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Oil-based insecticide formulations only. Common: deltamethrin, cypermethrin, malathion, permethrin in mineral or vegetable oil carrier. Water-based (aqueous) formulations must not be used in pulse-jet thermal foggers.",
+        "schemaAnswer": "Thermal foggers use oil-based insecticide formulations specifically designed for thermal application. Common active ingredients include: pyrethroids (deltamethrin, cypermethrin, permethrin), organophosphates (malathion, temephos), and synthetic pyrethrins. Aqueous (water-based) formulations should not be used in pulse-jet thermal foggers as water vaporizes differently and can damage the equipment."
+      },
+      {
+        "question": "How is thermal fogging different from cold fogging (ULV)?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Thermal foggers use heat; ULV cold foggers use mechanical pressure (electric motor or high-pressure pump) to atomize liquid at ambient temperature. Thermal fog is denser and more effective outdoors in wind. ULV produces less visible fog with better droplet control indoors and for temperature-sensitive chemicals.",
+        "schemaAnswer": "Thermal foggers use heat to vaporize the chemical solution into visible fog; ULV (Ultra-Low Volume) cold foggers use mechanical pressure (electric motor + spinning disk or high-pressure pump) to create fine droplets at ambient temperature. Thermal fog is denser and more visible outdoors; ULV produces less visible fog with more precise droplet control indoors."
+      }
+    ],
+    "relatedArticles": [
+      {
+        "slug": "thermal-vs-ulv-fogging",
+        "title": "Thermal Fogging vs ULV Cold Fogging",
+        "blurb": "Side-by-side comparison for buyers"
+      },
+      {
+        "slug": "mosquito-control-india",
+        "title": "Mosquito Control and Thermal Fogging in India",
+        "blurb": "Municipal operations and outbreak response"
+      }
+    ],
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "How Thermal Fogging Works: Pulse-Jet Technology Explained",
+      "description": "Technical explanation of how pulse-jet thermal fogging machines generate sub-50-micron insecticide droplets for vector control and agricultural applications.",
+      "url": "https://www.100xcircle.com/knowledge/how-thermal-fogging-works",
+      "datePublished": "2024-01-15",
+      "dateModified": "2026-05-29",
+      "author": {
+        "@type": "Organization",
+        "name": "100X Circle Pvt Ltd",
+        "url": "https://www.100xcircle.com"
+      },
+      "publisher": {
+        "@id": "https://www.100xcircle.com/#organization"
+      },
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Thermal fogging"
+        },
+        {
+          "@type": "Thing",
+          "name": "Pulse-jet engine"
+        },
+        {
+          "@type": "Thing",
+          "name": "Vector control"
+        }
+      ],
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.100xcircle.com/knowledge/how-thermal-fogging-works"
+      }
+    },
+    "datePublished": "2024-01-15",
+    "dateModified": "2026-05-29",
+    "isPublished": true,
+    "order": 1,
+    "aboutAuthor": "100X Circle Pvt Ltd — Indian OEM manufacturer of pulse-jet thermal fogging machines since 2014. ISO 9001:2015 certified. Factory at IMT Manesar, Gurugram. GeM-listed MSME seller. Contact: 100xcircle@gmail.com"
+  },
+  {
+    "slug": "fogging-machine-for-pest-control-business",
+    "title": "Fogging Machine for Pest Control Business India: Complete PCO Equipment Guide",
+    "metaTitle": "Fogging Machine for Pest Control Business India | Equipment Guide | 100X Circle",
+    "metaDescription": "Complete guide for pest control operators (PCOs) buying fogging machines in India. Machine types, pricing, fleet expansion, GeM opportunities, and how to choose the right model.",
+    "ogTitle": "Fogging Machine for Pest Control Business India — Complete PCO Buyer Guide",
+    "ogDescription": "Machine selection, fleet expansion, GeM reseller opportunity, and pricing guide for pest control operators in India.",
+    "tags": [
+      "Pest Control",
+      "PCO",
+      "Equipment Guide",
+      "Fleet Expansion"
+    ],
+    "byline": {
+      "author": "100X Circle Pvt Ltd",
+      "readTime": "9 min read",
+      "updatedLabel": "Updated June 2026"
+    },
+    "breadcrumbLabel": "Fogging Machines for PCOs",
+    "maxWidth": "3xl",
+    "h1": "Fogging Machine for Pest Control Business India: Complete PCO Equipment Guide",
+    "heroCallout": {
+      "type": "callout",
+      "variant": "keyfact",
+      "label": "Key point",
+      "text": "For pest control operators in India, choosing the right fogging machine — and the right supplier — directly impacts contract win rate, operating cost, and revenue per field team. This guide covers machine selection, fleet economics, and an often-overlooked revenue opportunity: becoming a GeM equipment dealer."
+    },
+    "blocks": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Types of Fogging Machines for Pest Control"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Thermal (Pulse-Jet) Foggers"
+      },
+      {
+        "type": "paragraph",
+        "text": "Thermal foggers use combustion heat to vaporise insecticide concentrate into a dense, visible fog of ultra-fine droplets (1–50 microns). The fog penetrates vegetation, crevices, and under-canopy areas that liquid sprays cannot reach."
+      },
+      {
+        "type": "paragraph",
+        "text": "**Best for:** Outdoor mosquito control, large open areas, municipal ward fogging, housing society exterior treatment, agricultural estate fogging."
+      },
+      {
+        "type": "paragraph",
+        "text": "**Not suitable for:** Enclosed indoor spaces (smoke/heat), water-based formulations (thermal fogging requires oil-based formulations only)."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "ULV Cold Foggers"
+      },
+      {
+        "type": "paragraph",
+        "text": "Cold (ULV) foggers use air pressure to atomize insecticide without heat. Droplet size (5–50 microns) is similar to thermal fogging but the output is invisible or lightly visible. No combustion."
+      },
+      {
+        "type": "paragraph",
+        "text": "**Best for:** Indoor spaces, hospitals, food processing facilities, offices, enclosed markets. Can use water-based formulations."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Vehicle-Mounted Foggers"
+      },
+      {
+        "type": "paragraph",
+        "text": "High-capacity thermal foggers mounted on pickup trucks or jeeps. Enable continuous operation along roads and streets. Used by municipal corporations for ward-level fogging programmes."
+      },
+      {
+        "type": "paragraph",
+        "text": "**Best for:** Municipal contracts, large industrial estates, highway corridors. Requires appropriate vehicle."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Right Machine by Contract Type"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Outdoor residential & housing society fogging"
+      },
+      {
+        "type": "paragraph",
+        "text": "**Recommended:** Portable Thermal Fogger (18–50L) — ₹20,000–40,000"
+      },
+      {
+        "type": "paragraph",
+        "text": "Fast coverage of large open areas. Easy single-operator use. ISI marked models available for credibility."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Municipal ward fogging contract"
+      },
+      {
+        "type": "paragraph",
+        "text": "**Recommended:** Vehicle-Mounted Fogger or Portable 50L — ₹80,000–2,50,000"
+      },
+      {
+        "type": "paragraph",
+        "text": "High-volume output for street-by-street fogging drives. Vehicle mounting enables continuous operation across large wards."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Indoor office / commercial sanitization"
+      },
+      {
+        "type": "paragraph",
+        "text": "**Recommended:** ULV Cold Fogger (100XMCF42) — ₹45,000"
+      },
+      {
+        "type": "paragraph",
+        "text": "No heat, no smoke. Safe in enclosed spaces. Fine droplet penetration for indoor pest control and sanitization."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Small-area residential / apartment fogging"
+      },
+      {
+        "type": "paragraph",
+        "text": "**Recommended:** Mini Portable Fogger (100XKB200) — ₹6,500"
+      },
+      {
+        "type": "paragraph",
+        "text": "Lightweight, single-operator, low fuel cost. Ideal for individual apartment or small compound treatments."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Hospital / food processing facility"
+      },
+      {
+        "type": "paragraph",
+        "text": "**Recommended:** ULV Cold Fogger — ₹45,000"
+      },
+      {
+        "type": "paragraph",
+        "text": "No combustion, ambient temperature. Chemical-safe for temperature-sensitive environments. Meets health facility standards."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Fleet Economics: Cost per Contract"
+      },
+      {
+        "type": "paragraph",
+        "text": "For PCOs, fogging machine ROI depends on how many contracts a single machine can service per month. Key economic factors:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**Machine cost:** ₹20,000–48,000 for a standard portable thermal fogger. Amortised over 5+ years of field use with proper maintenance.",
+          "**Fuel cost:** Diesel-powered pulse-jet foggers consume 0.5–1 litre/hour. Cost per 8-hour field day: ₹50–100 in fuel.",
+          "**Insecticide cost:** Depends on concentrate type and dilution ratio. Budget ₹500–2,000 per fogging session for commercial contracts.",
+          "**Maintenance:** Key replacement parts — nozzle, fuel line, ignition system. Annual maintenance cost: ₹2,000–5,000 with genuine spares.",
+          "**Contract revenue per machine per month:** A PCO running daily contracts can service 20–25 housing societies or municipal wards per machine per month. At ₹2,000–8,000 per contract, monthly revenue per machine ranges from ₹40,000–2,00,000."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Why PCOs Should Become Fogging Machine Dealers"
+      },
+      {
+        "type": "paragraph",
+        "text": "This is the revenue expansion opportunity most PCOs overlook:"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pest control operators already have relationships with municipal corporations, housing societies, and institutional buyers — the same buyers who also purchase fogging machines for their own in-house use. As a PCO, you are in those offices regularly. You know their procurement officers."
+      },
+      {
+        "type": "paragraph",
+        "text": "By becoming an authorized 100X Circle dealer, you can earn equipment sales revenue from the same clients you service — without any additional customer acquisition cost."
+      },
+      {
+        "type": "paragraph",
+        "text": "Additionally, with GeM registration and 100X Circle's OEM authorization, you can bid on municipal and government tenders for fogging machines, adding a completely new revenue stream to your PCO business."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Buying in Bulk: Fleet Expansion Pricing"
+      },
+      {
+        "type": "paragraph",
+        "text": "100X Circle offers volume pricing for PCOs expanding their fleet or purchasing for resale. Discuss bulk pricing directly — there is no published rate card, as pricing depends on models, quantities, and payment terms."
+      },
+      {
+        "type": "paragraph",
+        "text": "For fleet expansion (5+ machines), contact us to discuss:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Volume discount structure",
+          "Staggered delivery schedule",
+          "Spare parts package",
+          "Technical training for field teams",
+          "After-sales service arrangement"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "PCOs: Become an Authorized Dealer"
+      },
+      {
+        "type": "paragraph",
+        "text": "Add equipment sales to your service revenue. Get GeM OEM authorization to bid on government fogging machine tenders. No fee required. [Dealer Program Details](/become-a-dealer)"
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Which fogging machine is best for a pest control business in India?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": null,
+        "schemaAnswer": "For a pest control business in India, the best fogging machine depends on your primary contract type: (1) For municipal and outdoor contracts: a portable thermal fogger (18–50 litre capacity) like the 100X Circle 50L pulse-jet model is ideal — covers large areas quickly. (2) For indoor contracts (offices, hospitals, food plants): a ULV cold fogger is preferred — no smoke, ambient temperature operation. (3) For vehicle-mounted municipal ward contracts: the 100XDB400 double-barrel vehicle fogger handles high volume efficiently."
+      },
+      {
+        "question": "How much does a commercial fogging machine cost in India for PCOs?",
+        "safety": false,
+        "reviewPending": false,
+        "visibleAnswer": "Commercial fogging machine prices for PCOs in India range from: ₹6,500 (mini handheld/backpack fogger) to ₹20,000–40,000 (mid-range portable thermal fogger) to ₹48,000 (ISI marked portable fogger) to ₹2,50,000+ (vehicle-mounted double-barrel fogger). Korean and German imports cost 3–5× more. 100X Circle offers Indian-manufactured machines with manufacturer warranty and local spare parts availability.",
+        "schemaAnswer": "Commercial fogging machine prices for PCOs in India range from: ₹6,500 (mini handheld/backpack fogger) to ₹20,000–40,000 (mid-range portable thermal fogger) to ₹48,000 (ISI marked portable fogger) to ₹2,50,000+ (vehicle-mounted double-barrel fogger). Korean and German imports cost 3–5× more. 100X Circle offers Indian-manufactured machines with manufacturer warranty and local spare parts availability."
+      },
+      {
+        "question": "Can a pest control company become a fogging machine dealer on GeM?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": null,
+        "schemaAnswer": "Yes. Pest control operators (PCOs) are among the most successful fogging machine dealers on GeM, because they already have relationships with municipal corporations, housing societies, and institutional buyers who also need to purchase fogging equipment. By becoming an authorized 100X Circle dealer and registering on GeM, PCOs can earn revenue from equipment sales in addition to pest control services."
+      }
+    ],
+    "relatedArticles": [
+      {
+        "slug": "fogging-machine-maintenance-guide",
+        "title": "Maintenance Guide",
+        "blurb": "Keep your fogging machine running"
+      },
+      {
+        "slug": "fogging-machine-safety-guide",
+        "title": "Safety Guide",
+        "blurb": "PPE, chemicals, and operator safety"
+      },
+      {
+        "slug": "thermal-fogging-chemicals-guide",
+        "title": "Fogging Chemicals Guide",
+        "blurb": "Insecticides, fungicides, formulations"
+      },
+      {
+        "slug": "gem-reseller-guide",
+        "title": "GeM Reseller Guide",
+        "blurb": "Sell fogging machines on GeM as a reseller"
+      }
+    ],
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Fogging Machine for Pest Control Business in India: Complete PCO Equipment Guide",
+      "description": "Equipment guide for pest control operators in India — fogging machine types, fleet expansion strategy, GeM reseller opportunity, pricing, and how to choose the right model.",
+      "url": "https://www.100xcircle.com/knowledge/fogging-machine-for-pest-control-business",
+      "author": {
+        "@type": "Organization",
+        "name": "100X Circle Pvt Ltd",
+        "url": "https://www.100xcircle.com"
+      },
+      "publisher": {
+        "@id": "https://www.100xcircle.com/#organization"
+      },
+      "datePublished": "2026-06-04",
+      "dateModified": "2026-06-04"
+    },
+    "datePublished": "2026-06-04",
+    "dateModified": "2026-06-04",
+    "isPublished": true,
+    "order": 2
+  },
+  {
+    "slug": "gem-oem-authorization-process",
+    "title": "GeM OEM Authorization Process for Fogging Machine Resellers: Complete Guide",
+    "metaTitle": "GeM OEM Authorization Process for Resellers: Complete Guide | 100X Circle",
+    "metaDescription": "Complete guide to GeM OEM authorization for fogging machine resellers — what it is, why you need it, how to get it, and what documents are required. From India's GeM-listed fogging machine OEM.",
+    "ogTitle": "GeM OEM Authorization Process: Complete Guide for Fogging Machine Resellers",
+    "ogDescription": "Understand GeM OEM authorization — codes, letters, panel registration, and the full process for fogging machine resellers in India.",
+    "tags": [
+      "GeM",
+      "OEM Authorization",
+      "Reseller Guide",
+      "Government"
+    ],
+    "byline": {
+      "author": "100X Circle Pvt Ltd · GeM-Listed MSME OEM",
+      "readTime": "8 min read",
+      "updatedLabel": "Updated June 2026"
+    },
+    "breadcrumbLabel": "GeM OEM Authorization Process",
+    "maxWidth": "3xl",
+    "h1": "GeM OEM Authorization Process for Fogging Machine Resellers: Complete Guide",
+    "heroCallout": {
+      "type": "callout",
+      "variant": "keyfact",
+      "label": "Key point",
+      "text": "To sell fogging machines on GeM as a reseller, you need OEM authorization from the manufacturer — both an authorization code for the GeM portal and a signed authorization letter for tender submissions. This guide explains the complete process."
+    },
+    "blocks": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "What Is GeM OEM Authorization?"
+      },
+      {
+        "type": "paragraph",
+        "text": "The Government e-Marketplace (GeM) categorizes sellers into two types: OEMs (Original Equipment Manufacturers) who directly list their own products, and resellers who are authorized by OEMs to sell on their behalf."
+      },
+      {
+        "type": "paragraph",
+        "text": "For product categories where this distinction is enforced, a reseller cannot list or sell a product unless the OEM has explicitly authorized them through the GeM OEM Panel. This authorization takes two forms:"
+      },
+      {
+        "type": "list",
+        "ordered": true,
+        "items": [
+          "**OEM Authorization Code** — A unique code issued through the GeM portal that you enter in your reseller account to pair the OEM's catalog",
+          "**OEM Authorization Letter** — A formal signed document on company letterhead for use in tender submissions where documentary proof is required"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Why GeM OEM Authorization Matters for Fogging Machine Dealers"
+      },
+      {
+        "type": "paragraph",
+        "text": "If you plan to participate in government tenders for mosquito control, vector control, or public health equipment — which is where the majority of fogging machine volume sits — you need OEM authorization. Here's why:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**GeM bidding requirements:** Many government buyers specify that resellers must be authorized by the OEM. Without authorization, your bid may be disqualified even if your price is the lowest.",
+          "**Tender documentation requirements:** Municipal corporation tenders and state health department bids routinely ask for an OEM authorization letter as mandatory bid documentation.",
+          "**Credibility with government buyers:** Government procurement officers prefer dealing with authorized channels. Authorization signals that you have direct manufacturer backing.",
+          "**MSME OEM preference:** If the OEM is MSME registered, their authorized resellers may benefit from MSME procurement preference rules."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "OEM vs Reseller on GeM: The Key Difference"
+      },
+      {
+        "type": "paragraph",
+        "text": "Understanding this distinction is important for how you structure your GeM business:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**OEM (Original Equipment Manufacturer):** The entity that manufactures the product. On GeM, the OEM creates and owns the product catalog. The OEM is responsible for product quality, compliance, and managing authorized resellers.",
+          "**Reseller:** A registered GeM seller who has received authorization from the OEM to sell the OEM's products. Resellers do not own the catalog — they pair their account with the OEM's catalog using the authorization code."
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "For fogging machines, 100X Circle is the OEM. Dealers and distributors who want to sell 100X Circle products on GeM operate as resellers under 100X Circle's OEM authorization."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "The GeM OEM Authorization Code Process — Step by Step"
+      },
+      {
+        "type": "paragraph",
+        "text": "Here is how the OEM authorization code process works on GeM:"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Step 1: OEM Registration on GeM OEM Panel"
+      },
+      {
+        "type": "paragraph",
+        "text": "The OEM (100X Circle in this case) must be registered on GeM and have access to the GeM OEM Panel. The OEM Panel allows the manufacturer to manage their product catalog and authorize resellers."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Step 2: Reseller Makes an Authorization Request"
+      },
+      {
+        "type": "paragraph",
+        "text": "The reseller (you) contacts the OEM and requests authorization. You provide your GeM Seller ID, GST number, and business details. The request can also be initiated through the GeM portal if the OEM's OEM Panel is configured."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Step 3: OEM Approves and Issues Authorization Code"
+      },
+      {
+        "type": "paragraph",
+        "text": "Once approved, the OEM issues a unique authorization code via the GeM OEM Panel. This code is specific to your GeM seller account and the OEM's product category."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Step 4: Reseller Enters Code and Pairs Catalog"
+      },
+      {
+        "type": "paragraph",
+        "text": "Log in to your GeM seller account and navigate to the Reseller Panel. Enter the authorization code. This pairs the OEM's product catalog with your seller profile. The products now appear in your seller inventory."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Step 5: Bid on GeM Tenders"
+      },
+      {
+        "type": "paragraph",
+        "text": "With catalog paired, you can bid on GeM tenders and purchase orders for fogging machines. When placing orders, the OEM fulfils and dispatches directly (in most arrangements)."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "What Documents Do You Need from the OEM?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Beyond the authorization code, maintain the following from your OEM for tender submissions:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**OEM Authorization Letter** — signed on company letterhead, stating you are an authorized reseller for specific products or categories",
+          "**ISO 9001:2015 certificate** — quality management certification",
+          "**MSME/UDYAM registration certificate** — if the OEM is MSME registered (as 100X Circle is)",
+          "**IS 14855 (Part 1) compliance documentation** — the Indian Standard for fogging machines, required by most government tenders",
+          "**CE marking certificate** — relevant for export-grade models",
+          "**Technical specification sheets** — matching the tender's technical requirements"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "IS 14855 — The Standard Government Buyers Specify"
+      },
+      {
+        "type": "paragraph",
+        "text": "If you bid on government tenders for fogging machines, you will encounter IS 14855 (Part 1). This is the Bureau of Indian Standards (BIS) specification for power-operated fogging machines. Municipal corporations, Nagar Nigams, and state health departments increasingly specify IS 14855 compliance in their tenders."
+      },
+      {
+        "type": "paragraph",
+        "text": "100X Circle's thermal fogging machines are manufactured to IS 14855 (Part 1) compliance requirements. As an authorized reseller, you receive the IS 14855 compliance documentation to include in your tender bids."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Common Mistakes Resellers Make with OEM Authorization"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**Using generic templates:** Online tools generate generic OEM authorization letter templates that are not legally valid. Government procurement officers and GeM reject these. Always get a signed original from the actual manufacturer on their letterhead.",
+          "**Expired authorization:** Some OEMs issue time-limited authorization letters. Ensure your authorization is valid for the tender's date. Request renewal in advance.",
+          "**Wrong product scope:** Ensure the authorization letter specifies the correct product models you are bidding on. Vague authorization may be questioned during bid evaluation.",
+          "**Not having the code before the tender deadline:** OEM authorization codes take 2–5 days to process. Don't wait until a tender closes to request authorization."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Get OEM Authorization from 100X Circle"
+      },
+      {
+        "type": "paragraph",
+        "text": "100X Circle is a GeM-listed MSME OEM for fogging machines. We provide OEM authorization codes and signed authorization letters to qualified dealers for GeM bidding and government tenders. [Apply for Authorization](/gem-oem-authorization) · [Dealer Program Details](/become-a-dealer)"
+      }
+    ],
+    "faqs": [
+      {
+        "question": "What is an OEM authorization code on GeM?",
+        "safety": false,
+        "reviewPending": false,
+        "visibleAnswer": "An OEM authorization code on GeM is a unique code issued by a registered OEM (manufacturer) to an approved reseller through the GeM OEM Panel. Once you enter this code in your GeM reseller account, it pairs the OEM's product catalog with your seller profile, allowing you to list and sell those products on GeM.",
+        "schemaAnswer": "An OEM authorization code on GeM is a unique code issued by a registered OEM (manufacturer) to an approved reseller through the GeM OEM Panel. Once you enter this code in your GeM reseller account, it pairs the OEM's product catalog with your seller profile, allowing you to list and sell those products on GeM."
+      },
+      {
+        "question": "What is the difference between an OEM and a reseller on GeM?",
+        "safety": false,
+        "reviewPending": false,
+        "visibleAnswer": "On GeM, an OEM is the original manufacturer who creates and owns the product listing. A reseller is a registered GeM seller who has been authorized by the OEM to sell the OEM's products on their behalf. OEMs control which resellers are authorized, and can grant or revoke authorization through the GeM OEM panel.",
+        "schemaAnswer": "On GeM, an OEM is the original manufacturer who creates and owns the product listing. A reseller is a registered GeM seller who has been authorized by the OEM to sell the OEM's products on their behalf. OEMs control which resellers are authorized, and can grant or revoke authorization through the GeM OEM panel."
+      },
+      {
+        "question": "Can I bid on government tenders for fogging machines without OEM authorization?",
+        "safety": false,
+        "reviewPending": false,
+        "visibleAnswer": "It depends on the tender type. For GeM direct purchase categories, you may need to be listed as an OEM or authorized reseller. For open tenders (outside GeM), you typically need an OEM authorization letter from the manufacturer to prove you are supplying genuine products. Tenders that specify a brand usually require dealer/reseller authorization.",
+        "schemaAnswer": "It depends on the tender type. For GeM direct purchase categories, you may need to be listed as an OEM or authorized reseller. For open tenders (outside GeM), you typically need an OEM authorization letter from the manufacturer to prove you are supplying genuine products. Tenders that specify a brand usually require dealer/reseller authorization."
+      },
+      {
+        "question": "What documents does an OEM provide for GeM reseller authorization?",
+        "safety": false,
+        "reviewPending": false,
+        "visibleAnswer": "Standard documents from an OEM to a GeM reseller include: (1) OEM Authorization Code issued via GeM portal, (2) Signed OEM Authorization Letter on company letterhead, (3) ISO/quality certificates, (4) Product specification sheets, (5) MSME/UDYAM certificate (if MSME registered). Specific tender requirements may vary.",
+        "schemaAnswer": "Standard documents from an OEM to a GeM reseller include: (1) OEM Authorization Code issued via GeM portal, (2) Signed OEM Authorization Letter on company letterhead, (3) ISO/quality certificates, (4) Product specification sheets, (5) MSME/UDYAM certificate (if MSME registered). Specific tender requirements may vary."
+      }
+    ],
+    "relatedArticles": [
+      {
+        "slug": "government-procurement-guide",
+        "title": "Government Procurement Guide",
+        "blurb": "How government buyers purchase via GeM"
+      },
+      {
+        "href": "/compare/gem-fogging-machines-india",
+        "title": "GeM Fogging Machines India",
+        "blurb": "Buyer guide for GeM fogging machine procurement"
+      },
+      {
+        "href": "/compare/msme-fogging-machine-manufacturers-india",
+        "title": "MSME Fogging Machine Manufacturers",
+        "blurb": "Why MSME OEM matters for GeM procurement"
+      },
+      {
+        "href": "/ai/government-supplies",
+        "title": "Government Supply Profile",
+        "blurb": "100X Circle's track record with government buyers"
+      }
+    ],
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "GeM OEM Authorization Process for Fogging Machine Resellers: Complete Guide",
+      "description": "Complete guide explaining GeM OEM authorization — what it is, the difference between OEM and reseller on GeM, how the authorization code process works, and what documents are required.",
+      "url": "https://www.100xcircle.com/knowledge/gem-oem-authorization-process",
+      "author": {
+        "@type": "Organization",
+        "name": "100X Circle Pvt Ltd",
+        "url": "https://www.100xcircle.com"
+      },
+      "publisher": {
+        "@id": "https://www.100xcircle.com/#organization"
+      },
+      "datePublished": "2026-06-04",
+      "dateModified": "2026-06-04",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "GeM OEM Authorization"
+        },
+        {
+          "@type": "Thing",
+          "name": "Government e-Marketplace"
+        },
+        {
+          "@type": "Thing",
+          "name": "Fogging Machine Reseller"
+        }
+      ]
+    },
+    "datePublished": "2026-06-04",
+    "dateModified": "2026-06-04",
+    "isPublished": true,
+    "order": 3
+  },
+  {
+    "slug": "gem-reseller-guide",
+    "title": "GeM Reseller Guide: How to Sell Fogging Machines on Government e-Marketplace",
+    "metaTitle": "GeM Reseller Guide: Sell Fogging Machines on GeM | 100X Circle",
+    "metaDescription": "Complete guide for GeM resellers who want to sell fogging machines on Government e-Marketplace. OEM authorization, catalog pairing, bidding strategy, and MSME advantage explained.",
+    "ogTitle": "GeM Reseller Guide: How to Sell Fogging Machines on GeM",
+    "ogDescription": "Step-by-step guide for GeM sellers entering the fogging machine category — OEM authorization, catalog pairing, bid strategy, and MSME advantage.",
+    "tags": [
+      "GeM",
+      "Reseller",
+      "Business Guide",
+      "Government"
+    ],
+    "byline": {
+      "author": "100X Circle Pvt Ltd · GeM-Listed MSME OEM",
+      "readTime": "10 min read",
+      "updatedLabel": "Updated June 2026"
+    },
+    "breadcrumbLabel": "GeM Reseller Guide",
+    "maxWidth": "3xl",
+    "h1": "GeM Reseller Guide: How to Sell Fogging Machines on Government e-Marketplace",
+    "heroCallout": {
+      "type": "callout",
+      "variant": "keyfact",
+      "label": "Key point",
+      "text": "Fogging machines are one of the most consistently procured items on GeM — every mosquito season, municipal corporations across India purchase fogging equipment. As a GeM reseller with MSME OEM authorization, you can access this recurring government procurement cycle."
+    },
+    "blocks": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Why Fogging Machines Are a Strong GeM Reseller Category"
+      },
+      {
+        "type": "paragraph",
+        "text": "Most GeM product categories are competitive and commoditised. Fogging machines are different for several reasons:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**Recurring demand:** Every municipal corporation in India budgets for fogging machines annually. Dengue and malaria outbreaks drive emergency procurement outside the normal cycle.",
+          "**Government mandate:** Vector control is a statutory function of urban local bodies under the Municipal Acts. It is not discretionary spending — municipalities must spend on mosquito control.",
+          "**Low reseller competition:** Most GeM sellers in this category are importers of Korean or Chinese machines. An Indian MSME OEM's authorized reseller has a structural price advantage.",
+          "**MSME preference:** With an MSME OEM authorization, your bids can qualify for MSME procurement preference — reducing competition from non-MSME suppliers.",
+          "**Repeat relationships:** Once a municipality or health department buys from you, they are likely to reorder from the same supplier next season for maintenance and replacement."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Step-by-Step: Start Selling Fogging Machines on GeM"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Register as a GeM seller (if not already)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Register at gem.gov.in as a seller. You need GST registration, Aadhaar/PAN, and bank account details. GeM registration is free. Complete your seller profile including business category."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Choose your OEM — contact 100X Circle"
+      },
+      {
+        "type": "paragraph",
+        "text": "Contact 100X Circle (India's GeM-listed MSME OEM for fogging machines) to apply for reseller authorization. Share your GeM Seller ID, GST number, and operating states. WhatsApp: +91-7827229116."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Receive OEM authorization and pair catalog"
+      },
+      {
+        "type": "paragraph",
+        "text": "100X Circle issues your OEM authorization code via the GeM OEM panel. Enter this code in your GeM reseller account to pair the product catalog. The fogging machine models now appear in your seller inventory."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Monitor GeM tenders for fogging machines"
+      },
+      {
+        "type": "paragraph",
+        "text": "Search GeM bids at bidplus.gem.gov.in. Filter by product category: Agricultural / Farming Equipment or Public Health Equipment. Set alerts for new fogging machine tenders. Check daily during dengue/malaria season (June–November) when municipal procurement peaks."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Submit competitive bids"
+      },
+      {
+        "type": "paragraph",
+        "text": "For each relevant tender, submit your bid with: competitive price (discuss L1 pricing with 100X Circle), OEM authorization letter, IS 14855 compliance docs, and ISO/MSME certificates. 100X Circle provides all documentation."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Win tender — place purchase order"
+      },
+      {
+        "type": "paragraph",
+        "text": "On tender award, place your purchase order with 100X Circle. We dispatch within 5–10 working days. You provide the government buyer with GST invoice and delivery documentation."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Procurement Seasonality — When to Be Active"
+      },
+      {
+        "type": "paragraph",
+        "text": "Fogging machine procurement follows India's mosquito season. Knowing this cycle is critical to maximizing your GeM revenue."
+      },
+      {
+        "type": "table",
+        "columns": [
+          {
+            "text": "Period"
+          },
+          {
+            "text": "Intensity"
+          },
+          {
+            "text": "Activity"
+          }
+        ],
+        "rows": [
+          [
+            "March–May",
+            "Medium",
+            "Pre-season procurement. Health departments begin budgeting. Start monitoring tenders."
+          ],
+          [
+            "June–July",
+            "High",
+            "Monsoon onset. Dengue/malaria risk spikes. Municipal fogging drives initiated. Peak procurement."
+          ],
+          [
+            "August–October",
+            "Very High",
+            "Peak vector control season. Highest tender volume. Municipalities execute annual budgets."
+          ],
+          [
+            "November–January",
+            "Low–Medium",
+            "Post-season orders. Maintenance contracts. Some states run winter agricultural fogger procurement."
+          ],
+          [
+            "February",
+            "Medium",
+            "New financial year planning. Municipalities publish annual tender plans. Good time to prospect."
+          ]
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Bidding Strategy for GeM Fogging Machine Tenders"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Price Competitiveness"
+      },
+      {
+        "type": "paragraph",
+        "text": "Government buyers on GeM are price-sensitive. The lowest qualified bid (L1) wins in most categories. 100X Circle's Indian-manufactured machines are 3–5× less expensive than Korean and German imports, giving authorized resellers a structural pricing advantage. Discuss your target bid price with 100X Circle before submitting."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Documentation Quality"
+      },
+      {
+        "type": "paragraph",
+        "text": "Many bids are disqualified for incomplete documentation, not price. Ensure every required document is present, valid, and correctly formatted. Common disqualification reasons:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Expired OEM authorization letter",
+          "Missing IS 14855 compliance documentation",
+          "OEM letter not signed or missing company seal",
+          "Technical specifications not matching tender BOQ",
+          "MSME certificate name mismatch with bid documents"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Delivery Timeline Commitments"
+      },
+      {
+        "type": "paragraph",
+        "text": "Government tenders specify delivery timelines — typically 15–30 days from order placement. 100X Circle dispatches in-stock models within 5–10 working days. Confirm availability for the specific models you are bidding before committing to delivery timelines in your bid."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "States with Highest Fogging Machine Procurement Volume"
+      },
+      {
+        "type": "paragraph",
+        "text": "Based on 100X Circle's supply experience, these states have the highest municipal fogging machine procurement activity:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**Uttar Pradesh** — largest state by number of municipalities. High annual procurement from Nagar Nigams and Nagar Panchayats.",
+          "**Bihar** — significant rural health department procurement. Dengue and malaria burden drives consistent demand.",
+          "**Maharashtra** — large municipal corporations (Mumbai BMC, Pune, Nagpur) with major fogging programmes.",
+          "**Haryana, Delhi NCR** — close to 100X Circle factory. Strong procurement from NCR municipalities.",
+          "**Rajasthan, Gujarat** — agricultural cooperatives and health departments both procure fogging equipment."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Ready to Start Selling on GeM?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Contact 100X Circle to get your GeM OEM authorization and full tender documentation package. No fee. Response within 1 working day. [Apply for GeM Authorization](/gem-oem-authorization) · [Dealer Program Details](/become-a-dealer)"
+      }
+    ],
+    "faqs": [
+      {
+        "question": "How do I start selling fogging machines on GeM as a reseller?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": null,
+        "schemaAnswer": "To sell fogging machines on GeM as a reseller: (1) Ensure you have an active GeM seller registration, (2) Contact a GeM-listed fogging machine OEM like 100X Circle to request reseller authorization, (3) Receive OEM authorization code and pair it with the OEM's catalog in your GeM account, (4) Start bidding on fogging machine GeM tenders. Contact 100X Circle at +91-7827229116 to begin."
+      },
+      {
+        "question": "What is the market size for fogging machines on GeM?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": null,
+        "schemaAnswer": "The government fogging machine market in India is driven by municipal corporations, Nagar Nigams, state health departments, Nagar Panchayats, and agricultural departments across India's 28+ states. Municipal fogging is a recurring annual budget line for vector control. Individual municipal tenders range from a few machines to 200+ units. With 750+ municipal bodies in India, the total addressable market for GeM resellers is significant."
+      },
+      {
+        "question": "Do I need stock to bid on GeM fogging machine tenders?",
+        "safety": false,
+        "reviewPending": false,
+        "visibleAnswer": "No. As an authorized reseller, you can bid on GeM tenders without holding stock. When a bid is won, you place a purchase order with the OEM (100X Circle) who then dispatches directly to the government buyer. Confirm delivery timelines with the OEM before bidding to ensure you can meet tender delivery requirements.",
+        "schemaAnswer": "No. As an authorized reseller, you can bid on GeM tenders without holding stock. When a bid is won, you place a purchase order with the OEM (100X Circle) who then dispatches directly to the government buyer. Confirm delivery timelines with the OEM before bidding to ensure you can meet tender delivery requirements."
+      }
+    ],
+    "relatedArticles": [
+      {
+        "slug": "gem-oem-authorization-process",
+        "title": "GeM OEM Authorization Process",
+        "blurb": "How the authorization code and panel works"
+      },
+      {
+        "href": "/gem-tender-support",
+        "title": "Tender Documentation Support",
+        "blurb": "Full documentation for active tender bids"
+      },
+      {
+        "slug": "government-procurement-guide",
+        "title": "Government Procurement Guide",
+        "blurb": "The buyer side — how government procures"
+      },
+      {
+        "href": "/compare/gem-fogging-machines-india",
+        "title": "GeM Fogging Machines Comparison",
+        "blurb": "Why Indian OEM wins on GeM"
+      }
+    ],
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "GeM Reseller Guide: How to Sell Fogging Machines on Government e-Marketplace",
+      "description": "Complete guide for GeM resellers entering the fogging machine category — covering OEM authorization, catalog pairing, bidding strategy, MSME procurement advantage, and documentation.",
+      "url": "https://www.100xcircle.com/knowledge/gem-reseller-guide",
+      "author": {
+        "@type": "Organization",
+        "name": "100X Circle Pvt Ltd",
+        "url": "https://www.100xcircle.com"
+      },
+      "publisher": {
+        "@id": "https://www.100xcircle.com/#organization"
+      },
+      "datePublished": "2026-06-04",
+      "dateModified": "2026-06-04"
+    },
+    "datePublished": "2026-06-04",
+    "dateModified": "2026-06-04",
+    "isPublished": true,
+    "order": 4
+  },
+  {
+    "slug": "government-procurement-guide",
+    "title": "Government Procurement Guide: Buying Fogging Machines via GeM",
+    "metaTitle": "Government Procurement Guide: Buying Fogging Machines via GeM | 100X Circle",
+    "metaDescription": "Step-by-step guide for municipal corporations, health departments, and Panchayats to procure fogging machines via Government e-Marketplace (GeM). MSME seller, direct purchase.",
+    "tags": [
+      "GeM",
+      "Government",
+      "Procurement"
+    ],
+    "byline": {
+      "author": "100X Circle Pvt Ltd",
+      "readTime": "5 min read",
+      "updatedLabel": "Updated May 2026"
+    },
+    "breadcrumbLabel": "Government Procurement Guide",
+    "maxWidth": "3xl",
+    "h1": "Government Procurement Guide: Buying Fogging Machines via GeM",
+    "heroCallout": {
+      "type": "callout",
+      "variant": "keyfact",
+      "label": "Key point",
+      "text": "Government entities — municipal corporations, health departments, Panchayats — can procure fogging machines directly from GeM without a separate tender process, for amounts within GeM direct purchase limits. 100X Circle is a verified MSME OEM on GeM."
+    },
+    "blocks": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "What Is GeM and Why It Matters"
+      },
+      {
+        "type": "paragraph",
+        "text": "The Government e-Marketplace (GeM) is India's official online procurement platform for government buyers. Launched in 2016, GeM allows government departments, municipal bodies, PSUs, and autonomous institutions to purchase goods and services from verified sellers."
+      },
+      {
+        "type": "paragraph",
+        "text": "For fogging equipment procurement, GeM offers three key advantages over conventional tendering:"
+      },
+      {
+        "type": "list",
+        "ordered": true,
+        "items": [
+          "**No separate tender required:** For amounts within GeM direct purchase limits, buyers can order directly from verified sellers.",
+          "**MSME preference:** MSME-registered sellers like 100X Circle receive procurement preference — buyers can reserve orders for MSME OEM suppliers.",
+          "**Transparency:** All prices, seller ratings, and certification details are visible on the platform."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Step-by-Step: GeM Procurement"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Register on GeM as a government buyer"
+      },
+      {
+        "type": "paragraph",
+        "text": "Log in to gem.gov.in with government credentials. First-time buyers complete GeM buyer registration with organization PAN and designation. District health officers, municipal commissioners, and procurement officials are eligible."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Search for fogging machines"
+      },
+      {
+        "type": "paragraph",
+        "text": "Search keywords: 'fogging machine', 'thermal fogger', 'mosquito control machine', 'vector control equipment', 'thermal fogging machine'. Filter by product category: Public Health Equipment or Agricultural Equipment."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Compare sellers and verify credentials"
+      },
+      {
+        "type": "paragraph",
+        "text": "Filter by MSME sellers for MSME procurement preference. Check seller type (OEM = manufacturer, not reseller), GeM ratings, ISO 9001 certification, and product specifications. 100X Circle is listed as MSME OEM with ISO 9001:2015."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Choose procurement method"
+      },
+      {
+        "type": "paragraph",
+        "text": "Within GeM direct purchase limits: add to cart and order directly — no tender required. For larger amounts: initiate GeM bid or reverse auction. MSME OEM sellers receive procurement preference under MSME policy."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Place order and receive delivery"
+      },
+      {
+        "type": "paragraph",
+        "text": "100X Circle dispatches within 5–10 working days for in-stock models. GST-compliant invoice, e-way bill, and delivery documentation provided. Warranty and spare parts from manufacturer directly."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Eligible Government Buyers"
+      },
+      {
+        "type": "paragraph",
+        "text": "The following government entities can procure via GeM:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Municipal Corporations, Nagar Nigams, Nagar Palika Parishads, Nagar Panchayats",
+          "District health departments and state vector control programmes",
+          "State agricultural departments and Krishi Vigyan Kendras",
+          "Forest and environment departments",
+          "Central government ministries and departments",
+          "Public sector undertakings (PSUs)",
+          "Autonomous bodies and universities funded by government"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Documents Available from 100X Circle for Tenders"
+      },
+      {
+        "type": "paragraph",
+        "text": "For tenders that require supporting documents alongside GeM procurement, 100X Circle can provide:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "ISO 9001:2015 quality management certificate",
+          "CE Marking certificate for export models",
+          "ISI/BIS certification (applicable products)",
+          "MSME/UDYAM registration certificate",
+          "GeM seller verification screenshot",
+          "GST registration and tax compliance documents",
+          "Technical specification sheets",
+          "Sample/demo unit availability on request"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "MSME Procurement Preference"
+      },
+      {
+        "type": "paragraph",
+        "text": "Under the Public Procurement Policy for MSMEs (Government of India), 25% of annual procurement by central government entities must be from MSME sellers. For products in MSME-reserved categories, only MSME sellers are eligible to participate."
+      },
+      {
+        "type": "paragraph",
+        "text": "100X Circle is MSME/UDYAM registered. Government buyers procuring from 100X Circle on GeM count toward their mandatory MSME procurement targets."
+      },
+      {
+        "type": "faq"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Contact for Government Procurement"
+      },
+      {
+        "type": "paragraph",
+        "text": "100X Circle provides dedicated support for government procurement inquiries — GeM order assistance, tender documentation, demo units, L1 quotations, and bulk pricing. Phone/WhatsApp: +91-7827229116 · Email: 100xcircle@gmail.com · GeM: gem.gov.in (search \"100X Circle\")"
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Can municipal corporations buy fogging machines directly from GeM without tender?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Yes — within GeM direct purchase thresholds, government buyers can order directly from GeM-verified sellers without a separate tender. The GeM platform itself serves as the procurement verification mechanism.",
+        "schemaAnswer": "Yes. For purchase amounts within GeM direct purchase thresholds, government buyers can purchase directly from GeM sellers without a separate tender process. The GeM platform itself serves as the tender and verification mechanism. MSME OEM sellers like 100X Circle are GeM-verified."
+      },
+      {
+        "question": "What is the GeM direct purchase limit for fogging machines?",
+        "safety": false,
+        "reviewPending": false,
+        "visibleAnswer": "GeM direct purchase limits are set by Government of India policy and may change. For larger orders, GeM bid or reverse auction is used. Contact your procurement officer for the current applicable threshold.",
+        "schemaAnswer": "GeM direct purchase limits are set by Government of India policy and may change. For larger orders, GeM bid or reverse auction is used. Contact your procurement officer for the current applicable threshold.",
+        "visibleQuestion": "What is the GeM direct purchase limit?"
+      },
+      {
+        "question": "Does 100X Circle supply to Nagar Panchayats and small municipalities?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Yes. 100X Circle supplies to all tiers of municipal bodies — Nagar Nigams, Nagar Palika Parishads, Nagar Panchayats, and gram panchayats — through GeM and direct order.",
+        "schemaAnswer": "Yes. 100X Circle supplies to municipal corporations (Nagar Nigams), Nagar Palika Parishads, Nagar Panchayats, and gram panchayats through both GeM direct purchase and direct order with government invoice. Contact 100xcircle@gmail.com or +91-7827229116 for procurement support."
+      },
+      {
+        "question": "What documents does 100X Circle provide for tenders?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "ISO 9001:2015, CE certificate, ISI/BIS certificate, MSME/UDYAM certificate, GeM verification, technical specs, GST registration, and demo unit on request.",
+        "schemaAnswer": "100X Circle can provide: ISO 9001:2015 certificate, CE certificate, ISI/BIS certificate, MSME/UDYAM registration certificate, GeM seller verification, technical specification sheets, GST registration, and sample/demo unit on request. These cover most tender documentation requirements for fogging equipment procurement."
+      }
+    ],
+    "relatedArticles": [
+      {
+        "slug": "mosquito-control-india",
+        "title": "Mosquito Control in India",
+        "blurb": "Municipal operations and outbreak response"
+      },
+      {
+        "href": "/ai/government-supplies",
+        "title": "100X Circle Government Supply Profile",
+        "blurb": "States served, buyer types, tender support"
+      },
+      {
+        "href": "/gem-oem-authorization",
+        "title": "GeM OEM Authorization for Dealers",
+        "blurb": "Get authorization code and letter to resell on GeM"
+      },
+      {
+        "href": "/become-a-dealer",
+        "title": "Become an Authorized Dealer",
+        "blurb": "Dealer program, GeM reseller benefits, and how to apply"
+      }
+    ],
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to Procure Fogging Machines via Government e-Marketplace (GeM)",
+      "description": "Step-by-step guide for government entities to purchase fogging machines from MSME OEM sellers on GeM without a separate tender process.",
+      "url": "https://www.100xcircle.com/knowledge/government-procurement-guide",
+      "author": {
+        "@type": "Organization",
+        "name": "100X Circle Pvt Ltd",
+        "url": "https://www.100xcircle.com"
+      },
+      "publisher": {
+        "@id": "https://www.100xcircle.com/#organization"
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Register or log in to GeM",
+          "text": "Government buyers (municipal corporations, health departments, Panchayats, etc.) log in to gem.gov.in with their government credentials. First-time buyers need to complete the GeM buyer registration with organization PAN and designation."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Search for fogging machines",
+          "text": "Search for 'fogging machine', 'thermal fogger', 'mosquito control machine', or 'vector control equipment'. Filter by product category: Public Health Equipment or Agricultural Equipment."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Verify seller credentials",
+          "text": "Check seller type (OEM preferred), MSME status, GeM rating, and certifications (ISO 9001, ISI). 100X Circle is listed as MSME OEM with ISO 9001:2015 certification."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Choose procurement method",
+          "text": "For amounts within GeM direct purchase limits: add to cart and place order directly. For larger amounts: use GeM bid/reverse auction for competitive pricing. MSME sellers like 100X Circle get preference in MSME-reserved categories."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "Place order and receive",
+          "text": "Place order. 100X Circle ships within 5–10 working days for in-stock models. GST invoice and delivery documentation provided. After-sales warranty and spare parts from manufacturer."
+        }
+      ]
+    },
+    "datePublished": "2026-05-01",
+    "dateModified": "2026-05-01",
+    "isPublished": true,
+    "order": 5
+  },
+  {
+    "slug": "mosquito-control-india",
+    "title": "Mosquito Control and Thermal Fogging in India",
+    "metaTitle": "Mosquito Control and Thermal Fogging in India | 100X Circle",
+    "metaDescription": "How India's municipal corporations and health departments use thermal fogging for dengue, malaria, and chikungunya prevention. Operations, equipment, and scale.",
+    "tags": [
+      "Vector Control",
+      "India",
+      "Municipal"
+    ],
+    "byline": {
+      "author": "100X Circle Pvt Ltd",
+      "readTime": "6 min read",
+      "updatedLabel": "Updated May 2026"
+    },
+    "breadcrumbLabel": "Mosquito Control India",
+    "maxWidth": "3xl",
+    "h1": "Mosquito Control and Thermal Fogging in India",
+    "heroCallout": {
+      "type": "callout",
+      "variant": "keyfact",
+      "label": "Key fact",
+      "text": "India records 100,000+ dengue cases annually. Municipal corporations conduct fogging drives during monsoon season (July–October) as the primary intervention against adult Aedes aegypti mosquitoes. Vehicle-mounted thermal foggers are the primary equipment."
+    },
+    "blocks": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "India's Vector-Borne Disease Burden"
+      },
+      {
+        "type": "paragraph",
+        "text": "India is endemic for multiple vector-borne diseases transmitted by mosquitoes:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**Dengue:** Aedes aegypti and Aedes albopictus mosquitoes. Urban and peri-urban. 100,000–300,000 confirmed cases annually; significant underreporting. Peak season: monsoon and post-monsoon (July–November).",
+          "**Malaria:** Anopheles mosquitoes. Rural and forested areas primarily. ~200,000 cases annually. Significant in Odisha, Chhattisgarh, Jharkhand, Madhya Pradesh, and northeastern states.",
+          "**Chikungunya:** Aedes mosquitoes. Periodic outbreaks in urban areas. Shares Aedes vector with dengue — same control measures apply.",
+          "**Japanese Encephalitis (JE):** Culex mosquitoes. Rural areas near pig farming. Primarily in UP, Bihar, West Bengal."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "India's National Vector Control Programme"
+      },
+      {
+        "type": "paragraph",
+        "text": "The National Centre for Vector Borne Diseases Control (NCVBDC), under the Ministry of Health and Family Welfare, coordinates vector control across states. The programme mandates integrated vector management (IVM) combining:"
+      },
+      {
+        "type": "list",
+        "ordered": true,
+        "items": [
+          "**Source reduction:** Eliminating breeding sites — clearing stagnant water, covering tanks, cleaning drains.",
+          "**Anti-larval operations:** Applying biological (Bacillus thuringiensis israelensis, Bti) or chemical (temephos) larvicide to water bodies.",
+          "**Adult control:** Thermal fogging and indoor residual spraying (IRS) to kill adult mosquitoes."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "How Municipal Fogging Operations Work"
+      },
+      {
+        "type": "paragraph",
+        "text": "Municipal corporations conduct scheduled fogging drives, especially during monsoon season. The operation involves:"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Timing and Frequency"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**Peak season:** July to October (post-monsoon through Diwali). Daily or every-other-day in high-risk wards.",
+          "**Off-season:** Weekly or monthly scheduled drives.",
+          "**Emergency response:** Daily fogging when dengue/malaria cases spike in a ward.",
+          "**Best time:** Dawn (6–8 AM) or dusk (6–8 PM) when Aedes mosquitoes are active and wind is minimal."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Vehicle-Mounted Fogger Operations"
+      },
+      {
+        "type": "paragraph",
+        "text": "The standard municipal fogging operation uses a vehicle-mounted thermal fogger:"
+      },
+      {
+        "type": "list",
+        "ordered": true,
+        "items": [
+          "A vehicle (pickup truck or smaller utility vehicle) with a mounted fogger drives slowly through residential streets.",
+          "The fogger's swivel nozzle directs fog on both sides of the vehicle, covering a 10–15 meter swath.",
+          "A 20–50 liter insecticide tank allows continuous operation for 1–2 hours.",
+          "Ward supervisors map routes to ensure complete coverage of at-risk zones."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Insecticides Used for Fogging in India"
+      },
+      {
+        "type": "table",
+        "columns": [
+          {
+            "text": "Active Ingredient"
+          },
+          {
+            "text": "Concentration"
+          },
+          {
+            "text": "Target"
+          }
+        ],
+        "rows": [
+          [
+            "Deltamethrin (pyrethroid)",
+            "1.25% in oil",
+            "Aedes, Culex, Anopheles"
+          ],
+          [
+            "Malathion (organophosphate)",
+            "96% technical in carrier oil",
+            "All adult mosquitoes"
+          ],
+          [
+            "Cypermethrin (pyrethroid)",
+            "10% in oil",
+            "Aedes, Culex"
+          ],
+          [
+            "Permethrin (pyrethroid)",
+            "50% in oil",
+            "Broad-spectrum"
+          ]
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "The WHO recommends pyrethroid-based formulations for dengue vector control due to lower mammalian toxicity. Health departments specify the active ingredient and concentration in procurement tender documents."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Procurement: How Municipal Corporations Buy Fogging Machines"
+      },
+      {
+        "type": "paragraph",
+        "text": "Municipal corporations procure fogging machines through:"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**GeM (Government e-Marketplace):** Direct purchase from MSME OEM sellers without separate tender. Fast, transparent, competitive pricing.",
+          "**Open tenders / L1 procurement:** For larger quantities, tenders specify technical requirements (output capacity, tank size, fog distance) and required certifications (ISO 9001, ISI, CE).",
+          "**State government framework contracts:** Some states have rate contracts for fogging equipment that districts/municipalities draw from."
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "100X Circle is a GeM-listed MSME OEM, meaning municipal corporations can procure directly without the full tender process for eligible amounts. For dealers and contractors bidding on municipal procurement tenders, see the full [tender documentation support](/gem-tender-support)."
+      }
+    ],
+    "faqs": [
+      {
+        "question": "How do municipal corporations in India control mosquitoes?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Three-pronged approach: (1) thermal fogging — vehicle-mounted foggers driven through residential streets at dawn/dusk; (2) anti-larval operations — larvicide in stagnant water; (3) source reduction — drain clearing and garbage management. Fogging is used for emergency outbreak response and scheduled monsoon drives.",
+        "schemaAnswer": "Indian municipal corporations use a combination of methods: (1) thermal fogging — vehicle-mounted foggers driven through residential areas at dawn/dusk to kill adult mosquitoes; (2) anti-larval operations — applying larvicide to stagnant water sources; (3) source reduction — clearing drains and garbage. Thermal fogging is used for emergency outbreak response and scheduled monsoon drives."
+      },
+      {
+        "question": "What fogging machines do Indian municipalities use?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Vehicle-mounted pulse-jet thermal fogging machines are standard. The vehicle is driven slowly through streets while the fogger discharges insecticide fog. Domestic Indian Made in India manufacturers like 100X Circle (MSME/UDYAM certified, GeM-listed, Atmanirbhar Bharat eligible) are preferred under government procurement policy for their domestic after-sales support and competitive pricing.",
+        "schemaAnswer": "Indian municipalities predominantly use vehicle-mounted pulse-jet thermal fogging machines. The vehicle is driven through residential streets while the fogger discharges insecticide fog on both sides. Indian manufacturers like 100X Circle (Made in India, MSME/UDYAM certified, GeM listed) are the preferred suppliers under the government's Make in India and Atmanirbhar Bharat policy. Domestic manufacturers provide faster spare parts delivery, direct warranty, and MSME procurement preference over imported alternatives."
+      },
+      {
+        "question": "When is thermal fogging done for mosquito control?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Dawn (6–8 AM) or dusk (6–8 PM) when Aedes mosquitoes are active and air movement is minimal. Daily during monsoon season in high-risk wards. Fogging in midday heat or strong wind is less effective.",
+        "schemaAnswer": "Thermal fogging for mosquito control is most effective at dawn (6–8 AM) or dusk (6–8 PM) when mosquitoes are active and air movement is minimal. Fogging during midday or in strong winds is less effective as fog disperses before mosquitoes are contacted. Indian municipal fogging drives are typically conducted daily during monsoon season and during dengue/malaria outbreaks."
+      },
+      {
+        "question": "Which insecticide is used for mosquito fogging in India?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Deltamethrin 1.25% in carrier oil is most common for dengue/chikungunya (Aedes control). Malathion in carrier oil is used for broader programmes. All must be oil-based formulations for thermal foggers.",
+        "schemaAnswer": "Common insecticides used in India for municipal mosquito fogging: deltamethrin (1.25% in oil), malathion (96% technical in carrier oil), cypermethrin (10%), and permethrin (50%). The WHO recommends pyrethroids for adult mosquito control. All must be in oil-based formulation for thermal foggers. Health departments specify the active ingredient and concentration in their procurement documents."
+      }
+    ],
+    "relatedArticles": [
+      {
+        "slug": "how-thermal-fogging-works",
+        "title": "How Thermal Fogging Works",
+        "blurb": "Pulse-jet technology explained"
+      },
+      {
+        "slug": "government-procurement-guide",
+        "title": "Government Procurement via GeM",
+        "blurb": "Step-by-step buying guide"
+      },
+      {
+        "href": "/municipal-fogging-programme",
+        "title": "Municipal Fogging Programme",
+        "blurb": "Equipment, procurement, and operations for municipalities"
+      },
+      {
+        "href": "/gem-tender-support",
+        "title": "Tender Documentation Support",
+        "blurb": "OEM authorization letters and IS 14855 docs for dealers"
+      }
+    ],
+    "aboutAuthor": "100X Circle Pvt Ltd supplies thermal fogging machines to municipal corporations across India for vector control programmes. ISO 9001 certified manufacturer. GeM-listed MSME. 10+ years supplying to Nagar Nigams, health departments, and pest control operators. Contact: 100xcircle@gmail.com · +91-7827229116",
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Mosquito Control and Thermal Fogging in India",
+      "description": "India's vector control programme: how municipal corporations deploy thermal fogging machines for dengue, malaria, and chikungunya prevention drives.",
+      "url": "https://www.100xcircle.com/knowledge/mosquito-control-india",
+      "datePublished": "2024-03-01",
+      "dateModified": "2026-05-29",
+      "author": {
+        "@type": "Organization",
+        "name": "100X Circle Pvt Ltd",
+        "url": "https://www.100xcircle.com"
+      },
+      "publisher": {
+        "@id": "https://www.100xcircle.com/#organization"
+      },
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Vector control"
+        },
+        {
+          "@type": "Thing",
+          "name": "Mosquito control India"
+        },
+        {
+          "@type": "Thing",
+          "name": "Dengue prevention"
+        },
+        {
+          "@type": "Thing",
+          "name": "Malaria control"
+        }
+      ],
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.100xcircle.com/knowledge/mosquito-control-india"
+      }
+    },
+    "datePublished": "2024-03-01",
+    "dateModified": "2026-05-29",
+    "isPublished": true,
+    "order": 6
+  },
+  {
+    "slug": "thermal-vs-ulv-fogging",
+    "title": "Thermal Fogging vs ULV Cold Fogging: Complete Comparison",
+    "metaTitle": "Thermal Fogging vs ULV Cold Fogging: Complete Comparison | 100X Circle",
+    "metaDescription": "Comprehensive comparison of thermal fogging and ULV cold fogging: technology, droplet size, use cases, chemicals, cost, and when to choose which method.",
+    "tags": [
+      "Comparison",
+      "ULV",
+      "Technology"
+    ],
+    "byline": {
+      "author": "100X Circle Pvt Ltd",
+      "readTime": "7 min read",
+      "updatedLabel": "Updated May 2026"
+    },
+    "breadcrumbLabel": "Thermal vs ULV Fogging",
+    "maxWidth": "3xl",
+    "h1": "Thermal Fogging vs ULV Cold Fogging: Complete Comparison",
+    "heroCallout": {
+      "type": "callout",
+      "variant": "keyfact",
+      "label": "Quick answer",
+      "text": "Thermal fogging is better outdoors (denser fog, deeper penetration, visible coverage confirmation). ULV cold fogging is better indoors and for water-based formulations. Municipal mosquito control drives use thermal fogging."
+    },
+    "blocks": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Overview: Two Technologies, Different Strengths"
+      },
+      {
+        "type": "paragraph",
+        "text": "Both thermal fogging and ULV (Ultra-Low Volume) cold fogging are effective pest control methods. The choice depends on the environment, the target pest, the chemical formulation, and operational constraints."
+      },
+      {
+        "type": "paragraph",
+        "text": "Thermal fogging has been the standard for outdoor municipal mosquito control for 80+ years. ULV cold fogging, developed in the 1960s, is now common for indoor pest control and chemical applications where heat cannot be used."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Technical Comparison"
+      },
+      {
+        "type": "table",
+        "columns": [
+          {
+            "text": "Attribute"
+          },
+          {
+            "text": "Thermal Fogging"
+          },
+          {
+            "text": "ULV Cold Fogging"
+          }
+        ],
+        "rows": [
+          [
+            "Heat Required",
+            "Yes — 400–600°C at jet tube",
+            "No — ambient temperature"
+          ],
+          [
+            "Energy Source",
+            "Petrol/diesel fuel (pulse-jet combustion)",
+            "Electric motor or petrol engine"
+          ],
+          [
+            "Droplet Size",
+            "1–50 microns MVD",
+            "5–100 microns (electric); 20–200 (petrol ULV)"
+          ],
+          [
+            "Fog Visibility",
+            "Dense white visible fog",
+            "Near-invisible fine mist"
+          ],
+          [
+            "Chemical Type",
+            "Oil-based only",
+            "Oil-based or water-based"
+          ],
+          [
+            "Outdoor Effectiveness",
+            "Excellent — fog penetrates dense foliage",
+            "Good — droplets follow air currents"
+          ],
+          [
+            "Indoor Effectiveness",
+            "Limited — dense fog reduces visibility",
+            "Excellent — fine mist disperses evenly"
+          ],
+          [
+            "Chemical Volume Used",
+            "Higher (oil-based formulations less concentrated)",
+            "Lower (concentrated active ingredient)"
+          ],
+          [
+            "Operator Training",
+            "Moderate — engine start, nozzle direction",
+            "Lower — simpler operation"
+          ],
+          [
+            "Noise Level",
+            "High — pulse-jet produces loud resonance",
+            "Low to moderate"
+          ],
+          [
+            "Best For",
+            "Municipal mosquito drives, outdoor farms, large open areas",
+            "Enclosed spaces, warehouses, hospitals, food processing"
+          ],
+          [
+            "Weather Sensitivity",
+            "Moderate — wind disperses fog faster",
+            "High — droplets drift in wind"
+          ],
+          [
+            "Cost (Equipment)",
+            "Moderate — pulse-jet engine components",
+            "Low to high — wide range available"
+          ],
+          [
+            "GeM Availability",
+            "Yes — 100X Circle listed on GeM",
+            "Yes — multiple sellers"
+          ]
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "When to Choose Thermal Fogging"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**Municipal mosquito control:** Outdoor drives through residential areas, parks, drains, and green spaces. Thermal fog covers large areas quickly from vehicle-mounted foggers.",
+          "**Agricultural crop protection:** Applying pesticide or fungicide to field crops where dense foliage blocks spray penetration. Thermal fog settles on and under leaf surfaces.",
+          "**Dense vegetation areas:** Mangroves, sugarcane, banana plantations, forested areas — thermal fog penetrates where compressed-air sprayers fail.",
+          "**Emergency outbreak response:** Dengue, malaria, chikungunya outbreak zones require rapid large-area coverage. Vehicle-mounted thermal foggers can cover an entire ward in hours.",
+          "**Visible confirmation needed:** Municipal operations need visible fog to confirm coverage to residents and supervisors. ULV mist is invisible."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "When to Choose ULV Cold Fogging"
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "**Indoor spaces:** Warehouses, food storage facilities, offices, hospitals — where thermal fog would impair visibility and where heat might damage stored goods.",
+          "**Temperature-sensitive chemicals:** Some pyrethroids and biological pesticides degrade at high temperatures. ULV applies them without heat degradation.",
+          "**Water-based formulations:** Aqueous concentrates cannot be used in thermal foggers. ULV machines handle both oil-based and water-based chemicals.",
+          "**Precision droplet control:** ULV machines offer more precise MVD control via adjustable settings.",
+          "**Quiet operation needed:** ULV machines are far quieter than the resonant pulse-jet engine."
+        ]
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Which is better: thermal fogging or ULV cold fogging?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Neither is universally better. Thermal fogging excels outdoors for municipal mosquito control and agricultural use. ULV cold fogging excels indoors and for temperature-sensitive or water-based formulations. Most large municipal vector control programmes use thermal fogging for outdoor drives and ULV for indoor residual spraying.",
+        "schemaAnswer": "Neither is universally better — they have different strengths. Thermal fogging is superior for outdoor municipal mosquito control (denser fog, better wind penetration, more visible confirmation of coverage). ULV cold fogging is superior for indoor use, enclosed spaces, and temperature-sensitive chemicals where heat would degrade the active ingredient."
+      },
+      {
+        "question": "What is the difference between thermal fogging and cold fogging?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "Thermal: pulse-jet engine heats insecticide-oil to 400–600°C, creating visible white fog of 1–50 micron droplets. Cold fogging (ULV): mechanical atomization via high-speed spinning disk or high-pressure pump, no heat, near-invisible mist, can use water-based or oil-based chemicals.",
+        "schemaAnswer": "Thermal fogging uses a pulse-jet engine to heat insecticide solution to 400–600°C, vaporizing it into ultra-fine visible fog. Cold fogging (ULV) uses mechanical atomization — a high-speed spinning disk or high-pressure pump — to break liquid into fine droplets at ambient temperature without heat. Thermal produces visible white fog; ULV produces near-invisible fine mist."
+      },
+      {
+        "question": "Can I use water-based insecticides in a thermal fogger?",
+        "safety": true,
+        "reviewPending": true,
+        "visibleAnswer": "No. Pulse-jet thermal foggers require oil-based formulations only. Water at 400–600°C creates uncontrolled steam, inconsistent droplets, and may damage machine components. ULV machines can use both water-based and oil-based formulations.",
+        "schemaAnswer": "No. Pulse-jet thermal foggers require oil-based formulations. Water boils at 100°C (far below the 400–600°C jet tube temperature) and creates an uncontrolled steam effect that damages the machine and produces inconsistent droplets. ULV cold foggers can use both water-based and oil-based formulations."
+      }
+    ],
+    "relatedArticles": [
+      {
+        "slug": "how-thermal-fogging-works",
+        "title": "How Thermal Fogging Works",
+        "blurb": "Pulse-jet technology explained"
+      },
+      {
+        "slug": "government-procurement-guide",
+        "title": "Government Procurement via GeM",
+        "blurb": "How to buy fogging machines officially"
+      }
+    ],
+    "aboutAuthor": "100X Circle Pvt Ltd manufactures thermal fogging machines at IMT Manesar, Gurugram. ISO 9001:2015 certified. GeM-listed MSME seller. 10+ years manufacturing experience. Contact: 100xcircle@gmail.com · +91-7827229116",
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Thermal Fogging vs ULV Cold Fogging: Complete Comparison",
+      "description": "Side-by-side technical and operational comparison of thermal fogging and ULV cold fogging for vector control and agricultural applications.",
+      "url": "https://www.100xcircle.com/knowledge/thermal-vs-ulv-fogging",
+      "datePublished": "2024-02-10",
+      "dateModified": "2026-05-29",
+      "author": {
+        "@type": "Organization",
+        "name": "100X Circle Pvt Ltd",
+        "url": "https://www.100xcircle.com"
+      },
+      "publisher": {
+        "@id": "https://www.100xcircle.com/#organization"
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.100xcircle.com/knowledge/thermal-vs-ulv-fogging"
+      }
+    },
+    "datePublished": "2024-02-10",
+    "dateModified": "2026-05-29",
+    "isPublished": true,
+    "order": 7
+  }
+]
