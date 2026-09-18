@@ -12,12 +12,10 @@ type RichContentProps = {
 export function RichContent({ html, className }: RichContentProps) {
   const safe = typeof html === "string" ? html : html == null ? "" : String(html)
   if (!safe) return null
-  // Applied on both branches (and inherited by every RichContent consumer —
-  // blog excerpts, product short descriptions, About page copy) so a long
-  // unbroken token (pasted URL, SKU/model code, no-space string) can't
-  // overflow its container. Previously this was only patched in ad hoc at a
-  // single call site (the blog article body), leaving every other consumer
-  // exposed.
+  // Plain-text branch has no child elements to scope a break-anywhere rule
+  // to, so it keeps the blanket overflow-wrap as a safety net for a raw
+  // unbroken token (pasted URL, SKU/model code, no-space string) — these
+  // fields (excerpts, short descriptions) are short, so the tradeoff is rare.
   if (!isProbablyRichHtml(safe)) {
     return (
       <div className={cn("whitespace-pre-wrap [overflow-wrap:anywhere] [word-break:break-word]", className)}>
@@ -28,7 +26,18 @@ export function RichContent({ html, className }: RichContentProps) {
   return (
     <div
       className={cn(
-        "rich-html max-w-none leading-relaxed [overflow-wrap:anywhere] [word-break:break-word]",
+        // NOT a blanket overflow-wrap/word-break here: `anywhere` affects the
+        // browser's line-breaking algorithm for ALL text, not just genuinely
+        // unbreakable tokens, so ordinary short/medium words end up split
+        // mid-character whenever they land near a line-wrap boundary (e.g.
+        // "treatment" rendering as "tr" / "eatment" across two lines) —
+        // reproduced on a live blog post: 51 words split on one article with
+        // the blanket rule, 0 with it removed. The long-unbroken-token
+        // overflow risk this was meant to guard against realistically only
+        // shows up in links and inline code, so it's scoped to `a`/`code`
+        // below instead of applied to all text.
+        "rich-html max-w-none leading-relaxed",
+        "[&_a]:[overflow-wrap:anywhere] [&_a]:[word-break:break-word]",
         // Paragraphs
         "[&_p]:mb-4 [&_p:last-child]:mb-0",
         // Headings with clear hierarchy
@@ -53,7 +62,7 @@ export function RichContent({ html, className }: RichContentProps) {
         "[&_blockquote]:border-l-4 [&_blockquote]:border-green-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-600 [&_blockquote]:my-4",
         // Code
         "[&_pre]:bg-gray-900 [&_pre]:text-brand-400 [&_pre]:rounded-lg [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre]:my-4 [&_pre]:text-sm",
-        "[&_code]:bg-gray-100 [&_code]:text-gray-800 [&_code]:rounded [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-sm",
+        "[&_code]:bg-gray-100 [&_code]:text-gray-800 [&_code]:rounded [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-sm [&_code]:max-w-full [&_code]:[word-break:break-all]",
         "[&_pre_code]:bg-transparent [&_pre_code]:text-inherit [&_pre_code]:p-0",
         // Quill size classes
         "[&_span.ql-size-small]:text-sm [&_span.ql-size-large]:text-xl [&_span.ql-size-huge]:text-2xl",
