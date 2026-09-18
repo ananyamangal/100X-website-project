@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { serializeBlog } from '@/lib/blogSerialize';
 import { revalidateTag } from 'next/cache';
 import { BLOGS_CACHE_TAG } from '@/lib/blogsQuery';
+import { requirePermission, isAuthResult } from '@/lib/rbac/server';
 
 interface BlogUpdate {
   order?: number;
@@ -22,6 +23,8 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const auth = await requirePermission(request, "blog.edit");
+  if (!isAuthResult(auth)) return auth;
   try {
     const client = await clientPromise;
     const db = client.db();
@@ -68,6 +71,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const auth = await requirePermission(request, "blog.delete");
+  if (!isAuthResult(auth)) return auth;
   try {
     const client = await clientPromise;
     const db = client.db();

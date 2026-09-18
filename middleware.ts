@@ -21,6 +21,39 @@ const AUTH_WHITELIST = new Set([
   "/api/admin/rbac/seed",
 ])
 
+// Roles confined to the surfaces they own, enforced as a DEFAULT-DENY allowlist:
+// anything under /api/admin/ that is not listed here is 403 for these roles.
+// With 320+ admin API routes a blocklist would need re-auditing every time a
+// route is added; an allowlist means a new route is closed to these roles until
+// someone deliberately opens it. Route handlers re-check the specific permission
+// on top of this — the allowlist is the perimeter, not the only gate.
+//
+//   exact    — one specific path (no children)
+//   any      — path and its children, any HTTP method
+//   readOnly — path and its children, GET/HEAD only (read-only Growth OS)
+const RESTRICTED_ROLE_API_ALLOWLIST: Record<
+  string,
+  { exact: string[]; any: string[]; readOnly: string[] }
+> = {
+  // Blogs + Knowledge Hub (read/write), plus read-only Growth OS: dashboards and
+  // GSC/GA4 data are GET, so agent runs and edits (POST/PUT/DELETE) stay blocked.
+  seo_team: {
+    exact: ["/api/admin/auth/me"],
+    any: ["/api/admin/blogs", "/api/admin/knowledge"],
+    readOnly: ["/api/admin/growth/", "/api/admin/gsc/", "/api/admin/ga4/"],
+  },
+  // Blogs + Knowledge Hub only — no Growth OS.
+  content_team: {
+    exact: ["/api/admin/auth/me"],
+    any: ["/api/admin/blogs", "/api/admin/knowledge"],
+    readOnly: [],
+  },
+}
+
+function isPathOrChild(pathname: string, prefix: string): boolean {
+  return pathname === prefix || pathname.startsWith(prefix.endsWith("/") ? prefix : prefix + "/")
+}
+
 const intlMiddleware = createIntlMiddleware(routing)
 
 // pathname here is the raw incoming request path, which may still carry an
@@ -184,6 +217,23 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
 
       // ── 403: permission enforcement for sensitive route groups ─────────────
       const perms: string[] = payload.permissions ?? []
+
+      // ── 403: restricted roles — default-deny allowlist ─────────────────────
+      const allow = RESTRICTED_ROLE_API_ALLOWLIST[payload.role]
+      if (allow) {
+        const method = request.method.toUpperCase()
+        const isRead = method === "GET" || method === "HEAD"
+        const permitted =
+          allow.exact.includes(pathname) ||
+          allow.any.some(prefix => isPathOrChild(pathname, prefix)) ||
+          (isRead && allow.readOnly.some(prefix => isPathOrChild(pathname, prefix)))
+        if (!permitted) {
+          return NextResponse.json(
+            { error: "Forbidden", reason: "role_not_permitted", role: payload.role },
+            { status: 403 }
+          )
+        }
+      }
 
       // Procurement Intelligence — ALL routes require procurement.view
       if (pathname.startsWith("/api/admin/procurement/")) {

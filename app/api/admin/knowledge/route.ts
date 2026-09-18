@@ -3,11 +3,14 @@ import { revalidateTag } from "next/cache"
 import clientPromise from "@/lib/mongodb"
 import { KNOWLEDGE_CACHE_TAG } from "@/lib/knowledgeQuery"
 import type { KnowledgeArticle } from "@/lib/knowledge/types"
+import { requirePermission, isAuthResult } from "@/lib/rbac/server";
 
 const COLLECTION = "knowledge_articles"
 
 // GET - every article including unpublished ones, in hub order
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await requirePermission(request, "knowledge.view");
+  if (!isAuthResult(auth)) return auth;
   try {
     const client = await clientPromise
     const docs = await client.db().collection(COLLECTION).find({}).sort({ order: 1 }).toArray()
@@ -25,6 +28,8 @@ export async function GET() {
 
 // PUT - upsert one article by slug
 export async function PUT(request: NextRequest) {
+  const auth = await requirePermission(request, "knowledge.edit");
+  if (!isAuthResult(auth)) return auth;
   try {
     const body = (await request.json()) as Partial<KnowledgeArticle>
     if (!body?.slug) {

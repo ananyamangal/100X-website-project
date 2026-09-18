@@ -128,6 +128,8 @@ export const PERMISSION_REGISTRY: PermDef[] = [
   { key: "spare_parts.edit",     label: "Edit Spare Parts",      description: "Edit spare parts catalog",                          group: "Content & CMS", subgroup: "Spare Parts",  module: "spare_parts",  action: "edit",   sortOrder: 4401 },
   { key: "banners.view",         label: "View Banners",          description: "View homepage banners",                             group: "Content & CMS", subgroup: "Banners",      module: "banners",      action: "view",   sortOrder: 4500 },
   { key: "banners.edit",         label: "Edit Banners",          description: "Edit homepage banners",                             group: "Content & CMS", subgroup: "Banners",      module: "banners",      action: "edit",   sortOrder: 4501 },
+  { key: "knowledge.view",       label: "View Knowledge Hub",    description: "View Knowledge Hub articles",                       group: "Content & CMS", subgroup: "Knowledge Hub", module: "knowledge",   action: "view",   sortOrder: 4600 },
+  { key: "knowledge.edit",       label: "Edit Knowledge Hub",    description: "Edit Knowledge Hub articles, blocks and FAQs",      group: "Content & CMS", subgroup: "Knowledge Hub", module: "knowledge",   action: "edit",   sortOrder: 4601 },
 
   // ── DEALER & CRM ──────────────────────────────────────────────────────────
   { key: "dealers.view_all",     label: "View All Dealers",      description: "See all dealer records",                            group: "Dealer & CRM", subgroup: "Dealers",  module: "dealers", action: "view",   sortOrder: 5000 },
@@ -230,6 +232,7 @@ export const PERMISSIONS = {
   BILLING_VIEW: "billing.view",
   API_KEYS_VIEW: "api_keys.view", API_KEYS_EDIT: "api_keys.edit",
   BLOG_VIEW: "blog.view", BLOG_CREATE: "blog.create", BLOG_EDIT: "blog.edit", BLOG_DELETE: "blog.delete", BLOG_PUBLISH: "blog.publish",
+  KNOWLEDGE_VIEW: "knowledge.view", KNOWLEDGE_EDIT: "knowledge.edit",
   PRODUCTS_VIEW: "products.view", PRODUCTS_CREATE: "products.create", PRODUCTS_EDIT: "products.edit", PRODUCTS_DELETE: "products.delete",
   DATA_EXPORT_UNLIMITED: "data.export_unlimited", DATA_EXPORT_LIMITED: "data.export_limited", DATA_ALL_LEADS: "data.all_leads",
 } as const

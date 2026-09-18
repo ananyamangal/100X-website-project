@@ -4,9 +4,12 @@ import { BlogInput } from '@/lib/blogModel';
 import { serializeBlog, serializeBlogs } from '@/lib/blogSerialize';
 import { revalidateTag } from 'next/cache';
 import { BLOGS_CACHE_TAG } from '@/lib/blogsQuery';
+import { requirePermission, isAuthResult } from '@/lib/rbac/server';
 
 // GET - Fetch all blog posts
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await requirePermission(request, "blog.view");
+  if (!isAuthResult(auth)) return auth;
   try {
     const client = await clientPromise;
     const db = client.db();
@@ -33,6 +36,8 @@ export async function GET() {
 
 // POST - Create a new blog post
 export async function POST(request: NextRequest) {
+  const auth = await requirePermission(request, "blog.create");
+  if (!isAuthResult(auth)) return auth;
   try {
     const client = await clientPromise;
     const db = client.db();

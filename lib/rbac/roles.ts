@@ -44,6 +44,7 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     "reports.view", "reports.export",
     "paid.view",
     "blog.view", "blog.create", "blog.edit", "blog.delete", "blog.publish",
+    "knowledge.view", "knowledge.edit",
     "products.view", "products.create", "products.edit", "products.delete",
     "case_studies.view", "case_studies.create", "case_studies.edit", "case_studies.delete",
     "landing_pages.view", "landing_pages.edit", "landing_pages.publish",
@@ -106,16 +107,16 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
 
   seo_team: [
     "dashboard.view",
-    "seo.view", "seo.edit", "seo.gsc.view",
+    // Growth OS — READ ONLY. seo.edit is deliberately absent so agents cannot be
+    // run (they cost money) and SEO settings cannot be changed; middleware also
+    // restricts this role to GET on the growth/gsc/ga4 API surface.
+    "seo.view", "seo.gsc.view",
     "analytics.view",
-    "geo.view",
-    "competitors.view",
-    "content.view", "content.edit",
-    "logs.view",
-    "blog.view", "blog.create", "blog.edit",
-    "products.view",
-    "landing_pages.view", "landing_pages.edit",
-    "data.export_limited",
+    // Main dashboard — the only two tabs this role owns. blog.delete is withheld
+    // deliberately: destructive, and not needed to write posts.
+    "blog.view", "blog.create", "blog.edit", "blog.publish",
+    // FAQ editing rides on knowledge.edit — same document, same PUT.
+    "knowledge.view", "knowledge.edit",
   ],
 
   sales_manager: [
@@ -155,15 +156,9 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
 
   content_team: [
     "dashboard.view",
-    "content.view", "content.edit",
-    "seo.view",
-    "logs.view",
-    "blog.view", "blog.create", "blog.edit",
-    "products.view",
-    "case_studies.view", "case_studies.create", "case_studies.edit",
-    "landing_pages.view", "landing_pages.edit",
-    "spare_parts.view",
-    "banners.view",
+    // Main dashboard — the only two tabs this role owns. No Growth OS at all.
+    "blog.view", "blog.create", "blog.edit", "blog.publish",
+    "knowledge.view", "knowledge.edit",
   ],
 
   viewer: [
