@@ -64,7 +64,7 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
       subhead:
         "One machine, two fogging modes — thermal for outdoor vector control, cold for safe indoor disinfection.",
       intro:
-        "The 100XTFS50 is a thermal and cold fogging machine built for teams that don't want to buy two separate units. Thermal mode delivers a dense, far-reaching fog suited to outdoor mosquito and pest control over large areas. Cold mode produces a fine mist that's safe to use indoors — hospitals, warehouses, food facilities — without the heat or smoke of thermal fogging. Both run off the same 12V battery-powered unit.",
+        "The 100XTFS50 is a thermal and cold fogging machine built for teams that don't want to buy two separate units. Thermal mode delivers a dense, far-reaching fog suited to outdoor mosquito and pest control over large areas. Cold mode produces a fine mist that's safe to use indoors — hospitals, warehouses, food facilities — without the heat or smoke of thermal fogging. Both modes run on the same petrol-engine unit, with a 12V battery for push-button start.",
       sections: [
         {
           h2: "Thermal Fogging: Built for Large-Area Outdoor Coverage",

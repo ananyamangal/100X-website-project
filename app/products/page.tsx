@@ -27,7 +27,7 @@ const PRODUCTS_FAQS: FaqEntry[] = [
   },
   {
     q: "Do you provide spare parts and after-sales support for fogger machines?",
-    a: "Yes — genuine [OEM spare parts](/spare-parts) for every fogger machine we sell ship pan-India within 24-48 hours, and our team supports installation and servicing queries directly over call or WhatsApp.",
+    a: "Yes — genuine [OEM spare parts](/spare-parts) for every fogger machine we sell ship pan-India from our Gurugram factory, and our team supports installation and servicing queries directly over call or WhatsApp.",
   },
   {
     q: "Is your fogger machine suitable for both urban and rural pest control programs?",
