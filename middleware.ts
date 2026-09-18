@@ -312,6 +312,14 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
   // ── Legacy product ObjectId → slug redirect ──────────────────────────────────
   const match = pathname.match(/^\/products\/([a-f0-9]{24})$/i)
   if (match && OID_PATTERN.test(match[1])) {
+    // An admin-managed redirect registered for this exact ObjectId URL wins
+    // over slug resolution. Without this, an unpublished product that still
+    // exists in the DB gets a 308 to its slug first, and only then either
+    // chases the slug's own manual rule (a 2-hop chain) or 404s — the
+    // admin's stored destination for the ObjectId URL was never reachable.
+    const manualForIdFirst = manualRedirectFor(request, pathname, origin)
+    if (manualForIdFirst) return manualForIdFirst
+
     const id = match[1]
     let confirmedMissing = false
     try {
