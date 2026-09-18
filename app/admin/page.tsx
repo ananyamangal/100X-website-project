@@ -189,12 +189,56 @@ interface BlogPost {
   updatedAt?: string;
 }
 
+// Roles confined to the tabs they own. This MIRRORS the default-deny allowlist in
+// middleware.ts — it is not the gate. Hiding a tab hides a button; middleware and
+// the route handlers are what actually refuse the request. A role not listed here
+// is unaffected and keeps every tab.
+const RESTRICTED_ROLE_TABS: Record<string, string[]> = {
+  seo_team:     ["blogs", "knowledge"],
+  content_team: ["blogs", "knowledge"],
+}
+
 export default function AdminDashboard() {
   return <AdminDashboardContent />
 }
 
 function AdminDashboardContent() {
   const [activeTab, setActiveTab] = useState("dashboard")
+  const [userRole, setUserRole] = useState<string | null>(null)
+  const [roleLoaded, setRoleLoaded] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/admin/auth/me", { credentials: "same-origin" })
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => setUserRole(data?.user?.role ?? null))
+      .catch(() => setUserRole(null))
+      .finally(() => setRoleLoaded(true))
+  }, [])
+
+  const allowedTabs = userRole ? RESTRICTED_ROLE_TABS[userRole] : undefined
+
+  function canSeeAnyTab(tabs: string[]): boolean {
+    return tabs.some(canSeeTab)
+  }
+
+  // Mirrors the readOnly entry in middleware.ts: seo_team may read Growth OS,
+  // content_team has no business there at all.
+  const canSeeGrowthOS = roleLoaded && (!allowedTabs || userRole === "seo_team")
+
+  function canSeeTab(tab: string): boolean {
+    // Hide everything until the role is known, so a restricted role never sees a
+    // flash of tabs it does not have.
+    if (!roleLoaded) return false
+    if (!allowedTabs) return true
+    return allowedTabs.includes(tab)
+  }
+
+  // A restricted role landing on the default "dashboard" tab would sit on a tab
+  // whose every fetch 403s — send it to the first tab it actually owns.
+  useEffect(() => {
+    if (!roleLoaded || !allowedTabs) return
+    if (!allowedTabs.includes(activeTab)) setActiveTab(allowedTabs[0])
+  }, [roleLoaded, allowedTabs, activeTab])
   const [products, setProducts] = useState<Product[]>([])
   const [banners, setBanners] = useState<Banner[]>([])
   const [blogs, setBlogs] = useState<BlogPost[]>([])
@@ -955,12 +999,14 @@ function AdminDashboardContent() {
                 <Eye className="mr-2" size={16} />
                 View Website
               </Button>
-              <Link href="/admin/growth">
-                <Button className="bg-green-600 hover:bg-green-700 text-white gap-2">
-                  <Activity size={15} />
-                  Open Growth OS
-                </Button>
-              </Link>
+              {canSeeGrowthOS && (
+                <Link href="/admin/growth">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white gap-2">
+                    <Activity size={15} />
+                    Open Growth OS
+                  </Button>
+                </Link>
+              )}
               <AdminUserMenu />
             </div>
           </div>
@@ -975,14 +1021,16 @@ function AdminDashboardContent() {
           <span>
             ⚠ Data normalization is at <strong>{normPct}%</strong> — resolve all migration issues before adding new features.
           </span>
-          <button
-            onClick={() => setActiveTab("migration")}
-            className={`text-xs underline underline-offset-2 hover:no-underline ${
-              normPct >= 75 ? 'text-amber-700' : 'text-red-700'
-            }`}
-          >
-            View Migration Dashboard →
-          </button>
+          {canSeeTab("migration") && (
+            <button
+              onClick={() => setActiveTab("migration")}
+              className={`text-xs underline underline-offset-2 hover:no-underline ${
+                normPct >= 75 ? 'text-amber-700' : 'text-red-700'
+              }`}
+            >
+              View Migration Dashboard →
+            </button>
+          )}
         </div>
       )}
 
@@ -991,94 +1039,110 @@ function AdminDashboardContent() {
           {/* Sidebar */}
           <div className="w-64 flex-shrink-0">
             <nav className="space-y-2">
-              <button
-                onClick={() => setActiveTab("dashboard")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "dashboard"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <BarChart3 className="mr-3" size={20} />
-                Dashboard
-              </button>
-              <button
-                onClick={() => setActiveTab("products")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "products"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Package className="mr-3" size={20} />
-                Products
-              </button>
-              <button
-                onClick={() => setActiveTab("analytics")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "analytics"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Users className="mr-3" size={20} />
-                Analytics
-              </button>
-              <button
-                onClick={() => setActiveTab("content")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "content"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <FileText className="mr-3" size={20} />
-                Content
-              </button>
-              <button
-                onClick={() => setActiveTab("banners")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "banners"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Image className="mr-3" size={20} />
-                Banners
-              </button>
-              <button
-                onClick={() => setActiveTab("categories")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "categories"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Package className="mr-3" size={20} />
-                Categories
-              </button>
-              <button
-                onClick={() => setActiveTab("blogs")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "blogs"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <FileText className="mr-3" size={20} />
-                Blogs
-              </button>
-              <button
-                onClick={() => setActiveTab("knowledge")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "knowledge"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <FileText className="mr-3" size={20} />
-                Knowledge Hub
-              </button>
+              {canSeeTab("dashboard") && (
+                <button
+                  onClick={() => setActiveTab("dashboard")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "dashboard"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <BarChart3 className="mr-3" size={20} />
+                  Dashboard
+                </button>
+              )}
+              {canSeeTab("products") && (
+                <button
+                  onClick={() => setActiveTab("products")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "products"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Package className="mr-3" size={20} />
+                  Products
+                </button>
+              )}
+              {canSeeTab("analytics") && (
+                <button
+                  onClick={() => setActiveTab("analytics")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "analytics"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Users className="mr-3" size={20} />
+                  Analytics
+                </button>
+              )}
+              {canSeeTab("content") && (
+                <button
+                  onClick={() => setActiveTab("content")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "content"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <FileText className="mr-3" size={20} />
+                  Content
+                </button>
+              )}
+              {canSeeTab("banners") && (
+                <button
+                  onClick={() => setActiveTab("banners")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "banners"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Image className="mr-3" size={20} />
+                  Banners
+                </button>
+              )}
+              {canSeeTab("categories") && (
+                <button
+                  onClick={() => setActiveTab("categories")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "categories"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Package className="mr-3" size={20} />
+                  Categories
+                </button>
+              )}
+              {canSeeTab("blogs") && (
+                <button
+                  onClick={() => setActiveTab("blogs")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "blogs"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <FileText className="mr-3" size={20} />
+                  Blogs
+                </button>
+              )}
+              {canSeeTab("knowledge") && (
+                <button
+                  onClick={() => setActiveTab("knowledge")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "knowledge"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <FileText className="mr-3" size={20} />
+                  Knowledge Hub
+                </button>
+              )}
               <a
                 href="/admin/growth/landing-pages"
                 className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
@@ -1086,396 +1150,454 @@ function AdminDashboardContent() {
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3 text-gray-500"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                 Landing Pages ↗
               </a>
-              <button
-                onClick={() => setActiveTab("submissions")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "submissions"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <FileText className="mr-3" size={20} />
-                Submissions
-              </button>
-              <button
-                onClick={() => setActiveTab("accreditations")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "accreditations"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Award className="mr-3" size={20} />
-                Accreditations
-              </button>
-              <button
-                onClick={() => setActiveTab("customers")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "customers"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Users className="mr-3" size={20} />
-                Our Customers
-              </button>
-              <button
-                onClick={() => setActiveTab("redirects")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "redirects"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Link2 className="mr-3" size={20} />
-                Redirects
-              </button>
-              <button
-                onClick={() => setActiveTab("aboutUs")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "aboutUs"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Award className="mr-3" size={20} />
-                About Us Page
-              </button>
-              <button
-                onClick={() => setActiveTab("videoPopup")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "videoPopup"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Video className="mr-3" size={20} />
-                Video Popup
-              </button>
-              <button
-                onClick={() => setActiveTab("brochure")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "brochure"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Download className="mr-3" size={20} />
-                Brochure
-              </button>
-              <button
-                onClick={() => setActiveTab("brochureLeads")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "brochureLeads"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Download className="mr-3" size={20} />
-                Brochure Leads
-              </button>
-              <button
-                onClick={() => setActiveTab("rfqPopup")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "rfqPopup"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <FileText className="mr-3" size={20} />
-                RFQ Popup
-              </button>
-              <button
-                onClick={() => setActiveTab("homepageContent")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "homepageContent"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <FileText className="mr-3" size={20} />
-                Homepage Content
-              </button>
-              <button
-                onClick={() => setActiveTab("trustBadges")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "trustBadges"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <CheckCircle className="mr-3" size={20} />
-                Footer Trust Badges
-              </button>
-              <button
-                onClick={() => setActiveTab("websiteSettings")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "websiteSettings"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <ImageIcon className="mr-3" size={20} />
-                Website Settings
-              </button>
-              <button
-                onClick={() => setActiveTab("legalPages")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "legalPages"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <FileText className="mr-3" size={20} />
-                Legal Pages
-              </button>
-              <button
-                onClick={() => setActiveTab("caseStudies")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "caseStudies"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Star className="mr-3" size={20} />
-                Case Studies
-              </button>
-              <button
-                onClick={() => setActiveTab("govPastPerformance")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "govPastPerformance"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <ClipboardCheck className="mr-3" size={20} />
-                Gov Past Performance
-              </button>
-              <button
-                onClick={() => setActiveTab("govKPIs")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "govKPIs"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <BarChart3 className="mr-3" size={20} />
-                Gov KPIs
-              </button>
-              <button
-                onClick={() => setActiveTab("oemLeads")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "oemLeads"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <FileText className="mr-3" size={20} />
-                OEM Leads
-              </button>
-              <button
-                onClick={() => setActiveTab("spareParts")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "spareParts"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Package className="mr-3" size={20} />
-                Spare Parts
-              </button>
-              <button
-                onClick={() => setActiveTab("reviews")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "reviews"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Star className="mr-3" size={20} />
-                Reviews
-              </button>
-              <button
-                onClick={() => setActiveTab("siteSettings")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "siteSettings"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Settings className="mr-3" size={20} />
-                Site Settings
-              </button>
-              <button
-                onClick={() => setActiveTab("deployments")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "deployments"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Package className="mr-3" size={20} />
-                Deployments
-              </button>
-              <button
-                onClick={() => setActiveTab("videos")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "videos"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Video className="mr-3" size={20} />
-                Videos
-              </button>
-              <button
-                onClick={() => setActiveTab("leadAnalytics")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "leadAnalytics"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <BarChart3 className="mr-3" size={20} />
-                Lead Analytics
-              </button>
-              <button
-                onClick={() => setActiveTab("celebrityAssets")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "celebrityAssets"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Star className="mr-3" size={20} />
-                Celebrity Assets
-              </button>
-              <button
-                onClick={() => setActiveTab("homepageSections")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "homepageSections"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <ImageIcon className="mr-3" size={20} />
-                Homepage Sections
-              </button>
-              <button
-                onClick={() => setActiveTab("settings")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "settings"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Settings className="mr-3" size={20} />
-                Settings
-              </button>
-              <button
-                onClick={() => setActiveTab("procurement")}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  activeTab === "procurement"
-                    ? "bg-green-100 text-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-                GeM Intelligence
-              </button>
-              {/* CMS Foundation */}
-              <div className="pt-2 mt-2 border-t border-gray-200">
-                <p className="px-4 pt-1 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">CMS</p>
+              {canSeeTab("submissions") && (
                 <button
-                  onClick={() => setActiveTab("productBadges")}
+                  onClick={() => setActiveTab("submissions")}
                   className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                    activeTab === "productBadges"
+                    activeTab === "submissions"
                       ? "bg-green-100 text-green-700 font-medium"
                       : "text-gray-600 hover:bg-gray-100"
                   }`}
                 >
-                  <Tag className="mr-3" size={20} />
-                  Product Badges
+                  <FileText className="mr-3" size={20} />
+                  Submissions
                 </button>
+              )}
+              {canSeeTab("accreditations") && (
                 <button
-                  onClick={() => setActiveTab("certifications")}
+                  onClick={() => setActiveTab("accreditations")}
                   className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                    activeTab === "certifications"
+                    activeTab === "accreditations"
                       ? "bg-green-100 text-green-700 font-medium"
                       : "text-gray-600 hover:bg-gray-100"
                   }`}
                 >
                   <Award className="mr-3" size={20} />
-                  Certifications
+                  Accreditations
                 </button>
+              )}
+              {canSeeTab("customers") && (
                 <button
-                  onClick={() => setActiveTab("mediaLibrary")}
+                  onClick={() => setActiveTab("customers")}
                   className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                    activeTab === "mediaLibrary"
+                    activeTab === "customers"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Users className="mr-3" size={20} />
+                  Our Customers
+                </button>
+              )}
+              {canSeeTab("redirects") && (
+                <button
+                  onClick={() => setActiveTab("redirects")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "redirects"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Link2 className="mr-3" size={20} />
+                  Redirects
+                </button>
+              )}
+              {canSeeTab("aboutUs") && (
+                <button
+                  onClick={() => setActiveTab("aboutUs")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "aboutUs"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Award className="mr-3" size={20} />
+                  About Us Page
+                </button>
+              )}
+              {canSeeTab("videoPopup") && (
+                <button
+                  onClick={() => setActiveTab("videoPopup")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "videoPopup"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Video className="mr-3" size={20} />
+                  Video Popup
+                </button>
+              )}
+              {canSeeTab("brochure") && (
+                <button
+                  onClick={() => setActiveTab("brochure")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "brochure"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Download className="mr-3" size={20} />
+                  Brochure
+                </button>
+              )}
+              {canSeeTab("brochureLeads") && (
+                <button
+                  onClick={() => setActiveTab("brochureLeads")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "brochureLeads"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Download className="mr-3" size={20} />
+                  Brochure Leads
+                </button>
+              )}
+              {canSeeTab("rfqPopup") && (
+                <button
+                  onClick={() => setActiveTab("rfqPopup")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "rfqPopup"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <FileText className="mr-3" size={20} />
+                  RFQ Popup
+                </button>
+              )}
+              {canSeeTab("homepageContent") && (
+                <button
+                  onClick={() => setActiveTab("homepageContent")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "homepageContent"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <FileText className="mr-3" size={20} />
+                  Homepage Content
+                </button>
+              )}
+              {canSeeTab("trustBadges") && (
+                <button
+                  onClick={() => setActiveTab("trustBadges")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "trustBadges"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <CheckCircle className="mr-3" size={20} />
+                  Footer Trust Badges
+                </button>
+              )}
+              {canSeeTab("websiteSettings") && (
+                <button
+                  onClick={() => setActiveTab("websiteSettings")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "websiteSettings"
                       ? "bg-green-100 text-green-700 font-medium"
                       : "text-gray-600 hover:bg-gray-100"
                   }`}
                 >
                   <ImageIcon className="mr-3" size={20} />
-                  Media Library
+                  Website Settings
                 </button>
+              )}
+              {canSeeTab("legalPages") && (
                 <button
-                  onClick={() => setActiveTab("migration")}
+                  onClick={() => setActiveTab("legalPages")}
                   className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                    activeTab === "migration"
+                    activeTab === "legalPages"
                       ? "bg-green-100 text-green-700 font-medium"
                       : "text-gray-600 hover:bg-gray-100"
                   }`}
                 >
-                  <ArrowUp className="mr-3" size={20} />
-                  Migration
+                  <FileText className="mr-3" size={20} />
+                  Legal Pages
                 </button>
+              )}
+              {canSeeTab("caseStudies") && (
                 <button
-                  onClick={() => setActiveTab("seoHealth")}
+                  onClick={() => setActiveTab("caseStudies")}
                   className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                    activeTab === "seoHealth"
+                    activeTab === "caseStudies"
                       ? "bg-green-100 text-green-700 font-medium"
                       : "text-gray-600 hover:bg-gray-100"
                   }`}
                 >
-                  <Search className="mr-3" size={20} />
-                  SEO Health
+                  <Star className="mr-3" size={20} />
+                  Case Studies
                 </button>
+              )}
+              {canSeeTab("govPastPerformance") && (
                 <button
-                  onClick={() => setActiveTab("schemaHealth")}
+                  onClick={() => setActiveTab("govPastPerformance")}
                   className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                    activeTab === "schemaHealth"
+                    activeTab === "govPastPerformance"
                       ? "bg-green-100 text-green-700 font-medium"
                       : "text-gray-600 hover:bg-gray-100"
                   }`}
                 >
                   <ClipboardCheck className="mr-3" size={20} />
-                  Schema Health
+                  Gov Past Performance
                 </button>
-                <a
-                  href="/admin/system-health"
-                  className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
+              )}
+              {canSeeTab("govKPIs") && (
+                <button
+                  onClick={() => setActiveTab("govKPIs")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "govKPIs"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
                 >
-                  <Activity className="mr-3" size={20} />
-                  System Health
-                </a>
-                <a
-                  href="/admin/catalog-audit"
-                  className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
+                  <BarChart3 className="mr-3" size={20} />
+                  Gov KPIs
+                </button>
+              )}
+              {canSeeTab("oemLeads") && (
+                <button
+                  onClick={() => setActiveTab("oemLeads")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "oemLeads"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
                 >
-                  <ClipboardCheck className="mr-3" size={20} />
-                  Catalog Audit
-                </a>
-              </div>
-              <div className="pt-2 mt-2 border-t border-gray-200">
-                <a
-                  href="/admin/growth"
-                  className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors bg-gray-900 text-green-400 hover:bg-gray-800 font-semibold"
+                  <FileText className="mr-3" size={20} />
+                  OEM Leads
+                </button>
+              )}
+              {canSeeTab("spareParts") && (
+                <button
+                  onClick={() => setActiveTab("spareParts")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "spareParts"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                  Growth OS ↗
-                </a>
-              </div>
+                  <Package className="mr-3" size={20} />
+                  Spare Parts
+                </button>
+              )}
+              {canSeeTab("reviews") && (
+                <button
+                  onClick={() => setActiveTab("reviews")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "reviews"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Star className="mr-3" size={20} />
+                  Reviews
+                </button>
+              )}
+              {canSeeTab("siteSettings") && (
+                <button
+                  onClick={() => setActiveTab("siteSettings")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "siteSettings"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Settings className="mr-3" size={20} />
+                  Site Settings
+                </button>
+              )}
+              {canSeeTab("deployments") && (
+                <button
+                  onClick={() => setActiveTab("deployments")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "deployments"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Package className="mr-3" size={20} />
+                  Deployments
+                </button>
+              )}
+              {canSeeTab("videos") && (
+                <button
+                  onClick={() => setActiveTab("videos")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "videos"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Video className="mr-3" size={20} />
+                  Videos
+                </button>
+              )}
+              {canSeeTab("leadAnalytics") && (
+                <button
+                  onClick={() => setActiveTab("leadAnalytics")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "leadAnalytics"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <BarChart3 className="mr-3" size={20} />
+                  Lead Analytics
+                </button>
+              )}
+              {canSeeTab("celebrityAssets") && (
+                <button
+                  onClick={() => setActiveTab("celebrityAssets")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "celebrityAssets"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Star className="mr-3" size={20} />
+                  Celebrity Assets
+                </button>
+              )}
+              {canSeeTab("homepageSections") && (
+                <button
+                  onClick={() => setActiveTab("homepageSections")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "homepageSections"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <ImageIcon className="mr-3" size={20} />
+                  Homepage Sections
+                </button>
+              )}
+              {canSeeTab("settings") && (
+                <button
+                  onClick={() => setActiveTab("settings")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "settings"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Settings className="mr-3" size={20} />
+                  Settings
+                </button>
+              )}
+              {canSeeTab("procurement") && (
+                <button
+                  onClick={() => setActiveTab("procurement")}
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                    activeTab === "procurement"
+                      ? "bg-green-100 text-green-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+                  GeM Intelligence
+                </button>
+              )}
+              {/* CMS Foundation */}
+              {canSeeAnyTab(["productBadges", "certifications", "mediaLibrary", "seoHealth", "schemaHealth"]) && (
+                <div className="pt-2 mt-2 border-t border-gray-200">
+                  <p className="px-4 pt-1 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">CMS</p>
+                  <button
+                    onClick={() => setActiveTab("productBadges")}
+                    className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                      activeTab === "productBadges"
+                        ? "bg-green-100 text-green-700 font-medium"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    <Tag className="mr-3" size={20} />
+                    Product Badges
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("certifications")}
+                    className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                      activeTab === "certifications"
+                        ? "bg-green-100 text-green-700 font-medium"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    <Award className="mr-3" size={20} />
+                    Certifications
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("mediaLibrary")}
+                    className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                      activeTab === "mediaLibrary"
+                        ? "bg-green-100 text-green-700 font-medium"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    <ImageIcon className="mr-3" size={20} />
+                    Media Library
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("migration")}
+                    className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                      activeTab === "migration"
+                        ? "bg-green-100 text-green-700 font-medium"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    <ArrowUp className="mr-3" size={20} />
+                    Migration
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("seoHealth")}
+                    className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                      activeTab === "seoHealth"
+                        ? "bg-green-100 text-green-700 font-medium"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    <Search className="mr-3" size={20} />
+                    SEO Health
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("schemaHealth")}
+                    className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                      activeTab === "schemaHealth"
+                        ? "bg-green-100 text-green-700 font-medium"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    <ClipboardCheck className="mr-3" size={20} />
+                    Schema Health
+                  </button>
+                  <a
+                    href="/admin/system-health"
+                    className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
+                  >
+                    <Activity className="mr-3" size={20} />
+                    System Health
+                  </a>
+                  <a
+                    href="/admin/catalog-audit"
+                    className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
+                  >
+                    <ClipboardCheck className="mr-3" size={20} />
+                    Catalog Audit
+                  </a>
+                </div>
+              )}
+              {canSeeGrowthOS && (
+                <div className="pt-2 mt-2 border-t border-gray-200">
+                  <a
+                    href="/admin/growth"
+                    className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors bg-gray-900 text-green-400 hover:bg-gray-800 font-semibold"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    Growth OS ↗
+                  </a>
+                </div>
+              )}
               <div className="pt-2 mt-2 border-t border-gray-200">
                 <AdminSignOutButton className="w-full px-4 py-3 text-left rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 text-sm font-medium" />
               </div>
