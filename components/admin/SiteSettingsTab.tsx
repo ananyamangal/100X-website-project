@@ -84,6 +84,7 @@ export function SiteSettingsTab() {
   const [activeTab, setActiveTab] = useState("general")
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -107,14 +108,24 @@ export function SiteSettingsTab() {
 
   const save = async () => {
     setSaving(true)
-    await fetch("/api/admin/site-settings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(settings),
-    })
-    setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+    setSaveError(null)
+    try {
+      const res = await fetch("/api/admin/site-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error || `Save failed (HTTP ${res.status})`)
+      }
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Save failed — please try again.")
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) return <div className="py-12 text-center text-gray-400">Loading settings…</div>
@@ -127,9 +138,12 @@ export function SiteSettingsTab() {
           <h2 className="text-2xl font-700 text-gray-900">Site Settings</h2>
           <p className="text-sm text-gray-500 mt-1">All settings here update the live site automatically — header, footer, schemas, and Open Graph tags.</p>
         </div>
-        <Button onClick={save} disabled={saving} className="bg-brand-600 hover:bg-brand-700 min-w-[120px]">
-          {saving ? <><Loader2 size={15} className="mr-2 animate-spin" />Saving…</> : saved ? "✓ Saved!" : <><Save size={15} className="mr-2" />Save All</>}
-        </Button>
+        <div className="flex flex-col items-end gap-1.5">
+          <Button onClick={save} disabled={saving} className={`min-w-[120px] ${saveError ? "bg-red-600 hover:bg-red-700" : "bg-brand-600 hover:bg-brand-700"}`}>
+            {saving ? <><Loader2 size={15} className="mr-2 animate-spin" />Saving…</> : saved ? "✓ Saved!" : saveError ? "✕ Save failed" : <><Save size={15} className="mr-2" />Save All</>}
+          </Button>
+          {saveError && <p className="text-xs text-red-600 max-w-[280px] text-right">{saveError}</p>}
+        </div>
       </div>
 
       {/* Tab bar */}
@@ -312,10 +326,11 @@ export function SiteSettingsTab() {
       )}
 
       {/* Sticky save */}
-      <div className="pt-4 pb-2 flex justify-end">
-        <Button onClick={save} disabled={saving} className="bg-brand-600 hover:bg-brand-700">
-          {saving ? <><Loader2 size={15} className="mr-2 animate-spin" />Saving…</> : saved ? "✓ Saved!" : <><Save size={15} className="mr-2" />Save Settings</>}
+      <div className="pt-4 pb-2 flex flex-col items-end gap-1.5">
+        <Button onClick={save} disabled={saving} className={saveError ? "bg-red-600 hover:bg-red-700" : "bg-brand-600 hover:bg-brand-700"}>
+          {saving ? <><Loader2 size={15} className="mr-2 animate-spin" />Saving…</> : saved ? "✓ Saved!" : saveError ? "✕ Save failed" : <><Save size={15} className="mr-2" />Save Settings</>}
         </Button>
+        {saveError && <p className="text-xs text-red-600 max-w-[320px] text-right">{saveError}</p>}
       </div>
     </div>
   )
