@@ -40,6 +40,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { AdminRichTextEditor } from "@/components/admin/AdminRichTextEditor"
+import { KnowledgeManager } from "@/components/admin/KnowledgeManager"
 import { BrandAssetsTab } from "@/components/admin/BrandAssetsTab"
 import { HomepageContentTab } from "@/components/admin/HomepageContentTab"
 import { CaseStudiesTab } from "@/components/admin/CaseStudiesTab"
@@ -1067,6 +1068,17 @@ function AdminDashboardContent() {
                 <FileText className="mr-3" size={20} />
                 Blogs
               </button>
+              <button
+                onClick={() => setActiveTab("knowledge")}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  activeTab === "knowledge"
+                    ? "bg-green-100 text-green-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <FileText className="mr-3" size={20} />
+                Knowledge Hub
+              </button>
               <a
                 href="/admin/growth/landing-pages"
                 className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
@@ -1532,6 +1544,7 @@ function AdminDashboardContent() {
                 setEditingBlog={setEditingBlog}
               />
             )}
+            {activeTab === "knowledge" && <KnowledgeManager />}
             {activeTab === "submissions" && <SubmissionsTab />}
             {activeTab === "accreditations" && (
               <AccreditationsTab
