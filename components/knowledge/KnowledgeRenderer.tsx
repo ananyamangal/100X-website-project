@@ -1,5 +1,6 @@
 import { Fragment } from "react"
 import Link from "next/link"
+import { ChevronDown } from "lucide-react"
 import InlineText, { inlineToPlainText } from "@/components/landing/InlineText"
 import { SITE_URL } from "@/lib/seo/site-config"
 import type {
@@ -116,12 +117,30 @@ export default function KnowledgeRenderer({ article }: { article: KnowledgeArtic
       <>
         <h2>{article.faqHeading ?? "Frequently Asked Questions"}</h2>
         {visibleFaqs.map((f, i) => (
-          <Fragment key={i}>
-            <h3>{f.visibleQuestion ?? f.question}</h3>
-            <p>
-              <InlineText text={f.visibleAnswer as string} linkClassName="" />
-            </p>
-          </Fragment>
+          // Native <details>/<summary> — clickable/expandable without JS.
+          // The question stays a real <h3> inside <summary> so heading
+          // text/level/position is unchanged from the previous flat
+          // rendering (prose styles it the same either way); only the
+          // disclosure chrome around it is new. Doesn't touch faqJsonLd,
+          // which is built separately above from the same article.faqs.
+          <details
+            key={i}
+            className="group mt-3 mb-3 rounded-xl border border-gray-200 px-4 py-1 [&_summary::-webkit-details-marker]:hidden"
+          >
+            <summary className="flex cursor-pointer list-none items-start justify-between gap-3">
+              <h3 className="mt-0 mb-0">{f.visibleQuestion ?? f.question}</h3>
+              <ChevronDown
+                size={20}
+                aria-hidden="true"
+                className="mt-1.5 shrink-0 text-brand-700 transition-transform duration-200 group-open:rotate-180"
+              />
+            </summary>
+            <div className="mt-1">
+              <p>
+                <InlineText text={f.visibleAnswer as string} linkClassName="" />
+              </p>
+            </div>
+          </details>
         ))}
       </>
     ) : null

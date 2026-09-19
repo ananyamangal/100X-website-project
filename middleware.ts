@@ -180,7 +180,32 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
   return payload !== null
 }
 
+// Vercel gives every project a default `<project>-<random>.vercel.app`
+// production-style alias in addition to any custom domain, and it is NOT
+// covered by Deployment Protection the way preview/branch aliases are — it
+// serves the exact same content as www.100xcircle.com, publicly, over its
+// own indexable host. Confirmed indexed 2026-09-19 (one such alias was fully
+// public with a plain `index, follow` meta tag). This can't be turned off
+// without breaking deploys, so instead every response on a `*.vercel.app`
+// host gets `X-Robots-Tag: noindex, nofollow` — crawlable for internal QA,
+// just not indexable. www.100xcircle.com / 100xcircle.com never match this
+// suffix, so their responses are byte-identical to before.
+const VERCEL_APP_HOST_SUFFIX = ".vercel.app"
+
+function isNonCanonicalVercelHost(host: string): boolean {
+  return host.toLowerCase().endsWith(VERCEL_APP_HOST_SUFFIX)
+}
+
 export async function middleware(request: NextRequest, event: NextFetchEvent) {
+  const response = await handleMiddleware(request, event)
+  const host = request.headers.get("host") ?? ""
+  if (isNonCanonicalVercelHost(host)) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow")
+  }
+  return response
+}
+
+async function handleMiddleware(request: NextRequest, event: NextFetchEvent) {
   const { pathname, origin } = request.nextUrl
 
   // ── Admin page routes: inject x-is-admin + enforce unified auth ─────────────

@@ -1,15 +1,25 @@
 ﻿import { cn } from "@/lib/utils"
 import { isProbablyRichHtml, normalizeNbsp, sanitizeRichHtml } from "@/lib/rich-text"
+import { wrapFaqAccordion } from "@/lib/faqAccordion"
 
 type RichContentProps = {
   html: string
   className?: string
+  /**
+   * Wrap an existing "Frequently Asked Questions" h2 + h3/p block (if the
+   * content has one) in native <details>/<summary> so it becomes
+   * clickable/expandable. Opt-in and off by default — every call site other
+   * than the blog post page renders exactly as before. Pure presentation:
+   * doesn't touch JSON-LD, heading text/level, or word count; a safe no-op
+   * when the exact pattern isn't found. See lib/faqAccordion.ts.
+   */
+  faqAccordion?: boolean
 }
 
 /**
  * Renders admin-authored HTML safely, or plain text (legacy) with preserved line breaks.
  */
-export function RichContent({ html, className }: RichContentProps) {
+export function RichContent({ html, className, faqAccordion = false }: RichContentProps) {
   const safe = normalizeNbsp(html)
   if (!safe) return null
   // Plain-text branch has no child elements to scope a break-anywhere rule
@@ -70,9 +80,22 @@ export function RichContent({ html, className }: RichContentProps) {
         "[&_hr]:my-6 [&_hr]:border-gray-200",
         // Strong/em
         "[&_strong]:font-semibold [&_strong]:text-gray-900",
+        // FAQ accordion (see lib/faqAccordion.ts) — native <details>/<summary>,
+        // so it works without JS. Question keeps its own h3 styling above;
+        // only the disclosure chrome and spacing are added here.
+        "[&_details.faq-accordion-item]:mt-3 [&_details.faq-accordion-item]:mb-3 [&_details.faq-accordion-item]:rounded-xl [&_details.faq-accordion-item]:border [&_details.faq-accordion-item]:border-gray-200 [&_details.faq-accordion-item]:px-4 [&_details.faq-accordion-item]:py-1",
+        "[&_summary.faq-accordion-summary]:cursor-pointer [&_summary.faq-accordion-summary]:list-none [&_summary.faq-accordion-summary]:flex [&_summary.faq-accordion-summary]:items-start [&_summary.faq-accordion-summary]:justify-between [&_summary.faq-accordion-summary]:gap-3",
+        "[&_summary.faq-accordion-summary::-webkit-details-marker]:hidden",
+        "[&_summary.faq-accordion-summary_h3]:mt-0 [&_summary.faq-accordion-summary_h3]:mb-0",
+        "[&_.faq-accordion-chevron]:mt-1.5 [&_.faq-accordion-chevron]:shrink-0 [&_.faq-accordion-chevron]:text-brand-700 [&_.faq-accordion-chevron]:transition-transform [&_.faq-accordion-chevron]:duration-200",
+        "[&_details.faq-accordion-item[open]_.faq-accordion-chevron]:rotate-180",
+        "[&_.faq-accordion-answer]:mt-1",
+        "[&_.faq-accordion-answer_p]:mb-2 [&_.faq-accordion-answer_p:last-child]:mb-2",
         className
       )}
-      dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(safe) }}
+      dangerouslySetInnerHTML={{
+        __html: faqAccordion ? wrapFaqAccordion(sanitizeRichHtml(safe)) : sanitizeRichHtml(safe),
+      }}
     />
   )
 }
