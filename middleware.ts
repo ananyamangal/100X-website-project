@@ -4,6 +4,7 @@ import { verifyJWT, SESSION_COOKIE } from "@/lib/rbac/jwt"
 import { routing } from "@/i18n/routing"
 import { isLocaleManagedPathname } from "@/lib/i18n/locale-routes"
 import { isRestrictedRole, canAccessAdminApi, canOpenAdminPage } from "@/lib/rbac/access"
+import { isAuthorizedCronRequest } from "@/lib/rbac/cron"
 
 const OID_PATTERN = /^[a-f0-9]{24}$/i
 
@@ -208,6 +209,11 @@ async function handleMiddleware(request: NextRequest, event: NextFetchEvent) {
 
   // ── Protect admin API routes ─────────────────────────────────────────────────
   if (pathname.startsWith("/api/admin/")) {
+    // Vercel Cron: exact scheduled paths (vercel.json), GET, Bearer CRON_SECRET. No session
+    // cookie is sent, so these skip the session check; the job handlers re-check the secret.
+    if (isAuthorizedCronRequest(request.method, pathname, request.headers.get("authorization"), process.env.CRON_SECRET)) {
+      return NextResponse.next()
+    }
     if (!AUTH_WHITELIST.has(pathname)) {
       const token = request.cookies.get(SESSION_COOKIE)?.value
 
