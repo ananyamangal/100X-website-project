@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { scheduleAutoSync } from "@/lib/knowledge/sync/execute";
 import clientPromise from '@/lib/mongodb';
 import { BlogInput } from '@/lib/blogModel';
 import { serializeBlog, serializeBlogs } from '@/lib/blogSerialize';
@@ -61,6 +62,7 @@ export async function POST(request: NextRequest) {
     const result = await db.collection('blogs').insertOne(newBlog);
     // Public blog reads are tag-cached (lib/blogsQuery) — publish the new post now.
     revalidateTag(BLOGS_CACHE_TAG);
+    scheduleAutoSync(["blogs"]);
     
     const inserted = {
       ...newBlog,

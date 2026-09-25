@@ -11,6 +11,8 @@ import {
   AI_KNOWLEDGE_ARTICLES,
   SITE_URL,
 } from "@/lib/ai/knowledge"
+import { getPublishedKnowledgeArticles } from "@/lib/knowledgeQuery"
+import { mergeKnowledgeFeed } from "@/lib/knowledge/feed"
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -91,12 +93,20 @@ export async function GET(
     }
 
     case "knowledge": {
+      // Curated list + every published knowledge_articles entry it does not already cover.
+      // getPublishedKnowledgeArticles never throws (a DB outage yields the curated list alone).
+      const feed = mergeKnowledgeFeed(
+        AI_KNOWLEDGE_ARTICLES,
+        await getPublishedKnowledgeArticles(),
+        SITE_URL,
+        AI_LAST_UPDATED,
+      )
       return json({
         schema_version: "1.0",
-        last_updated: AI_LAST_UPDATED,
+        last_updated: feed.lastUpdated,
         source: `${SITE_URL}/api/ai/knowledge`,
-        count: AI_KNOWLEDGE_ARTICLES.length,
-        data: AI_KNOWLEDGE_ARTICLES,
+        count: feed.items.length,
+        data: feed.items,
       })
     }
 

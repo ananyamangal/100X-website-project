@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { scheduleAutoSync } from "@/lib/knowledge/sync/execute"
 import clientPromise from "@/lib/mongodb"
 
 export async function GET() {
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     }
     const result = await db.collection("gov_past_performance").insertOne(doc)
+    scheduleAutoSync(["past_performance"])
     return NextResponse.json({ ...doc, _id: String(result.insertedId) })
   } catch {
     return NextResponse.json({ error: "Failed to create" }, { status: 500 })

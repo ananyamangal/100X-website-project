@@ -11,12 +11,13 @@ export const KNOWLEDGE_CACHE_TAG = "knowledge"
 
 const COLLECTION = "knowledge_articles"
 
-/** Fields that never reach the renderer (Mongo internals / audit). */
+/** Fields that never reach the renderer (Mongo internals / audit / sync bookkeeping). */
 function toArticle(doc: Record<string, unknown>): KnowledgeArticle {
-  const { _id, createdAt, updatedAt, ...rest } = doc
+  const { _id, createdAt, updatedAt, sync, ...rest } = doc
   void _id
   void createdAt
   void updatedAt
+  void sync // internal sync bookkeeping never reaches the renderer
   return rest as unknown as KnowledgeArticle
 }
 

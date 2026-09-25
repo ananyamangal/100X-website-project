@@ -37,19 +37,26 @@ export async function PUT(request: NextRequest) {
     }
 
     // _id is immutable — a round-tripped document would otherwise fail the update.
-    const { _id, createdAt, ...rest } = body as Record<string, unknown>
+    // `sync` is the sync engine's bookkeeping, never taken from the client: it is set below.
+    const { _id, createdAt, sync, ...rest } = body as Record<string, unknown>
     void _id
     void createdAt
+    void sync
 
     const client = await clientPromise
-    await client
-      .db()
-      .collection(COLLECTION)
-      .updateOne(
-        { slug: body.slug },
-        { $set: { ...rest, updatedAt: new Date() }, $setOnInsert: { createdAt: new Date() } },
-        { upsert: true },
-      )
+    const col = client.db().collection(COLLECTION)
+    const $set: Record<string, unknown> = { ...rest, updatedAt: new Date() }
+
+    // An admin edit of a synced article locks it: the Knowledge Base sync then leaves it (and its
+    // published / draft state) alone, so a reviewed draft is never flipped back by the next run.
+    const existing = await col.findOne({ slug: body.slug }, { projection: { sync: 1 } })
+    if (existing?.sync) $set["sync.locked"] = true
+
+    await col.updateOne(
+      { slug: body.slug },
+      { $set, $setOnInsert: { createdAt: new Date() } },
+      { upsert: true },
+    )
 
     revalidateTag(KNOWLEDGE_CACHE_TAG)
     return NextResponse.json({ success: true })

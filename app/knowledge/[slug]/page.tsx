@@ -10,8 +10,12 @@ import { SITE_URL } from "@/lib/seo/site-config"
  * `app/knowledge/<slug>/page.tsx` folder keep serving from there — a static
  * route segment wins over this dynamic one, so the two coexist during the
  * phased migration and only the migrated slugs reach this file.
+ *
+ * `dynamicParams` is on so a slug added by the Knowledge Base sync resolves
+ * without a redeploy: an unknown or unpublished slug still 404s, because
+ * getKnowledgeArticleBySlug only sees published articles.
  */
-export const dynamicParams = false
+export const dynamicParams = true
 
 export async function generateStaticParams() {
   return getAllKnowledgeSlugs()
@@ -28,7 +32,8 @@ export async function generateMetadata({
   return {
     title: a.metaTitle,
     description: a.metaDescription,
-    alternates: { canonical: `${SITE_URL}/knowledge/${a.slug}` },
+    // Synced pages are derived views of an existing page and canonical to it; hand-written ones are self-canonical.
+    alternates: { canonical: a.canonicalUrl ?? `${SITE_URL}/knowledge/${a.slug}` },
     openGraph: {
       title: a.ogTitle ?? a.title,
       description: a.ogDescription ?? a.metaDescription,

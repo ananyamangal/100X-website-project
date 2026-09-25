@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { scheduleAutoSync } from "@/lib/knowledge/sync/execute"
 import { ObjectId } from "mongodb"
 import clientPromise from "@/lib/mongodb"
 
@@ -18,6 +19,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     await db
       .collection("gov_past_performance")
       .updateOne({ _id: new ObjectId(params.id) }, { $set: update })
+    scheduleAutoSync(["past_performance"])
     return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 })
@@ -29,6 +31,7 @@ export async function DELETE(_: NextRequest, { params }: { params: { id: string 
     const client = await clientPromise
     const db = client.db()
     await db.collection("gov_past_performance").deleteOne({ _id: new ObjectId(params.id) })
+    scheduleAutoSync(["past_performance"])
     return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: "Failed to delete" }, { status: 500 })

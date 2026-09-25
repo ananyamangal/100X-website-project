@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { scheduleAutoSync } from "@/lib/knowledge/sync/execute"
 import clientPromise from "@/lib/mongodb"
 
 const VALID_CATEGORIES = ["Municipal", "Health", "Railways", "Defence", "Agriculture", "Other"]
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
     const client = await clientPromise
     const db = client.db()
     const result = await db.collection("gov_past_performance").insertMany(parsed)
+    scheduleAutoSync(["past_performance"])
 
     return NextResponse.json({
       inserted: result.insertedCount,

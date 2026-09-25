@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { scheduleAutoSync } from "@/lib/knowledge/sync/execute"
 import clientPromise from "@/lib/mongodb"
 
 export async function POST() {
@@ -12,6 +13,7 @@ export async function POST() {
       { published: false, isSample: { $ne: true } },
       { $set: { published: true, updatedAt: new Date().toISOString() } }
     )
+    if (result.modifiedCount > 0) scheduleAutoSync(["case_studies"])
 
     return NextResponse.json({
       ok: true,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { scheduleAutoSync } from "@/lib/knowledge/sync/execute";
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 import { serializeBlog } from '@/lib/blogSerialize';
@@ -54,6 +55,7 @@ export async function PUT(
     }
     // Public blog reads are tag-cached (lib/blogsQuery) — publish the edit now.
     revalidateTag(BLOGS_CACHE_TAG);
+    scheduleAutoSync(["blogs"]);
 
     const blog = await db.collection('blogs').findOne({ _id: new ObjectId(params.id) });
     if (!blog) {
@@ -85,6 +87,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
     revalidateTag(BLOGS_CACHE_TAG);
+    scheduleAutoSync(["blogs"]);
 
     return NextResponse.json({ success: true });
   } catch (error) {
