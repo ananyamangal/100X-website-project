@@ -55,6 +55,17 @@ export const LANDING_PAGES_PERMISSION = "landing_pages.view"
 // the growth/gsc/ga4 surface, and writes there stay closed regardless.
 export const GROWTH_OS_READ_PERMISSIONS: readonly string[] = ["seo.view", "analytics.view"]
 
+// Which confined roles may use Growth OS (and the Landing Pages editor, which lives
+// inside it) at all. Deliberately a role list, not a permission check: content_team
+// holds seo.view / dashboard.view / logs.view for the main dashboard, and letting
+// those open Growth OS exposed its data (2026-09-25 incident). Growth OS route
+// handlers mostly have no permission check of their own, so this gate is load-bearing.
+export const GROWTH_OS_ROLES: ReadonlySet<string> = new Set(["seo_team"])
+
+// Admin pages (not APIs) a confined role without Growth OS may open. Everything
+// else under /admin (Growth OS, system health, catalog audit, ...) redirects to /admin.
+const NO_GROWTH_PAGES: readonly string[] = ["/admin", "/admin/change-password"]
+
 interface ApiRule {
   prefix: string
   // Any-of lists. A missing list means the method class is closed to confined roles.
@@ -96,12 +107,7 @@ const API_RULES: readonly ApiRule[] = [
   { prefix: "/api/admin/spare-parts", read: ["spare_parts.view"], write: ["spare_parts.edit"] },
   { prefix: "/api/admin/banners", read: ["banners.view"], write: ["banners.edit"] },
 
-  // Handlers re-check landing_pages.* themselves.
-  {
-    prefix: "/api/admin/landing-pages",
-    read: ["landing_pages.view"],
-    write: ["landing_pages.edit", "landing_pages.publish"],
-  },
+  // Landing pages: see canAccessAdminApi (Growth OS roles only).
 
   // Site content tabs. These handlers have no permission check of their own.
   // Lead / customer data stays closed: the RFQ popup's leads sub-route is listed FIRST with no
@@ -176,15 +182,25 @@ function holdsAny(permissions: readonly string[], required: readonly string[] | 
 export function canAccessAdminApi(
   permissions: readonly string[],
   method: string,
-  pathname: string
+  pathname: string,
+  role: string | null | undefined
 ): boolean {
   const m = method.toUpperCase()
   const isRead = m === "GET" || m === "HEAD"
+  const growthRole = !!role && GROWTH_OS_ROLES.has(role)
 
   if (pathname === "/api/admin/auth/me") return true
 
   if (GROWTH_READ_PREFIXES.some(prefix => isPathOrChild(pathname, prefix))) {
-    return isRead && holdsAny(permissions, GROWTH_OS_READ_PERMISSIONS)
+    return growthRole && isRead && holdsAny(permissions, GROWTH_OS_READ_PERMISSIONS)
+  }
+
+  // The Landing Pages editor lives in Growth OS; handlers re-check landing_pages.* themselves.
+  if (isPathOrChild(pathname, "/api/admin/landing-pages")) {
+    if (!growthRole) return false
+    return isRead
+      ? holdsAny(permissions, ["landing_pages.view"])
+      : holdsAny(permissions, ["landing_pages.edit", "landing_pages.publish"])
   }
 
   const rule = API_RULES.find(r => isPathOrChild(pathname, r.prefix))
@@ -205,10 +221,20 @@ export function firstVisibleDashboardTab(permissions: readonly string[]): string
   return Object.keys(DASHBOARD_TAB_PERMISSIONS).find(tab => canSeeDashboardTab(permissions, tab)) ?? null
 }
 
-export function canSeeGrowthOS(permissions: readonly string[]): boolean {
-  return holdsAny(permissions, GROWTH_OS_READ_PERMISSIONS)
+export function canSeeGrowthOS(permissions: readonly string[], role: string | null | undefined): boolean {
+  return !!role && GROWTH_OS_ROLES.has(role) && holdsAny(permissions, GROWTH_OS_READ_PERMISSIONS)
 }
 
-export function canSeeLandingPages(permissions: readonly string[]): boolean {
-  return permissions.includes(LANDING_PAGES_PERMISSION)
+export function canSeeLandingPages(permissions: readonly string[], role: string | null | undefined): boolean {
+  return !!role && GROWTH_OS_ROLES.has(role) && permissions.includes(LANDING_PAGES_PERMISSION)
+}
+
+/**
+ * Whether a confined role may open an /admin page. Callers apply this only when
+ * isRestrictedRole(role). Growth OS roles keep every page (unchanged); the others
+ * get the main dashboard and change-password only.
+ */
+export function canOpenAdminPage(role: string | null | undefined, pathname: string): boolean {
+  if (!!role && GROWTH_OS_ROLES.has(role)) return true
+  return NO_GROWTH_PAGES.includes(pathname.replace(/\/+$/, "") || "/")
 }

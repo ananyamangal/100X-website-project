@@ -1,15 +1,25 @@
 // Run: node --test tests/unit/rbac-access.test.mjs
 import test from "node:test"
 import assert from "node:assert/strict"
+import fs from "node:fs"
 import {
   isRestrictedRole,
-  canAccessAdminApi,
+  canAccessAdminApi as canAccessAdminApiForRole,
   canSeeDashboardTab,
-  canSeeGrowthOS,
-  canSeeLandingPages,
+  canSeeGrowthOS as canSeeGrowthOSForRole,
+  canSeeLandingPages as canSeeLandingPagesForRole,
+  canOpenAdminPage,
   firstVisibleDashboardTab,
   DASHBOARD_TAB_PERMISSIONS,
 } from "../../lib/rbac/access.ts"
+
+// Growth OS / Landing Pages / page access depend on the ROLE as well as the permissions.
+// Fixtures are registered with their role; anything else is treated as content_team.
+const ROLE_OF = new Map()
+const roleOf = perms => ROLE_OF.get(perms) ?? "content_team"
+const canAccessAdminApi = (perms, m, p) => canAccessAdminApiForRole(perms, m, p, roleOf(perms))
+const canSeeGrowthOS = perms => canSeeGrowthOSForRole(perms, roleOf(perms))
+const canSeeLandingPages = perms => canSeeLandingPagesForRole(perms, roleOf(perms))
 
 // Mirrors lib/rbac/engine.ts: (role base + grants) - denials.
 const effective = (base, granted = [], denied = []) => {
@@ -34,6 +44,7 @@ const CONTENT_TEAM = [
 
 const SEO_TEAM = ["dashboard.view", "seo.view", "seo.gsc.view", "analytics.view",
   "blog.view", "blog.create", "blog.edit", "blog.publish", "knowledge.view", "knowledge.edit"]
+ROLE_OF.set(SEO_TEAM, "seo_team")
 
 const visibleTabs = perms => Object.keys(DASHBOARD_TAB_PERMISSIONS).filter(t => canSeeDashboardTab(perms, t))
 
@@ -42,7 +53,7 @@ test("content_team with the full permission set sees every section it can .view"
     visibleTabs(CONTENT_TEAM).sort(),
     ["banners", "blogs", "caseStudies", "categories", "certifications", "knowledge", "productBadges", "products", "spareParts"]
   )
-  assert.equal(canSeeLandingPages(CONTENT_TEAM), true)
+  assert.equal(canSeeLandingPages(CONTENT_TEAM), false)
   assert.equal(canSeeGrowthOS(CONTENT_TEAM), false)
   assert.equal(firstVisibleDashboardTab(CONTENT_TEAM), "blogs")
 })
@@ -66,8 +77,8 @@ test("API perimeter follows permissions for the content surfaces", () => {
   assert.ok(ok("PUT", "/api/admin/spare-parts/abc"))
   assert.ok(ok("GET", "/api/admin/banners"))
   assert.ok(ok("PUT", "/api/admin/banners/abc"))
-  assert.ok(ok("GET", "/api/admin/landing-pages/metrics"))
-  assert.ok(ok("POST", "/api/admin/landing-pages/some-slug/override"))
+  assert.equal(ok("GET", "/api/admin/landing-pages/metrics"), false)
+  assert.equal(ok("POST", "/api/admin/landing-pages/some-slug/override"), false)
   assert.ok(ok("POST", "/api/admin/upload-file"))
   assert.ok(ok("GET", "/api/admin/blogs"))
   assert.ok(ok("GET", "/api/admin/knowledge"))
@@ -152,6 +163,10 @@ const CONTENT_TEAM_WIDE = [...CONTENT_TEAM, ...SITE_CONTENT]
 const SEO_TEAM_LIVE = ["analytics.export", "analytics.view", "blog.create", "blog.delete", "blog.edit",
   "blog.publish", "blog.view", "content.edit", "dashboard.view", "geo.view", "knowledge.edit",
   "knowledge.view", "landing_pages.view", "products.view", "seo.export", "seo.view"]
+ROLE_OF.set(SEO_TEAM_LIVE, "seo_team")
+// The live content_team row after the 2026-09-25 migration (56 permissions; includes
+// dashboard.view, seo.view and logs.view, which drove the Growth OS exposure).
+const CONTENT_TEAM_LIVE = JSON.parse(fs.readFileSync(new URL("./fixtures/content-team-live-2026-09-25.json", import.meta.url), "utf8"))
 const SITE_CONTENT_APIS = ["about-page", "home-content", "homepage-sections", "trust-badges", "brand-assets",
   "accreditations", "customers", "videos", "video-popup", "celebrity-assets", "brochure", "rfq-popup",
   "media-assets", "media-library", "legal-pages", "reviews", "gov-past-performance", "gov-kpis"]
@@ -242,4 +257,62 @@ test("the live seo_team row gains nothing from this change", () => {
   }
   assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/redirects"), false)
   assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/migrate"), false)
+})
+
+// ── Growth OS closed to content_team (2026-09-25 incident) ────────────────────
+// eb48100 opened Growth OS reads to any confined role holding seo.view/analytics.view;
+// content_team holds seo.view, so Vivek could read ~116 Growth OS GET routes whose
+// handlers have no permission check. Growth OS is now a role decision (seo_team only).
+const GROWTH_GETS = fs.readFileSync(new URL("./fixtures/growth-get-routes.txt", import.meta.url), "utf8")
+  .split("\n").map(l => l.trim()).filter(Boolean)
+
+test("content_team (live row) cannot read or write ANY Growth OS / GSC / GA4 route", () => {
+  assert.ok(GROWTH_GETS.length > 100, "fixture lists the Growth OS GET routes")
+  for (const p of GROWTH_GETS) {
+    for (const m of ["GET", "HEAD", "POST", "PUT", "DELETE"]) {
+      assert.equal(canAccessAdminApi(CONTENT_TEAM_LIVE, m, p), false, m + " " + p)
+    }
+  }
+  for (const p of ["/api/admin/gsc/overview", "/api/admin/ga4/summary", "/api/admin/growth/cron/revenue-director",
+    "/api/admin/growth/crm/dealers", "/api/admin/growth/director/customer-match-export", "/api/admin/growth/logs"]) {
+    assert.equal(canAccessAdminApi(CONTENT_TEAM_LIVE, "GET", p), false, p)
+  }
+  assert.equal(canSeeGrowthOS(CONTENT_TEAM_LIVE), false)
+  assert.equal(canSeeLandingPages(CONTENT_TEAM_LIVE), false)
+  assert.equal(canAccessAdminApi(CONTENT_TEAM_LIVE, "GET", "/api/admin/landing-pages"), false)
+})
+
+test("content_team pages: main dashboard and change-password only", () => {
+  assert.ok(canOpenAdminPage("content_team", "/admin"))
+  assert.ok(canOpenAdminPage("content_team", "/admin/"))
+  assert.ok(canOpenAdminPage("content_team", "/admin/change-password"))
+  for (const p of ["/admin/growth", "/admin/growth/security", "/admin/growth/logs", "/admin/growth/founder",
+    "/admin/growth/market-intelligence", "/admin/growth/platform-registry", "/admin/growth/agents/health-check",
+    "/admin/growth/landing-pages", "/admin/system-health", "/admin/catalog-audit", "/admin/seo-pages",
+    "/admin/visibility", "/admin/growthx"]) {
+    assert.equal(canOpenAdminPage("content_team", p), false, p)
+  }
+})
+
+test("content_team keeps its whole CMS scope after the Growth OS fix", () => {
+  assert.deepEqual(visibleTabs(CONTENT_TEAM_LIVE).sort(), [
+    "aboutUs", "accreditations", "banners", "blogs", "brochure", "caseStudies", "categories",
+    "celebrityAssets", "certifications", "customers", "govKPIs", "govPastPerformance",
+    "homepageContent", "homepageSections", "knowledge", "legalPages", "mediaLibrary", "migration",
+    "productBadges", "products", "redirects", "reviews", "rfqPopup", "spareParts", "trustBadges",
+    "videoPopup", "videos", "websiteSettings",
+  ])
+  assert.ok(canAccessAdminApi(CONTENT_TEAM_LIVE, "PUT", "/api/admin/about-page"))
+  assert.ok(canAccessAdminApi(CONTENT_TEAM_LIVE, "POST", "/api/admin/blogs"))
+})
+
+test("seo_team is unchanged by the Growth OS fix (reads, pages, landing pages)", () => {
+  assert.ok(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/growth/dashboard"))
+  assert.ok(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/gsc/overview"))
+  assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, "POST", "/api/admin/growth/dashboard"), false)
+  assert.ok(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/landing-pages"))
+  assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, "PUT", "/api/admin/landing-pages/x"), false)
+  assert.equal(canSeeGrowthOS(SEO_TEAM_LIVE), true)
+  assert.equal(canSeeLandingPages(SEO_TEAM_LIVE), true)
+  assert.ok(canOpenAdminPage("seo_team", "/admin/growth/seo"))
 })

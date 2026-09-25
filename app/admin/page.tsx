@@ -227,8 +227,8 @@ function AdminDashboardContent() {
     return tabs.some(canSeeTab)
   }
 
-  const canSeeGrowthOS = roleLoaded && (!restricted || canSeeGrowthOSPerm(userPermissions))
-  const showLandingPages = roleLoaded && (!restricted || canSeeLandingPagesPerm(userPermissions))
+  const canSeeGrowthOS = roleLoaded && (!restricted || canSeeGrowthOSPerm(userPermissions, userRole))
+  const showLandingPages = roleLoaded && (!restricted || canSeeLandingPagesPerm(userPermissions, userRole))
 
   function canSeeTab(tab: string): boolean {
     // Hide everything until the role is known, so a restricted role never sees a

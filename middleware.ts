@@ -3,7 +3,7 @@ import createIntlMiddleware from "next-intl/middleware"
 import { verifyJWT, SESSION_COOKIE } from "@/lib/rbac/jwt"
 import { routing } from "@/i18n/routing"
 import { isLocaleManagedPathname } from "@/lib/i18n/locale-routes"
-import { isRestrictedRole, canAccessAdminApi } from "@/lib/rbac/access"
+import { isRestrictedRole, canAccessAdminApi, canOpenAdminPage } from "@/lib/rbac/access"
 
 const OID_PATTERN = /^[a-f0-9]{24}$/i
 
@@ -193,6 +193,16 @@ async function handleMiddleware(request: NextRequest, event: NextFetchEvent) {
       return NextResponse.redirect(loginUrl)
     }
 
+    // Confined roles without Growth OS (content_team) get the main dashboard only:
+    // Growth OS, system health, catalog audit etc. redirect to /admin.
+    const pagePayload = await verifyJWT(request.cookies.get(SESSION_COOKIE)?.value ?? "")
+    if (pagePayload && isRestrictedRole(pagePayload.role) && !canOpenAdminPage(pagePayload.role, pathname)) {
+      const home = request.nextUrl.clone()
+      home.pathname = "/admin"
+      home.search = ""
+      return NextResponse.redirect(home)
+    }
+
     return NextResponse.next({ request: { headers: cloned } })
   }
 
@@ -212,7 +222,7 @@ async function handleMiddleware(request: NextRequest, event: NextFetchEvent) {
       const perms: string[] = payload.permissions ?? []
 
       // ── 403: restricted roles — default-deny, decided by effective permissions ──
-      if (isRestrictedRole(payload.role) && !canAccessAdminApi(perms, request.method, pathname)) {
+      if (isRestrictedRole(payload.role) && !canAccessAdminApi(perms, request.method, pathname, payload.role)) {
         return NextResponse.json(
           { error: "Forbidden", reason: "role_not_permitted", role: payload.role },
           { status: 403 }
