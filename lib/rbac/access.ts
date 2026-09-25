@@ -22,6 +22,31 @@ export const DASHBOARD_TAB_PERMISSIONS: Readonly<Record<string, string>> = {
   caseStudies: "case_studies.view",
   spareParts:  "spare_parts.view",
   banners:     "banners.view",
+  // Product-side CMS tabs ride on products.edit (not .view): seo_team holds products.view and
+  // must not gain these tabs.
+  categories:     "products.edit",
+  productBadges:  "products.edit",
+  certifications: "products.edit",
+  // Site content tabs (owner decision 2026-09-25).
+  aboutUs:            "site_content.view",
+  homepageContent:    "site_content.view",
+  homepageSections:   "site_content.view",
+  trustBadges:        "site_content.view",
+  websiteSettings:    "site_content.view",
+  accreditations:     "site_content.view",
+  customers:          "site_content.view",
+  videos:             "site_content.view",
+  videoPopup:         "site_content.view",
+  celebrityAssets:    "site_content.view",
+  brochure:           "site_content.view",
+  rfqPopup:           "site_content.view",
+  mediaLibrary:       "site_content.view",
+  legalPages:         "site_content.view",
+  reviews:            "site_content.view",
+  govPastPerformance: "site_content.view",
+  govKPIs:            "site_content.view",
+  redirects:          "redirects.view",
+  migration:          "migration.view",
 }
 
 export const LANDING_PAGES_PERMISSION = "landing_pages.view"
@@ -77,6 +102,44 @@ const API_RULES: readonly ApiRule[] = [
     read: ["landing_pages.view"],
     write: ["landing_pages.edit", "landing_pages.publish"],
   },
+
+  // Site content tabs. These handlers have no permission check of their own.
+  // Lead / customer data stays closed: the RFQ popup's leads sub-route is listed FIRST with no
+  // methods (first match wins); brochure leads live under /api/admin/brochure-analytics, which is
+  // not a child of /api/admin/brochure and has no rule.
+  { prefix: "/api/admin/rfq-popup/leads" },
+  ...[
+    "/api/admin/about-page",
+    "/api/admin/home-content",
+    "/api/admin/homepage-sections",
+    "/api/admin/trust-badges",
+    "/api/admin/brand-assets",
+    "/api/admin/accreditations",
+    "/api/admin/customers",
+    "/api/admin/videos",
+    "/api/admin/video-popup",
+    "/api/admin/celebrity-assets",
+    "/api/admin/brochure",
+    "/api/admin/rfq-popup",
+    "/api/admin/media-assets",
+    "/api/admin/media-library",
+    "/api/admin/legal-pages",
+    "/api/admin/reviews",
+    "/api/admin/gov-past-performance",
+    "/api/admin/gov-kpis",
+  ].map((prefix): ApiRule => ({
+    prefix,
+    read: ["site_content.view"],
+    write: ["site_content.edit"],
+    delete: ["site_content.delete"],
+  })),
+
+  // Redirects: view + add only. PUT / DELETE on /api/admin/redirects/[id] need a write
+  // permission no confined role is given, so existing redirects cannot be changed or removed.
+  { prefix: "/api/admin/redirects", read: ["redirects.view"], create: ["redirects.create"] },
+
+  // Migration dashboard: GET is the health report, POST runs the product migration / spec repair.
+  { prefix: "/api/admin/migrate", read: ["migration.view"], create: ["migration.run"] },
 
   // Supporting endpoints the Products / Case Studies / Spare Parts editors call.
   { prefix: "/api/admin/categories", read: ["products.view"] },

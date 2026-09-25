@@ -1511,9 +1511,10 @@ function AdminDashboardContent() {
                 </button>
               )}
               {/* CMS Foundation */}
-              {canSeeAnyTab(["productBadges", "certifications", "mediaLibrary", "seoHealth", "schemaHealth"]) && (
+              {canSeeAnyTab(["productBadges", "certifications", "mediaLibrary", "migration", "seoHealth", "schemaHealth"]) && (
                 <div className="pt-2 mt-2 border-t border-gray-200">
                   <p className="px-4 pt-1 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">CMS</p>
+                  {canSeeTab("productBadges") && (
                   <button
                     onClick={() => setActiveTab("productBadges")}
                     className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
@@ -1525,6 +1526,8 @@ function AdminDashboardContent() {
                     <Tag className="mr-3" size={20} />
                     Product Badges
                   </button>
+                  )}
+                  {canSeeTab("certifications") && (
                   <button
                     onClick={() => setActiveTab("certifications")}
                     className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
@@ -1536,6 +1539,8 @@ function AdminDashboardContent() {
                     <Award className="mr-3" size={20} />
                     Certifications
                   </button>
+                  )}
+                  {canSeeTab("mediaLibrary") && (
                   <button
                     onClick={() => setActiveTab("mediaLibrary")}
                     className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
@@ -1547,6 +1552,8 @@ function AdminDashboardContent() {
                     <ImageIcon className="mr-3" size={20} />
                     Media Library
                   </button>
+                  )}
+                  {canSeeTab("migration") && (
                   <button
                     onClick={() => setActiveTab("migration")}
                     className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
@@ -1558,6 +1565,8 @@ function AdminDashboardContent() {
                     <ArrowUp className="mr-3" size={20} />
                     Migration
                   </button>
+                  )}
+                  {canSeeTab("seoHealth") && (
                   <button
                     onClick={() => setActiveTab("seoHealth")}
                     className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
@@ -1569,6 +1578,8 @@ function AdminDashboardContent() {
                     <Search className="mr-3" size={20} />
                     SEO Health
                   </button>
+                  )}
+                  {canSeeTab("schemaHealth") && (
                   <button
                     onClick={() => setActiveTab("schemaHealth")}
                     className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
@@ -1580,6 +1591,9 @@ function AdminDashboardContent() {
                     <ClipboardCheck className="mr-3" size={20} />
                     Schema Health
                   </button>
+                  )}
+                  {/* Separate audit pages: not for confined roles. */}
+                  {!restricted && (
                   <a
                     href="/admin/system-health"
                     className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
@@ -1587,6 +1601,9 @@ function AdminDashboardContent() {
                     <Activity className="mr-3" size={20} />
                     System Health
                   </a>
+                  )}
+                  {/* Separate audit pages: not for confined roles. */}
+                  {!restricted && (
                   <a
                     href="/admin/catalog-audit"
                     className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
@@ -1594,6 +1611,7 @@ function AdminDashboardContent() {
                     <ClipboardCheck className="mr-3" size={20} />
                     Catalog Audit
                   </a>
+                  )}
                 </div>
               )}
               {canSeeGrowthOS && (

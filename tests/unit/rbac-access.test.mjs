@@ -40,7 +40,7 @@ const visibleTabs = perms => Object.keys(DASHBOARD_TAB_PERMISSIONS).filter(t => 
 test("content_team with the full permission set sees every section it can .view", () => {
   assert.deepEqual(
     visibleTabs(CONTENT_TEAM).sort(),
-    ["banners", "blogs", "caseStudies", "knowledge", "products", "spareParts"]
+    ["banners", "blogs", "caseStudies", "categories", "certifications", "knowledge", "productBadges", "products", "spareParts"]
   )
   assert.equal(canSeeLandingPages(CONTENT_TEAM), true)
   assert.equal(canSeeGrowthOS(CONTENT_TEAM), false)
@@ -142,4 +142,104 @@ test("only seo_team and content_team are confined; other roles are not gated her
   for (const r of ["super_admin", "growth_admin", "sales_manager", "viewer", null, undefined, ""]) {
     assert.equal(isRestrictedRole(r), false, String(r))
   }
+})
+
+// ── Site content scope (owner decision 2026-09-25) ────────────────────────────
+const SITE_CONTENT = ["site_content.view", "site_content.edit", "site_content.delete",
+  "redirects.view", "redirects.create", "migration.view", "migration.run"]
+const CONTENT_TEAM_WIDE = [...CONTENT_TEAM, ...SITE_CONTENT]
+// The live seo_team row in rbac_role_permissions (2026-09-25).
+const SEO_TEAM_LIVE = ["analytics.export", "analytics.view", "blog.create", "blog.delete", "blog.edit",
+  "blog.publish", "blog.view", "content.edit", "dashboard.view", "geo.view", "knowledge.edit",
+  "knowledge.view", "landing_pages.view", "products.view", "seo.export", "seo.view"]
+const SITE_CONTENT_APIS = ["about-page", "home-content", "homepage-sections", "trust-badges", "brand-assets",
+  "accreditations", "customers", "videos", "video-popup", "celebrity-assets", "brochure", "rfq-popup",
+  "media-assets", "media-library", "legal-pages", "reviews", "gov-past-performance", "gov-kpis"]
+
+test("content_team with site content permissions sees exactly the approved tabs", () => {
+  assert.deepEqual(visibleTabs(CONTENT_TEAM_WIDE).sort(), [
+    "aboutUs", "accreditations", "banners", "blogs", "brochure", "caseStudies", "categories",
+    "celebrityAssets", "certifications", "customers", "govKPIs", "govPastPerformance",
+    "homepageContent", "homepageSections", "knowledge", "legalPages", "mediaLibrary", "migration",
+    "productBadges", "products", "redirects", "reviews", "rfqPopup", "spareParts", "trustBadges",
+    "videoPopup", "videos", "websiteSettings",
+  ])
+})
+
+test("site content APIs: view / edit / delete are independent", () => {
+  for (const api of SITE_CONTENT_APIS) {
+    const p = "/api/admin/" + api
+    assert.ok(canAccessAdminApi(CONTENT_TEAM_WIDE, "GET", p), "GET " + p)
+    assert.ok(canAccessAdminApi(CONTENT_TEAM_WIDE, "PUT", p + "/x"), "PUT " + p)
+    assert.ok(canAccessAdminApi(CONTENT_TEAM_WIDE, "POST", p), "POST " + p)
+    assert.ok(canAccessAdminApi(CONTENT_TEAM_WIDE, "DELETE", p + "/x"), "DELETE " + p)
+    const viewOnly = ["site_content.view"]
+    assert.ok(canAccessAdminApi(viewOnly, "GET", p))
+    assert.equal(canAccessAdminApi(viewOnly, "PUT", p + "/x"), false, "view-only PUT " + p)
+    const noDelete = ["site_content.view", "site_content.edit"]
+    assert.ok(canAccessAdminApi(noDelete, "PUT", p + "/x"))
+    assert.equal(canAccessAdminApi(noDelete, "DELETE", p + "/x"), false, "no-delete DELETE " + p)
+  }
+  assert.ok(canAccessAdminApi(CONTENT_TEAM_WIDE, "POST", "/api/admin/brochure/upload"))
+  assert.ok(canAccessAdminApi(CONTENT_TEAM_WIDE, "POST", "/api/admin/gov-past-performance/import"))
+})
+
+test("lead and customer data stays closed even with site content permissions", () => {
+  const no = (m, p) => assert.equal(canAccessAdminApi(CONTENT_TEAM_WIDE, m, p), false, m + " " + p)
+  for (const m of ["GET", "POST", "PUT", "DELETE"]) no(m, "/api/admin/rfq-popup/leads")
+  no("GET", "/api/admin/rfq-popup/leads/123")
+  no("GET", "/api/admin/brochure-analytics")
+  no("GET", "/api/admin/oem-leads")
+  no("GET", "/api/admin/lead-analytics")
+  for (const tab of ["submissions", "brochureLeads", "oemLeads", "leadAnalytics"]) {
+    assert.equal(canSeeDashboardTab(CONTENT_TEAM_WIDE, tab), false, tab)
+  }
+})
+
+test("redirects: view + add only, existing redirects cannot be edited or deleted", () => {
+  const ok = (m, p) => canAccessAdminApi(CONTENT_TEAM_WIDE, m, p)
+  assert.ok(ok("GET", "/api/admin/redirects"))
+  assert.ok(ok("POST", "/api/admin/redirects"))
+  assert.equal(ok("PUT", "/api/admin/redirects/abc"), false)
+  assert.equal(ok("PATCH", "/api/admin/redirects/abc"), false)
+  assert.equal(ok("DELETE", "/api/admin/redirects/abc"), false)
+  assert.equal(canAccessAdminApi(["redirects.view"], "POST", "/api/admin/redirects"), false)
+})
+
+test("migration: view reads the report, run is separate; migrate-products stays closed", () => {
+  assert.ok(canAccessAdminApi(["migration.view"], "GET", "/api/admin/migrate"))
+  assert.equal(canAccessAdminApi(["migration.view"], "POST", "/api/admin/migrate"), false)
+  assert.ok(canAccessAdminApi(CONTENT_TEAM_WIDE, "POST", "/api/admin/migrate"))
+  assert.equal(canAccessAdminApi(CONTENT_TEAM_WIDE, "POST", "/api/admin/migrate-products"), false)
+  assert.equal(canAccessAdminApi(CONTENT_TEAM_WIDE, "GET", "/api/admin/migrate-products"), false)
+})
+
+test("still closed for content_team: settings, deployments, users, audits, rebuild, Growth OS writes", () => {
+  const no = (m, p) => assert.equal(canAccessAdminApi(CONTENT_TEAM_WIDE, m, p), false, m + " " + p)
+  no("GET", "/api/admin/site-settings")
+  no("POST", "/api/admin/site-settings")
+  no("GET", "/api/admin/deployments")
+  no("GET", "/api/admin/users")
+  no("GET", "/api/admin/permissions")
+  no("GET", "/api/admin/seo-health")
+  no("GET", "/api/admin/schema-health")
+  no("GET", "/api/admin/health")
+  no("GET", "/api/admin/catalog-audit")
+  no("POST", "/api/admin/knowledge/rebuild")
+  no("POST", "/api/admin/growth/agents/run")
+  for (const tab of ["dashboard", "analytics", "content", "siteSettings", "settings", "deployments",
+    "procurement", "seoHealth", "schemaHealth"]) {
+    assert.equal(canSeeDashboardTab(CONTENT_TEAM_WIDE, tab), false, tab)
+  }
+})
+
+test("the live seo_team row gains nothing from this change", () => {
+  assert.deepEqual(visibleTabs(SEO_TEAM_LIVE).sort(), ["blogs", "knowledge", "products"])
+  for (const api of SITE_CONTENT_APIS) {
+    for (const m of ["GET", "POST", "PUT", "DELETE"]) {
+      assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, m, "/api/admin/" + api), false, m + " " + api)
+    }
+  }
+  assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/redirects"), false)
+  assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/migrate"), false)
 })

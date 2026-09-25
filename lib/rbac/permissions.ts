@@ -131,6 +131,14 @@ export const PERMISSION_REGISTRY: PermDef[] = [
   { key: "knowledge.view",       label: "View Knowledge Hub",    description: "View Knowledge Hub articles",                       group: "Content & CMS", subgroup: "Knowledge Hub", module: "knowledge",   action: "view",   sortOrder: 4600 },
   { key: "knowledge.edit",       label: "Edit Knowledge Hub",    description: "Edit Knowledge Hub articles, blocks and FAQs",      group: "Content & CMS", subgroup: "Knowledge Hub", module: "knowledge",   action: "edit",   sortOrder: 4601 },
   { key: "knowledge.rebuild",    label: "Rebuild Knowledge Base", description: "Run the Knowledge Base sync: regenerate synced Knowledge Hub entries from blogs, case studies and past performance", group: "Content & CMS", subgroup: "Knowledge Hub", module: "knowledge",   action: "run",    sortOrder: 4602 },
+  // Site content tabs for confined roles (About, Homepage, Legal, Videos, Reviews, Gov records, brand assets...). See lib/rbac/access.ts.
+  { key: "site_content.view",    label: "View Site Content",     description: "Open the site content tabs: About Us, Homepage, Trust Badges, Accreditations, Customers, Videos, Brochure, RFQ Popup, Media Library, Legal Pages, Reviews, Gov Past Performance, Gov KPIs, Website Settings", group: "Content & CMS", subgroup: "Site Content", module: "site_content", action: "view",   sortOrder: 4700 },
+  { key: "site_content.edit",    label: "Edit Site Content",     description: "Create and edit site content in those tabs (never their leads)",                group: "Content & CMS", subgroup: "Site Content", module: "site_content", action: "edit",   sortOrder: 4701 },
+  { key: "site_content.delete",  label: "Delete Site Content",   description: "Delete items in the site content tabs",                                        group: "Content & CMS", subgroup: "Site Content", module: "site_content", action: "delete", sortOrder: 4702 },
+  { key: "redirects.view",       label: "View Redirects",        description: "View the redirect list",                                                       group: "Content & CMS", subgroup: "Redirects",    module: "redirects",    action: "view",   sortOrder: 4800 },
+  { key: "redirects.create",     label: "Add Redirects",         description: "Add new redirects (existing redirects cannot be edited or deleted with this)", group: "Content & CMS", subgroup: "Redirects",    module: "redirects",    action: "create", sortOrder: 4801 },
+  { key: "migration.view",       label: "View Migration",        description: "View the product data-normalization health report",                           group: "Content & CMS", subgroup: "Migration",    module: "migration",    action: "view",   sortOrder: 4900 },
+  { key: "migration.run",        label: "Run Migration",         description: "Run the product data migration and duplicate-spec repair (rewrites product records)", group: "Content & CMS", subgroup: "Migration", module: "migration", action: "run", sortOrder: 4901 },
 
   // ── DEALER & CRM ──────────────────────────────────────────────────────────
   { key: "dealers.view_all",     label: "View All Dealers",      description: "See all dealer records",                            group: "Dealer & CRM", subgroup: "Dealers",  module: "dealers", action: "view",   sortOrder: 5000 },
@@ -234,6 +242,9 @@ export const PERMISSIONS = {
   API_KEYS_VIEW: "api_keys.view", API_KEYS_EDIT: "api_keys.edit",
   BLOG_VIEW: "blog.view", BLOG_CREATE: "blog.create", BLOG_EDIT: "blog.edit", BLOG_DELETE: "blog.delete", BLOG_PUBLISH: "blog.publish",
   KNOWLEDGE_VIEW: "knowledge.view", KNOWLEDGE_EDIT: "knowledge.edit", KNOWLEDGE_REBUILD: "knowledge.rebuild",
+  SITE_CONTENT_VIEW: "site_content.view", SITE_CONTENT_EDIT: "site_content.edit", SITE_CONTENT_DELETE: "site_content.delete",
+  REDIRECTS_VIEW: "redirects.view", REDIRECTS_CREATE: "redirects.create",
+  MIGRATION_VIEW: "migration.view", MIGRATION_RUN: "migration.run",
   PRODUCTS_VIEW: "products.view", PRODUCTS_CREATE: "products.create", PRODUCTS_EDIT: "products.edit", PRODUCTS_DELETE: "products.delete",
   DATA_EXPORT_UNLIMITED: "data.export_unlimited", DATA_EXPORT_LIMITED: "data.export_limited", DATA_ALL_LEADS: "data.all_leads",
 } as const

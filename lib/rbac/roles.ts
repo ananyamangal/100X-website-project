@@ -45,6 +45,9 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     "paid.view",
     "blog.view", "blog.create", "blog.edit", "blog.delete", "blog.publish",
     "knowledge.view", "knowledge.edit", "knowledge.rebuild",
+    "site_content.view", "site_content.edit", "site_content.delete",
+    "redirects.view", "redirects.create",
+    "migration.view", "migration.run",
     "products.view", "products.create", "products.edit", "products.delete",
     "case_studies.view", "case_studies.create", "case_studies.edit", "case_studies.delete",
     "landing_pages.view", "landing_pages.edit", "landing_pages.publish",
@@ -160,6 +163,11 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     // Main dashboard — the only two tabs this role owns. No Growth OS at all.
     "blog.view", "blog.create", "blog.edit", "blog.publish",
     "knowledge.view", "knowledge.edit",
+    // Site content tabs (owner decision 2026-09-25). Redirects: view + add only. The live
+    // content_team row in rbac_role_permissions governs; this template mirrors the additions.
+    "site_content.view", "site_content.edit", "site_content.delete",
+    "redirects.view", "redirects.create",
+    "migration.view", "migration.run",
   ],
 
   viewer: [
