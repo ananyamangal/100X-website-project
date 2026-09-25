@@ -69,6 +69,13 @@ import { ProductForm } from "@/components/admin/ProductForm"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import {
+  isRestrictedRole,
+  canSeeDashboardTab,
+  firstVisibleDashboardTab,
+  canSeeGrowthOS as canSeeGrowthOSPerm,
+  canSeeLandingPages as canSeeLandingPagesPerm,
+} from "@/lib/rbac/access"
 import Link from "next/link"
 
 interface Product {
@@ -189,15 +196,6 @@ interface BlogPost {
   updatedAt?: string;
 }
 
-// Roles confined to the tabs they own. This MIRRORS the default-deny allowlist in
-// middleware.ts — it is not the gate. Hiding a tab hides a button; middleware and
-// the route handlers are what actually refuse the request. A role not listed here
-// is unaffected and keeps every tab.
-const RESTRICTED_ROLE_TABS: Record<string, string[]> = {
-  seo_team:     ["blogs", "knowledge"],
-  content_team: ["blogs", "knowledge"],
-}
-
 export default function AdminDashboard() {
   return <AdminDashboardContent />
 }
@@ -205,40 +203,49 @@ export default function AdminDashboard() {
 function AdminDashboardContent() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [userRole, setUserRole] = useState<string | null>(null)
+  const [userPermissions, setUserPermissions] = useState<string[]>([])
   const [roleLoaded, setRoleLoaded] = useState(false)
 
   useEffect(() => {
     fetch("/api/admin/auth/me", { credentials: "same-origin" })
       .then(res => (res.ok ? res.json() : null))
-      .then(data => setUserRole(data?.user?.role ?? null))
-      .catch(() => setUserRole(null))
+      .then(data => {
+        setUserRole(data?.user?.role ?? null)
+        setUserPermissions(Array.isArray(data?.user?.permissions) ? data.user.permissions : [])
+      })
+      .catch(() => { setUserRole(null); setUserPermissions([]) })
       .finally(() => setRoleLoaded(true))
   }, [])
 
-  const allowedTabs = userRole ? RESTRICTED_ROLE_TABS[userRole] : undefined
+  // Confined roles (see lib/rbac/access.ts) see only what their effective
+  // permissions unlock. This MIRRORS the middleware perimeter — hiding a tab
+  // hides a button; middleware is what refuses the request. Every other role is
+  // unaffected and keeps every tab.
+  const restricted = isRestrictedRole(userRole)
 
   function canSeeAnyTab(tabs: string[]): boolean {
     return tabs.some(canSeeTab)
   }
 
-  // Mirrors the readOnly entry in middleware.ts: seo_team may read Growth OS,
-  // content_team has no business there at all.
-  const canSeeGrowthOS = roleLoaded && (!allowedTabs || userRole === "seo_team")
+  const canSeeGrowthOS = roleLoaded && (!restricted || canSeeGrowthOSPerm(userPermissions))
+  const showLandingPages = roleLoaded && (!restricted || canSeeLandingPagesPerm(userPermissions))
 
   function canSeeTab(tab: string): boolean {
     // Hide everything until the role is known, so a restricted role never sees a
     // flash of tabs it does not have.
     if (!roleLoaded) return false
-    if (!allowedTabs) return true
-    return allowedTabs.includes(tab)
+    if (!restricted) return true
+    return canSeeDashboardTab(userPermissions, tab)
   }
 
   // A restricted role landing on the default "dashboard" tab would sit on a tab
-  // whose every fetch 403s — send it to the first tab it actually owns.
+  // whose every fetch 403s — send it to the first tab its permissions unlock.
   useEffect(() => {
-    if (!roleLoaded || !allowedTabs) return
-    if (!allowedTabs.includes(activeTab)) setActiveTab(allowedTabs[0])
-  }, [roleLoaded, allowedTabs, activeTab])
+    if (!roleLoaded || !restricted) return
+    if (canSeeDashboardTab(userPermissions, activeTab)) return
+    const first = firstVisibleDashboardTab(userPermissions)
+    if (first) setActiveTab(first)
+  }, [roleLoaded, restricted, userPermissions, activeTab])
   const [products, setProducts] = useState<Product[]>([])
   const [banners, setBanners] = useState<Banner[]>([])
   const [blogs, setBlogs] = useState<BlogPost[]>([])
@@ -1143,6 +1150,7 @@ function AdminDashboardContent() {
                   Knowledge Hub
                 </button>
               )}
+              {showLandingPages && (
               <a
                 href="/admin/growth/landing-pages"
                 className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
@@ -1150,6 +1158,7 @@ function AdminDashboardContent() {
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3 text-gray-500"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                 Landing Pages ↗
               </a>
+              )}
               {canSeeTab("submissions") && (
                 <button
                   onClick={() => setActiveTab("submissions")}
