@@ -123,6 +123,30 @@ const ARTICLES = [
     readTime: "5 min",
     tags: ["GeM", "Government", "Procurement"],
   },
+  {
+    slug: "gem-oem-authorization-process",
+    title: "GeM OEM Authorization Process for Fogging Machine Resellers: Complete Guide",
+    summary:
+      "What GeM OEM authorization is, why resellers need it, how to get it, and which documents are required. From India's GeM-listed fogging machine OEM.",
+    readTime: "5 min",
+    tags: ["GeM", "OEM Authorization", "Reseller Guide", "Government"],
+  },
+  {
+    slug: "gem-reseller-guide",
+    title: "GeM Reseller Guide: How to Sell Fogging Machines on Government e-Marketplace",
+    summary:
+      "For resellers selling fogging machines on GeM: OEM authorization, catalog pairing, bidding strategy, and the MSME advantage explained.",
+    readTime: "4 min",
+    tags: ["GeM", "Reseller", "Business Guide", "Government"],
+  },
+  {
+    slug: "fogging-machine-for-pest-control-business",
+    title: "Fogging Machine for Pest Control Business India: Complete PCO Equipment Guide",
+    summary:
+      "For pest control operators (PCOs) buying fogging machines in India: machine types, pricing, fleet expansion, GeM opportunities, and how to choose the right model.",
+    readTime: "3 min",
+    tags: ["Pest Control", "PCO", "Equipment Guide", "Fleet Expansion"],
+  },
 ]
 
 export default function KnowledgeHubPage() {

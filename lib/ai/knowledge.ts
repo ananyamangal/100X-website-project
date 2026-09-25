@@ -392,4 +392,22 @@ export const AI_KNOWLEDGE_ARTICLES = [
     summary:
       "Municipal corporations, health departments, and Panchayats can procure fogging machines via GeM (Government e-Marketplace) from verified MSME sellers like 100X Circle. No separate tender required for amounts within GeM limits.",
   },
+  {
+    title: "GeM OEM Authorization Process for Fogging Machine Resellers: Complete Guide",
+    url: `${SITE_URL}/knowledge/gem-oem-authorization-process`,
+    summary:
+      "Complete guide to GeM OEM authorization for fogging machine resellers: what it is, why it is needed, how to get it, and what documents are required. From India's GeM-listed fogging machine OEM.",
+  },
+  {
+    title: "GeM Reseller Guide: How to Sell Fogging Machines on Government e-Marketplace",
+    url: `${SITE_URL}/knowledge/gem-reseller-guide`,
+    summary:
+      "Guide for GeM resellers who want to sell fogging machines on Government e-Marketplace: OEM authorization, catalog pairing, bidding strategy, and the MSME advantage.",
+  },
+  {
+    title: "Fogging Machine for Pest Control Business India: Complete PCO Equipment Guide",
+    url: `${SITE_URL}/knowledge/fogging-machine-for-pest-control-business`,
+    summary:
+      "Guide for pest control operators (PCOs) buying fogging machines in India: machine types, pricing, fleet expansion, GeM opportunities, and how to choose the right model.",
+  },
 ]
