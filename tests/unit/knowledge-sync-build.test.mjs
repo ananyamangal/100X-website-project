@@ -26,25 +26,47 @@ const BENIGN = {
   updatedAt: "2026-04-02T00:00:00Z",
 }
 
-test("sensitivity: chemicals, dosing, dilution and safety all hold a page for review", () => {
+test("sensitivity: guidance on dosing, mixing, application, chemical choice, toxicity or safety/PPE holds a page", () => {
   for (const text of [
     "Recommended dosage per hectare",
     "Mix at a 1:20 dilution ratio",
-    "Use malathion for adult mosquitoes",
-    "Always wear PPE and a respirator",
-    "The insecticide must be approved",
+    "Diesel mixed with chemical kills mosquitoes",
     "Apply 500 ml per hectare",
-    "Chemical names used in fogging",
+    "Use malathion for adult mosquitoes",
+    "What types of chemicals can be used in this machine?",
+    "Best chemical for mosquito fogging",
+    "Mosquito fogging chemicals used in India",
+    "Always wear PPE and a respirator",
+    "Safety tips for operators",
+    "Is it safe to use indoors?",
+    "Cold fog: no heat, safe for occupied spaces",
+    "Side effects of fogging",
+    "Handling of chemicals on site",
   ]) {
     assert.equal(classifySensitivity(text).sensitive, true, text)
   }
 })
 
-test("sensitivity: an ordinary product/fleet text is not held, and reasons name what matched", () => {
-  assert.equal(classifySensitivity("Fleet planning, fuel type and running cost for cities").sensitive, false)
+test("sensitivity: naming a component or spec, or a bare mention of chemical/safety, does not hold a page", () => {
+  for (const text of [
+    "Chemical Tank Capacity | 100 litres",
+    "Tank Capacity: 6 litre chemical tank",
+    "Chemical Tank + Water Tank | 7 litres + 7 litres",
+    "Chemical Output | 2.5 L / hr",
+    "Chemical Tank Material | PE",
+    "Chemical Compatibility | Water-based and oil-based formulations",
+    "Fuel tank: 1.2 L",
+    "Chemical inlet valve: brass",
+    "Updated chemical circuit and reinforced frame",
+    "Designed for smooth and safe handling of luggage",
+    "Safety risks rise if parts degrade under pressure",
+    "Disinfectant fogging machine uses in hospitals",
+    "Fleet planning, fuel type and running cost for cities",
+  ]) {
+    assert.equal(classifySensitivity(text).sensitive, false, text)
+  }
   assert.equal(classifySensitivity(undefined, null, "").sensitive, false)
-  const r = classifySensitivity("dosage and PPE")
-  assert.deepEqual(r.reasons.sort(), ["dosing", "safety"])
+  assert.deepEqual(classifySensitivity("dosage and PPE").reasons.sort(), ["dosing", "safety guidance"])
 })
 
 test("blog digest: benign post auto-publishes, canonical + JSON-LD point at the right URLs", () => {
@@ -82,8 +104,8 @@ test("blog digest: classified on what the page says. A digest of a post with dos
 test("blog digest: dosing/chemicals/safety in the excerpt, title, category or headings holds it as a draft, with the reasons", () => {
   const cases = [
     { ...BENIGN, excerpt: "The recommended dosage per hectare for every fogger." },
-    { ...BENIGN, title: "Common Fogging Chemical Names" },
-    { ...BENIGN, category: "Safety" },
+    { ...BENIGN, title: "Which Chemicals to Use in a Fogger" },
+    { ...BENIGN, category: "Safety Tips" },
     { ...BENIGN, content: "<h2>PPE and safe handling</h2><p>x</p>" },
   ]
   for (const post of cases) {
@@ -227,8 +249,8 @@ test("product page: JSON-LD is an Article about a Thing (no Product node, so no 
 
 test("product page: a chemical / dosing / safety mention anywhere on the page holds the WHOLE page as a draft", () => {
   for (const extra of [
-    { specifications: [...PRODUCT.specifications, { label: "Chemical tank", value: "3 L" }] },
-    { features: [{ title: "Tank", value: "Holds insecticide solutions" }] },
+    { specifications: [...PRODUCT.specifications, { label: "Dosage", value: "5 ml per litre" }] },
+    { features: [{ title: "Tank", value: "Mix 50 ml insecticide with 1 litre of diesel" }] },
     { applications: [{ title: "Dosage guidance", description: "" }] },
     { detailedDescription: "<p>Includes PPE and safety kit.</p>" },
   ]) {
@@ -265,4 +287,14 @@ test("product page: meta description is generated and never the product's own sh
   const { article } = buildProductPage(PRODUCT, "100XTFS50", PSRC, ctx("product-100xtfs50"))
   assert.equal(article.metaDescription, "Specifications, key features and applications of the Thermal & Cold Fogging Machine-100XTFS50.")
   assert.notEqual(article.metaDescription, "AVAILABLE ON GEM with OEM authorization.")
+})
+
+test("product page: a spec sheet that only names components (chemical tank, output, compatibility) publishes", () => {
+  const spec = { ...PRODUCT, specifications: [
+    { label: "Chemical Tank Capacity", value: "7 litres" }, { label: "Chemical Output", value: "2.5 L / hr" },
+    { label: "Chemical Compatibility", value: "Water-based and oil-based formulations" }, { label: "Fuel Tank", value: "1.2 L" },
+  ] }
+  const { article, sync } = buildProductPage(spec, "100XTFS50", PSRC, ctx("product-100xtfs50"))
+  assert.equal(article.isPublished, true)
+  assert.deepEqual(sync.reasons, [])
 })

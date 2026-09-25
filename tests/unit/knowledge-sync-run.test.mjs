@@ -15,7 +15,7 @@ const blog = (id, title, extra = {}) => ({
 const seed = () => ({
   blogs: [
     blog("fleet-planning", "Fleet Planning for Cities"),
-    blog("chemical-names", "Common Fogging Chemical Names"), // sensitive: chemicals in the title
+    blog("chemical-names", "Which Chemicals to Use for Fogging"), // sensitive: chemical-selection guidance in the title
     blog("hidden-draft", "Unpublished post", { isPublished: false }),
   ],
   case_studies: [
@@ -32,7 +32,7 @@ const seed = () => ({
       features: [{ title: "Engine", value: "Pulse jet", order: 0 }], specifications: [{ label: "Tank capacity", value: "5 L", order: 1 }, { label: "Weight", value: "9 kg", order: 0 }],
       applications: [{ title: "Municipal use", description: "", order: 0 }], warrantyPeriod: "6 months", isPublished: true,
       priceRange: "SECRET PRICE", rating: 4.6, reviewsCount: 36, productFaqs: [{ q: "SECRET FAQ", a: "x" }] },
-    { _id: "pr2", name: "Cold Fogger 100XMCF42", slug: "cold-fogger-100xmcf42-abc", specifications: [{ label: "Chemical tank", value: "3 L" }], isPublished: true },
+    { _id: "pr2", name: "Cold Fogger 100XMCF42", slug: "cold-fogger-100xmcf42-abc", specifications: [{ label: "Chemical tank", value: "3 L" }, { label: "Dosage", value: "5 ml per litre" }], isPublished: true },
     { _id: "pr3", name: "Unnamed accessory", slug: "accessory", isPublished: true },
     { _id: "pr4", name: "Draft Model 100XZZ99", slug: "zz", isPublished: false },
     { _id: "pr5", name: "Duplicate 100XTFS50", slug: "dup", isPublished: true },
@@ -233,7 +233,7 @@ test("products: published only, keyed by 100X code; a general spec page publishe
   const held = bySlug(db, "product-100xmcf42")
   assert.equal(held.isPublished, false)
   assert.equal(held.sync.policy, "draft-review")
-  assert.ok(held.sync.reasons.includes("chemicals"))
+  assert.ok(held.sync.reasons.includes("dosing"))
   assert.equal(bySlug(db, "product-100xzz99"), undefined, "unpublished product is not synced")
 })
 

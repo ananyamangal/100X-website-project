@@ -24,20 +24,32 @@ import type { KnowledgeArticle, KnowledgeBlock, KnowledgeSyncMeta, KnowledgeSync
 // the side of drafting: a single hit is enough. Reasons are stored so a reviewer
 // can see why an entry was held.
 
+// Owner refinement (2026-09-25): hold only when the text GIVES GUIDANCE on dosing, mixing,
+// application, toxicity or safety/PPE. Naming a component or a spec ("chemical tank capacity",
+// "chemical output", "fuel tank", "chemical inlet valve", "chemical compatibility") is not guidance,
+// and neither is a bare mention of the word "chemical" or "safety".
+
+/** Component / spec-sheet phrases, removed before the rules run. */
+const COMPONENT_PHRASES =
+  /\b(?:chemical|solution|insecticide|pesticide|fuel|water|diesel|kerosene)\s+(?:tank(?:\s+(?:capacity|material|size|volume))?|inlet(?:\s+valve)?|outlet|valve|pump|pipe|line|hose|nozzle|filter|cap|container|output|flow(?:\s+rate)?|circuit|compatibility|capacity|material|level|gauge|chamber|consumption)\b/gi
+
 const RULES: ReadonlyArray<readonly [string, RegExp]> = [
   ["dosing", /\bdos(?:e|es|age|ing)\b/i],
-  ["dilution", /\bdilut(?:e|es|ed|ion|ing)\b|\b(?:mix(?:ing)?|dilution) ratio\b/i],
+  ["mixing", /\bdilut(?:e|es|ed|ion|ing)\b|\bmixture\b|\bmixed with\b|\bmix(?:ing)? (?:ratio|tips|instructions)\b|\bmix\b[^.\n]{0,30}\bwith\b/i],
   ["application rate", /\b(?:ml|litres?|liters?|l)\s*(?:\/|per)\s*(?:ha|hectare|acre|litre|liter|l|m2|m3)\b/i],
   ["concentration", /\bppm\b|\bconcentrations?\b|\bactive ingredients?\b/i],
-  ["chemicals", /\bchemicals?\b|\b(?:insecticides?|pesticides?|larvicides?|adulticides?|rodenticides?|herbicides?|fungicides?|disinfectants?|sanitizers?)\b/i],
+  [
+    "chemical selection",
+    /\b(?:what|which|best|right|correct|recommended|types? of|kinds? of)\s+(?:[\w-]+\s+){0,2}(?:chemicals?|insecticides?|pesticides?|larvicides?|adulticides?)\b|\b(?:chemicals?|insecticides?|pesticides?|larvicides?)\s+(?:used|to use|for (?:mosquito|mosquitoes|pest|pests|fogging|dengue|malaria))\b/i,
+  ],
   [
     "named chemical",
     /\b(?:malathion|deltamethrin|cypermethrin|permethrin|pyrethr(?:um|oid|oids)|temephos|lambda[- ]cyhalothrin|fenthion|dichlorvos|chlorpyrifos|formalin|formaldehyde|hypochlorite|quaternary ammonium)\b/i,
   ],
-  ["toxicity", /\b(?:toxic|toxicity|poison(?:ing|ous)?|hazard(?:s|ous)?|carcinogen\w*|irritants?|antidote|overexposure)\b/i],
+  ["toxicity", /\b(?:toxic|toxicity|poison(?:ing|ous)?|hazardous|carcinogen\w*|irritants?|antidote|overexposure|harmful|side effects?|health (?:risks?|effects?))\b/i],
   [
-    "safety",
-    /\bsafety\b|\bsafe (?:distance|use|handling|operation|exposure)\b|\bppe\b|\brespirators?\b|\bprotective (?:gear|equipment|clothing)\b|\bfirst aid\b/i,
+    "safety guidance",
+    /\bppe\b|\brespirators?\b|\bprotective (?:gear|equipment|clothing)\b|\bfirst aid\b|\bsafety (?:tips|precautions?|guide(?:lines)?|measures|instructions|gear|equipment|kit|rules)\b|\bsafe (?:distance|exposure|dosage|to use)\b|\bsafe for (?:use|people|humans|children|kids|pets|occupied|indoor|homes?)\b|\bis (?:it|\w+(?: \w+)?) safe\b|\bsafer alternatives?\b|\b(?:handling|storage|disposal) of (?:the )?(?:chemicals?|insecticides?|pesticides?)\b/i,
   ],
 ]
 
@@ -48,7 +60,10 @@ export interface Sensitivity {
 }
 
 export function classifySensitivity(...texts: Array<string | null | undefined>): Sensitivity {
-  const haystack = texts.filter((t): t is string => typeof t === "string" && t.length > 0).join("\n")
+  const haystack = texts
+    .filter((t): t is string => typeof t === "string" && t.length > 0)
+    .join("\n")
+    .replace(COMPONENT_PHRASES, " ")
   const reasons = RULES.filter(([, re]) => re.test(haystack)).map(([label]) => label)
   return { sensitive: reasons.length > 0, reasons }
 }
