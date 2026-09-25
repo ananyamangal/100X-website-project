@@ -51,8 +51,8 @@ export const DASHBOARD_TAB_PERMISSIONS: Readonly<Record<string, string>> = {
 
 export const LANDING_PAGES_PERMISSION = "landing_pages.view"
 
-// Growth OS is read-only for a confined role: holding any of these opens GET on
-// the growth/gsc/ga4 surface, and writes there stay closed regardless.
+// Growth OS is read-only for a confined role: a Growth OS role holding any of these
+// may GET the routes in GROWTH_OS_READ_ALLOWLIST; writes there stay closed regardless.
 export const GROWTH_OS_READ_PERMISSIONS: readonly string[] = ["seo.view", "analytics.view"]
 
 // Which confined roles may use Growth OS (and the Landing Pages editor, which lives
@@ -65,6 +65,40 @@ export const GROWTH_OS_ROLES: ReadonlySet<string> = new Set(["seo_team"])
 // Admin pages (not APIs) a confined role without Growth OS may open. Everything
 // else under /admin (Growth OS, system health, catalog audit, ...) redirects to /admin.
 const NO_GROWTH_PAGES: readonly string[] = ["/admin", "/admin/change-password"]
+
+// A Growth OS role (seo_team, agency users) gets SEO work only, not the whole of Growth OS
+// (owner decision 2026-09-25): no CRM, Ads, revenue/founder dashboards, leads, procurement,
+// logs, security, GA4. Default-deny: a Growth OS route or page not listed here is closed.
+// Reads only; every entry covers the path and its children.
+const GROWTH_OS_READ_ALLOWLIST: readonly string[] = [
+  "/api/admin/growth/seo",
+  "/api/admin/growth/content",
+  "/api/admin/growth/citations",
+  "/api/admin/growth/citation-tasks",
+  "/api/admin/growth/competitors",
+  "/api/admin/growth/page-guidance",
+  // Agent GETs return the last stored result; running an agent is POST (closed).
+  "/api/admin/growth/agents/internal-link",
+  "/api/admin/growth/agents/schema-audit",
+  "/api/admin/growth/agents/ai-citation",
+  "/api/admin/gsc/data",
+  "/api/admin/gsc/sync",          // GET = last sync status; running a sync is POST
+  "/api/admin/gsc/oauth/status",
+]
+
+// Growth snapshots mix competitor, procurement and market data; only the competitor module is SEO work.
+const GROWTH_SNAPSHOTS_PATH = "/api/admin/growth/snapshots"
+
+// Pages a Growth OS role may open. Other /admin/growth pages redirect to the SEO page,
+// other /admin pages to /admin (see adminPageFallback).
+const GROWTH_ROLE_PAGES: readonly string[] = [
+  "/admin/growth/seo",
+  "/admin/growth/content",
+  "/admin/growth/competitors",
+  "/admin/growth/geo",
+  "/admin/growth/landing-pages",
+]
+const GROWTH_ROLE_HOME = "/admin/growth/seo"
 
 interface ApiRule {
   prefix: string
@@ -183,7 +217,8 @@ export function canAccessAdminApi(
   permissions: readonly string[],
   method: string,
   pathname: string,
-  role: string | null | undefined
+  role: string | null | undefined,
+  search = ""
 ): boolean {
   const m = method.toUpperCase()
   const isRead = m === "GET" || m === "HEAD"
@@ -192,7 +227,12 @@ export function canAccessAdminApi(
   if (pathname === "/api/admin/auth/me") return true
 
   if (GROWTH_READ_PREFIXES.some(prefix => isPathOrChild(pathname, prefix))) {
-    return growthRole && isRead && holdsAny(permissions, GROWTH_OS_READ_PERMISSIONS)
+    if (!growthRole || !isRead || !holdsAny(permissions, GROWTH_OS_READ_PERMISSIONS)) return false
+    if (pathname === GROWTH_SNAPSHOTS_PATH) {
+      const modules = new URLSearchParams(search).getAll("module")
+      return modules.length === 1 && modules[0] === "competitors"
+    }
+    return GROWTH_OS_READ_ALLOWLIST.some(prefix => isPathOrChild(pathname, prefix))
   }
 
   // The Landing Pages editor lives in Growth OS; handlers re-check landing_pages.* themselves.
@@ -231,10 +271,18 @@ export function canSeeLandingPages(permissions: readonly string[], role: string 
 
 /**
  * Whether a confined role may open an /admin page. Callers apply this only when
- * isRestrictedRole(role). Growth OS roles keep every page (unchanged); the others
- * get the main dashboard and change-password only.
+ * isRestrictedRole(role). Every confined role gets the main dashboard and
+ * change-password; Growth OS roles also get the SEO pages in GROWTH_ROLE_PAGES.
  */
 export function canOpenAdminPage(role: string | null | undefined, pathname: string): boolean {
-  if (!!role && GROWTH_OS_ROLES.has(role)) return true
-  return NO_GROWTH_PAGES.includes(pathname.replace(/\/+$/, "") || "/")
+  const path = pathname.replace(/\/+$/, "") || "/"
+  if (NO_GROWTH_PAGES.includes(path)) return true
+  if (!role || !GROWTH_OS_ROLES.has(role)) return false
+  return GROWTH_ROLE_PAGES.some(page => isPathOrChild(path, page))
+}
+
+/** Where a confined role is sent when canOpenAdminPage refuses a page. */
+export function adminPageFallback(role: string | null | undefined, pathname: string): string {
+  if (!!role && GROWTH_OS_ROLES.has(role) && isPathOrChild(pathname, "/admin/growth")) return GROWTH_ROLE_HOME
+  return "/admin"
 }

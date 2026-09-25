@@ -9,6 +9,7 @@ import {
   canSeeGrowthOS as canSeeGrowthOSForRole,
   canSeeLandingPages as canSeeLandingPagesForRole,
   canOpenAdminPage,
+  adminPageFallback,
   firstVisibleDashboardTab,
   DASHBOARD_TAB_PERMISSIONS,
 } from "../../lib/rbac/access.ts"
@@ -134,13 +135,13 @@ test("a role with no visible content tab gets no default tab (no redirect loop)"
   assert.equal(firstVisibleDashboardTab(["dashboard.view"]), null)
 })
 
-test("seo_team is unchanged: blogs+knowledge, read-only Growth OS", () => {
+test("seo_team: blogs+knowledge, read-only SEO part of Growth OS", () => {
   assert.deepEqual(visibleTabs(SEO_TEAM).sort(), ["blogs", "knowledge"])
   assert.equal(canSeeGrowthOS(SEO_TEAM), true)
   assert.equal(canSeeLandingPages(SEO_TEAM), false)
   assert.ok(canAccessAdminApi(SEO_TEAM, "GET", "/api/admin/growth/seo/recommendations"))
-  assert.ok(canAccessAdminApi(SEO_TEAM, "GET", "/api/admin/gsc/overview"))
-  assert.ok(canAccessAdminApi(SEO_TEAM, "GET", "/api/admin/ga4/summary"))
+  assert.ok(canAccessAdminApi(SEO_TEAM, "GET", "/api/admin/gsc/data"))
+  assert.equal(canAccessAdminApi(SEO_TEAM, "GET", "/api/admin/ga4/summary"), false)
   assert.equal(canAccessAdminApi(SEO_TEAM, "POST", "/api/admin/growth/agents/run"), false)
   assert.equal(canAccessAdminApi(SEO_TEAM, "DELETE", "/api/admin/gsc/x"), false)
   assert.equal(canAccessAdminApi(SEO_TEAM, "GET", "/api/admin/products"), false)
@@ -306,13 +307,87 @@ test("content_team keeps its whole CMS scope after the Growth OS fix", () => {
   assert.ok(canAccessAdminApi(CONTENT_TEAM_LIVE, "POST", "/api/admin/blogs"))
 })
 
-test("seo_team is unchanged by the Growth OS fix (reads, pages, landing pages)", () => {
-  assert.ok(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/growth/dashboard"))
-  assert.ok(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/gsc/overview"))
-  assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, "POST", "/api/admin/growth/dashboard"), false)
+test("seo_team keeps landing pages view-only and Growth OS read-only after the Growth OS fix", () => {
+  assert.ok(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/gsc/data"))
+  assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, "POST", "/api/admin/growth/seo/recommendations"), false)
   assert.ok(canAccessAdminApi(SEO_TEAM_LIVE, "GET", "/api/admin/landing-pages"))
   assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, "PUT", "/api/admin/landing-pages/x"), false)
   assert.equal(canSeeGrowthOS(SEO_TEAM_LIVE), true)
   assert.equal(canSeeLandingPages(SEO_TEAM_LIVE), true)
   assert.ok(canOpenAdminPage("seo_team", "/admin/growth/seo"))
+})
+
+// ── SEO Team reduced to SEO work (owner decision 2026-09-25: plan A approved, GA4 closed,
+// DB row unchanged). Exact expected set of Growth OS GET routes for the live seo_team row.
+const SEO_TEAM_GROWTH_GETS = [
+  "/api/admin/gsc/data",
+  "/api/admin/gsc/oauth/status",
+  "/api/admin/gsc/sync",
+  "/api/admin/growth/agents/ai-citation",
+  "/api/admin/growth/agents/internal-link",
+  "/api/admin/growth/agents/schema-audit",
+  "/api/admin/growth/citation-tasks",
+  "/api/admin/growth/citations",
+  "/api/admin/growth/competitors",
+  "/api/admin/growth/competitors/crawl",
+  "/api/admin/growth/content",
+  "/api/admin/growth/page-guidance/x",
+]
+
+test("seo_team (live row): Growth OS GET is exactly the SEO allowlist", () => {
+  const allowed = GROWTH_GETS.filter(p => canAccessAdminApi(SEO_TEAM_LIVE, "GET", p))
+  const expected = GROWTH_GETS.filter(p => p.startsWith("/api/admin/growth/seo/") || SEO_TEAM_GROWTH_GETS.includes(p))
+  assert.ok(expected.length > 30, "fixture covers the SEO routes")
+  assert.deepEqual(allowed.sort(), expected.sort())
+})
+
+test("seo_team (live row): no Growth OS write on any route, allowed or not", () => {
+  for (const p of GROWTH_GETS) {
+    for (const m of ["POST", "PUT", "PATCH", "DELETE"]) {
+      assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, m, p), false, m + " " + p)
+    }
+  }
+})
+
+test("seo_team (live row): business data, GA4, cron and admin surfaces are closed", () => {
+  for (const p of [
+    "/api/admin/growth/crm/dealers", "/api/admin/growth/crm/opportunities", "/api/admin/growth/dealers",
+    "/api/admin/growth/director", "/api/admin/growth/director/customer-match-export",
+    "/api/admin/growth/ads/customer-match", "/api/admin/growth/founder-v2", "/api/admin/growth/exec-summary",
+    "/api/admin/growth/business-outcomes", "/api/admin/growth/lead-scores", "/api/admin/growth/dashboard",
+    "/api/admin/growth/market-intelligence", "/api/admin/growth/procurement", "/api/admin/growth/categories",
+    "/api/admin/growth/landing", "/api/admin/growth/logs", "/api/admin/growth/opportunities",
+    "/api/admin/growth/cron/revenue-director", "/api/admin/growth/cron/gsc-sync",
+    "/api/admin/ga4/data", "/api/admin/ga4/properties", "/api/admin/gsc/oauth/start", "/api/admin/gsc/test",
+    "/api/admin/growth/seo-evil", "/api/admin/growth/agents/dealer-lead",
+  ]) {
+    assert.equal(canAccessAdminApi(SEO_TEAM_LIVE, "GET", p), false, p)
+  }
+})
+
+test("seo_team: growth snapshots only for the competitors module", () => {
+  const snap = (search) => canAccessAdminApiForRole(SEO_TEAM_LIVE, "GET", "/api/admin/growth/snapshots", "seo_team", search)
+  assert.ok(snap("?module=competitors&days=90"))
+  for (const q of ["", "?module=all", "?module=procurement", "?module=market", "?days=90", "?module=competitors&module=market"]) {
+    assert.equal(snap(q), false, q)
+  }
+})
+
+test("seo_team pages: SEO pages only; others fall back to the SEO page or /admin", () => {
+  for (const p of ["/admin", "/admin/change-password", "/admin/growth/seo", "/admin/growth/seo/offpage/validate",
+    "/admin/growth/seo/setup", "/admin/growth/content", "/admin/growth/competitors", "/admin/growth/geo",
+    "/admin/growth/landing-pages", "/admin/growth/landing-pages/x/edit", "/admin/growth/seo/"]) {
+    assert.ok(canOpenAdminPage("seo_team", p), p)
+  }
+  for (const p of ["/admin/growth", "/admin/growth/dashboard", "/admin/growth/analytics", "/admin/growth/crm/dealers",
+    "/admin/growth/ads", "/admin/growth/director", "/admin/growth/founder", "/admin/growth/landing",
+    "/admin/growth/security", "/admin/growth/users", "/admin/growth/logs", "/admin/growth/fogging",
+    "/admin/growth/seo-evil", "/admin/system-health", "/admin/catalog-audit"]) {
+    assert.equal(canOpenAdminPage("seo_team", p), false, p)
+  }
+  assert.equal(adminPageFallback("seo_team", "/admin/growth/dashboard"), "/admin/growth/seo")
+  assert.equal(adminPageFallback("seo_team", "/admin/growth"), "/admin/growth/seo")
+  assert.equal(adminPageFallback("seo_team", "/admin/system-health"), "/admin")
+  assert.equal(adminPageFallback("content_team", "/admin/growth/seo"), "/admin")
+  assert.equal(canOpenAdminPage("content_team", "/admin/growth/seo"), false)
 })

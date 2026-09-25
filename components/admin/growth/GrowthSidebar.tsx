@@ -14,6 +14,7 @@ import {
   BookOpen, MessageSquare, Layers, Package,
 } from "lucide-react"
 import { useAuth } from "@/lib/rbac/client"
+import { isRestrictedRole, canOpenAdminPage } from "@/lib/rbac/access"
 import { performAdminLogout } from "@/components/admin/AdminUserMenu"
 import type { Permission } from "@/lib/rbac/permissions"
 
@@ -279,6 +280,8 @@ export function GrowthSidebar() {
     ? NAV_MODULES.filter(m => {
         if (founderMode && SECTION_META[m.section].founderOnly) return false
         if (!permissions.includes(m.permission)) return false
+        // Confined roles (seo_team) see only the pages middleware lets them open.
+        if (isRestrictedRole(user?.role) && !canOpenAdminPage(user?.role, m.href.split("?")[0])) return false
         return true
       })
     : []
