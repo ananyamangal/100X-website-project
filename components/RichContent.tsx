@@ -1,6 +1,7 @@
 ﻿import { cn } from "@/lib/utils"
 import { isProbablyRichHtml, normalizeNbsp, sanitizeRichHtml } from "@/lib/rich-text"
 import { wrapFaqAccordion } from "@/lib/faqAccordion"
+import { enhanceTables } from "@/lib/richTables"
 
 type RichContentProps = {
   html: string
@@ -63,11 +64,13 @@ export function RichContent({ html, className, faqAccordion = false }: RichConte
         "[&_a]:text-brand-600 [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-brand-700",
         // Images — responsive, no overflow
         "[&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-4",
-        // Tables — scrollable on mobile, no overflow
-        "[&_table]:w-full [&_table]:border-collapse [&_table]:my-4 [&_table]:text-sm",
-        "[&_thead]:bg-gray-50 [&_th]:border [&_th]:border-gray-200 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:text-gray-700",
-        "[&_td]:border [&_td]:border-gray-200 [&_td]:px-3 [&_td]:py-2 [&_td]:text-gray-700",
-        "[&_table]:block [&_table]:overflow-x-auto [&_table]:md:table",
+        // Tables — enhanceTables() wraps each in .rich-table-scroll, which is what
+        // scrolls sideways on a phone; the table itself stays a real table.
+        "[&_.rich-table-scroll]:overflow-x-auto [&_.rich-table-scroll]:my-6 [&_.rich-table-scroll]:max-w-full",
+        "[&_table]:w-full [&_table]:min-w-[32rem] [&_table]:border-collapse [&_table]:text-sm",
+        "[&_thead]:bg-green-50 [&_th]:border [&_th]:border-gray-200 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:text-gray-900",
+        "[&_td]:border [&_td]:border-gray-200 [&_td]:px-3 [&_td]:py-2 [&_td]:text-gray-700 [&_td]:align-top",
+        "[&_tbody_tr:nth-child(even)]:bg-gray-50",
         // Blockquotes
         "[&_blockquote]:border-l-4 [&_blockquote]:border-green-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-600 [&_blockquote]:my-4",
         // Code
@@ -94,7 +97,9 @@ export function RichContent({ html, className, faqAccordion = false }: RichConte
         className
       )}
       dangerouslySetInnerHTML={{
-        __html: faqAccordion ? wrapFaqAccordion(sanitizeRichHtml(safe)) : sanitizeRichHtml(safe),
+        __html: faqAccordion
+          ? wrapFaqAccordion(enhanceTables(sanitizeRichHtml(safe)))
+          : enhanceTables(sanitizeRichHtml(safe)),
       }}
     />
   )

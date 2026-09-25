@@ -21,15 +21,44 @@ const SANITIZE: sanitizeHtml.IOptions = {
     "a",
     "span",
     "div",
+    "img",
+    "table",
+    "colgroup",
+    "col",
+    "caption",
+    "thead",
+    "tbody",
+    "tr",
+    "th",
+    "td",
   ],
   allowedAttributes: {
     a: ["href", "target", "rel", "class"],
     span: ["class"],
     div: ["class"],
     p: ["class"],
+    img: ["src", "alt", "width", "height", "loading", "decoding"],
+    th: ["scope", "colspan", "rowspan"],
+    td: ["colspan", "rowspan"],
   },
   allowedSchemes: ["http", "https", "mailto", "tel"],
+  // Body images must be absolute https URLs: no http (mixed content), no data:
+  // (base64 blobs), no relative paths. An img that fails this is dropped whole.
+  allowedSchemesByTag: { img: ["https"] },
   allowProtocolRelative: false,
+  exclusiveFilter: (frame: { tag: string; attribs: Record<string, string> }) =>
+    frame.tag === "img" && !/^https:\/\//i.test(frame.attribs.src ?? ""),
+  transformTags: {
+    img: (tagName: string, attribs: Record<string, string>) => ({
+      tagName,
+      attribs: {
+        ...attribs,
+        alt: attribs.alt ?? "",
+        loading: attribs.loading === "eager" ? "eager" : "lazy",
+        decoding: "async",
+      },
+    }),
+  },
 }
 
 /**

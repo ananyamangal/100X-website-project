@@ -39,7 +39,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { AdminRichTextEditor } from "@/components/admin/AdminRichTextEditor"
+import { AdminRichTextEditor, type EditorHandle } from "@/components/admin/AdminRichTextEditor"
 import { KnowledgeManager } from "@/components/admin/KnowledgeManager"
 import { BrandAssetsTab } from "@/components/admin/BrandAssetsTab"
 import { HomepageContentTab } from "@/components/admin/HomepageContentTab"
@@ -3690,6 +3690,7 @@ function BlogForm({
   })
   const [isUploadingTop, setIsUploadingTop] = useState(false)
   const [isUploadingInline, setIsUploadingInline] = useState(false)
+  const contentEditorRef = useRef<EditorHandle | null>(null)
   const [uploadError, setUploadError] = useState("")
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -3776,6 +3777,8 @@ function BlogForm({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
             <AdminRichTextEditor
+              blog
+              handleRef={contentEditorRef}
               value={formData.content}
               onChange={(v) => setFormData({ ...formData, content: v })}
               placeholder="Write your blog content here…"
@@ -3855,7 +3858,7 @@ function BlogForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Inline Images (Optional)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Gallery images (shown at the end) (Optional)</label>
             <input
               type="file"
               accept="image/*"
@@ -3904,7 +3907,7 @@ function BlogForm({
               className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               disabled={isUploadingInline}
             />
-            <p className="text-xs text-gray-500 mt-1">Upload images to be displayed within the blog content (multiple images allowed)</p>
+            <p className="text-xs text-gray-500 mt-1">Gallery images are shown together in a "Related Images" section after the article. To place an image inside the article text, click "Insert into body" on a thumbnail (it goes at the cursor in the Content editor), then remove it from the gallery if you do not want it repeated at the end.</p>
             
             {isUploadingInline && (
               <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
@@ -3916,7 +3919,21 @@ function BlogForm({
               <div className="mt-2 flex flex-wrap gap-2">
                 {formData.inlineImages.map((url, idx) => (
                   <div key={idx} className="relative">
-                    <img src={url} alt={`Inline ${idx + 1}`} className="w-24 h-24 object-cover rounded-lg" />
+                    <img src={url} alt={`Gallery ${idx + 1}`} className="w-24 h-24 object-cover rounded-lg" />
+                    <button
+                      type="button"
+                      data-testid={`insert-gallery-image-${idx}`}
+                      onClick={() => {
+                        if (!contentEditorRef.current?.insertImage(url)) {
+                          setUploadError("Content editor is not ready yet — try again in a moment.")
+                        } else {
+                          setUploadError("")
+                        }
+                      }}
+                      className="mt-1 w-24 rounded border border-gray-300 bg-white px-1 py-0.5 text-[11px] text-gray-700 hover:bg-gray-50"
+                    >
+                      Insert into body
+                    </button>
                     <button
                       type="button"
                       onClick={() => {

@@ -1,8 +1,9 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
+import { BlogBody } from "@/components/BlogBody"
 import "react-quill-new/dist/quill.snow.css"
 
 // next/dynamic's return type doesn't expose `ref` even though react-quill-new
@@ -14,12 +15,28 @@ const ReactQuill = dynamic(() => import("react-quill-new"), {
   ),
 }) as any
 
+export type EditorHandle = { insertImage: (url: string) => boolean }
+
 type AdminRichTextEditorProps = {
   value: string
   onChange: (value: string) => void
   placeholder?: string
   className?: string
+  // Blog post body: adds the table controls and an Edit / Preview toggle whose
+  // preview renders through BlogBody, the exact component the live page uses.
+  blog?: boolean
+  // Populated with imperative helpers (inserting a gallery image at the cursor).
+  handleRef?: { current: EditorHandle | null }
 }
+
+type TableAction =
+  | "insertRowAbove"
+  | "insertRowBelow"
+  | "insertColumnLeft"
+  | "insertColumnRight"
+  | "deleteRow"
+  | "deleteColumn"
+  | "deleteTable"
 
 // Same unsigned Cloudinary preset already used for the blog top/inline image
 // uploads elsewhere in the admin (app/admin/page.tsx) — reused here so a
@@ -39,8 +56,63 @@ async function uploadImage(file: File): Promise<string> {
   return data.secure_url as string
 }
 
-export function AdminRichTextEditor({ value, onChange, placeholder, className }: AdminRichTextEditorProps) {
+export function AdminRichTextEditor({
+  value,
+  onChange,
+  placeholder,
+  className,
+  blog = false,
+  handleRef,
+}: AdminRichTextEditorProps) {
   const quillRef = useRef<{ getEditor: () => any } | null>(null)
+  const lastIndex = useRef<number | null>(null)
+  const [mode, setMode] = useState<"edit" | "preview">("edit")
+  const [inTable, setInTable] = useState(false)
+  const [rows, setRows] = useState(3)
+  const [cols, setCols] = useState(3)
+
+  function trackSelection(range: { index: number } | null) {
+    if (range) lastIndex.current = range.index
+    const quill = quillRef.current?.getEditor()
+    if (!quill || !blog || !range) {
+      setInTable(false)
+      return
+    }
+    try {
+      const [table] = quill.getModule("table").getTable(range)
+      setInTable(!!table)
+    } catch {
+      setInTable(false)
+    }
+  }
+
+  function insertTable() {
+    const quill = quillRef.current?.getEditor()
+    if (!quill) return
+    quill.focus()
+    let at: number = lastIndex.current ?? Math.max(quill.getLength() - 1, 0)
+    // Quill turns the line the cursor is on into the first table cell, which
+    // would swallow an existing paragraph. Put the table on its own blank line
+    // directly below the current paragraph instead.
+    const [line] = quill.getLine(at)
+    if (line && line.length() > 1) {
+      const textEnd = quill.getIndex(line) + line.length() - 1
+      quill.insertText(textEnd, "\n", "user")
+      quill.formatLine(textEnd + 1, 1, { header: false, list: false }, "user")
+      at = textEnd + 1
+    }
+    quill.setSelection(at, 0)
+    quill
+      .getModule("table")
+      .insertTable(Math.min(Math.max(rows, 1), 20), Math.min(Math.max(cols, 1), 8))
+  }
+
+  function tableAction(action: TableAction) {
+    const quill = quillRef.current?.getEditor()
+    if (!quill) return
+    quill.focus()
+    quill.getModule("table")[action]()
+  }
 
   async function insertImageAtCursor(file: File) {
     const quill = quillRef.current?.getEditor()
@@ -56,8 +128,28 @@ export function AdminRichTextEditor({ value, onChange, placeholder, className }:
     }
   }
 
+  // Re-assigned every render (no dep array) because the editor is lazy-loaded and
+  // quillRef is still null on the first passes.
+  useEffect(() => {
+    if (!handleRef) return
+    handleRef.current = {
+      insertImage(url: string) {
+        const quill = quillRef.current?.getEditor()
+        if (!quill) return false
+        const at = lastIndex.current ?? Math.max(quill.getLength() - 1, 0)
+        quill.insertEmbed(at, "image", url, "user")
+        quill.setSelection(at + 1, 0)
+        return true
+      },
+    }
+    return () => {
+      handleRef.current = null
+    }
+  })
+
   const modules = useMemo(
     () => ({
+      ...(blog ? { table: true } : {}),
       toolbar: {
         container: [
           [{ header: [1, 2, 3, false] }],
@@ -81,12 +173,16 @@ export function AdminRichTextEditor({ value, onChange, placeholder, className }:
         },
       },
     }),
-    []
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [blog]
   )
 
   const formats = useMemo(
-    () => ["header", "bold", "italic", "underline", "strike", "list", "bullet", "size", "link", "image"],
-    []
+    () => [
+      "header", "bold", "italic", "underline", "strike", "list", "bullet", "size", "link", "image",
+      ...(blog ? ["table"] : []),
+    ],
+    [blog]
   )
 
   // Clipboard paste isn't covered by the toolbar handler — Quill's default
@@ -157,6 +253,20 @@ export function AdminRichTextEditor({ value, onChange, placeholder, className }:
     })
   })
 
+  const btn = "rounded border border-input bg-background px-2 py-1 text-xs hover:bg-muted"
+  // Keep the editor's selection when a control is clicked, so table actions
+  // land where the cursor was.
+  const keepSelection = (e: React.MouseEvent) => e.preventDefault()
+  const tableButtons: [string, TableAction][] = [
+    ["Row above", "insertRowAbove"],
+    ["Row below", "insertRowBelow"],
+    ["Col left", "insertColumnLeft"],
+    ["Col right", "insertColumnRight"],
+    ["Delete row", "deleteRow"],
+    ["Delete column", "deleteColumn"],
+    ["Delete table", "deleteTable"],
+  ]
+
   return (
     <div
       className={cn(
@@ -167,15 +277,88 @@ export function AdminRichTextEditor({ value, onChange, placeholder, className }:
         className
       )}
     >
-      <ReactQuill
-        ref={quillRef}
-        theme="snow"
-        value={value ?? ""}
-        onChange={onChange}
-        modules={modules}
-        formats={formats}
-        placeholder={placeholder}
-      />
+      {blog && (
+        <div className="flex items-center gap-1 border-b border-input bg-muted/40 px-2 py-1">
+          <button
+            type="button"
+            data-testid="editor-tab-edit"
+            className={cn(btn, mode === "edit" && "font-semibold")}
+            onClick={() => setMode("edit")}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            data-testid="editor-tab-preview"
+            className={cn(btn, mode === "preview" && "font-semibold")}
+            onClick={() => setMode("preview")}
+          >
+            Preview (as published)
+          </button>
+        </div>
+      )}
+      {blog && mode === "edit" && (
+        <div className="flex flex-wrap items-center gap-2 border-b border-input bg-muted/20 px-2 py-1.5 text-xs">
+          <span className="font-medium">Table</span>
+          <label className="flex items-center gap-1">
+            Rows
+            <input
+              type="number"
+              min={1}
+              max={20}
+              value={rows}
+              onChange={(e) => setRows(Number(e.target.value) || 1)}
+              className="w-14 rounded border border-input px-1 py-0.5"
+            />
+          </label>
+          <label className="flex items-center gap-1">
+            Columns
+            <input
+              type="number"
+              min={1}
+              max={8}
+              value={cols}
+              onChange={(e) => setCols(Number(e.target.value) || 1)}
+              className="w-14 rounded border border-input px-1 py-0.5"
+            />
+          </label>
+          <button type="button" data-testid="insert-table" className={btn} disabled={inTable} onMouseDown={keepSelection} onClick={insertTable}>
+            Insert table
+          </button>
+          {inTable &&
+            tableButtons.map(([label, action]) => (
+              <button
+                key={action}
+                type="button"
+                className={cn(btn, action === "deleteTable" && "text-red-600")}
+                onMouseDown={keepSelection}
+                onClick={() => tableAction(action)}
+              >
+                {label}
+              </button>
+            ))}
+          <span className="ml-auto text-muted-foreground">First row is published as the header row.</span>
+        </div>
+      )}
+      {blog && mode === "preview" && (
+        <div className="bg-gray-50 p-4 min-h-[200px]" data-testid="editor-preview">
+          <div className="max-w-3xl mx-auto">
+            <BlogBody html={value ?? ""} />
+          </div>
+        </div>
+      )}
+      <div className={cn(blog && mode === "preview" && "hidden")}>
+        <ReactQuill
+          ref={quillRef}
+          theme="snow"
+          value={value ?? ""}
+          onChange={onChange}
+          onChangeSelection={trackSelection}
+          modules={modules}
+          formats={formats}
+          placeholder={placeholder}
+        />
+      </div>
     </div>
   )
 }
