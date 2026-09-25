@@ -104,7 +104,7 @@ test("blog digest: holdOnSourceBody mode is the stricter switch: the whole post 
 test("blog digest: markup and inline-markdown characters in source text cannot break the page", () => {
   const post = { ...BENIGN, title: "Best [Fogger] **2026** <b>guide</b>", excerpt: "<p>Read <em>this</em> [now](http://x)</p>" }
   const { article } = buildBlogDigest(post, "s", ctx("blog-s"))
-  assert.equal(article.title, "Best (Fogger) 2026 guide")
+  assert.equal(article.title, "Key points: Best (Fogger) 2026 guide")
   assert.equal(article.blocks[0].text, "Read this (now)(http://x)")
   assert.doesNotMatch(article.blocks[0].text, /[\[\]*<>]/)
 })
@@ -243,4 +243,25 @@ test("product page: only what the record's page fields say is used (FAQs, price,
   const withExtras = buildProductPage(dirty, "100XTFS50", PSRC, ctx("product-100xtfs50"))
   assert.deepEqual(withExtras.article, clean.article)
   assert.equal(withExtras.sync.hash, clean.sync.hash)
+})
+
+test("blog digest: title, H1 and meta description never equal the source post's (no collision with the page it canonicals to)", () => {
+  for (const post of [BENIGN, { ...BENIGN, content: "" }, { ...BENIGN, excerpt: "" }]) {
+    const { article } = buildBlogDigest(post, "s", ctx("blog-s"))
+    assert.notEqual(article.title, post.title)
+    assert.notEqual(article.h1, post.title)
+    assert.notEqual(article.metaTitle.replace(/ \| 100X Circle$/, ""), post.title)
+    assert.notEqual(article.metaDescription, post.excerpt)
+    assert.equal(article.metaDescription.includes(post.excerpt || "\u0000"), false)
+    assert.ok(article.metaDescription.length >= 40 && article.metaDescription.length <= 155)
+  }
+  const { article } = buildBlogDigest(BENIGN, "s", ctx("blog-s"))
+  assert.equal(article.metaDescription, "Covers Fleet planning; Fuel types. Read the full guide for details.")
+  assert.equal(article.structuredData.headline, "Key points: Why Municipal Corporations Choose Thermal Foggers")
+})
+
+test("product page: meta description is generated and never the product's own short description", () => {
+  const { article } = buildProductPage(PRODUCT, "100XTFS50", PSRC, ctx("product-100xtfs50"))
+  assert.equal(article.metaDescription, "Specifications, key features and applications of the Thermal & Cold Fogging Machine-100XTFS50.")
+  assert.notEqual(article.metaDescription, "AVAILABLE ON GEM with OEM authorization.")
 })

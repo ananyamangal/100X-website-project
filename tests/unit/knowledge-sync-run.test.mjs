@@ -1,7 +1,7 @@
 // Run: node --import ./tests/support/register.mjs --test tests/unit/knowledge-sync-run.test.mjs
 import test from "node:test"
 import assert from "node:assert/strict"
-import { FakeDb } from "../support/fake-db.mjs"
+import { FakeDb, writeGuard } from "../support/fake-db.mjs"
 import { runKnowledgeSync } from "../../lib/knowledge/sync/run.ts"
 import { startJob, finishJob, requestRerun, takeRerun, totalsOf, STALE_MS } from "../../lib/knowledge/sync/jobs.ts"
 import { summarizeSource } from "../../lib/knowledge/sync/summary.ts"
@@ -88,7 +88,7 @@ test("a changed source updates its page; a page that becomes sensitive flips to 
   b.title = "Fleet Planning: Dosage and PPE"
   const out = await runKnowledgeSync(db, { sources: ["blogs"], now: NOW })
   assert.equal(out.results[0].updated, 1)
-  assert.equal(bySlug(db, "blog-fleet-planning").title, "Fleet Planning: Dosage and PPE")
+  assert.equal(bySlug(db, "blog-fleet-planning").title, "Key points: Fleet Planning: Dosage and PPE")
   assert.equal(bySlug(db, "blog-fleet-planning").isPublished, false)
 })
 
@@ -273,4 +273,79 @@ test("products: content is stable across runs; an unpublished product is taken o
   const out = (await runKnowledgeSync(db, { sources: ["products"], now: NOW })).results[0]
   assert.equal(out.unpublished, 1)
   assert.equal(bySlug(db, "product-100xtfs50").isPublished, false)
+})
+
+// ── the sync can never write to source content ───────────────────────────────
+
+test("read-only source collections: the sync never writes to blogs / case_studies / gov_past_performance / products, in any scenario", async () => {
+  const raw = new FakeDb(seed())
+  const db = writeGuard(raw, new Set(["knowledge_articles", "knowledge_sync_jobs"]))
+  const SOURCES = ["blogs", "case_studies", "gov_past_performance", "products"]
+  const snap = () => JSON.stringify(SOURCES.map((n) => raw.collection(n).docs))
+  const untouched = async (label, fn) => {
+    const before = snap()
+    await fn() // a write attempt on a source collection throws here and fails the test
+    assert.equal(snap(), before, label + ": source collections must be byte-identical")
+  }
+
+  await untouched("first run", () => runKnowledgeSync(db, { now: NOW }))
+  await untouched("second run", () => runKnowledgeSync(db, { now: NOW }))
+  await untouched("dry run", () => runKnowledgeSync(db, { dryRun: true, now: NOW }))
+
+  // admin edits a synced page (locks it) and publishes a draft
+  const held = raw.collection("knowledge_articles").docs.find((d) => d.sync && !d.isPublished)
+  held.isPublished = true; held.title = "Reviewed"; held.sync.locked = true
+  await untouched("run after an admin edit of a synced page", () => runKnowledgeSync(db, { now: NOW }))
+  assert.equal(held.title, "Reviewed")
+
+  // an author edits a source post (that edit is the author's, made outside the sync), then the sync runs
+  raw.collection("blogs").docs[0].excerpt = "Edited by the author."
+  await untouched("run after a source edit", () => runKnowledgeSync(db, { now: NOW }))
+
+  // a source disappears: the synced page goes offline, the source collections are still not written
+  raw.collection("blogs").docs.splice(0, 1)
+  raw.collection("gov_past_performance").docs.forEach((d) => (d.isPublic = false))
+  raw.collection("products").docs.forEach((d) => (d.isPublished = false))
+  await untouched("run after sources were removed", () => runKnowledgeSync(db, { now: NOW }))
+
+  // hand-written article on a synced slug: reported, source untouched
+  raw.collection("knowledge_articles").docs.push({ _id: "h", slug: "case-study-index-x", title: "hand", isPublished: true })
+
+  // the job bookkeeping only touches knowledge_sync_jobs
+  await untouched("job records", async () => {
+    const s = await startJob(db, { sources: ["blogs"], trigger: "manual", now: NOW })
+    await requestRerun(db, ["blogs"])
+    await takeRerun(db, s.job._id)
+    await finishJob(db, s.job._id, { results: [] })
+  })
+
+  // and the guard itself works: a direct write attempt on a source collection throws
+  assert.throws(() => db.collection("blogs").updateOne({}, { $set: { x: 1 } }), /WRITE ATTEMPTED on read-only source collection "blogs"/)
+  assert.throws(() => db.collection("products").bulkWrite([]), /WRITE ATTEMPTED on read-only source collection "products"/)
+  assert.throws(() => db.collection("gov_past_performance").deleteMany({}), /WRITE ATTEMPTED/)
+  assert.throws(() => db.collection("case_studies").insertOne({}), /WRITE ATTEMPTED/)
+})
+
+test("the only collections the sync code writes to are knowledge_articles and knowledge_sync_jobs (static check of the source)", async () => {
+  const { readFileSync } = await import("node:fs")
+  const read = (p) => readFileSync(new URL("../../" + p, import.meta.url), "utf8")
+  const run = read("lib/knowledge/sync/run.ts")
+  const jobs = read("lib/knowledge/sync/jobs.ts")
+  // run.ts: the only write handle is `col`, bound to the knowledge collection
+  assert.match(run, /const col = db\.collection\(KNOWLEDGE_COLLECTION\)/)
+  assert.equal((run.match(/const col =/g) || []).length, 1)
+  // the source collections appear only in read chains (find), never with a write method
+  for (const src of ["blogs", "case_studies", "gov_past_performance", "products"]) {
+    const rx = new RegExp(`collection\\("${src}"\\)([\\s\\S]{0,600}?)\\.toArray\\(\\)`)
+    const chain = run.match(rx)
+    assert.ok(chain, src + " chain found")
+    assert.match(chain[1], /\.find\(/)
+    assert.doesNotMatch(chain[1], /\.(insertOne|insertMany|updateOne|updateMany|deleteOne|deleteMany|bulkWrite|replaceOne|findOneAndUpdate|findOneAndDelete|drop)\(/)
+  }
+  // no delete operation exists anywhere in the sync
+  for (const src of [run, jobs, read("lib/knowledge/sync/execute.ts"), read("lib/knowledge/sync/build.ts"), read("app/api/admin/knowledge/rebuild/route.ts")]) {
+    assert.doesNotMatch(src, /deleteOne|deleteMany|findOneAndDelete|\.drop\(|dropDatabase/)
+  }
+  // jobs.ts writes only to the job collection
+  assert.equal((jobs.match(/\.collection(<[A-Za-z]+>)?\(([A-Za-z_"]+)\)/g) || []).every((m) => m.includes("JOBS_COLLECTION")), true)
 })

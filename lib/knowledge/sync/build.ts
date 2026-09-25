@@ -220,7 +220,11 @@ export function buildBlogDigest(blog: BlogSource, blogSlug: string, ctx: BuildCo
   }
   blocks.push({ type: "callout", variant: "info", label: "Read the full article", text: `[${title}](${path})` })
 
-  const description = truncate(excerpt || title, 155)
+  // Title, H1 and description are deliberately NOT the source post's: a synced page must never
+  // collide with the page it canonicals to. The description is built from the section outline.
+  const pageTitle = `Key points: ${title}`
+  const covers = heads.length ? `Covers ${truncate(heads.slice(0, 6).join("; "), 100)}.` : `A short summary of "${truncate(title, 80)}".`
+  const description = `${covers} Read the full guide for details.`
   const digestWords = words(excerpt) + heads.reduce((n, h) => n + words(h), 0)
   const category = inline(plainText(blog.category))
 
@@ -231,14 +235,14 @@ export function buildBlogDigest(blog: BlogSource, blogSlug: string, ctx: BuildCo
     ctx,
     {
       slug: ctx.slug,
-      title,
-      metaTitle: metaTitle(title),
+      title: pageTitle,
+      metaTitle: metaTitle(pageTitle),
       metaDescription: description,
       tags: ["Blog", ...(category ? [category] : [])],
       byline: { author: AUTHOR, readTime: readTime(digestWords), updatedLabel: monthLabel(isoDay(blog.updatedAt ?? blog.publishedAt ?? blog.createdAt, ctx.now)) },
       breadcrumbLabel: title,
       maxWidth: "3xl",
-      h1: title,
+      h1: pageTitle,
       blocks,
       faqs: [],
     },
@@ -445,7 +449,8 @@ export function buildProductPage(product: ProductSource, code: string, sourceUrl
 
   const title = `${name}: Specifications and Features`
   const category = inline(plainText(product.category))
-  const description = truncate(summary || name, 155)
+  // Never the product's own meta/short description (the product page already uses it).
+  const description = truncate(`Specifications, key features and applications of the ${name}.`, 155)
   const allText = [name, summary, detail, ...features, ...specs.flat(), ...apps, warranty]
 
   return finish(

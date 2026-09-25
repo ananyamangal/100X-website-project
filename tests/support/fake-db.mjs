@@ -81,3 +81,22 @@ export class FakeDb {
   constructor(seed = {}) { this.cols = {}; for (const [n, docs] of Object.entries(seed)) this.cols[n] = new FakeCollection(n, structuredClone(docs)) }
   collection(name) { return (this.cols[name] ??= new FakeCollection(name)) }
 }
+
+export const WRITE_METHODS = new Set(["insertOne", "insertMany", "updateOne", "updateMany", "deleteOne", "deleteMany", "bulkWrite", "replaceOne", "findOneAndUpdate", "findOneAndReplace", "findOneAndDelete", "drop", "createIndex"])
+
+/** Wraps a db so that ANY write method on a collection outside `allowed` throws (an attempt, not just an effect). */
+export function writeGuard(db, allowed) {
+  return {
+    collection(name) {
+      const col = db.collection(name)
+      if (allowed.has(name)) return col
+      return new Proxy(col, {
+        get(target, prop) {
+          if (WRITE_METHODS.has(prop)) return () => { throw new Error(`WRITE ATTEMPTED on read-only source collection "${name}" via ${String(prop)}`) }
+          const v = target[prop]
+          return typeof v === "function" ? v.bind(target) : v
+        },
+      })
+    },
+  }
+}
