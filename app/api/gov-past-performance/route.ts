@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { PUBLIC_API_FIELDS, pickPublic, projectionFor } from "@/lib/govPastPerformancePublic"
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,14 +27,16 @@ export async function GET(request: NextRequest) {
       ]
     }
 
+    // Public endpoint: return only the allow-listed card fields, never the whole
+    // document (notes, documents, orderValue are internal).
     const docs = await db
       .collection("gov_past_performance")
-      .find(filter)
+      .find(filter, { projection: projectionFor(PUBLIC_API_FIELDS) })
       .sort({ orderYear: -1, createdAt: -1 })
       .limit(limit)
       .toArray()
 
-    return NextResponse.json(docs.map((d) => ({ ...d, _id: String(d._id) })))
+    return NextResponse.json(docs.map((d) => pickPublic(d, PUBLIC_API_FIELDS)))
   } catch {
     return NextResponse.json([], { status: 500 })
   }

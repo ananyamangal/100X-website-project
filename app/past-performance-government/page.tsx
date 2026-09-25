@@ -11,6 +11,7 @@ import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/F
 import FeaturedGovSupplies, { type SupplyRecord } from "@/components/trust/FeaturedGovSupplies"
 import GovProductCarousel, { type ProductSlim } from "@/components/gov-procurement/GovProductCarousel"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
+import { PUBLIC_PAGE_FIELDS, pickPublic, projectionFor } from "@/lib/govPastPerformancePublic"
 
 export const revalidate = 60
 
@@ -84,7 +85,7 @@ export default async function PastPerformancePage() {
 
   if (db) {
     const [rawRecords, rawKpis, rawCustomers, rawCaseStudies, rawProducts, rawDeployments] = await Promise.all([
-      db.collection("gov_past_performance").find({ isPublic: true }).sort({ orderYear: -1 }).limit(200).toArray(),
+      db.collection("gov_past_performance").find({ isPublic: true }, { projection: projectionFor(PUBLIC_PAGE_FIELDS) }).sort({ orderYear: -1 }).limit(200).toArray(),
       db.collection("gov_kpis").findOne({ key: "main" }),
       db.collection("customers").find({ isActive: { $ne: false } }).sort({ order: 1 }).toArray(),
       db.collection("case_studies").find({ published: true }).sort({ createdAt: -1 }).limit(6).toArray(),
@@ -92,7 +93,7 @@ export default async function PastPerformancePage() {
       db.collection("deployments").find({ images: { $exists: true, $ne: [] } }).sort({ createdAt: -1 }).limit(6).toArray(),
     ])
 
-    records = JSON.parse(JSON.stringify(rawRecords)).map((r: any) => ({ ...r, _id: String(r._id) }))
+    records = JSON.parse(JSON.stringify(rawRecords)).map((r: any) => pickPublic(r, PUBLIC_PAGE_FIELDS))
     if (rawKpis) kpis = { ...kpis, ...JSON.parse(JSON.stringify(rawKpis)) }
 
     govLogos = JSON.parse(JSON.stringify(rawCustomers)).map((c: any) => ({
