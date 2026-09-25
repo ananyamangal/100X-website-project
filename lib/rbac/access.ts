@@ -48,6 +48,8 @@ const API_RULES: readonly ApiRule[] = [
     read: ["blog.view"],
     write: ["blog.create", "blog.edit", "blog.publish", "blog.delete"],
   },
+  // Stricter rule FIRST (first match wins): seo_team / content_team hold knowledge.edit but must not run the sync.
+  { prefix: "/api/admin/knowledge/rebuild", read: ["knowledge.rebuild"], write: ["knowledge.rebuild"] },
   { prefix: "/api/admin/knowledge", read: ["knowledge.view"], write: ["knowledge.edit"] },
 
   // These handlers have no permission check of their own, so the method-level
