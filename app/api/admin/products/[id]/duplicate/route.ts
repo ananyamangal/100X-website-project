@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { scheduleAutoSync } from "@/lib/knowledge/sync/execute"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { generateProductSlug } from "@/lib/productSlug"
@@ -52,6 +53,7 @@ export async function POST(_req: NextRequest, context: { params?: { id?: string 
     }
 
     await db.collection("products").insertOne(duplicate as any)
+    scheduleAutoSync(["products"])
 
     const inserted = await db.collection("products").findOne({ _id: newId })
     return NextResponse.json(

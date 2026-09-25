@@ -123,7 +123,10 @@ function monthLabel(iso: string): string {
   return `Updated ${MONTHS[Number(m) - 1] ?? ""} ${y}`.replace("  ", " ")
 }
 
-function articleSchema(a: { title: string; description: string; url: string; datePublished: string; dateModified: string }, siteUrl: string) {
+function articleSchema(
+  a: { title: string; description: string; url: string; datePublished: string; dateModified: string; about?: Record<string, unknown> },
+  siteUrl: string,
+) {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -135,6 +138,7 @@ function articleSchema(a: { title: string; description: string; url: string; dat
     dateModified: a.dateModified,
     author: { "@type": "Organization", name: AUTHOR, url: siteUrl },
     publisher: { "@id": `${siteUrl}/#organization` },
+    ...(a.about ? { about: a.about } : {}),
   }
 }
 
@@ -151,6 +155,7 @@ function finish(
   core: Omit<KnowledgeArticle, "structuredData" | "datePublished" | "dateModified" | "isPublished" | "order" | "canonicalUrl" | "sync">,
   dates: { published: unknown; modified: unknown },
   sensitivityTexts: string[],
+  about?: Record<string, unknown>,
 ): BuiltEntry {
   const sens = classifySensitivity(...sensitivityTexts)
   const hasSourceDate = !Number.isNaN(new Date(String(dates.modified ?? "")).getTime()) && dates.modified != null
@@ -159,7 +164,7 @@ function finish(
   const url = `${ctx.siteUrl}/knowledge/${ctx.slug}`
   const article: KnowledgeArticle = {
     ...core,
-    structuredData: articleSchema({ title: core.title, description: core.metaDescription, url, datePublished, dateModified }, ctx.siteUrl),
+    structuredData: articleSchema({ title: core.title, description: core.metaDescription, url, datePublished, dateModified, about }, ctx.siteUrl),
     datePublished,
     dateModified,
     isPublished: !sens.sensitive,
@@ -368,5 +373,105 @@ export function buildCaseStudyIndex(studies: CaseStudySource[], ctx: BuildContex
     },
     { published: ctx.now, modified: latest },
     [title, intro, ...rows.map((s) => `${s.title ?? ""} ${s.productUsed ?? ""} ${s.industry ?? ""}`)],
+  )
+}
+
+// ── products ─────────────────────────────────────────────────────────────────
+
+export interface ProductSource {
+  _id?: unknown
+  name?: string
+  category?: string
+  tagline?: string
+  shortDescription?: string
+  detailedDescription?: string
+  features?: Array<{ title?: string; value?: string; order?: number }>
+  specifications?: Array<{ label?: string; value?: string; order?: number }>
+  applications?: Array<{ title?: string; description?: string; order?: number }>
+  warrantyPeriod?: string
+  createdAt?: unknown
+  updatedAt?: unknown
+}
+
+const MODEL_CODE = /\b100X[A-Z0-9]{3,}\b/i
+
+/** The 100X model code in a product's name (preferred) or slug, upper-cased; null when it has none. */
+export function productModelCode(product: { name?: string; slug?: string }): string | null {
+  const m = String(product.name ?? "").match(MODEL_CODE) ?? String(product.slug ?? "").match(MODEL_CODE)
+  return m ? m[0].toUpperCase() : null
+}
+
+const byOrder = <T extends { order?: number }>(list: T[] | undefined) =>
+  [...(Array.isArray(list) ? list : [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+
+/**
+ * A factual page for one published product: its own description, features, spec
+ * table, applications and warranty. Pricing, ratings, review counts and the
+ * product FAQs (which discuss chemicals) are never read. A product whose page
+ * touches chemicals, dosing or safety (a spec row mentioning the chemical tank,
+ * say) is held whole as a draft rather than guessing which parts are safe.
+ */
+export function buildProductPage(product: ProductSource, code: string, sourceUrl: string, ctx: BuildContext): BuiltEntry {
+  const name = inline(plainText(product.name) || code)
+  const summary = inline(plainText(product.shortDescription) || truncate(plainText(product.detailedDescription), 300))
+  const detail = inline(plainText(product.detailedDescription))
+
+  const features = byOrder(product.features)
+    .map((f) => [inline(plainText(f.title)), inline(plainText(f.value))] as const)
+    .filter(([t, v]) => t || v)
+    .map(([t, v]) => (t && v ? `**${t}:** ${v}` : t || v))
+  const specs = byOrder(product.specifications)
+    .map((r) => [inline(plainText(r.label)), inline(plainText(r.value))] as const)
+    .filter(([l, v]) => l && v)
+  const apps = byOrder(product.applications)
+    .map((a) => [inline(plainText(a.title)), inline(plainText(a.description))] as const)
+    .filter(([t, d]) => t || d)
+    .map(([t, d]) => (t && d ? `**${t}:** ${d}` : t || d))
+  const warranty = inline(plainText(product.warrantyPeriod))
+
+  const blocks: KnowledgeBlock[] = []
+  if (summary) blocks.push({ type: "paragraph", text: summary })
+  if (detail && detail !== summary) blocks.push({ type: "paragraph", text: detail })
+  if (features.length) blocks.push({ type: "heading", level: 2, text: "Key features" }, { type: "list", ordered: false, items: features })
+  if (specs.length) {
+    blocks.push(
+      { type: "heading", level: 2, text: "Specifications" },
+      { type: "table", columns: [{ text: "Specification" }, { text: "Value" }], rows: specs.map(([l, v]) => [l, v]), variant: "bordered" },
+    )
+  }
+  if (apps.length) blocks.push({ type: "heading", level: 2, text: "Applications" }, { type: "list", ordered: false, items: apps })
+  if (warranty) blocks.push({ type: "callout", variant: "note", label: "Warranty", text: warranty })
+  blocks.push({ type: "callout", variant: "info", label: "Product page", text: `[${name}](${sourceUrl.replace(ctx.siteUrl, "")})` })
+
+  const title = `${name}: Specifications and Features`
+  const category = inline(plainText(product.category))
+  const description = truncate(summary || name, 155)
+  const allText = [name, summary, detail, ...features, ...specs.flat(), ...apps, warranty]
+
+  return finish(
+    "products",
+    String(product._id ?? code),
+    sourceUrl,
+    ctx,
+    {
+      slug: ctx.slug,
+      title,
+      metaTitle: metaTitle(title),
+      metaDescription: description,
+      tags: ["Product", code, ...(category ? [category] : [])],
+      byline: {
+        author: AUTHOR,
+        readTime: readTime(words(allText.join(" "))),
+        updatedLabel: monthLabel(isoDay(product.updatedAt ?? product.createdAt, ctx.now)),
+      },
+      breadcrumbLabel: name,
+      maxWidth: "3xl",
+      h1: title,
+      blocks,
+      faqs: [],
+    },
+    { published: product.createdAt, modified: product.updatedAt ?? product.createdAt },
+    allText,
+    { "@type": "Product", name, model: code, url: sourceUrl },
   )
 }

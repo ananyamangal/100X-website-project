@@ -18,7 +18,7 @@ function mergeResults(into: SourceResult[], more: SourceResult[]) {
   for (const r of more) {
     const cur = into.find((x) => x.source === r.source)
     if (!cur) {
-      into.push({ ...r, errors: [...r.errors] })
+      into.push({ ...r, errors: [...r.errors], notes: [...(r.notes ?? [])] })
       continue
     }
     cur.scanned = r.scanned
@@ -30,6 +30,7 @@ function mergeResults(into: SourceResult[], more: SourceResult[]) {
     cur.skippedLocked = r.skippedLocked
     cur.unpublished += r.unpublished
     cur.errors.push(...r.errors)
+    cur.notes = [...new Set([...(cur.notes ?? []), ...(r.notes ?? [])])]
   }
 }
 

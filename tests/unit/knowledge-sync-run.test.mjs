@@ -27,6 +27,16 @@ const seed = () => ({
     { _id: "p1", organization: "CRPF Kerala", department: "Defence", state: "Kerala", product: "Cold Fogger", orderYear: 2024, isPublic: true, notes: "PRIVATE NOTE", orderValue: 9, documents: [{ url: "x" }] },
     { _id: "p2", organization: "Hidden Org", isPublic: false },
   ],
+  products: [
+    { _id: "pr1", name: "Thermal Fogging Machine 100XTFS50", slug: "100xtfs50", category: "Fogging Machines", shortDescription: "<p>Pulse jet&nbsp;fogger.</p>", detailedDescription: "<p>Built for municipal fogging.</p>",
+      features: [{ title: "Engine", value: "Pulse jet", order: 0 }], specifications: [{ label: "Tank capacity", value: "5 L", order: 1 }, { label: "Weight", value: "9 kg", order: 0 }],
+      applications: [{ title: "Municipal use", description: "", order: 0 }], warrantyPeriod: "6 months", isPublished: true,
+      priceRange: "SECRET PRICE", rating: 4.6, reviewsCount: 36, productFaqs: [{ q: "SECRET FAQ", a: "x" }] },
+    { _id: "pr2", name: "Cold Fogger 100XMCF42", slug: "cold-fogger-100xmcf42-abc", specifications: [{ label: "Chemical tank", value: "3 L" }], isPublished: true },
+    { _id: "pr3", name: "Unnamed accessory", slug: "accessory", isPublished: true },
+    { _id: "pr4", name: "Draft Model 100XZZ99", slug: "zz", isPublished: false },
+    { _id: "pr5", name: "Duplicate 100XTFS50", slug: "dup", isPublished: true },
+  ],
   knowledge_articles: [],
 })
 
@@ -40,6 +50,7 @@ test("first run: creates one page per published blog, one index per aggregate so
     ["blogs", 2, 2, 1, 1],
     ["case_studies", 1, 1, 1, 0],
     ["past_performance", 1, 1, 1, 0],
+    ["products", 2, 2, 1, 1],
   ])
   assert.equal(bySlug(db, "blog-fleet-planning").isPublished, true)
   assert.equal(bySlug(db, "blog-chemical-names").isPublished, false)
@@ -66,7 +77,7 @@ test("second run with no source change writes nothing (content hash)", async () 
   await runKnowledgeSync(db, { now: NOW })
   const writesBefore = db.collection("knowledge_articles").writes.length
   const out = await runKnowledgeSync(db, { now: new Date("2026-10-01T00:00:00Z") })
-  assert.deepEqual(out.results.map((r) => [r.created, r.updated, r.unchanged]), [[0, 0, 2], [0, 0, 1], [0, 0, 1]])
+  assert.deepEqual(out.results.map((r) => [r.created, r.updated, r.unchanged]), [[0, 0, 2], [0, 0, 1], [0, 0, 1], [0, 0, 2]])
   assert.equal(db.collection("knowledge_articles").writes.length, writesBefore)
 })
 
@@ -131,7 +142,7 @@ test("an aggregate page is retired when its source becomes empty", async () => {
 test("dry run reports the plan and writes nothing", async () => {
   const db = new FakeDb(seed())
   const out = await runKnowledgeSync(db, { dryRun: true, now: NOW })
-  assert.equal(out.totals.created, 4)
+  assert.equal(out.totals.created, 6)
   assert.equal(docs(db).length, 0)
   assert.equal(db.collection("knowledge_articles").writes.length, 0)
 })
@@ -209,4 +220,57 @@ test("feed: drafts never appear; last_updated is the newest date of what is list
   assert.equal(f.lastUpdated, "2026-09-24")
   assert.equal(f.items.some((i) => i.url.endsWith("/d1")), false)
   assert.equal(mergeKnowledgeFeed(CURATED, [], "https://s", "2026-05-29").lastUpdated, "2026-05-29")
+})
+
+// ── products ─────────────────────────────────────────────────────────────────
+
+test("products: published only, keyed by 100X code; a general spec page publishes, a chemical spec row drafts the whole page", async () => {
+  const db = new FakeDb(seed())
+  const out = await runKnowledgeSync(db, { sources: ["products"], now: NOW })
+  const r = out.results[0]
+  assert.deepEqual([r.scanned, r.created, r.published, r.drafted, r.errors.length], [2, 2, 1, 1, 0])
+  assert.equal(bySlug(db, "product-100xtfs50").isPublished, true)
+  const held = bySlug(db, "product-100xmcf42")
+  assert.equal(held.isPublished, false)
+  assert.equal(held.sync.policy, "draft-review")
+  assert.ok(held.sync.reasons.includes("chemicals"))
+  assert.equal(bySlug(db, "product-100xzz99"), undefined, "unpublished product is not synced")
+})
+
+test("products: no model code or a repeated code is skipped with a note (informational, not an error)", async () => {
+  const db = new FakeDb(seed())
+  const r = (await runKnowledgeSync(db, { sources: ["products"], now: NOW })).results[0]
+  assert.equal(r.errors.length, 0)
+  assert.equal(r.notes.length, 2)
+  assert.match(r.notes.join("\n"), /"Unnamed accessory" has no 100X model code; skipped/)
+  assert.match(r.notes.join("\n"), /"Duplicate 100XTFS50" repeats model code 100XTFS50/)
+})
+
+test("products: pricing, ratings, review counts and FAQs are never queried or stored", async () => {
+  const db = new FakeDb(seed())
+  await runKnowledgeSync(db, { sources: ["products"], now: NOW })
+  const proj = db.collection("products").finds.at(-1).projection
+  for (const banned of ["priceRange", "rating", "reviewsCount", "productFaqs", "imageUrls"]) assert.equal(banned in proj, false, banned)
+  assert.deepEqual(db.collection("products").finds.at(-1).filter, { isPublished: { $ne: false } })
+  const stored = JSON.stringify(docs(db))
+  for (const secret of ["SECRET PRICE", "SECRET FAQ", "4.6", "reviewsCount"]) assert.equal(stored.includes(secret), false, secret)
+})
+
+test("products: canonical follows the sitemap rule: landing page when one exists, else /products/<slug>", async () => {
+  const db = new FakeDb(seed())
+  await runKnowledgeSync(db, { sources: ["products"], now: NOW })
+  assert.equal(bySlug(db, "product-100xtfs50").canonicalUrl, "https://www.100xcircle.com/thermal-and-cold-fogging-machine-100xtfs50")
+  assert.equal(bySlug(db, "product-100xmcf42").canonicalUrl, "https://www.100xcircle.com/products/cold-fogger-100xmcf42-abc")
+})
+
+test("products: content is stable across runs; an unpublished product is taken offline", async () => {
+  const db = new FakeDb(seed())
+  await runKnowledgeSync(db, { sources: ["products"], now: NOW })
+  const again = (await runKnowledgeSync(db, { sources: ["products"], now: new Date("2026-11-01T00:00:00Z") })).results[0]
+  assert.deepEqual([again.created, again.updated, again.unchanged], [0, 0, 2])
+  // pr5 shares the code, so it would take the page over; unpublish both
+  for (const id of ["pr1", "pr5"]) db.collection("products").docs.find((d) => d._id === id).isPublished = false
+  const out = (await runKnowledgeSync(db, { sources: ["products"], now: NOW })).results[0]
+  assert.equal(out.unpublished, 1)
+  assert.equal(bySlug(db, "product-100xtfs50").isPublished, false)
 })

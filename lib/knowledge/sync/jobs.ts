@@ -30,6 +30,8 @@ export interface SourceResult {
   /** Previously synced entries taken offline because their source is gone. */
   unpublished: number
   errors: string[]
+  /** Source items skipped on purpose (e.g. a product with no model code): informational, not a failure. */
+  notes: string[]
 }
 
 export interface JobTotals {

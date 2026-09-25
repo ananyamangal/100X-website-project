@@ -7,6 +7,8 @@ import {
   buildBlogDigest,
   buildTrackRecord,
   buildCaseStudyIndex,
+  buildProductPage,
+  productModelCode,
   inline,
   headingsOf,
 } from "../../lib/knowledge/sync/build.ts"
@@ -178,4 +180,67 @@ test("helpers: inline() strips markup characters; headingsOf() de-duplicates and
   assert.equal(inline("a *b* [c]"), "a b (c)")
   assert.deepEqual(headingsOf("<h2>A</h2><h2>A</h2><h3>B</h3>"), ["A", "B"])
   assert.equal(headingsOf(Array.from({ length: 30 }, (_, i) => `<h2>H${i}</h2>`).join(""), 12).length, 12)
+})
+
+const PRODUCT = {
+  _id: "p1", name: "Thermal &amp; Cold Fogging Machine-100XTFS50", slug: "thermal-cold-fogging-machine-100xtfs50-90602f", category: "Fogging Machines",
+  shortDescription: "<p>AVAILABLE&nbsp;ON&nbsp;GEM with OEM authorization.</p>", detailedDescription: "<p>Pulse jet&nbsp;engine machine for municipal use.</p>",
+  features: [{ title: "Engine", value: "Pulse jet", order: 1 }, { title: "Start", value: "Electric", order: 0 }],
+  specifications: [{ label: "Weight", value: "9 kg", order: 1 }, { label: "Machine type", value: "Pulse jet", order: 0 }, { label: "", value: "orphan value" }],
+  applications: [{ title: "Municipal fogging", description: "Cities and towns" }], warrantyPeriod: "6 months ",
+  updatedAt: "2026-07-30T11:10:58.432Z", createdAt: "2025-10-07T14:19:38.000Z",
+}
+const PSRC = "https://www.100xcircle.com/thermal-and-cold-fogging-machine-100xtfs50"
+
+test("product: model code comes from the name first, then the slug, upper-cased; none means null", () => {
+  assert.equal(productModelCode({ name: "Mini Fogger- 100XBF102" }), "100XBF102")
+  assert.equal(productModelCode({ name: "Plain name", slug: "thing-100xulvss10-5e46c5" }), "100XULVSS10")
+  assert.equal(productModelCode({ name: "Two 100XAAA1 and 100XBBB2" }), "100XAAA1")
+  assert.equal(productModelCode({ name: "Unnamed", slug: "unnamed" }), null)
+})
+
+test("product page: description, ordered features with bold lead-ins, ordered spec table, applications, warranty, link to the product page", () => {
+  const { article, sync } = buildProductPage(PRODUCT, "100XTFS50", PSRC, ctx("product-100xtfs50"))
+  assert.equal(article.title, "Thermal & Cold Fogging Machine-100XTFS50: Specifications and Features")
+  assert.equal(article.blocks[0].text, "AVAILABLE ON GEM with OEM authorization.")
+  const list = article.blocks.filter((b) => b.type === "list")
+  assert.deepEqual(list[0].items, ["**Start:** Electric", "**Engine:** Pulse jet"])
+  const table = article.blocks.find((b) => b.type === "table")
+  assert.deepEqual(table.rows, [["Machine type", "Pulse jet"], ["Weight", "9 kg"]], "ordered; the row with no label is dropped")
+  assert.deepEqual(list[1].items, ["**Municipal fogging:** Cities and towns"])
+  assert.ok(article.blocks.some((b) => b.type === "callout" && b.label === "Warranty" && b.text === "6 months"))
+  const link = article.blocks.at(-1)
+  assert.equal(link.text, "[Thermal & Cold Fogging Machine-100XTFS50](/thermal-and-cold-fogging-machine-100xtfs50)")
+  assert.equal(article.canonicalUrl, PSRC)
+  assert.equal(sync.source, "products")
+  assert.equal(sync.sourceId, "p1")
+  assert.deepEqual(article.tags, ["Product", "100XTFS50", "Fogging Machines"])
+  assert.equal(article.isPublished, true)
+})
+
+test("product page: Product JSON-LD carries only name, model and url: no price, rating or offers", () => {
+  const { article } = buildProductPage(PRODUCT, "100XTFS50", PSRC, ctx("product-100xtfs50"))
+  assert.deepEqual(article.structuredData.about, { "@type": "Product", name: "Thermal & Cold Fogging Machine-100XTFS50", model: "100XTFS50", url: PSRC })
+  assert.equal(/offers|aggregateRating|price|rating/i.test(JSON.stringify(article)), false)
+})
+
+test("product page: a chemical / dosing / safety mention anywhere on the page holds the WHOLE page as a draft", () => {
+  for (const extra of [
+    { specifications: [...PRODUCT.specifications, { label: "Chemical tank", value: "3 L" }] },
+    { features: [{ title: "Tank", value: "Holds insecticide solutions" }] },
+    { applications: [{ title: "Dosage guidance", description: "" }] },
+    { detailedDescription: "<p>Includes PPE and safety kit.</p>" },
+  ]) {
+    const { article, sync } = buildProductPage({ ...PRODUCT, ...extra }, "100XTFS50", PSRC, ctx("product-100xtfs50"))
+    assert.equal(article.isPublished, false, JSON.stringify(extra).slice(0, 60))
+    assert.equal(sync.policy, "draft-review")
+  }
+})
+
+test("product page: only what the record's page fields say is used (FAQs, price, ratings ignored even if present)", () => {
+  const dirty = { ...PRODUCT, priceRange: "SECRET PRICE", rating: 4.6, reviewsCount: 36, productFaqs: [{ q: "SECRET FAQ", a: "dose 5 ml per litre" }] }
+  const clean = buildProductPage(PRODUCT, "100XTFS50", PSRC, ctx("product-100xtfs50"))
+  const withExtras = buildProductPage(dirty, "100XTFS50", PSRC, ctx("product-100xtfs50"))
+  assert.deepEqual(withExtras.article, clean.article)
+  assert.equal(withExtras.sync.hash, clean.sync.hash)
 })

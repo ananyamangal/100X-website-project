@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { scheduleAutoSync } from "@/lib/knowledge/sync/execute";
 import clientPromise from "@/lib/mongodb";
 import { Product } from "@/lib/productModel";
 import { ObjectId } from "mongodb";
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
     const slug = productData.slug || generateProductSlug(productData.name, String(tempId))
     const newProduct = { ...productData, _id: tempId, slug, order, createdAt: now, updatedAt: now };
     const result = await db.collection("products").insertOne(newProduct as any);
+    scheduleAutoSync(["products"]);
     return NextResponse.json({ ...newProduct, _id: result.insertedId }, { status: 201 });
   } catch (error) {
     console.error("❌ Error in POST /api/admin/products:", error);
@@ -85,6 +87,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
+    scheduleAutoSync(["products"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("❌ Error in DELETE /api/admin/products/[id]:", error);
@@ -118,6 +121,7 @@ export async function PUT(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
+    scheduleAutoSync(["products"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("❌ Error in PUT /api/admin/products/[id]:", error);

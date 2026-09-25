@@ -19,19 +19,21 @@
 import type { Db } from "mongodb"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { SITE_URL } from "@/lib/seo/site-config"
-import { buildBlogDigest, buildCaseStudyIndex, buildTrackRecord, type BuildContext, type BuiltEntry } from "./build"
+import { PRODUCT_LANDING_MAP } from "@/lib/seo/product-landing-map"
+import { buildBlogDigest, buildCaseStudyIndex, buildProductPage, buildTrackRecord, productModelCode, type BuildContext, type BuiltEntry } from "./build"
 import { totalsOf, type SourceResult } from "./jobs"
 
 export const KNOWLEDGE_COLLECTION = "knowledge_articles"
 
-/** Sources this sync can build today. Products are added once the mapping is signed off. */
-export const SYNC_SOURCES = ["blogs", "case_studies", "past_performance"] as const
+/** Sources this sync can build. */
+export const SYNC_SOURCES = ["blogs", "case_studies", "past_performance", "products"] as const
 export type SyncSourceKey = (typeof SYNC_SOURCES)[number]
 
 export const SOURCE_LABELS: Record<SyncSourceKey, string> = {
   blogs: "Blog posts",
   case_studies: "Case studies",
   past_performance: "Past performance",
+  products: "Products",
 }
 
 export function isSyncSource(v: unknown): v is SyncSourceKey {
@@ -40,7 +42,8 @@ export function isSyncSource(v: unknown): v is SyncSourceKey {
 
 const slugSafe = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
 
-type Collector = (db: Db, now: Date) => Promise<BuiltEntry[]>
+/** entries to write, plus notes about source items that were skipped (shown to the owner, not errors). */
+type Collector = (db: Db, now: Date) => Promise<{ entries: BuiltEntry[]; notes: string[] }>
 
 const ctxFor = (slug: string, now: Date): BuildContext => ({ slug, siteUrl: SITE_URL, now, order: 0 })
 
@@ -56,7 +59,7 @@ export const COLLECTORS: Record<SyncSourceKey, Collector> = {
       seen.add(slug)
       out.push(buildBlogDigest(b as never, blogSlug, ctxFor(slug, now)))
     }
-    return out
+    return { entries: out, notes: [] }
   },
 
   async case_studies(db, now) {
@@ -67,7 +70,7 @@ export const COLLECTORS: Record<SyncSourceKey, Collector> = {
       .sort({ createdAt: -1 })
       .toArray()
     const built = buildCaseStudyIndex(studies as never, ctxFor("case-study-index", now))
-    return built ? [built] : []
+    return { entries: built ? [built] : [], notes: [] }
   },
 
   async past_performance(db, now) {
@@ -78,7 +81,42 @@ export const COLLECTORS: Record<SyncSourceKey, Collector> = {
       .project({ organization: 1, department: 1, state: 1, product: 1, orderYear: 1, createdAt: 1, updatedAt: 1 })
       .toArray()
     const built = buildTrackRecord(records as never, ctxFor("government-supply-track-record", now))
-    return built ? [built] : []
+    return { entries: built ? [built] : [], notes: [] }
+  },
+
+  async products(db, now) {
+    // Published products only. Pricing, ratings, review counts and the product FAQs are never read.
+    const docs = await db
+      .collection("products")
+      .find({ isPublished: { $ne: false } })
+      .project({
+        name: 1, slug: 1, category: 1, tagline: 1, shortDescription: 1, detailedDescription: 1,
+        features: 1, specifications: 1, applications: 1, warrantyPeriod: 1, createdAt: 1, updatedAt: 1,
+      })
+      .sort({ order: 1 })
+      .toArray()
+    const entries: BuiltEntry[] = []
+    const notes: string[] = []
+    const used = new Map<string, string>()
+    for (const p of docs) {
+      const label = String(p.name ?? p._id)
+      const code = productModelCode(p as never)
+      if (!code) {
+        notes.push(`Product "${label}" has no 100X model code; skipped.`)
+        continue
+      }
+      if (used.has(code)) {
+        notes.push(`Product "${label}" repeats model code ${code} (already used by "${used.get(code)}"); skipped.`)
+        continue
+      }
+      used.set(code, label)
+      // Same rule the sitemap uses: a product with a landing page canonicals to it, else /products/<slug>.
+      const seg = (typeof p.slug === "string" && p.slug) || String(p._id)
+      const landing = PRODUCT_LANDING_MAP[seg] ?? PRODUCT_LANDING_MAP[String(p._id)]
+      const sourceUrl = landing ? `${SITE_URL}/${landing}` : `${SITE_URL}/products/${seg}`
+      entries.push(buildProductPage(p as never, code, sourceUrl, ctxFor(`product-${code.toLowerCase()}`, now)))
+    }
+    return { entries, notes }
   },
 }
 
@@ -108,11 +146,12 @@ export async function runKnowledgeSync(db: Db, opts: RunOptions = {}) {
 
   for (let i = 0; i < sources.length; i++) {
     const source = sources[i]
-    const res: SourceResult = { source, scanned: 0, created: 0, updated: 0, unchanged: 0, published: 0, drafted: 0, skippedLocked: 0, unpublished: 0, errors: [] }
+    const res: SourceResult = { source, scanned: 0, created: 0, updated: 0, unchanged: 0, published: 0, drafted: 0, skippedLocked: 0, unpublished: 0, errors: [], notes: [] }
     await opts.onProgress?.({ done: i, total: sources.length, current: source }, results)
 
     try {
-      const entries = await COLLECTORS[source](db, now)
+      const { entries, notes } = await COLLECTORS[source](db, now)
+      res.notes.push(...notes)
       res.scanned = entries.length
       const slugs = entries.map((e) => e.article.slug)
 

@@ -14,6 +14,7 @@ interface SourceResult {
   skippedLocked: number
   unpublished: number
   errors: string[]
+  notes?: string[]
 }
 
 interface Job {
@@ -197,11 +198,18 @@ export function KnowledgeRebuildPanel({ onFinished }: { onFinished?: () => void 
         <ul className="text-xs text-gray-800 space-y-1 list-disc pl-5" data-testid="sync-summary">
           {job.results.map((r) => (
             <li key={r.source}>
-              {summarizeSource(r, labelOf(r.source))}
+              {summarizeSource({ ...r, notes: r.notes ?? [] }, labelOf(r.source))}
               {r.errors.length ? (
                 <ul className="list-none pl-0 text-red-700">
                   {r.errors.map((e, i) => (
                     <li key={i}>{e}</li>
+                  ))}
+                </ul>
+              ) : null}
+              {r.notes?.length ? (
+                <ul className="list-none pl-0 text-gray-600">
+                  {r.notes.map((n, i) => (
+                    <li key={i}>Note: {n}</li>
                   ))}
                 </ul>
               ) : null}
