@@ -218,9 +218,10 @@ test("product page: description, ordered features with bold lead-ins, ordered sp
   assert.equal(article.isPublished, true)
 })
 
-test("product page: Product JSON-LD carries only name, model and url: no price, rating or offers", () => {
+test("product page: JSON-LD is an Article about a Thing (no Product node, so no Product-snippet validation); no price, rating or offers", () => {
   const { article } = buildProductPage(PRODUCT, "100XTFS50", PSRC, ctx("product-100xtfs50"))
-  assert.deepEqual(article.structuredData.about, { "@type": "Product", name: "Thermal & Cold Fogging Machine-100XTFS50", model: "100XTFS50", url: PSRC })
+  assert.deepEqual(article.structuredData.about, { "@type": "Thing", name: "Thermal & Cold Fogging Machine-100XTFS50 (100XTFS50)", url: PSRC })
+  assert.equal(JSON.stringify(article.structuredData).includes("\"Product\""), false)
   assert.equal(/offers|aggregateRating|price|rating/i.test(JSON.stringify(article)), false)
 })
 

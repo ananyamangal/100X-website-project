@@ -477,6 +477,7 @@ export function buildProductPage(product: ProductSource, code: string, sourceUrl
     },
     { published: product.createdAt, modified: product.updatedAt ?? product.createdAt },
     allText,
-    { "@type": "Product", name, model: code, url: sourceUrl },
+    // "Thing", not "Product": a Product node without offers/reviews can raise Product-snippet errors in Search Console.
+    { "@type": "Thing", name: `${name} (${code})`, url: sourceUrl },
   )
 }
