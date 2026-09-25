@@ -44,13 +44,20 @@ test("public API: keeps exactly what the supply cards use", () => {
   assert.equal(out.orderYear, 2024)
 })
 
-test("page payload: keeps what the page renders (quantity/orderValue/notes) but never documents/images/internal fields", () => {
+test("page payload: identical to the API card fields; quantity, orderValue, notes, documents, images never reach the browser", () => {
+  assert.deepEqual([...PUBLIC_PAGE_FIELDS], [...PUBLIC_API_FIELDS])
   const out = pickPublic(DOC, PUBLIC_PAGE_FIELDS)
-  assert.equal(out.quantity, 12)
-  assert.equal(out.orderValue, 18.5)
-  assert.equal(out.notes, "internal negotiation notes")
-  for (const banned of ["documents", "images", "isPublic", "createdAt", "someFutureInternalField"]) {
+  for (const banned of ["quantity", "orderValue", "notes", "documents", "images", "isPublic", "createdAt", "someFutureInternalField"]) {
     assert.equal(banned in out, false, `${banned} must not reach the browser`)
+  }
+  assert.equal(out.organization, "Municipal Corporation X")
+  assert.equal(out.verified, true)
+})
+
+test("the public page component no longer renders quantity, orderValue or notes", () => {
+  const src = readFileSync(new URL("../../components/trust/GovPerformanceCards.tsx", import.meta.url), "utf8")
+  for (const gone of ["record.quantity", "record.orderValue", "record.notes", "Order Value", "Units Supplied", "Supply Details"]) {
+    assert.equal(src.includes(gone), false, gone)
   }
 })
 

@@ -21,17 +21,12 @@ export const PUBLIC_API_FIELDS = [
 ] as const
 
 /**
- * The /past-performance-government page renders these in its record cards and
- * detail view (quantity, orderValue and notes are shown there today). Anything
- * not listed - documents, images, timestamps, admin flags - is not rendered and
- * so is not sent to the browser either.
+ * The /past-performance-government page shows the same card-level fields as the
+ * public API (owner decision 2026-09-25): quantity, orderValue and notes were
+ * removed from the page as well. Anything not listed (documents, images,
+ * timestamps, admin flags) is not sent to the browser.
  */
-export const PUBLIC_PAGE_FIELDS = [
-  ...PUBLIC_API_FIELDS,
-  "quantity",
-  "orderValue",
-  "notes",
-] as const
+export const PUBLIC_PAGE_FIELDS = PUBLIC_API_FIELDS
 
 export const projectionFor = (fields: readonly string[]) =>
   Object.fromEntries(fields.map((f) => [f, 1])) as Record<string, 1>

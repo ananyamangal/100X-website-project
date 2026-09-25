@@ -8,13 +8,9 @@ export interface PastPerformanceRecord {
   organization: string
   state: string
   product: string
-  quantity?: number | null
-  orderValue?: number | null
   orderYear: number
   status: string
   category: string
-  notes?: string
-  images?: string[]
 }
 
 interface Props {
@@ -133,18 +129,6 @@ function RecordCard({ record, onClick }: { record: PastPerformanceRecord; onClic
             <span className="text-gray-500 text-xs uppercase tracking-wide">Year</span>
             <span className="text-gray-200 text-xs font-medium">{record.orderYear}</span>
           </div>
-          {record.quantity && (
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-xs uppercase tracking-wide">Quantity</span>
-              <span className="text-gray-200 text-xs font-medium">{record.quantity} units</span>
-            </div>
-          )}
-          {record.orderValue && (
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-xs uppercase tracking-wide">Order Value</span>
-              <span className="text-brand-400 text-sm font-700">₹{record.orderValue.toLocaleString("en-IN")}L</span>
-            </div>
-          )}
         </div>
 
         <div className="mt-4 flex items-center justify-between">
@@ -203,8 +187,6 @@ function RecordDrawer({ record, onClose }: { record: PastPerformanceRecord; onCl
               { label: "State", value: record.state },
               { label: "Year", value: String(record.orderYear) },
               { label: "Status", value: record.status, isStatus: true },
-              ...(record.quantity ? [{ label: "Units Supplied", value: `${record.quantity} units` }] : []),
-              ...(record.orderValue ? [{ label: "Order Value", value: `₹${record.orderValue.toLocaleString("en-IN")} Lakhs`, highlight: true }] : []),
             ].map((item: any) => (
               <div key={item.label} className="bg-gray-900 rounded-xl p-3">
                 <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-1">{item.label}</p>
@@ -228,14 +210,6 @@ function RecordDrawer({ record, onClose }: { record: PastPerformanceRecord; onCl
             <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Product / Equipment</p>
             <p className="text-gray-200 text-sm">{record.product || "—"}</p>
           </div>
-
-          {/* Notes */}
-          {record.notes && (
-            <div className="bg-gray-900 rounded-xl p-4">
-              <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Supply Details</p>
-              <p className="text-gray-400 text-sm leading-relaxed">{record.notes}</p>
-            </div>
-          )}
 
           {/* Certifications note */}
           <div className="bg-brand-500/5 border border-brand-500/20 rounded-xl p-4">
