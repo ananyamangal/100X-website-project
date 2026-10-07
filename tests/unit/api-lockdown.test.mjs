@@ -20,7 +20,7 @@ test("middleware gates /api/fogging and /api/growth with the same branch as /api
   const m = /const PROTECTED_API_PREFIXES = \[([^\]]+)\]/.exec(middleware)
   assert.ok(m, "PROTECTED_API_PREFIXES not found")
   const prefixes = [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1])
-  assert.deepEqual(prefixes, ["/api/admin/", "/api/fogging/", "/api/growth/"])
+  for (const p of ["/api/admin/", "/api/fogging/", "/api/growth/"]) assert.ok(prefixes.includes(p), `missing prefix ${p}`)
   assert.ok(middleware.includes("PROTECTED_API_PREFIXES.some((prefix) => pathname.startsWith(prefix))"))
 })
 

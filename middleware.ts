@@ -35,7 +35,22 @@ const intlMiddleware = createIntlMiddleware(routing)
 // a confined role (seo_team / content_team) → 403 via canAccessAdminApi's
 // default-deny, every other role → through. No public page calls either
 // family (verified by grep over app/(site), app/[locale], components, lib).
-const PROTECTED_API_PREFIXES = ["/api/admin/", "/api/fogging/", "/api/growth/"] as const
+const PROTECTED_API_PREFIXES = ["/api/admin/", "/api/fogging/", "/api/growth/", "/api/rfq-attachments/"] as const
+
+// Lead data and admin-only writes outside those families, gated the same way:
+//  - /api/rfq-attachments/<id> (prefix above): customers' RFQ uploads, streamed from
+//    GridFS. Only the admin Leads view and the admin notification e-mail link to it.
+//  - GET /api/brochure-leads: the brochure-lead list (names, phones, e-mails); only
+//    the admin Brochure Leads tab reads it. The POST stays public — that is the
+//    brochure form on the site — and is handled by isProtectedLeadRead() below.
+//  - /api/upload: legacy disk upload with no remaining caller; session required.
+// /api/files/<id> is deliberately NOT here: product brochure PDFs and case-study
+// files uploaded through the admin are served from it on public pages.
+const PROTECTED_API_PATHS: ReadonlySet<string> = new Set(["/api/upload"])
+
+function isProtectedLeadRead(method: string, pathname: string): boolean {
+  return pathname === "/api/brochure-leads" && method.toUpperCase() === "GET"
+}
 
 // pathname here is the raw incoming request path, which may still carry an
 // explicit locale prefix ("/hi", "/id", "/en", ...) — isLocaleManagedPathname
@@ -227,7 +242,11 @@ async function handleMiddleware(request: NextRequest, event: NextFetchEvent) {
   }
 
   // ── Protect admin, fogging and growth API routes ─────────────────────────────
-  if (PROTECTED_API_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+  if (
+    PROTECTED_API_PREFIXES.some((prefix) => pathname.startsWith(prefix)) ||
+    PROTECTED_API_PATHS.has(pathname) ||
+    isProtectedLeadRead(request.method, pathname)
+  ) {
     // Vercel Cron: exact scheduled paths (vercel.json), GET, Bearer CRON_SECRET. No session
     // cookie is sent, so these skip the session check; the job handlers re-check the secret.
     if (isAuthorizedCronRequest(request.method, pathname, request.headers.get("authorization"), process.env.CRON_SECRET)) {
@@ -498,6 +517,10 @@ export const config = {
     // catch-all at the bottom excludes /api, so these must be listed explicitly.
     "/api/fogging/:path*",
     "/api/growth/:path*",
+    // Lead data + legacy upload (PROTECTED_API_PATHS / isProtectedLeadRead above).
+    "/api/rfq-attachments/:path*",
+    "/api/brochure-leads",
+    "/api/upload",
     "/api/submissions",
     "/admin/:path*",
     // i18n — locale-managed content only
