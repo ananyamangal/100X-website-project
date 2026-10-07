@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 
+// Shared route error boundary UI; app/(site)/error.tsx, app/[locale]/error.tsx and
+// app/(admin)/error.tsx re-export it so every root layout keeps the same recovery UI.
 export default function RouteError({
   error,
   reset,
