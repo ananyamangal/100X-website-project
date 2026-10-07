@@ -39,7 +39,12 @@ export async function GET() {
         })),
         productSlugs: products.map((p) => p.slug).filter(Boolean),
       },
-      { headers: { "Cache-Control": "no-store" } },
+      // Polled by every warm middleware isolate once per REDIRECT_CACHE_TTL_MS.
+      // s-maxage lets the CDN serve those polls for 5 min without invoking this
+      // function (one DB read per region per 5 min instead of per isolate).
+      // Worst-case delay for a newly saved redirect: s-maxage + the
+      // middleware TTL (see middleware.ts). The 500 path below stays uncached.
+      { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" } },
     )
   } catch (error) {
     console.error("Error building active-redirects cache payload:", error)

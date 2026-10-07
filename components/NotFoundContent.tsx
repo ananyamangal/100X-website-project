@@ -1,11 +1,9 @@
 import Link from 'next/link'
 
-// Without this file, Next.js has no NotFoundBoundary anywhere in the tree,
-// so notFound() throws inside the tree but the response is served with the
-// framework's fallback rendering path and no dedicated boundary forces the
-// status to 404 — the page renders correct "not found" content at HTTP 200.
-// This file is what makes notFound() actually produce a 404 response.
-export default function NotFound() {
+// The site's 404 content. Each root layout (app/(site), app/[locale], app/(admin))
+// has its own not-found.tsx rendering this, so notFound() still produces a real
+// 404 status inside that layout's shell — see the note in app/(site)/not-found.tsx.
+export default function NotFoundContent() {
   return (
     <div className="min-h-screen flex items-center justify-center text-center px-4 bg-white">
       <div className="max-w-md">

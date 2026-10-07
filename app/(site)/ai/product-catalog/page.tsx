@@ -7,7 +7,8 @@ import AiSummaryBlock from "@/components/seo/AiSummaryBlock"
 import { AI_PRODUCT_CATEGORIES } from "@/lib/ai/knowledge"
 import { plainTextFromHtml } from "@/lib/rich-text"
 
-export const dynamic = "force-dynamic"
+// Catalog content only changes when products are edited; re-render at most every 5 min.
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: "100X Circle Product Catalog — Thermal Fogging Machines & Agricultural Equipment",

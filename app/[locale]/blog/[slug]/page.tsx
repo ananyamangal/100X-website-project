@@ -28,6 +28,14 @@ import {
 
 export const revalidate = 300
 
+// Nothing is prerendered at build time, but exporting generateStaticParams is
+// what makes Next treat this dynamic segment as ISR: each path is rendered on
+// its first request and then served from the cache for `revalidate` seconds.
+// Without it the route is fully dynamic and `revalidate` above is ignored.
+export function generateStaticParams(): Array<{ locale: string; slug: string }> {
+  return []
+}
+
 function formatDate(value: unknown) {
   const s = blogOptStr(value)
   if (!s) return ""

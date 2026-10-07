@@ -1,16 +1,8 @@
-// Revalidate layout data every 5 minutes — brand assets and trust badges
-// change rarely; no need to hit MongoDB on every request.
-export const revalidate = 300
-
-import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import type { AbstractIntlMessages } from 'next-intl'
 import Script from 'next/script'
 import { Suspense } from 'react'
-import { headers } from 'next/headers'
 import { NextIntlClientProvider } from 'next-intl'
-import { getLocale, getMessages } from 'next-intl/server'
-import './globals.css'
-import Navbar from '../components/Navbar'
+import Navbar from '@/components/Navbar'
 import SiteFooter from '@/components/SiteFooter'
 import GlobalJsonLd from '@/components/seo/GlobalJsonLd'
 import SeoSchemaOverrideInjector from '@/components/seo/SeoSchemaOverrideInjector'
@@ -18,144 +10,40 @@ import UtmPersist from '@/components/UtmPersist'
 import { Toaster } from '@/components/ui/sonner'
 import { MobileCtaProvider } from '@/components/cta/MobileCtaContext'
 import MobileCtaBar from '@/components/cta/MobileCtaBar'
-import { SITE_URL, SITE_NAME } from '@/lib/seo/site-config'
 import { getBrandAssets } from '@/lib/brandAssets'
 import { getSocialLinks, pickVisibleSocialLinks } from '@/lib/socialLinks'
 import { getHasMainBrochure, getActiveTrustBadges } from '@/lib/layoutData'
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton'
 import ClientOnlyPopups from '@/components/ClientOnlyPopups'
+import { inter } from '@/lib/fonts'
 
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-sans',
-  preload: true,
-})
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-  themeColor: '#b91c1c',
-}
-
-export async function generateMetadata(): Promise<Metadata> {
-  const assets = await getBrandAssets()
-  const ogImage = assets.ogImageUrl.startsWith('/')
-    ? `${SITE_URL}${assets.ogImageUrl}`
-    : assets.ogImageUrl
-  const faviconUrl = assets.faviconUrl.startsWith('/')
-    ? `${SITE_URL}${assets.faviconUrl}`
-    : assets.faviconUrl
-
-  return {
-    metadataBase: new URL(SITE_URL),
-    title: 'Thermal Fogging Machine Manufacturer in India | 100x Circle',
-    description:
-      'Factory-direct thermal foggers — vehicle-mounted, portable, SS-tank. GeM-approved OEM. Municipalities, pest control firms & farms across India. Get a quote.',
-    applicationName: SITE_NAME,
-    authors: [{ name: SITE_NAME, url: SITE_URL }],
-    creator: SITE_NAME,
-    publisher: SITE_NAME,
-    formatDetection: {
-      email: false,
-      address: false,
-      telephone: false,
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
-    verification: {
-      google: [
-        '7yMHOjyWo4oTSZpe1JQP0P7CR1t0dxuHSVufT6u065A',
-        'saCxhHF_sk36QWa6G2RxUYaSRHPjAujIOzdLf8X72II',
-      ],
-    },
-    alternates: {
-      canonical: '/',
-    },
-    keywords: [
-      'thermal fogging machine manufacturer',
-      'mosquito fogging machine India',
-      'vehicle mounted fogger',
-      'industrial fogging machine',
-      'pest control equipment supplier',
-      '100x Circle',
-    ],
-    icons: {
-      icon: [{ url: faviconUrl, sizes: '48x48' }],
-    },
-    openGraph: {
-      type: 'website',
-      locale: 'en_IN',
-      url: SITE_URL,
-      siteName: SITE_NAME,
-      title: 'Best Thermal Fogging Machine Manufacturer | 100x Circle',
-      description:
-        'High-performance thermal and pulse-jet fogging machines for public health, municipalities, and agriculture — manufactured and supplied across India.',
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: `${SITE_NAME} — thermal fogging equipment`,
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: 'Best Thermal Fogging Machine Manufacturer | 100x Circle',
-      description:
-        'Industrial fogging machines and agricultural equipment from 100x Circle — demos, specs, and nationwide support.',
-      images: [ogImage],
-    },
-    category: 'business',
-  }
-}
-
-export default async function RootLayout({
-  children,
-}: Readonly<{
+/**
+ * The public site's <html>…</html>: GTM/GA4 tags, preloads, Navbar, Footer,
+ * popups, CTA bar and the next-intl client provider. Rendered by the two
+ * public root layouts — app/(site)/layout.tsx (every untouched page,
+ * lang="en-IN") and app/[locale]/layout.tsx (the locale-managed pages,
+ * lang={locale}). The markup here is the former single root layout's
+ * non-admin branch, moved verbatim; only the inputs changed: what used to be
+ * read from request headers (x-is-admin / x-locale-managed) is now decided by
+ * which root layout renders, so no request-time API is touched and every
+ * route below can be prerendered / ISR-cached.
+ */
+export interface SiteShellProps {
+  /** <html lang> — "en-IN" for untouched pages, the resolved locale for locale-managed ones. */
+  htmlLang: string
+  /** <html dir> — only set for locale-managed pages (ltr/rtl), undefined otherwise. */
+  dir?: 'ltr' | 'rtl'
+  /** Locale handed to NextIntlClientProvider. */
+  locale: string
+  messages: AbstractIntlMessages
+  /** Locale the footer translates with ("en" for untouched pages). */
+  footerLocale: string
   children: React.ReactNode
-}>) {
-  // Skip public UI entirely for admin routes — the middleware injects
-  // x-is-admin: 1 for all /admin/* requests so we can detect it here.
-  const headersList = await headers()
-  const isAdmin = headersList.get("x-is-admin") === "1"
+}
 
-  if (isAdmin) {
-    return (
-      <html lang="en" className={inter.variable}>
-        <body className="min-h-screen antialiased">{children}</body>
-      </html>
-    )
-  }
-
-  // i18n: resolves to the request's locale for pages under app/[locale]/
-  // (Phase 1: en/hi/id), and to the 'en' default everywhere else — untouched
-  // pages never run the intl middleware so this always falls back safely.
-  const [locale, messages] = await Promise.all([getLocale(), getMessages()])
-  const dir = locale === "ur" || locale === "ar" ? "rtl" : "ltr"
-
-  // getLocale() falls back to "en" for EVERY untouched page too (there's no
-  // way to tell "genuinely locale-managed and resolved to en" from "not
-  // locale-managed at all" from the locale value alone) — x-locale-managed
-  // is set by middleware only for the 9 actual locale-managed pages, so only
-  // those get <html lang={locale}>. Every other page keeps lang="en-IN"
-  // exactly as it was before Phase 1.
-  const isLocaleManaged = headersList.get("x-locale-managed") === "1"
-  const htmlLang = isLocaleManaged ? locale : "en-IN"
-
-  // All four reads are Data-Cache backed (see lib/layoutData.ts) — this layout
-  // wraps every on-demand-rendered route, so they must not hit MongoDB per view.
+export default async function SiteShell({ htmlLang, dir, locale, messages, footerLocale, children }: SiteShellProps) {
+  // All four reads are Data-Cache backed (see lib/layoutData.ts) — this shell
+  // wraps every public route, so they must not hit MongoDB per render.
   const [brandAssets, socialLinks, hasBrochure, trustBadges] = await Promise.all([
     getBrandAssets(),
     getSocialLinks(),
@@ -164,7 +52,7 @@ export default async function RootLayout({
   ])
 
   return (
-    <html lang={htmlLang} dir={isLocaleManaged ? dir : undefined} className={inter.variable}>
+    <html lang={htmlLang} dir={dir} className={inter.variable}>
       <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -230,7 +118,7 @@ export default async function RootLayout({
             logoUrl={brandAssets.footerLogoUrl}
             logoAlt={brandAssets.logoAlt}
             trustBadges={trustBadges}
-            locale={isLocaleManaged ? locale : "en"}
+            locale={footerLocale}
             socialLinks={pickVisibleSocialLinks(socialLinks, "showInFooter")}
             whatsappUrl={socialLinks.whatsapp.url}
           />

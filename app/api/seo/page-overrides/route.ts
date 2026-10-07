@@ -31,7 +31,10 @@ export async function GET(req: NextRequest) {
       link_injections: (override?.link_injections as object[]) ?? [],
     }, {
       headers: {
-        "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+        // Fetched by every public page view (one request per path). s-maxage lets
+        // the CDN answer repeats for 5 min without invoking this function;
+        // stale-while-revalidate keeps serving while a refresh runs.
+        "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=3600",
       },
     })
   } catch {

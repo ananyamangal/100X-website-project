@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation"
+import { hasLocale } from "next-intl"
+import { routing } from "@/i18n/routing"
 import { isUntranslatableProductLanding } from "@/lib/seo/locale-gate"
 
 // This check lives here rather than in page.tsx on purpose: this segment's
@@ -18,6 +20,9 @@ export default async function ProductSlugLayout({
   params: Promise<{ slug: string; locale: string }>
 }) {
   const { slug, locale } = await params
+  // Unknown :locale → 404 here, not in app/[locale]/layout.tsx: that is a
+  // root layout now and has no enclosing boundary to render a 404 in.
+  if (!hasLocale(routing.locales, locale)) notFound()
   if (await isUntranslatableProductLanding(slug, locale)) notFound()
   return children
 }

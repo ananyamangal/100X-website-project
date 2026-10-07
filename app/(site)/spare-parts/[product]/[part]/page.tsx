@@ -11,6 +11,14 @@ import { Download, MessageCircle, CheckCircle2, Wrench, ArrowRight } from "lucid
 
 export const revalidate = 300
 
+// Nothing is prerendered at build time, but exporting generateStaticParams is
+// what makes Next treat this dynamic segment as ISR: each path is rendered on
+// its first request and then served from the cache for `revalidate` seconds.
+// Without it the route is fully dynamic and `revalidate` above is ignored.
+export function generateStaticParams(): Array<{ product: string; part: string }> {
+  return []
+}
+
 export async function generateMetadata({
   params,
 }: {

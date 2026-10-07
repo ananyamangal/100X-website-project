@@ -9,6 +9,14 @@ import { BUSINESS } from "@/lib/seo/site-config"
 
 export const revalidate = 120
 
+// Nothing is prerendered at build time, but exporting generateStaticParams is
+// what makes Next treat this dynamic segment as ISR: each path is rendered on
+// its first request and then served from the cache for `revalidate` seconds.
+// Without it the route is fully dynamic and `revalidate` above is ignored.
+export function generateStaticParams(): Array<{ product: string }> {
+  return []
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ product: string }> }): Promise<Metadata> {
   const { product: productSlug } = await params
   const name = productSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())

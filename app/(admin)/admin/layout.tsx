@@ -10,9 +10,9 @@ export const metadata: Metadata = {
   },
 }
 
-// Root layout (app/layout.tsx) detects admin routes via the x-is-admin header
-// set by middleware and renders a clean <html><body> with no public Navbar/Footer.
-// This layout just passes children through — no extra wrapping needed.
+// The (admin) route group's root layout (app/(admin)/layout.tsx) renders the clean
+// <html><body> with no public Navbar/Footer. This layout only adds the admin
+// metadata (noindex) and passes children through — no extra wrapping needed.
 export default function AdminRootLayout({ children }: { children: ReactNode }) {
   return <>{children}</>
 }

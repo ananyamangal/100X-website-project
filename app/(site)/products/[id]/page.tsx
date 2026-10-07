@@ -1,8 +1,18 @@
-export const dynamic = "force-dynamic"
+// ISR: the page is rendered on first request, cached, and re-rendered at most
+// every 5 minutes (or sooner via revalidatePath from the admin). It used to be
+// force-dynamic — every product view was a full server render.
+export const revalidate = 300
+
+// Nothing is prerendered at build time, but exporting generateStaticParams is
+// what makes Next treat this dynamic segment as ISR: each path is rendered on
+// its first request and then served from the cache for `revalidate` seconds.
+// Without it the route is fully dynamic and `revalidate` above is ignored.
+export function generateStaticParams(): Array<{ id: string }> {
+  return []
+}
 
 import type { Metadata } from "next"
 import { notFound, permanentRedirect } from "next/navigation"
-import { cookies } from "next/headers"
 import Link from "next/link"
 import ProductDetailV2 from "@/components/product/ProductDetailV2"
 import { ProductJsonLd } from "@/components/seo/ProductJsonLd"
@@ -127,11 +137,11 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
   const { id } = await params
   const result = await getProductBySlugOrId(id)
 
-  // Block public access to draft products; allow logged-in admins to preview
-  if (result?.product?.isPublished === false) {
-    const adminToken = (await cookies()).get("admin-token")?.value
-    if (!adminToken) notFound()
-  }
+  // Draft products are not public. (The previous cookie-based admin preview of
+  // drafts at this URL read cookies(), which forces dynamic rendering and
+  // would have kept every product page uncacheable; drafts now 404 for
+  // everyone until a dedicated preview route exists.)
+  if (result?.product?.isPublished === false) notFound()
 
   // Legacy ObjectId URL → redirect. If the product has a canonical SEO
   // landing page, go there directly (single hop). Otherwise fall through
