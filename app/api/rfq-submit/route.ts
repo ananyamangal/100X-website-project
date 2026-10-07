@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { sendAdminEmail, isEmailConfigured } from "@/lib/email"
 import clientPromise from "@/lib/mongodb"
+import { ObjectId } from "mongodb"
+import { buildLeadEmail, leadSubject } from "@/lib/lead-email"
 
 interface RFQBody {
   product: string;
@@ -23,67 +25,6 @@ interface RFQBody {
   company_website?: string;
 }
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;")
-}
-
-function row(label: string, value: string | undefined | null | boolean) {
-  if (value === undefined || value === null || value === "" || value === false) return ""
-  const display = value === true ? "Yes" : String(value)
-  return `<tr><td style="padding:6px 12px;background:#f3f4f6;font-weight:600;width:180px">${escapeHtml(label)}</td><td style="padding:6px 12px">${escapeHtml(display)}</td></tr>`
-}
-
-function buildEmailBodies(body: RFQBody): { subject: string; text: string; html: string } {
-  const subject = `New RFQ — ${body.product}${body.organization ? ` (${body.organization})` : ""}`
-  const lines = [
-    `New RFQ submission from the 100x Circle website`,
-    ``,
-    `Product:          ${body.product}`,
-    body.quantity ? `Quantity:         ${body.quantity}` : "",
-    `Name:             ${body.name}`,
-    `Phone:            ${body.phone}`,
-    body.email ? `Email:            ${body.email}` : "",
-    body.organization ? `Organization:     ${body.organization}` : "",
-    body.cityState ? `City / State:     ${body.cityState}` : "",
-    body.description ? `Description:      ${body.description}` : "",
-    `GeM auth required: ${body.gemAuthRequired ? "Yes" : "No"}`,
-    `Dealer inquiry:    ${body.dealerInquiry ? "Yes" : "No"}`,
-    body.uploadUrl ? `Upload:           ${body.uploadUrl}` : "",
-    ``,
-    body.form_page_url ? `Source URL: ${body.form_page_url}` : "",
-    body.location_label ? `Form location: ${body.location_label}` : "",
-  ].filter(Boolean)
-  const text = lines.join("\n")
-  const html = `
-    <div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:640px">
-      <h2 style="color:#16a34a;margin:0 0 16px">New RFQ Submission</h2>
-      <table style="border-collapse:collapse;width:100%;border:1px solid #e5e7eb;font-size:14px;color:#111827">
-        ${row("Product", body.product)}
-        ${row("Quantity", body.quantity)}
-        ${row("Name", body.name)}
-        ${row("Phone", body.phone)}
-        ${row("Email", body.email)}
-        ${row("Organization", body.organization)}
-        ${row("City / State", body.cityState)}
-        ${row("Description", body.description)}
-        ${row("GeM auth required", body.gemAuthRequired === true)}
-        ${row("Dealer inquiry", body.dealerInquiry === true)}
-        ${row("Upload", body.uploadUrl)}
-      </table>
-      <p style="font-size:12px;color:#6b7280;margin-top:16px">
-        ${body.form_page_url ? `Source: <a href="${escapeHtml(body.form_page_url)}">${escapeHtml(body.form_page_url)}</a><br/>` : ""}
-        ${body.location_label ? `Form location: ${escapeHtml(body.location_label)}` : ""}
-      </p>
-    </div>
-  `
-  return { subject, text, html }
-}
-
 export async function POST(request: NextRequest) {
   let body: RFQBody
   try {
@@ -104,38 +45,64 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Try email (graceful fallback if not configured)
-  let emailStatus: "sent" | "not_configured" | "failed" = "not_configured"
-  let emailError: string | undefined
-  if (isEmailConfigured()) {
-    const { subject, text, html } = buildEmailBodies(body)
-    const result = await sendAdminEmail({ subject, text, html, replyTo: body.email })
-    if (result.ok) {
-      emailStatus = "sent"
-    } else {
-      emailStatus = "failed"
-      emailError = result.reason === "send_failed" ? result.error : undefined
-    }
-  }
-
-  // Try DB save (graceful fallback if Mongo unreachable)
+  // Save first (graceful fallback if Mongo is unreachable), so the e-mail can
+  // carry the database id and the saved document is the single source of truth.
+  const now = new Date().toISOString()
+  const { company_website: _honeypot, ...fields } = body
+  const record: Record<string, unknown> = { type: "rfq", ...fields, createdAt: now }
   let dbStatus: "saved" | "failed" = "failed"
   let dbId: string | undefined
   try {
     const client = await clientPromise
     const db = client.db()
-    const now = new Date().toISOString()
-    const result = await db.collection("submissions").insertOne({
-      type: "rfq",
-      ...body,
-      createdAt: now,
-      emailStatus,
-    })
+    const result = await db.collection("submissions").insertOne({ ...record, emailStatus: "pending" })
     dbStatus = "saved"
     dbId = String(result.insertedId)
   } catch (err) {
     dbStatus = "failed"
-    console.error("RFQ DB save failed:", err)
+    console.error("[api/rfq-submit] DB save failed:", err instanceof Error ? err.message.split("\n")[0] : String(err))
+  }
+
+  // E-mail built from every submitted field (graceful if not configured or failing).
+  let emailStatus: "sent" | "not_configured" | "failed" = "not_configured"
+  let emailError: string | undefined
+  if (isEmailConfigured()) {
+    try {
+      const { text, html } = buildLeadEmail({
+        title: "New RFQ",
+        intro: "Request for quotation submitted on www.100xcircle.com.",
+        record,
+        id: dbId,
+      })
+      const result = await sendAdminEmail({
+        subject: leadSubject("New RFQ", record, body.product),
+        text,
+        html,
+        replyTo: body.email && body.email.includes("@") ? body.email : undefined,
+      })
+      if (result.ok) {
+        emailStatus = "sent"
+      } else {
+        emailStatus = "failed"
+        emailError = result.reason === "send_failed" ? result.error : undefined
+        console.error(`[api/rfq-submit] admin e-mail not sent for submission ${dbId ?? "(unsaved)"}: ${result.reason}`)
+      }
+    } catch (err) {
+      emailStatus = "failed"
+      console.error(`[api/rfq-submit] admin e-mail failed for submission ${dbId ?? "(unsaved)"}:`, err instanceof Error ? err.message.split("\n")[0] : String(err))
+    }
+  } else {
+    console.error(`[api/rfq-submit] admin e-mail not sent for submission ${dbId ?? "(unsaved)"}: EMAIL_USER / EMAIL_APP_PASSWORD not configured`)
+  }
+
+  // Record the final e-mail status on the saved row (best effort).
+  if (dbId) {
+    try {
+      const client = await clientPromise
+      await client.db().collection("submissions").updateOne({ _id: new ObjectId(dbId) }, { $set: { emailStatus } })
+    } catch {
+      /* the row is saved; the status is informational */
+    }
   }
 
   // We treat the submission as successful if EITHER email or DB succeeded —

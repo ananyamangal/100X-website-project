@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { sendAdminEmail, isEmailConfigured } from "@/lib/email"
+import { buildLeadEmail } from "@/lib/lead-email"
 
 function detectDevice(ua: string): "mobile" | "tablet" | "desktop" {
   if (/tablet|ipad/i.test(ua)) return "tablet"
@@ -96,31 +97,32 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     }
 
-    await db.collection("brochure_leads").insertOne(lead)
+    const inserted = await db.collection("brochure_leads").insertOne(lead)
+    const id = String(inserted.insertedId)
 
-    // Send email
+    // E-mail built from every saved field (escaped); a failure is logged, never thrown.
     if (isEmailConfigured()) {
-      const rows = [
-        ["Name", lead.name], ["Phone", lead.phone], ["Email", lead.email],
-        ["Organization", lead.organization || "—"], ["State", lead.state || "—"],
-        ["Requirement", lead.requirement || "—"],
-        ["Product", lead.productName || "—"], ["Brochure", lead.brochureName || lead.brochureType],
-        ["Source", lead.source], ["Device", lead.device],
-        ["Score", String(lead.score)], ["Converted", isConverted ? "Yes ✓" : "No"],
-        ["Page", lead.pageUrl], ["Referrer", lead.referrer || "—"],
-      ]
-      await sendAdminEmail({
-        subject: `Brochure Download — ${lead.name} · Score ${lead.score}${isConverted ? " · CONVERTED" : ""}`,
-        text: rows.map(([k, v]) => `${k}: ${v}`).join("\n"),
-        html: `<div style="font-family:sans-serif;max-width:540px">
-          <h2 style="color:#16a34a;margin:0 0 4px">Brochure Download Lead</h2>
-          <p style="color:#6b7280;font-size:13px;margin:0 0 16px">Score: <strong>${lead.score}/100</strong>${isConverted ? ' &nbsp;🔁 Converted lead' : ''}</p>
-          <table style="border-collapse:collapse;width:100%;font-size:13px">
-            ${rows.map(([k, v]) => `<tr><td style="padding:5px 12px;background:#f3f4f6;font-weight:600;width:130px">${k}</td><td style="padding:5px 12px">${v}</td></tr>`).join("")}
-          </table>
-        </div>`,
-        replyTo: lead.email,
-      })
+      try {
+        const { text, html } = buildLeadEmail({
+          title: "Brochure download lead",
+          intro: `Lead score ${lead.score}/100${isConverted ? " · converted lead (has an RFQ on file)" : ""}.`,
+          record: lead,
+          id,
+        })
+        const result = await sendAdminEmail({
+          subject: `Brochure Download — ${lead.name} · Score ${lead.score}${isConverted ? " · CONVERTED" : ""}`,
+          text,
+          html,
+          replyTo: lead.email,
+        })
+        if (!result.ok) {
+          console.error(`[api/brochure-leads] admin e-mail not sent for lead ${id}: ${result.reason}`)
+        }
+      } catch (err) {
+        console.error(`[api/brochure-leads] admin e-mail failed for lead ${id}:`, err instanceof Error ? err.message.split("\n")[0] : String(err))
+      }
+    } else {
+      console.error(`[api/brochure-leads] admin e-mail not sent for lead ${id}: EMAIL_USER / EMAIL_APP_PASSWORD not configured`)
     }
 
     return NextResponse.json({ ok: true, score })
