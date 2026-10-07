@@ -299,10 +299,17 @@ export default function LaunchStatusPage() {
 
   useEffect(() => { load() }, [load])
 
-  // Auto-refresh every 60 s once campaign might be live
+  // Auto-refresh every 5 min while the tab is visible (was every 60 s, even
+  // in a backgrounded tab); reloads immediately when the tab becomes visible.
   useEffect(() => {
-    const t = setInterval(load, 60_000)
-    return () => clearInterval(t)
+    const tick = () => { if (!document.hidden) load() }
+    const t = setInterval(tick, 5 * 60_000)
+    const onVisible = () => { if (!document.hidden) load() }
+    document.addEventListener("visibilitychange", onVisible)
+    return () => {
+      clearInterval(t)
+      document.removeEventListener("visibilitychange", onVisible)
+    }
   }, [load])
 
   const confirm = async (field: string, value: boolean) => {

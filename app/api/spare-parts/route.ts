@@ -22,5 +22,10 @@ export async function GET(req: NextRequest) {
     .sort({ order: 1, name: 1 })
     .toArray()
 
-  return NextResponse.json(JSON.parse(JSON.stringify(parts)))
+  // `revalidate` above does not apply once the handler reads the query string
+  // (that makes it dynamic); the CDN header is what actually caches each
+  // ?product=… / ?category=… answer, for the same 2 minutes.
+  return NextResponse.json(JSON.parse(JSON.stringify(parts)), {
+    headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=600" },
+  })
 }

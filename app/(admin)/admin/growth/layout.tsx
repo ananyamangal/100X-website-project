@@ -10,14 +10,19 @@ import { useRouter }        from "next/navigation"
 import Link                 from "next/link"
 import { Search, LayoutDashboard, Globe } from "lucide-react"
 
-// Heartbeat: pings /api/admin/auth/sessions/heartbeat every 5 min.
+// Heartbeat: pings /api/admin/auth/sessions/heartbeat every 10 min while the
+// tab is visible (skipped while hidden — a backgrounded admin tab used to
+// invoke this function all day; it pings again as soon as the tab returns).
 // Returns 401 if session was revoked → redirect to login.
+const HEARTBEAT_MS = 10 * 60 * 1000
+
 function SessionHeartbeat() {
   const router      = useRouter()
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     const ping = async () => {
+      if (document.hidden) return
       try {
         const res = await fetch("/api/admin/auth/sessions/heartbeat", { method: "POST" })
         if (res.status === 401) router.push("/admin/login?reason=session_expired")
@@ -25,9 +30,14 @@ function SessionHeartbeat() {
         // Network error — don't redirect (could be temporary)
       }
     }
+    const onVisible = () => { if (!document.hidden) ping() }
     ping()
-    intervalRef.current = setInterval(ping, 5 * 60 * 1000)
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
+    intervalRef.current = setInterval(ping, HEARTBEAT_MS)
+    document.addEventListener("visibilitychange", onVisible)
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+      document.removeEventListener("visibilitychange", onVisible)
+    }
   }, [router])
 
   return null

@@ -14,6 +14,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { Document, Filter } from 'mongodb';
+import { withCdnCache } from "@/lib/cache/cdn"
 
 const DB   = '100xDB';
 const COLL = 'fogging_contracts';
@@ -74,7 +75,7 @@ function p50FromArr(arr: number[]): number | null {
   return s.length % 2 ? s[mid] : Math.round((s[mid - 1] + s[mid]) / 2);
 }
 
-export async function GET(req: NextRequest) {
+async function GET_handler(req: NextRequest) {
   const p       = Object.fromEntries(req.nextUrl.searchParams);
   const groupBy = p.group_by || 'flat';
 
@@ -163,3 +164,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
+
+// Public, anonymous, URL-keyed data refreshed by daily imports: let the CDN serve it (lib/cache/cdn.ts).
+export const GET = withCdnCache(GET_handler)

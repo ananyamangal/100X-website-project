@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { withCdnCache } from "@/lib/cache/cdn"
 
 const DB   = '100xDB';
 const COLL = 'fogging_organizations';
 
-export async function GET(req: NextRequest) {
+async function GET_handler(req: NextRequest) {
   const p = Object.fromEntries(req.nextUrl.searchParams);
   const page      = Math.max(1, parseInt(p.page      || '1'));
   const page_size = Math.min(200, parseInt(p.page_size || '50'));
@@ -75,3 +76,6 @@ export async function GET(req: NextRequest) {
     summary: summary[0] || null,
   });
 }
+
+// Public, anonymous, URL-keyed data refreshed by daily imports: let the CDN serve it (lib/cache/cdn.ts).
+export const GET = withCdnCache(GET_handler)

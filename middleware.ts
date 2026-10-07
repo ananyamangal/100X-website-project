@@ -59,7 +59,11 @@ function isLocaleManagedPath(pathname: string): boolean {
 // module-level Map/Set cache that Vercel's warm isolates reuse across
 // requests. Steady state: every request is an O(1) in-memory lookup, with a
 // DB round-trip only once per REDIRECT_CACHE_TTL_MS, off the request path.
-const REDIRECT_CACHE_TTL_MS = 60_000
+// 10 min (was 1 min): the lookup is an O(1) in-memory hit and /api/redirects/active
+// is itself CDN-cached for 5 min, so a shorter TTL only re-fetched the same cached
+// payload once a minute per warm isolate. Worst-case delay for a newly saved
+// manual redirect is therefore ~15 min (5 min CDN + 10 min here).
+const REDIRECT_CACHE_TTL_MS = 600_000
 
 let redirectCache: {
   redirects: Map<string, { destination: string; type: 301 | 302 }>
@@ -177,7 +181,10 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
 async function handleMiddleware(request: NextRequest, event: NextFetchEvent) {
   const { pathname, origin } = request.nextUrl
 
-  // ── Admin page routes: inject x-is-admin + enforce unified auth ─────────────
+  // ── Admin page routes: enforce unified auth ─────────────────────────────────
+  // (x-is-admin is still injected for any downstream reader, but no layout
+  // depends on it anymore: /admin/* renders under its own root layout,
+  // app/(admin)/layout.tsx, so the public root layouts never read headers().)
   if (pathname.startsWith("/admin")) {
     const cloned = new Headers(request.headers)
     cloned.set("x-is-admin", "1")
@@ -296,14 +303,12 @@ async function handleMiddleware(request: NextRequest, event: NextFetchEvent) {
     // there's no <html lang> to fix; pass through unchanged.
     if (intlResponse.headers.get("location")) return intlResponse
 
-    // x-locale-managed tells RootLayout (which wraps every route, including
-    // the ~400 untouched pages outside app/[locale]/) that this specific
-    // request is for one of the 9 locale-managed pages and should use the
-    // resolved next-intl locale for <html lang>. Without this flag,
-    // RootLayout can't tell "en because this genuinely is a locale-managed
-    // page in English" apart from "en because getLocale() just falls back
-    // to its default on an untouched page" — and it must not: every other
-    // page needs to keep lang="en-IN" exactly as before Phase 1.
+    // x-locale-managed used to tell the single root layout that this request
+    // is one of the locale-managed pages (so <html lang> gets the resolved
+    // locale instead of "en-IN"). That decision is now made by route group —
+    // app/[locale]/layout.tsx is its own root layout — so no layout reads this
+    // header anymore (reading headers() would opt every page out of caching).
+    // Still set for any downstream reader; harmless otherwise.
     //
     // next-intl's own response already carries its own request-header
     // override (x-next-intl-locale) via the same x-middleware-override-headers
