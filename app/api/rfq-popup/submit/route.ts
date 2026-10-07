@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { sendAdminEmail, isEmailConfigured } from "@/lib/email"
+import { buildLeadEmail } from "@/lib/lead-email"
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,53 +56,40 @@ export async function POST(request: NextRequest) {
       const result = await db.collection("rfq_popup_leads").insertOne(lead)
       savedId = String(result.insertedId)
     } catch (dbErr) {
-      console.error("RFQ popup lead DB save failed:", dbErr)
-      return NextResponse.json({ error: "Failed to save lead to database", detail: String(dbErr) }, { status: 500 })
+      console.error("[api/rfq-popup/submit] DB save failed:", dbErr instanceof Error ? dbErr.message.split("\n")[0] : String(dbErr))
+      return NextResponse.json({ error: "Failed to save lead to database" }, { status: 500 })
     }
 
-    // Build answer summary for notifications
-    const answerLines = Object.entries(answers as Record<string, string | string[]>)
-      .map(([q, a]) => `${q}: ${Array.isArray(a) ? a.join(", ") : a}`)
-      .join("\n")
-
-    const answersHtml = Object.entries(answers as Record<string, string | string[]>)
-      .map(([q, a]) => {
-        const val = Array.isArray(a) ? a.join(", ") : String(a)
-        return `<tr><td style="padding:6px 12px;background:#f3f4f6;font-weight:600;width:180px">${q}</td><td style="padding:6px 12px">${val}</td></tr>`
-      })
-      .join("")
-
-    const attachmentHtml = attachmentUrl
-      ? `<p style="font-size:13px;margin-top:8px"><strong>Attachment:</strong> <a href="${attachmentUrl}">${attachmentUrl}</a></p>`
-      : ""
-
-    const waQuickReply = notificationWhatsapp
-      ? `<p style="margin-top:12px"><a href="https://wa.me/${notificationWhatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('New RFQ lead from website: ' + (pageUrl || pagePath))}" style="background:#25d366;color:white;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:13px">Quick Reply on WhatsApp</a></p>`
-      : ""
-
-    // Send email notification (uses recipientEmail from DB config, fallback to env)
+    // E-mail built from every saved field: answers, attachment, page, attribution,
+    // UTM, device … (previously only the answers, unescaped, plus two UTM values).
     if (isEmailConfigured()) {
-      const emailResult = await sendAdminEmail({
-        to: recipientEmail || undefined,
-        subject: `New RFQ Lead — ${pagePath || pageUrl}`,
-        text: answerLines + (attachmentUrl ? `\nAttachment: ${attachmentUrl}` : ""),
-        html: `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:640px">
-          <h2 style="color:#16a34a;margin:0 0 16px">New RFQ Lead</h2>
-          <table style="border-collapse:collapse;width:100%;border:1px solid #e5e7eb;font-size:14px;color:#111827">
-            ${answersHtml}
-          </table>
-          ${attachmentHtml}
-          <p style="font-size:12px;color:#6b7280;margin-top:16px">
-            Page: <a href="${pageUrl}">${pageUrl}</a><br/>
-            ${utm?.utm_source ? `UTM Source: ${utm.utm_source}<br/>` : ""}
-            ${utm?.utm_campaign ? `Campaign: ${utm.utm_campaign}` : ""}
-          </p>
-          ${waQuickReply}
-        </div>`,
-      })
-      if (!emailResult.ok) {
-        console.error("RFQ email send failed:", emailResult)
+      try {
+        const waQuickReply = notificationWhatsapp
+          ? `<p style="margin-top:12px"><a href="https://wa.me/${notificationWhatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent("New RFQ lead from website: " + (pageUrl || pagePath))}" style="background:#25d366;color:white;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:13px">Quick Reply on WhatsApp</a></p>`
+          : ""
+        const { text, html } = buildLeadEmail({
+          title: "New RFQ popup lead",
+          intro: `Answered the RFQ popup on ${pagePath || pageUrl || "the website"}.`,
+          record: lead,
+          id: savedId,
+          extraHtml: waQuickReply,
+        })
+        const answerValues = Object.values(answers as Record<string, string | string[]>).map((a) => (Array.isArray(a) ? a.join(", ") : String(a)))
+        const nameGuess = answerValues.find((v) => /^[A-Za-z][A-Za-z .'-]{1,60}$/.test(v) && !/^(yes|no)$/i.test(v))
+        const emailResult = await sendAdminEmail({
+          to: recipientEmail || undefined,
+          subject: `New RFQ popup lead — ${nameGuess ?? "website lead"} — ${pagePath || pageUrl || "website"}`,
+          text,
+          html,
+        })
+        if (!emailResult.ok) {
+          console.error(`[api/rfq-popup/submit] admin e-mail not sent for lead ${savedId}: ${emailResult.reason}`)
+        }
+      } catch (err) {
+        console.error(`[api/rfq-popup/submit] admin e-mail failed for lead ${savedId}:`, err instanceof Error ? err.message.split("\n")[0] : String(err))
       }
+    } else {
+      console.error(`[api/rfq-popup/submit] admin e-mail not sent for lead ${savedId}: EMAIL_USER / EMAIL_APP_PASSWORD not configured`)
     }
 
     // Webhook notification (for n8n / Zapier / WhatsApp Business API integrations)
@@ -124,13 +112,14 @@ export async function POST(request: NextRequest) {
           }),
         })
       } catch (webhookErr) {
-        console.error("RFQ webhook delivery failed:", webhookErr)
+        console.error("[api/rfq-popup/submit] webhook delivery failed:", webhookErr instanceof Error ? webhookErr.message.split("\n")[0] : String(webhookErr))
       }
     }
 
     return NextResponse.json({ ok: true, savedId })
   } catch (err) {
-    console.error("RFQ popup submit error:", err)
+    console.error("[api/rfq-popup/submit] error:", err instanceof Error ? err.message.split("\n")[0] : String(err))
     return NextResponse.json({ error: "Failed to process submission" }, { status: 500 })
   }
 }
+
