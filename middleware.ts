@@ -25,6 +25,18 @@ const AUTH_WHITELIST = new Set([
 
 const intlMiddleware = createIntlMiddleware(routing)
 
+// API families that require an admin session. /api/admin/* always did; the
+// GeM procurement-intelligence APIs under /api/fogging/* (29 GETs, the copilot
+// POST and the attack-accounts export) and /api/growth/* (sellers export) used
+// to be reachable with no session at all although only the admin Fogging
+// dashboard calls them and they return private sales intelligence
+// (opportunity scores, forecasts, incumbent analysis, our own pricing). They
+// now get the exact same session + role gate as /api/admin/*: no cookie → 401,
+// a confined role (seo_team / content_team) → 403 via canAccessAdminApi's
+// default-deny, every other role → through. No public page calls either
+// family (verified by grep over app/(site), app/[locale], components, lib).
+const PROTECTED_API_PREFIXES = ["/api/admin/", "/api/fogging/", "/api/growth/"] as const
+
 // pathname here is the raw incoming request path, which may still carry an
 // explicit locale prefix ("/hi", "/id", "/en", ...) — isLocaleManagedPathname
 // alone only recognizes the locale-agnostic form, so prefixed paths are
@@ -214,8 +226,8 @@ async function handleMiddleware(request: NextRequest, event: NextFetchEvent) {
     return NextResponse.next({ request: { headers: cloned } })
   }
 
-  // ── Protect admin API routes ─────────────────────────────────────────────────
-  if (pathname.startsWith("/api/admin/")) {
+  // ── Protect admin, fogging and growth API routes ─────────────────────────────
+  if (PROTECTED_API_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
     // Vercel Cron: exact scheduled paths (vercel.json), GET, Bearer CRON_SECRET. No session
     // cookie is sent, so these skip the session check; the job handlers re-check the secret.
     if (isAuthorizedCronRequest(request.method, pathname, request.headers.get("authorization"), process.env.CRON_SECRET)) {
@@ -482,6 +494,10 @@ export const config = {
   matcher: [
     "/products/:path*",
     "/api/admin/:path*",
+    // Same gate as /api/admin — see PROTECTED_API_PREFIXES above. The generic
+    // catch-all at the bottom excludes /api, so these must be listed explicitly.
+    "/api/fogging/:path*",
+    "/api/growth/:path*",
     "/api/submissions",
     "/admin/:path*",
     // i18n — locale-managed content only
