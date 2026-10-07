@@ -1,0 +1,7 @@
+{
+  "onlyInBefore": [],
+  "onlyInAfter": [],
+  "changed": {}
+}
+
+[seo-snapshot diff] onlyInBefore=0 onlyInAfter=0 changedPages=0

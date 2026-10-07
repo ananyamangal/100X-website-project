@@ -1,0 +1,18 @@
+/ try1 status=200 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: STALE
+/ try2 status=200 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: STALE
+/products/cold-fogger-machine-with-2-stoke-engine-100xmcf42-c42ca1 try1 status=200 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: MISS
+/products/cold-fogger-machine-with-2-stoke-engine-100xmcf42-c42ca1 try2 status=200 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: HIT
+/blog/what-is-the-best-fog-machine-for-home-use try1 status=200 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: MISS
+/blog/what-is-the-best-fog-machine-for-home-use try2 status=200 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: HIT
+/thermal-and-cold-fogging-machine-100xtfs50 try1 status=200 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: MISS
+/thermal-and-cold-fogging-machine-100xtfs50 try2 status=200 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: HIT
+/hi/fogging-machine-supplier-in-bihar try1 status=200 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: MISS
+/hi/fogging-machine-supplier-in-bihar try2 status=200 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: HIT
+/hi/thermal-and-cold-fogging-machine-100xtfs50 try1 status=404 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: MISS
+/hi/thermal-and-cold-fogging-machine-100xtfs50 try2 status=404 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: HIT
+/this-url-does-not-exist-404 try1 status=404 | Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate | 
+/this-url-does-not-exist-404 try2 status=404 | Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate | 
+/foo/bar-does-not-exist try1 status=404 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: MISS
+/foo/bar-does-not-exist try2 status=404 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: HIT
+/products/no-such-product-xyz try1 status=404 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: MISS
+/products/no-such-product-xyz try2 status=404 | Cache-Control: s-maxage=60, stale-while-revalidate=31535940 | x-nextjs-cache: HIT

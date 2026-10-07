@@ -1,0 +1,80 @@
+same (DOM/head/text; bytes differ) /  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /about  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /contact-us  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /products  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+DIFF /blog  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+  HEAD/JSON-LD differs: -0 +3
+    + <link rel="preload" as="image" href="https://res.cloudinary.com/dhbvzugv6/image/upload/v1790076719/s3up4dh0kjgbw6cpxeyo.jpg"/>
+    + <link rel="preload" as="image" href="https://res.cloudinary.com/dhbvzugv6/image/upload/v1790149373/uwqreguvgntnikikj8ie.jpg"/>
+    + <link rel="preload" as="image" href="https://res.cloudinary.com/dhbvzugv6/image/upload/v1790337250/b3zpiqdhdpo1goaaqmy4.jpg"/>
+same (DOM/head/text; bytes differ) /knowledge  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /case-studies  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /spare-parts  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /compare  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /videos  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /deployments  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /privacy-policy  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /become-a-dealer  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /dealer-program  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /thermal-and-cold-fogging-machine-100xtfs50  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /thermal-fogging-machine-with-stainless-steel-tank-100xssma20  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /gem-approved-fogging-machine-oem  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /fogging-machine-buying-guide  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /fogging-machine-supplier-in-bihar  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /hi/fogging-machine-supplier-in-bihar  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /id/thermal-vs-cold-fogging-machine  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+DIFF /hi/blog  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+  HEAD/JSON-LD differs: -0 +3
+    + <link rel="preload" as="image" href="https://res.cloudinary.com/dhbvzugv6/image/upload/v1790076719/s3up4dh0kjgbw6cpxeyo.jpg"/>
+    + <link rel="preload" as="image" href="https://res.cloudinary.com/dhbvzugv6/image/upload/v1790149373/uwqreguvgntnikikj8ie.jpg"/>
+    + <link rel="preload" as="image" href="https://res.cloudinary.com/dhbvzugv6/image/upload/v1790337250/b3zpiqdhdpo1goaaqmy4.jpg"/>
+same (DOM/head/text; bytes differ) /vehicle-mounted-fogging-machine  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /fogging-machine-government-procurement  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /nhm-fogging-machine  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /is-14855-fogging-machine  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /ai/product-catalog  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /ai/about-100x  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /sitemap.xml
+same (byte-identical) /robots.txt
+same (byte-identical) /manifest.webmanifest
+same (byte-identical) /llms.txt
+DIFF /this-url-does-not-exist-404
+  <html> attrs: [lang="en-IN" class="__variable_d8ebd1"] -> [id="__next_error__"]
+  HEAD/JSON-LD differs: -11 +0
+    - <link rel="dns-prefetch" href="https://res.cloudinary.com"/>
+    - <link rel="dns-prefetch" href="https://www.googletagmanager.com"/>
+    - <link rel="preconnect" href="https://res.cloudinary.com" crossorigin="anonymous"/>
+    - <link rel="preconnect" href="https://www.googletagmanager.com"/>
+    - <link rel="preload" as="image" href="/banner-desktop.jpg" media="(min-width: 1024px)"/>
+    - <link rel="preload" as="image" href="/banner-mobile.jpg" media="(max-width: 767.98px)"/>
+  VISIBLE TEXT differs: words only before [Thermal×4 Fogging×9 Machine×8 Manufacturer×1 in×5 India×1 Circle×3 Skip×1 to×2 main×1 content×1 Home×1] only after []
+same (DOM/head/text; bytes differ) /foo/bar-does-not-exist  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /zz/blog  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /admin/login
+same (byte-identical) /admin
+same (byte-identical) /api/video-popup
+same (byte-identical) /api/rfq-popup/config
+same (byte-identical) /api/seo/page-overrides?path=/  [cache-control: "public, max-age=60, stale-while-revalidate=300" -> "public, max-age=60, s-maxage=300, stale-while-revalidate=3600"]
+same (byte-identical) /api/i18n/available-locales?pathname=/blog
+same (byte-identical) /api/redirects/active  [cache-control: "no-store" -> "public, s-maxage=300, stale-while-revalidate=600"]
+same (DOM/head/text; bytes differ) /api/merchant/products.xml
+same (DOM/head/text; bytes differ) /blog/what-are-the-most-common-fogging-machine-chemical-names  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /blog/what-is-the-best-fog-machine-for-home-use  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /knowledge/how-thermal-fogging-works  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /knowledge/thermal-vs-ulv-fogging  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /compare/100x-circle-vs-korean-fogging-machines  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /compare/100x-circle-vs-german-fogging-machines  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /products/cold-fogger-machine-with-2-stoke-engine-100xmcf42-c42ca1  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /products/passenger-baggage-trolleys-stainless-steel-with-brakes-100xats  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /hi/gem-approved-fogging-machine-oem  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same (DOM/head/text; bytes differ) /hi/fogging-machine-supplier-in-uttar-pradesh  [cache-control: "private, no-cache, no-store, max-age=0, must-revalidate" -> "s-maxage=60, stale-while-revalidate=31535940"]
+same /contact
+same /products/100xtfs50
+same /products/tfs50
+same /cold-fogging-machine
+same /en/blog
+same /en/fogging-machine-buying-guide
+same /100xdb400-double-barrel-thermal-fogging-machine-vehicle-mountable
+
+PROBLEMS: 5 unexplained difference(s) across 61 URLs
