@@ -1,0 +1,50 @@
+# Hourly uptime check for www.100xcircle.com, run on GitHub's runners (outside Vercel) so a
+# paused or broken deployment is still reported. When the site is DOWN the job e-mails the
+# recipients in the ALERT_EMAIL_TO secret on EVERY run and then fails, so GitHub's own
+# "workflow failed" notification acts as a second alert. Docs: docs/UPTIME_ALERTS.md
+name: Uptime alert
+
+on:
+  schedule:
+    - cron: "7 * * * *" # hourly at :07 (cron can run a few minutes late)
+  workflow_dispatch:
+    inputs:
+      simulate_down:
+        description: "Treat the site as DOWN and send the alert e-mail (test the pipeline)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uptime-alert
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check www.100xcircle.com
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install nodemailer (pinned, the only dependency)
+        run: npm install --no-save --no-audit --no-fund --no-package-lock nodemailer@6.9.16
+      - name: Check the site and e-mail if DOWN
+        run: node .github/scripts/uptime-alert.mjs
+        env:
+          SITE_URL: https://www.100xcircle.com
+          SIMULATE_DOWN: ${{ inputs.simulate_down == true && 'true' || 'false' }}
+          # Values come only from repository secrets; the script masks them and never prints them.
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+          ALERT_EMAIL_FROM: ${{ secrets.ALERT_EMAIL_FROM }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
