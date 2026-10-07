@@ -40,16 +40,21 @@ const PROTECTED_API_PREFIXES = ["/api/admin/", "/api/fogging/", "/api/growth/", 
 // Lead data and admin-only writes outside those families, gated the same way:
 //  - /api/rfq-attachments/<id> (prefix above): customers' RFQ uploads, streamed from
 //    GridFS. Only the admin Leads view and the admin notification e-mail link to it.
-//  - GET /api/brochure-leads: the brochure-lead list (names, phones, e-mails); only
-//    the admin Brochure Leads tab reads it. The POST stays public — that is the
-//    brochure form on the site — and is handled by isProtectedLeadRead() below.
+//  - GET /api/brochure-leads and GET /api/submissions: the brochure-lead and RFQ /
+//    contact submission lists (names, phones, e-mails); only the admin Brochure Leads,
+//    Leads and Analytics tabs read them. Both POSTs stay public — they are the
+//    brochure, quote, contact and dealer forms on the site — so isProtectedLeadRead()
+//    below gates the GET only. (Until 2026-10-07 /api/submissions GET only checked
+//    that a session existed, so confined roles could read every lead.)
 //  - /api/upload: legacy disk upload with no remaining caller; session required.
 // /api/files/<id> is deliberately NOT here: product brochure PDFs and case-study
 // files uploaded through the admin are served from it on public pages.
 const PROTECTED_API_PATHS: ReadonlySet<string> = new Set(["/api/upload"])
 
+const PROTECTED_LEAD_READ_PATHS: ReadonlySet<string> = new Set(["/api/brochure-leads", "/api/submissions"])
+
 function isProtectedLeadRead(method: string, pathname: string): boolean {
-  return pathname === "/api/brochure-leads" && method.toUpperCase() === "GET"
+  return PROTECTED_LEAD_READ_PATHS.has(pathname) && method.toUpperCase() === "GET"
 }
 
 // pathname here is the raw incoming request path, which may still carry an
@@ -307,14 +312,6 @@ async function handleMiddleware(request: NextRequest, event: NextFetchEvent) {
     return NextResponse.next()
   }
 
-  // ── Protect /api/submissions GET (lead data) ─────────────────────────────────
-  if (pathname === "/api/submissions" && request.method === "GET") {
-    if (!(await isAuthenticated(request))) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-    return NextResponse.next()
-  }
-
   // ── i18n: only for routes moved under app/[locale]/ (Phase 1 slice) ─────────
   // Everything else (all other static/marketing pages) is untouched by design.
   if (isLocaleManagedPath(pathname)) {
@@ -521,7 +518,7 @@ export const config = {
     "/api/rfq-attachments/:path*",
     "/api/brochure-leads",
     "/api/upload",
-    "/api/submissions",
+    "/api/submissions", // GET gated via isProtectedLeadRead; POST (site forms) passes
     "/admin/:path*",
     // i18n — locale-managed content only
     "/blog",
