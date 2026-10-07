@@ -82,6 +82,7 @@
     "@eslint/eslintrc": "^3.3.5",
     "@playwright/test": "^1.60.0",
     "@types/node": "^22",
+    "@types/nodemailer": "^6.4.24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9.39.4",
