@@ -87,7 +87,8 @@ export function KnowledgeRebuildPanel({ onFinished }: { onFinished?: () => void 
         }
       }
       void tick()
-      timer.current = setInterval(tick, 2000)
+      // A backgrounded tab stops polling; the next visible tick picks the job up again.
+      timer.current = setInterval(() => { if (!document.hidden) void tick() }, 2000)
     },
     [loadInfo, onFinished, stopPolling],
   )

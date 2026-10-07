@@ -2,8 +2,9 @@
 // Returns counts of missing/anomalous fields in fogging_contracts
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { withCdnCache } from "@/lib/cache/cdn"
 
-export async function GET() {
+async function GET_handler() {
   const client = await clientPromise;
   const db = client.db('100xDB');
   const c = db.collection('fogging_contracts');
@@ -72,3 +73,6 @@ export async function GET() {
     },
   });
 }
+
+// Public, anonymous, URL-keyed data refreshed by daily imports: let the CDN serve it (lib/cache/cdn.ts).
+export const GET = withCdnCache(GET_handler)

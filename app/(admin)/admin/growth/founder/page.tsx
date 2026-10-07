@@ -1209,14 +1209,16 @@ export default function FounderModePage() {
 
   useEffect(() => { load() }, [load])
 
-  // Auto-refresh metrics only (fast endpoint)
+  // Auto-refresh metrics only (fast endpoint) — every 5 min while the tab is
+  // visible (was every 90 s, even in a backgrounded tab).
   useEffect(() => {
     const t = setInterval(() => {
+      if (document.hidden) return
       fetch("/api/admin/growth/founder-v2")
         .then(r => r.ok ? r.json() : null)
         .then(d => { if (d) setData(d) })
         .catch(() => {})
-    }, 90_000)
+    }, 5 * 60_000)
     return () => clearInterval(t)
   }, [])
 

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { enrichWithOrg } from '@/lib/fogging-org-lookup';
+import { withCdnCache } from "@/lib/cache/cdn"
 
 const DB = '100xDB';
 
-export async function GET(
+async function GET_handler(
   req: NextRequest,
   { params }: { params: { normalized: string } },
 ) {
@@ -103,3 +104,6 @@ export async function GET(
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
+
+// Public, anonymous, URL-keyed data refreshed by daily imports: let the CDN serve it (lib/cache/cdn.ts).
+export const GET = withCdnCache(GET_handler)

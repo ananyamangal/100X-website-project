@@ -18,6 +18,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { Document, Filter } from 'mongodb';
+import { withCdnCache } from "@/lib/cache/cdn"
 
 const DB   = '100xDB';
 const COLL = 'fogging_contracts';
@@ -42,7 +43,7 @@ function buildMatch(params: Record<string, string>): Filter<Document> {
   return m;
 }
 
-export async function GET(req: NextRequest) {
+async function GET_handler(req: NextRequest) {
   const params = Object.fromEntries(req.nextUrl.searchParams);
   const qty    = params.quantity ? parseInt(params.quantity) : null;
 
@@ -154,3 +155,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
+
+// Public, anonymous, URL-keyed data refreshed by daily imports: let the CDN serve it (lib/cache/cdn.ts).
+export const GET = withCdnCache(GET_handler)

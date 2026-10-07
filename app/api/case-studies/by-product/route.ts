@@ -20,5 +20,9 @@ export async function GET(req: NextRequest) {
     .sort({ createdAt: -1 })
     .toArray()
 
-  return NextResponse.json(JSON.parse(JSON.stringify(studies)))
+  // Reading the query string makes this handler dynamic (the `revalidate`
+  // export is ignored); the CDN header caches each ?productId=… answer instead.
+  return NextResponse.json(JSON.parse(JSON.stringify(studies)), {
+    headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
+  })
 }

@@ -6,6 +6,12 @@ import { getBlogBySlug } from "@/lib/blogsQuery"
 
 export const dynamic = "force-dynamic"
 
+// Fetched by LanguageSwitcher on every locale-managed page view. The answer
+// only changes when a reviewed translation is published, so the CDN may hold
+// each pathname's response for 5 min instead of invoking this per view.
+const CACHE_HEADERS = { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600" }
+const json = (body: { locales: readonly string[] }) => NextResponse.json(body, { headers: CACHE_HEADERS })
+
 /**
  * Client-side counterpart to lib/seo/hreflang.ts's getAvailableLocales(),
  * used only by LanguageSwitcher (a client component mounted in the global
@@ -19,11 +25,11 @@ export async function GET(request: NextRequest) {
   const pathname = request.nextUrl.searchParams.get("pathname") || ""
 
   if (!isLocaleManagedPathname(pathname)) {
-    return NextResponse.json({ locales: ["en"] })
+    return json({ locales: ["en"] })
   }
 
   if (pathname === "/blog") {
-    return NextResponse.json({ locales: BLOG_INDEX_TRANSLATED_LOCALES })
+    return json({ locales: BLOG_INDEX_TRANSLATED_LOCALES })
   }
 
   if (pathname.startsWith("/blog/")) {
@@ -34,9 +40,9 @@ export async function GET(request: NextRequest) {
     } catch {
       blog = null
     }
-    if (!blog?._id) return NextResponse.json({ locales: ["en"] })
+    if (!blog?._id) return json({ locales: ["en"] })
     const locales = await getAvailableLocales("blog", String(blog._id))
-    return NextResponse.json({ locales })
+    return json({ locales })
   }
 
   const slug = pathname.slice(1)
@@ -47,5 +53,5 @@ export async function GET(request: NextRequest) {
   // predicate (which silently never awaits and keeps everything).
   const gated = await Promise.all(candidates.map((l) => isUntranslatableProductLanding(slug, l)))
   const locales = candidates.filter((_, i) => !gated[i])
-  return NextResponse.json({ locales })
+  return json({ locales })
 }
