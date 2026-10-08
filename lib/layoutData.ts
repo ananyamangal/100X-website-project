@@ -1,8 +1,6 @@
 import { cache } from "react"
 import { unstable_cache } from "next/cache"
 import clientPromise from "@/lib/mongodb"
-import { shapeNavProducts, type NavProductGroup } from "@/lib/navProducts"
-import { shapeNavCaseStudies, type NavCaseStudy } from "@/lib/navPerformance"
 
 /**
  * The root layout wraps every public route and every route currently renders
@@ -57,60 +55,6 @@ const fetchActiveTrustBadges = unstable_cache(
 export const getActiveTrustBadges = cache(async () => {
   try {
     return await fetchActiveTrustBadges()
-  } catch {
-    return []
-  }
-})
-
-// Header "Products" menu. Minimal projection; shaping (published only,
-// canonical URLs, grouping, thumbnails) is in lib/navProducts.ts.
-const fetchNavProducts = unstable_cache(
-  async (): Promise<NavProductGroup[]> => {
-    const client = await clientPromise
-    const docs = await client
-      .db()
-      .collection("products")
-      .find(
-        { isPublished: { $ne: false } },
-        { projection: { _id: 1, name: 1, slug: 1, category: 1, order: 1, createdAt: 1, isPublished: 1, imageUrls: { $slice: 1 }, imageUrl: 1 } },
-      )
-      .toArray()
-    return shapeNavProducts(JSON.parse(JSON.stringify(docs)))
-  },
-  ["layout-nav-products-v1"],
-  { tags: [LAYOUT_DATA_TAG], revalidate: LAYOUT_DATA_REVALIDATE_SECONDS },
-)
-
-export const getNavProducts = cache(async (): Promise<NavProductGroup[]> => {
-  try {
-    return await fetchNavProducts()
-  } catch {
-    return []
-  }
-})
-
-// Header "Performance" menu: published case studies. Minimal projection;
-// shaping (published only, detail URLs, thumbnails) is in lib/navPerformance.ts.
-const fetchNavCaseStudies = unstable_cache(
-  async (): Promise<NavCaseStudy[]> => {
-    const client = await clientPromise
-    const docs = await client
-      .db()
-      .collection("case_studies")
-      .find(
-        { published: true },
-        { projection: { _id: 0, slug: 1, title: 1, customer: 1, state: 1, published: 1, createdAt: 1, images: { $slice: 1 } } },
-      )
-      .toArray()
-    return shapeNavCaseStudies(JSON.parse(JSON.stringify(docs)))
-  },
-  ["layout-nav-case-studies-v1"],
-  { tags: [LAYOUT_DATA_TAG], revalidate: LAYOUT_DATA_REVALIDATE_SECONDS },
-)
-
-export const getNavCaseStudies = cache(async (): Promise<NavCaseStudy[]> => {
-  try {
-    return await fetchNavCaseStudies()
   } catch {
     return []
   }
