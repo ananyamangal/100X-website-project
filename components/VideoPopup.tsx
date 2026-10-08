@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
-import { Volume2, VolumeX, X } from "lucide-react"
+import { Play, Volume2, VolumeX, X } from "lucide-react"
 
 const FALLBACK_VIDEO_URL = "https://www.youtube.com/shorts/ZiVGNkvAI9g"
 const SESSION_KEY = "video-popup-seen-v1"
@@ -30,7 +30,10 @@ export default function VideoPopup() {
   const [config, setConfig] = useState<VideoConfig | null>(null)
   const [visible, setVisible] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [muted, setMuted] = useState(true)
+  const [muted, setMuted] = useState(false)
+  // Click-to-load facade: only the thumbnail renders until the visitor taps
+  // play, so the YouTube player (~700 KB JS + video) never loads on its own.
+  const [playing, setPlaying] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Track explicit user dismissal — once dismissed, never reopen until page reload
@@ -88,6 +91,7 @@ export default function VideoPopup() {
     // Reset on navigation — clear timers and close any open popup so it
     // doesn't persist as an overlay on a new page.
     setVisible(false)
+    setPlaying(false)
     clearTimeout(timerRef.current!)
     clearTimeout(autoCloseRef.current!)
 
@@ -209,7 +213,7 @@ export default function VideoPopup() {
 
   const isPortrait = config.orientation === "portrait"
   const muteParam = muted ? "1" : "0"
-  const embed = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&playsinline=1&loop=1&playlist=${videoId}&rel=0&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0`
+  const embed = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=${muteParam}&playsinline=1&loop=1&playlist=${videoId}&rel=0&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0`
 
   return (
     <div
@@ -231,13 +235,15 @@ export default function VideoPopup() {
     >
       {/* Close + mute controls */}
       <div className="flex items-center gap-1.5 -mb-1 z-10">
-        <button
-          onClick={() => setMuted((m) => !m)}
-          className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
-          aria-label={muted ? "Unmute video" : "Mute video"}
-        >
-          {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-        </button>
+        {playing && (
+          <button
+            onClick={() => setMuted((m) => !m)}
+            className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
+            aria-label={muted ? "Unmute video" : "Mute video"}
+          >
+            {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
+        )}
         <button
           onClick={dismiss}
           className="rounded-full bg-black/60 text-white p-1.5 hover:bg-black/80 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
@@ -252,14 +258,38 @@ export default function VideoPopup() {
         }`}
       >
         <div className={`w-full relative ${isPortrait ? "aspect-[9/16]" : "aspect-video"}`}>
-          <iframe
-            key={muteParam}
-            src={embed}
-            title="Product video"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="absolute inset-0 w-full h-full"
-          />
+          {playing ? (
+            <iframe
+              key={muteParam}
+              src={embed}
+              title="Product video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full"
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPlaying(true)}
+              aria-label="Play product video"
+              data-gtm="video_popup_play"
+              className="group absolute inset-0 w-full h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+                alt=""
+                aria-hidden="true"
+                decoding="async"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <span className="absolute inset-0 grid place-items-center">
+                <span className="grid place-items-center w-14 h-14 rounded-full bg-brand-600/95 text-white shadow-2xl ring-4 ring-white/20 group-hover:scale-110 transition-transform">
+                  <Play size={24} className="ml-0.5" aria-hidden="true" />
+                </span>
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </div>
