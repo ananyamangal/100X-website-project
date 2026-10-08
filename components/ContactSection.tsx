@@ -33,6 +33,8 @@ function useContactPageSocialLinks(): VisibleSocialLink[] {
   return links
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 const PHONE_DIGITS_RE = /\D/g
 
 function validatePhone(phone: string) {
@@ -69,6 +71,7 @@ export default function ContactSection({
     const name = String(formData.get("name") ?? "").trim()
     const phone = String(formData.get("phone") ?? "").trim()
     const organization = String(formData.get("organization") ?? "").trim()
+    const email = String(formData.get("email") ?? "").trim()
     const requirement = String(formData.get("requirement") ?? "").trim()
 
     if (!name) {
@@ -77,6 +80,10 @@ export default function ContactSection({
     }
     if (!validatePhone(phone)) {
       setError("Please enter a valid mobile number (10–15 digits).")
+      return
+    }
+    if (email && !EMAIL_RE.test(email)) {
+      setError("Please enter a valid email address, or leave it blank.")
       return
     }
     if (Date.now() - mountedAtRef.current < 2000) {
@@ -100,6 +107,7 @@ export default function ContactSection({
         body: JSON.stringify({
           name,
           phone,
+          ...(email ? { email } : {}),
           organization,
           message: requirement,
           type: "contact",
@@ -257,6 +265,19 @@ export default function ContactSection({
                     autoComplete="tel"
                     placeholder="Mobile number"
                     required
+                    className="p-5 text-lg min-h-[52px]"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="contact-email" className="block text-sm font-medium text-gray-700 mb-1.5">Email (optional)</label>
+                  <Input
+                    id="contact-email"
+                    name="email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
                     className="p-5 text-lg min-h-[52px]"
                   />
                 </div>

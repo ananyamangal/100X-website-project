@@ -3,6 +3,22 @@
     "label": "ഭാഷ"
   },
   "LandingForm": {
+    "extra": {
+      "email": "Email (optional)",
+      "department": "Department",
+      "officerName": "Officer name",
+      "state": "State",
+      "requirement": "Requirement",
+      "roleLegend": "I am a…",
+      "roleBuyer": "Buyer / government department",
+      "roleReseller": "Reseller / GeM seller",
+      "callbackToggle": "Request a call back instead",
+      "preferredTime": "Preferred time",
+      "slotMorning": "Morning 9–12",
+      "slotAfternoon": "Afternoon 12–4",
+      "slotEvening": "Evening 4–7",
+      "callbackSubmit": "Request a call back"
+    },
     "common": {
       "selectPlaceholder": "തിരഞ്ഞെടുക്കുക…",
       "submitting": "അയയ്ക്കുന്നു…",

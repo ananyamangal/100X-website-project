@@ -27,7 +27,9 @@ const GENERATE_LEAD_CFG: Record<LandingFormVariant, { lead_type: string; page_ty
 type FormFieldDef = {
   name: string
   label: string
-  type: "text" | "tel" | "email" | "select"
+  /** message-key override when the field name is shared with another field list */
+  labelKey?: string
+  type: "text" | "tel" | "email" | "select" | "textarea"
   required?: boolean
   placeholder?: string
   autoComplete?: string
@@ -44,6 +46,7 @@ const FIELDS_BY_VARIANT: Record<LandingFormBlockData["variant"], FormFieldDef[]>
     { name: "company", label: "Company / Firm Name", type: "text", required: true, placeholder: "Your registered company name", autoComplete: "organization" },
     { name: "name", label: "Your Name", type: "text", required: true, placeholder: "Contact person name", autoComplete: "name", colSpan: 1 },
     { name: "mobile", label: "Mobile Number", type: "tel", required: true, placeholder: "+91 XXXXX XXXXX", autoComplete: "tel", inputMode: "tel", colSpan: 1 },
+    { name: "email", label: "Email (optional)", labelKey: "__extra.email", type: "email", autoComplete: "email", inputMode: "email" },
     { name: "city", label: "City / State", type: "text", required: true, placeholder: "e.g. Lucknow, UP", autoComplete: "address-level1", colSpan: 1 },
     { name: "gem_seller_id", label: "GeM Seller ID", type: "text", placeholder: "Your GeM portal seller ID (if you have one)", colSpan: 1 },
     { name: "gst", label: "GST Number", type: "text", placeholder: "15-digit GSTIN (if registered)" },
@@ -92,6 +95,20 @@ const FIELDS_BY_VARIANT: Record<LandingFormBlockData["variant"], FormFieldDef[]>
   ],
 }
 
+// Buyer / government-department fields for the reseller (GeM) landing form.
+const BUYER_FIELDS: FormFieldDef[] = [
+  { name: "department", label: "Department", labelKey: "__extra.department", type: "text", required: true, autoComplete: "organization" },
+  { name: "name", label: "Officer name", labelKey: "__extra.officerName", type: "text", required: true, autoComplete: "name", colSpan: 1 },
+  { name: "mobile", label: "Mobile Number", type: "tel", required: true, autoComplete: "tel", inputMode: "tel", colSpan: 1 },
+  { name: "email", label: "Email (optional)", labelKey: "__extra.email", type: "email", autoComplete: "email", inputMode: "email" },
+  { name: "state", label: "State", labelKey: "__extra.state", type: "text", required: true, autoComplete: "address-level1" },
+  { name: "requirement", label: "Requirement", labelKey: "__extra.requirement", type: "textarea" },
+]
+
+type BuyerRole = "buyer" | "reseller"
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 type Props = {
   block: LandingFormBlockData
   /** Slug of the landing page — added to the submission for analytics. */
@@ -104,7 +121,9 @@ type Props = {
 }
 
 export default function LandingFormBlock({ block, landingSlug, locale = "en" }: Props) {
-  const fields = FIELDS_BY_VARIANT[block.variant]
+  const hasRoleChoice = block.variant === "reseller"
+  const [role, setRole] = useState<BuyerRole>("reseller")
+  const fields = hasRoleChoice && role === "buyer" ? BUYER_FIELDS : FIELDS_BY_VARIANT[block.variant]
   const submissionType = FORM_SUBMISSION_TYPE[block.variant]
   const gaEvent = block.gaEvent || `${block.variant.replace("-", "_")}_submit`
   const router = useRouter()
@@ -114,6 +133,10 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
   // present in FIELDS_BY_VARIANT — never throws, never renders blank on a
   // missing key (e.g. a language whose LandingForm messages aren't seeded yet).
   const tf = (fieldName: string, key: "label" | "placeholder", fallback?: string) => {
+    if (fieldName.startsWith("__extra.")) {
+      const k = `extra.${fieldName.slice(8)}`
+      return key === "label" && t.has(k) ? t(k) : fallback
+    }
     const msgKey = `fields.${block.variant}.${fieldName}.${key}`
     return t.has(msgKey) ? t(msgKey) : fallback
   }
@@ -124,6 +147,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
     return Array.isArray(raw) && raw.length === fallback.length ? (raw as string[]) : fallback
   }
   const tc = (key: string, fallback: string) => (t.has(`common.${key}`) ? t(`common.${key}`) : fallback)
+  const tx = (key: string, fallback: string) => (t.has(`extra.${key}`) ? t(`extra.${key}`) : fallback)
 
   const [values, setValues] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -147,8 +171,14 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
 
     const missing = fields.filter((f) => f.required && !(values[f.name] || "").trim())
     if (missing.length > 0) {
-      const labels = missing.map((m) => tf(m.name, "label", m.label)).join(", ")
+      const labels = missing.map((m) => tf(m.labelKey ?? m.name, "label", m.label)).join(", ")
       setError(`${tc("requiredPrefix", "Please fill required:")} ${labels}`)
+      return
+    }
+
+    const emailVal = (values.email || "").trim()
+    if (emailVal && !EMAIL_RE.test(emailVal)) {
+      setError("Please enter a valid email address, or leave it blank.")
       return
     }
 
@@ -164,6 +194,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
       event: `${gaEvent}_attempt`,
       variant: block.variant,
       landing_slug: landingSlug,
+      ...(hasRoleChoice ? { buyer_role: role } : {}),
     })
 
     setSubmitting(true)
@@ -172,10 +203,13 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...values,
+          ...(hasRoleChoice
+            ? Object.fromEntries(fields.map((f) => [f.name, (values[f.name] || "").trim()]).filter(([, v]) => v))
+            : values),
           type: submissionType,
           form_variant: block.variant,
           landing_slug: landingSlug,
+          ...(hasRoleChoice ? { buyer_role: role } : {}),
           attribution: getPersistedAttribution(),
           form_page_url: typeof window !== "undefined" ? location.href : "",
           form_page_path: typeof window !== "undefined" ? location.pathname : "",
@@ -187,6 +221,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
         event: gaEvent,
         variant: block.variant,
         landing_slug: landingSlug,
+        ...(hasRoleChoice ? { buyer_role: role } : {}),
       })
 
       // Fire generate_lead AFTER confirmed server response — triggers Google Ads conversion
@@ -199,6 +234,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
         currency:     "INR",
         variant:      block.variant,
         landing_slug: landingSlug,
+        ...(hasRoleChoice ? { buyer_role: role } : {}),
       })
 
       setValues({})
@@ -259,6 +295,33 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
             <input name="company_website" type="text" tabIndex={-1} autoComplete="off" />
           </div>
 
+          {hasRoleChoice ? (
+            <fieldset className="col-span-2 flex flex-col gap-2 border-0 p-0 m-0">
+              <legend className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-600 [[data-theme=dark-industrial]_&]:text-slate-400">
+                {tx("roleLegend", "I am a…")}
+              </legend>
+              <div className="flex flex-wrap gap-x-5 gap-y-2">
+                {([
+                  ["buyer", tx("roleBuyer", "Buyer / government department")],
+                  ["reseller", tx("roleReseller", "Reseller / GeM seller")],
+                ] as const).map(([val, text]) => (
+                  <label key={val} className="inline-flex min-h-[44px] items-center gap-2 text-sm text-gray-800 [[data-theme=dark-industrial]_&]:text-slate-200">
+                    <input
+                      type="radio"
+                      name="buyer_role"
+                      value={val}
+                      checked={role === val}
+                      onChange={() => setRole(val)}
+                      disabled={submitting}
+                      className="h-4 w-4 accent-brand-600"
+                    />
+                    {text}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
+
           {fields.map((f) => {
             const span = f.colSpan === 1 ? "col-span-1" : "col-span-2"
             const id = `lf-${f.name}`
@@ -268,7 +331,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
                   htmlFor={id}
                   className="text-[11px] font-semibold uppercase tracking-wider text-gray-600 [[data-theme=dark-industrial]_&]:text-slate-400"
                 >
-                  {tf(f.name, "label", f.label)}
+                  {tf(f.labelKey ?? f.name, "label", f.label)}
                   {f.required ? <span aria-hidden="true" className="text-brand-700"> *</span> : null}
                 </label>
                 {f.type === "select" ? (
@@ -303,6 +366,17 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
                       </option>
                     ))}
                   </select>
+                ) : f.type === "textarea" ? (
+                  <textarea
+                    id={id}
+                    name={f.name}
+                    rows={3}
+                    required={f.required}
+                    value={values[f.name] || ""}
+                    onChange={(e) => update(f.name, e.target.value)}
+                    disabled={submitting}
+                    className="rounded-md border border-gray-300 bg-white px-3.5 py-3 text-base text-gray-900 outline-none placeholder:text-gray-400 focus:border-brand-600 focus:ring-2 focus:ring-green-200 disabled:opacity-60 [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:bg-white/5 [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:placeholder:text-slate-500 [[data-theme=dark-industrial]_&]:focus:border-green-500 [[data-theme=dark-industrial]_&]:focus:ring-brand-500/30"
+                  />
                 ) : (
                   <input
                     id={id}
@@ -310,7 +384,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
                     type={f.type}
                     inputMode={f.inputMode}
                     autoComplete={f.autoComplete}
-                    placeholder={tf(f.name, "placeholder", f.placeholder)}
+                    placeholder={tf(f.labelKey ?? f.name, "placeholder", f.placeholder)}
                     required={f.required}
                     value={values[f.name] || ""}
                     onChange={(e) => update(f.name, e.target.value)}
