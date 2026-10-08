@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { BUSINESS } from "@/lib/seo/site-config"
+import { RFQ_WA_MESSAGE_KEY } from "@/components/conversion/RfqWhatsAppFollowUp"
 import {
   getPersistedAttribution,
   pushDataLayer,
@@ -266,8 +267,8 @@ export default function RFQForm({
       body: JSON.stringify({ event: 'rfq_submit', page: typeof window !== 'undefined' ? window.location.pathname : '', source: location }),
     }).catch(() => {})
 
-    // Show the success state in place; WhatsApp is an optional extra here and
-    // the user continues to /thank-you when ready.
+    // Saved: show the success state, then continue to /thank-you. WhatsApp is an
+    // optional extra on both.
     const waMessage = buildWhatsAppMessage({
       product,
       quantity,
@@ -284,6 +285,15 @@ export default function RFQForm({
     setWaUrl(`https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waMessage)}`)
     setSubmitting(false)
     setDone(true)
+    // Keep the /thank-you?type=rfq page view: the GTM container has a trigger on it.
+    // The prefilled WhatsApp text travels in this tab's sessionStorage (never the URL),
+    // so the thank-you page can offer it as an optional button.
+    try {
+      sessionStorage.setItem(RFQ_WA_MESSAGE_KEY, waMessage)
+    } catch {
+      /* storage blocked: the thank-you page falls back to its generic WhatsApp link */
+    }
+    router.push("/thank-you?type=rfq")
   }
 
   const isPanel = variant === "panel"
@@ -300,7 +310,7 @@ export default function RFQForm({
       >
         <h3 className="text-lg font-bold text-gray-900">Thank you, we received your request</h3>
         <p className="text-sm text-gray-600">
-          Our team will contact you shortly. Typical response time is within one business day.
+          Our team will contact you shortly.
         </p>
         <Button
           type="button"

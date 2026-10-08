@@ -4,6 +4,7 @@ import { Mail, MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BUSINESS, SITE_NAME, SITE_NAME_LEGAL, SITE_URL } from "@/lib/seo/site-config"
 import { ContactThankYouTracker } from "@/components/conversion/ContactThankYouTracker"
+import { RfqWhatsAppFollowUp } from "@/components/conversion/RfqWhatsAppFollowUp"
 
 export const metadata: Metadata = {
   title: `Thank You | ${SITE_NAME}`,
@@ -56,6 +57,7 @@ export default async function ThankYouPage({
             <span className="font-semibold">Typical response time:</span> within one business day (Mon–Sat, 9:00 AM – 6:00
             PM IST).
           </p>
+          <RfqWhatsAppFollowUp type={type} />
 
           <div className="mt-10 space-y-4 border-t border-gray-100 pt-8">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
