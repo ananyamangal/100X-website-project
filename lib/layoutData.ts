@@ -3,6 +3,8 @@ import { unstable_cache } from "next/cache"
 import clientPromise from "@/lib/mongodb"
 import { shapeNavProducts, type NavProductGroup } from "@/lib/navProducts"
 import { shapeNavCaseStudies, type NavCaseStudy } from "@/lib/navPerformance"
+import { shapeNavBlogPosts, NAV_BLOG_LIMIT, type NavBlogPost } from "@/lib/navBlog"
+import { BLOGS_CACHE_TAG } from "@/lib/blogsQuery"
 
 /**
  * The root layout wraps every public route and every route currently renders
@@ -111,6 +113,35 @@ const fetchNavCaseStudies = unstable_cache(
 export const getNavCaseStudies = cache(async (): Promise<NavCaseStudy[]> => {
   try {
     return await fetchNavCaseStudies()
+  } catch {
+    return []
+  }
+})
+
+// Header "Blog" menu: the latest published posts. Also tagged BLOGS_CACHE_TAG,
+// which every admin blog write already revalidates. No post body is read.
+const fetchNavBlogPosts = unstable_cache(
+  async (): Promise<NavBlogPost[]> => {
+    const client = await clientPromise
+    const docs = await client
+      .db()
+      .collection("blogs")
+      .find(
+        { $or: [{ isPublished: true }, { isPublished: { $exists: false } }] },
+        { projection: { _id: 1, title: 1, slug: 1, topImage: 1, publishedAt: 1, createdAt: 1, isPublished: 1 } },
+      )
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .limit(NAV_BLOG_LIMIT * 4)
+      .toArray()
+    return shapeNavBlogPosts(JSON.parse(JSON.stringify(docs)))
+  },
+  ["layout-nav-blog-posts-v1"],
+  { tags: [LAYOUT_DATA_TAG, BLOGS_CACHE_TAG], revalidate: LAYOUT_DATA_REVALIDATE_SECONDS },
+)
+
+export const getNavBlogPosts = cache(async (): Promise<NavBlogPost[]> => {
+  try {
+    return await fetchNavBlogPosts()
   } catch {
     return []
   }

@@ -7,6 +7,7 @@ import { test, expect } from "@playwright/test"
 const MENUS = [
   { label: "Products", href: "/products", toggle: "Show all products" },
   { label: "Performance", href: "/past-performance-government", toggle: "Show past performance" },
+  { label: "Blog", href: "/blog", toggle: "Show latest articles" },
 ]
 
 test.describe("desktop", () => {

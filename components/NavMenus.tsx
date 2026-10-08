@@ -6,6 +6,7 @@ import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NavProductGroup } from '@/lib/navProducts';
 import type { NavCaseStudy } from '@/lib/navPerformance';
+import type { NavBlogPost } from '@/lib/navBlog';
 
 /**
  * Header dropdown menus ("Products", "Performance"): a desktop dropdown and a
@@ -155,6 +156,33 @@ export function performancePanel(caseStudies: NavCaseStudy[], variant: 'desktop'
           )}
         </div>
         <ViewAll href="/past-performance-government" label="View all past performance" onNavigate={onNavigate} />
+      </>
+    )
+  }
+}
+
+// ── Blog ────────────────────────────────────────────────────────────────────
+
+export function blogPanel(posts: NavBlogPost[], variant: 'desktop' | 'mobile'): PanelContent {
+  return function BlogPanel(showThumbs, onNavigate) {
+    const desktop = variant === 'desktop'
+    return (
+      <>
+        <p className={cn(KICKER_CLASS, desktop ? 'pt-1' : 'pt-3')}>Latest articles</p>
+        <ul className={desktop ? 'grid grid-cols-2 gap-x-6 xl:grid-cols-3' : undefined}>
+          {posts.map((p) => (
+            <li key={p.href}>
+              <Link href={p.href} onClick={onNavigate} className={ROW_CLASS}>
+                <NavThumb src={p.thumb} alt={p.title} show={showThumbs} />
+                <span className="min-w-0 leading-snug">
+                  <span className="line-clamp-2">{p.title}</span>
+                  {p.date && <span className="block text-xs font-normal text-gray-500">{p.date}</span>}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <ViewAll href="/blog" label="View all articles" onNavigate={onNavigate} />
       </>
     )
   }
