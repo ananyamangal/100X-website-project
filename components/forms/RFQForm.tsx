@@ -51,6 +51,8 @@ interface Props {
   defaultDescription?: string;
   /** Telemetry location label so we know where the form lives. */
   location: string;
+  /** Preselect "GeM authorization required" (e.g. the floating GeM entry point). */
+  defaultGemAuth?: boolean;
 }
 
 const PHONE_RE = /^[0-9+\-()\s]{10,18}$/
@@ -93,6 +95,7 @@ export default function RFQForm({
   defaultOrganization,
   defaultDescription,
   location,
+  defaultGemAuth = false,
 }: Props) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
@@ -107,7 +110,7 @@ export default function RFQForm({
   const [organization, setOrganization] = useState(defaultOrganization ?? "")
   const [cityState, setCityState] = useState("")
   const [description, setDescription] = useState(defaultDescription ?? "")
-  const [gemAuth, setGemAuth] = useState(false)
+  const [gemAuth, setGemAuth] = useState(defaultGemAuth)
   const [dealerInquiry, setDealerInquiry] = useState(false)
   const [showOptional, setShowOptional] = useState(false)
   const fileInputRef   = useRef<HTMLInputElement>(null)
