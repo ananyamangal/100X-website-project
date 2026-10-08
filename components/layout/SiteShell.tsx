@@ -12,7 +12,7 @@ import { MobileCtaProvider } from '@/components/cta/MobileCtaContext'
 import MobileCtaBar from '@/components/cta/MobileCtaBar'
 import { getBrandAssets } from '@/lib/brandAssets'
 import { getSocialLinks, pickVisibleSocialLinks } from '@/lib/socialLinks'
-import { getHasMainBrochure, getActiveTrustBadges } from '@/lib/layoutData'
+import { getHasMainBrochure, getActiveTrustBadges, getNavProducts, getNavCaseStudies } from '@/lib/layoutData'
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton'
 import ClientOnlyPopups from '@/components/ClientOnlyPopups'
 import { inter } from '@/lib/fonts'
@@ -42,13 +42,15 @@ export interface SiteShellProps {
 }
 
 export default async function SiteShell({ htmlLang, dir, locale, messages, footerLocale, children }: SiteShellProps) {
-  // All four reads are Data-Cache backed (see lib/layoutData.ts) — this shell
+  // All six reads are Data-Cache backed (see lib/layoutData.ts) — this shell
   // wraps every public route, so they must not hit MongoDB per render.
-  const [brandAssets, socialLinks, hasBrochure, trustBadges] = await Promise.all([
+  const [brandAssets, socialLinks, hasBrochure, trustBadges, navProducts, navCaseStudies] = await Promise.all([
     getBrandAssets(),
     getSocialLinks(),
     getHasMainBrochure(),
     getActiveTrustBadges(),
+    getNavProducts(),
+    getNavCaseStudies(),
   ])
 
   return (
@@ -108,8 +110,10 @@ export default async function SiteShell({ htmlLang, dir, locale, messages, foote
             logoUrl={brandAssets.logoUrl}
             logoAlt={brandAssets.logoAlt}
             hasBrochure={hasBrochure}
-            // WhatsApp is excluded: the navbar already has a permanent "WhatsApp Us" button.
+            // WhatsApp is excluded: the navbar already has a permanent WhatsApp button.
             socialLinks={pickVisibleSocialLinks(socialLinks, "showInHeader").filter((s) => s.key !== "whatsapp")}
+            productGroups={navProducts}
+            caseStudies={navCaseStudies}
           />
           <main id="main-content" tabIndex={-1}>
             {children}

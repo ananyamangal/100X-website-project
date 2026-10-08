@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { scheduleAutoSync } from "@/lib/knowledge/sync/execute"
+import { revalidateTag } from "next/cache"
+import { LAYOUT_DATA_TAG } from "@/lib/layoutData"
 import clientPromise from "@/lib/mongodb"
 
 export async function GET() {
@@ -27,6 +29,7 @@ export async function POST(request: NextRequest) {
     }
     const result = await db.collection("case_studies").insertOne(doc)
     scheduleAutoSync(["case_studies"])
+    revalidateTag(LAYOUT_DATA_TAG) // header Performance menu
     return NextResponse.json({ ...doc, _id: String(result.insertedId) })
   } catch {
     return NextResponse.json({ error: "Failed to create" }, { status: 500 })

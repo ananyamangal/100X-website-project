@@ -12,10 +12,14 @@ import type { VisibleSocialLink } from '@/lib/socialLinksShared';
 import { SOCIAL_ICONS } from '@/components/seo/SocialIcons';
 import BrochureLeadModal from '@/components/BrochureLeadModal';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { DesktopNavDropdown, MobileNavAccordion, productsPanel, performancePanel, type PanelContent } from '@/components/NavMenus';
+import type { NavProductGroup } from '@/lib/navProducts';
+import type { NavCaseStudy } from '@/lib/navPerformance';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/products', label: 'Products' },
+  { href: '/past-performance-government', label: 'Performance' },
   { href: '/spare-parts', label: 'Spare Parts' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
@@ -38,9 +42,20 @@ interface NavbarProps {
   logoAlt?: string
   hasBrochure?: boolean
   socialLinks?: VisibleSocialLink[]
+  /** Header Products menu; empty → the plain "Products" link. */
+  productGroups?: NavProductGroup[]
+  /** Case studies for the Performance menu (its quick links are static). */
+  caseStudies?: NavCaseStudy[]
 }
 
-export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Circle', hasBrochure: hasBrochureProp, socialLinks = [] }: NavbarProps) {
+export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Circle', hasBrochure: hasBrochureProp, socialLinks = [], productGroups = [], caseStudies = [] }: NavbarProps) {
+  // Dropdown per nav item; an item without an entry renders as a plain link.
+  const dropdowns: Partial<Record<string, { toggleLabel: string; panel: (v: 'desktop' | 'mobile') => PanelContent }>> = {
+    ...(productGroups.length > 0 && {
+      '/products': { toggleLabel: 'Show all products', panel: (v) => productsPanel(productGroups, v) },
+    }),
+    '/past-performance-government': { toggleLabel: 'Show past performance', panel: (v) => performancePanel(caseStudies, v) },
+  }
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [hasBrochure, setHasBrochure] = useState(hasBrochureProp ?? false)
@@ -134,20 +149,37 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
           </Link>
 
           {/* Desktop nav links */}
-          <div className="hidden lg:flex items-center gap-7">
+          <div className="hidden lg:flex items-center gap-5 xl:gap-7">
             {NAV_LINKS.map((l) => {
               const active = isActive(pathname, l.href)
+              const linkClassName = cn(
+                'text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1 rounded-sm',
+                active
+                  ? transparent ? 'text-brand-400' : 'text-brand-700'
+                  : transparent ? 'text-white/85 hover:text-white' : 'text-gray-700 hover:text-brand-600',
+              )
+              const dd = dropdowns[l.href]
+              if (dd) {
+                return (
+                  <DesktopNavDropdown
+                    key={l.href}
+                    href={l.href}
+                    label={l.label}
+                    toggleLabel={dd.toggleLabel}
+                    active={active}
+                    linkClassName={linkClassName}
+                    chevronClassName={transparent ? 'text-white/85 hover:text-white' : 'text-gray-700 hover:text-brand-600'}
+                  >
+                    {dd.panel('desktop')}
+                  </DesktopNavDropdown>
+                )
+              }
               return (
                 <Link
                   key={l.href}
                   href={l.href}
                   aria-current={active ? 'page' : undefined}
-                  className={cn(
-                    'text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1 rounded-sm',
-                    active
-                      ? transparent ? 'text-brand-400' : 'text-brand-700'
-                      : transparent ? 'text-white/85 hover:text-white' : 'text-gray-700 hover:text-brand-600',
-                  )}
+                  className={linkClassName}
                 >
                   {l.label}
                 </Link>
@@ -220,10 +252,25 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
         </nav>
 
         {isMenuOpen && (
-          <div id="navbar-mobile-menu" className="lg:hidden bg-white shadow-md border-t border-gray-200">
+          <div id="navbar-mobile-menu" className="lg:hidden bg-white shadow-md border-t border-gray-200 max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain">
             <div className="flex flex-col p-3">
               {NAV_LINKS.map((l) => {
                 const active = isActive(pathname, l.href)
+                const dd = dropdowns[l.href]
+                if (dd) {
+                  return (
+                    <MobileNavAccordion
+                      key={l.href}
+                      href={l.href}
+                      label={l.label}
+                      toggleLabel={dd.toggleLabel}
+                      active={active}
+                      onNavigate={() => setIsMenuOpen(false)}
+                    >
+                      {dd.panel('mobile')}
+                    </MobileNavAccordion>
+                  )
+                }
                 return (
                   <Link
                     key={l.href}

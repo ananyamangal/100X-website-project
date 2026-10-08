@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+import { LAYOUT_DATA_TAG } from "@/lib/layoutData";
 import { scheduleAutoSync } from "@/lib/knowledge/sync/execute";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
@@ -96,8 +98,12 @@ export async function PUT(request: NextRequest, context: { params?: { id?: strin
     );
     // MongoDB driver v6 returns the document directly (not wrapped in {value: ...})
     if (!result) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    // Autosaves fire while typing; only a deliberate save re-syncs the Knowledge Base.
-    if (request.headers.get("X-Autosave") !== "1") scheduleAutoSync(["products"]);
+    // Autosaves fire while typing; only a deliberate save re-syncs the Knowledge Base
+    // and refreshes the header Products menu (layout data; its 60 s TTL covers autosaves).
+    if (request.headers.get("X-Autosave") !== "1") {
+      scheduleAutoSync(["products"]);
+      revalidateTag(LAYOUT_DATA_TAG);
+    }
 
     // Save revision snapshot only for manual saves (not autosave — would flood history)
     const isAutosave = request.headers.get("X-Autosave") === "1"
@@ -136,6 +142,7 @@ export async function DELETE(request: NextRequest, context: { params?: { id?: st
     const result = await db.collection("products").deleteOne({ _id: new ObjectId(id) });
     if (!result || result.deletedCount === 0) return NextResponse.json({ error: "Not found" }, { status: 404 });
     scheduleAutoSync(["products"]);
+    revalidateTag(LAYOUT_DATA_TAG); // header Products menu
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete product" }, { status: 500 });

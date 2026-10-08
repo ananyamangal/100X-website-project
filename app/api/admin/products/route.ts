@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+import { LAYOUT_DATA_TAG } from "@/lib/layoutData";
 import { scheduleAutoSync } from "@/lib/knowledge/sync/execute";
 import clientPromise from "@/lib/mongodb";
 import { Product } from "@/lib/productModel";
@@ -60,6 +62,7 @@ export async function POST(request: NextRequest) {
     const newProduct = { ...productData, _id: tempId, slug, order, createdAt: now, updatedAt: now };
     const result = await db.collection("products").insertOne(newProduct as any);
     scheduleAutoSync(["products"]);
+    revalidateTag(LAYOUT_DATA_TAG); // header Products menu
     return NextResponse.json({ ...newProduct, _id: result.insertedId }, { status: 201 });
   } catch (error) {
     console.error("❌ Error in POST /api/admin/products:", error);
