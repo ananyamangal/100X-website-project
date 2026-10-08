@@ -130,7 +130,7 @@ export default function AboutPageContent({
             </div>
           </div>
           <div className="relative">
-            <img src={optimizeCloudinary(journeyImage, 1200) || journeyImage} alt={heroTitle} className="w-full rounded-2xl shadow-2xl" loading="lazy" decoding="async" />
+            <img src={optimizeCloudinary(journeyImage, 1200) || journeyImage} alt={heroTitle} {...(journeyImage === "/new.png" ? { width: 1922, height: 1106 } : {})} className="w-full h-auto rounded-2xl shadow-2xl" loading="lazy" decoding="async" />
             <div className="absolute -top-6 -left-6 w-24 h-24 bg-brand-600 rounded-2xl flex items-center justify-center">
               <Award className="text-white" size={32} />
             </div>
@@ -178,7 +178,7 @@ export default function AboutPageContent({
               </div>
             </div>
             <div>
-              <img src={optimizeCloudinary(manufacturingImage, 1200) || manufacturingImage} alt="Manufacturing facility" className="w-full rounded-xl shadow-lg" loading="lazy" decoding="async" />
+              <img src={optimizeCloudinary(manufacturingImage, 1200) || manufacturingImage} alt="Manufacturing facility" {...(manufacturingImage === "/production.png" ? { width: 1096, height: 1308 } : {})} className="w-full h-auto rounded-xl shadow-lg" loading="lazy" decoding="async" />
             </div>
           </div>
         </div>
