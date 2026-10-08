@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import type { NavProductGroup } from '@/lib/navProducts';
 import type { NavCaseStudy } from '@/lib/navPerformance';
 import type { NavBlogPost } from '@/lib/navBlog';
+import type { NavSparePartGroup } from '@/lib/navSpareParts';
 
 /**
  * Header dropdown menus ("Products", "Performance"): a desktop dropdown and a
@@ -183,6 +184,35 @@ export function blogPanel(posts: NavBlogPost[], variant: 'desktop' | 'mobile'): 
           ))}
         </ul>
         <ViewAll href="/blog" label="View all articles" onNavigate={onNavigate} />
+      </>
+    )
+  }
+}
+
+// ── Spare parts ─────────────────────────────────────────────────────────────
+
+export function sparePartsPanel(groups: NavSparePartGroup[], variant: 'desktop' | 'mobile'): PanelContent {
+  return function SparePartsPanel(showThumbs, onNavigate) {
+    return (
+      <>
+        <div className={variant === 'desktop' ? 'grid grid-cols-2 gap-x-6 gap-y-3 xl:grid-cols-3' : 'space-y-2'}>
+          {groups.map((g) => (
+            <div key={g.machine} className="min-w-0">
+              <p className={cn(KICKER_CLASS, 'truncate', variant === 'mobile' ? 'pt-3' : 'pt-1')} title={g.machine}>{g.machine}</p>
+              <ul>
+                {g.parts.map((p) => (
+                  <li key={p.href}>
+                    <Link href={p.href} onClick={onNavigate} className={ROW_CLASS}>
+                      <NavThumb src={p.thumb} alt={p.name} show={showThumbs} />
+                      <span className="min-w-0 leading-snug line-clamp-2">{p.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <ViewAll href="/spare-parts" label="View all spare parts" onNavigate={onNavigate} />
       </>
     )
   }

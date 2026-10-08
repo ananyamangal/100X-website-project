@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { revalidateTag } from "next/cache"
+import { LAYOUT_DATA_TAG } from "@/lib/layoutData"
 import { ObjectId } from "mongodb"
 import { requireAuth } from "@/lib/rbac/server"
 
@@ -37,6 +39,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     { returnDocument: "after" }
   )
   if (!result) return NextResponse.json({ error: "Not found" }, { status: 404 })
+  revalidateTag(LAYOUT_DATA_TAG) // header Spare Parts menu
   return NextResponse.json(JSON.parse(JSON.stringify(result)))
 }
 
@@ -50,5 +53,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!oid) return NextResponse.json({ error: "Invalid ID" }, { status: 400 })
   const client = await clientPromise
   await client.db().collection("spare_parts").deleteOne({ _id: oid })
+  revalidateTag(LAYOUT_DATA_TAG) // header Spare Parts menu
   return NextResponse.json({ ok: true })
 }

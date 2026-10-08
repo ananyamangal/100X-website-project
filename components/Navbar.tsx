@@ -12,10 +12,11 @@ import type { VisibleSocialLink } from '@/lib/socialLinksShared';
 import { SOCIAL_ICONS } from '@/components/seo/SocialIcons';
 import BrochureLeadModal from '@/components/BrochureLeadModal';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { DesktopNavDropdown, MobileNavAccordion, productsPanel, performancePanel, blogPanel, type PanelContent } from '@/components/NavMenus';
+import { DesktopNavDropdown, MobileNavAccordion, productsPanel, performancePanel, blogPanel, sparePartsPanel, type PanelContent } from '@/components/NavMenus';
 import type { NavProductGroup } from '@/lib/navProducts';
 import type { NavCaseStudy } from '@/lib/navPerformance';
 import type { NavBlogPost } from '@/lib/navBlog';
+import type { NavSparePartGroup } from '@/lib/navSpareParts';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
@@ -49,15 +50,20 @@ interface NavbarProps {
   caseStudies?: NavCaseStudy[]
   /** Latest posts for the Blog menu; empty → the plain "Blog" link. */
   blogPosts?: NavBlogPost[]
+  /** Machine-grouped parts for the Spare Parts menu; empty → the plain link. */
+  sparePartGroups?: NavSparePartGroup[]
 }
 
-export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Circle', hasBrochure: hasBrochureProp, socialLinks = [], productGroups = [], caseStudies = [], blogPosts = [] }: NavbarProps) {
+export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Circle', hasBrochure: hasBrochureProp, socialLinks = [], productGroups = [], caseStudies = [], blogPosts = [], sparePartGroups = [] }: NavbarProps) {
   // Dropdown per nav item; an item without an entry renders as a plain link.
   const dropdowns: Partial<Record<string, { toggleLabel: string; panel: (v: 'desktop' | 'mobile') => PanelContent }>> = {
     ...(productGroups.length > 0 && {
       '/products': { toggleLabel: 'Show all products', panel: (v) => productsPanel(productGroups, v) },
     }),
     '/past-performance-government': { toggleLabel: 'Show past performance', panel: (v) => performancePanel(caseStudies, v) },
+    ...(sparePartGroups.length > 0 && {
+      '/spare-parts': { toggleLabel: 'Show spare parts', panel: (v) => sparePartsPanel(sparePartGroups, v) },
+    }),
     ...(blogPosts.length > 0 && {
       '/blog': { toggleLabel: 'Show latest articles', panel: (v) => blogPanel(blogPosts, v) },
     }),

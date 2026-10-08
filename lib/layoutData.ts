@@ -5,6 +5,7 @@ import { shapeNavProducts, type NavProductGroup } from "@/lib/navProducts"
 import { shapeNavCaseStudies, type NavCaseStudy } from "@/lib/navPerformance"
 import { shapeNavBlogPosts, NAV_BLOG_LIMIT, type NavBlogPost } from "@/lib/navBlog"
 import { BLOGS_CACHE_TAG } from "@/lib/blogsQuery"
+import { shapeNavSpareParts, type NavSparePartGroup } from "@/lib/navSpareParts"
 
 /**
  * The root layout wraps every public route and every route currently renders
@@ -142,6 +143,33 @@ const fetchNavBlogPosts = unstable_cache(
 export const getNavBlogPosts = cache(async (): Promise<NavBlogPost[]> => {
   try {
     return await fetchNavBlogPosts()
+  } catch {
+    return []
+  }
+})
+
+// Header "Spare Parts" menu: a capped, machine-grouped selection of published
+// parts. Minimal projection; shaping is in lib/navSpareParts.ts.
+const fetchNavSpareParts = unstable_cache(
+  async (): Promise<NavSparePartGroup[]> => {
+    const client = await clientPromise
+    const docs = await client
+      .db()
+      .collection("spare_parts")
+      .find(
+        { isPublished: true },
+        { projection: { _id: 0, name: 1, slug: 1, category: 1, order: 1, isPublished: 1, compatibleProductNames: { $slice: 1 }, images: { $slice: 1 } } },
+      )
+      .toArray()
+    return shapeNavSpareParts(JSON.parse(JSON.stringify(docs)))
+  },
+  ["layout-nav-spare-parts-v1"],
+  { tags: [LAYOUT_DATA_TAG], revalidate: LAYOUT_DATA_REVALIDATE_SECONDS },
+)
+
+export const getNavSpareParts = cache(async (): Promise<NavSparePartGroup[]> => {
+  try {
+    return await fetchNavSpareParts()
   } catch {
     return []
   }

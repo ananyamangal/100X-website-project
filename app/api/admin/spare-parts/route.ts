@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { revalidateTag } from "next/cache"
+import { LAYOUT_DATA_TAG } from "@/lib/layoutData"
 import { requireAuth } from "@/lib/rbac/server"
 
 function slug(name: string) {
@@ -36,5 +38,6 @@ export async function POST(req: NextRequest) {
   }
   const client = await clientPromise
   const result = await client.db().collection("spare_parts").insertOne(doc)
+  revalidateTag(LAYOUT_DATA_TAG) // header Spare Parts menu
   return NextResponse.json({ _id: result.insertedId.toString(), ...doc }, { status: 201 })
 }
