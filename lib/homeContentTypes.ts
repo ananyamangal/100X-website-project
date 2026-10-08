@@ -139,7 +139,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
       { value: 'Gurugram', label: 'Manufacturing facility' },
       { value: `${yearsInBusiness()} years`, label: 'Of OEM production' },
       { value: 'In-house', label: 'Engineering & assembly' },
-      { value: '50+', label: 'Distribution points' },
+      { value: 'Pan-India', label: 'Distribution' },
     ],
   },
   faqs: [
