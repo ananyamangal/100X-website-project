@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { pushDataLayer } from "@/lib/gtm"
 
-function WhatsAppIcon({ size = 26 }: { size?: number }) {
+export function WhatsAppIcon({ size = 26 }: { size?: number }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

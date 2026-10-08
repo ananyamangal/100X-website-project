@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Download, Menu, MessageCircle, Phone, X } from 'lucide-react';
+import { Download, Menu, Phone, X } from 'lucide-react';
+import { WhatsAppIcon } from '@/components/WhatsAppFloatingButton';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { BUSINESS } from '@/lib/seo/site-config';
@@ -89,15 +90,17 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
     ? 'inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-white/90 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2'
     : 'inline-flex items-center gap-1.5 h-10 px-2.5 md:px-3 rounded-full text-gray-700 transition-colors hover:bg-brand-50 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2'
 
+  // Icon-only (40 px targets) so the desktop nav fits from 1024 px; the label
+  // lives in aria-label and the title tooltip.
+  const contactIconClass = cn(iconClass, 'w-10 justify-center px-0 md:px-0')
+
   const contactIcons = (
     <div data-gtm-location="navbar" className="flex items-center gap-1 md:gap-2" aria-label="Quick contact">
-      <a href={TEL_HREF} aria-label={`Call ${BUSINESS.phonePrimary}`} className={iconClass}>
+      <a href={TEL_HREF} aria-label={`Call ${BUSINESS.phonePrimary}`} title={`Call ${BUSINESS.phonePrimary}`} className={contactIconClass}>
         <Phone size={18} aria-hidden="true" />
-        <span className="hidden md:inline text-sm font-semibold">Call Now</span>
       </a>
-      <a href={WA_HREF} target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" className={iconClass}>
-        <MessageCircle size={18} aria-hidden="true" />
-        <span className="hidden md:inline text-sm font-semibold">WhatsApp Us</span>
+      <a href={WA_HREF} target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" title="Chat on WhatsApp" className={contactIconClass}>
+        <WhatsAppIcon size={18} />
       </a>
       <LanguageSwitcher triggerClassName={cn(iconClass, 'text-sm font-semibold')} />
     </div>
