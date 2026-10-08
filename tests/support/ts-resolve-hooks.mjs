@@ -20,6 +20,9 @@ export async function resolve(specifier, context, next) {
       const hit = tryFile(base)
       if (hit) return next(hit, context)
     }
+  } else if (specifier === "next/server") {
+    // next has no "exports" map, so Node's ESM resolver needs the file name (route handlers import this).
+    return next("next/server.js", context)
   }
   return next(specifier, context)
 }
