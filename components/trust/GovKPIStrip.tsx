@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { FOUNDED_YEAR, yearsInBusiness } from "@/lib/facts"
+import { useCountUp } from "@/components/cinematic/useCountUp"
+import { FOUNDED_YEAR, yearsInBusiness, VERIFIED_STATE_COUNT, GOV_BUYERS_LISTED, CASE_STUDY_COUNT } from "@/lib/facts"
 
 export interface KPIs {
   totalOrders: number
@@ -10,26 +11,6 @@ export interface KPIs {
   unitsSupplied: number
   yearsExperience: number
   totalOrderValue?: number
-}
-
-function useCountUp(target: number, duration = 2000, enabled = false) {
-  const [count, setCount] = useState(0)
-  useEffect(() => {
-    if (!enabled) return
-    if (target === 0) { setCount(0); return }
-    let raf: number
-    const start = performance.now()
-    const tick = (now: number) => {
-      const t = Math.min((now - start) / duration, 1)
-      const eased = 1 - Math.pow(1 - t, 3)
-      setCount(Math.round(eased * target))
-      if (t < 1) raf = requestAnimationFrame(tick)
-      else setCount(target)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [target, duration, enabled])
-  return count
 }
 
 function KPICard({
@@ -97,13 +78,6 @@ function IconBuilding() {
     </svg>
   )
 }
-function IconBox() {
-  return (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" />
-    </svg>
-  )
-}
 function IconCalendar() {
   return (
     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -112,16 +86,15 @@ function IconCalendar() {
   )
 }
 
-export default function GovKPIStrip({ kpis }: { kpis: KPIs }) {
-  // Years and founding year are facts (lib/facts.ts), never read from the database.
-  const founded = FOUNDED_YEAR
-
+// The database `gov_kpis` numbers (total orders / departments / units) have no records behind
+// them and are not published. Tiles below come from lib/facts.ts. The `kpis` prop is accepted
+// for backwards compatibility but its numbers are ignored.
+export default function GovKPIStrip(_props: { kpis?: KPIs | null }) {
   const metrics = [
-    { value: kpis.totalOrders, label: "Govt. Orders", suffix: "+", icon: <IconClipboard />, delay: 0 },
-    { value: kpis.statesServed, label: "States Served", suffix: "+", icon: <IconMap />, delay: 100 },
-    { value: kpis.departmentsServed, label: "Departments", suffix: "+", icon: <IconBuilding />, delay: 200 },
-    { value: kpis.unitsSupplied, label: "Units Supplied", suffix: "+", icon: <IconBox />, delay: 300 },
-    { value: yearsInBusiness(), label: "Years Track Record", icon: <IconCalendar />, delay: 400, note: `Est. ${founded}` },
+    { value: GOV_BUYERS_LISTED, label: "Govt. Buyers Listed", icon: <IconBuilding />, delay: 0 },
+    { value: VERIFIED_STATE_COUNT, label: "States With Verified Orders", icon: <IconMap />, delay: 100 },
+    { value: CASE_STUDY_COUNT, label: "Case Studies", icon: <IconClipboard />, delay: 200 },
+    { value: yearsInBusiness(), label: "Years Track Record", icon: <IconCalendar />, delay: 300, note: `Est. ${FOUNDED_YEAR}` },
   ]
 
   return (
@@ -139,11 +112,15 @@ export default function GovKPIStrip({ kpis }: { kpis: KPIs }) {
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-y lg:divide-y-0 divide-white/[0.05]">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 divide-y lg:divide-y-0 divide-white/[0.05]">
         {metrics.map((m) => (
           <KPICard key={m.label} {...m} />
         ))}
       </div>
+
+      <p className="px-6 py-3 text-center text-xs text-gray-400 border-t border-white/[0.05]">
+        Supplied to many government buyers across {VERIFIED_STATE_COUNT} states.
+      </p>
 
       {/* Certifications footer */}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 px-6 py-4 bg-white/[0.02] border-t border-white/[0.05]">
