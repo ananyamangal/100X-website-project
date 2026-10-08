@@ -113,6 +113,8 @@ export default function RFQForm({
   const [gemAuth, setGemAuth] = useState(defaultGemAuth)
   const [dealerInquiry, setDealerInquiry] = useState(false)
   const [showOptional, setShowOptional] = useState(false)
+  const [done, setDone] = useState(false)
+  const [waUrl, setWaUrl] = useState<string | null>(null)
   const fileInputRef   = useRef<HTMLInputElement>(null)
   const startFiredRef  = useRef(false)
   // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) --
@@ -187,30 +189,12 @@ export default function RFQForm({
     setSubmitting(true)
     pushDataLayer({ event: "rfq_form_submit_attempt", location, product })
 
-    // Build the WhatsApp message and open the wa.me link immediately so the
-    // popup is initiated inside the user gesture (avoids popup blockers).
-    const waMessage = buildWhatsAppMessage({
-      product,
-      quantity,
-      name: name.trim(),
-      phone: phone.trim(),
-      email: email.trim(),
-      organization: organization.trim(),
-      cityState: cityState.trim(),
-      description: description.trim(),
-      gemAuth,
-      dealerInquiry,
-      uploadUrl: uploaded?.url ?? null,
-    })
-    const waUrl = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waMessage)}`
-    if (typeof window !== "undefined") {
-      window.open(waUrl, "_blank", "noopener,noreferrer")
-    }
-
-    // Fire the server submission. Email + DB save both happen here; either
-    // succeeding is enough to claim delivery (we already opened WhatsApp).
+    // Save first. The lead must never depend on WhatsApp opening: success is
+    // only claimed once the server confirms the save (HTTP 2xx and, when the
+    // route returns JSON with ok/success, a truthy flag).
+    let saved = false
     try {
-      await fetch("/api/rfq-submit", {
+      const res = await fetch("/api/rfq-submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -233,11 +217,23 @@ export default function RFQForm({
           location_label: location,
         }),
       })
-      // We don't gate the user's flow on the response body — WhatsApp is
-      // already open and they'll land on /thank-you either way.
+      if (res.ok) {
+        const data = (await res.json().catch(() => null)) as
+          | { ok?: unknown; success?: unknown }
+          | null
+        const flag = data ? (data.ok ?? data.success) : undefined
+        saved = flag === undefined ? true : Boolean(flag)
+      }
     } catch (err) {
-      // Network/server error: don't block. WhatsApp tab is already open.
       console.error("RFQ submit network error:", err)
+    }
+
+    if (!saved) {
+      setSubmitting(false)
+      setError(
+        "We could not send your request. Please check your connection and tap Send RFQ to try again.",
+      )
+      return
     }
 
     setQuoteLeadContext({
@@ -270,10 +266,62 @@ export default function RFQForm({
       body: JSON.stringify({ event: 'rfq_submit', page: typeof window !== 'undefined' ? window.location.pathname : '', source: location }),
     }).catch(() => {})
 
-    router.push("/thank-you?type=rfq")
+    // Show the success state in place; WhatsApp is an optional extra here and
+    // the user continues to /thank-you when ready.
+    const waMessage = buildWhatsAppMessage({
+      product,
+      quantity,
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
+      organization: organization.trim(),
+      cityState: cityState.trim(),
+      description: description.trim(),
+      gemAuth,
+      dealerInquiry,
+      uploadUrl: uploaded?.url ?? null,
+    })
+    setWaUrl(`https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(waMessage)}`)
+    setSubmitting(false)
+    setDone(true)
   }
 
   const isPanel = variant === "panel"
+
+  if (done) {
+    return (
+      <div
+        className={
+          isPanel
+            ? "space-y-3 rounded-2xl bg-white/95 backdrop-blur p-5 md:p-6 shadow-xl ring-1 ring-black/5"
+            : "space-y-4 rounded-2xl bg-white p-5 md:p-6 shadow-md ring-1 ring-gray-200"
+        }
+        role="status"
+      >
+        <h3 className="text-lg font-bold text-gray-900">Thank you, we received your request</h3>
+        <p className="text-sm text-gray-600">
+          Our team will contact you shortly. Typical response time is within one business day.
+        </p>
+        <Button
+          type="button"
+          className="w-full bg-brand-600 hover:bg-brand-700 min-h-[48px] text-base font-semibold"
+          onClick={() => router.push("/thank-you?type=rfq")}
+        >
+          Continue
+        </Button>
+        {waUrl && (
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex min-h-[44px] w-full items-center justify-center rounded-md border border-gray-300 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+          >
+            Also send on WhatsApp
+          </a>
+        )}
+      </div>
+    )
+  }
 
   return (
     <form
