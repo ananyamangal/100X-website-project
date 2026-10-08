@@ -149,7 +149,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
           </Link>
 
           {/* Desktop nav links */}
-          <div className="hidden lg:flex items-center gap-5 xl:gap-7">
+          <div className="hidden lg:flex items-center gap-4 xl:gap-5 2xl:gap-7">
             {NAV_LINKS.map((l) => {
               const active = isActive(pathname, l.href)
               const linkClassName = cn(
@@ -179,7 +179,8 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
                   key={l.href}
                   href={l.href}
                   aria-current={active ? 'page' : undefined}
-                  className={linkClassName}
+                  // Below xl the logo is the home link, which leaves room for five dropdowns.
+                  className={cn(linkClassName, l.href === '/' && 'hidden xl:inline')}
                 >
                   {l.label}
                 </Link>

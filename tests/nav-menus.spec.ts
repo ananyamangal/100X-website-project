@@ -53,6 +53,20 @@ test.describe("desktop", () => {
     })
   }
 
+  test("only one dropdown is open at a time", async ({ page }) => {
+    await page.goto("/about")
+    const nav = page.locator("header nav")
+    const first = nav.getByRole("button", { name: MENUS[0].toggle })
+    const second = nav.getByRole("button", { name: MENUS[1].toggle })
+    await first.click()
+    await expect(first).toHaveAttribute("aria-expanded", "true")
+    await second.focus()
+    await page.keyboard.press("Enter")
+    await expect(second).toHaveAttribute("aria-expanded", "true")
+    await expect(first).toHaveAttribute("aria-expanded", "false")
+    await expect(nav.locator('button[aria-expanded="true"]')).toHaveCount(1)
+  })
+
   test("hover opens after the intent delay; thumbnails load only then", async ({ page }) => {
     await page.goto("/about")
     const thumbs: string[] = []

@@ -22,6 +22,23 @@ const THUMB = 48
 const OPEN_DELAY_MS = 120
 const CLOSE_DELAY_MS = 200
 
+// Only one dropdown (desktop) / accordion (mobile) open at a time: opening one
+// announces its id on window, every other instance closes itself.
+const DESKTOP_OPEN_EVENT = 'nav-dropdown-open'
+const MOBILE_OPEN_EVENT = 'nav-accordion-open'
+
+function announceOpen(event: string, id: string) {
+  window.dispatchEvent(new CustomEvent<string>(event, { detail: id }))
+}
+
+function useOnlyOneOpen(event: string, id: string, close: () => void) {
+  useEffect(() => {
+    const onOpen = (e: Event) => { if ((e as CustomEvent<string>).detail !== id) close() }
+    window.addEventListener(event, onOpen)
+    return () => window.removeEventListener(event, onOpen)
+  }, [event, id, close])
+}
+
 /** Renders the panel body; `showThumbs` is false until the first open. */
 export type PanelContent =(showThumbs: boolean, onNavigate: () => void) => React.ReactNode
 
@@ -170,10 +187,15 @@ export function DesktopNavDropdown({ href, label, toggleLabel, active, linkClass
   const panelId = useId()
 
   const clearTimer = () => { if (timer.current) { clearTimeout(timer.current); timer.current = null } }
-  const show = useCallback(() => { setOpen(true); setEverOpened(true) }, [])
+  const show = useCallback(() => {
+    setOpen(true)
+    setEverOpened(true)
+    announceOpen(DESKTOP_OPEN_EVENT, panelId)
+  }, [panelId])
   const hide = useCallback(() => { clearTimer(); setOpen(false) }, [])
 
   useEffect(() => clearTimer, [])
+  useOnlyOneOpen(DESKTOP_OPEN_EVENT, panelId, hide)
 
   useEffect(() => {
     if (!open) return
@@ -258,6 +280,8 @@ export function MobileNavAccordion({ href, label, toggleLabel, active, onNavigat
 }) {
   const [expanded, setExpanded] = useState(false)
   const regionId = useId()
+  const collapse = useCallback(() => setExpanded(false), [])
+  useOnlyOneOpen(MOBILE_OPEN_EVENT, regionId, collapse)
 
   return (
     <div>
@@ -279,7 +303,10 @@ export function MobileNavAccordion({ href, label, toggleLabel, active, onNavigat
           aria-expanded={expanded}
           aria-controls={regionId}
           className="ml-1 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
-          onClick={() => setExpanded((v) => !v)}
+          onClick={() => {
+            if (!expanded) announceOpen(MOBILE_OPEN_EVENT, regionId)
+            setExpanded(!expanded)
+          }}
         >
           <ChevronDown size={20} aria-hidden="true" className={cn('motion-safe:transition-transform motion-safe:duration-200', expanded && 'rotate-180')} />
         </button>
