@@ -11,6 +11,10 @@ import RFQForm from "./RFQForm"
 // pages, etc.). Match by prefix.
 const HIDE_ON_PREFIXES = ["/admin", "/thank-you", "/brochure-thank-you"]
 
+// On the homepage the pills wait until the visitor has scrolled this far, then
+// stay for the rest of the visit (also on scroll-up). Other pages: immediate.
+const HOME_REVEAL_SCROLL_PX = 300
+
 /**
  * The two floating entry points share ONE slide-over and ONE RFQForm; only
  * the telemetry location, the subtitle and the GeM checkbox preselect differ.
@@ -41,6 +45,22 @@ export default function RFQFloatingRibbon() {
   const openerRef = useRef<HTMLButtonElement | null>(null)
 
   const hidden = pathname ? HIDE_ON_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/")) : false
+  const isHome = pathname === "/"
+  const [homeRevealed, setHomeRevealed] = useState(false)
+
+  useEffect(() => {
+    if (!isHome) return
+    setHomeRevealed(false)
+    const check = () => {
+      if (window.scrollY >= HOME_REVEAL_SCROLL_PX) {
+        setHomeRevealed(true)
+        window.removeEventListener("scroll", check)
+      }
+    }
+    check()
+    window.addEventListener("scroll", check, { passive: true })
+    return () => window.removeEventListener("scroll", check)
+  }, [isHome])
 
   const openFrom = (entry: Entry) => {
     openerRef.current = entry === "gem" ? gemButtonRef.current : rfqButtonRef.current
@@ -67,6 +87,7 @@ export default function RFQFloatingRibbon() {
   }, [open])
 
   if (hidden) return null
+  const showPills = !isHome || homeRevealed
 
   return (
     <>
@@ -78,6 +99,7 @@ export default function RFQFloatingRibbon() {
           viewports). Desktop uses a plain bottom-6 since there's no bottom
           bar to clear there, and sits opposite WhatsAppFloatingButton
           (bottom-right, desktop-only) instead of on top of it. */}
+      {showPills && (<>
       <button
         ref={rfqButtonRef}
         type="button"
@@ -111,6 +133,7 @@ export default function RFQFloatingRibbon() {
         </span>
         <span>Get GeM Auth Code</span>
       </button>
+      </>)}
 
       {/* Slide-over modal */}
       {open && (
