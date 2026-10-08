@@ -47,3 +47,63 @@ test("popup shows a thumbnail facade; the player loads only after tapping play",
   await page.getByRole("button", { name: /close video/i }).click()
   await expect(frame).toHaveCount(0)
 })
+
+// Any request to YouTube's player/video hosts. The poster thumbnail on
+// i.ytimg.com is the facade itself and is allowed.
+const PLAYER_HOSTS = /\/\/([a-z0-9-]+\.)?(youtube\.com|youtube-nocookie\.com|googlevideo\.com|ytimg\.com)\//
+
+test("no player request before tap; keyboard opens the player; poster has fixed size; no layout shift", async ({ page }) => {
+  const before: string[] = []
+  let tapped = false
+  await page.route("**/api/video-popup", (r) => r.fulfill({ json: POPUP_CONFIG }))
+  page.on("request", (req) => {
+    const u = req.url()
+    if (!tapped && PLAYER_HOSTS.test(u) && !u.startsWith("https://i.ytimg.com/vi/")) before.push(u)
+  })
+  await page.route(/youtube(-nocookie)?\.com\//, (r) => r.fulfill({ status: 200, contentType: "text/html", body: "<html></html>" }))
+  await page.addInitScript(() => {
+    ;(window as unknown as { __cls: number }).__cls = 0
+    new PerformanceObserver((l) => {
+      for (const e of l.getEntries() as unknown as { value: number; hadRecentInput: boolean }[]) {
+        if (!e.hadRecentInput) (window as unknown as { __cls: number }).__cls += e.value
+      }
+    }).observe({ type: "layout-shift", buffered: true })
+  })
+  await page.goto("/about")
+
+  const play = page.getByRole("button", { name: "Play product video" })
+  await expect(play).toBeVisible()
+  const img = play.locator("img")
+  await expect(img).toHaveAttribute("width", "480")
+  await expect(img).toHaveAttribute("height", "360")
+  const box1 = await play.boundingBox()
+  await page.waitForTimeout(2000)
+  const box2 = await play.boundingBox()
+  expect(box2).toEqual(box1)
+  expect(before).toEqual([])
+
+  const clsBeforeTap = await page.evaluate(() => (window as unknown as { __cls: number }).__cls)
+  tapped = true
+  await play.focus()
+  await page.keyboard.press("Enter")
+  const frame = page.locator('iframe[title="Product video"]')
+  await expect(frame).toHaveCount(1)
+  const fbox = await frame.boundingBox()
+  expect(Math.round(fbox!.width)).toBe(Math.round(box1!.width))
+  expect(Math.round(fbox!.height)).toBe(Math.round(box1!.height))
+  const clsAfter = await page.evaluate(() => (window as unknown as { __cls: number }).__cls)
+  console.log(`[video-facade] ${test.info().project.name} cls_before_tap=${clsBeforeTap.toFixed(4)} cls_after_tap=${clsAfter.toFixed(4)} player_requests_before_tap=${before.length}`)
+  expect(clsAfter - clsBeforeTap).toBeLessThan(0.001)
+})
+
+test("touch tap on the facade starts the player", async ({ page, browserName }, info) => {
+  test.skip(!info.project.use.hasTouch, "touch-only")
+  await page.route("**/api/video-popup", (r) => r.fulfill({ json: POPUP_CONFIG }))
+  await page.route(/youtube(-nocookie)?\.com\//, (r) => r.fulfill({ status: 200, contentType: "text/html", body: "<html></html>" }))
+  await page.goto("/about")
+  const play = page.getByRole("button", { name: "Play product video" })
+  await expect(play).toBeVisible()
+  await play.tap()
+  await expect(page.locator('iframe[title="Product video"]')).toHaveCount(1)
+  void browserName
+})

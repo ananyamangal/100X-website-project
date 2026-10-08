@@ -280,6 +280,8 @@ export default function VideoPopup() {
                 src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
                 alt=""
                 aria-hidden="true"
+                width={480}
+                height={360}
                 decoding="async"
                 className="absolute inset-0 w-full h-full object-cover"
               />
