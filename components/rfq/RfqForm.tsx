@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { pushDataLayer } from "@/lib/gtm"
+import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
 
 const INDIAN_STATES = [
   "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat",
@@ -41,7 +43,33 @@ export default function RfqForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, product, source }),
       })
-      setStatus(res.ok ? "done" : "error")
+      if (!res.ok) {
+        setStatus("error")
+        return
+      }
+      const data = (await res.json().catch(() => null)) as { success?: unknown } | null
+      if (data && data.success !== undefined && !data.success) {
+        setStatus("error")
+        return
+      }
+      // Fire conversion events only after the server confirmed the save.
+      pushDataLayer({
+        event: "rfq_submit",
+        lead_type: "rfq",
+        location: source,
+        product,
+        value: QUOTE_LEAD_VALUE_INR,
+        currency: "INR",
+      })
+      pushDataLayer({
+        event: "generate_lead",
+        lead_type: "rfq",
+        location: source,
+        product,
+        value: QUOTE_LEAD_VALUE_INR,
+        currency: "INR",
+      })
+      setStatus("done")
     } catch {
       setStatus("error")
     }
