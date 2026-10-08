@@ -163,7 +163,7 @@ export default async function GemApprovedOEMPage() {
   let govLogos: GovLogo[] = []
   let caseStudies: any[] = []
   let deployments: DeploymentRecord[] = []
-  let kpis = { totalOrders: 500, statesServed: 15, departmentsServed: 80, unitsSupplied: 2000, yearsExperience: 12 }
+  let kpis = { totalOrders: 0, statesServed: 12, departmentsServed: 0, unitsSupplied: 0, yearsExperience: 0 } // KPI numbers are not published; see lib/facts.ts
   let supplyRecords: SupplyRecord[] = []
   let celebrityHomepageSections: HomepageSection[] = []
 
@@ -424,7 +424,7 @@ export default async function GemApprovedOEMPage() {
                 <p className="eyebrow text-brand-400 mb-4">Get Started</p>
                 <h2 className="text-display-xs font-700 text-white mb-4">Request a Quote or Apply for Partnership</h2>
                 <p className="text-gray-400 text-base">
-                  Tell us what you need — a quote, a dealership, or both. Our team responds within 1 business day.
+                  Tell us what you need — a quote, a dealership, or both. Our team responds within 24 hours on working days.
                 </p>
               </div>
               <div className="glass-card rounded-2xl p-6 md:p-8">

@@ -5,7 +5,7 @@ import type { Metadata } from "next"
 import { SITE_URL, SITE_NAME_LEGAL, defaultOgImage } from "@/lib/seo/site-config"
 import AboutPageContent from "@/components/AboutPageContent"
 import clientPromise from "@/lib/mongodb"
-import { FOUNDED_YEAR } from "@/lib/facts"
+import { FOUNDED_YEAR, CASE_STUDY_COUNT } from "@/lib/facts"
 
 export const metadata: Metadata = {
   title: "About 100X Circle — Indian Thermal Fogging Machine Manufacturer",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "About 100X Circle — Indian Thermal Fogging Machine Manufacturer",
     description:
-      "Indian OEM manufacturer of thermal fogging machines. ISO 9001:2015, CE, ISI, GeM listed. Factory at IMT Manesar, Gurugram. Supplies to 50+ dealers and government bodies pan-India.",
+      "Indian OEM manufacturer of thermal fogging machines. ISO 9001:2015, CE, ISI, GeM listed. Factory at IMT Manesar, Gurugram. Supplies to dealers and government bodies pan-India.",
     url: `${SITE_URL}/about`,
     siteName: "100X Circle",
     locale: "en_IN",
@@ -32,8 +32,8 @@ const DEFAULT_CONTENT = {
   journeyParagraph2: 'Tested in approved labs, our machines are available and listed on the Government e-Marketplace (GeM) and widely used by defense forces, municipal bodies, and agriculture departments.',
   journeyStat1Value: String(FOUNDED_YEAR),
   journeyStat1Label: 'Founded',
-  journeyStat2Value: '10K+',
-  journeyStat2Label: 'Happy customers',
+  journeyStat2Value: String(CASE_STUDY_COUNT),
+  journeyStat2Label: 'Case studies',
   journeyImage: '/new.png',
   foundationHeading: 'Our Foundation',
   foundationSubtext: 'The principles that guide our work and define our commitment to excellence.',
@@ -118,7 +118,7 @@ export default async function AboutPage() {
     if (doc) {
       const { _id, key, ...rest } = doc as any
       // Founding year is a fact, never read from the database.
-      content = { ...DEFAULT_CONTENT, ...rest, journeyStat1Value: String(FOUNDED_YEAR) }
+      content = { ...DEFAULT_CONTENT, ...rest, journeyStat1Value: String(FOUNDED_YEAR), journeyStat2Value: String(CASE_STUDY_COUNT), journeyStat2Label: 'Case studies' }
     }
   } catch { /* fall back to defaults */ }
 

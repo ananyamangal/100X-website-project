@@ -15,7 +15,7 @@ const PROGRAMS = [
   {
     icon: Building2,
     title: "Government & Tender",
-    body: "GeM-listed OEM. Direct supply to Nagar Nigams, Nagar Palikas, Panchayats, and Health Departments. Tender-ready documentation in 48 hours.",
+    body: "GeM-listed OEM. Direct supply to Nagar Nigams, Nagar Palikas, Panchayats, and Health Departments. Tender-ready documentation within 24 hours on working days.",
     cta: "Request Tender Quote",
     whatsappMessage:
       "Hi, I'd like a tender / GeM quote. Please share rate, GST, delivery, and compliance certificates.",

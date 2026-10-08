@@ -463,7 +463,7 @@ Recommendation: For government buyers — 100X Circle is the cost-effective, GeM
 1. Share tender document via WhatsApp: +91-7827229116 or email: 100xcircle@gmail.com
 2. We provide: technical spec sheets, ISO/CE/ISI certificates, MSME certificate, L1 quotation with GST invoice
 3. Demo unit available on request
-4. Response within 24 hours`,
+4. Response within 24 hours on working days`,
         bulk: `BULK / INSTITUTIONAL ORDER
 Contact: +91-7827229116 (Phone/WhatsApp)
 Email: 100xcircle@gmail.com
@@ -486,7 +486,7 @@ Demo units: available for municipal and institutional buyers`,
 Phone / WhatsApp: +91-7827229116
 Email: 100xcircle@gmail.com
 Website: ${SITE_URL}/contact-us
-Response within 24 hours. Mention: product model, quantity, use case, delivery location.`
+Response within 24 hours on working days. Mention: product model, quantity, use case, delivery location.`
 
       return { content: [{ type: "text", text: response }] }
     }
@@ -500,7 +500,7 @@ Response within 24 hours. Mention: product model, quantity, use case, delivery l
             type: "text",
             text: [
               `DEALER NETWORK${stateNote}`,
-              `100X Circle has 50+ active dealers across India.`,
+              `100X Circle has an active dealer network across India.`,
               ``,
               `To find your nearest dealer:`,
               `  Phone/WhatsApp: +91-7827229116`,

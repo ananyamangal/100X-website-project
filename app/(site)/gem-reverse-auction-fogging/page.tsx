@@ -104,7 +104,7 @@ export default function GemReverseAuctionFoggingPage() {
           <strong>Active RA?</strong> Contact us immediately with your RA reference number for
           L1 pricing support and documentation. WhatsApp{" "}
           <a href={`tel:${BUSINESS.phonePrimary}`} className="text-brand-600 font-medium">{BUSINESS.phonePrimary}</a>
-          {" "}for same-day response.
+          {" "}for a response within 24 hours on working days.
         </div>
 
         <article className="prose prose-gray max-w-none">

@@ -896,7 +896,7 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
                     <div className="max-w-2xl mx-auto">
                         <div className="text-center mb-8">
                             <h2 className="text-2xl md:text-3xl font-700 text-gray-900 mb-2">Request a Quote</h2>
-                            <p className="text-sm text-gray-500">Tender, GeM, dealer &amp; bulk inquiries — response within 48 hours.</p>
+                            <p className="text-sm text-gray-500">Tender, GeM, dealer &amp; bulk inquiries — response within 24 hours on working days.</p>
                         </div>
                         <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6 md:p-8">
                             <RFQForm

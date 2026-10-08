@@ -144,7 +144,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
           </svg>
         </div>
         <p className="text-white font-700 mb-1">Request Received</p>
-        <p className="text-gray-400 text-sm mb-4">Our team will contact you within 1 business day.</p>
+        <p className="text-gray-400 text-sm mb-4">Our team will contact you within 24 hours on working days.</p>
         <button
           type="button"
           onClick={() => setSuccess(false)}
@@ -255,7 +255,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
       </div>
 
       <p className="text-gray-600 text-[11px] text-center">
-        No fees. No commitment. Response within 1 business day.
+        No fees. No commitment. Response within 24 hours on working days.
       </p>
     </form>
   )

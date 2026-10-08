@@ -22,3 +22,22 @@ Facts the overnight program (2026-10-08) could not verify. Until each is answere
 | 16 | The trolley (100XATS): move it out of the fogging catalogue? | Proposal only (no URL change) | /products |
 | 17 | **Honeypot (A7), owner decision needed.** Sending the hidden `company_website` value lets the server reject bots, but the repo history (BrochureLeadModal, ContactSection, LandingFormBlock comments; PartnerApplyForm fix fb362d1) records real buyers whose browser autofilled that field and lost their lead. With A1, a rejected RFQ would now show an error and the buyer could not submit at all. The safe alternative (server saves a filled-honeypot lead flagged `honeypotFilled` and skips the admin e-mail, instead of rejecting it) was not applied: it changes the lead API's bot handling and needs your OK. | Overnight: the label leak is fixed (no "Company website" text in pages; input stays off-screen, aria-hidden, tabIndex -1); the value is still **not** sent, exactly as in production today. Bot defence = existing 2-second time gates. | RFQForm, ContactSection, LandingFormBlock, QuoteModal |
 | 18 | Lead value for call-back requests: contact-page call backs reuse the contact conversion value (`CONTACT_LEAD_VALUE_INR`); GeM-page call backs use the GeM form value (1,000). Keep, or set a separate call-back value? | As described | GTM/Ads conversion values |
+
+## Separate promise needing confirmation: OEM authorization letter turnaround
+
+The OEM authorization letter has its own turnaround wording that was deliberately left unchanged by the facts pass. It is a different promise from the quote / response time in row 1, and nobody has confirmed it.
+
+| # | Where | Wording currently on the site |
+|---|---|---|
+| 19 | `lib/seo/landing-pages.ts` (GeM landing FAQ, "How quickly will I receive the OEM authorization") | "Typically within 24–48 hours of receiving your registration" |
+| 20 | `app/(site)/gem-oem-authorization/page.tsx`, `app/(site)/dealer-application/page.tsx`, `app/(site)/ai/dealer-authorization/page.tsx` | "2–5 working days" |
+| 21 | `app/(site)/oem-authorization-letter/page.tsx` ("PDF Delivered: to your email within 24 hours", "within 24 hours of approval") and `components/oem/OemProcessSteps.tsx` ("PDF within 24 hours") | letter PDF within 24 hours |
+
+Question for the owner: what is the real turnaround from request to signed letter, and is it the same for resellers and direct dealers?
+
+## Also noticed, not changed (not on the owner's token list)
+
+- "200+ municipalities" (`components/home/IndustryApplicationsSection.tsx`, `CinematicManufacturingSection` tile) has no record behind it (23 buyers are listed).
+- "1,500+ UP customers" (`lib/seo/landing-pages.ts`), "8+ GeM Models" (`GovPastPerformance.tsx`), "50+ Products" (about-page default `manufacturingStat4Value`), "5,000+ machines" and "28 states" inside `lib/growth-os/agents/*` prompts (internal LLM prompts, not rendered).
+- `/api/mcp` and `lib/pageSections.ts:143` (admin hint text) still mention "10,000+ customers, 50+ dealers" in the section-picker description only.
+- Machine-dispatch lead times ("5–10 working days", "24–72h transit" on UP/Bihar pages) are a separate promise from spare-part dispatch; not in FACTS.

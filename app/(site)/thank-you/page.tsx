@@ -54,7 +54,7 @@ export default async function ThankYouPage({
             Your message has been saved securely. A member of our team will review it and respond as soon as possible.
           </p>
           <p className="mt-6 rounded-lg bg-brand-50 px-4 py-3 text-center text-sm text-green-900">
-            <span className="font-semibold">Typical response time:</span> within one business day (Mon–Sat, 9:00 AM – 6:00
+            <span className="font-semibold">Typical response time:</span> within 24 hours on working days (Mon–Sat, 9:00 AM – 6:00
             PM IST).
           </p>
           <RfqWhatsAppFollowUp type={type} />

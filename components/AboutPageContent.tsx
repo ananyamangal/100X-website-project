@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { RichContent } from "@/components/RichContent"
 import { optimizeCloudinary } from "@/lib/cloudinaryUrl"
-import { yearsInBusiness, FOUNDED_YEAR } from "@/lib/facts"
+import { yearsInBusiness, FOUNDED_YEAR, GOV_BUYERS_LISTED, CASE_STUDY_COUNT } from "@/lib/facts"
 
 export default function AboutPageContent({
   content,
@@ -35,8 +35,8 @@ export default function AboutPageContent({
   const journeyParagraph2 = c.journeyParagraph2 ?? ""
   const journeyStat1Value = String(FOUNDED_YEAR)
   const journeyStat1Label = c.journeyStat1Label ?? "Founded"
-  const journeyStat2Value = c.journeyStat2Value ?? "10K+"
-  const journeyStat2Label = c.journeyStat2Label ?? "Happy customers"
+  const journeyStat2Value = String(CASE_STUDY_COUNT)
+  const journeyStat2Label = "Case studies"
   const journeyImage = c.journeyImage ?? "/new.png"
   const foundationHeading = c.foundationHeading ?? "Our Foundation"
   const foundationSubtext = c.foundationSubtext ?? "The principles that guide our work and define our commitment to excellence."
@@ -80,7 +80,7 @@ export default function AboutPageContent({
             <div className="flex flex-wrap gap-x-8 gap-y-3 mt-8">
               {[
                 { value: String(yearsInBusiness()), label: "Years Manufacturing" },
-                { value: "10,000+", label: "Machines Deployed" },
+                { value: String(GOV_BUYERS_LISTED), label: "Government Buyers Listed" },
                 { value: "GeM", label: "OEM Registered" },
                 { value: "ISO", label: "9001:2015 Certified" },
               ].map((s) => (

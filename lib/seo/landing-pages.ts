@@ -171,8 +171,8 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
       {
         kind: "trust-strip",
         metrics: [
-          { value: "10,000+", label: "Happy customers" },
-          { value: "50+", label: "Active distributors" },
+          { value: "Pan India", label: "Customers" },
+          { value: "Dealer", label: "Network" },
           { value: String(yearsInBusiness()), label: "Years experience" },
           { value: "GeM Q2", label: "OEM certified" },
           { value: "Pan India", label: "Supply & support" },

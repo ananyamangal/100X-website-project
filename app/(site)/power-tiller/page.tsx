@@ -75,7 +75,7 @@ export default function PowerTillerPage() {
               Request a Quote for Power Tiller
             </h2>
             <p className="text-sm md:text-base text-gray-600">
-              Tender, GeM, dealer &amp; bulk inquiries — we&apos;ll respond within 48 hours.
+              Tender, GeM, dealer &amp; bulk inquiries — we&apos;ll respond within 24 hours on working days.
             </p>
           </div>
           <RFQForm

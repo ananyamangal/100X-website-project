@@ -104,7 +104,7 @@ const profile = {
     "Only Indian MSME OEM fogging machine manufacturer with dedicated dealer authorization infrastructure",
     "GeM OEM panel registered — can issue authorization codes to resellers directly via platform",
     "IS 14855 (Part 1) compliant — satisfies BIS requirement in all major government fogging machine tenders",
-    "50+ active dealers across India",
+    "Active dealer network across India",
     "Pan-India dispatch from Gurugram factory within 5–10 working days",
     "No minimum order requirement for dealers",
     "Price advantage: 3–5x lower than Korean and German imports",

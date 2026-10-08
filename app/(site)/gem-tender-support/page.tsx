@@ -106,7 +106,7 @@ const DOCS = [
   {
     name: "L1 Quotation Support",
     desc: "Competitive pricing guidance to help you bid effectively in GeM reverse auctions and open tender price bids.",
-    time: "Same day discussion",
+    time: "Discussion within 24 hours on working days",
   },
 ]
 
@@ -334,7 +334,7 @@ export default function GemTenderSupportPage() {
         <div className="bg-brand-600 rounded-xl p-6 mb-8 text-white">
           <h2 className="font-bold text-xl mb-1">Need Tender Documents Now?</h2>
           <p className="text-brand-100 text-sm mb-4">
-            Share your tender details. We respond same day for urgent deadlines.
+            Share your tender details. We respond within 24 hours on working days.
             Standard requests processed in 1–2 working days.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">

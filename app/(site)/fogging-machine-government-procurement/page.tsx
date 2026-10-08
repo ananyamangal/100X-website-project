@@ -13,6 +13,7 @@ import GovPastPerformance from "@/components/gov-procurement/GovPastPerformance"
 import TenderPackLeadCapture from "@/components/gov-procurement/TenderPackLeadCapture"
 import GovLogoWall, { type GovLogo } from "@/components/trust/GovLogoWall"
 import GovKPIStrip from "@/components/trust/GovKPIStrip"
+import { VERIFIED_STATE_COUNT, GOV_BUYERS_LISTED } from "@/lib/facts"
 import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
 import FeaturedGovSupplies, { type SupplyRecord } from "@/components/trust/FeaturedGovSupplies"
 import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/FeaturedDeployments"
@@ -168,8 +169,8 @@ const TRUST_CERTS = [
 ]
 
 const TRUST_STATS = [
-  { value: "15+", label: "States Served" },
-  { value: "50+", label: "Active Dealers" },
+  { value: String(VERIFIED_STATE_COUNT), label: "States With Verified Orders" },
+  { value: "Pan-India", label: "Dealer Network" },
   { value: "5–10", label: "Day Dispatch" },
   { value: "10", label: "Tender Docs Ready" },
 ]
@@ -429,7 +430,7 @@ export default async function GovernmentProcurementPage() {
   let products: ProductSlim[] = []
   let govLogos: GovLogo[] = []
   let customerLogos: string[] = []
-  let govKpis = { totalOrders: 500, statesServed: 15, departmentsServed: 80, unitsSupplied: 2000, yearsExperience: 12 }
+  let govKpis = { totalOrders: 0, statesServed: VERIFIED_STATE_COUNT, departmentsServed: 0, unitsSupplied: 0, yearsExperience: 0 } // KPI numbers are not published; see lib/facts.ts
   let caseStudies: any[] = []
   let supplyRecords: SupplyRecord[] = []
   let deployments: DeploymentRecord[] = []
@@ -557,8 +558,8 @@ export default async function GovernmentProcurementPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-px bg-white/[0.04]">
                     {[
-                      { label: "States Covered", value: "15+", sub: "Active government supply" },
-                      { label: "Govt Orders", value: "500+", sub: "Fulfilled to date" },
+                      { label: "States Covered", value: String(VERIFIED_STATE_COUNT), sub: "Verified government supply" },
+                      { label: "Govt Buyers Listed", value: String(GOV_BUYERS_LISTED), sub: "On our past-performance register" },
                       { label: "Dispatch Time", value: "5–10", sub: "Working days from Gurugram" },
                       { label: "Tender Docs", value: "10", sub: "Ready to share instantly" },
                       { label: "IS Standard", value: "14855", sub: "Part 1 certified" },
@@ -876,7 +877,7 @@ export default async function GovernmentProcurementPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Procurement Documentation Centre</h2>
             <p className="text-gray-500 text-sm mb-8 max-w-2xl">
               All documents required for government tender submissions are pre-prepared and shareable within 24 hours.
-              Request via WhatsApp or email — we respond on the same business day.
+              Request via WhatsApp or email — we respond within 24 hours on working days.
             </p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
               {DOCUMENTATION_ITEMS.map((doc, i) => (

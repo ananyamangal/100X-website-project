@@ -109,7 +109,7 @@ export default function TenderPackLeadCapture() {
           Request Complete Tender Documentation Pack
         </h2>
         <p className="text-sm text-gray-500">
-          All 10 documents provided at no cost. Delivered to your WhatsApp &amp; email within 2 hours.
+          All 10 documents provided at no cost. Delivered to your WhatsApp &amp; email within 24 hours on working days.
         </p>
       </div>
 
@@ -135,7 +135,7 @@ export default function TenderPackLeadCapture() {
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <p className="text-sm font-semibold text-green-800 mb-1">Pack Request Received</p>
               <p className="text-xs text-green-700 mb-4">
-                We&apos;ll send the complete documentation pack to your WhatsApp and email within 2 hours.
+                We&apos;ll send the complete documentation pack to your WhatsApp and email within 24 hours on working days.
               </p>
               <a
                 href={waPackUrl}
@@ -216,7 +216,7 @@ export default function TenderPackLeadCapture() {
                 {status === "submitting" ? "Sending…" : "Get Tender Pack — Free"}
               </button>
               <p className="text-[10px] text-gray-400 text-center">
-                Delivered via WhatsApp &amp; email · No cost · 2 hours
+                Delivered via WhatsApp &amp; email · No cost · within 24 hours
               </p>
             </form>
           )}

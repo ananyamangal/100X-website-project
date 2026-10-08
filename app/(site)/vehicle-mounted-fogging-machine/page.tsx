@@ -129,7 +129,7 @@ export default function VehicleMountedFoggingMachinePage() {
               Request a Quote for Vehicle Mounted Fogger
             </h2>
             <p className="text-sm md:text-base text-gray-600">
-              Tender, GeM, dealer &amp; bulk inquiries — we&apos;ll respond within 48 hours.
+              Tender, GeM, dealer &amp; bulk inquiries — we&apos;ll respond within 24 hours on working days.
             </p>
           </div>
           <RFQForm
@@ -156,7 +156,7 @@ export default function VehicleMountedFoggingMachinePage() {
             Not sure which model fits your need, or want to know the vehicle mounted{' '}
             <Link href="/" className="text-brand-700 underline underline-offset-2 hover:text-brand-600">fogging machine price</Link>?
             Just tell us your requirement — we&apos;ll help you pick the right one and send you a quote
-            within 48 hours. No pressure, no middlemen — we manufacture these ourselves, so you get a
+            within 24 hours on working days. No pressure, no middlemen — we manufacture these ourselves, so you get a
             straight price.
           </p>
           <p className="text-lg text-gray-700">

@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import OemAuthForm from "@/components/oem/OemAuthForm"
-import { yearsInBusiness } from "@/lib/facts"
+import { yearsInBusiness, VERIFIED_STATE_COUNT, GOV_BUYERS_LISTED, CASE_STUDY_COUNT } from "@/lib/facts"
 
 export const revalidate = 60
 
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/oem-authorization-letter` },
   openGraph: {
     title: "OEM Authorization Letter for Government Tenders | 100X Circle",
-    description: "Free OEM Authorization Letter for fogging machine tenders. IS 14855, GeM OEM, ISO 9001. 4-hour response.",
+    description: "Free OEM Authorization Letter for fogging machine tenders. IS 14855, GeM OEM, ISO 9001. Response within 24 hours on working days.",
     url: `${SITE_URL}/oem-authorization-letter`,
   },
   robots: { index: true, follow: true },
@@ -36,8 +36,8 @@ const TRUST_ITEMS = [
 
 const STEPS = [
   { n: 1, label: "Submit Request", sub: "Fill form below — 2 minutes" },
-  { n: 2, label: "Eligibility Review", sub: "Team reviews in 4 hours" },
-  { n: 3, label: "Letter Prepared", sub: "Company letterhead, same day" },
+  { n: 2, label: "Eligibility Review", sub: "Team reviews within 24 hours on working days" },
+  { n: 3, label: "Letter Prepared", sub: "Company letterhead, within 24 hours on working days" },
   { n: 4, label: "PDF Delivered", sub: "To your email within 24 hours" },
 ]
 
@@ -55,7 +55,7 @@ export default function OemAuthorizationLetterPage() {
             {/* Left — headline + trust */}
             <div>
               <div className="flex flex-wrap gap-2 mb-6">
-                {["Free Authorization", "4-Hour Response", "GeM OEM", "IS 14855"].map((t) => (
+                {["Free Authorization", "24-Hour Response", "GeM OEM", "IS 14855"].map((t) => (
                   <span key={t} className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-xs font-bold text-emerald-400">{t}</span>
                 ))}
               </div>
@@ -114,7 +114,7 @@ export default function OemAuthorizationLetterPage() {
             <div id="oem-auth-form" className="bg-slate-900 border border-white/[0.08] rounded-2xl p-6 md:p-8">
               <div className="mb-6">
                 <h2 className="text-xl font-black text-white mb-1">Request OEM Authorization Letter</h2>
-                <p className="text-slate-400 text-sm">Fill the form — our team responds within 4 business hours.</p>
+                <p className="text-slate-400 text-sm">Fill the form — our team responds within 24 hours on working days.</p>
               </div>
               <OemAuthForm source="oem_authorization_letter_page" />
             </div>
@@ -157,9 +157,9 @@ export default function OemAuthorizationLetterPage() {
         <div className="max-w-6xl mx-auto px-4 md:px-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { n: "80+", label: "Government Departments Served" },
-              { n: "15+", label: "States Covered" },
-              { n: "500+", label: "Government Orders Fulfilled" },
+              { n: String(GOV_BUYERS_LISTED), label: "Government Buyers Listed" },
+              { n: String(VERIFIED_STATE_COUNT), label: "States With Verified Orders" },
+              { n: String(CASE_STUDY_COUNT), label: "Case Studies" },
               { n: String(yearsInBusiness()), label: "Years Manufacturing" },
             ].map((s) => (
               <div key={s.label} className="text-center p-5 bg-slate-900 border border-white/[0.06] rounded-xl">
@@ -183,7 +183,7 @@ export default function OemAuthorizationLetterPage() {
               },
               {
                 q: "How long does it take to receive the letter?",
-                a: "We confirm eligibility within 4 business hours and send the complete documentation pack (OEM letter + all certificates) within 24 hours of approval.",
+                a: "We confirm eligibility within 24 hours on working days and send the complete documentation pack (OEM letter + all certificates) within 24 hours of approval.",
               },
               {
                 q: "Do I need a GeM Seller ID to get authorization?",

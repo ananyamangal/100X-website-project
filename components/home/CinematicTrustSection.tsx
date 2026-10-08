@@ -3,7 +3,7 @@
 import React from "react"
 import ScrollReveal from "@/components/cinematic/ScrollReveal"
 import { ShieldCheck, Award, Globe2, Zap } from "lucide-react"
-import { yearsInBusiness } from "@/lib/facts"
+import { yearsInBusiness, VERIFIED_STATE_COUNT, SPARE_DISPATCH } from "@/lib/facts"
 
 const TRUST_PILLARS = [
   {
@@ -21,7 +21,7 @@ const TRUST_PILLARS = [
   {
     icon: Globe2,
     title: "Pan-India Presence",
-    body: "Service network across 29 states. Spare parts dispatched within 24 hours.",
+    body: `Service network across ${VERIFIED_STATE_COUNT} states. Spare parts dispatched within ${SPARE_DISPATCH}.`,
     accent: "text-purple-400",
   },
   {

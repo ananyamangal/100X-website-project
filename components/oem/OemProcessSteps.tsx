@@ -13,8 +13,8 @@ const STEPS = [
   {
     n: 2,
     title: "Technical Eligibility Review",
-    desc: "Our team reviews your tender specifications against our IS 14855-compliant product range and confirms eligibility within 4 hours.",
-    timeline: "Within 4 hours",
+    desc: "Our team reviews your tender specifications against our IS 14855-compliant product range and confirms eligibility within 24 hours on working days.",
+    timeline: "Within 24 hours (working days)",
     icon: (
       <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /><polyline points="9 11 11 13 15 9" />

@@ -78,7 +78,7 @@ export default async function PastPerformancePage() {
 
   let records: any[] = []
   let supplyCards: SupplyRecord[] = []
-  let kpis = { totalOrders: 500, statesServed: 15, departmentsServed: 80, unitsSupplied: 2000, yearsExperience: 12 }
+  let kpis = { totalOrders: 0, statesServed: 12, departmentsServed: 0, unitsSupplied: 0, yearsExperience: 0 } // KPI numbers are not published; see lib/facts.ts
   let govLogos: GovLogo[] = []
   let caseStudies: any[] = []
   let deployments: DeploymentRecord[] = []

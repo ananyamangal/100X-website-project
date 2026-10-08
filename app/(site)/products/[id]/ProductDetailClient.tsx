@@ -710,7 +710,7 @@ function FAQSection({ faqs }: { faqs: Array<{ q: string; a: string }> }) {
 
 const DEFAULT_FAQS = [
   { q: 'What fuel does this machine use?', a: 'The machine operates on regular petroleum/kerosene-based fogging oil. We recommend certified fogging chemicals for best results and to maintain warranty validity.' },
-  { q: 'Is this machine suitable for government tenders?', a: 'Yes. 100X Circle is GeM-registered with complete tender-ready documentation available in 48 hours. We have supplied to municipal corporations, health departments, and agriculture boards across India.' },
+  { q: 'Is this machine suitable for government tenders?', a: 'Yes. 100X Circle is GeM-registered with complete tender-ready documentation available within 24 hours on working days. We have supplied to municipal corporations, health departments, and agriculture boards across India.' },
   { q: 'What is the delivery timeline?', a: 'Standard delivery is 5–7 working days across India. Bulk and government orders may require 10–15 days. Contact us for urgent requirements.' },
   { q: 'Do you provide operator training?', a: 'Yes — complimentary operator training on purchase. On-site training available for large orders. Video training materials also provided.' },
   { q: 'What spare parts support is available?', a: 'Genuine OEM spare parts are stocked at our Gurugram factory and available nationwide through our dealer network. We guarantee 5+ years of parts availability.' },

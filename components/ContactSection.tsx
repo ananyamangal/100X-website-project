@@ -179,7 +179,7 @@ export default function ContactSection({
           <p className="eyebrow text-brand-600 mb-3">Contact Us</p>
           <h2 className="text-display-xs text-gray-900 mb-4 text-balance">Talk to our team.</h2>
           <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            Government, municipal, dealer, and export inquiries welcome. Our team responds within one business day.
+            Government, municipal, dealer, and export inquiries welcome. Our team responds within 24 hours on working days.
           </p>
         </div>
 
@@ -256,7 +256,7 @@ export default function ContactSection({
               <div className="mb-8 flex items-start gap-3 rounded-xl border border-brand-100 bg-brand-50/80 px-4 py-3 text-left text-base text-green-900">
                 <Shield className="mt-0.5 h-6 w-6 shrink-0 text-brand-600" aria-hidden />
                 <p className="leading-snug">
-                  Your details are used only to respond to this inquiry. We typically reply within one business day.
+                  Your details are used only to respond to this inquiry. We typically reply within 24 hours on working days.
                 </p>
               </div>
 

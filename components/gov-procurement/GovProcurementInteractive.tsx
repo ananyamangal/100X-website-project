@@ -146,7 +146,7 @@ const READINESS_ITEMS = [
   { label: "GeM OEM Seller Registration", score: 100, note: "Direct purchase without separate public tender" },
   { label: "GST Registration with correct HSN", score: 100, note: "HSN 8424 — Mechanical appliances for spraying" },
   { label: "L1 Quotation on Company Letterhead", score: 100, note: "Within 24 hours for tender submissions" },
-  { label: "Complete Tender Documentation Pack", score: 100, note: "10 pre-prepared documents — shareable same day" },
+  { label: "Complete Tender Documentation Pack", score: 100, note: "10 pre-prepared documents — shareable within 24 hours on working days" },
   { label: "Pan-India Delivery Capability", score: 100, note: "5–10 days from Gurugram (IMT Manesar)" },
   { label: "OEM Authorization Letters for Dealers", score: 100, note: "Issued on request for dealer-assisted bids" },
   { label: "AMC / After-Sales Support Program", score: 85, note: "Available for bulk orders — terms on request" },

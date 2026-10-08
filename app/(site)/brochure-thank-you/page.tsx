@@ -77,7 +77,7 @@ export default async function BrochureThankYouPage() {
             or quote.
           </p>
           <p className="mt-6 rounded-lg bg-emerald-50 px-4 py-3 text-center text-sm text-emerald-900">
-            <span className="font-semibold">{SITE_NAME_LEGAL}</span> — we typically reply within one business day (Mon–Sat,
+            <span className="font-semibold">{SITE_NAME_LEGAL}</span> — we typically reply within 24 hours on working days (Mon–Sat,
             9:00 AM – 6:00 PM IST).
           </p>
 

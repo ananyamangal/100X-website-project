@@ -6,6 +6,7 @@ import { getProductCanonicalUrl } from "@/lib/seo/product-landing-map"
 import AiSummaryBlock from "@/components/seo/AiSummaryBlock"
 import { AI_PRODUCT_CATEGORIES } from "@/lib/ai/knowledge"
 import { plainTextFromHtml } from "@/lib/rich-text"
+import { FOGGER_MODEL_COUNT } from "@/lib/facts"
 
 // Catalog content only changes when products are edited; re-render at most every 5 min.
 export const revalidate = 300
@@ -30,7 +31,7 @@ async function getProducts(): Promise<Product[]> {
   try {
     const client = await clientPromise
     const db = client.db()
-    const raw = await db.collection("products").find({}).sort({ order: 1 }).toArray()
+    const raw = await db.collection("products").find({ isPublished: true }).sort({ order: 1 }).toArray()
     return raw.map((p) => ({
       id: p._id?.toString() ?? "",
       name: p.name ?? "",
@@ -46,6 +47,11 @@ async function getProducts(): Promise<Product[]> {
 
 export default async function AiProductCatalogPage() {
   const products = await getProducts()
+  // Count only published fogging machines (the baggage trolley is not a fogger). Falls back to
+  // the documented catalogue size if the listing is empty.
+  const foggerModelCount = products.length > 0
+    ? products.filter((p) => !/trolley|baggage/i.test(p.name)).length
+    : FOGGER_MODEL_COUNT
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -129,7 +135,7 @@ export default async function AiProductCatalogPage() {
         {products.length > 0 && (
           <section className="mb-10">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Current Product Listing ({products.length} models)
+              Current Product Listing ({foggerModelCount} fogging machine models)
             </h2>
             <div className="space-y-4">
               {products.map((p) => (

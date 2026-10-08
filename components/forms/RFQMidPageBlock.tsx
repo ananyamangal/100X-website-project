@@ -19,7 +19,7 @@ export default function RFQMidPageBlock() {
             Get a quote in 24 hours.
           </h2>
           <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            GeM-ready documentation, GST invoices, and compliance certificates included. Our procurement desk responds within 48 hours.
+            GeM-ready documentation, GST invoices, and compliance certificates included. Our procurement desk responds within 24 hours on working days.
           </p>
         </div>
 

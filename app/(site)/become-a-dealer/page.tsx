@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Become an Authorized 100X Circle Dealer",
     description:
-      "Join 50+ active dealers selling 100X Circle fogging machines across India. GeM OEM authorization, full tender support, and competitive margins.",
+      "Join the active dealer network selling 100X Circle fogging machines across India. GeM OEM authorization, full tender support, and competitive margins.",
     url: `${SITE_URL}/become-a-dealer`,
     type: "website",
   },
@@ -215,7 +215,7 @@ export default async function BecomeADealerPage() {
           Become an Authorized 100X Circle Fogging Machine Dealer
         </h1>
         <p className="text-gray-500 text-sm mb-2">
-          Join 50+ active dealers across India · GeM OEM Authorization Available
+          Join our active dealer network across India · GeM OEM Authorization Available
         </p>
         <p className="text-gray-600 text-lg mb-8 leading-relaxed">
           Sell India&apos;s GeM-listed, ISO 9001-certified thermal fogging machines in your

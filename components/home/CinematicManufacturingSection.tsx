@@ -6,13 +6,13 @@ import ScrollReveal from "@/components/cinematic/ScrollReveal"
 import CinematicStatCounter from "@/components/cinematic/CinematicStatCounter"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
-import { yearsInBusiness } from "@/lib/facts"
+import { yearsInBusiness, VERIFIED_STATE_COUNT, GOV_BUYERS_LISTED } from "@/lib/facts"
 
 const MANUFACTURING_STATS = [
   { value: yearsInBusiness(), label: "Years Experience", description: "Thermal fogging OEM manufacturing" },
-  { value: 10000, suffix: "+", label: "Machines Deployed", description: "Across India and abroad" },
+  { value: GOV_BUYERS_LISTED, label: "Government Buyers Listed", description: "On our past-performance register" },
   { value: 200, suffix: "+", label: "Municipalities", description: "Government supply network" },
-  { value: 29, label: "States Reached", description: "Pan-India service coverage" },
+  { value: VERIFIED_STATE_COUNT, label: "States With Verified Orders", description: "Government supply records" },
 ]
 
 const MANUFACTURING_PILLARS = [
