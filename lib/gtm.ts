@@ -9,11 +9,17 @@ const UTM_KEYS = [
   "utm_term",
   "utm_content",
   "gclid",
+  "gbraid",
+  "wbraid",
   "fbclid",
   "msclkid",
 ] as const
 
+/** Campaign touch (utm_*, click ids): localStorage, 30-day expiry. */
 export const ATTRIBUTION_STORAGE_KEY = "attribution_v1"
+/** Per-visit fields (landingPage, sessionPageCount...): sessionStorage. */
+export const SESSION_ATTRIBUTION_STORAGE_KEY = "attribution_session_v1"
+export const ATTRIBUTION_TTL_MS = 30 * 24 * 60 * 60 * 1000
 
 export const CONTACT_LEAD_CTX_KEY = "contact_lead_ctx"
 export const BROCHURE_LEAD_CTX_KEY = "brochure_lead_ctx"
@@ -21,6 +27,94 @@ export const QUOTE_LEAD_CTX_KEY = "quote_lead_ctx"
 
 export type PersistedAttribution = Record<string, string>
 
+interface StoredCampaign {
+  ts: number
+  data: PersistedAttribution
+}
+
+/** Parse a stored campaign wrapper; null when malformed or older than 30 days. */
+export function parseStoredCampaign(
+  raw: string | null,
+  now: number = Date.now(),
+): PersistedAttribution | null {
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw) as Partial<StoredCampaign> | null
+    if (!parsed || typeof parsed.ts !== "number" || !parsed.data || typeof parsed.data !== "object") {
+      return null
+    }
+    if (now - parsed.ts > ATTRIBUTION_TTL_MS || parsed.ts > now + 60_000) return null
+    const out: PersistedAttribution = {}
+    for (const [k, v] of Object.entries(parsed.data)) {
+      if (typeof v === "string") out[k] = v
+    }
+    return out
+  } catch {
+    return null
+  }
+}
+
+function readCampaign(now: number = Date.now()): PersistedAttribution {
+  try {
+    const fromLocal = parseStoredCampaign(localStorage.getItem(ATTRIBUTION_STORAGE_KEY), now)
+    if (fromLocal) return fromLocal
+    // Expired or missing: clear a stale local entry (best effort).
+    try {
+      if (localStorage.getItem(ATTRIBUTION_STORAGE_KEY)) localStorage.removeItem(ATTRIBUTION_STORAGE_KEY)
+    } catch {
+      /* ignore */
+    }
+  } catch {
+    /* localStorage unavailable — fall back to sessionStorage */
+  }
+  try {
+    const fromSession = parseStoredCampaign(sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY), now)
+    if (fromSession) return fromSession
+    if (sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY)) sessionStorage.removeItem(ATTRIBUTION_STORAGE_KEY)
+  } catch {
+    /* ignore */
+  }
+  return {}
+}
+
+function writeCampaign(data: PersistedAttribution, now: number = Date.now()): void {
+  const payload = JSON.stringify({ ts: now, data } satisfies StoredCampaign)
+  try {
+    localStorage.setItem(ATTRIBUTION_STORAGE_KEY, payload)
+    return
+  } catch {
+    /* fall through to sessionStorage */
+  }
+  try {
+    sessionStorage.setItem(ATTRIBUTION_STORAGE_KEY, payload)
+  } catch {
+    /* no storage available */
+  }
+}
+
+function readSessionFields(): PersistedAttribution {
+  try {
+    return JSON.parse(
+      sessionStorage.getItem(SESSION_ATTRIBUTION_STORAGE_KEY) || "{}",
+    ) as PersistedAttribution
+  } catch {
+    return {}
+  }
+}
+
+function writeSessionFields(data: PersistedAttribution): void {
+  try {
+    sessionStorage.setItem(SESSION_ATTRIBUTION_STORAGE_KEY, JSON.stringify(data))
+  } catch {
+    /* sessionStorage unavailable — no-op */
+  }
+}
+
+/**
+ * Merge utm_* / click ids from the URL into the 30-day campaign store.
+ * Values present in the URL overwrite stored ones (so a new gclid/gbraid/wbraid
+ * always wins); keys absent from the URL keep their stored value.
+ */
 export function mergePersistedAttributionFromUrl(): void {
   if (typeof window === "undefined") return
   const params = new URLSearchParams(window.location.search)
@@ -30,17 +124,7 @@ export function mergePersistedAttributionFromUrl(): void {
     if (v) next[k] = v
   }
   if (!Object.keys(next).length) return
-  try {
-    const prev = JSON.parse(
-      sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY) || "{}",
-    ) as PersistedAttribution
-    sessionStorage.setItem(
-      ATTRIBUTION_STORAGE_KEY,
-      JSON.stringify({ ...prev, ...next }),
-    )
-  } catch {
-    sessionStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(next))
-  }
+  writeCampaign({ ...readCampaign(), ...next })
 }
 
 /**
@@ -53,41 +137,30 @@ export function initSessionAttribution(): void {
   if (typeof window === "undefined") return
   try {
     const path = window.location.pathname
-    const raw = sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY)
-    if (!raw || !JSON.parse(raw).landingPage) {
+    const existing = readSessionFields()
+    if (!existing.landingPage) {
       // First page of this session — record entry context
-      const existing = raw ? (JSON.parse(raw) as PersistedAttribution) : {}
-      sessionStorage.setItem(
-        ATTRIBUTION_STORAGE_KEY,
-        JSON.stringify({
-          ...existing,
-          landingPage: path,
-          firstPageVisited: path,
-          entryReferrer: document.referrer || "",
-          sessionPageCount: "1",
-          sessionStart: new Date().toISOString(),
-        }),
-      )
+      writeSessionFields({
+        ...existing,
+        landingPage: path,
+        firstPageVisited: path,
+        entryReferrer: document.referrer || "",
+        sessionPageCount: "1",
+        sessionStart: new Date().toISOString(),
+      })
     } else {
-      // Subsequent page — increment count
-      const existing = JSON.parse(raw) as PersistedAttribution
       const count = parseInt(existing.sessionPageCount || "1", 10)
-      sessionStorage.setItem(
-        ATTRIBUTION_STORAGE_KEY,
-        JSON.stringify({ ...existing, sessionPageCount: String(count + 1) }),
-      )
+      writeSessionFields({ ...existing, sessionPageCount: String(count + 1) })
     }
   } catch {
-    // sessionStorage unavailable — no-op
+    // storage unavailable — no-op
   }
 }
 
 export function getPersistedAttribution(): PersistedAttribution {
   if (typeof window === "undefined") return {}
   try {
-    return JSON.parse(
-      sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY) || "{}",
-    ) as PersistedAttribution
+    return { ...readCampaign(), ...readSessionFields() }
   } catch {
     return {}
   }

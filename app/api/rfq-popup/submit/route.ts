@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { sendAdminEmail, isEmailConfigured } from "@/lib/email"
 import { buildLeadEmail } from "@/lib/lead-email"
+import { sanitizeAttribution } from "@/lib/attribution-sanitize"
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { answers, pagePath, pageUrl, utm, userAgent, referrer, attachmentUrl } = body
+    const { answers, pagePath, pageUrl, utm, userAgent, referrer, attachmentUrl, attribution } = body
     // Extract attribution fields from the utm object (populated by initSessionAttribution + mergePersistedAttributionFromUrl)
     const attr = (utm || {}) as Record<string, string>
 
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest) {
       pagePath: pagePath || "",
       pageUrl: pageUrl || "",
       utm: utm || {},
+      ...(sanitizeAttribution(attribution ?? utm) ? { attribution: sanitizeAttribution(attribution ?? utm) } : {}),
       // Top-level attribution fields for easy MongoDB aggregation
       landingPage: attr.landingPage || pagePath || "",
       firstPageVisited: attr.firstPageVisited || attr.landingPage || pagePath || "",

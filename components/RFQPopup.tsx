@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { X, Paperclip } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { BUSINESS } from "@/lib/seo/site-config"
-import { pushDataLayer } from "@/lib/gtm"
+import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
 
 interface Question {
@@ -39,13 +39,7 @@ const SESSION_KEY = "rfq-popup-seen-v1"
 const SUBMITTED_KEY = "rfq-popup-submitted-v1"
 
 function getUtm(): Record<string, string> {
-  if (typeof window === "undefined") return {}
-  try {
-    const raw = sessionStorage.getItem("attribution_v1") || "{}"
-    return JSON.parse(raw) || {}
-  } catch {
-    return {}
-  }
+  return getPersistedAttribution()
 }
 
 function buildWaMessage(answers: Record<string, string | string[]>, attachmentUrl?: string): string {
@@ -245,6 +239,7 @@ export default function RFQPopup() {
           pagePath: window.location.pathname,
           pageUrl: window.location.href,
           utm,
+          attribution: utm,
           userAgent: navigator.userAgent,
           referrer: document.referrer,
           attachmentUrl,

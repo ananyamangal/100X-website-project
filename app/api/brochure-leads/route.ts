@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { sendAdminEmail, isEmailConfigured } from "@/lib/email"
 import { buildLeadEmail } from "@/lib/lead-email"
+import { sanitizeAttribution } from "@/lib/attribution-sanitize"
 
 function detectDevice(ua: string): "mobile" | "tablet" | "desktop" {
   if (/tablet|ipad/i.test(ua)) return "tablet"
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
     const {
       name, phone, email, organization, state, requirement,
       source, brochureType, brochureName, productName,
-      pageUrl, referrer, company_website,
+      pageUrl, referrer, company_website, attribution,
     } = body
 
     if (company_website?.trim()) return NextResponse.json({ ok: true })
@@ -91,6 +92,7 @@ export async function POST(request: NextRequest) {
       productName: productName?.trim() || "",
       pageUrl: pageUrl || "",
       referrer: referrer || "",
+      ...(sanitizeAttribution(attribution) ? { attribution: sanitizeAttribution(attribution) } : {}),
       device,
       score,
       isConverted,

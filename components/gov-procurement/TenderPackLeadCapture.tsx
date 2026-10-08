@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { pushDataLayer } from "@/lib/gtm"
+import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { BUSINESS } from "@/lib/seo/site-config"
 
 const TENDER_DOCS = [
@@ -73,6 +73,7 @@ export default function TenderPackLeadCapture() {
           gemAuthRequired: false,
           dealerInquiry: false,
           form_page_url: typeof window !== "undefined" ? window.location.href : "",
+          attribution: getPersistedAttribution(),
           location_label: "tender_pack_request",
         }),
       })

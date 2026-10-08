@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { pushDataLayer } from "@/lib/gtm"
+import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
 
 const INDIAN_STATES = [
@@ -41,7 +41,7 @@ export default function RfqForm({
       const res = await fetch("/api/rfq", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, product, source }),
+        body: JSON.stringify({ ...form, product, source, attribution: getPersistedAttribution() }),
       })
       if (!res.ok) {
         setStatus("error")

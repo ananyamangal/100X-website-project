@@ -3,6 +3,7 @@ import { sendAdminEmail, isEmailConfigured } from "@/lib/email"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { buildLeadEmail, leadSubject } from "@/lib/lead-email"
+import { sanitizeAttribution } from "@/lib/attribution-sanitize"
 
 interface RFQBody {
   product: string;
@@ -48,8 +49,14 @@ export async function POST(request: NextRequest) {
   // Save first (graceful fallback if Mongo is unreachable), so the e-mail can
   // carry the database id and the saved document is the single source of truth.
   const now = new Date().toISOString()
-  const { company_website: _honeypot, ...fields } = body
-  const record: Record<string, unknown> = { type: "rfq", ...fields, createdAt: now }
+  const { company_website: _honeypot, attribution: rawAttribution, ...fields } = body
+  const cleanAttribution = sanitizeAttribution(rawAttribution)
+  const record: Record<string, unknown> = {
+    type: "rfq",
+    ...fields,
+    ...(cleanAttribution ? { attribution: cleanAttribution } : {}),
+    createdAt: now,
+  }
   let dbStatus: "saved" | "failed" = "failed"
   let dbId: string | undefined
   try {

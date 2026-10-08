@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { sanitizeAttribution } from "@/lib/attribution-sanitize"
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,7 +8,7 @@ export async function POST(request: NextRequest) {
     const {
       name, company, mobile, email, state,
       gemSellerId, tenderName, tenderClosingDate,
-      product, message, source,
+      product, message, source, attribution,
     } = body
 
     if (!name?.trim() || !company?.trim() || !mobile?.trim() || !email?.trim() || !state?.trim() || !product?.trim()) {
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
       product: product.trim(),
       message: message?.trim() || "",
       source: source || "oem_authorization",
+      ...(sanitizeAttribution(attribution) ? { attribution: sanitizeAttribution(attribution) } : {}),
       status: "new",
       createdAt: new Date(),
       updatedAt: new Date(),

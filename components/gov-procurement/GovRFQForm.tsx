@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { pushDataLayer } from "@/lib/gtm"
+import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { useRouter } from "next/navigation"
 
 const INDIAN_STATES = [
@@ -91,6 +91,7 @@ export default function GovRFQForm() {
           gemAuthRequired: false,
           dealerInquiry: false,
           form_page_url: window.location.href,
+          attribution: getPersistedAttribution(),
           form_page_path: window.location.pathname,
           location_label: "gov_procurement_rfq",
         }),

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { BUSINESS } from "@/lib/seo/site-config"
-import { pushDataLayer } from "@/lib/gtm"
+import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 
 // High-value Funnel A signal -- matches the value already assigned to this
 // lead type in lib/growth-os/conversion-tracking.ts's (currently unwired)
@@ -70,7 +70,7 @@ export default function OemAuthForm({ source = "oem_authorization", compact = fa
       const res = await fetch("/api/oem-leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, source }),
+        body: JSON.stringify({ ...form, source, attribution: getPersistedAttribution() }),
       })
       if (!res.ok) throw new Error("Submission failed")
 

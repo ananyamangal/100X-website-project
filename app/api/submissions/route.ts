@@ -3,6 +3,7 @@ import clientPromise from '@/lib/mongodb';
 import { Submission } from '@/lib/submissionModel';
 import { sendAdminEmail, isEmailConfigured } from '@/lib/email';
 import { buildLeadEmail, leadSubject } from '@/lib/lead-email';
+import { sanitizeAttribution } from '@/lib/attribution-sanitize';
 
 // This route is shared by several different forms (OEM partner apply, quote
 // modal, dealer program, contact section, landing pages) with different field
@@ -48,9 +49,15 @@ export async function POST(request: NextRequest) {
     }
 
     const data = rest as unknown as Submission;
-    const { _id, ...submissionData } = data;
+    const { _id, attribution: rawAttribution, ...submissionData } = data;
     const now = new Date().toISOString();
-    const submission = { ...submissionData, createdAt: now };
+    // Additive: keep only whitelisted attribution keys (length-capped).
+    const cleanAttribution = sanitizeAttribution(rawAttribution);
+    const submission = {
+      ...submissionData,
+      ...(cleanAttribution ? { attribution: cleanAttribution } : {}),
+      createdAt: now,
+    };
     const client = await clientPromise;
     const db = client.db();
     const result = await db.collection('submissions').insertOne(submission);

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react"
 import { X, Download, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { pushDataLayer } from "@/lib/gtm"
+import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 
 const BROCHURE_LEAD_VALUE_INR =
   Number(process.env.NEXT_PUBLIC_BROCHURE_LEAD_VALUE_INR) || 50000
@@ -125,6 +125,7 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
           source,
           brochureType: brochureUrl ? "product" : "main",
           pageUrl: typeof window !== "undefined" ? window.location.href : "",
+          attribution: getPersistedAttribution(),
         }),
       })
       const data = await res.json()
