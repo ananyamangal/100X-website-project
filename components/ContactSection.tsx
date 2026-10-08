@@ -103,6 +103,7 @@ export default function ContactSection({
           organization,
           message: requirement,
           type: "contact",
+          company_website: String(formData.get("company_website") ?? ""),
           attribution,
           form_page_url: window.location.href,
           form_page_path: window.location.pathname,
@@ -227,9 +228,7 @@ export default function ContactSection({
               <form id="contact-inquiry-form" onSubmit={handleContactSubmit} className="relative space-y-5 text-lg">
                 {/* Honeypot — hidden from real users, catches bots */}
                 <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-                  <label htmlFor="contact-company-website">Company website</label>
                   <input
-                    id="contact-company-website"
                     name="company_website"
                     type="text"
                     tabIndex={-1}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { readHoneypot } from "@/lib/honeypot"
 import {
   FORM_SUBMISSION_TYPE,
   type LandingFormBlockData,
@@ -142,6 +143,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
     setValues((prev) => ({ ...prev, [name]: val }))
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const honeypot = readHoneypot(e.currentTarget)
     e.preventDefault()
     setError(null)
 
@@ -174,6 +176,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
         body: JSON.stringify({
           ...values,
           type: submissionType,
+          company_website: honeypot,
           form_variant: block.variant,
           landing_slug: landingSlug,
           attribution: getPersistedAttribution(),
@@ -256,8 +259,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
         <form onSubmit={handleSubmit} className="relative grid grid-cols-2 gap-3">
           {/* Honeypot */}
           <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-            <label htmlFor="landing-form-hp">Company website</label>
-            <input id="landing-form-hp" name="company_website" type="text" tabIndex={-1} autoComplete="off" />
+            <input name="company_website" type="text" tabIndex={-1} autoComplete="off" />
           </div>
 
           {fields.map((f) => {

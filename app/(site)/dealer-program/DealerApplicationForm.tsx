@@ -108,8 +108,7 @@ export default function DealerApplicationForm() {
       <form onSubmit={handleSubmit} className="space-y-4 relative">
         {/* Honeypot */}
         <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-          <label htmlFor="dealer-hp">Company website</label>
-          <input id="dealer-hp" name="company_website" type="text" tabIndex={-1} autoComplete="off" />
+          <input name="company_website" type="text" tabIndex={-1} autoComplete="off" />
         </div>
 
         <div>

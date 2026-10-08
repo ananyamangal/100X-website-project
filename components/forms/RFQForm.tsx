@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { readHoneypot } from "@/lib/honeypot"
 import { BUSINESS } from "@/lib/seo/site-config"
 import {
   getPersistedAttribution,
@@ -160,6 +161,7 @@ export default function RFQForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const honeypot = readHoneypot(e.currentTarget)
     setError(null)
 
     if (!product) {
@@ -215,6 +217,7 @@ export default function RFQForm({
           form_page_url: typeof window !== "undefined" ? window.location.href : "",
           form_page_path: typeof window !== "undefined" ? window.location.pathname : "",
           location_label: location,
+          company_website: honeypot,
         }),
       })
       if (res.ok) {
@@ -336,8 +339,7 @@ export default function RFQForm({
     >
       {/* Honeypot */}
       <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-        <label htmlFor="rfq-hp">Company website</label>
-        <input id="rfq-hp" name="company_website" type="text" tabIndex={-1} autoComplete="off" />
+        <input name="company_website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
       {!isPanel && (
