@@ -194,7 +194,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
 
     const emailVal = (values.email || "").trim()
     if (emailVal && !EMAIL_RE.test(emailVal)) {
-      setError("Please enter a valid email address, or leave it blank.")
+      setError(tx("emailInvalid", "Please enter a valid email address, or leave it blank."))
       return
     }
 
@@ -258,6 +258,8 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
           product: "contact_form",
           interest: "callback_request",
           lead_type: "callback",
+          // The thank-you tracker defaults to the contact value; keep this form's own value.
+          value: GENERATE_LEAD_CFG[block.variant].value,
           source_form: "gem_landing",
           callback_slot: callbackSlot,
           form_page_url: typeof window !== "undefined" ? location.href : "",
@@ -279,7 +281,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
       const leadCfg = GENERATE_LEAD_CFG[block.variant]
       pushDataLayer({
         event: "generate_lead",
-        lead_type:    leadCfg.lead_type,
+        lead_type:    hasRoleChoice && role === "buyer" ? "gem_buyer_inquiry" : leadCfg.lead_type,
         page_type:    leadCfg.page_type,
         value:        leadCfg.value,
         currency:     "INR",
