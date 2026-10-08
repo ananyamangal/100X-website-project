@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { FileText, X } from "lucide-react"
+import { FileText, ShieldCheck, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import RFQForm from "./RFQForm"
 
@@ -15,6 +15,13 @@ const HIDE_ON_PREFIXES = ["/admin", "/thank-you", "/brochure-thank-you"]
  * The two floating entry points share ONE slide-over and ONE RFQForm; only
  * the telemetry location, the subtitle and the GeM checkbox preselect differ.
  */
+/**
+ * GeM pill chip image. null = neutral shield icon. The only GeM logo in the repo
+ * ("/Logos clipart 2/GeM logo.png") has an opaque dark background; when a clean
+ * transparent file is supplied, set its public path here — nothing else changes.
+ */
+const GEM_PILL_LOGO: string | null = null
+
 type Entry = "rfq" | "gem"
 const ENTRY: Record<Entry, { location: string; subtitle: string; gemAuth: boolean }> = {
   rfq: { location: "floating_ribbon", subtitle: "Government, municipal, dealer, and bulk orders.", gemAuth: false },
@@ -98,8 +105,9 @@ export default function RFQFloatingRibbon() {
         className={cn(open ? "hidden" : "flex", "fixed left-4 md:left-6 bottom-[calc(var(--mobile-cta-bar-h)+1rem+3rem)] md:bottom-[calc(1.5rem+3.25rem)] z-[60] min-h-[44px] items-center gap-2 pl-1.5 pr-3 md:pr-4 bg-white hover:bg-brand-50 text-brand-700 border-2 border-brand-600 font-semibold tracking-wide shadow-lg rounded-full text-xs md:text-sm motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2")}
       >
         <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-1 ring-gray-200">
-          {/* The GeM mark the site already uses on product cards, at display size. */}
-          <Image src="/Logos clipart 2/GeM logo.png" alt="GeM" width={22} height={22} sizes="22px" className="h-[22px] w-[22px] rounded-[4px] object-cover" />
+          {GEM_PILL_LOGO
+            ? <Image src={GEM_PILL_LOGO} alt="GeM" width={22} height={22} sizes="22px" className="h-[22px] w-[22px] rounded-[4px] object-cover" />
+            : <ShieldCheck size={18} aria-hidden="true" className="text-brand-700" />}
         </span>
         <span>Get GeM Auth Code</span>
       </button>

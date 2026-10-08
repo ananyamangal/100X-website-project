@@ -31,6 +31,9 @@ test.describe("desktop", () => {
     await expect(gemPill(page)).toBeVisible()
     await expect(gemPill(page)).toHaveAttribute("data-gtm", "gem_authorisation_open")
     await expect(gemPill(page)).toHaveText("Get GeM Auth Code")
+    // GEM_PILL_LOGO = null: neutral icon, no logo image in the pill
+    await expect(gemPill(page).locator("svg")).toHaveCount(1)
+    await expect(gemPill(page).locator("img")).toHaveCount(0)
     const g = (await gemPill(page).boundingBox())!, r = (await rfqPill(page).boundingBox())!
     expect(g.y + g.height).toBeLessThanOrEqual(r.y)
     expect(Math.abs(g.x - r.x)).toBeLessThan(2)
