@@ -1,18 +1,26 @@
-# Hourly uptime check for www.100xcircle.com, run on GitHub's runners (outside Vercel) so a
-# paused or broken deployment is still reported. When the site is DOWN the job e-mails the
-# recipients in the ALERT_EMAIL_TO secret on EVERY run and then fails, so GitHub's own
-# "workflow failed" notification acts as a second alert. Docs: docs/UPTIME_ALERTS.md
+# Uptime check for www.100xcircle.com, run on GitHub's runners (outside Vercel) so a paused or
+# broken deployment is still reported. Every 10 minutes; e-mails on DOWN (then at most hourly
+# while it stays down) and once on RECOVERED. State lives in the Actions cache.
+# Docs: docs/UPTIME_ALERTS.md
 name: Uptime alert
 
 on:
   schedule:
-    - cron: "7 * * * *" # hourly at :07 (cron can run a few minutes late)
+    - cron: "*/10 * * * *" # site check (GitHub may start scheduled runs late or skip some under load)
+    - cron: "23 3 * * *" # daily monitor health: SMTP login check + keep-alive (08:53 IST)
   workflow_dispatch:
     inputs:
       simulate_down:
-        description: "Treat the site as DOWN and send the alert e-mail (test the pipeline)"
+        description: "Send a [TEST] SITE DOWN e-mail (real state untouched)"
         type: boolean
         default: false
+      simulate_recovery:
+        description: "Send a [TEST] RECOVERED e-mail (real state untouched)"
+        type: boolean
+        default: false
+  # Lets an external scheduler (see docs) trigger a check when GitHub's own cron runs late.
+  repository_dispatch:
+    types: [uptime-check]
 
 permissions:
   contents: read
@@ -21,9 +29,14 @@ concurrency:
   group: uptime-alert
   cancel-in-progress: false
 
+env:
+  SITE_URL: https://www.100xcircle.com
+  VERCEL_DASHBOARD_URL: https://vercel.com/ananyamangal07-5264/100-x-website-project
+
 jobs:
   check:
     name: Check www.100xcircle.com
+    if: github.event.schedule != '23 3 * * *'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -36,11 +49,19 @@ jobs:
           node-version: 22
       - name: Install nodemailer (pinned, the only dependency)
         run: npm install --no-save --no-audit --no-fund --no-package-lock nodemailer@6.9.16
-      - name: Check the site and e-mail if DOWN
+      # Newest saved state (UP/DOWN, since, last alert). Cache keys are immutable, so each run
+      # saves under its own run id and the next run restores the newest by prefix.
+      - name: Restore alert state
+        uses: actions/cache/restore@v4
+        with:
+          path: .uptime-state
+          key: uptime-state-${{ github.run_id }}
+          restore-keys: uptime-state-
+      - name: Check the site and e-mail on DOWN / RECOVERED
         run: node .github/scripts/uptime-alert.mjs
         env:
-          SITE_URL: https://www.100xcircle.com
-          SIMULATE_DOWN: ${{ inputs.simulate_down == true && 'true' || 'false' }}
+          MAINTENANCE_MODE: ${{ vars.MAINTENANCE_MODE }}
+          SIMULATE: ${{ inputs.simulate_down == true && 'down' || (inputs.simulate_recovery == true && 'recovery' || '') }}
           # Values come only from repository secrets; the script masks them and never prints them.
           ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
           ALERT_EMAIL_FROM: ${{ secrets.ALERT_EMAIL_FROM }}
@@ -48,3 +69,49 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      # Saved even when the job fails (a DOWN alert run fails on purpose). Test runs never save.
+      - name: Save alert state
+        if: always() && hashFiles('.uptime-state/state.json') != '' && inputs.simulate_down != true && inputs.simulate_recovery != true
+        uses: actions/cache/save@v4
+        with:
+          path: .uptime-state
+          key: uptime-state-${{ github.run_id }}
+
+  monitor-health:
+    name: Monitor health (SMTP login + keep-alive)
+    if: github.event.schedule == '23 3 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: write # only to re-enable this workflow (keep-alive)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install nodemailer (pinned, the only dependency)
+        run: npm install --no-save --no-audit --no-fund --no-package-lock nodemailer@6.9.16
+      # Fails loudly (red run + GitHub's own failure e-mail) when the alert mailbox cannot log in,
+      # so a silent alert system is noticed even while the site is UP and nothing is sent.
+      - name: Verify the SMTP login works
+        run: node .github/scripts/uptime-alert.mjs
+        env:
+          MODE: smtp-check
+          MAINTENANCE_MODE: ${{ vars.MAINTENANCE_MODE }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+          ALERT_EMAIL_FROM: ${{ secrets.ALERT_EMAIL_FROM }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      # GitHub disables scheduled workflows after 60 days without repository activity. Calling the
+      # "enable workflow" API on itself counts as activity and keeps the schedule alive.
+      - name: Keep the schedule alive
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/uptime-alert.yml/enable" && echo "keep-alive OK"
