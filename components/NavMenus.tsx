@@ -95,8 +95,7 @@ export function productsPanel(groups: NavProductGroup[], variant: 'desktop' | 'm
 /** Static pages only (all 200 + self-canonical in the SEO snapshot). */
 export const PERFORMANCE_LINKS = [
   { href: '/past-performance-government', label: 'Government Past Performance' },
-  // "Procurement Register" (#procurement-register) waits on the owner's OK: the
-  // register <section> has no id yet, and adding one changes page HTML outside the nav.
+  { href: '/past-performance-government#procurement-register', label: 'Procurement Register' },
   { href: '/case-studies', label: 'Case Studies' },
   { href: '/deployments', label: 'Deployments' },
   { href: '/oem-authorization-letter', label: 'OEM Authorization Letter' },

@@ -299,7 +299,8 @@ export default async function PastPerformancePage() {
         </section>
 
         {/* ── 5. Full Supply Register ───────────────────────────────────────────── */}
-        <section className="py-20 md:py-28 bg-gray-950 border-t border-white/[0.06]">
+        {/* id: target of the header Performance menu's "Procurement Register" link */}
+        <section id="procurement-register" className="py-20 md:py-28 bg-gray-950 border-t border-white/[0.06]">
           <div className="container mx-auto px-4 md:px-6">
             <div className="flex items-end justify-between mb-10 gap-4">
               <div>
