@@ -68,13 +68,40 @@ function readCampaign(now: number = Date.now()): PersistedAttribution {
     /* localStorage unavailable — fall back to sessionStorage */
   }
   try {
-    const fromSession = parseStoredCampaign(sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY), now)
+    const rawSession = sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY)
+    const fromSession = parseStoredCampaign(rawSession, now)
     if (fromSession) return fromSession
-    if (sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY)) sessionStorage.removeItem(ATTRIBUTION_STORAGE_KEY)
+    // Pre-2026-10 format: a flat object in sessionStorage with no ts/data. Keep its
+    // campaign keys so a session that was open during the deploy keeps its gclid/utm.
+    const legacy = migrateLegacyCampaign(rawSession)
+    if (rawSession) sessionStorage.removeItem(ATTRIBUTION_STORAGE_KEY)
+    if (legacy) {
+      writeCampaign(legacy, now)
+      return legacy
+    }
   } catch {
     /* ignore */
   }
   return {}
+}
+
+/** Campaign keys from a legacy flat sessionStorage entry, or null when there are none. */
+export function migrateLegacyCampaign(raw: string | null): PersistedAttribution | null {
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw) as unknown
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null
+    const obj = parsed as Record<string, unknown>
+    if ("ts" in obj || "data" in obj) return null
+    const out: PersistedAttribution = {}
+    for (const k of UTM_KEYS) {
+      const v = obj[k]
+      if (typeof v === "string" && v.trim() !== "") out[k] = v
+    }
+    return Object.keys(out).length ? out : null
+  } catch {
+    return null
+  }
 }
 
 function writeCampaign(data: PersistedAttribution, now: number = Date.now()): void {

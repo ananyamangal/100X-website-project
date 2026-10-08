@@ -6,6 +6,7 @@ import test from "node:test"
 import assert from "node:assert/strict"
 import {
   parseStoredCampaign,
+  migrateLegacyCampaign,
   mergePersistedAttributionFromUrl,
   getPersistedAttribution,
   ATTRIBUTION_STORAGE_KEY,
@@ -89,4 +90,13 @@ test("sanitizeAttribution: whitelist, string-only, length cap, empty -> undefine
   assert.equal(sanitizeAttribution(null), undefined)
   assert.equal(sanitizeAttribution([1]), undefined)
   assert.equal(sanitizeAttribution("x"), undefined)
+})
+
+test("migrateLegacyCampaign: keeps campaign keys from the old flat sessionStorage entry", () => {
+  const legacy = JSON.stringify({ utm_source: "google", gclid: "g1", landingPage: "/x", sessionPageCount: "3" })
+  assert.deepEqual(migrateLegacyCampaign(legacy), { utm_source: "google", gclid: "g1" })
+  assert.equal(migrateLegacyCampaign(JSON.stringify({ ts: 1, data: { gclid: "g" } })), null)
+  assert.equal(migrateLegacyCampaign(JSON.stringify({ landingPage: "/x" })), null)
+  assert.equal(migrateLegacyCampaign("not json"), null)
+  assert.equal(migrateLegacyCampaign(null), null)
 })
