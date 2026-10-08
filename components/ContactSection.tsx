@@ -35,6 +35,8 @@ function useContactPageSocialLinks(): VisibleSocialLink[] {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+const CALLBACK_SLOTS = ["Morning 9–12", "Afternoon 12–4", "Evening 4–7"] as const
+
 const PHONE_DIGITS_RE = /\D/g
 
 function validatePhone(phone: string) {
@@ -51,6 +53,7 @@ export default function ContactSection({
   const router = useRouter()
   const socialLinks = useContactPageSocialLinks()
   const [submitting, setSubmitting] = useState(false)
+  const [callback, setCallback] = useState(false)
   const [error, setError] = useState<string | null>(null)
   // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) --
   // see the same note in BrochureLeadModal.tsx. This REPLACES a client-side
@@ -73,6 +76,7 @@ export default function ContactSection({
     const organization = String(formData.get("organization") ?? "").trim()
     const email = String(formData.get("email") ?? "").trim()
     const requirement = String(formData.get("requirement") ?? "").trim()
+    const callbackSlot = String(formData.get("callback_slot") ?? "").trim()
 
     if (!name) {
       setError("Please enter your name.")
@@ -82,7 +86,11 @@ export default function ContactSection({
       setError("Please enter a valid mobile number (10–15 digits).")
       return
     }
-    if (email && !EMAIL_RE.test(email)) {
+    if (callback && !callbackSlot) {
+      setError("Please choose a preferred time for the call back.")
+      return
+    }
+    if (!callback && email && !EMAIL_RE.test(email)) {
       setError("Please enter a valid email address, or leave it blank.")
       return
     }
@@ -93,8 +101,8 @@ export default function ContactSection({
 
     setSubmitting(true)
     pushDataLayer({
-      event: "contact_form_submit_attempt",
-      lead_type: "contact_form",
+      event: callback ? "callback_request_attempt" : "contact_form_submit_attempt",
+      lead_type: callback ? "callback" : "contact_form",
       product: "contact_form",
       interest: organization || "general_inquiry",
     })
@@ -104,7 +112,16 @@ export default function ContactSection({
       const res = await fetch("/api/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify(callback ? {
+          name,
+          phone,
+          type: "callback",
+          callback_slot: callbackSlot,
+          source_form: "contact",
+          attribution,
+          form_page_url: window.location.href,
+          form_page_path: window.location.pathname,
+        } : {
           name,
           phone,
           ...(email ? { email } : {}),
@@ -128,10 +145,21 @@ export default function ContactSection({
         body: JSON.stringify({ event: 'contact_submit', page: window.location.pathname, source: 'contact_section' }),
       }).catch(() => {})
 
+      // For a call back, generate_lead is fired once by ContactThankYouTracker
+      // (it reads this context), so it is not pushed here as well.
+      if (callback) {
+        pushDataLayer({
+          event: "callback_request_submit",
+          source_form: "contact",
+          callback_slot: callbackSlot,
+        })
+      }
+
       setContactLeadContext({
         product: "contact_form",
-        interest: organization || "general_inquiry",
-        lead_type: "contact_form",
+        interest: callback ? "callback_request" : organization || "general_inquiry",
+        lead_type: callback ? "callback" : "contact_form",
+        ...(callback ? { source_form: "contact", callback_slot: callbackSlot } : {}),
         form_page_url: window.location.href,
       })
 
@@ -269,6 +297,37 @@ export default function ContactSection({
                   />
                 </div>
 
+                <div className="flex items-center gap-3">
+                  <input
+                    id="contact-callback"
+                    type="checkbox"
+                    checked={callback}
+                    onChange={(e) => setCallback(e.target.checked)}
+                    disabled={submitting}
+                    className="h-5 w-5 accent-brand-600"
+                  />
+                  <label htmlFor="contact-callback" className="text-base text-gray-800">Request a call back instead</label>
+                </div>
+
+                {callback ? (
+                  <div>
+                    <label htmlFor="contact-callback-slot" className="block text-sm font-medium text-gray-700 mb-1.5">Preferred time</label>
+                    <select
+                      id="contact-callback-slot"
+                      name="callback_slot"
+                      required
+                      defaultValue=""
+                      className="w-full rounded-md border border-gray-300 bg-white p-4 text-lg min-h-[52px] text-gray-900"
+                    >
+                      <option value="" disabled>Select a time</option>
+                      {CALLBACK_SLOTS.map((o) => (
+                        <option key={o} value={o}>{o}</option>
+                      ))}
+                    </select>
+                    <p className="mt-1.5 text-sm text-gray-500">We call within 24 hours on working days.</p>
+                  </div>
+                ) : (
+                  <>
                 <div>
                   <label htmlFor="contact-email" className="block text-sm font-medium text-gray-700 mb-1.5">Email (optional)</label>
                   <Input
@@ -303,6 +362,8 @@ export default function ContactSection({
                     className="p-5 text-lg resize-y min-h-[110px]"
                   />
                 </div>
+                  </>
+                )}
 
                 {error ? (
                   <p className="text-base text-red-600" role="alert">
@@ -322,7 +383,7 @@ export default function ContactSection({
                       Submitting…
                     </>
                   ) : (
-                    "Send enquiry"
+                    callback ? "Request a call back" : "Send enquiry"
                   )}
                 </Button>
               </form>

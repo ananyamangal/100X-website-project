@@ -13,6 +13,7 @@ import {
 import {
   getPersistedAttribution,
   pushDataLayer,
+  setContactLeadContext,
 } from "@/lib/gtm"
 
 // generate_lead params per variant — values in INR
@@ -107,6 +108,12 @@ const BUYER_FIELDS: FormFieldDef[] = [
 
 type BuyerRole = "buyer" | "reseller"
 
+const CALLBACK_SLOTS = [
+  { value: "Morning 9–12", key: "slotMorning" },
+  { value: "Afternoon 12–4", key: "slotAfternoon" },
+  { value: "Evening 4–7", key: "slotEvening" },
+] as const
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 type Props = {
@@ -123,7 +130,11 @@ type Props = {
 export default function LandingFormBlock({ block, landingSlug, locale = "en" }: Props) {
   const hasRoleChoice = block.variant === "reseller"
   const [role, setRole] = useState<BuyerRole>("reseller")
-  const fields = hasRoleChoice && role === "buyer" ? BUYER_FIELDS : FIELDS_BY_VARIANT[block.variant]
+  const [callbackMode, setCallbackMode] = useState(false)
+  const [callbackSlot, setCallbackSlot] = useState("")
+  const baseFields = hasRoleChoice && role === "buyer" ? BUYER_FIELDS : FIELDS_BY_VARIANT[block.variant]
+  // Call back needs only name + mobile (+ the time slot below).
+  const fields = callbackMode ? baseFields.filter((f) => f.name === "name" || f.name === "mobile") : baseFields
   const submissionType = FORM_SUBMISSION_TYPE[block.variant]
   const gaEvent = block.gaEvent || `${block.variant.replace("-", "_")}_submit`
   const router = useRouter()
@@ -176,6 +187,11 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
       return
     }
 
+    if (callbackMode && !callbackSlot) {
+      setError(`${tc("requiredPrefix", "Please fill required:")} ${tx("preferredTime", "Preferred time")}`)
+      return
+    }
+
     const emailVal = (values.email || "").trim()
     if (emailVal && !EMAIL_RE.test(emailVal)) {
       setError("Please enter a valid email address, or leave it blank.")
@@ -191,7 +207,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
     }
 
     pushDataLayer({
-      event: `${gaEvent}_attempt`,
+      event: callbackMode ? "callback_request_attempt" : `${gaEvent}_attempt`,
       variant: block.variant,
       landing_slug: landingSlug,
       ...(hasRoleChoice ? { buyer_role: role } : {}),
@@ -202,7 +218,17 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
       const res = await fetch("/api/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify(callbackMode ? {
+          name: (values.name || "").trim(),
+          phone: (values.mobile || "").trim(),
+          type: "callback",
+          callback_slot: callbackSlot,
+          source_form: "gem_landing",
+          landing_slug: landingSlug,
+          attribution: getPersistedAttribution(),
+          form_page_url: typeof window !== "undefined" ? location.href : "",
+          form_page_path: typeof window !== "undefined" ? location.pathname : "",
+        } : {
           ...(hasRoleChoice
             ? Object.fromEntries(fields.map((f) => [f.name, (values[f.name] || "").trim()]).filter(([, v]) => v))
             : values),
@@ -216,6 +242,31 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
         }),
       })
       if (!res.ok) throw new Error(`Status ${res.status}`)
+
+      if (callbackMode) {
+        // generate_lead for a call back is fired once on /thank-you?type=contact
+        // by ContactThankYouTracker (it reads the lead context set here).
+        pushDataLayer({
+          event: "callback_request_submit",
+          source_form: "gem_landing",
+          callback_slot: callbackSlot,
+          variant: block.variant,
+          landing_slug: landingSlug,
+          buyer_role: role,
+        })
+        setContactLeadContext({
+          product: "contact_form",
+          interest: "callback_request",
+          lead_type: "callback",
+          source_form: "gem_landing",
+          callback_slot: callbackSlot,
+          form_page_url: typeof window !== "undefined" ? location.href : "",
+        })
+        setValues({})
+        toast.success("Received! We will call you within 24 hours on working days.")
+        router.push("/thank-you?type=contact")
+        return
+      }
 
       pushDataLayer({
         event: gaEvent,
@@ -322,6 +373,19 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
             </fieldset>
           ) : null}
 
+          {hasRoleChoice ? (
+            <label className="col-span-2 inline-flex min-h-[44px] items-center gap-2 text-sm text-gray-800 [[data-theme=dark-industrial]_&]:text-slate-200">
+              <input
+                type="checkbox"
+                checked={callbackMode}
+                onChange={(e) => setCallbackMode(e.target.checked)}
+                disabled={submitting}
+                className="h-4 w-4 accent-brand-600"
+              />
+              {tx("callbackToggle", "Request a call back instead")}
+            </label>
+          ) : null}
+
           {fields.map((f) => {
             const span = f.colSpan === 1 ? "col-span-1" : "col-span-2"
             const id = `lf-${f.name}`
@@ -396,6 +460,36 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
             )
           })}
 
+          {callbackMode ? (
+            <div className="col-span-2 flex flex-col gap-1.5">
+              <label
+                htmlFor="lf-callback_slot"
+                className="text-[11px] font-semibold uppercase tracking-wider text-gray-600 [[data-theme=dark-industrial]_&]:text-slate-400"
+              >
+                {tx("preferredTime", "Preferred time")}
+                <span aria-hidden="true" className="text-brand-700"> *</span>
+              </label>
+              <select
+                id="lf-callback_slot"
+                name="callback_slot"
+                required
+                value={callbackSlot}
+                onChange={(e) => setCallbackSlot(e.target.value)}
+                disabled={submitting}
+                className="rounded-md border border-gray-300 bg-white px-3.5 py-3 text-base text-gray-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-green-200 disabled:opacity-60 [color-scheme:light] [[data-theme=dark-industrial]_&]:border-white/10 [[data-theme=dark-industrial]_&]:bg-white/5 [[data-theme=dark-industrial]_&]:text-white [[data-theme=dark-industrial]_&]:[color-scheme:dark]"
+              >
+                <option value="" className="bg-white text-gray-900 [[data-theme=dark-industrial]_&]:bg-slate-900 [[data-theme=dark-industrial]_&]:text-white">
+                  {tc("selectPlaceholder", "Select…")}
+                </option>
+                {CALLBACK_SLOTS.map((o) => (
+                  <option key={o.value} value={o.value} className="bg-white text-gray-900 [[data-theme=dark-industrial]_&]:bg-slate-900 [[data-theme=dark-industrial]_&]:text-white">
+                    {tx(o.key, o.value)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+
           {error ? (
             <p className="col-span-2 text-sm text-red-600" role="alert">
               {error}
@@ -414,7 +508,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
                 {tc("submitting", "Sending…")}
               </>
             ) : (
-              <>{tc("submit", "Submit")}</>
+              <>{callbackMode ? tx("callbackSubmit", "Request a call back") : tc("submit", "Submit")}</>
             )}
           </button>
           <p className="col-span-2 text-center text-[11px] text-gray-500 [[data-theme=dark-industrial]_&]:text-slate-400">
