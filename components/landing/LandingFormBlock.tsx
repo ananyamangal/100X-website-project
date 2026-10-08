@@ -49,7 +49,7 @@ const FIELDS_BY_VARIANT: Record<LandingFormBlockData["variant"], FormFieldDef[]>
     { name: "mobile", label: "Mobile Number", type: "tel", required: true, placeholder: "+91 XXXXX XXXXX", autoComplete: "tel", inputMode: "tel", colSpan: 1 },
     { name: "email", label: "Email (optional)", labelKey: "__extra.email", type: "email", autoComplete: "email", inputMode: "email" },
     { name: "city", label: "City / State", type: "text", required: true, placeholder: "e.g. Lucknow, UP", autoComplete: "address-level1", colSpan: 1 },
-    { name: "gem_seller_id", label: "GeM Seller ID", type: "text", placeholder: "Your GeM portal seller ID (if you have one)", colSpan: 1 },
+    { name: "gem_seller_id", label: "GeM Seller ID (optional)", type: "text", placeholder: "Your GeM portal seller ID (if you have one)", colSpan: 1 },
     { name: "gst", label: "GST Number", type: "text", placeholder: "15-digit GSTIN (if registered)" },
     {
       name: "capacity",

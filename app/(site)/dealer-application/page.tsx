@@ -45,7 +45,7 @@ const DEALER_PATHS = [
 I am a GeM seller and want to become an authorized reseller of your fogging machines on GeM.
 
 My details:
-- GeM Seller ID: [please fill]
+- GeM Seller ID (optional): [please fill]
 - GST Number: [please fill]
 - Business Name: [please fill]
 - State(s) I operate in: [please fill]
