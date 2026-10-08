@@ -12,7 +12,7 @@ import type { VisibleSocialLink } from '@/lib/socialLinksShared';
 import { SOCIAL_ICONS } from '@/components/seo/SocialIcons';
 import BrochureLeadModal from '@/components/BrochureLeadModal';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { DesktopNavDropdown, MobileNavAccordion, productsPanel, performancePanel, blogPanel, sparePartsPanel, type PanelContent } from '@/components/NavMenus';
+import { DesktopNavDropdown, MobileNavAccordion, productsPanel, performancePanel, blogPanel, sparePartsPanel, contactPanel, type PanelContent } from '@/components/NavMenus';
 import type { NavProductGroup } from '@/lib/navProducts';
 import type { NavCaseStudy } from '@/lib/navPerformance';
 import type { NavBlogPost } from '@/lib/navBlog';
@@ -67,6 +67,7 @@ export default function Navbar({ logoUrl = '/logo-main.png', logoAlt = '100x Cir
     ...(blogPosts.length > 0 && {
       '/blog': { toggleLabel: 'Show latest articles', panel: (v) => blogPanel(blogPosts, v) },
     }),
+    '/contact-us': { toggleLabel: 'Show contact options', panel: (v) => contactPanel(v) },
   }
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)

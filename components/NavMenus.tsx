@@ -2,8 +2,10 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, FileText, Handshake, Landmark, Mail, Phone } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BUSINESS } from '@/lib/seo/site-config';
+import { WhatsAppIcon } from '@/components/WhatsAppFloatingButton';
 import type { NavProductGroup } from '@/lib/navProducts';
 import type { NavCaseStudy } from '@/lib/navPerformance';
 import type { NavBlogPost } from '@/lib/navBlog';
@@ -214,6 +216,56 @@ export function sparePartsPanel(groups: NavSparePartGroup[], variant: 'desktop' 
         </div>
         <ViewAll href="/spare-parts" label="View all spare parts" onNavigate={onNavigate} />
       </>
+    )
+  }
+}
+
+// ── Contact ─────────────────────────────────────────────────────────────────
+
+const CONTACT_WA_HREF = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent(
+  "Hi 100x Circle, I'd like to know more about your fogging machines.",
+)}`
+
+/** Static: BUSINESS constants and existing pages only, no data read. */
+const CONTACT_ITEMS: { href: string; label: string; sub: string; icon?: React.ReactNode; photo?: string; external?: boolean }[] = [
+  { href: `tel:${BUSINESS.phonePrimary.replace(/\s+/g, '')}`, label: 'Call us', sub: 'Talk to our team', icon: <Phone size={20} aria-hidden="true" /> },
+  { href: CONTACT_WA_HREF, label: 'WhatsApp', sub: 'Chat with us', icon: <WhatsAppIcon size={20} />, external: true },
+  { href: `mailto:${BUSINESS.email}`, label: 'Email', sub: 'Write to us', icon: <Mail size={20} aria-hidden="true" /> },
+  { href: '/contact-us', label: 'Request a Quote', sub: 'Share your requirement', icon: <FileText size={20} aria-hidden="true" /> },
+  { href: '/factory', label: 'Visit our Factory', sub: BUSINESS.addressLocality, photo: '/nav-factory.webp' },
+  { href: '/become-a-dealer', label: 'Become a Dealer', sub: 'Dealer programme', icon: <Handshake size={20} aria-hidden="true" /> },
+  { href: '/fogging-machine-government-procurement', label: 'Government / GeM enquiries', sub: 'Tenders and GeM procurement', icon: <Landmark size={20} aria-hidden="true" /> },
+]
+
+export function contactPanel(variant: 'desktop' | 'mobile'): PanelContent {
+  return function ContactPanel(showThumbs, onNavigate) {
+    return (
+      // data-gtm-location: the site-wide click listener tags tel:/wa.me/mailto: clicks with it.
+      <div data-gtm-location="navbar-contact-menu">
+        <ul className={variant === 'desktop' ? 'grid grid-cols-2 gap-x-6 xl:grid-cols-3' : undefined}>
+          {CONTACT_ITEMS.map((c) => {
+            const inner = (
+              <>
+                {c.photo
+                  ? <NavThumb src={c.photo} alt={c.label} show={showThumbs} />
+                  : <span aria-hidden="true" className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-brand-50 text-brand-700">{c.icon}</span>}
+                <span className="min-w-0 leading-snug">
+                  {c.label}
+                  <span className="block text-xs font-normal text-gray-500">{c.sub}</span>
+                </span>
+              </>
+            )
+            return (
+              <li key={c.label}>
+                {c.href.startsWith('/')
+                  ? <Link href={c.href} onClick={onNavigate} className={ROW_CLASS}>{inner}</Link>
+                  : <a href={c.href} onClick={onNavigate} className={ROW_CLASS} {...(c.external && { target: '_blank', rel: 'noopener noreferrer' })}>{inner}</a>}
+              </li>
+            )
+          })}
+        </ul>
+        <ViewAll href="/contact-us" label="Go to the contact page" onNavigate={onNavigate} />
+      </div>
     )
   }
 }

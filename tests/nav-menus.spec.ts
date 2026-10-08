@@ -9,6 +9,7 @@ const MENUS = [
   { label: "Performance", href: "/past-performance-government", toggle: "Show past performance" },
   { label: "Spare Parts", href: "/spare-parts", toggle: "Show spare parts" },
   { label: "Blog", href: "/blog", toggle: "Show latest articles" },
+  { label: "Contact", href: "/contact-us", toggle: "Show contact options" },
 ]
 
 test.describe("desktop", () => {
