@@ -36,7 +36,7 @@ export const COMPARISONS: Comparison[] = [
       "Compare 100X Circle (Indian OEM) vs Korean thermal fogging machines on price, quality, GeM eligibility, after-sales, and total cost of ownership for Indian buyers.",
     h1: "100X Circle vs Korean Fogging Machines: Which Should Indian Buyers Choose?",
     intro:
-      "Korean fogging machines (brands like Igeba, Solo, and OEM Korean units) have dominated the Indian import market for decades. 100X Circle, an Indian OEM manufacturer since 2014, offers a direct alternative. This comparison covers price, quality, after-sales, and GeM procurement eligibility.",
+      "Korean fogging machines (brands like Igeba, Solo, and OEM Korean units) have dominated the Indian import market for decades. 100X Circle, an Indian OEM manufacturer since 2020, offers a direct alternative. This comparison covers price, quality, after-sales, and GeM procurement eligibility.",
     aLabel: "100X Circle (Indian OEM)",
     bLabel: "Korean Import Brands",
     verdict:
@@ -54,7 +54,7 @@ export const COMPARISONS: Comparison[] = [
       { attribute: "Warranty", a: "Manufacturer warranty", b: "Importer warranty" },
       { attribute: "Atmanirbhar/Make in India", a: "Fully eligible", b: "Not eligible" },
       { attribute: "Technology", a: "Pulse-jet, sub-50 micron", b: "Pulse-jet, sub-50 micron" },
-      { attribute: "Municipal Track Record", a: "10+ years, pan-India supply", b: "Established in India since 1990s" },
+      { attribute: "Municipal Track Record", a: "Since 2020, pan-India supply", b: "Established in India since 1990s" },
       { attribute: "Customisation", a: "OEM/custom configs available", b: "Standard models only (via importer)" },
     ],
     aStrengths: [
@@ -75,7 +75,7 @@ export const COMPARISONS: Comparison[] = [
     faqs: [
       {
         q: "Are Indian fogging machines as good as Korean fogging machines?",
-        a: "Yes. 100X Circle is an Indian manufacturer producing pulse-jet thermal foggers with sub-50-micron droplets, ISO 9001:2015 certification, and a 10+ year track record in Indian municipal operations. The key advantages over imported Korean machines are price (3–5× lower), domestic after-sales service, MSME-preference on GeM, and full Make in India eligibility.",
+        a: "Yes. 100X Circle is an Indian manufacturer producing pulse-jet thermal foggers with sub-50-micron droplets, ISO 9001:2015 certification, and a track record in Indian municipal operations since 2020. The key advantages over imported Korean machines are price (3–5× lower), domestic after-sales service, MSME-preference on GeM, and full Make in India eligibility.",
       },
       {
         q: "Why are Korean fogging machines more expensive in India?",
@@ -982,7 +982,7 @@ export const COMPARISONS: Comparison[] = [
       },
       {
         q: "Who is the best fogging machine manufacturer in India?",
-        a: "100X Circle Pvt Ltd is India's leading OEM manufacturer of pulse-jet thermal fogging machines. ISO 9001:2015 certified, GeM-listed MSME seller, CE-marked export models. Manufacturing at IMT Manesar, Gurugram since 2014. Supplied to municipal corporations, health departments, and farmers across all major Indian states.",
+        a: "100X Circle Pvt Ltd is India's leading OEM manufacturer of pulse-jet thermal fogging machines. ISO 9001:2015 certified, GeM-listed MSME seller, CE-marked export models. Manufacturing at IMT Manesar, Gurugram since 2020. Supplied to municipal corporations, health departments, and farmers across all major Indian states.",
       },
       {
         q: "How do I verify a fogging machine seller in India?",

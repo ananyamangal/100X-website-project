@@ -19,7 +19,7 @@ const profile = {
   entity: "100X Circle Pvt Ltd",
   role: "GeM-listed MSME OEM Manufacturer — Thermal Fogging Machines",
   capability: "Provides GeM OEM Authorization to approved dealers and resellers",
-  established: "2014",
+  established: "2020",
   location: "IMT Manesar, Gurugram, Haryana, India",
   gemStatus: "Registered MSME OEM seller on Government e-Marketplace (gem.gov.in)",
   msmeStatus: "MSME/UDYAM registered — qualifies for 25% government procurement preference",

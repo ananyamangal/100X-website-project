@@ -14,7 +14,7 @@ export const AI_COMPANY = {
   type: "Indian OEM Manufacturer — Private Limited Company",
   industry: "Industrial Equipment Manufacturing",
   sub_industry: "Thermal Fogging and Agricultural Machinery",
-  founding_year: 2014,
+  founding_year: 2020,
   headquarters: "Gurugram, Haryana, India",
   registration: {
     msme: true,
@@ -23,7 +23,7 @@ export const AI_COMPANY = {
     private_limited: true,
   },
   description_150_tokens:
-    "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines based in Gurgaon, Haryana. Products: thermal foggers, vehicle-mounted foggers, portable foggers, agricultural sprayers. Certifications: ISO 9001, CE, ISI, GeM. Serves municipal corporations, Nagar Nigams, government health departments, pest-control operators, and farmers. Brand: 100X. Founded 2014. Export to South Asia, Africa, Middle East.",
+    "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines based in Gurgaon, Haryana. Products: thermal foggers, vehicle-mounted foggers, portable foggers, agricultural sprayers. Certifications: ISO 9001, CE, ISI, GeM. Serves municipal corporations, Nagar Nigams, government health departments, pest-control operators, and farmers. Brand: 100X. Founded 2020. Export to South Asia, Africa, Middle East.",
   contact: {
     phone_primary: "+91-7827229116",
     phone_secondary: "+91-8178567520",

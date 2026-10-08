@@ -138,7 +138,7 @@ export default function MakeInIndiaFoggingMachinePage() {
           <h2>100X Circle — India&apos;s MSME Fogging Machine Manufacturer</h2>
           <p>
             100X Circle Pvt Ltd has manufactured pulse-jet thermal fogging machines in India
-            since 2014. The factory at IMT Manesar, Gurugram (Haryana) operates under ISO
+            since 2020. The factory at IMT Manesar, Gurugram (Haryana) operates under ISO
             9001:2015 quality management certification. All manufacturing — from metal
             fabrication to final assembly and quality testing — is performed at the Gurugram
             facility.

@@ -17,6 +17,7 @@
  */
 
 import { DEFAULT_THEME_BY_TYPE, type LandingPageDef } from "./landing-types"
+import { yearsInBusiness } from "../facts"
 
 // ─── Re-exports so existing consumers don't need to update import paths ──
 export type { LandingPageDef }
@@ -172,7 +173,7 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
         metrics: [
           { value: "10,000+", label: "Happy customers" },
           { value: "50+", label: "Active distributors" },
-          { value: "10+", label: "Years experience" },
+          { value: String(yearsInBusiness()), label: "Years experience" },
           { value: "GeM Q2", label: "OEM certified" },
           { value: "Pan India", label: "Supply & support" },
         ],
@@ -381,7 +382,7 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
     hero: {
       eyebrow: "Bihar & Eastern India Supply Network",
       headline: "Fogging Machine Supplier in Bihar",
-      sub: "Seasonal flooding, dense populations, and recurring mosquito-borne disease drives make Bihar one of India's highest-demand zones for fogging equipment. 100x Circle has been supplying thermal, cold, and vehicle-mounted machines to Bihar's government health departments and private pest-control operators for over a decade — with local stock, GST invoicing, and on-the-ground support.",
+      sub: "Seasonal flooding, dense populations, and recurring mosquito-borne disease drives make Bihar one of India's highest-demand zones for fogging equipment. 100x Circle has been supplying thermal, cold, and vehicle-mounted machines to Bihar's government health departments and private pest-control operators since 2020 — with local stock, GST invoicing, and on-the-ground support.",
       primary: { label: "Get a Bihar Tender Quote", href: "#landing-form", track: "bihar_hero_primary" },
       secondary: {
         label: "Call Us Now",
@@ -393,7 +394,7 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
       {
         kind: "trust-strip",
         metrics: [
-          { value: "10+ yrs", label: "Supplying Bihar" },
+          { value: "Since 2020", label: "Supplying Bihar" },
           { value: "Local", label: "Stock points" },
           { value: "24–72h", label: "Dispatch time" },
           { value: "GST", label: "Invoiced supply" },
@@ -604,7 +605,7 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
       {
         kind: "trust-strip",
         metrics: [
-          { value: "10+ yrs", label: "Manufacturing both" },
+          { value: "Since 2020", label: "Manufacturing both" },
           { value: "GeM", label: "Q2 OEM" },
           { value: "INR", label: "Direct factory pricing" },
           { value: "Pan India", label: "Supply + support" },

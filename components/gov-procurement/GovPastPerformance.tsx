@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import { yearsInBusiness } from "@/lib/facts"
 
 interface Props {
   customerLogos: string[]
@@ -32,7 +33,7 @@ const BUYER_CATEGORIES = [
 ]
 
 const METRICS = [
-  { value: "12+", label: "Years Manufacturing", sub: "Since 2014" },
+  { value: String(yearsInBusiness()), label: "Years Manufacturing", sub: "Since 2020" },
   { value: "15+", label: "States", sub: "Government supply" },
   { value: "50+", label: "Active Dealers", sub: "Pan-India network" },
   { value: "5–10", label: "Day Dispatch", sub: "From Gurugram factory" },

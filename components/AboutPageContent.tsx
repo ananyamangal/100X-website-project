@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { RichContent } from "@/components/RichContent"
 import { optimizeCloudinary } from "@/lib/cloudinaryUrl"
+import { yearsInBusiness, FOUNDED_YEAR } from "@/lib/facts"
 
 export default function AboutPageContent({
   content,
@@ -32,7 +33,7 @@ export default function AboutPageContent({
   const journeyParagraph1 = c.journeyParagraph1 ?? ""
   const journeyList = c.journeyList ?? ""
   const journeyParagraph2 = c.journeyParagraph2 ?? ""
-  const journeyStat1Value = c.journeyStat1Value ?? "2015"
+  const journeyStat1Value = String(FOUNDED_YEAR)
   const journeyStat1Label = c.journeyStat1Label ?? "Founded"
   const journeyStat2Value = c.journeyStat2Value ?? "10K+"
   const journeyStat2Label = c.journeyStat2Label ?? "Happy customers"
@@ -78,7 +79,7 @@ export default function AboutPageContent({
             </h1>
             <div className="flex flex-wrap gap-x-8 gap-y-3 mt-8">
               {[
-                { value: "15+", label: "Years Manufacturing" },
+                { value: String(yearsInBusiness()), label: "Years Manufacturing" },
                 { value: "10,000+", label: "Machines Deployed" },
                 { value: "GeM", label: "OEM Registered" },
                 { value: "ISO", label: "9001:2015 Certified" },

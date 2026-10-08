@@ -161,7 +161,7 @@ export default async function PastPerformancePage() {
                 </h1>
                 <p className="text-gray-400 text-lg leading-relaxed mb-4">
                   Real fogging machine supply orders to municipal bodies, health departments, and public institutions
-                  across India — 12+ years of government procurement experience.
+                  across India — government procurement experience since 2020.
                 </p>
                 <p className="text-gray-500 text-sm mb-8">
                   Reference letters, IS 14855 certificates, and OEM documentation available within 24 hours.
@@ -270,7 +270,7 @@ export default async function PastPerformancePage() {
                 <p className="eyebrow text-brand-400 mb-4">Trusted By</p>
                 <h2 className="text-display-xs font-700 text-white mb-3">Organizations Served</h2>
                 <p className="text-gray-400 text-base max-w-2xl">
-                  Categories of government institutions served across India since 2014 — with full OEM documentation available on request.
+                  Categories of government institutions served across India since 2020 — with full OEM documentation available on request.
                 </p>
               </div>
               <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">

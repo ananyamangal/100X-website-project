@@ -6,9 +6,10 @@ import ScrollReveal from "@/components/cinematic/ScrollReveal"
 import CinematicStatCounter from "@/components/cinematic/CinematicStatCounter"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
+import { yearsInBusiness } from "@/lib/facts"
 
 const MANUFACTURING_STATS = [
-  { value: 15, suffix: "+", label: "Years Experience", description: "Thermal fogging OEM manufacturing" },
+  { value: yearsInBusiness(), label: "Years Experience", description: "Thermal fogging OEM manufacturing" },
   { value: 10000, suffix: "+", label: "Machines Deployed", description: "Across India and abroad" },
   { value: 200, suffix: "+", label: "Municipalities", description: "Government supply network" },
   { value: 29, label: "States Reached", description: "Pan-India service coverage" },
@@ -36,7 +37,7 @@ interface Props {
 
 export default function CinematicManufacturingSection({ content }: Props) {
   const eyebrow = content?.eyebrow || "Manufacturing Excellence"
-  const headline = content?.headline || "Precision-engineered in India.\nBuilt to last a decade."
+  const headline = content?.headline || "Precision-engineered in India.\nBuilt to last."
   const body = content?.body || "Every 100X Circle machine begins its journey at our Gurugram facility — where engineering tolerances are non-negotiable and every unit is run-tested before dispatch."
   const stats = content?.stats || MANUFACTURING_STATS
   const pillars = content?.pillars || MANUFACTURING_PILLARS

@@ -7,6 +7,7 @@ import ScrollReveal from '@/components/cinematic/ScrollReveal'
 import BrochureLeadModal from '@/components/BrochureLeadModal'
 import { BUSINESS } from '@/lib/seo/site-config'
 import { getProductCanonicalUrl } from '@/lib/seo/product-landing-map'
+import { yearsInBusiness } from '@/lib/facts'
 
 const badgeLogoMap: Record<string, string> = {
   'German Technology':  '/Logos clipart 2/german technology.png',
@@ -197,7 +198,7 @@ export default function ProductsPageClient({ products }: { products: any[] }) {
           <div className="mt-10 flex flex-wrap gap-6 md:gap-10">
             {[
               { value: `${products.length}+`, label: 'Products' },
-              { value: '15+', label: 'Years Manufacturing' },
+              { value: String(yearsInBusiness()), label: 'Years Manufacturing' },
               { value: '500+', label: 'Government Orders' },
               { value: 'GeM', label: 'Registered' },
             ].map((s) => (

@@ -1,5 +1,7 @@
 // Types and defaults only — safe to import in client components (no server-only deps)
 
+import { yearsInBusiness } from './facts'
+
 export interface HomeContentFaq {
   q: string
   a: string
@@ -77,7 +79,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
     section2Body: 'Lightweight, single-operator foggers used by farmers across India to apply fungicides, pesticides, and plant growth regulators across orchards, paddy fields, and vegetable farms. Handles both diesel-based and water-based formulations.',
     whyChooseTitle: 'Why Choose 100X Circle',
     whyChooseBullets: [
-      '10+ years of focused manufacturing experience in fogging equipment',
+      'Focused manufacturing experience in fogging equipment since 2020',
       'GeM-approved OEM status for direct government procurement',
       'Pulse-jet engine technology for consistent, powerful fog output',
       '50+ active distributors across India for local support',
@@ -135,7 +137,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
     body: 'Pulse-jet thermal foggers engineered and assembled at our Gurugram facility. Every machine field-tested for Indian conditions before it ships — from monsoon humidity to high-vegetation municipal terrain.',
     stats: [
       { value: 'Gurugram', label: 'Manufacturing facility' },
-      { value: '10+ years', label: 'Of OEM production' },
+      { value: `${yearsInBusiness()} years`, label: 'Of OEM production' },
       { value: 'In-house', label: 'Engineering & assembly' },
       { value: '50+', label: 'Distribution points' },
     ],
@@ -167,7 +169,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
     },
   ],
   connectors: {
-    c1: { eyebrow: 'Built for India', text: 'A decade of manufacturing for the field.' },
+    c1: { eyebrow: 'Built for India', text: 'Manufacturing for the field since 2020.' },
     c2: { eyebrow: 'The Range', text: 'From handheld to vehicle-mounted.' },
     c3: { eyebrow: 'The Technology', text: 'Inside every 100X fogger.' },
     c4: { eyebrow: 'In Their Words', text: 'Reviews from the field.' },

@@ -3,6 +3,7 @@ import Link from "next/link"
 import { CheckCircle2, MapPin, TrendingUp, Shield, Package, Phone, MessageCircle } from "lucide-react"
 import { SITE_URL, BUSINESS, SITE_NAME } from "@/lib/seo/site-config"
 import DealerApplicationForm from "./DealerApplicationForm"
+import { yearsInBusiness } from "@/lib/facts"
 
 // ─── SEO ──────────────────────────────────────────────────────────────────────
 
@@ -82,7 +83,7 @@ const TRUST_BADGES = [
   { value: "10,000+", label: "Machines sold" },
   { value: "50+",     label: "Active dealers" },
   { value: "28",      label: "States served" },
-  { value: "15+",     label: "Years manufacturing" },
+  { value: String(yearsInBusiness()), label: "Years manufacturing" },
   { value: "GeM OEM", label: "Certified" },
   { value: "ISO 9001",label: ":2015 certified" },
 ]

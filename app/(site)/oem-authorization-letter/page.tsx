@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import OemAuthForm from "@/components/oem/OemAuthForm"
+import { yearsInBusiness } from "@/lib/facts"
 
 export const revalidate = 60
 
@@ -159,7 +160,7 @@ export default function OemAuthorizationLetterPage() {
               { n: "80+", label: "Government Departments Served" },
               { n: "15+", label: "States Covered" },
               { n: "500+", label: "Government Orders Fulfilled" },
-              { n: "12+", label: "Years Manufacturing" },
+              { n: String(yearsInBusiness()), label: "Years Manufacturing" },
             ].map((s) => (
               <div key={s.label} className="text-center p-5 bg-slate-900 border border-white/[0.06] rounded-xl">
                 <p className="text-3xl font-black text-emerald-400 mb-1">{s.n}</p>

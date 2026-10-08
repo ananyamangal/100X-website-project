@@ -5,11 +5,12 @@ import type { Metadata } from "next"
 import { SITE_URL, SITE_NAME_LEGAL, defaultOgImage } from "@/lib/seo/site-config"
 import AboutPageContent from "@/components/AboutPageContent"
 import clientPromise from "@/lib/mongodb"
+import { FOUNDED_YEAR } from "@/lib/facts"
 
 export const metadata: Metadata = {
   title: "About 100X Circle — Indian Thermal Fogging Machine Manufacturer",
   description:
-    "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines. Founded 2014. ISO 9001:2015 certified. GeM-listed, MSME/UDYAM registered. Factory at IMT Manesar, Gurugram, Haryana.",
+    "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines. Founded 2020. ISO 9001:2015 certified. GeM-listed, MSME/UDYAM registered. Factory at IMT Manesar, Gurugram, Haryana.",
   alternates: { canonical: `${SITE_URL}/about` },
   openGraph: {
     title: "About 100X Circle — Indian Thermal Fogging Machine Manufacturer",
@@ -29,7 +30,7 @@ const DEFAULT_CONTENT = {
   journeyParagraph1: `100X Circle Pvt Ltd is India's fast-growing OEM of advanced fogging machines, agri implements, and airport ground equipment. Located at Sector 7, IMT Manesar, Gurgaon, we proudly uphold the 'Make in India' mission by delivering CE-certified, ISO 9001-compliant, and W.H.O-compliant solutions for both public and private sectors.`,
   journeyList: 'Thermal Fogging Machines (Portable & Vehicle-Mounted)\nBio-Foggers for sensitive applications\nMini Fogging Machines for compact operations\nComplete Agricultural Machinery line\nHeavy-duty Airport Baggage Trolleys',
   journeyParagraph2: 'Tested in approved labs, our machines are available and listed on the Government e-Marketplace (GeM) and widely used by defense forces, municipal bodies, and agriculture departments.',
-  journeyStat1Value: '2015',
+  journeyStat1Value: String(FOUNDED_YEAR),
   journeyStat1Label: 'Founded',
   journeyStat2Value: '10K+',
   journeyStat2Label: 'Happy customers',
@@ -69,9 +70,9 @@ const aboutJsonLd = {
     alternateName: ["100X", "100X Circle"],
     url: SITE_URL,
     logo: `${defaultOgImage}`,
-    foundingDate: "2014",
+    foundingDate: "2020",
     description:
-      "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines. Established 2014. ISO 9001:2015 certified, CE marked, ISI marked, MSME/UDYAM registered, and GeM-approved seller for direct government procurement. Factory at IMT Manesar, Gurugram, Haryana. Brand: 100X.",
+      "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines. Established 2020. ISO 9001:2015 certified, CE marked, ISI marked, MSME/UDYAM registered, and GeM-approved seller for direct government procurement. Factory at IMT Manesar, Gurugram, Haryana. Brand: 100X.",
     address: {
       "@type": "PostalAddress",
       streetAddress: "UG, 398, Sector 7, Industrial Model Township",
@@ -116,7 +117,8 @@ export default async function AboutPage() {
     const doc = await client.db().collection('about_page').findOne({ key: 'about_page' })
     if (doc) {
       const { _id, key, ...rest } = doc as any
-      content = { ...DEFAULT_CONTENT, ...rest }
+      // Founding year is a fact, never read from the database.
+      content = { ...DEFAULT_CONTENT, ...rest, journeyStat1Value: String(FOUNDED_YEAR) }
     }
   } catch { /* fall back to defaults */ }
 

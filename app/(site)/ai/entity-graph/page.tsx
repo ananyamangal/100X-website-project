@@ -19,7 +19,7 @@ const ENTITY_GRAPH = {
       legalName: "100X Circle Private Limited",
       alternateName: ["100X"],
       url: SITE_URL,
-      foundingDate: "2014",
+      foundingDate: "2020",
       naics: "333999",
       isicV4: "2819",
       location: { "@id": `${SITE_URL}/#factory` },
@@ -138,7 +138,7 @@ const ENTITIES = [
     type: "Organization + Manufacturer",
     color: "bg-brand-600",
     links: ["factory", "cert-iso9001", "cert-ce", "cert-msme", "cert-gem", "product-thermal", "product-vehicle", "product-portable", "product-agri"],
-    facts: ["Founded 2014", "Gurugram, Haryana", "ISO 9001:2015", "GeM MSME OEM"],
+    facts: ["Founded 2020", "Gurugram, Haryana", "ISO 9001:2015", "GeM MSME OEM"],
   },
   {
     id: "factory",

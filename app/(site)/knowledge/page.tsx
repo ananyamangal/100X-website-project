@@ -208,7 +208,7 @@ export default function KnowledgeHubPage() {
           <p className="text-sm text-gray-600 mb-4">
             This knowledge base is authored by 100X Circle Pvt Ltd, an ISO 9001 certified Indian
             OEM manufacturer of thermal fogging machines. All technical information reflects
-            operational experience from 10+ years of manufacturing and supplying equipment to
+            operational experience from manufacturing and supplying equipment since 2020 to
             municipal corporations, health departments, and agricultural buyers across India.
           </p>
           <p className="text-sm text-gray-600">

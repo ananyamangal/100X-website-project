@@ -25,7 +25,7 @@ const jsonLd = {
     legalName: "100X Circle Private Limited",
     alternateName: ["100X"],
     url: SITE_URL,
-    foundingDate: "2014",
+    foundingDate: "2020",
     foundingLocation: "Gurugram, Haryana, India",
     naics: "333999",
     isicV4: "2819",

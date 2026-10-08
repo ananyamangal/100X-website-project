@@ -217,7 +217,7 @@ export default async function ComparisonPage({
           <p className="font-semibold text-brand-800 mb-2">Ready to Buy? Get a Quote from 100X Circle</p>
           <p className="text-brand-700 mb-3">
             100X Circle is India&apos;s leading OEM manufacturer of thermal fogging machines — ISO
-            9001 certified, GeM-listed MSME, supplying to municipalities and farmers since 2014.
+            9001 certified, GeM-listed MSME, supplying to municipalities and farmers since 2020.
           </p>
           <div className="flex flex-wrap gap-4 text-brand-800 font-medium">
             <span>📞 +91-7827229116</span>

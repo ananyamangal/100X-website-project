@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import { yearsInBusiness } from "@/lib/facts"
 
 interface KPIs {
   totalOrders: number
@@ -75,7 +76,7 @@ export default function GovPerformanceSnapshot({ initialKpis }: { initialKpis?: 
           <StatCounter value={kpis.statesServed} suffix="+" label="States Served" />
           <StatCounter value={kpis.departmentsServed} suffix="+" label="Departments" />
           <StatCounter value={kpis.unitsSupplied} suffix="+" label="Units Supplied" />
-          <StatCounter value={kpis.yearsExperience} suffix="" label="Years Experience" />
+          <StatCounter value={yearsInBusiness()} suffix="" label="Years Experience" />
         </div>
 
         <div className="text-center">

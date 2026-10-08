@@ -3,6 +3,7 @@
 import React from "react"
 import ScrollReveal from "@/components/cinematic/ScrollReveal"
 import { ShieldCheck, Award, Globe2, Zap } from "lucide-react"
+import { yearsInBusiness } from "@/lib/facts"
 
 const TRUST_PILLARS = [
   {
@@ -25,8 +26,8 @@ const TRUST_PILLARS = [
   },
   {
     icon: Zap,
-    title: "15+ Years Manufacturing",
-    body: "A decade and a half of thermal fogging expertise — built into every machine we make.",
+    title: `${yearsInBusiness()} Years Manufacturing`,
+    body: "Thermal fogging expertise since 2020 — built into every machine we make.",
     accent: "text-yellow-400",
   },
 ]

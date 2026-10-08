@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { FOUNDED_YEAR, yearsInBusiness } from "@/lib/facts"
 
 export interface KPIs {
   totalOrders: number
@@ -112,14 +113,15 @@ function IconCalendar() {
 }
 
 export default function GovKPIStrip({ kpis }: { kpis: KPIs }) {
-  const founded = new Date().getFullYear() - (kpis.yearsExperience || 12)
+  // Years and founding year are facts (lib/facts.ts), never read from the database.
+  const founded = FOUNDED_YEAR
 
   const metrics = [
     { value: kpis.totalOrders, label: "Govt. Orders", suffix: "+", icon: <IconClipboard />, delay: 0 },
     { value: kpis.statesServed, label: "States Served", suffix: "+", icon: <IconMap />, delay: 100 },
     { value: kpis.departmentsServed, label: "Departments", suffix: "+", icon: <IconBuilding />, delay: 200 },
     { value: kpis.unitsSupplied, label: "Units Supplied", suffix: "+", icon: <IconBox />, delay: 300 },
-    { value: kpis.yearsExperience, label: "Years Track Record", icon: <IconCalendar />, delay: 400, note: `Est. ${founded}` },
+    { value: yearsInBusiness(), label: "Years Track Record", icon: <IconCalendar />, delay: 400, note: `Est. ${founded}` },
   ]
 
   return (
