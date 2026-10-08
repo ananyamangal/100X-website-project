@@ -42,12 +42,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    // TEMP DEBUG: tracing intermittent submit failures — remove once resolved.
-    console.log("[PartnerApplyForm] submit attempt", { sending, elapsedMs: Date.now() - mountedAtRef.current })
-    if (sending) {
-      console.log("[PartnerApplyForm] blocked re-entrant submit while a request is already in flight")
-      return
-    }
+    if (sending) return
 
     setError("")
 
@@ -64,7 +59,6 @@ export default function PartnerApplyForm({ source = "partner_application", compa
     // the field's value.
     const elapsed = Date.now() - mountedAtRef.current
     if (elapsed < 2000) {
-      console.log("[PartnerApplyForm] time gate rejected submit", { elapsedMs: elapsed })
       setError("Please try again.")
       return
     }
@@ -116,10 +110,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
         }),
       })
 
-      const resBodyText = await res.clone().text()
-      console.log("[PartnerApplyForm] /api/submissions response", { status: res.status, ok: res.ok, body: resBodyText })
-
-      if (!res.ok) throw new Error(`Server error ${res.status}: ${resBodyText}`)
+      if (!res.ok) throw new Error(`Server error ${res.status}`)
 
       // Fire generate_lead only AFTER the server confirms the save — never on
       // click alone. "Request quote" in Google Ads listens on this event.
@@ -137,8 +128,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
       formRef.current?.reset()
       setWantsQuote(true)
       setWantsDealer(false)
-    } catch (err) {
-      console.log("[PartnerApplyForm] submit failed", { name: err instanceof Error ? err.name : typeof err, message: err instanceof Error ? err.message : String(err) })
+    } catch {
       setError("We couldn't save your request due to a connection issue. Please try again, or WhatsApp us directly and we'll respond right away.")
     } finally {
       setSending(false)
