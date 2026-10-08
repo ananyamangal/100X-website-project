@@ -4,7 +4,7 @@
  * All data is static and fact-dense — no marketing language.
  */
 
-import { VERIFIED_STATES } from "./facts"
+import { VERIFIED_STATES } from "../facts"
 
 export const AI_LAST_UPDATED = "2026-05-29"
 export const SITE_URL = "https://www.100xcircle.com"
