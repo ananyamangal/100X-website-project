@@ -229,7 +229,6 @@ export default function PublicHealthEquipmentPage() {
               <strong>WHO Guidelines on Space Spraying</strong> — WHO&apos;s operational guidelines
               for thermal and ULV space spraying for vector control specify droplet size (10–30
               microns for adult mosquitoes), insecticide formulations, and application rates.
-              100X Circle machines achieve WHO-specified droplet ranges.
             </li>
             <li>
               <strong>NVBDCP Operational Guidelines</strong> — The national programme specifies
@@ -305,7 +304,7 @@ export default function PublicHealthEquipmentPage() {
             {[
               { q: "Can NGOs and private hospitals procure from 100X Circle?", a: "Yes. NGOs, private hospitals, and institutional buyers can purchase directly from 100X Circle without GeM. Contact us for pricing and documentation." },
               { q: "What documentation is provided for public health programme procurement?", a: "IS 14855 compliance docs, ISO 9001:2015 certificate, MSME/UDYAM certificate, technical spec sheets, CE certificate (export models), GST registration, and GeM seller verification — everything required for government tender bid submissions." },
-              { q: "Are insecticide chemicals supplied along with the machines?", a: "100X Circle specialises in fogging machine hardware. For insecticide procurement, we can recommend approved formulations and suppliers. The machines are compatible with all WHO-recommended oil-based insecticide formulations." },
+              { q: "Are insecticide chemicals supplied along with the machines?", a: "100X Circle specialises in fogging machine hardware. For insecticide procurement, we can recommend approved formulations and suppliers. The machines are compatible with oil-based insecticide formulations." },
             ].map(({ q, a }) => (
               <details key={q} className="border border-gray-200 rounded-xl">
                 <summary className="p-4 font-medium text-gray-800 cursor-pointer text-sm">{q}</summary>

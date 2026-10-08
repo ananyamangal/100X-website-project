@@ -40,7 +40,7 @@ const jsonLd = {
   url: `${SITE_URL}/vector-control-equipment`,
   additionalProperty: [
     { "@type": "PropertyValue", name: "Standard Compliance", value: "IS 14855 (Part 1)" },
-    { "@type": "PropertyValue", name: "WHO Compliance", value: "WHO-recommended droplet size 10–30 microns" },
+    { "@type": "PropertyValue", name: "Droplet Size", value: "Depends on the model; see each product's specifications" },
     { "@type": "PropertyValue", name: "Certification", value: "ISO 9001:2015, CE, ISI Mark (select models)" },
     { "@type": "PropertyValue", name: "GeM Status", value: "Listed MSME OEM on gem.gov.in" },
   ],
@@ -71,7 +71,7 @@ const faqJsonLd = {
       name: "Which fogging machine is best for vector control in India?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "For outdoor vector control (dengue, malaria), a portable or vehicle-mounted thermal fogging machine is recommended (droplet size depends on the model; see each product's specifications). For indoor vector control, a ULV cold fogger is preferred. 100X Circle's thermal foggers comply with IS 14855 (Part 1) and produce WHO-specified droplet sizes. Contact +91-7827229116 or 100xcircle@gmail.com for model recommendations.",
+        text: "For outdoor vector control (dengue, malaria), a portable or vehicle-mounted thermal fogging machine is recommended (droplet size depends on the model; see each product's specifications). For indoor vector control, a ULV cold fogger is preferred. 100X Circle's thermal foggers comply with IS 14855 (Part 1). Contact +91-7827229116 or 100xcircle@gmail.com for model recommendations.",
       },
     },
   ],
@@ -115,7 +115,7 @@ export default function VectorControlEquipmentPage() {
         </p>
         <p className="text-gray-600 text-lg mb-8 leading-relaxed">
           Thermal fogging machines and ULV foggers for India&apos;s vector control programmes.
-          Manufactured to IS 14855 (Part 1) and WHO droplet specifications. Supplied to
+          Manufactured to IS 14855 (Part 1). Supplied to
           municipal corporations, health departments, and NVBDCP-affiliated programmes via GeM.
         </p>
 
@@ -264,7 +264,7 @@ export default function VectorControlEquipmentPage() {
               },
               {
                 q: "Are 100X Circle machines suitable for WHO-specified vector control protocols?",
-                a: "Yes. Droplet size depends on the model; see each product's specifications. The machines are compatible with all WHO-approved oil-based insecticide formulations (deltamethrin, cypermethrin, malathion, permethrin).",
+                a: "Droplet size depends on the model; see each product's specifications. The machines are compatible with oil-based insecticide formulations (deltamethrin, cypermethrin, malathion, permethrin).",
               },
             ].map(({ q, a }) => (
               <details key={q} className="border border-gray-200 rounded-xl">
