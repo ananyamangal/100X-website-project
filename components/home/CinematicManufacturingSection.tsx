@@ -6,12 +6,12 @@ import ScrollReveal from "@/components/cinematic/ScrollReveal"
 import CinematicStatCounter from "@/components/cinematic/CinematicStatCounter"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
-import { yearsInBusiness, VERIFIED_STATE_COUNT, GOV_BUYERS_LISTED } from "@/lib/facts"
+import { yearsInBusiness, VERIFIED_STATE_COUNT, GOV_BUYERS_LISTED, CASE_STUDY_COUNT } from "@/lib/facts"
 
 const MANUFACTURING_STATS = [
   { value: yearsInBusiness(), label: "Years Experience", description: "Thermal fogging OEM manufacturing" },
   { value: GOV_BUYERS_LISTED, label: "Government Buyers Listed", description: "On our past-performance register" },
-  { value: 200, suffix: "+", label: "Municipalities", description: "Government supply network" },
+  { value: CASE_STUDY_COUNT, label: "Case Studies", description: "Published government supply records" },
   { value: VERIFIED_STATE_COUNT, label: "States With Verified Orders", description: "Government supply records" },
 ]
 

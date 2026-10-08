@@ -5,7 +5,7 @@ export const FOUNDED_YEAR = 2020
 
 /** Whole calendar years since FOUNDED_YEAR. Never read this from the database. */
 export function yearsInBusiness(now: Date = new Date()): number {
-  return now.getFullYear() - FOUNDED_YEAR
+  return now.getUTCFullYear() - FOUNDED_YEAR
 }
 
 /** Fogging machine models in the live catalogue (the baggage trolley is not a fogger). */

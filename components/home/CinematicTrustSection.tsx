@@ -21,7 +21,7 @@ const TRUST_PILLARS = [
   {
     icon: Globe2,
     title: "Pan-India Presence",
-    body: `Service network across ${VERIFIED_STATE_COUNT} states. Spare parts dispatched within ${SPARE_DISPATCH}.`,
+    body: `Government supply in ${VERIFIED_STATE_COUNT} states. Spare parts dispatched within ${SPARE_DISPATCH}.`,
     accent: "text-purple-400",
   },
   {

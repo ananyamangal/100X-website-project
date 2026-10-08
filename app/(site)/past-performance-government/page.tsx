@@ -5,6 +5,7 @@ import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import { normalizeProducts } from "@/lib/normalizeProduct"
 import OpenQuoteButton from "@/components/cta/OpenQuoteButton"
 import GovKPIStrip from "@/components/trust/GovKPIStrip"
+import { VERIFIED_STATE_COUNT, GOV_BUYERS_LISTED, yearsInBusiness } from "@/lib/facts"
 import GovPerformanceCards from "@/components/trust/GovPerformanceCards"
 import GovLogoWall, { type GovLogo } from "@/components/trust/GovLogoWall"
 import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
@@ -186,9 +187,9 @@ export default async function PastPerformancePage() {
                 {/* Quick stats */}
                 <div className="grid grid-cols-3 gap-4">
                   {[
-                    { value: "15+", label: "States" },
-                    { value: "80+", label: "Departments" },
-                    { value: "12+", label: "Years" },
+                    { value: String(VERIFIED_STATE_COUNT), label: "States" },
+                    { value: String(GOV_BUYERS_LISTED), label: "Govt Buyers Listed" },
+                    { value: String(yearsInBusiness()), label: "Years" },
                   ].map((s) => (
                     <div key={s.label} className="text-center glass-card rounded-xl py-3">
                       <p className="text-xl font-700 text-white">{s.value}</p>

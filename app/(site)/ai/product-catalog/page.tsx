@@ -31,7 +31,7 @@ async function getProducts(): Promise<Product[]> {
   try {
     const client = await clientPromise
     const db = client.db()
-    const raw = await db.collection("products").find({ isPublished: true }).sort({ order: 1 }).toArray()
+    const raw = await db.collection("products").find({ isPublished: { $ne: false } }).sort({ order: 1 }).toArray()
     return raw.map((p) => ({
       id: p._id?.toString() ?? "",
       name: p.name ?? "",

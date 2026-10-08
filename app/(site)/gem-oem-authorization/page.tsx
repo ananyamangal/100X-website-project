@@ -96,7 +96,7 @@ const jsonLdFaq = {
       name: "What is the eligibility to become a 100X Circle GeM reseller?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "To become a 100X Circle GeM reseller, you need: (1) A GeM seller registration is optional when you request the authorization letter, (2) Valid GST registration, (3) Prior experience in pest control, public health, or equipment supply is preferred but not mandatory. Contact 100X Circle to discuss your territory and requirements.",
+        text: "To become a 100X Circle GeM reseller, you need: (1) Valid GST registration, (2) Prior experience in pest control, public health, or equipment supply is preferred but not mandatory. A GeM Seller ID is optional when you request the authorization letter. Contact 100X Circle to discuss your territory and requirements.",
       },
     },
     {

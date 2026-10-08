@@ -41,3 +41,5 @@ Question for the owner: what is the real turnaround from request to signed lette
 - "1,500+ UP customers" (`lib/seo/landing-pages.ts`), "8+ GeM Models" (`GovPastPerformance.tsx`), "50+ Products" (about-page default `manufacturingStat4Value`), "5,000+ machines" and "28 states" inside `lib/growth-os/agents/*` prompts (internal LLM prompts, not rendered).
 - `/api/mcp` and `lib/pageSections.ts:143` (admin hint text) still mention "10,000+ customers, 50+ dealers" in the section-picker description only.
 - Machine-dispatch lead times ("5–10 working days", "24–72h transit" on UP/Bihar pages) are a separate promise from spare-part dispatch; not in FACTS.
+
+- 21: /past-performance-government meta + og description still say "80+ departments across 15+ states" (protected hub meta, left unchanged) — owner to approve a meta fix.

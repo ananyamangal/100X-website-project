@@ -216,7 +216,7 @@ export default function TenderPackLeadCapture() {
                 {status === "submitting" ? "Sending…" : "Get Tender Pack — Free"}
               </button>
               <p className="text-[10px] text-gray-400 text-center">
-                Delivered via WhatsApp &amp; email · No cost · within 24 hours
+                Delivered via WhatsApp &amp; email · No cost · within 24 hours on working days
               </p>
             </form>
           )}

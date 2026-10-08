@@ -164,7 +164,7 @@ export default function TrustBlock() {
           <p className="eyebrow text-brand-600 mb-3">Customer Reviews</p>
           <h2 className="text-display-xs text-gray-900 mb-4 text-balance">What our customers say.</h2>
           <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            Trusted by customers across India — municipal bodies, Nagar Nigams, and farm cooperatives across India. Field reviews from the people running our machines every day.
+            Trusted by customers across India — municipal bodies, Nagar Nigams, and farm cooperatives. Field reviews from the people running our machines every day.
           </p>
         </div>
         <div className="grid sm:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto mb-12 md:mb-16">

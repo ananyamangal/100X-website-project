@@ -38,7 +38,7 @@ function StatItem({ stat, dark }: { stat: Stat; dark: boolean }) {
     <div ref={ref} className="text-center">
       <div className={`metric-value ${dark ? "text-white" : "text-gray-900"}`}>
         {stat.prefix && <span className={`text-[0.55em] font-700 ${dark ? "text-brand-400" : "text-brand-600"}`}>{stat.prefix}</span>}
-        <span>{count.toLocaleString()}</span>
+        <span>{count.toLocaleString("en-IN")}</span>
         {stat.suffix && <span className={`text-[0.45em] font-700 ml-0.5 align-super ${dark ? "text-brand-400" : "text-brand-600"}`}>{stat.suffix}</span>}
       </div>
       <div className={`w-6 h-px mx-auto mt-3 mb-2.5 ${dark ? "bg-brand-600/50" : "bg-brand-400/50"}`} />

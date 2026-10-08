@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { yearsInBusiness, VERIFIED_STATE_COUNT } from "@/lib/facts"
+import { yearsInBusiness, VERIFIED_STATE_COUNT, FOGGER_MODEL_COUNT } from "@/lib/facts"
 
 interface Props {
   customerLogos: string[]
@@ -37,7 +37,7 @@ const METRICS = [
   { value: String(VERIFIED_STATE_COUNT), label: "States", sub: "Government supply" },
   { value: "Pan-India", label: "Dealer Network", sub: "Across India" },
   { value: "5–10", label: "Day Dispatch", sub: "From Gurugram factory" },
-  { value: "8+", label: "GeM Models", sub: "Listed on gem.gov.in" },
+  { value: String(FOGGER_MODEL_COUNT), label: "Fogging Machine Models", sub: "Listed on gem.gov.in" },
   { value: "10", label: "Tender Docs", sub: "Ready on request" },
 ]
 

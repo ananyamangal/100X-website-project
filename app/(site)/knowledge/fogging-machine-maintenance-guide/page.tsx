@@ -131,7 +131,7 @@ export default function MaintenancePage() {
               Thermal Fogging Machine Maintenance Guide
             </h1>
             <p className="text-cinema-300 leading-relaxed max-w-2xl">
-              Proper maintenance extends machine life to 10+ years. This guide covers daily cleaning, weekly inspection, fuel system care, off-season storage, and troubleshooting common faults — based on 10 years of manufacturing and after-sales experience.
+              Proper maintenance extends machine life to 10+ years. This guide covers daily cleaning, weekly inspection, fuel system care, off-season storage, and troubleshooting common faults — based on our manufacturing and after-sales experience since 2020.
             </p>
           </div>
         </div>
