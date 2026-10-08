@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
+import OpenQuoteButton from "@/components/cta/OpenQuoteButton"
 
 export const revalidate = 60
 
@@ -150,6 +151,10 @@ export default function NvbdcpFoggingMachinePage() {
             IS 14855 documentation, GeM authorization, and bulk pricing available.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
+            <OpenQuoteButton audience="tender" productName="NVBDCP Fogging Machine Procurement"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-bold px-5 py-2.5 rounded-lg text-sm hover:bg-brand-50 transition-colors">
+              Get a Quote Online
+            </OpenQuoteButton>
             <a href={waLink} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-brand-50 transition-colors">
               WhatsApp: +91-7827229116

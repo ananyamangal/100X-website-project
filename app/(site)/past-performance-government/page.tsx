@@ -3,6 +3,7 @@ import Link from "next/link"
 import clientPromise from "@/lib/mongodb"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import { normalizeProducts } from "@/lib/normalizeProduct"
+import OpenQuoteButton from "@/components/cta/OpenQuoteButton"
 import GovKPIStrip from "@/components/trust/GovKPIStrip"
 import GovPerformanceCards from "@/components/trust/GovPerformanceCards"
 import GovLogoWall, { type GovLogo } from "@/components/trust/GovLogoWall"
@@ -166,6 +167,10 @@ export default async function PastPerformancePage() {
                   Reference letters, IS 14855 certificates, and OEM documentation available within 24 hours.
                 </p>
                 <div className="flex flex-wrap gap-3 mb-8">
+                  <OpenQuoteButton audience="tender" productName="Past performance reference list request"
+                    className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-brand-700 hover:bg-brand-50 font-700 rounded-full text-sm transition-colors">
+                    Request a Quote Online
+                  </OpenQuoteButton>
                   <a href={WA_HREF} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-7 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-700 rounded-full text-sm transition-colors">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -326,6 +331,10 @@ export default async function PastPerformancePage() {
                   Our complete past performance register is being digitalised. Contact us for a formal reference list with OEM certificates.
                 </p>
                 <div className="flex flex-wrap gap-3 justify-center">
+                  <OpenQuoteButton audience="tender" productName="Past performance reference list request"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-700 hover:bg-brand-50 font-700 rounded-full text-sm transition-colors">
+                    Request a Quote Online
+                  </OpenQuoteButton>
                   <a href={WA_HREF} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-700 rounded-full text-sm transition-colors">
                     Request Reference List
@@ -413,6 +422,10 @@ export default async function PastPerformancePage() {
               GeM seller verification, and reference letters — within 24 hours, at no cost.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
+              <OpenQuoteButton audience="tender" productName="Past performance reference list request"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-700 hover:bg-brand-50 font-700 rounded-full text-sm transition-colors">
+                Request a Quote Online
+              </OpenQuoteButton>
               <a href={WA_HREF} target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-700 rounded-full text-sm transition-colors">
                 WhatsApp for Documents

@@ -5,6 +5,7 @@ import ScrollReveal from "@/components/cinematic/ScrollReveal"
 import { MessageCircle, ArrowRight, Download } from "lucide-react"
 import { BUSINESS } from "@/lib/seo/site-config"
 import Link from "next/link"
+import OpenQuoteButton from "@/components/cta/OpenQuoteButton"
 
 interface Props {
   headline?: string
@@ -52,6 +53,13 @@ export default function CinematicCTASection({
 
         <ScrollReveal animation="scale" delay={300}>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <OpenQuoteButton
+              audience="default"
+              className="inline-flex items-center gap-2.5 px-8 py-4 bg-white text-brand-700 font-700 rounded-full hover:bg-brand-50 transition-all hover:-translate-y-0.5 shadow-xl shadow-brand-900/30 text-base"
+            >
+              Get a Quote Online
+            </OpenQuoteButton>
+
             <a
               href={waHref}
               target="_blank"
