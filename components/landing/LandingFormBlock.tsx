@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import { readHoneypot } from "@/lib/honeypot"
 import {
   FORM_SUBMISSION_TYPE,
   type LandingFormBlockData,
@@ -143,7 +142,6 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
     setValues((prev) => ({ ...prev, [name]: val }))
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const honeypot = readHoneypot(e.currentTarget)
     e.preventDefault()
     setError(null)
 
@@ -176,7 +174,6 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
         body: JSON.stringify({
           ...values,
           type: submissionType,
-          company_website: honeypot,
           form_variant: block.variant,
           landing_slug: landingSlug,
           attribution: getPersistedAttribution(),

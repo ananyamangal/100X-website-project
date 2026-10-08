@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { Loader2, X } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { readHoneypot } from "@/lib/honeypot"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -71,7 +70,6 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const honeypot = readHoneypot(e.currentTarget)
     e.preventDefault()
     setError(null)
     const trimmedName = name.trim()
@@ -110,7 +108,6 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
           message: trimmedMessage,
           subject: copy.modalSubject,
           type: "sticky_quote_request",
-          company_website: honeypot,
           audience,
           productName: productName ?? null,
           attribution: getPersistedAttribution(),

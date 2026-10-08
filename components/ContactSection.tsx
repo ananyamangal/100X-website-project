@@ -103,7 +103,6 @@ export default function ContactSection({
           organization,
           message: requirement,
           type: "contact",
-          company_website: String(formData.get("company_website") ?? ""),
           attribution,
           form_page_url: window.location.href,
           form_page_path: window.location.pathname,
