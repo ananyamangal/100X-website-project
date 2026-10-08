@@ -689,7 +689,7 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
                                 {/* 100X Circle brand badge — always visible on product images */}
                                 {mediaItems[currentIdx]?.kind === 'image' && (
                                     <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-full pl-2 pr-3 py-1.5 shadow-md">
-                                        <img src="/logo-main.png" alt="100X Circle" className="h-5 w-auto object-contain" />
+                                        <img src="/logo-main-card.png" alt="100X Circle" className="h-5 w-auto object-contain" />
                                     </div>
                                 )}
                                 {mediaItems.length > 1 && (
