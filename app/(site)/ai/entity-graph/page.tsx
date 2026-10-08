@@ -178,7 +178,7 @@ const ENTITIES = [
     type: "Product Category",
     color: "bg-teal-600",
     links: ["organization"],
-    facts: ["Pulse-jet technology", "Sub-50 micron droplets", "Municipal vector control"],
+    facts: ["Pulse-jet technology", "Fine droplets", "Municipal vector control"],
   },
   {
     id: "product-vehicle",

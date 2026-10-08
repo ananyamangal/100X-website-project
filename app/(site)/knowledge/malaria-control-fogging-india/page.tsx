@@ -43,7 +43,7 @@ const faqJsonLd = {
       name: "Does thermal fogging kill malaria mosquitoes?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. Thermal fogging kills adult Anopheles mosquitoes — the malaria vectors in India (primarily Anopheles culicifacies in rural areas and Anopheles stephensi in urban areas). The sub-50-micron aerosol penetrates resting sites in indoor walls, ceilings, vegetation, and drainage channels where Anopheles rest after blood feeding. Thermal fogging kills adult mosquitoes on contact but does not affect eggs, larvae, or pupae. It must be combined with larval source management for sustained malaria control.",
+        text: "Yes. Thermal fogging kills adult Anopheles mosquitoes — the malaria vectors in India (primarily Anopheles culicifacies in rural areas and Anopheles stephensi in urban areas). The fine aerosol penetrates resting sites in indoor walls, ceilings, vegetation, and drainage channels where Anopheles rest after blood feeding. Thermal fogging kills adult mosquitoes on contact but does not affect eggs, larvae, or pupae. It must be combined with larval source management for sustained malaria control.",
       },
     },
     {
@@ -128,7 +128,7 @@ export default function MalariaControlFoggingPage() {
             Malaria in India is transmitted by <em>Anopheles</em> mosquitoes — primarily <em>An. culicifacies</em> in rural areas and <em>An. stephensi</em> in urban areas. Unlike <em>Aedes aegypti</em> (dengue), which bites during the day, <em>Anopheles</em> are primarily night-biting (dusk to dawn), resting indoors during the day on dark walls, ceilings, and behind furniture.
           </p>
           <p className="text-gray-700 leading-relaxed mb-4">
-            Thermal fogging generates sub-50-micron aerosol droplets that remain airborne for 5–15 minutes and penetrate indoor spaces, vegetation edges, drainage channels, and water body margins where Anopheles rest and breed. Space spraying with thermal foggers at dusk and dawn intercepts mosquitoes as they become active — reducing adult population density before peak biting hours.
+            Thermal fogging generates fine aerosol droplets that remain airborne for 5–15 minutes and penetrate indoor spaces, vegetation edges, drainage channels, and water body margins where Anopheles rest and breed. Space spraying with thermal foggers at dusk and dawn intercepts mosquitoes as they become active — reducing adult population density before peak biting hours.
           </p>
           <p className="text-gray-700 leading-relaxed">
             <strong>Limitation:</strong> Space spraying kills adults only. Malaria control requires a multi-pronged approach: thermal fogging for adult knockdown, indoor residual spraying (IRS) for long-term indoor protection, insecticide-treated nets (ITNs), and larval source management (draining, oiling, or larviciding breeding sites).

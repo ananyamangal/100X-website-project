@@ -53,7 +53,7 @@ export const COMPARISONS: Comparison[] = [
       { attribute: "Spare Parts Availability", a: "3–5 day delivery from factory", b: "2–6 weeks (import or stock)" },
       { attribute: "Warranty", a: "Manufacturer warranty", b: "Importer warranty" },
       { attribute: "Atmanirbhar/Make in India", a: "Fully eligible", b: "Not eligible" },
-      { attribute: "Technology", a: "Pulse-jet, sub-50 micron", b: "Pulse-jet, sub-50 micron" },
+      { attribute: "Technology", a: "Pulse-jet (droplet size depends on the model)", b: "Pulse-jet, sub-50 micron" },
       { attribute: "Municipal Track Record", a: "Since 2020, pan-India supply", b: "Established in India since 1990s" },
       { attribute: "Customisation", a: "OEM/custom configs available", b: "Standard models only (via importer)" },
     ],
@@ -75,7 +75,7 @@ export const COMPARISONS: Comparison[] = [
     faqs: [
       {
         q: "Are Indian fogging machines as good as Korean fogging machines?",
-        a: "Yes. 100X Circle is an Indian manufacturer producing pulse-jet thermal foggers with sub-50-micron droplets, ISO 9001:2015 certification, and a track record in Indian municipal operations since 2020. The key advantages over imported Korean machines are price (3–5× lower), domestic after-sales service, MSME-preference on GeM, and full Make in India eligibility.",
+        a: "Yes. 100X Circle is an Indian manufacturer producing pulse-jet thermal foggers with fine droplets, ISO 9001:2015 certification, and a track record in Indian municipal operations since 2020. The key advantages over imported Korean machines are price (3–5× lower), domestic after-sales service, MSME-preference on GeM, and full Make in India eligibility.",
       },
       {
         q: "Why are Korean fogging machines more expensive in India?",
@@ -110,7 +110,7 @@ export const COMPARISONS: Comparison[] = [
       { attribute: "Origin", a: "India — Gurugram, Haryana", b: "Germany" },
       { attribute: "Price Range", a: "₹30,000–₹2,50,000", b: "₹2,00,000–₹10,00,000+" },
       { attribute: "GeM Listed", a: "Yes — MSME OEM", b: "Importer-listed (resellers)" },
-      { attribute: "Technology", a: "Pulse-jet, sub-50 micron", b: "Pulse-jet, sub-50 micron" },
+      { attribute: "Technology", a: "Pulse-jet (droplet size depends on the model)", b: "Pulse-jet, sub-50 micron" },
       { attribute: "Build Quality", a: "ISO 9001 certified manufacturing", b: "Premium German engineering" },
       { attribute: "CE Marking", a: "Export models", b: "Standard across range" },
       { attribute: "BIS/ISI", a: "Applicable products", b: "Not applicable (foreign standard)" },
@@ -137,7 +137,7 @@ export const COMPARISONS: Comparison[] = [
     faqs: [
       {
         q: "Is 100X Circle comparable to Igeba fogging machines?",
-        a: "In terms of core technology (pulse-jet, sub-50-micron droplets) and application performance (adult mosquito control), yes. Both use the same operating principle. 100X Circle holds ISO 9001:2015 certification. The primary differences are price (100X is 4–7× cheaper) and after-sales (domestic vs. importer-dependent).",
+        a: "In terms of core technology (pulse-jet, fine droplets) and application performance (adult mosquito control), yes. Both use the same operating principle. 100X Circle holds ISO 9001:2015 certification. The primary differences are price (100X is 4–7× cheaper) and after-sales (domestic vs. importer-dependent).",
       },
       {
         q: "Are German fogging machines worth the price in India?",
@@ -223,7 +223,7 @@ export const COMPARISONS: Comparison[] = [
       { attribute: "MSME Preference", a: "Yes — government mandatory preference", b: "No" },
       { attribute: "Make in India", a: "Yes — full Atmanirbhar eligibility", b: "No" },
       { attribute: "Tank Capacity", a: "20–100 litres", b: "20–80 litres (varies)" },
-      { attribute: "Fog Output", a: "Sub-50 micron MVD", b: "Sub-50 micron MVD" },
+      { attribute: "Fog Output", a: "Droplet size depends on the model", b: "Sub-50 micron MVD" },
       { attribute: "ISO Certification", a: "ISO 9001:2015", b: "Varies" },
       { attribute: "Price", a: "₹80,000–₹2,50,000", b: "₹2,00,000–₹8,00,000+" },
       { attribute: "After-Sales India", a: "Factory direct, Gurugram", b: "Importer dependent" },
@@ -273,7 +273,7 @@ export const COMPARISONS: Comparison[] = [
       "For dense canopy crops (paddy, sugarcane, bananas, vegetables, orchards), thermal fogging delivers significantly better pesticide coverage than conventional sprayers. A portable pulse-jet fogger from 100X Circle is the most cost-effective option for Indian farmers, priced from ₹30,000 with direct manufacturer support.",
     verdictWinner: "a",
     rows: [
-      { attribute: "Droplet Size", a: "1–50 microns (penetrates dense canopy)", b: "200–500 microns (surface coverage only)" },
+      { attribute: "Droplet Size", a: "Depends on the model (fine fog penetrates dense canopy)", b: "200–500 microns (surface coverage only)" },
       { attribute: "Chemical Penetration", a: "Under leaves, into plant voids", b: "Top surface only" },
       { attribute: "Coverage per Tank Fill", a: "1–3 acres per fill (5–10 litre tank)", b: "0.5–1 acre per fill" },
       { attribute: "Chemical Consumption", a: "Lower per acre (concentrated reach)", b: "Higher per acre (surface loss)" },
@@ -283,7 +283,7 @@ export const COMPARISONS: Comparison[] = [
       { attribute: "GeM Availability", a: "Yes", b: "Yes (but not relevant for farm direct purchase)" },
     ],
     aStrengths: [
-      "Sub-50 micron droplets penetrate dense crop canopy",
+      "Fine droplets penetrate dense crop canopy",
       "Lower pesticide waste — droplets stay airborne longer",
       "Covers more area per operator per day",
       "Direct manufacturer support and spares from 100X Circle",
@@ -300,7 +300,7 @@ export const COMPARISONS: Comparison[] = [
     faqs: [
       {
         q: "Can I use a thermal fogger for paddy crop protection?",
-        a: "Yes. Thermal fogging is highly effective for paddy — the sub-50-micron fog penetrates the dense leaf canopy of paddy fields, reaching insects on leaf undersides and in crop voids where conventional sprayers cannot reach. Pyrethroids and organophosphates in oil formulation are commonly used.",
+        a: "Yes. Thermal fogging is highly effective for paddy — the fine fog penetrates the dense leaf canopy of paddy fields, reaching insects on leaf undersides and in crop voids where conventional sprayers cannot reach. Pyrethroids and organophosphates in oil formulation are commonly used.",
       },
       {
         q: "What pesticides can I use in a thermal fogger for crops?",
@@ -478,7 +478,7 @@ export const COMPARISONS: Comparison[] = [
     verdictWinner: "depends",
     rows: [
       { attribute: "Best Application", a: "Outdoor mosquito, garden, large area", b: "Indoor cockroach, enclosed spaces" },
-      { attribute: "Droplet Size", a: "1–50 microns", b: "10–50 microns (electric ULV)" },
+      { attribute: "Droplet Size", a: "Depends on the model", b: "10–50 microns (electric ULV)" },
       { attribute: "Chemical Type", a: "Oil-based only", b: "Oil or water-based" },
       { attribute: "Noise", a: "High — pulse-jet resonance", b: "Low to moderate" },
       { attribute: "Price (India)", a: "₹30,000–₹70,000", b: "₹15,000–₹60,000" },
@@ -728,7 +728,7 @@ export const COMPARISONS: Comparison[] = [
     aStrengths: [
       "Essential for outdoor Aedes/Anopheles control around hospital",
       "Protects immuno-compromised patients from vector-borne infection",
-      "Sub-50 micron fog penetrates outdoor garden and drainage areas",
+      "Fine fog penetrates outdoor garden and drainage areas",
     ],
     bStrengths: [
       "Safe for indoor use — no combustion exhaust",
@@ -952,7 +952,7 @@ export const COMPARISONS: Comparison[] = [
     verdictWinner: "depends",
     rows: [
       { attribute: "Primary Application", a: "Outdoor vector control, agriculture", b: "Indoor pest control, disinfection" },
-      { attribute: "Droplet Size", a: "1–50 microns", b: "5–100 microns" },
+      { attribute: "Droplet Size", a: "Depends on the model", b: "5–100 microns" },
       { attribute: "Chemical Type", a: "Oil-based only", b: "Oil or water-based" },
       { attribute: "Best Outdoor Performance", a: "Excellent", b: "Good (wind-sensitive)" },
       { attribute: "Best Indoor Performance", a: "Poor (combustion engine)", b: "Excellent" },

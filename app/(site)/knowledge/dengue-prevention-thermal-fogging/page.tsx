@@ -43,7 +43,7 @@ const faqJsonLd = {
       name: "Does thermal fogging kill dengue mosquitoes?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. Thermal fogging produces sub-50-micron droplets in the WHO-recommended 10–30 micron range for adult Aedes aegypti mosquito control. The fine aerosol particles penetrate dense vegetation, narrow lanes, and standing structures where dengue-carrying mosquitoes rest. Contact kill is immediate for adult mosquitoes. Thermal fogging does NOT kill mosquito eggs or larvae — it must be combined with larval source reduction.",
+        text: "Yes. Thermal fogging produces fine droplets in the WHO-recommended 10–30 micron range for adult Aedes aegypti mosquito control. The fine aerosol particles penetrate dense vegetation, narrow lanes, and standing structures where dengue-carrying mosquitoes rest. Contact kill is immediate for adult mosquitoes. Thermal fogging does NOT kill mosquito eggs or larvae — it must be combined with larval source reduction.",
       },
     },
     {
@@ -129,7 +129,7 @@ export default function DengueFoggingPage() {
             Dengue is transmitted by <em>Aedes aegypti</em> — a daytime-biting mosquito that rests in shaded indoor and semi-indoor spaces: under furniture, inside drains, behind curtains, and in dense vegetation. Its resting behaviour makes contact-insecticide sprays less effective because the chemical must reach the resting site.
           </p>
           <p className="text-gray-700 leading-relaxed mb-4">
-            Thermal fogging generates sub-50-micron droplets that remain airborne for 5–15 minutes and penetrate narrow spaces, vegetation gaps, and shaded zones where mosquitoes rest. The WHO recommends 10–30 micron droplets for adult mosquito control — a specification that thermal pulse-jet foggers consistently achieve.
+            Thermal fogging generates fine droplets that remain airborne for 5–15 minutes and penetrate narrow spaces, vegetation gaps, and shaded zones where mosquitoes rest. The WHO recommends 10–30 micron droplets for adult mosquito control — a specification that thermal pulse-jet foggers consistently achieve.
           </p>
           <p className="text-gray-700 leading-relaxed">
             <strong>Critical limitation:</strong> Thermal fogging kills adult mosquitoes only. It has no effect on eggs or pupae. Sustainable dengue control requires thermal fogging for adult knockdown combined with larval source reduction (eliminating standing water) to interrupt the breeding cycle.

@@ -3,9 +3,9 @@
     "slug": "how-thermal-fogging-works",
     "title": "How Thermal Fogging Works: Pulse-Jet Technology Explained",
     "metaTitle": "How Thermal Fogging Works: Pulse-Jet Technology Explained | 100X Circle",
-    "metaDescription": "Technical explanation of thermal fogging: pulse-jet combustion cycle, heat vaporization, sub-50-micron droplet formation, and why thermal fog reaches where sprays cannot.",
+    "metaDescription": "Technical explanation of thermal fogging: pulse-jet combustion cycle, heat vaporization, fine droplet formation, and why thermal fog reaches where sprays cannot.",
     "ogTitle": "How Thermal Fogging Works: Pulse-Jet Technology Explained",
-    "ogDescription": "Pulse-jet engine ignites fuel-air mix at high frequency; heat vaporizes chemical solution; vapor cools at nozzle forming sub-50-micron droplets that penetrate vegetation and voids.",
+    "ogDescription": "Pulse-jet engine ignites fuel-air mix at high frequency; heat vaporizes chemical solution; vapor cools at nozzle forming fine droplets that penetrate vegetation and voids.",
     "tags": [
       "Technology",
       "Pulse-Jet",
@@ -167,8 +167,8 @@
         "question": "What is thermal fogging?",
         "safety": true,
         "reviewPending": true,
-        "visibleAnswer": "Thermal fogging uses a pulse-jet engine to heat insecticide-oil solution to 400–600°C, vaporizing it into dense fog of sub-50-micron droplets that penetrate vegetation and remain airborne for minutes — reaching adult mosquitoes where sprays cannot.",
-        "schemaAnswer": "Thermal fogging is a pest control technique that uses a pulse-jet engine to heat a mixture of insecticide and carrier oil to high temperature, vaporizing it into a dense visible fog of sub-50-micron droplets. These tiny particles remain airborne, penetrate vegetation, and reach insects in voids and dense foliage where conventional sprays cannot reach."
+        "visibleAnswer": "Thermal fogging uses a pulse-jet engine to heat insecticide-oil solution to 400–600°C, vaporizing it into dense fog of fine droplets that penetrate vegetation and remain airborne for minutes — reaching adult mosquitoes where sprays cannot.",
+        "schemaAnswer": "Thermal fogging is a pest control technique that uses a pulse-jet engine to heat a mixture of insecticide and carrier oil to high temperature, vaporizing it into a dense visible fog of fine droplets. These tiny particles remain airborne, penetrate vegetation, and reach insects in voids and dense foliage where conventional sprays cannot reach."
       },
       {
         "question": "How does a pulse-jet engine work in a thermal fogger?",
@@ -215,7 +215,7 @@
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "How Thermal Fogging Works: Pulse-Jet Technology Explained",
-      "description": "Technical explanation of how pulse-jet thermal fogging machines generate sub-50-micron insecticide droplets for vector control and agricultural applications.",
+      "description": "Technical explanation of how pulse-jet thermal fogging machines generate fine insecticide droplets for vector control and agricultural applications.",
       "url": "https://www.100xcircle.com/knowledge/how-thermal-fogging-works",
       "datePublished": "2024-01-15",
       "dateModified": "2026-05-29",

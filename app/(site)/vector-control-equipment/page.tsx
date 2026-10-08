@@ -71,7 +71,7 @@ const faqJsonLd = {
       name: "Which fogging machine is best for vector control in India?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "For outdoor vector control (dengue, malaria), a portable or vehicle-mounted thermal fogging machine producing 1–50 micron droplets is recommended. For indoor vector control, a ULV cold fogger is preferred. 100X Circle's thermal foggers comply with IS 14855 (Part 1) and produce WHO-specified droplet sizes. Contact +91-7827229116 or 100xcircle@gmail.com for model recommendations.",
+        text: "For outdoor vector control (dengue, malaria), a portable or vehicle-mounted thermal fogging machine is recommended (droplet size depends on the model; see each product's specifications). For indoor vector control, a ULV cold fogger is preferred. 100X Circle's thermal foggers comply with IS 14855 (Part 1) and produce WHO-specified droplet sizes. Contact +91-7827229116 or 100xcircle@gmail.com for model recommendations.",
       },
     },
   ],
@@ -148,7 +148,7 @@ export default function VectorControlEquipmentPage() {
             municipal corporations.
           </p>
           <p>
-            Thermal fogging — using pulse-jet machines to generate sub-50-micron insecticide
+            Thermal fogging — using pulse-jet machines to generate fine insecticide
             aerosols — remains the primary adult mosquito knockdown intervention in India&apos;s
             Integrated Vector Management (IVM) programme. It is operationally irreplaceable for
             emergency outbreak response where rapid adult knockdown is needed within 24–48 hours.
@@ -163,8 +163,7 @@ export default function VectorControlEquipmentPage() {
           <ul>
             <li>
               <strong>Droplet size (VMD):</strong> 10–30 microns for adult mosquito control.
-              100X Circle pulse-jet machines produce droplets in the 1–50 micron range,
-              with peak distribution within the WHO-specified window.
+              Droplet size depends on the model; see each product&apos;s specifications.
             </li>
             <li>
               <strong>Application rate:</strong> 1 g active ingredient per hectare for
@@ -265,7 +264,7 @@ export default function VectorControlEquipmentPage() {
               },
               {
                 q: "Are 100X Circle machines suitable for WHO-specified vector control protocols?",
-                a: "Yes. 100X Circle pulse-jet thermal foggers produce droplets in the 1–50 micron range with peak distribution in the WHO-recommended 10–30 micron window for adult mosquito control. The machines are compatible with all WHO-approved oil-based insecticide formulations (deltamethrin, cypermethrin, malathion, permethrin).",
+                a: "Yes. Droplet size depends on the model; see each product's specifications. The machines are compatible with all WHO-approved oil-based insecticide formulations (deltamethrin, cypermethrin, malathion, permethrin).",
               },
             ].map(({ q, a }) => (
               <details key={q} className="border border-gray-200 rounded-xl">

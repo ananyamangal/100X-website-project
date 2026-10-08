@@ -44,7 +44,7 @@ export default function HomepageJsonLd({ heroVideoId }: Props) {
         "@type": "HowToStep",
         position: 3,
         name: "Ultra-Fine Fog Ejection",
-        text: "Vapor cools at the nozzle to form sub-50-micron droplets.",
+        text: "Vapor cools at the nozzle to form fine droplets.",
       },
       {
         "@type": "HowToStep",

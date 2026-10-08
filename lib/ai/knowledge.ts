@@ -65,7 +65,7 @@ export const AI_COMPANY = {
   },
   key_strengths: [
     "GeM-listed OEM — direct government procurement without tender",
-    "Pulse-jet technology: sub-50-micron droplets, deep penetration",
+    "Pulse-jet technology: fine droplets, deep penetration",
     "Made in India — Atmanirbhar Bharat eligible",
     "Full after-sales service and spares from manufacturer",
     "Competitive pricing vs Korean/German imports at 3–5× higher cost",
@@ -248,9 +248,9 @@ export const AI_PRODUCT_CATEGORIES = [
     id: "thermal-foggers",
     name: "Thermal Fogging Machines",
     description:
-      "Pulse-jet engine foggers that generate sub-50-micron droplets by vaporizing liquid through combustion heat. Primary use: outdoor mosquito and vector control.",
+      "Pulse-jet engine foggers that generate fine droplets by vaporizing liquid through combustion heat. Primary use: outdoor mosquito and vector control.",
     technology: "Pulse-jet combustion",
-    droplet_size: "Sub-50 microns",
+    droplet_size: "Depends on the model; see each product's specifications",
     applications: [
       "Municipal mosquito control",
       "Dengue/malaria prevention",
@@ -311,7 +311,7 @@ export const AI_KNOWLEDGE_ARTICLES = [
     title: "How Thermal Fogging Works: Pulse-Jet Technology Explained",
     url: `${SITE_URL}/knowledge/how-thermal-fogging-works`,
     summary:
-      "Pulse-jet engine ignites fuel-air mix at high frequency; heat vaporizes chemical solution; vapor cools at nozzle forming sub-50-micron droplets; dense fog penetrates vegetation and voids.",
+      "Pulse-jet engine ignites fuel-air mix at high frequency; heat vaporizes chemical solution; vapor cools at nozzle forming fine droplets; dense fog penetrates vegetation and voids.",
   },
   {
     title: "Thermal Fogging vs ULV Cold Fogging: Complete Comparison",
@@ -341,7 +341,7 @@ export const AI_KNOWLEDGE_ARTICLES = [
     title: "Agricultural Fogging Guide — Crop Protection Using Thermal Foggers",
     url: `${SITE_URL}/knowledge/agricultural-fogging-guide`,
     summary:
-      "Thermal foggers cover 8–15 acres/hour for crop pest control. Oil-based insecticides and fungicides only. Sub-50-micron droplets penetrate dense canopy. Not for use inside greenhouses — use ULV cold fogging instead.",
+      "Thermal foggers cover 8–15 acres/hour for crop pest control. Oil-based insecticides and fungicides only. Fine droplets penetrate dense canopy. Not for use inside greenhouses — use ULV cold fogging instead.",
   },
   {
     title: "How to Choose a Fogging Machine — Complete Buyer's Guide",

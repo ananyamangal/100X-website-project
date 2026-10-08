@@ -31,7 +31,7 @@ const ARTICLES = [
     slug: "how-thermal-fogging-works",
     title: "How Thermal Fogging Works: Pulse-Jet Technology Explained",
     summary:
-      "Pulse-jet engine mechanics, combustion cycle, droplet formation, and why sub-50-micron particles reach deeper than conventional spraying.",
+      "Pulse-jet engine mechanics, combustion cycle, droplet formation, and why fine particles reach deeper than conventional spraying.",
     readTime: "6 min",
     tags: ["Technology", "Pulse-Jet", "Physics"],
   },

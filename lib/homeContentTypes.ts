@@ -104,7 +104,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
       },
       {
         title: 'Ultra-Fine Fog Ejection',
-        body: 'The vapor cools instantly at the nozzle, forming sub-50-micron droplets — small enough to drift, large enough to deposit on target surfaces.',
+        body: 'The vapor cools instantly at the nozzle, forming fine droplets — small enough to drift, large enough to deposit on target surfaces.',
       },
       {
         title: 'Deep Penetration',
