@@ -176,3 +176,10 @@ Paths checked free: no route in app/, no landing slug, no next.config redirect, 
 | same | items | 60 (live, 2026-10-09) | 78 against the same DB: +9 fogger products (incl. 100XMCF42, 100XULV22, 100XULVSS10 that had no entry), +4 key pages (GeM landing, IS 14855, government procurement, thermal vs cold), +2 procurement guides, +9 FAQ items (only FAQs visible on the guide pages); -6 Knowledge Base product mirrors (product-100xdb400/-tfs50/-hbl22/-hm20/-ssma20/-bf102) whose original product page is now listed. 33 blog mirrors stay, marked `is_mirror: true` with `canonical_url` = the blog post | E2 | {E2} | same |
 
 Implementation: new pure `lib/knowledge/feed-v2.ts` on top of the unchanged `mergeKnowledgeFeed`; route `app/api/ai/[entity]/route.ts` (knowledge case only). No ISO/CE claims or certificate numbers added.
+
+### E1 public/llms.txt (static file, served as is; no generator route exists; llms-full.txt does not exist, 404 on live)
+
+| URL | field | old | new | reason | commit | rollback |
+|---|---|---|---|---|---|---|
+| /llms.txt | whole file | "Founded 2014"; ISO 9001 / CE / MSME claims; "13 models"; 5 product URLs that 404 or 301 (BF-150, BF-200, BF-400, Minisuper Classic/New); export and price-multiple claims ("3-5x lower cost", "40-60% cost advantage"); no date, no FAQ | rewritten from the live catalogue (9 fogger models with each model's own DB specs + trolley + power tiller), FACTS.md ("since 2020", 24-hour reply, 24-48 h spares, 120+ parts, GeM Seller ID optional, IS 14855 "built to the requirements; test report on request", ISI on HM20/HBL22), owner-confirmed published numbers, services, the GeM path (6 URLs), the 2 new guides, contact, FAQ (8 Q&A), "Last updated: 2026-10-09" | E1 | {E1} | `git revert {E1}` |
+| same | URLs | 48 unique (43 returned 200, 5 dead) | all 43 valid URLs kept; 5 dead removed; added 26 that return 200 on live (GeM landing, OEM letter, past performance, spare parts, gov procurement, thermal vs cold, buying guide, dengue, Bihar, UP, power tiller, BF102, trolley, 10 knowledge/blog guides, /api/ai/knowledge) + the 2 new E5 pages (404 until this branch is deployed) | E1 | {E1} | same |

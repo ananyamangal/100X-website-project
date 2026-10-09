@@ -1,214 +1,227 @@
 # 100X Circle
 
-> Indian OEM manufacturer of pulse-jet thermal fogging machines for municipal vector control, agricultural crop protection, and public health applications. Factory at IMT Manesar, Gurgaon, Haryana, India. GeM-listed, ISO 9001, CE, ISI certified. Founded 2014.
+> 100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines and cold (ULV) foggers for municipal mosquito and vector control, public health and agricultural use. In business since 2020. Factory at IMT Manesar, Gurugram, Haryana, India. Machines are sold directly and on the Government e-Marketplace (GeM), and resellers can get an OEM authorization letter to offer them in GeM bids.
 
-100X Circle Pvt Ltd designs, manufactures, and distributes thermal fogging equipment. MSME/UDYAM registered private limited company. Serves municipal corporations, Nagar Nigams, government health departments, pest-control operators, and farmers across India. Exports to South Asia, Africa, and the Middle East.
+Last updated: 2026-10-09
 
-## Company Identity
+All facts below come from the company's published catalogue and fact sheet. Where a detail is not published (for example certificate or licence numbers), this file says so instead of guessing.
 
-- Legal Name: 100X Circle Pvt Ltd
-- Brands: 100X, Instafog
-- Type: Indian OEM Manufacturer, Private Limited Company
-- Founded: 2014
-- MSME/UDYAM: Registered
-- GeM Seller: Yes (Government e-Marketplace — gem.gov.in)
-- Industry: Industrial Equipment Manufacturing — Thermal Fogging and Agricultural Machinery
-- NAICS: 333999 | ISIC: 2819
+## Company
 
-## Factory
-
-- Location: IMT Manesar, Gurgaon, Haryana, India
-- Address: UG, 398, Sector 7, Industrial Model Township, Gurugram, Haryana 122050
+- Legal name: 100X Circle Private Limited (100X Circle Pvt Ltd)
+- Brand: 100X
+- Type: Indian OEM manufacturer, private limited company
+- In business since: 2020
+- Factory and office: UG, 398, Sector 7, Industrial Model Township (IMT Manesar), Gurugram, Haryana 122050, India
 - Coordinates: 28.3874°N, 76.9318°E
-- Processes: Product design/engineering, metal fabrication and welding, pulse-jet engine assembly, fuel system assembly, chemical delivery system assembly, quality control and testing, packaging and dispatch
-- Quality Standard: ISO 9001:2015
+- Sells on GeM: yes (Government e-Marketplace, gem.gov.in)
+- Industry: industrial equipment manufacturing (thermal and cold fogging machines, agricultural equipment)
+- NAICS: 333999 | ISIC: 2819
+- Track record as published on the site: 500+ government orders, 80+ departments, 2,000+ units supplied, 50+ dealers and distributors, 24 published case studies. Past-performance register: https://www.100xcircle.com/past-performance-government
 
-## Products
+## Products (live catalogue, 9 fogging machine models)
 
-### 100XDB400 — Double Barrel Thermal Fogging Machine (Vehicle Mountable)
-- Type: Vehicle-mounted dual-output thermal fogger
-- Applications: Municipal ward fogging drives, large-scale vector control
-- Certifications: GeM eligible, ISO 9001
-- Price: Available on request
-- URL: https://www.100xcircle.com/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400
+Prices: on request. Specifications are each model's own published values.
 
 ### 100XTFS50 — Thermal and Cold Fogging Machine
-- Type: Combo thermal + cold (ULV) fogger
-- Applications: Municipal + agricultural dual-purpose
-- Price: Available on request
+- Type: pulse-jet fogger with thermal and cold modes
+- Tanks: 7 L chemical + 7 L water; start: 12V battery push-button; output: 50-100 L/hour; empty weight: 8 kg
+- Use: outdoor vector control (thermal) and indoor disinfection (cold); available on GeM
 - URL: https://www.100xcircle.com/thermal-and-cold-fogging-machine-100xtfs50
 
+### 100XDB400 — Double Barrel Thermal Fogging Machine (Vehicle Mountable)
+- Type: double-barrel pulse-jet thermal fogger for vehicles (pickup, small truck, e-rickshaw or other flat-bed)
+- Tanks: 100 L stainless steel chemical tank, 16 L fuel tank; output: 80-100 L/hour; start: electric, from the vehicle's 12V battery; wired remote from the driver's cabin
+- Use: municipal ward fogging drives, large-area vector control; available on GeM
+- URL: https://www.100xcircle.com/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400
+
 ### 100XSSMA20 — Thermal Fogging Machine with Stainless Steel Tank
-- Type: Portable thermal fogger, pulse-jet engine, hand-carried
-- Material: Grade stainless steel tank (corrosion resistant)
-- Applications: Pest control operators, municipal use
-- Price: Available on request
+- Type: hand-carried pulse-jet thermal fogger
+- Tanks: 7 L stainless steel chemical tank, 1.5 L fuel tank; output: up to 40 L/hour; start: 12V electric auto-start; droplet size: 8-20 microns
+- Use: pest control operators, municipal and disinfection work; available on GeM
 - URL: https://www.100xcircle.com/thermal-fogging-machine-with-stainless-steel-tank-100xssma20
 
 ### 100XHM20 — ISI Marked Thermal Fogging Machine (HDPE Tank)
-- Type: Portable thermal fogger, pulse-jet engine, hand-carried
-- Tank Material: True HDPE (High-density polyethylene)
-- Certification: ISI Mark, ISO 9001, WHO complied
-- Applications: Government procurement, municipal use
-- Price: Available on request
+- Type: hand-carried pulse-jet thermal fogger
+- Tanks: 5.5 L HDPE solution tank, 2 L HDPE fuel tank; output: 30-40 L/hour adjustable; start: manual; weight: 7.5 kg
+- Marks: ISI mark; WHO complied (as stated on the product page). Licence number: on request
+- Use: government procurement, municipal mosquito and vector control; available on GeM
 - URL: https://www.100xcircle.com/products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde
 
 ### 100XHBL22 — Pulse Jet Thermal Fogging Machine (HDPE Tank)
-- Type: Portable thermal fogger, pulse-jet engine, hand-carried
-- Tank Material: True HDPE
-- Certification: ISI Mark, ISO 9001, WHO complied
-- Applications: Government procurement, municipal use
-- Price: Available on request
+- Type: hand-carried pulse-jet thermal fogger
+- Tanks: 6 L HDPE solution tank, 2 L HDPE fuel tank; output: 30-40 L/hour adjustable; start: manual, replaceable dry-cell batteries; weight: 7.5 kg
+- Marks: ISI mark; WHO complied (as stated on the product page). Licence number: on request
+- Use: government procurement, municipal use; available on GeM
 - URL: https://www.100xcircle.com/products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhbl22-c-ea7f75
 
-### 100X BF-150 — Thermal Fogger
-- Type: DC 12V auto-start pulse-jet fogger, Grade 316L marine stainless steel
-- Tank Capacity: 8 litre; Output: 40 litre/hour, continuous-duty
-- Applications: Municipal mosquito control, licensed pest control companies, government health departments
-- Price: Available on request
-- URL: https://www.100xcircle.com/products/100x-thermal-fogger-bf150
-
-### 100X BF-200 — Thermal Fogger
-- Type: Higher-output DC 12V auto-start pulse-jet fogger, Grade 316L stainless steel
-- Tank Capacity: 8 litre; Output: 50 litre/hour; Operating weight: 10 kg
-- Applications: Operators requiring faster area coverage
-- Price: Available on request
-- URL: https://www.100xcircle.com/products/100x-thermal-fogger-bf200
-
-### 100X BF-400 — Heavy-Duty Thermal Fogger
-- Type: Pulse-jet resonance engine, large-capacity stainless steel tank
-- Applications: High-volume municipal vector control, large-scale agricultural operations, industrial pest management
-- Price: Available on request
-- URL: https://www.100xcircle.com/products/100x-heavy-duty-thermal-fogger-bf400
-
-### 100X Minisuper 2000 Gold — Classic Edition
-- Type: Compact, lightweight portable thermal fogger, Korean pulse-jet design
-- Applications: Pest control professionals, health departments
-- Price: Available on request
-- URL: https://www.100xcircle.com/products/100x-minisuper-2000-gold-classic
-
-### 100X Minisuper 2000 Gold — New Edition
-- Type: Updated portable thermal fogger — improved ergonomic handle, updated chemical circuit, reinforced frame
-- Price: Available on request
-- URL: https://www.100xcircle.com/products/100x-minisuper-2000-gold-new
-
-### 100XMCF42 — Cold Fogger (2-Stroke Engine)
-- Type: Cold fogger / mist sprayer
-- Mechanism: Mechanical pressure at ambient temperature
-- Applications: Indoor spaces, temperature-sensitive environments
-- Price: Available on request
+### 100XMCF42 — Cold Fogger with 2-Stroke Engine
+- Type: cold fogger / mist sprayer, 2-stroke petrol engine, no heat
+- Tank: 14 L chemical; droplet size: 20-100 microns adjustable; spray distance: 8-16 m; water-based and oil-based formulations
+- Use: disinfection, hospitals, food facilities, vector control, crop protection; available on GeM
 - URL: https://www.100xcircle.com/products/cold-fogger-machine-with-2-stoke-engine-100xmcf42-c42ca1
 
-### 100XULV22 — ULV Cold Fogger
-- Type: ULV cold fogger / mist sprayer
-- Price: Available on request
+### 100XULV22 — ULV Cold Fogger (Electric)
+- Type: ULV cold fogger, 230V single-phase AC, counter-rotating vortex nozzle
+- Tank: 7 L chemical; droplet size: 0.5-30 microns adjustable; spray distance: 20-40 ft
+- Use: disinfection in hospitals and food facilities; available on GeM
 - URL: https://www.100xcircle.com/products/ulv-cold-fogger-machine-100xmcf42-copy-8dcd42lvlv
 
-### 100XULVSS10 — ULV Electric Cold Fogger
-- Type: ULV electric cold fogger / mist sprayer
-- Price: Available on request
+### 100XULVSS10 — ULV Electric Cold Fogger / Mist Sprayer
+- Type: ULV cold fogger, 240V single-phase AC, one counter-rotating vortex nozzle
+- Tank: 5 L chemical; droplet size: 0.5-30 microns adjustable; spray distance: 20-40 ft; water-based and oil-based liquids
+- Use: disinfection work
 - URL: https://www.100xcircle.com/products/100xulvss10-5e46c5
 
-## Technical Specifications (Thermal Fogging Technology)
+### 100XBF102 — Mini Fogger
+- Type: hand-held mini fogger, butane gas, ignition-switch start
+- Tank: 2.5 L PE chemical tank; output: 2.5 L/hour; weight: 1.2 kg
+- Use: mosquito control in small areas (gardens, lawns, farmhouses, warehouses)
+- URL: https://www.100xcircle.com/products/mini-fogger-100xbf102-2d9887
 
-- Operating Principle: Pulse-jet resonant combustion at 40–100 Hz
-- Combustion Temperature: 400–600°C
-- Droplet Size: 1–50 microns MVD (WHO recommends 10–30 microns for mosquito control)
-- Fog Airborne Duration: 5–15 minutes
-- Compatible Insecticides: Oil-based formulations (deltamethrin, cypermethrin, malathion, permethrin)
-- Contraindicated: Water-based formulations not suitable for thermal fogging
+### Other equipment
+- 100XATS passenger baggage trolley (grade 304 stainless steel, foot-operated locking brakes, 150 kg load): https://www.100xcircle.com/products/passenger-baggage-trolleys-stainless-steel-with-brakes-100xats
+- Power tiller (agricultural soil preparation): https://www.100xcircle.com/power-tiller
+- Full catalogue: https://www.100xcircle.com/products
 
-## Certifications and Compliance
+## Services
 
-- ISO 9001:2015: Quality Management System — all manufacturing operations
-- CE Marking: European conformity certification for export models
-- ISI Mark: Bureau of Indian Standards approval (select models)
-- MSME/UDYAM: Government of India MSME registration — enables 25% procurement preference on GeM
-- GeM: Government e-Marketplace approved seller (direct government purchase, no tender required for eligible buyers)
+- Direct supply to government departments, municipalities, pest control operators, farms and institutions across India
+- GeM supply: government buyers can order listed models on GeM
+- OEM authorization letters for resellers bidding with our machines on GeM or in tenders (a GeM Seller ID is optional when you request one): https://www.100xcircle.com/oem-authorization-letter
+- Tender documents: technical datasheets and the IS 14855 test report on request: https://www.100xcircle.com/gem-tender-support
+- Spare parts: 120+ parts listed, dispatched in 24-48 hours: https://www.100xcircle.com/spare-parts
+- Dealer programme: https://www.100xcircle.com/become-a-dealer
+- Quotations: within 24 hours on working days
+
+## Standards and marks (only what is published)
+
+- IS 14855: thermal fogging machines are built to the requirements of IS 14855; the test report is available on request. Certificate or licence numbers are not published here.
+- ISI mark: 100XHM20 and 100XHBL22. Licence number on request.
+- GeM: products are sold on the Government e-Marketplace (direct GeM purchase and OEM reseller path).
+- Not claimed in this file: ISO, CE or other certificate numbers.
+
+## Thermal fogging technology
+
+- Operating principle: pulse-jet resonant combustion
+- Droplet size: 1-50 microns (thermal fog); see each model above for its own figure
+- Compatible insecticides for thermal fogging: oil-based formulations (for example deltamethrin, cypermethrin, malathion, permethrin in a carrier oil)
+- Water-based formulations are generally not used in thermal-only foggers; cold (ULV) and dual-mode machines take water-based liquids (see each model)
+- Thermal fogging suits large outdoor areas; cold (ULV) fogging suits indoor and sensitive spaces: https://www.100xcircle.com/thermal-vs-cold-fogging-machine
 
 ## Applications
 
 - Municipal mosquito control and vector-borne disease prevention (dengue, malaria, chikungunya)
-- Government public health fogging drives by Nagar Nigams and district health departments
-- Agricultural pest management, fungicide and pesticide application on farms
-- Industrial estate and housing society pest control
-- Emergency vector control operations
-- Nagar Nigam, Nagar Panchayat, and Gram Panchayat procurement
+- Public health fogging drives by municipal corporations, Nagar Nigams, Nagar Panchayats and district health departments
+- Agricultural pest management and crop protection; agriculture fogging for farms, orchards and storage
+- Indoor disinfection in hospitals, food facilities and warehouses (cold / ULV)
+- Industrial estates, housing societies and pest control operators
 
-## Government Supply Experience
+## GeM and government procurement path
 
-- Supplies to municipal corporations, Nagar Nigams, Nagar Panchayats across India
-- GeM-listed for direct government procurement
-- States served: Bihar, Uttar Pradesh, Delhi, Maharashtra, Gujarat, Rajasthan, Haryana, Punjab, and others
-- Emergency dengue/malaria outbreak response supply via GeM direct procurement pathway
-- 2022–2025: Multiple municipalities in Haryana, UP, Bihar used vehicle-mounted 50-litre pulse-jet foggers
-- Farm cooperative societies in Punjab and Haryana use portable models under shared-use schemes
-- 50+ active pest control operators (PCOs) expanded fleets from 1–2 to 5–10 machines
-- Export customers in South Asia, Africa, Middle East: 40–60% cost advantage vs European alternatives
-
-## Distribution
-
-- 50+ active dealers and distributors across India
-- Pan-India dispatch from Gurugram
-- Standard delivery: 5–10 working days for in-stock models
-- Export: South Asia, Africa, Middle East (CE-marked models)
-
-## Contact
-
-- Phone: +91-7827229116 (primary sales)
-- Phone: +91-8178567520 (support)
-- WhatsApp: +91-7827229116
-- Email: 100xcircle@gmail.com
-- Website: https://www.100xcircle.com
+- [Fogging machines on GeM](https://www.100xcircle.com/gem-approved-fogging-machine-oem): buying 100X machines on GeM, OEM authorization for resellers
+- [OEM Authorization Letter](https://www.100xcircle.com/oem-authorization-letter): request the letter for a tender or GeM bid
+- [GeM OEM Authorization for dealers](https://www.100xcircle.com/gem-oem-authorization): OEM authorization codes and letters for GeM resellers and fogging machine dealers
+- [Government past performance](https://www.100xcircle.com/past-performance-government): supply register of government buyers
+- [Spare parts](https://www.100xcircle.com/spare-parts): 120+ spare parts for 100X machines
+- [Case studies](https://www.100xcircle.com/case-studies): government, municipal and institutional supply references
+- [Government procurement](https://www.100xcircle.com/fogging-machine-government-procurement): GeM direct purchase and tender supply
+- [Tender specification checklist](https://www.100xcircle.com/fogging-machine-tender-specification-checklist): what to write into a fogging machine tender, incl. IS 14855 for procurement officers
+- [Delivery and acceptance checklist](https://www.100xcircle.com/fogging-machine-delivery-inspection-checklist): checking delivered machines, GeM buying steps, PRC and CRAC
 
 ## Key URLs
 
-- [Homepage](https://www.100xcircle.com): Company overview, hero products, certifications
-- [All Products](https://www.100xcircle.com/products): Complete product catalog
-- [Vehicle Mounted Fogger](https://www.100xcircle.com/vehicle-mounted-fogging-machine): Municipal-grade vehicle fogger
-- [About](https://www.100xcircle.com/about): Company profile, manufacturing authority
-- [Factory](https://www.100xcircle.com/factory): Manufacturing facility, processes, certifications
-- [Contact / RFQ](https://www.100xcircle.com/contact-us): Sales enquiry and quotation request
-- [Blog](https://www.100xcircle.com/blog): Technical articles on fogging technology
-- [Knowledge Base](https://www.100xcircle.com/knowledge): How fogging works, thermal vs ULV, procurement guides
-- [Case Studies](https://www.100xcircle.com/case-studies): Government and PCO supply references
-- [Comparison Pages](https://www.100xcircle.com/compare): 100X vs Korean/German machines, municipal vs agricultural use
+- [Homepage](https://www.100xcircle.com): company overview and products
+- [All Products](https://www.100xcircle.com/products): complete product catalogue
+- [Vehicle Mounted Fogger](https://www.100xcircle.com/vehicle-mounted-fogging-machine): municipal vehicle-mounted fogging machines
+- [About](https://www.100xcircle.com/about): company profile
+- [Factory](https://www.100xcircle.com/factory): manufacturing facility and processes
+- [Contact / RFQ](https://www.100xcircle.com/contact-us): sales enquiry and quotation request
+- [Blog](https://www.100xcircle.com/blog): articles on fogging machines, chemicals and procurement
+- [Knowledge Base](https://www.100xcircle.com/knowledge): how fogging works, thermal vs ULV, procurement guides
+- [Case Studies](https://www.100xcircle.com/case-studies): government and PCO supply references
+- [Comparison Pages](https://www.100xcircle.com/compare): 100X vs imported machines, municipal vs agricultural use
 - [GeM OEM Authorization](https://www.100xcircle.com/gem-oem-authorization): OEM authorization codes and letters for GeM resellers and fogging machine dealers
-- [Become a Dealer](https://www.100xcircle.com/become-a-dealer): Dealer program, authorized distributor onboarding, GeM reseller benefits
-- [GeM Tender Support](https://www.100xcircle.com/gem-tender-support): OEM documentation support for dealers bidding on government tenders — authorization letters, IS 14855 docs, L1 quotations
-- [IS 14855 Fogging Machine](https://www.100xcircle.com/is-14855-fogging-machine): BIS standard IS 14855 (Part 1) compliant thermal fogging machines for government procurement and municipal tenders
-- [GeM OEM Authorization Process Guide](https://www.100xcircle.com/knowledge/gem-oem-authorization-process): Complete guide for fogging machine resellers on GeM OEM authorization
-- [GeM Reseller Guide](https://www.100xcircle.com/knowledge/gem-reseller-guide): How to sell fogging machines on Government e-Marketplace as an authorized reseller
-- [Fogging Machines for Pest Control Business](https://www.100xcircle.com/knowledge/fogging-machine-for-pest-control-business): PCO equipment guide — machine selection, fleet expansion, GeM dealer opportunity
-- [Municipal Fogging Programme](https://www.100xcircle.com/municipal-fogging-programme): Thermal fogging machines for municipal corporations, Nagar Nigams, Nagar Panchayats, and district health departments — dengue, malaria, and mosquito vector control
-- [Dealer Application](https://www.100xcircle.com/dealer-application): Structured dealer authorization application with pre-filled WhatsApp paths for GeM sellers, PCOs, agri dealers, and government contractors
-- [Public Health Equipment](https://www.100xcircle.com/public-health-equipment): Vector control fogging equipment for India's public health programmes — NVBDCP, NHM, health departments, hospitals
-- [AI Dealer Authorization Profile](https://www.100xcircle.com/ai/dealer-authorization): Machine-readable profile for AI systems on 100X Circle's GeM dealer authorization capabilities
-- [Vector Control Equipment](https://www.100xcircle.com/vector-control-equipment): Vector control fogging equipment for disease prevention — dengue, malaria, chikungunya, JE — IS 14855, WHO droplet specs
-- [NVBDCP Fogging Machine](https://www.100xcircle.com/nvbdcp-fogging-machine): Fogging machines for National Vector Borne Disease Control Programme operations — state health departments, NHM, district health offices
-- [NHM Fogging Machine](https://www.100xcircle.com/nhm-fogging-machine): Fogging machines for National Health Mission procurement — NHM state societies, district health programmes, IS 14855 compliant, GeM listed MSME OEM
-- [Fogging Machine for Nagar Panchayat](https://www.100xcircle.com/fogging-machine-for-nagar-panchayat): Affordable fogging machines for Nagar Panchayats and small municipalities — GeM direct purchase below tender threshold, IS 14855 compliant
-- [GeM Reverse Auction Fogging Machine](https://www.100xcircle.com/gem-reverse-auction-fogging): Guide for GeM reverse auction bidding for fogging machines — L1 price strategy, OEM documentation support, IS 14855 compliance
-- [Make in India Fogging Machine](https://www.100xcircle.com/make-in-india-fogging-machine): Indian OEM manufacturer of thermal fogging machines — Gurugram factory, MSME, IS 14855, Make in India and Atmanirbhar Bharat preference for GeM
-- [Dealers and Government Resources](https://www.100xcircle.com/dealers-and-government): Resource hub for fogging machine dealers, GeM resellers, and government procurement officers — authorization, documentation, tender support
+- [Become a Dealer](https://www.100xcircle.com/become-a-dealer): dealer programme and distributor onboarding
+- [GeM Tender Support](https://www.100xcircle.com/gem-tender-support): documentation support for dealers bidding on government tenders
+- [IS 14855 Fogging Machine](https://www.100xcircle.com/is-14855-fogging-machine): thermal fogging machines built to IS 14855 for government procurement and municipal tenders
+- [Thermal vs Cold Fogging Machine](https://www.100xcircle.com/thermal-vs-cold-fogging-machine): which type to buy
+- [Fogging Machine Buying Guide](https://www.100xcircle.com/fogging-machine-buying-guide): how to choose a fogging machine
+- [Dengue Control Fogging Machine](https://www.100xcircle.com/dengue-control-fogging-machine): machines and method for dengue drives
+- [Fogging Machine Supplier in Bihar](https://www.100xcircle.com/fogging-machine-supplier-in-bihar): supply in Bihar
+- [Fogging Machine Supplier in Uttar Pradesh](https://www.100xcircle.com/fogging-machine-supplier-in-uttar-pradesh): supply in Uttar Pradesh
+- [GeM OEM Authorization Process Guide](https://www.100xcircle.com/knowledge/gem-oem-authorization-process): guide for fogging machine resellers on GeM OEM authorization
+- [GeM Reseller Guide](https://www.100xcircle.com/knowledge/gem-reseller-guide): selling fogging machines on GeM as an authorized reseller
+- [Government Procurement Guide](https://www.100xcircle.com/knowledge/government-procurement-guide): buying fogging machines via GeM
+- [Fogging Machines for Pest Control Business](https://www.100xcircle.com/knowledge/fogging-machine-for-pest-control-business): PCO equipment guide
+- [Municipal Fogging Programme](https://www.100xcircle.com/municipal-fogging-programme): fogging machines for municipal corporations, Nagar Nigams, Nagar Panchayats and district health departments
+- [Dealer Application](https://www.100xcircle.com/dealer-application): dealer authorization application
+- [Public Health Equipment](https://www.100xcircle.com/public-health-equipment): vector control fogging equipment for public health programmes
+- [AI Dealer Authorization Profile](https://www.100xcircle.com/ai/dealer-authorization): machine-readable profile of the GeM dealer authorization process
+- [Vector Control Equipment](https://www.100xcircle.com/vector-control-equipment): fogging equipment for dengue, malaria, chikungunya and JE control
+- [NVBDCP Fogging Machine](https://www.100xcircle.com/nvbdcp-fogging-machine): fogging machines for National Vector Borne Disease Control Programme operations
+- [NHM Fogging Machine](https://www.100xcircle.com/nhm-fogging-machine): fogging machines for National Health Mission procurement
+- [Fogging Machine for Nagar Panchayat](https://www.100xcircle.com/fogging-machine-for-nagar-panchayat): fogging machines for Nagar Panchayats and small municipalities
+- [GeM Reverse Auction Fogging Machine](https://www.100xcircle.com/gem-reverse-auction-fogging): GeM reverse auction bidding for fogging machines
+- [Make in India Fogging Machine](https://www.100xcircle.com/make-in-india-fogging-machine): Indian-made thermal fogging machines from the Gurugram factory
+- [Dealers and Government Resources](https://www.100xcircle.com/dealers-and-government): resource hub for dealers, GeM resellers and procurement officers
+
+## Knowledge articles
+
+- [How Thermal Fogging Works](https://www.100xcircle.com/knowledge/how-thermal-fogging-works)
+- [Thermal vs ULV Cold Fogging](https://www.100xcircle.com/knowledge/thermal-vs-ulv-fogging)
+- [Thermal Fogging Chemicals Guide](https://www.100xcircle.com/knowledge/thermal-fogging-chemicals-guide)
+- [Agricultural Fogging Guide](https://www.100xcircle.com/knowledge/agricultural-fogging-guide)
+- [Dengue Prevention Using Thermal Fogging](https://www.100xcircle.com/knowledge/dengue-prevention-thermal-fogging)
+- [Mosquito Control in India](https://www.100xcircle.com/knowledge/mosquito-control-india)
+- [How to Choose a Fogging Machine](https://www.100xcircle.com/knowledge/how-to-choose-fogging-machine)
+- [Fogging Machine Maintenance Guide](https://www.100xcircle.com/knowledge/fogging-machine-maintenance-guide)
+- [Fogging Machine Safety Guide](https://www.100xcircle.com/knowledge/fogging-machine-safety-guide)
+- [How to Buy Fogging Machines on the GeM Portal](https://www.100xcircle.com/blog/how-to-buy-fogging-machines-on-gem-portal-a-complete-guide)
+- [IS 14855 in Government Fogging Machine Tenders](https://www.100xcircle.com/blog/is-14855-government-fogging-machine-tenders-india)
 
 ## Machine-Readable AI Endpoints
 
-- [Company JSON](https://www.100xcircle.com/api/ai/company): Structured company data
-- [Product Catalog JSON](https://www.100xcircle.com/api/ai/products): All products with specifications
-- [Certifications JSON](https://www.100xcircle.com/api/ai/certifications): All certification details
-- [Factory JSON](https://www.100xcircle.com/api/ai/factory): Factory and manufacturing data
-- [Capabilities JSON](https://www.100xcircle.com/api/ai/capabilities): Full manufacturing capabilities
-- [Government Supply JSON](https://www.100xcircle.com/api/ai/government-supplies): Government procurement experience
+- [Company JSON](https://www.100xcircle.com/api/ai/company): structured company data
+- [Product Catalog JSON](https://www.100xcircle.com/api/ai/products): all products with specifications
+- [Knowledge JSON](https://www.100xcircle.com/api/ai/knowledge): articles, products, guides and FAQs with dates and canonical URLs
+- [Certifications JSON](https://www.100xcircle.com/api/ai/certifications): certification details
+- [Factory JSON](https://www.100xcircle.com/api/ai/factory): factory and manufacturing data
+- [Capabilities JSON](https://www.100xcircle.com/api/ai/capabilities): manufacturing capabilities
+- [Government Supply JSON](https://www.100xcircle.com/api/ai/government-supplies): government procurement experience
 - [MCP Server](https://www.100xcircle.com/api/mcp): Model Context Protocol endpoint for AI agent queries (JSON-RPC 2.0)
 
-## Comparison Position
+## Contact
 
-- 100X Circle (Indian OEM) vs Korean imported foggers: 3–5× lower cost, local spares, GeM eligible, no import delays
-- 100X Circle vs European/German foggers: Indian pricing, faster delivery, MSME preference on GeM
-- Thermal fogging vs generic sprayers: fog penetrates vegetation and voids that sprayers cannot reach
-- Thermal fogging vs ULV cold fogging: thermal ideal for large outdoor areas; ULV preferred for indoor use
+- Phone (sales): +91-7827229116
+- Phone (support): +91-8178567520
+- WhatsApp: +91-7827229116
+- Email: 100xcircle@gmail.com
+- Contact form / RFQ: https://www.100xcircle.com/contact-us
+- Response: within 24 hours on working days
 
-## AI Summary
+## FAQ
 
-100X Circle Pvt Ltd is India's GeM-listed, ISO 9001-certified manufacturer of pulse-jet thermal fogging machines, supplying municipal corporations, Nagar Nigams, health departments, and agricultural cooperatives across India since 2014. Headquartered at IMT Manesar, Gurugram. 13 thermal and cold fogging models in the current catalog; pricing available on request. 50+ dealers. Exports to South Asia, Africa, Middle East.
+Q: Who makes 100X fogging machines?
+A: 100X Circle Pvt Ltd, an Indian OEM manufacturer in business since 2020, at its factory in IMT Manesar, Gurugram, Haryana.
+
+Q: Can government departments buy 100X fogging machines on GeM?
+A: Yes. Listed models can be bought on the Government e-Marketplace (GeM). See https://www.100xcircle.com/gem-approved-fogging-machine-oem
+
+Q: How does a reseller get an OEM authorization letter?
+A: A GeM Seller ID is optional. Request the letter at https://www.100xcircle.com/oem-authorization-letter
+
+Q: Are the machines built to IS 14855?
+A: The thermal fogging machines are built to the requirements of IS 14855 and the test report is available on request. 100XHM20 and 100XHBL22 carry the ISI mark.
+
+Q: Which machine is for outdoor mosquito control and which for indoor disinfection?
+A: Thermal foggers (for example 100XHM20, 100XHBL22, 100XSSMA20, 100XDB400) for outdoor vector control; cold / ULV foggers (100XMCF42, 100XULV22, 100XULVSS10) for indoor disinfection; 100XTFS50 does both.
+
+Q: How fast are spare parts dispatched?
+A: In 24-48 hours. 120+ parts are listed at https://www.100xcircle.com/spare-parts
+
+Q: How quickly do you reply to a quotation request?
+A: Within 24 hours on working days.
+
+Q: What should a fogging machine tender specify?
+A: Machine type, form factor, tank capacities, output, droplet size, power and start, the standard (IS 14855 for thermal foggers), documents, warranty, spares and training. See https://www.100xcircle.com/fogging-machine-tender-specification-checklist
