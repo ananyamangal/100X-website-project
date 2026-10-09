@@ -5,16 +5,15 @@
  * layout, via SiteShell). Other schema should reference it by `@id`
  * (ORGANIZATION_ID) instead of re-declaring the company.
  *
- * Facts come from docs/FACTS.md only:
- *  - foundingDate "2020" (owner).
- *  - ISI is owner-confirmed; GeM selling is documented. ISO 9001, CE and the
- *    MSME/Udyam number have no certificate on file (OPEN_FACTS #11-#13), so
- *    they are not asserted as credentials here.
- *  - sameAs lists only the company's own social profiles that the site links
- *    to (admin-managed social links, defaults in lib/socialLinksShared.ts;
- *    OPEN_FACTS #14). Generic sites (gem.gov.in, udyamregistration.gov.in) and
- *    our own pages are not profiles and are not listed.
- *  - areaServed: India. Export markets are not in FACTS (OPEN_FACTS #22).
+ * Content = the node previously built inline in GlobalJsonLd.tsx, kept as
+ * published (owner rule 2026-10-09: published claims stay), plus consistency
+ * fixes only:
+ *  - foundingDate from lib/facts.ts ("2020").
+ *  - social profile URLs de-duplicated / blanks dropped (organizationSameAs);
+ *    the other sameAs entries are unchanged.
+ *  - `address` added (same PostalAddress as the LocalBusiness node).
+ *  - contactOption "TollFree" dropped: +91-7827229116 is a 10-digit mobile
+ *    number, not an Indian toll-free number (those start 1800 / 1860).
  */
 import { BUSINESS, SITE_NAME, SITE_NAME_LEGAL, SITE_URL, defaultOgImage } from "./site-config"
 import { DEFAULT_SOCIAL_LINKS, socialLinksToSameAs, type SocialLinks } from "../socialLinksShared"
@@ -81,7 +80,30 @@ export function buildOrganizationNode(socialLinks?: SocialLinks) {
         availableLanguage: ["en", "hi"],
       },
     ],
-    sameAs: organizationSameAs(socialLinks),
+    sameAs: [
+      ...organizationSameAs(socialLinks),
+      "https://gem.gov.in",
+      "https://udyamregistration.gov.in",
+      "https://www.100xcircle.com/ai/about-100x",
+      "https://www.100xcircle.com/ai/entity-graph",
+    ],
+    identifier: [
+      {
+        "@type": "PropertyValue",
+        name: "MSME Registration Type",
+        value: "UDYAM Registered MSME",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "GeM Seller",
+        value: "Government e-Marketplace Registered OEM Seller",
+      },
+      {
+        "@type": "PropertyValue",
+        name: "Industry Classification",
+        value: "NAICS 333999 — All Other General Purpose Machinery Manufacturing",
+      },
+    ],
     foundingDate: String(FOUNDED_YEAR),
     foundingLocation: {
       "@type": "Place",
@@ -94,7 +116,7 @@ export function buildOrganizationNode(socialLinks?: SocialLinks) {
       },
     },
     description:
-      "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal and cold fogging machines for municipal vector control, public health and agricultural use, in business since 2020. Machines are sold directly and through the Government e-Marketplace (GeM). Factory at IMT Manesar, Gurugram, Haryana.",
+      "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines for municipal vector control and agricultural use. GeM-listed, ISO 9001 certified, MSME/UDYAM registered. Factory at IMT Manesar, Gurgaon. Brand: 100X. Distributed across 50+ Indian locations. Export to South Asia, Africa, and the Middle East.",
     knowsAbout: [
       "Pulse-jet thermal fogging technology",
       "Vector-borne disease control — dengue, malaria, chikungunya",
@@ -109,15 +131,36 @@ export function buildOrganizationNode(socialLinks?: SocialLinks) {
       {
         "@type": "EducationalOccupationalCredential",
         credentialCategory: "certification",
+        name: "ISO 9001:2015",
+        description: "Quality Management System certification for manufacturing and supply of fogging equipment",
+        recognizedBy: { "@type": "Organization", name: "ISO — International Organization for Standardization" },
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        credentialCategory: "certification",
+        name: "CE Marking",
+        description: "European conformity certification for export models",
+        recognizedBy: { "@type": "Organization", name: "European Union Standards Body" },
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        credentialCategory: "certification",
         name: "ISI Mark — Bureau of Indian Standards",
-        description: "BIS product standard certification (select models)",
+        description: "BIS product standard certification",
         recognizedBy: { "@type": "Organization", name: "Bureau of Indian Standards, Government of India" },
       },
       {
         "@type": "EducationalOccupationalCredential",
         credentialCategory: "registration",
+        name: "MSME / UDYAM Registration",
+        description: "Micro, Small and Medium Enterprise registration enabling GeM preference",
+        recognizedBy: { "@type": "Organization", name: "Ministry of MSME, Government of India" },
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        credentialCategory: "registration",
         name: "GeM Seller Registration",
-        description: "Seller on the Government e-Marketplace for direct government procurement",
+        description: "Government e-Marketplace approved seller for direct government procurement",
         recognizedBy: { "@type": "Organization", name: "Government e-Marketplace (GeM), Government of India" },
       },
     ],
@@ -171,7 +214,14 @@ export function buildOrganizationNode(socialLinks?: SocialLinks) {
         },
       ],
     },
-    areaServed: { "@type": "Country", name: "India" },
+    areaServed: [
+      { "@type": "Country", name: "India" },
+      { "@type": "AdministrativeArea", name: "South Asia" },
+      { "@type": "AdministrativeArea", name: "Middle East" },
+      { "@type": "AdministrativeArea", name: "Africa" },
+    ],
+    numberOfEmployees: { "@type": "QuantitativeValue", minValue: 25, maxValue: 100 },
+    numberOfEmployees: { "@type": "QuantitativeValue", minValue: 25, maxValue: 100 },
     naics: "333999",
     isicV4: "2819",
     slogan: "100X your productivity with Indian-made fogging technology",
