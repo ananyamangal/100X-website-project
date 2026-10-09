@@ -62,18 +62,6 @@ const jsonLdFaq = {
   ],
 }
 
-const jsonLdProduct = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "Public Health Vector Control Fogging Equipment",
-  description:
-    "Thermal fogging machines and ULV foggers for India's public health vector control programmes — dengue, malaria, chikungunya prevention. IS 14855 (Part 1) compliant, ISO 9001:2015 certified, GeM listed MSME OEM.",
-  brand: { "@type": "Brand", name: "100X Circle" },
-  manufacturer: { "@id": `${SITE_URL}/#organization` },
-  countryOfOrigin: "IN",
-  url: `${SITE_URL}/public-health-equipment`,
-}
-
 const APPLICATIONS = [
   {
     disease: "Dengue Prevention",
@@ -129,7 +117,6 @@ export default function PublicHealthEquipmentPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }} />
 
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">

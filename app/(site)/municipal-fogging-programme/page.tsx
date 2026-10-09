@@ -69,18 +69,6 @@ const jsonLdFaq = {
   ],
 }
 
-const jsonLdProduct = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "Thermal Fogging Machine for Municipal Vector Control",
-  description:
-    "IS 14855 (Part 1) compliant, ISO 9001:2015 certified thermal fogging machines for municipal corporations, Nagar Nigams, Nagar Panchayats, and health departments. For dengue, malaria, and mosquito vector control programmes. GeM listed MSME OEM.",
-  brand: { "@type": "Brand", name: "100X Circle" },
-  manufacturer: { "@id": `${SITE_URL}/#organization` },
-  countryOfOrigin: "IN",
-  url: `${SITE_URL}/municipal-fogging-programme`,
-}
-
 const BUYER_TYPES = [
   {
     type: "Municipal Corporation (Nagar Nigam)",
@@ -131,10 +119,6 @@ export default function MunicipalFoggingProgrammePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }}
       />
 
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">

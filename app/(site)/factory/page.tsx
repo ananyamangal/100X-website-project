@@ -12,14 +12,16 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "AutoPartsStore"],
+  // B3: the facility is a Place (as on /ai/factory and /ai/entity-graph). The one
+  // LocalBusiness node (/#localbusiness, same name/address/phone) is sitewide in
+  // GlobalJsonLd; a second LocalBusiness with a different name contradicted it.
+  "@type": "Place",
   "@id": `${SITE_URL}/#factory`,
   name: "100X Circle Manufacturing Facility",
   description:
     "ISO 9001:2015 certified factory producing pulse-jet thermal fogging machines and agricultural equipment at IMT Manesar, Gurugram, Haryana.",
-  url: SITE_URL,
+  url: `${SITE_URL}/factory`,
   telephone: "+91-7827229116",
-  email: "100xcircle@gmail.com",
   address: {
     "@type": "PostalAddress",
     streetAddress: AI_FACTORY.location.address,
@@ -46,20 +48,6 @@ const jsonLd = {
     "@type": "Place",
     name: "IMT Manesar — Industrial Model Township",
     address: { "@type": "PostalAddress", addressLocality: "Manesar", addressRegion: "Haryana", addressCountry: "IN" },
-  },
-  hasCredential: AI_CERTIFICATIONS.map((c) => ({
-    "@type": "EducationalOccupationalCredential",
-    name: c.name,
-    credentialCategory: c.type,
-    description: c.significance,
-  })),
-  makesOffer: {
-    "@type": "OfferCatalog",
-    name: "100X Circle Products",
-    itemListElement: AI_FACTORY.products_manufactured.map((p) => ({
-      "@type": "Offer",
-      itemOffered: { "@type": "Product", name: p },
-    })),
   },
 }
 

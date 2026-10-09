@@ -30,24 +30,6 @@ export const metadata: Metadata = {
   },
 }
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "Vector Control Equipment — Thermal Fogging Machines",
-  description:
-    "Thermal fogging machines and ULV cold foggers for vector control programmes in India. For dengue, malaria, chikungunya, and other vector-borne disease prevention. IS 14855 (Part 1) compliant, ISO 9001:2015 certified, GeM listed MSME OEM.",
-  brand: { "@type": "Brand", name: "100X Circle" },
-  manufacturer: { "@id": `${SITE_URL}/#organization` },
-  countryOfOrigin: "IN",
-  url: `${SITE_URL}/vector-control-equipment`,
-  additionalProperty: [
-    { "@type": "PropertyValue", name: "Standard Compliance", value: "IS 14855 (Part 1)" },
-    { "@type": "PropertyValue", name: "WHO Compliance", value: "WHO-recommended droplet size 10–30 microns" },
-    { "@type": "PropertyValue", name: "Certification", value: "ISO 9001:2015, CE, ISI Mark (select models)" },
-    { "@type": "PropertyValue", name: "GeM Status", value: "Listed MSME OEM on gem.gov.in" },
-  ],
-}
-
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -93,7 +75,6 @@ export default function VectorControlEquipmentPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">

@@ -41,25 +41,6 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", images: [`${SITE_URL}/og-oem-partnership.jpg`] },
 }
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": `${SITE_URL}/#organization`,
-  name: "100X Circle Pvt Ltd",
-  url: SITE_URL,
-  description: "OEM manufacturer of IS 14855-compliant thermal fogging machines. GeM registered, MSME, ISO 9001:2015. Authorized dealer partnership program for pan-India government supply.",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: BUSINESS.streetAddress,
-    addressLocality: BUSINESS.addressLocality,
-    addressRegion: BUSINESS.addressRegion,
-    postalCode: BUSINESS.postalCode,
-    addressCountry: BUSINESS.addressCountry,
-  },
-  contactPoint: [{ "@type": "ContactPoint", telephone: BUSINESS.phonePrimary, contactType: "sales", areaServed: "IN", availableLanguage: ["Hindi", "English"] }],
-  sameAs: [BUSINESS.youtube, BUSINESS.facebook, BUSINESS.instagram],
-}
-
 const PARTNER_BENEFITS = [
   {
     title: "GeM Authorization Support",
@@ -203,7 +184,6 @@ export default async function GemApprovedOEMPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <BreadcrumbJsonLd items={[
         { name: "Home", url: "/" },
         { name: "OEM Dealer Partnership", url: "/gem-approved-fogging-machine-oem" },

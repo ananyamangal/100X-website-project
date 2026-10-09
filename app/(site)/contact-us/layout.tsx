@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import type { Metadata } from "next"
 import { SITE_URL, SITE_NAME, defaultOgImage } from "@/lib/seo/site-config"
+import { buildContactBreadcrumbJsonLd, buildContactPageJsonLd } from "@/lib/seo/businessSchema"
 
 export const metadata: Metadata = {
   title: "Contact Us | 100x Circle",
@@ -23,6 +24,16 @@ export const metadata: Metadata = {
   },
 }
 
+// B3: ContactPage + BreadcrumbList for /contact-us (the page itself is a client component).
+const contactPageJsonLd = buildContactPageJsonLd()
+const breadcrumbJsonLd = buildContactBreadcrumbJsonLd()
+
 export default function ContactUsLayout({ children }: { children: ReactNode }) {
-  return children
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {children}
+    </>
+  )
 }

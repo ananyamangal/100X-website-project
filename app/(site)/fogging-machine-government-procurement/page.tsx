@@ -55,37 +55,6 @@ export const metadata: Metadata = {
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
 
-const jsonLdProduct = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "Government Procurement Ready Fogging Machines — IS 14855 Compliant",
-  description:
-    "IS 14855 (Part 1)-compliant thermal fogging machines manufactured by 100X Circle Pvt Ltd. Suitable for municipal corporations, state health departments, Nagar Panchayats, and defence. Procure via GeM (Government e-Marketplace) direct purchase or tender.",
-  brand: { "@type": "Brand", name: "100X Circle" },
-  manufacturer: {
-    "@type": "Organization",
-    "@id": `${SITE_URL}/#organization`,
-    name: "100X Circle Pvt Ltd",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "UG, 398, Sector 7, IMT Manesar",
-      addressLocality: "Gurugram",
-      addressRegion: "Haryana",
-      postalCode: "122050",
-      addressCountry: "IN",
-    },
-  },
-  offers: {
-    "@type": "AggregateOffer",
-    priceCurrency: "INR",
-    lowPrice: "6500",
-    highPrice: "350000",
-    offerCount: "8",
-    availability: "https://schema.org/InStock",
-  },
-  url: `${SITE_URL}/fogging-machine-government-procurement`,
-}
-
 const jsonLdFaq = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -489,7 +458,6 @@ export default async function GovernmentProcurementPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }} />
 

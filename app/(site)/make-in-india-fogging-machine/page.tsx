@@ -23,23 +23,6 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/make-in-india-fogging-machine` },
 }
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "Make in India Thermal Fogging Machine",
-  description:
-    "Thermal fogging machines manufactured in India by 100X Circle Pvt Ltd. MSME OEM, factory at IMT Manesar Gurugram. Make in India and Atmanirbhar Bharat procurement preference applies for government buyers.",
-  brand: { "@type": "Brand", name: "100X Circle" },
-  manufacturer: {
-    "@type": "Organization",
-    name: "100X Circle Pvt Ltd",
-    "@id": `${SITE_URL}/#organization`,
-    address: { "@type": "PostalAddress", addressLocality: "Gurugram", addressRegion: "Haryana", addressCountry: "IN" },
-  },
-  countryOfOrigin: "IN",
-  url: `${SITE_URL}/make-in-india-fogging-machine`,
-}
-
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -85,7 +68,6 @@ export default function MakeInIndiaFoggingMachinePage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">

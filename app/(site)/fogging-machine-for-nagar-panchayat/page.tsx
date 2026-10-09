@@ -23,24 +23,6 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/fogging-machine-for-nagar-panchayat` },
 }
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "Fogging Machine for Nagar Panchayat",
-  description:
-    "Portable thermal fogging machines for Nagar Panchayats, Nagar Palikas, and gram panchayats. GeM direct purchase available. IS 14855 (Part 1) compliant. MSME OEM seller. No tender required below GeM threshold.",
-  brand: { "@type": "Brand", name: "100X Circle" },
-  manufacturer: { "@id": `${SITE_URL}/#organization` },
-  offers: {
-    "@type": "AggregateOffer",
-    priceCurrency: "INR",
-    lowPrice: "6500",
-    highPrice: "80000",
-    offerCount: "6",
-  },
-  url: `${SITE_URL}/fogging-machine-for-nagar-panchayat`,
-}
-
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -84,7 +66,6 @@ export default function FoggingMachineForNagarPanchayatPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">

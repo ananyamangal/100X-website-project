@@ -18,26 +18,8 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfilePage",
-  mainEntity: {
-    "@type": ["Organization", "Manufacturer"],
-    "@id": `${SITE_URL}/#organization`,
-    name: "100X Circle Pvt Ltd",
-    legalName: "100X Circle Private Limited",
-    alternateName: ["100X"],
-    url: SITE_URL,
-    foundingDate: "2020",
-    foundingLocation: "Gurugram, Haryana, India",
-    naics: "333999",
-    isicV4: "2819",
-    description: AI_COMPANY.description_150_tokens,
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: AI_COMPANY.contact.phone_primary,
-      email: AI_COMPANY.contact.email,
-      contactType: "sales",
-      areaServed: "IN",
-    },
-  },
+  // B3: reference the sitewide Organization node (GlobalJsonLd) instead of redefining the same @id.
+  mainEntity: { "@id": `${SITE_URL}/#organization` },
 }
 
 export default function AiAbout100xPage() {

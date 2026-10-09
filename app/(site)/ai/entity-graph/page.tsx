@@ -11,45 +11,8 @@ export const metadata: Metadata = {
 
 const ENTITY_GRAPH = {
   "@context": "https://schema.org",
+  // B3: the Organization node (/#organization) is defined once, sitewide, by GlobalJsonLd.
   "@graph": [
-    {
-      "@type": ["Organization", "Manufacturer"],
-      "@id": `${SITE_URL}/#organization`,
-      name: "100X Circle Pvt Ltd",
-      legalName: "100X Circle Private Limited",
-      alternateName: ["100X"],
-      url: SITE_URL,
-      foundingDate: "2020",
-      naics: "333999",
-      isicV4: "2819",
-      location: { "@id": `${SITE_URL}/#factory` },
-      hasCredential: [
-        { "@id": `${SITE_URL}/#cert-iso9001` },
-        { "@id": `${SITE_URL}/#cert-ce` },
-        { "@id": `${SITE_URL}/#cert-bis` },
-        { "@id": `${SITE_URL}/#cert-msme` },
-        { "@id": `${SITE_URL}/#cert-gem` },
-      ],
-      makesOffer: [
-        { "@id": `${SITE_URL}/#product-thermal-foggers` },
-        { "@id": `${SITE_URL}/#product-vehicle-mounted` },
-        { "@id": `${SITE_URL}/#product-portable` },
-        { "@id": `${SITE_URL}/#product-agricultural` },
-      ],
-      areaServed: [
-        { "@type": "Country", name: "India" },
-        { "@type": "AdministrativeArea", name: "South Asia" },
-        { "@type": "AdministrativeArea", name: "Africa" },
-        { "@type": "AdministrativeArea", name: "Middle East" },
-      ],
-      knowsAbout: [
-        "Pulse-jet thermal fogging technology",
-        "Vector-borne disease control",
-        "Municipal mosquito control",
-        "Government e-Marketplace procurement",
-        "Agricultural pest management",
-      ],
-    },
     {
       "@type": "Place",
       "@id": `${SITE_URL}/#factory`,
@@ -101,32 +64,28 @@ const ENTITY_GRAPH = {
       recognizedBy: { "@type": "Organization", name: "Government e-Marketplace (GeM), Government of India" },
     },
     {
-      "@type": "Product",
+      "@type": "Thing",
       "@id": `${SITE_URL}/#product-thermal-foggers`,
       name: "Thermal Fogging Machines",
-      manufacturer: { "@id": `${SITE_URL}/#organization` },
-      category: "Municipal Vector Control Equipment",
+      description: "Municipal Vector Control Equipment",
     },
     {
-      "@type": "Product",
+      "@type": "Thing",
       "@id": `${SITE_URL}/#product-vehicle-mounted`,
       name: "Vehicle-Mounted Thermal Fogging Machines",
-      manufacturer: { "@id": `${SITE_URL}/#organization` },
-      category: "Municipal Vector Control Equipment",
+      description: "Municipal Vector Control Equipment",
     },
     {
-      "@type": "Product",
+      "@type": "Thing",
       "@id": `${SITE_URL}/#product-portable`,
       name: "Portable / Mini Thermal Fogging Machines",
-      manufacturer: { "@id": `${SITE_URL}/#organization` },
-      category: "Agricultural and Portable Pest Control",
+      description: "Agricultural and Portable Pest Control",
     },
     {
-      "@type": "Product",
+      "@type": "Thing",
       "@id": `${SITE_URL}/#product-agricultural`,
       name: "Agricultural Sprayers and Power Tillers",
-      manufacturer: { "@id": `${SITE_URL}/#organization` },
-      category: "Agricultural Machinery",
+      description: "Agricultural Machinery",
     },
   ],
 }

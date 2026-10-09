@@ -1,4 +1,5 @@
 import { BUSINESS, SITE_NAME, SITE_NAME_LEGAL, SITE_URL, defaultOgImage } from "@/lib/seo/site-config"
+import { businessPostalAddress, FOUNDING_DATE } from "@/lib/seo/businessSchema"
 import { DEFAULT_SOCIAL_LINKS, socialLinksToSameAs, type SocialLinks } from "@/lib/socialLinksShared"
 
 function buildOrganization(socialLinks?: SocialLinks) {
@@ -62,7 +63,9 @@ function buildOrganization(socialLinks?: SocialLinks) {
       value: "NAICS 333999 — All Other General Purpose Machinery Manufacturing",
     },
   ],
-  foundingDate: "2020",
+  foundingDate: FOUNDING_DATE,
+  // B3: same PostalAddress as the LocalBusiness node and the contact page.
+  address: businessPostalAddress(),
   foundingLocation: {
     "@type": "Place",
     name: "Gurugram, Haryana, India",
@@ -194,14 +197,9 @@ const localBusiness = {
   url: SITE_URL,
   telephone: BUSINESS.phonePrimary,
   email: BUSINESS.email,
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: BUSINESS.streetAddress,
-    addressLocality: BUSINESS.addressLocality,
-    addressRegion: BUSINESS.addressRegion,
-    postalCode: BUSINESS.postalCode,
-    addressCountry: BUSINESS.addressCountry,
-  },
+  address: businessPostalAddress(),
+  // B3: same founding date as the Organization node.
+  foundingDate: FOUNDING_DATE,
   geo: {
     "@type": "GeoCoordinates",
     latitude: BUSINESS.geo.latitude,

@@ -215,18 +215,8 @@ export default function AiDealerAuthorizationPage() {
             "@type": "ProfilePage",
             name: "100X Circle — GeM Dealer Authorization Profile",
             url: `${SITE_URL}/ai/dealer-authorization`,
-            mainEntity: {
-              "@id": `${SITE_URL}/#organization`,
-              "@type": ["Organization", "Manufacturer"],
-              name: "100X Circle Pvt Ltd",
-              description: profile.keyFacts[0],
-              knowsAbout: [
-                "GeM OEM Authorization",
-                "IS 14855 Fogging Machine Compliance",
-                "Government Procurement Support",
-                "Thermal Fogging Machine Manufacturing",
-              ],
-            },
+            // B3: reference the sitewide Organization node instead of redefining the same @id.
+            mainEntity: { "@id": `${SITE_URL}/#organization` },
           }),
         }}
       />

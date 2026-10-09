@@ -62,52 +62,8 @@ const aboutJsonLd = {
   "@id": `${SITE_URL}/about`,
   name: "About 100X Circle Pvt Ltd",
   url: `${SITE_URL}/about`,
-  mainEntity: {
-    "@id": `${SITE_URL}/#organization`,
-    "@type": ["Organization", "Manufacturer"],
-    name: SITE_NAME_LEGAL,
-    legalName: "100X Circle Private Limited",
-    alternateName: ["100X", "100X Circle"],
-    url: SITE_URL,
-    logo: `${defaultOgImage}`,
-    foundingDate: "2020",
-    description:
-      "100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines. Established 2020. ISO 9001:2015 certified, CE marked, ISI marked, MSME/UDYAM registered, and GeM-approved seller for direct government procurement. Factory at IMT Manesar, Gurugram, Haryana. Brand: 100X.",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "UG, 398, Sector 7, Industrial Model Township",
-      addressLocality: "Gurugram",
-      addressRegion: "Haryana",
-      postalCode: "122050",
-      addressCountry: "IN",
-    },
-    telephone: ["+91-7827229116", "+91-8178567520"],
-    email: "100xcircle@gmail.com",
-    numberOfEmployees: { "@type": "QuantitativeValue", minValue: 25, maxValue: 100 },
-    naics: "333999",
-    isicV4: "2819",
-    hasCredential: [
-      { "@type": "EducationalOccupationalCredential", name: "ISO 9001:2015", credentialCategory: "Quality Management System" },
-      { "@type": "EducationalOccupationalCredential", name: "CE Marking", credentialCategory: "European Product Conformity" },
-      { "@type": "EducationalOccupationalCredential", name: "ISI Mark — Bureau of Indian Standards", credentialCategory: "Indian Product Standard" },
-      { "@type": "EducationalOccupationalCredential", name: "MSME / UDYAM Registration", credentialCategory: "Government Enterprise Registration" },
-      { "@type": "EducationalOccupationalCredential", name: "GeM Seller Registration", credentialCategory: "Government e-Marketplace" },
-    ],
-    areaServed: [
-      { "@type": "Country", name: "India" },
-      { "@type": "AdministrativeArea", name: "South Asia" },
-      { "@type": "AdministrativeArea", name: "Africa" },
-      { "@type": "AdministrativeArea", name: "Middle East" },
-    ],
-    knowsAbout: [
-      "Pulse-jet thermal fogging technology",
-      "Vector-borne disease control — dengue, malaria, chikungunya",
-      "Municipal mosquito control operations",
-      "Government e-Marketplace (GeM) procurement",
-      "Agricultural crop protection fogging",
-    ],
-    sameAs: ["https://www.youtube.com/@100Xcircle", "https://gem.gov.in"],
-  },
+  // B3: reference the sitewide Organization node (GlobalJsonLd) instead of redefining the same @id.
+  mainEntity: { "@id": `${SITE_URL}/#organization` },
 }
 
 export default async function AboutPage() {

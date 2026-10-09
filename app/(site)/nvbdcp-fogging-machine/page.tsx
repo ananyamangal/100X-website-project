@@ -31,18 +31,6 @@ export const metadata: Metadata = {
   },
 }
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "NVBDCP Fogging Machine — National Vector Control Programme",
-  description:
-    "Thermal fogging machines for NVBDCP (National Vector Borne Disease Control Programme) operations across India. IS 14855 (Part 1) compliant, ISO 9001:2015 certified, GeM listed MSME OEM.",
-  brand: { "@type": "Brand", name: "100X Circle" },
-  manufacturer: { "@id": `${SITE_URL}/#organization` },
-  countryOfOrigin: "IN",
-  url: `${SITE_URL}/nvbdcp-fogging-machine`,
-}
-
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -117,7 +105,6 @@ export default function NvbdcpFoggingMachinePage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">

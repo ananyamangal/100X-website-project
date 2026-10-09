@@ -61,20 +61,13 @@ export default async function AiProductCatalogPage() {
       "Complete catalog of fogging machines and agricultural equipment manufactured by 100X Circle Pvt Ltd.",
     url: `${SITE_URL}/ai/product-catalog`,
     provider: { "@id": `${SITE_URL}/#organization` },
+    // B3: this is a catalogue page, not a product page — each part is the
+    // product's own page (which carries the Product node), not a Product here.
     hasPart: products.map((p) => ({
-      "@type": "Product",
+      "@type": "WebPage",
       name: p.name,
       description: p.shortDescription,
       url: `${SITE_URL}${getProductCanonicalUrl(p.id)}`,
-      offers: {
-        "@type": "Offer",
-        availability: p.inStock
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
-        priceCurrency: "INR",
-      },
-      brand: { "@type": "Brand", name: "100X" },
-      manufacturer: { "@id": `${SITE_URL}/#organization` },
     })),
   }
 

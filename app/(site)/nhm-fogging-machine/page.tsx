@@ -23,18 +23,6 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/nhm-fogging-machine` },
 }
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "NHM Fogging Machine — National Health Mission",
-  description:
-    "Thermal fogging machines for National Health Mission (NHM) procurement — state societies, district health units, and NVBDCP-NHM convergence programmes. IS 14855 (Part 1) compliant, GeM listed MSME OEM.",
-  brand: { "@type": "Brand", name: "100X Circle" },
-  manufacturer: { "@id": `${SITE_URL}/#organization` },
-  countryOfOrigin: "IN",
-  url: `${SITE_URL}/nhm-fogging-machine`,
-}
-
 // Single source for the visible FAQ accordion AND the FAQPage JSON-LD (FaqBlock
 // renders both). The first two entries are the Q&As this page previously
 // carried in a schema-only FAQPage block (now also visible on the page); the
@@ -89,7 +77,6 @@ export default function NhmFoggingMachinePage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <main className="max-w-3xl mx-auto px-4 py-16 pt-32">
         <nav className="text-sm text-gray-500 mb-6">

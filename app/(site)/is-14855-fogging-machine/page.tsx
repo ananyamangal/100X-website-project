@@ -80,39 +80,6 @@ const jsonLdFaq = {
   ],
 }
 
-const jsonLdProduct = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  "@id": `${SITE_URL}/is-14855-fogging-machine#product`,
-  name: "IS 14855 Compliant Thermal Fogging Machine",
-  description:
-    "Pulse-jet thermal fogging machine manufactured in compliance with IS 14855 (Part 1) — the Bureau of Indian Standards specification for power-operated fogging machines. For municipal vector control, government procurement, and GeM tender supply.",
-  brand: { "@type": "Brand", name: "100X Circle" },
-  manufacturer: { "@id": `${SITE_URL}/#organization` },
-  countryOfOrigin: "IN",
-  url: `${SITE_URL}/is-14855-fogging-machine`,
-  // This page quotes on request (no published price), so the Offer carries
-  // availability/condition/seller but no `price` — see lib/seo/offers.ts.
-  offers: buildOfferNode({ url: "/is-14855-fogging-machine", priceText: "Price on Request" }),
-  additionalProperty: [
-    {
-      "@type": "PropertyValue",
-      name: "Standard Compliance",
-      value: "IS 14855 (Part 1) — Bureau of Indian Standards",
-    },
-    {
-      "@type": "PropertyValue",
-      name: "Quality Certification",
-      value: "ISO 9001:2015",
-    },
-    {
-      "@type": "PropertyValue",
-      name: "Manufacturer Type",
-      value: "MSME OEM, GeM Listed",
-    },
-  ],
-}
-
 const PRODUCTS = [
   {
     name: "100XDB400 — Double Barrel Vehicle-Mounted Fogger",
@@ -146,7 +113,6 @@ export default function Is14855FoggingMachinePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }} />
       <BreadcrumbJsonLd items={[
         { name: "Home", url: "/" },
         { name: "Products", url: "/products" },
