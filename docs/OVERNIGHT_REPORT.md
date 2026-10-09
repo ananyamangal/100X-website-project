@@ -22,7 +22,18 @@ Production: main 47d0c8d (push 5, deployed 2026-10-09 ~13:08Z). Item-by-item sta
 
 ## Lighthouse (mobile, local Lighthouse 12.8.2 against production)
 
-Before B10 (b10/lh-before.txt): home perf 45-51, LCP 7.9 s (hero image lazy, preload pointed at an unused tablet image); TFS50 LCP 7.0 s; mini-fogger LCP 4.0 s; /products, /case-studies, GeM page LCP 9.7-11.8 s; CLS 0 everywhere; TBT 0.5-1.1 s (mostly Google Tag Manager). After-B10 run not yet taken (b10/lh-after, `tools/lh.sh`).
+Before B10 (b10/lh-before.txt): home perf 45-51, LCP 7.9 s (hero image lazy, preload pointed at an unused tablet image); TFS50 LCP 7.0 s; mini-fogger LCP 4.0 s; /products, /case-studies, GeM page LCP 9.7-11.8 s; CLS 0 everywhere; TBT 0.5-1.1 s (mostly Google Tag Manager). After B10 (b10/lh-after.txt, 2026-10-09, same pages, 2 runs each, min/max perf and median LCP; lab numbers vary run to run):
+
+| page | perf before | perf after | LCP before | LCP after | TBT before | TBT after |
+|---|---|---|---|---|---|---|
+| / | 45/51 | 48/51 | 7.9 s | 5.3 s | 1062 ms | 1156 ms |
+| /thermal-and-cold-fogging-machine-100xtfs50 | 46/56 | 44/59 | 7.0 s | 6.5 s | 775 ms | 697 ms |
+| /products/mini-fogger-100xbf102-2d9887 | 42/65 | 64/70 | 4.0 s | 3.8 s | 863 ms | 720 ms |
+| /gem-approved-fogging-machine-oem | 49/53 | 51/55 | 11.2 s | 9.6 s | 604 ms | 574 ms |
+| /products | 49/61 | 53/62 | 9.7 s | 7.9 s | 484 ms | 514 ms |
+| /case-studies | 55/57 | 51/56 | 11.8 s | 9.7 s | 687 ms | 563 ms |
+
+CLS stays 0.000 everywhere. The clearest gain is the homepage LCP (hero image now preloaded at high priority). On /products, /case-studies and the GeM page the LCP is still the video popup thumbnail opening on its 5 s timer (see below).
 
 The 9.7-11.8 s LCP on /products, /case-studies and the GeM page is the floating video popup: its 25 KB thumbnail is not slow, the popup opens on a 5 s timer and is then the largest paint. Real fixes for the owner: fetch the thumbnail only when the popup opens (low priority), or open the popup on first scroll/tap.
 
