@@ -8,6 +8,7 @@ import { blogPostSlug } from "@/lib/blogSlug"
 import { PRODUCT_LANDING_MAP } from "@/lib/seo/product-landing-map"
 import { getAvailableLocales, buildLocalizedSitemapEntries } from "@/lib/seo/hreflang"
 import { getCaseStudiesForSitemap } from "@/lib/caseStudySitemap"
+import { procurementGuideSitemapEntries } from "@/lib/seo/procurement-guides"
 
 // Unlike the 14 hardcoded landing pages fixed alongside this (see their own
 // revalidate additions), this route genuinely reads from Mongo on every
@@ -139,6 +140,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: r.changeFrequency,
     priority: r.priority,
   }))
+
+  // E5 (2026-10): procurement guides, with their real last-modified date.
+  entries.push(...procurementGuideSitemapEntries(SITE_URL))
 
   // Every registered landing page is locale-managed (see
   // lib/i18n/locale-routes.ts) — one <url> entry per locale that actually

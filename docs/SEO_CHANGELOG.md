@@ -152,3 +152,18 @@ Block = `components/seo/AnswerSummary.tsx` ("In short" + 40-60 word answer + "La
 | /products/mini-fogger-100xbf102-2d9887 | same | Tier B | {E3} |
 
 Skipped on purpose: /knowledge/* and /blog/* articles (AGENCY rule 3/4: nothing before the first content paragraph; the knowledge "government procurement guide" (Tier A) and the GeM blog guide keep their text; their topics are covered by /fogging-machine-government-procurement above and the new E5 pages). Trolley 100XATS not a key page.
+
+### E5 new pages (new URLs; nothing existing changed except two sitemap rows added)
+
+| URL | field | old | new | reason | commit | rollback |
+|---|---|---|---|---|---|---|
+| /fogging-machine-tender-specification-checklist | new page | 404 | "Fogging Machine Specification Checklist for Tenders \| 100X" (H1 "Fogging Machine Specifications Checklist for Tenders"), ~950 words, visible FAQ = FAQPage JSON-LD, Article JSON-LD (author/publisher = Organization @id), BreadcrumbList | E5 topic "specifications checklist for tenders"; also carries the "IS 14855 explained for procurement officers" section (links to /is-14855-fogging-machine and the IS 14855 blog) and a thermal/cold section (links to /thermal-vs-cold-fogging-machine) | {E5} | `git revert {E5}` |
+| /fogging-machine-delivery-inspection-checklist | new page | 404 | "Fogging Machine Delivery Inspection Checklist \| 100X Circle" (H1 "Fogging Machine Delivery and Acceptance Checklist"), ~810 words, same schema set | distinct query (delivery / acceptance on GeM); carries the "how to buy on GeM, step by step" section (links to /knowledge/government-procurement-guide, /gem-approved-fogging-machine-oem, the GeM blog guide) and "thermal vs cold for municipalities: what to check" | {E5} | same |
+| /sitemap.xml | 2 rows added | - | the two URLs above, lastmod 2026-10-09 (their real date, from lib/seo/procurement-guides.ts) | E5 | {E5} | same |
+
+Cannibalisation decisions (checked against protected_pages_union.csv and top_queries_union.csv):
+- "How to buy a fogging machine on GeM (step by step)": NOT a new page. /gem-approved-fogging-machine-oem (Tier A, "fogging machine on gem" pos 3.3), /knowledge/government-procurement-guide (Tier A) and /blog/how-to-buy-fogging-machines-on-gem-portal-a-complete-guide (Tier B) already target it. Became a section of the delivery/acceptance page with prominent links to all three.
+- "IS 14855 explained for procurement officers": NOT a new page. /is-14855-fogging-machine (Tier B) and /blog/is-14855-government-fogging-machine-tenders-india (Tier B) target it. Became a section of the tender-specification page, linking to both.
+- "Thermal vs cold fogging for municipalities": NOT a new page. /thermal-vs-cold-fogging-machine (Tier A) and several Tier A blogs rank at 1-3 for "thermal vs cold fogger" queries. Short sections in both new pages link to it.
+- "Fogging machine specifications checklist for tenders": no existing page targets it (closest: /fogging-machine-buying-guide, Tier B, a general buyer guide; linked). New page.
+Paths checked free: no route in app/, no landing slug, no next.config redirect, no DB url_redirects row, not in the 2026-10-08 sitemap baseline, 404 on live.
