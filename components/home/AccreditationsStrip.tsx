@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { optimizeCloudinary } from "@/lib/cloudinaryUrl"
 
 const LOGO_PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect fill='%23e5e7eb' width='80' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='10'%3ELogo%3C/text%3E%3C/svg%3E"
@@ -34,7 +35,9 @@ export default function AccreditationsStrip({ accreditations }: Props) {
                 <div className="bg-white rounded-lg p-1.5 md:p-6 h-20 md:h-28 lg:h-32 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow min-h-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={accreditation.logo || LOGO_PLACEHOLDER}
+                    // ~120x80 logo slot: a 240 px f_auto rendition instead of the
+                    // full-size PNG original (50-80 KB each, just below the fold).
+                    src={optimizeCloudinary(accreditation.logo, 240) || LOGO_PLACEHOLDER}
                     alt={accreditation.name ? `${accreditation.name} certification` : "Industry certification"}
                     width={120}
                     height={80}

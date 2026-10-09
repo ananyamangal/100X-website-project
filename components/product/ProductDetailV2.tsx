@@ -17,6 +17,7 @@ import RFQForm from '@/components/forms/RFQForm'
 import { plainTextFromHtml } from '@/lib/rich-text'
 import { toDisplayStrings } from '@/lib/normalizeProduct'
 import { SHOW_PRODUCT_RATINGS } from '@/lib/seo/ratings'
+import { optimizeCloudinary } from '@/lib/cloudinaryUrl'
 
 // ── Utilities ──────────────────────────────────────────────────────────────────
 
@@ -145,8 +146,11 @@ function GalleryV2({ images, highlightImages = [], videoId, name }: { images: st
                   </div>
                 </>
               ) : (
+                // 60-68 px thumbnail: request a small f_auto/q_auto rendition, not
+                // the full-size original (some are 1-1.6 MB PNGs, fetched above
+                // the fold on mobile in competition with the LCP image).
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.url} alt="" className="w-full h-full object-contain p-1" loading="lazy" />
+                <img src={optimizeCloudinary(item.url, 160)} alt="" className="w-full h-full object-contain p-1" loading="lazy" />
               )}
             </button>
           ))}
@@ -424,7 +428,7 @@ function ProductFeaturesSection({ chapters }: { chapters: any[] }) {
                       />
                     ) : chImg ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={chImg} alt={s(ch.title)} className="w-full h-full object-cover" loading="lazy" />
+                      <img src={optimizeCloudinary(chImg, 1200)} alt={s(ch.title)} className="w-full h-full object-cover" loading="lazy" />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className="text-7xl font-black text-gray-200 select-none">{String(i + 1).padStart(2, '0')}</span>
@@ -543,7 +547,7 @@ function UGCCarousel({ images, productName }: { images: string[]; productName: s
         {images.map((img, i) => (
           <div key={i} className="flex-shrink-0 w-72 md:w-80 aspect-[4/3] rounded-xl overflow-hidden bg-gray-200 snap-start">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img} alt={`${productName} deployment ${i + 1}`}
+            <img src={optimizeCloudinary(img, 640)} alt={`${productName} deployment ${i + 1}`}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
           </div>
         ))}
@@ -623,7 +627,7 @@ function SparePartsSection({ productId, productName }: { productId: string; prod
                 <div className="aspect-square bg-gray-50">
                   {part.images?.[0]
                     // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={part.images[0]} alt={part.name} className="w-full h-full object-contain p-3" loading="lazy" />
+                    ? <img src={optimizeCloudinary(part.images[0], 600)} alt={part.name} className="w-full h-full object-contain p-3" loading="lazy" />
                     : <div className="w-full h-full flex items-center justify-center"><Wrench size={28} className="text-gray-200" /></div>}
                 </div>
                 <div className="p-3">
