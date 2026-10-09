@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useRef, useCallback } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import { Play, Volume2, VolumeX, X } from "lucide-react"
 
@@ -23,64 +23,6 @@ interface VideoConfig {
   showOnDesktop: boolean
   autoCloseMs: number
   hideOnPaths: string[]
-}
-
-/**
- * Decorative poster for the floating popup, painted through a <canvas>.
- *
- * The popup opens several seconds after load (delayMs), and its 480x360
- * poster was then the largest image painted so far, so on text-led pages
- * (/products, /case-studies, /gem-approved-fogging-machine-oem) this late
- * corner overlay -- not the page's own content -- was reported as the
- * Largest Contentful Paint (9.7-11.8 s on mobile Lighthouse). Canvas paints
- * are not LCP candidates, so the overlay no longer masks the real LCP.
- *
- * The <img> stays in the DOM with the same src/size attributes (it is the
- * download + decode source and what tests/video-popup-facade.spec.ts pins);
- * it is visibility:hidden so it is never painted, and the canvas -- same box,
- * same object-cover -- shows the identical pixels. Looks and behaves exactly
- * as before; the button around it is unchanged.
- */
-function PosterFacade({ src }: { src: string }) {
-  const imgRef = useRef<HTMLImageElement | null>(null)
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const draw = useCallback(() => {
-    const img = imgRef.current
-    const canvas = canvasRef.current
-    if (!img || !canvas || !img.naturalWidth) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-  }, [])
-  // Cached images can finish before the load listener matters.
-  useEffect(() => {
-    if (imgRef.current?.complete) draw()
-  }, [src, draw])
-  return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        ref={imgRef}
-        src={src}
-        alt=""
-        aria-hidden="true"
-        width={480}
-        height={360}
-        decoding="async"
-        fetchPriority="low"
-        onLoad={draw}
-        className="invisible absolute inset-0 w-full h-full object-cover"
-      />
-      <canvas
-        ref={canvasRef}
-        width={480}
-        height={360}
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-    </>
-  )
 }
 
 export default function VideoPopup() {
@@ -333,7 +275,16 @@ export default function VideoPopup() {
               data-gtm="video_popup_play"
               className="group absolute inset-0 w-full h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
             >
-              <PosterFacade src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+                alt=""
+                aria-hidden="true"
+                width={480}
+                height={360}
+                decoding="async"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
               <span className="absolute inset-0 grid place-items-center">
                 <span className="grid place-items-center w-14 h-14 rounded-full bg-brand-600/95 text-white shadow-2xl ring-4 ring-white/20 group-hover:scale-110 transition-transform">
                   <Play size={24} className="ml-0.5" aria-hidden="true" />
