@@ -71,7 +71,9 @@ export async function generateRootMetadata(): Promise<Metadata> {
       locale: 'en_IN',
       url: SITE_URL,
       siteName: SITE_NAME,
-      title: 'Best Thermal Fogging Machine Manufacturer | 100x Circle',
+      // B5 (2026-10): no "Best ..." superlative in the inherited social title;
+      // matches the default <title>. Description wording (incl. agriculture) kept.
+      title: 'Thermal Fogging Machine Manufacturer in India | 100x Circle',
       description:
         'High-performance thermal and pulse-jet fogging machines for public health, municipalities, and agriculture — manufactured and supplied across India.',
       images: [
@@ -85,7 +87,7 @@ export async function generateRootMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Best Thermal Fogging Machine Manufacturer | 100x Circle',
+      title: 'Thermal Fogging Machine Manufacturer in India | 100x Circle',
       description:
         'Industrial fogging machines and agricultural equipment from 100x Circle — demos, specs, and nationwide support.',
       images: [ogImage],

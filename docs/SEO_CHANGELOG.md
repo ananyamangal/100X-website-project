@@ -103,3 +103,17 @@ Title/meta budget for this batch: at most 12 URLs with a changed `<title>` or me
 | /thermal-fogging-machine-with-stainless-steel-tank-100xssma20 (Tier B) | title (and og/twitter title) | "Buy Stainless Steel Tank Thermal Fogger \| 100x Circle" | "Buy Stainless Steel Tank Thermal Fogger 100XSSMA20 \| 100X" (57) | B4: model number added; `displayName` pinned | {B4} | same |
 
 B4 notes: on /products/* pages og:title and twitter:title follow the `<title>` (no stored og fields), so they change with it. No H1 was changed: both HDPE pages already show the correct model in their H1 (the mismatch was only in HBL22's title and meta). 100XTFS50 (title already has the model) and 100XBF102 ("100XBF102 \| Mini Fogger", no defect) were left alone.
+
+### B5 social tags (not in the title/meta budget)
+
+| URL | field | old | new | reason | commit | rollback |
+|---|---|---|---|---|---|---|
+| site-wide default (every page without its own og/twitter title, incl. /) | og:title, twitter:title | "Best Thermal Fogging Machine Manufacturer \| 100x Circle" | "Thermal Fogging Machine Manufacturer in India \| 100x Circle" | B5: stop the inherited "Best ..." title. Default descriptions (with "agriculture"/"agricultural") unchanged | {B5} | `git revert {B5}` |
+| /case-studies | og:title / og:description / og:url / twitter:* | inherited: "Best ..." title, homepage description, og:url = https://www.100xcircle.com | own: "Fogging Machine Case Studies: Government & Municipal Supply \| 100X Circle"; "Case studies of 100X Circle fogging machines supplied to municipal corporations, health departments, defence units and agricultural cooperatives in India."; og:url = /case-studies | B5: wrong og:url, inherited title | {B5} | same |
+| /knowledge | og:title / og:description / og:url / twitter:* | inherited (same as above, og:url = homepage) | own: "Knowledge Hub: Thermal Fogging & Vector Control Guides \| 100X Circle"; "Guides on thermal and cold fogging, mosquito and vector control, chemicals, maintenance, safety and buying fogging machines through GeM, by 100X Circle."; og:url = /knowledge | B5 | {B5} | same |
+| /spare-parts | twitter:title / twitter:description | inherited "Best ..." / homepage text | = its own og tags ("Spare Parts \| 100X Circle") | B5 | {B5} | same |
+| /products | twitter:title / twitter:description | "Products \| 100x Circle" / "Thermal fogging machines and agricultural equipment from 100x Circle." (from products/layout.tsx) | = its own og tags ("Fogging Machines & Agricultural Equipment \| 100X Circle"; agricultural wording kept) | B5 | {B5} | same |
+| /oem-authorization-letter | twitter:title / twitter:description | inherited "Best ..." | = its own og tags | B5 | {B5} | same |
+| /gem-oem-authorization | twitter:title / twitter:description | inherited "Best ..." | = its own og tags | B5 | {B5} | same |
+
+Checked and left as is (already own og:url and own social title): /gem-approved-fogging-machine-oem, /past-performance-government, /blog.

@@ -18,6 +18,12 @@ export const metadata: Metadata = {
     description: "Genuine OEM spare parts for 100X Circle fogging machines",
     url: `${SITE_URL}/spare-parts`,
   },
+  // B5 (2026-10): twitter tags used to fall back to the site-wide "Best ..." title.
+  twitter: {
+    card: "summary_large_image",
+    title: "Spare Parts | 100X Circle",
+    description: "Genuine OEM spare parts for 100X Circle fogging machines",
+  },
 }
 
 export default async function SparePartsPage() {

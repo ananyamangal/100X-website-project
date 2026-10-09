@@ -24,6 +24,12 @@ export const metadata: Metadata = {
     description: "Free OEM Authorization Letter for fogging machine tenders. IS 14855, GeM OEM, ISO 9001. Response within 24 hours on working days.",
     url: `${SITE_URL}/oem-authorization-letter`,
   },
+  // B5 (2026-10): twitter tags used to fall back to the site-wide "Best ..." title.
+  twitter: {
+    card: "summary_large_image",
+    title: "OEM Authorization Letter for Government Tenders | 100X Circle",
+    description: "Free OEM Authorization Letter for fogging machine tenders. IS 14855, GeM OEM, ISO 9001. Response within 24 hours on working days.",
+  },
   robots: { index: true, follow: true },
 }
 

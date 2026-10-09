@@ -8,6 +8,24 @@ export const metadata: Metadata = {
   description:
     "Technical knowledge base on thermal fogging technology, mosquito vector control, and government procurement. Authored by 100X Circle Pvt Ltd, Indian OEM manufacturer.",
   alternates: { canonical: `${SITE_URL}/knowledge` },
+  // B5 (2026-10): own social tags; this page used to inherit the site-wide
+  // "Best ..." title and the homepage og:url.
+  openGraph: {
+    title: "Knowledge Hub: Thermal Fogging & Vector Control Guides | 100X Circle",
+    description:
+      "Guides on thermal and cold fogging, mosquito and vector control, chemicals, maintenance, safety and buying fogging machines through GeM, by 100X Circle.",
+    url: `${SITE_URL}/knowledge`,
+    siteName: "100x Circle",
+    locale: "en_IN",
+    type: "website",
+    images: [{ url: `${SITE_URL}/logo-main.png` }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Knowledge Hub: Thermal Fogging & Vector Control Guides | 100X Circle",
+    description:
+      "Guides on thermal and cold fogging, mosquito and vector control, chemicals, maintenance, safety and buying fogging machines through GeM, by 100X Circle.",
+  },
 }
 
 const jsonLd = {

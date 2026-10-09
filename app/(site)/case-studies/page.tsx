@@ -11,6 +11,24 @@ export const metadata: Metadata = {
   description:
     "Real-world government supply case studies: 100X Circle thermal fogging machines deployed by municipal corporations, health departments, and agricultural cooperatives across India.",
   alternates: { canonical: `${SITE_URL}/case-studies` },
+  // B5 (2026-10): own social tags; this page used to inherit the site-wide
+  // "Best ..." title and the homepage og:url.
+  openGraph: {
+    title: "Fogging Machine Case Studies: Government & Municipal Supply | 100X Circle",
+    description:
+      "Case studies of 100X Circle fogging machines supplied to municipal corporations, health departments, defence units and agricultural cooperatives in India.",
+    url: `${SITE_URL}/case-studies`,
+    siteName: "100x Circle",
+    locale: "en_IN",
+    type: "website",
+    images: [{ url: `${SITE_URL}/logo-main.png` }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Fogging Machine Case Studies: Government & Municipal Supply | 100X Circle",
+    description:
+      "Case studies of 100X Circle fogging machines supplied to municipal corporations, health departments, defence units and agricultural cooperatives in India.",
+  },
 }
 
 const CASE_STUDIES = [

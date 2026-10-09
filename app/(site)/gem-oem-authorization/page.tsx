@@ -28,6 +28,13 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/gem-oem-authorization`,
     type: "website",
   },
+  // B5 (2026-10): twitter tags used to fall back to the site-wide "Best ..." title.
+  twitter: {
+    card: "summary_large_image",
+    title: "GeM OEM Authorization for Dealers | 100X Circle",
+    description:
+      "Become an authorized 100X Circle reseller on GeM. Get your OEM authorization code, letter, and tender support from India's ISO-certified fogging machine manufacturer.",
+  },
 }
 
 const jsonLdHowTo = {

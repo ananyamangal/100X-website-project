@@ -45,6 +45,13 @@ export const metadata: Metadata = {
     description: "OEM-manufactured fogging machines and agricultural equipment. Government-approved. Pan-India delivery.",
     url: `${SITE_URL}/products`,
   },
+  // B5 (2026-10): twitter tags used to come from products/layout.tsx
+  // ("Products | 100x Circle"); now they match this page's own og tags.
+  twitter: {
+    card: "summary_large_image",
+    title: "Fogging Machines & Agricultural Equipment | 100X Circle",
+    description: "OEM-manufactured fogging machines and agricultural equipment. Government-approved. Pan-India delivery.",
+  },
 }
 
 // The page renders on demand, so this read ran on every view; it is now
