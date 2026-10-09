@@ -7,6 +7,7 @@ import { Download } from 'lucide-react';
 import { Star } from 'lucide-react';
 import Link from 'next/link';
 import { plainTextFromHtml } from '@/lib/rich-text';
+import { SHOW_PRODUCT_RATINGS } from '@/lib/seo/ratings'
 
 const badgeLogoMap: Record<string, string> = {
   'Korean Technology':  '/Logos clipart 2/Korean Technology.png',
@@ -145,6 +146,7 @@ export default function ProductCard({
             </Badge>
           )}
         </div>
+        {SHOW_PRODUCT_RATINGS && (
         <div
           aria-hidden="true"
           className="absolute top-3 right-3 rounded-md bg-white px-2.5 py-1 shadow-sm ring-1 ring-gray-200 pointer-events-none"
@@ -155,6 +157,7 @@ export default function ProductCard({
             <span className="text-xs text-gray-500 tabular-nums">({product.reviewsCount})</span>
           </div>
         </div>
+        )}
       </Link>
       <CardContent className="p-6 md:p-7">
         <div className="flex items-start justify-between gap-3 mb-3">

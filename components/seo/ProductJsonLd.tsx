@@ -1,5 +1,6 @@
 import { SITE_NAME, SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
+import { SHOW_PRODUCT_RATINGS } from '@/lib/seo/ratings'
 
 type Props = {
   name: string
@@ -107,7 +108,9 @@ export function ProductJsonLd({
     .slice(0, 10)
     .map(absolutize)
 
+  // B2: no AggregateRating until real, visible product reviews exist.
   const aggregateRating =
+    SHOW_PRODUCT_RATINGS &&
     typeof rating === "number" && rating > 0 && reviewsCount && reviewsCount > 0
       ? {
           "@type": "AggregateRating",

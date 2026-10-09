@@ -3,6 +3,7 @@
 import React from "react"
 import Link from "next/link"
 import { ChevronRight, Award, ShieldCheck, Zap } from "lucide-react"
+import { SHOW_PRODUCT_RATINGS } from '@/lib/seo/ratings'
 
 interface Props {
   name: string
@@ -176,7 +177,7 @@ export default function ProductCinematicHero({
                 </p>
               </div>
             )}
-            {rating && rating > 0 ? (
+            {SHOW_PRODUCT_RATINGS && rating && rating > 0 ? (
               <div className="flex items-center gap-1.5">
                 <div className="flex gap-0.5">
                   {[1, 2, 3, 4, 5].map((s) => (

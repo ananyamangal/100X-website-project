@@ -12,6 +12,7 @@ import RFQForm from '@/components/forms/RFQForm';
 import PremiumAccordion from '@/components/cinematic/PremiumAccordion';
 import { plainTextFromHtml } from '@/lib/rich-text';
 import { decodeHtmlEntities } from '@/lib/utils';
+import { SHOW_PRODUCT_RATINGS } from '@/lib/seo/ratings'
 
 // ── Utilities ────────────────────────────────────────────────────────────
 
@@ -748,7 +749,7 @@ export default function ProductDetailPage({ product: productProp, slug: slugProp
                                 {tagline && <p className="text-sm text-cinema-400 italic">{tagline}</p>}
                             </div>
 
-                            {rating > 0 && (
+                            {SHOW_PRODUCT_RATINGS && rating > 0 && (
                                 <div className="flex items-center gap-2">
                                     <div className="flex gap-0.5">
                                         {[...Array(5)].map((_, i) => <Star key={i} size={13} className={i < Math.floor(rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'} />)}

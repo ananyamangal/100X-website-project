@@ -14,6 +14,7 @@ import RFQForm from '@/components/forms/RFQForm';
 import BrochureLeadModal from '@/components/BrochureLeadModal';
 import { BUSINESS } from '@/lib/seo/site-config';
 import ProductCinematicHero from '@/components/product/ProductCinematicHero';
+import { SHOW_PRODUCT_RATINGS } from '@/lib/seo/ratings'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Utilities
@@ -840,7 +841,7 @@ export default function ProductDetailClient({ productId, initialProduct, pageSec
             </div>
 
             {/* Rating */}
-            {rating > 0 && (
+            {SHOW_PRODUCT_RATINGS && rating > 0 && (
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
                   {[1,2,3,4,5].map(star => (

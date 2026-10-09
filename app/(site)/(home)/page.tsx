@@ -8,7 +8,6 @@ import { getHomeContent } from "@/lib/homeContent"
 import { serializeBlogs } from "@/lib/blogSerialize"
 import HomePageClient from "@/components/home/HomePageClient"
 import HomepageAiSummary from "@/components/seo/HomepageAiSummary"
-import HomepageTestimonialsJsonLd from "@/components/seo/HomepageTestimonialsJsonLd"
 import { optimizeCloudinary } from "@/lib/cloudinaryUrl"
 
 // Server-side preload component for the first banner image.
@@ -124,7 +123,6 @@ export default async function HomePage() {
     <>
       <BannerPreloads banners={banners} />
       <HomepageAiSummary />
-      <HomepageTestimonialsJsonLd />
       <HomePageClient
         products={products}
         banners={banners}

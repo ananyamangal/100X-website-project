@@ -9,6 +9,7 @@ import { BUSINESS } from '@/lib/seo/site-config'
 import { getProductCanonicalUrl } from '@/lib/seo/product-landing-map'
 import { yearsInBusiness, FOGGER_MODEL_COUNT } from '@/lib/facts'
 import { featureLabel } from '@/lib/featureLabel'
+import { SHOW_PRODUCT_RATINGS } from '@/lib/seo/ratings'
 
 const badgeLogoMap: Record<string, string> = {
   'German Technology':  '/Logos clipart 2/german technology.png',
@@ -69,7 +70,7 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
           )
         })}
         {/* Rating pill */}
-        {product.rating && (
+        {SHOW_PRODUCT_RATINGS && product.rating && (
           <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/95 backdrop-blur-sm rounded-full px-2.5 py-1 shadow-sm">
             <Star size={11} className="text-yellow-400 fill-yellow-400" />
             <span className="text-xs font-600 text-gray-800">{product.rating}</span>

@@ -16,6 +16,7 @@ import BrochureLeadModal from '@/components/BrochureLeadModal'
 import RFQForm from '@/components/forms/RFQForm'
 import { plainTextFromHtml } from '@/lib/rich-text'
 import { toDisplayStrings } from '@/lib/normalizeProduct'
+import { SHOW_PRODUCT_RATINGS } from '@/lib/seo/ratings'
 
 // ── Utilities ──────────────────────────────────────────────────────────────────
 
@@ -804,7 +805,7 @@ export default function ProductDetailV2({ product, socialLinks = [], h1Override,
               </div>
 
               {/* Rating */}
-              {rating > 0 && (
+              {SHOW_PRODUCT_RATINGS && rating > 0 && (
                 <div className="flex items-center gap-2">
                   <div className="flex gap-0.5">
                     {[1,2,3,4,5].map(star => (
