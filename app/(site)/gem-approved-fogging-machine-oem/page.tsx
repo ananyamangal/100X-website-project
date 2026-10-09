@@ -13,6 +13,8 @@ import PartnerApplyForm from "@/components/oem/PartnerApplyForm"
 import CelebritySectionsBlock, { type HomepageSection } from "@/components/home/CelebritySectionsBlock"
 import OemHeroVisual from "@/components/oem/OemHeroVisual"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
+import { TopicRelatedLinks } from "@/components/seo/RelatedLinks"
+import { GEM_OEM_GUIDE_LINK } from "@/lib/relatedLinks"
 
 export const revalidate = 60
 
@@ -439,6 +441,8 @@ export default async function GemApprovedOEMPage() {
           </div>
         </section>
 
+        {/* B9: government case studies + GeM OEM guide, after all existing content */}
+        <TopicRelatedLinks heading="Related case studies" id="gem-related-case-studies" caseStudyKinds={["vehicle", "handheld", "cold"]} caseStudyLimit={3} extra={[GEM_OEM_GUIDE_LINK]} tone="dark" />
       </main>
     </>
   )

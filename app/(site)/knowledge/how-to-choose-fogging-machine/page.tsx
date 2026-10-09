@@ -3,6 +3,7 @@ import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import VisibleSchemaFaq from "@/components/seo/VisibleSchemaFaq"
 import { faqPairsFromJsonLd } from "@/lib/seo/faqVisible"
+import { TopicRelatedLinks } from "@/components/seo/RelatedLinks"
 
 export const metadata: Metadata = {
   title: "How to Choose a Thermal Fogging Machine in India (2026 Buyer's Guide) | 100X Circle",
@@ -398,6 +399,8 @@ export default function HowToChoosePage() {
         </section>
         {/* B1: every FAQPage schema Q&A shown as visible text (schema-only before) */}
         <VisibleSchemaFaq items={faqPairsFromJsonLd(faqJsonLd, ["What tank capacity should I choose for municipal fogging?"])} heading="More frequently asked questions" />
+        {/* B9: related products / case studies, after all existing content */}
+        <TopicRelatedLinks heading="Related products and case studies" productKinds={["handheld", "vehicle", "cold"]} productLimit={3} caseStudyKinds={["vehicle"]} caseStudyLimit={1} />
       </main>
     </>
   )

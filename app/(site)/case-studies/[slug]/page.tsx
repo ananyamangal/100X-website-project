@@ -17,6 +17,7 @@ import { SITE_URL } from "@/lib/seo/site-config"
 import { getProductCanonicalUrl } from "@/lib/seo/product-landing-map"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import { ArrowRight } from "lucide-react"
+import { CaseStudyRelatedProducts } from "@/components/seo/RelatedLinks"
 
 async function getCaseStudy(slug: string) {
   try {
@@ -438,6 +439,12 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
           ← Back to all case studies
         </Link>
       </div>
+      {/* B9: related products (same machine type) + buying guide, after all existing content */}
+      <CaseStudyRelatedProducts
+        productUsed={typeof cs.productUsed === "string" ? cs.productUsed : undefined}
+        excludeProductIds={linkedProducts.map((p: any) => String(p._id))}
+        seed={String(cs.slug)}
+      />
     </main>
     </>
   )

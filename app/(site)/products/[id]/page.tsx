@@ -26,6 +26,7 @@ import { plainTextFromHtml } from "@/lib/rich-text"
 import ProductAiSummary from "@/components/seo/ProductAiSummary"
 import clientPromise from "@/lib/mongodb"
 import { getSocialLinks, pickVisibleSocialLinks } from "@/lib/socialLinks"
+import { ProductRelatedCaseStudies } from "@/components/seo/RelatedLinks"
 
 function absolutizeImages(urls: string[]): string[] {
   return urls
@@ -335,6 +336,13 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
           </div>
         </section>
       )}
+
+      {/* B9: related case studies (same machine type) + GeM page, after all existing content */}
+      <ProductRelatedCaseStudies
+        productName={productName}
+        category={category}
+        excludeCaseStudySlugs={relatedCaseStudies.map((s: any) => String(s.slug))}
+      />
     </>
   )
 }

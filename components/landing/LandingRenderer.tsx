@@ -34,6 +34,7 @@ import CtaBandBlock from "./CtaBandBlock"
 import RichTextBlock from "./RichTextBlock"
 import LandingFormBlock from "./LandingFormBlock"
 import VideoBlock from "./VideoBlock"
+import { ProductRelatedCaseStudies } from "@/components/seo/RelatedLinks"
 
 type Props = { slug: string; locale?: string }
 
@@ -274,6 +275,8 @@ export default async function LandingRenderer({ slug, locale = "en" }: Props) {
           }
         />
         <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
+        {/* B9: related case studies (same machine type) + GeM page, after all existing content */}
+        <ProductRelatedCaseStudies productName={productName} category={category} />
       </>
     )
   }

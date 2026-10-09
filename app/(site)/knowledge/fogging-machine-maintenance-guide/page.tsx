@@ -3,6 +3,7 @@ import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
 import VisibleSchemaFaq from "@/components/seo/VisibleSchemaFaq"
 import { faqPairsFromJsonLd } from "@/lib/seo/faqVisible"
+import { TopicRelatedLinks } from "@/components/seo/RelatedLinks"
 
 export const metadata: Metadata = {
   title: "Thermal Fogging Machine Maintenance Guide — Cleaning, Storage, Troubleshooting | 100X Circle",
@@ -287,6 +288,8 @@ export default function MaintenancePage() {
         </section>
         {/* B1: every FAQPage schema Q&A shown as visible text (schema-only before) */}
         <VisibleSchemaFaq items={faqPairsFromJsonLd(faqJsonLd)} heading="More frequently asked questions" />
+        {/* B9: related products / case studies, after all existing content */}
+        <TopicRelatedLinks heading="Related products and case studies" productKinds={["handheld", "vehicle"]} productLimit={2} caseStudyKinds={["handheld", "vehicle"]} caseStudyLimit={2} />
       </main>
     </>
   )
