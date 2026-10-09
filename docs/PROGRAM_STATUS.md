@@ -1,4 +1,51 @@
-# PROGRAM STATUS (audit, 2026-10-09, read-only)
+# PROGRAM STATUS
+
+## Final status (2026-10-09 ~13:20Z, production = main 47d0c8d)
+
+| item | status | commit(s) |
+|---|---|---|
+| Step 0 docs (FACTS, OPEN_FACTS, AGENCY_PROTECTED) | live | 4faebfc, 86d751e, 548d569 |
+| A1 RFQ save-first | live (push 2) | bee42fc, 2703ee2 |
+| A2 success-gated events | live (push 2) | 4fd7af2 |
+| A3 / A4 / A6 optional email, call back, quote actions | live (push 3) | 9357caf, 7a57cff, 7af099e, e9b0970, 0033c3d |
+| A5 attribution | live (push 2) | e9d3228, b27cae5 |
+| A7 honeypot (value sent, silent discard) | live (push 4) | c750188 |
+| A8 home pills, /about image dims | live (pushes 1-2) | ebfa2c5, 68d6da9 |
+| A9 DB typos (13 fields, reversible) + featLabel | live (DB 2026-10-09 ~07:10Z; code push 4) | a9/db-changes-2026-10-09.json, 5e94f35 |
+| A9 DB fact rows (10+ years, 7 models, 50+/65+ spares) | blocked: owner decision | DECISIONS_PENDING.md section 2 |
+| A10 debug logs | live (push 2) | a1101d0 |
+| Facts pass (owner 10-09 decisions kept) | live (push 3) | 78cea58, 00c0ee0, 9021252 |
+| Test-lead generate_lead filter | live (push 4) | 587041c |
+| B1 visible FAQ = schema | live (push 4) | 3b77fd0 |
+| B2 rating markup off until real reviews | live (push 4) | 6c25ee2 |
+| B3 Product schema only on product pages, ContactPage, Org dedupe | live (push 4) | 316c74f, 95ed25f |
+| B4 product titles (8 URLs) | live (push 4) | c07bb8d |
+| B5 social titles | live (push 4) | 7e04270 |
+| B6 sitemap case studies, duplicate removed | live (push 4) | f0586c1 |
+| B7 robots named bot groups | live (push 4) | dfbc6f1 |
+| B8 claim removals | skipped by owner (published data is real) | - |
+| B9 related links | live (push 4) | 443cf3f |
+| B10 performance (hero preload, sized images) | live (push 5) | ac7f776, e3396d0 |
+| B10 canvas poster | not shipped: owner decision | 65a8bed (reverted 8ff2547) |
+| Hidden footer keywords | assessed, unchanged: owner decision | PHASE_B_NOTES.md |
+| E1 llms.txt | live (push 4) | bc27c0d, 701ec2e |
+| E2 /api/ai/knowledge | live (push 4) | 7bf82b0 |
+| E3 answer-first summaries | live (push 4) | 5bf9115 |
+| E4 single Organization node | live (push 4) | 7879c2a, d1923d2 |
+| E5 procurement guides (2 new; 3 topics folded into existing pages to avoid cannibalisation) | live (push 4) | c4fd89a |
+| E6 OFFSITE_TODO.md | live | 3989a97 |
+| Phase 0b CONVERSION_STUDY + PR #27 | live (PR merged d81aaed; final pass 3989a97) | |
+| SEO_WATCHLIST (all changed URLs, GSC checks 2026-10-16 / 2026-10-23) | live (push 5) | 47d0c8d |
+| DECISIONS_PENDING | live (push 5) | 47d0c8d |
+| Final verification on production | done (OVERNIGHT_REPORT.md) | - |
+
+Title/meta URL changes this program: /about meta (push 3), 8 spare-part titles (A9 DB), 8 product URLs (B4) = 17 of 24.
+Rollback: revert the push range (`git revert --no-edit c750188..47d0c8d` for push 5, `05c4c04..c750188` for push 4); full program rollback tag `rollback-pre-overnight-2026-10-08` -> d81aaed.
+
+---
+
+## Audit at the start of the day run (kept for history)
+
 
 Sources: BRIEF.md, BRIEF-2026-10-09-day.md, CHECKPOINT.md, PUSH-LOG.md, git (origin/main = 7785acf; ov3 `overnight/facts` = 05c4c04, 24 commits ahead of origin/main, not pushed), gh pr list, docs in F:/dev/100x-ov3/docs.
 Status key: live = commit on origin/main; ready-unpushed = committed in the ov3 push-3 stack (gates passed per CHECKPOINT; push blocked by the auto-mode classifier, awaiting owner OK); in progress; not started; blocked.
