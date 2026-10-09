@@ -695,9 +695,11 @@ interface Props {
   intro?: string
   /** Server-rendered sections placed right after the purchase area. */
   afterPurchaseArea?: React.ReactNode
+  /** Server-rendered answer-first summary shown under the H1 block (E3, additive). */
+  answerSummary?: React.ReactNode
 }
 
-export default function ProductDetailV2({ product, socialLinks = [], h1Override, subhead, intro, afterPurchaseArea }: Props) {
+export default function ProductDetailV2({ product, socialLinks = [], h1Override, subhead, intro, afterPurchaseArea, answerSummary }: Props) {
   const [brochureOpen, setBrochureOpen] = useState(false)
   const [showFullDesc, setShowFullDesc]   = useState(false)
 
@@ -802,6 +804,7 @@ export default function ProductDetailV2({ product, socialLinks = [], h1Override,
                 <h1 className="text-2xl md:text-3xl lg:text-[1.85rem] font-black text-gray-900 leading-tight tracking-tight">{h1}</h1>
                 {subhead && <p className="text-base text-gray-700 mt-2 leading-snug">{subhead}</p>}
                 {tagline && <p className="text-sm text-gray-500 mt-1.5 italic">{tagline}</p>}
+                {answerSummary ? <div className="mt-3">{answerSummary}</div> : null}
               </div>
 
               {/* Rating */}

@@ -6,6 +6,8 @@ import { buildOfferNode } from "@/lib/seo/offers"
 import RfqForm from "@/components/rfq/RfqForm"
 import VisibleSchemaFaq from "@/components/seo/VisibleSchemaFaq"
 import { faqPairsFromJsonLd } from "@/lib/seo/faqVisible"
+import AnswerSummary from "@/components/seo/AnswerSummary"
+import { ANSWER_SUMMARIES } from "@/lib/seo/answer-summaries"
 
 export const revalidate = 60
 
@@ -149,6 +151,13 @@ export default function Is14855FoggingMachinePage() {
           IS 14855-compliant thermal fogging machines for municipal corporations, Nagar
           Panchayats, health departments, and GeM procurement.
         </p>
+
+        {/* E3 (2026-10): answer-first summary, additive (intro above is unchanged). */}
+        <AnswerSummary
+          summary={ANSWER_SUMMARIES["/is-14855-fogging-machine"].summary}
+          updated={ANSWER_SUMMARIES["/is-14855-fogging-machine"].updated}
+          className="mb-8"
+        />
 
         {/* Procurement CTA bar */}
         <div className="bg-brand-600 rounded-xl p-6 mb-10 text-white">

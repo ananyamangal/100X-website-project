@@ -13,6 +13,8 @@ import GovPastPerformance from "@/components/gov-procurement/GovPastPerformance"
 import TenderPackLeadCapture from "@/components/gov-procurement/TenderPackLeadCapture"
 import GovLogoWall, { type GovLogo } from "@/components/trust/GovLogoWall"
 import GovKPIStrip from "@/components/trust/GovKPIStrip"
+import AnswerSummary from "@/components/seo/AnswerSummary"
+import { ANSWER_SUMMARIES } from "@/lib/seo/answer-summaries"
 import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
 import FeaturedGovSupplies, { type SupplyRecord } from "@/components/trust/FeaturedGovSupplies"
 import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/FeaturedDeployments"
@@ -571,6 +573,16 @@ export default async function GovernmentProcurementPage() {
                 )}
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* E3 (2026-10): answer-first summary, additive, right after the hero. */}
+        <section className="bg-white py-6 border-b border-gray-100">
+          <div className="container mx-auto px-4 md:px-6 max-w-4xl">
+            <AnswerSummary
+              summary={ANSWER_SUMMARIES["/fogging-machine-government-procurement"].summary}
+              updated={ANSWER_SUMMARIES["/fogging-machine-government-procurement"].updated}
+            />
           </div>
         </section>
 

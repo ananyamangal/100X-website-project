@@ -25,6 +25,8 @@ import { resolveProductSeoOverride } from "@/lib/seo/product-seo-overrides"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import ProductAiSummary from "@/components/seo/ProductAiSummary"
+import AnswerSummary from "@/components/seo/AnswerSummary"
+import { getAnswerSummary } from "@/lib/seo/answer-summaries"
 import clientPromise from "@/lib/mongodb"
 import { getSocialLinks, pickVisibleSocialLinks } from "@/lib/socialLinks"
 import { ProductRelatedCaseStudies } from "@/components/seo/RelatedLinks"
@@ -265,6 +267,11 @@ export default async function ProductRoutePage({ params }: { params: Promise<{ i
       <ProductDetailV2
         product={JSON.parse(JSON.stringify(product))}
         socialLinks={pickVisibleSocialLinks(await getSocialLinks(), "showOnProductPages")}
+        answerSummary={(() => {
+          // E3 (2026-10): answer-first summary under the H1 (additive).
+          const entry = getAnswerSummary(`/products/${productSlug}`)
+          return entry ? <AnswerSummary summary={entry.summary} updated={entry.updated} /> : undefined
+        })()}
       />
       <RelatedProductsSection category={category} excludeId={rawId} limit={4} />
 

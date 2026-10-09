@@ -18,6 +18,8 @@ import { plainTextFromHtml } from "@/lib/rich-text"
 import type { FaqEntry, LandingPageDef, LandingSection } from "@/lib/seo/landing-types"
 import type { AppLocale } from "@/i18n/routing"
 import LocaleSuggestionBanner from "@/components/LocaleSuggestionBanner"
+import AnswerSummary from "@/components/seo/AnswerSummary"
+import { getAnswerSummary } from "@/lib/seo/answer-summaries"
 
 import LandingThemeProvider from "./LandingThemeProvider"
 import BreadcrumbNav from "./BreadcrumbNav"
@@ -167,6 +169,13 @@ function renderSection(section: LandingSection, def: LandingPageDef, idx: number
   }
 }
 
+/** E3 answer-first summary for an English landing URL (English copy only). */
+function answerSummaryFor(slug: string, locale: string) {
+  if (locale !== "en") return null
+  const entry = getAnswerSummary(`/${slug}`)
+  return entry ? <AnswerSummary summary={entry.summary} updated={entry.updated} /> : null
+}
+
 /** Has the registry author already placed an FAQ section explicitly? */
 function sectionsIncludeFaq(sections: LandingSection[] | undefined): boolean {
   return !!sections?.some((s) => s.kind === "faq")
@@ -266,6 +275,7 @@ export default async function LandingRenderer({ slug, locale = "en" }: Props) {
           h1Override={def.productPage?.h1}
           subhead={def.productPage?.subhead}
           intro={def.productPage?.intro}
+          answerSummary={answerSummaryFor(slug, locale)}
           afterPurchaseArea={
             def.productPage?.sections?.length
               ? def.productPage.sections.map((sec, i) => (
@@ -306,6 +316,11 @@ export default async function LandingRenderer({ slug, locale = "en" }: Props) {
       <LandingThemeProvider theme={theme}>
         <BreadcrumbNav items={breadcrumb} />
         {def.hero ? <HeroBlock hero={def.hero} theme={theme} /> : null}
+        {/* E3 (2026-10): answer-first summary, additive, right after the hero. */}
+        {(() => {
+          const node = answerSummaryFor(def.slug, locale)
+          return node ? <div className="container mx-auto px-4 md:px-6 max-w-4xl pt-6">{node}</div> : null
+        })()}
         {sections.map((s, i) => {
           try { return renderSection(s, def, i, locale) } catch { return null }
         })}

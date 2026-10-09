@@ -130,3 +130,25 @@ Checked and left as is (already own og:url and own social title): /gem-approved-
 | same | added / removed | contactPoint `contactOption: TollFree`; `numberOfEmployees` 25-100 | removed (mobile numbers are not toll-free; headcount unverified); `address` (PostalAddress from site-config) added | accuracy | {E4} | same |
 
 LocalBusiness and WebSite nodes in GlobalJsonLd.tsx were not touched (B3 / structured-data batch owns LocalBusiness).
+
+### E3 answer-first summaries (new visible block; no title/meta/H1/paragraph changed)
+
+Block = `components/seo/AnswerSummary.tsx` ("In short" + 40-60 word answer + "Last updated 9 October 2026 · By 100X Circle Pvt Ltd, fogging machine manufacturer, Gurugram"). Text lives in `lib/seo/answer-summaries.ts`. Rollback for all rows: `git revert {E3}`.
+
+| URL | placement | protected? | commit |
+|---|---|---|---|
+| /gem-approved-fogging-machine-oem | new block directly after the hero (LandingRenderer, English only) | Tier A: additive block, hero/H1/body unchanged | {E3} |
+| /thermal-vs-cold-fogging-machine | same | Tier A: additive | {E3} |
+| /is-14855-fogging-machine | new block after the intro paragraph, before the CTA bar | Tier B: additive | {E3} |
+| /fogging-machine-government-procurement | new white band directly after the hero section | Tier B: additive | {E3} |
+| /thermal-and-cold-fogging-machine-100xtfs50 | under the H1/subhead/tagline in the product hero (new `answerSummary` prop on ProductDetailV2) | Tier A: additive | {E3} |
+| /double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400 | same | Tier B | {E3} |
+| /thermal-fogging-machine-with-stainless-steel-tank-100xssma20 | same | Tier B | {E3} |
+| /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde | same | no | {E3} |
+| /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhbl22-c-ea7f75 | same | Tier A: additive | {E3} |
+| /products/cold-fogger-machine-with-2-stoke-engine-100xmcf42-c42ca1 | same | Tier B | {E3} |
+| /products/ulv-cold-fogger-machine-100xmcf42-copy-8dcd42lvlv | same | Tier B | {E3} |
+| /products/100xulvss10-5e46c5 | same | no | {E3} |
+| /products/mini-fogger-100xbf102-2d9887 | same | Tier B | {E3} |
+
+Skipped on purpose: /knowledge/* and /blog/* articles (AGENCY rule 3/4: nothing before the first content paragraph; the knowledge "government procurement guide" (Tier A) and the GeM blog guide keep their text; their topics are covered by /fogging-machine-government-procurement above and the new E5 pages). Trolley 100XATS not a key page.
