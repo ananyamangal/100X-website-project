@@ -4,6 +4,8 @@ import { useState } from "react"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 
 // High-value Funnel A signal -- matches the value already assigned to this
 // lead type in lib/growth-os/conversion-tracking.ts's (currently unwired)
@@ -62,6 +64,8 @@ export default function OemAuthForm({ source = "oem_authorization", compact = fa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(e.currentTarget as HTMLFormElement)
     if (!form.name || !form.company || !form.mobile || !form.email || !form.state || !form.product) {
       setError("Please fill in all required fields.")
       return
@@ -71,7 +75,7 @@ export default function OemAuthForm({ source = "oem_authorization", compact = fa
       const res = await fetch("/api/oem-leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, source, attribution: getPersistedAttribution() }),
+        body: JSON.stringify({ ...form, source, attribution: getPersistedAttribution(), [HONEYPOT_FIELD]: honeypot }),
       })
       if (!res.ok) throw new Error("Submission failed")
 
@@ -130,6 +134,7 @@ export default function OemAuthForm({ source = "oem_authorization", compact = fa
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      <HoneypotField />
       <div className={`grid gap-4 ${compact ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}>
         <div>
           <label className={labelClass}>Full Name <span className="text-rose-400">*</span></label>

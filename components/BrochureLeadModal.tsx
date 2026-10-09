@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 
 const BROCHURE_LEAD_VALUE_INR =
   Number(process.env.NEXT_PUBLIC_BROCHURE_LEAD_VALUE_INR) || 50000
@@ -50,6 +52,8 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
   // whose browser autofilled the visually-hidden-but-DOM-present
   // "company_website" field (it sits right next to real Organization/State
   // fields) saw a success state while their lead was silently never saved.
+  // Since A7 (owner-approved) the decoy is <HoneypotField /> named "website"
+  // (no "company" for autofill heuristics to match), and its value is sent.
   // Re-armed on every open, not just first mount, since this modal can be
   // opened/closed/reopened without remounting.
   const mountedAtRef = useRef<number>(Date.now())
@@ -100,6 +104,8 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError("")
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(e.currentTarget)
 
     const trimPhone = phone.replace(/\D/g, "")
     if (!name.trim()) { setError("Name is required."); return }
@@ -127,6 +133,7 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
           brochureType: brochureUrl ? "product" : "main",
           pageUrl: typeof window !== "undefined" ? window.location.href : "",
           attribution: getPersistedAttribution(),
+          [HONEYPOT_FIELD]: honeypot,
         }),
       })
       const data = await res.json()
@@ -197,10 +204,7 @@ export default function BrochureLeadModal({ open, onClose, source, brochureUrl, 
             </div>
           ) : (
             <form onSubmit={handleSubmit} noValidate className="space-y-3">
-              {/* Honeypot */}
-              <div className="absolute -left-[9999px] w-0 h-0 overflow-hidden" aria-hidden>
-                <input name="company_website" type="text" tabIndex={-1} autoComplete="off" />
-              </div>
+              <HoneypotField />
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">

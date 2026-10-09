@@ -3,6 +3,7 @@ import clientPromise from "@/lib/mongodb"
 import { sendAdminEmail, isEmailConfigured } from "@/lib/email"
 import { buildLeadEmail } from "@/lib/lead-email"
 import { sanitizeAttribution } from "@/lib/attribution-sanitize"
+import { isHoneypotFilled, logHoneypotDiscard } from "@/lib/honeypot"
 
 function detectDevice(ua: string): "mobile" | "tablet" | "desktop" {
   if (/tablet|ipad/i.test(ua)) return "tablet"
@@ -44,10 +45,18 @@ export async function POST(request: NextRequest) {
     const {
       name, phone, email, organization, state, requirement,
       source, brochureType, brochureName, productName,
-      pageUrl, referrer, company_website, attribution,
+      pageUrl, referrer, attribution,
     } = body
 
-    if (company_website?.trim()) return NextResponse.json({ ok: true })
+    // Honeypot filled (lib/honeypot.ts): answer like a saved first-time lead so the
+    // client proceeds normally, but nothing is saved or e-mailed. One log line, no lead data.
+    if (isHoneypotFilled(body)) {
+      logHoneypotDiscard("/api/brochure-leads", body, request.headers.get("referer"))
+      return NextResponse.json({
+        ok: true,
+        score: computeLeadScore({ brochureType: brochureType || "main", downloadCount: 1, isConverted: false }),
+      })
+    }
 
     if (!name?.trim() || !phone?.trim() || !email?.trim()) {
       return NextResponse.json({ error: "Name, phone, and email are required." }, { status: 400 })

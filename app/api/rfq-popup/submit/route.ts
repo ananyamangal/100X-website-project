@@ -3,6 +3,7 @@ import clientPromise from "@/lib/mongodb"
 import { sendAdminEmail, isEmailConfigured } from "@/lib/email"
 import { buildLeadEmail } from "@/lib/lead-email"
 import { sanitizeAttribution } from "@/lib/attribution-sanitize"
+import { decoyId, isHoneypotFilled, logHoneypotDiscard } from "@/lib/honeypot"
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +11,13 @@ export async function POST(request: NextRequest) {
     const { answers, pagePath, pageUrl, utm, userAgent, referrer, attachmentUrl, attribution } = body
     // Extract attribution fields from the utm object (populated by initSessionAttribution + mergePersistedAttributionFromUrl)
     const attr = (utm || {}) as Record<string, string>
+
+    // Honeypot filled (lib/honeypot.ts): answer like a saved lead so the client proceeds
+    // normally, but nothing is saved, e-mailed or sent to the webhook. One log line, no lead data.
+    if (isHoneypotFilled(body)) {
+      logHoneypotDiscard("/api/rfq-popup/submit", body, request.headers.get("referer"))
+      return NextResponse.json({ ok: true, savedId: decoyId() })
+    }
 
     if (!answers || typeof answers !== "object") {
       return NextResponse.json({ error: "Invalid submission" }, { status: 400 })

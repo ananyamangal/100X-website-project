@@ -16,6 +16,8 @@ import {
   setContactLeadContext,
 } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 
 // generate_lead params per variant — values in INR
 const GENERATE_LEAD_CFG: Record<LandingFormVariant, { lead_type: string; page_type: string; value: number }> = {
@@ -169,9 +171,10 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
   // DOM-present input named "company_website" sitting next to a real
   // "Company / Firm Name" field gets autofilled by real browsers often
   // enough that a value-based honeypot silently rejects genuine leads (this
-  // exact bug already cost PartnerApplyForm real submissions once). The
-  // hidden input stays in the DOM as a decoy but its value is intentionally
-  // never sent to the server.
+  // exact bug already cost PartnerApplyForm real submissions once). Since
+  // A7 the decoy is <HoneypotField /> (name "website", no "company" for
+  // autofill to match); its value is sent and a filled one is silently
+  // discarded by the server (lib/honeypot.ts).
   const mountedAtRef = useRef<number>(Date.now())
 
   const update = (name: string, val: string) =>
@@ -180,6 +183,8 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(e.currentTarget)
 
     const missing = fields.filter((f) => f.required && !(values[f.name] || "").trim())
     if (missing.length > 0) {
@@ -229,6 +234,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
           attribution: getPersistedAttribution(),
           form_page_url: typeof window !== "undefined" ? location.href : "",
           form_page_path: typeof window !== "undefined" ? location.pathname : "",
+          [HONEYPOT_FIELD]: honeypot,
         } : {
           ...(hasRoleChoice
             ? Object.fromEntries(fields.map((f) => [f.name, (values[f.name] || "").trim()]).filter(([, v]) => v))
@@ -240,6 +246,8 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
           attribution: getPersistedAttribution(),
           form_page_url: typeof window !== "undefined" ? location.href : "",
           form_page_path: typeof window !== "undefined" ? location.pathname : "",
+          // Last, so it always carries the hidden input's value.
+          [HONEYPOT_FIELD]: honeypot,
         }),
       })
       if (!res.ok) throw new Error(`Status ${res.status}`)
@@ -346,10 +354,7 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
         </div>
 
         <form onSubmit={handleSubmit} className="relative grid grid-cols-2 gap-3">
-          {/* Honeypot */}
-          <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-            <input name="company_website" type="text" tabIndex={-1} autoComplete="off" />
-          </div>
+          <HoneypotField />
 
           {hasRoleChoice ? (
             <fieldset className="col-span-2 flex flex-col gap-2 border-0 p-0 m-0">

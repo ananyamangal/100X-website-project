@@ -23,6 +23,8 @@ import {
 } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 
 const PRODUCT_OPTIONS = [
   "Thermal Fogging Machine",
@@ -163,6 +165,8 @@ export default function RFQForm({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(e.currentTarget)
 
     if (!product) {
       setError("Please select a product of interest.")
@@ -217,6 +221,7 @@ export default function RFQForm({
           form_page_url: typeof window !== "undefined" ? window.location.href : "",
           form_page_path: typeof window !== "undefined" ? window.location.pathname : "",
           location_label: location,
+          [HONEYPOT_FIELD]: honeypot,
         }),
       })
       if (res.ok) {
@@ -347,10 +352,7 @@ export default function RFQForm({
       }
       noValidate
     >
-      {/* Honeypot */}
-      <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-        <input name="company_website" type="text" tabIndex={-1} autoComplete="off" />
-      </div>
+      <HoneypotField />
 
       {!isPanel && (
         <div className="mb-1">

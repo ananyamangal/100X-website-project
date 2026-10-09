@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { sanitizeAttribution } from "@/lib/attribution-sanitize"
+import { decoyId, isHoneypotFilled, logHoneypotDiscard } from "@/lib/honeypot"
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +11,13 @@ export async function POST(request: NextRequest) {
       gemSellerId, tenderName, tenderClosingDate,
       product, message, source, attribution,
     } = body
+
+    // Honeypot filled (lib/honeypot.ts): answer like a saved lead so the client proceeds
+    // normally, but nothing is saved. One log line, no lead data.
+    if (isHoneypotFilled(body)) {
+      logHoneypotDiscard("/api/oem-leads", body, request.headers.get("referer"))
+      return NextResponse.json({ success: true, id: decoyId() })
+    }
 
     if (!name?.trim() || !company?.trim() || !mobile?.trim() || !email?.trim() || !state?.trim() || !product?.trim()) {
       return NextResponse.json({ error: "Required fields missing: name, company, mobile, email, state, product" }, { status: 400 })

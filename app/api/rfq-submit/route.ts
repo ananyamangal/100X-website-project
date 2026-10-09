@@ -4,6 +4,7 @@ import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { buildLeadEmail, leadSubject } from "@/lib/lead-email"
 import { sanitizeAttribution } from "@/lib/attribution-sanitize"
+import { decoyId, isHoneypotFilled, logHoneypotDiscard, withoutHoneypot } from "@/lib/honeypot"
 
 interface RFQBody {
   product: string;
@@ -23,6 +24,8 @@ interface RFQBody {
   form_page_url?: string;
   form_page_path?: string;
   location_label?: string;
+  /** Honeypot (lib/honeypot.ts). */
+  website?: string;
   company_website?: string;
 }
 
@@ -34,9 +37,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
 
-  // Honeypot
-  if (body.company_website && body.company_website.trim() !== "") {
-    return NextResponse.json({ error: "Invalid submission" }, { status: 400 })
+  // Honeypot filled (lib/honeypot.ts): answer exactly like a saved and e-mailed RFQ
+  // so the client proceeds normally, but nothing is saved or e-mailed. One log line,
+  // no lead data.
+  if (isHoneypotFilled(body)) {
+    logHoneypotDiscard("/api/rfq-submit", body, request.headers.get("referer"))
+    return NextResponse.json({ ok: true, emailStatus: "sent", dbStatus: "saved", dbId: decoyId() }, { status: 200 })
   }
 
   if (!body.product || !body.name?.trim() || !body.phone?.trim()) {
@@ -49,7 +55,7 @@ export async function POST(request: NextRequest) {
   // Save first (graceful fallback if Mongo is unreachable), so the e-mail can
   // carry the database id and the saved document is the single source of truth.
   const now = new Date().toISOString()
-  const { company_website: _honeypot, attribution: rawAttribution, ...fields } = body
+  const { attribution: rawAttribution, ...fields } = withoutHoneypot(body as unknown as Record<string, unknown>) as unknown as RFQBody
   const cleanAttribution = sanitizeAttribution(rawAttribution)
   const record: Record<string, unknown> = {
     type: "rfq",

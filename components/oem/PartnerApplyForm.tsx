@@ -5,6 +5,8 @@ import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 
 const INDIA_STATES = [
   "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat",
@@ -42,6 +44,8 @@ export default function PartnerApplyForm({ source = "partner_application", compa
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(e.currentTarget)
 
     if (sending) return
 
@@ -57,7 +61,9 @@ export default function PartnerApplyForm({ source = "partner_application", compa
     // value — it was observed getting a phantom value on genuine manual
     // submissions (likely browser/extension autofill matching its name), which
     // blocked real leads. This check is immune to that since it never reads
-    // the field's value.
+    // the field's value. (Since A7 the decoy is <HoneypotField />, named
+    // "website" so autofill has nothing to match; its value IS sent and the
+    // server silently discards a filled one instead of rejecting it.)
     const elapsed = Date.now() - mountedAtRef.current
     if (elapsed < 2000) {
       setError("Please try again.")
@@ -108,6 +114,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
           attribution: getPersistedAttribution(),
           form_page_url: typeof window !== "undefined" ? window.location.href : "",
           form_page_path: typeof window !== "undefined" ? window.location.pathname : "",
+          [HONEYPOT_FIELD]: honeypot,
         }),
       })
 
@@ -172,6 +179,7 @@ export default function PartnerApplyForm({ source = "partner_application", compa
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+      <HoneypotField />
       <div>
         <label className={labelCls}>I&apos;m interested in *</label>
         <div className="space-y-2">

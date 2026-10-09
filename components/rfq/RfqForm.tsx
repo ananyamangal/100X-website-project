@@ -4,6 +4,8 @@ import { useState } from "react"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 
 const INDIAN_STATES = [
   "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat",
@@ -37,12 +39,14 @@ export default function RfqForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(e.currentTarget as HTMLFormElement)
     setStatus("sending")
     try {
       const res = await fetch("/api/rfq", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, product, source, attribution: getPersistedAttribution() }),
+        body: JSON.stringify({ ...form, product, source, attribution: getPersistedAttribution(), [HONEYPOT_FIELD]: honeypot }),
       })
       if (!res.ok) {
         setStatus("error")
@@ -110,6 +114,7 @@ export default function RfqForm({
       <p className={`text-sm mb-6 ${dark ? "text-gray-400" : "text-gray-500"}`}>{subheading}</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <HoneypotField />
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <label className={label}>Full Name *</label>

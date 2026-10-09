@@ -15,6 +15,8 @@ import {
 import { markTestLeadSession, isTestLeadClient } from "@/lib/analytics/testLead"
 import { normalizeSocialLinks, pickVisibleSocialLinks, type VisibleSocialLink } from "@/lib/socialLinksShared"
 import { SOCIAL_ICONS } from "@/components/seo/SocialIcons"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 
 function useContactPageSocialLinks(): VisibleSocialLink[] {
   const [links, setLinks] = useState<VisibleSocialLink[]>([])
@@ -78,6 +80,8 @@ export default function ContactSection({
     const email = String(formData.get("email") ?? "").trim()
     const requirement = String(formData.get("requirement") ?? "").trim()
     const callbackSlot = String(formData.get("callback_slot") ?? "").trim()
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(form)
 
     if (!name) {
       setError("Please enter your name.")
@@ -122,6 +126,7 @@ export default function ContactSection({
           attribution,
           form_page_url: window.location.href,
           form_page_path: window.location.pathname,
+          [HONEYPOT_FIELD]: honeypot,
         } : {
           name,
           phone,
@@ -132,6 +137,7 @@ export default function ContactSection({
           attribution,
           form_page_url: window.location.href,
           form_page_path: window.location.pathname,
+          [HONEYPOT_FIELD]: honeypot,
         }),
       })
 
@@ -265,15 +271,7 @@ export default function ContactSection({
               </div>
 
               <form id="contact-inquiry-form" onSubmit={handleContactSubmit} className="relative space-y-5 text-lg">
-                {/* Honeypot — hidden from real users, catches bots */}
-                <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-                  <input
-                    name="company_website"
-                    type="text"
-                    tabIndex={-1}
-                    autoComplete="off"
-                  />
-                </div>
+                <HoneypotField />
 
                 <div>
                   <label htmlFor="contact-name" className="sr-only">Your name</label>

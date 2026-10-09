@@ -8,6 +8,8 @@ import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 
 interface Question {
   id: string
@@ -183,6 +185,8 @@ export default function RFQPopup() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(e.currentTarget as HTMLFormElement)
 
     // Validate required fields
     const qs = config?.questions || []
@@ -244,6 +248,7 @@ export default function RFQPopup() {
           userAgent: navigator.userAgent,
           referrer: document.referrer,
           attachmentUrl,
+          [HONEYPOT_FIELD]: honeypot,
         }),
       })
       if (!res.ok) {
@@ -348,6 +353,7 @@ export default function RFQPopup() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              <HoneypotField />
               {config.questions.map((q) => (
                 <div key={q.id}>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">

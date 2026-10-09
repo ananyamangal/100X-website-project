@@ -3,6 +3,8 @@
 import { useRef, useState } from "react"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 import { BUSINESS } from "@/lib/seo/site-config"
 
 const TENDER_DOCS = [
@@ -23,20 +25,17 @@ interface FormState {
   dept: string
   phone: string
   email: string
-  company_website: string
 }
 
-const EMPTY: FormState = { name: "", dept: "", phone: "", email: "", company_website: "" }
+const EMPTY: FormState = { name: "", dept: "", phone: "", email: "" }
 
 export default function TenderPackLeadCapture() {
   const [form, setForm] = useState<FormState>(EMPTY)
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle")
   const [errorMsg, setErrorMsg] = useState("")
   // Time-based bot gate (mirrors PartnerApplyForm's fix in commit fb362d1) --
-  // see the same note in BrochureLeadModal.tsx. /api/rfq-submit rejects any
-  // request whose company_website field is non-empty; that field is a
-  // controlled input tied to form state below, but its value is
-  // intentionally never forwarded to the server (see handleSubmit).
+  // see the same note in BrochureLeadModal.tsx. The honeypot (<HoneypotField />)
+  // is sent in the body; /api/rfq-submit silently discards a filled one.
   const mountedAtRef = useRef<number>(Date.now())
 
   const set = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -49,6 +48,8 @@ export default function TenderPackLeadCapture() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (status === "submitting" || status === "success") return
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(e.currentTarget as HTMLFormElement)
 
     // Time-gate: see mountedAtRef comment above.
     if (Date.now() - mountedAtRef.current < 2000) {
@@ -76,6 +77,7 @@ export default function TenderPackLeadCapture() {
           form_page_url: typeof window !== "undefined" ? window.location.href : "",
           attribution: getPersistedAttribution(),
           location_label: "tender_pack_request",
+          [HONEYPOT_FIELD]: honeypot,
         }),
       })
       const data = await res.json()
@@ -158,11 +160,7 @@ export default function TenderPackLeadCapture() {
                 Enter details to receive the pack:
               </p>
 
-              {/* Honeypot */}
-              <input
-                type="text" name="company_website" value={form.company_website} onChange={set}
-                className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true"
-              />
+              <HoneypotField />
 
               <div>
                 <label className="block text-[11px] font-medium text-gray-600 mb-0.5">

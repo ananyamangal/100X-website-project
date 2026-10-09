@@ -3,6 +3,8 @@
 import { useRef, useState } from "react"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 import { useRouter } from "next/navigation"
 
 const INDIAN_STATES = [
@@ -35,13 +37,11 @@ interface FormState {
   procurement_type: string
   tender_deadline: string
   message: string
-  company_website: string
 }
 
 const EMPTY: FormState = {
   dept_name: "", officer_name: "", state_val: "", phone: "", email: "",
   quantity: "", procurement_type: "", tender_deadline: "", message: "",
-  company_website: "",
 }
 
 export default function GovRFQForm() {
@@ -59,6 +59,8 @@ export default function GovRFQForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (status === "submitting") return
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(e.currentTarget as HTMLFormElement)
 
     // Time-gate: see mountedAtRef comment above.
     if (Date.now() - mountedAtRef.current < 2000) {
@@ -95,6 +97,7 @@ export default function GovRFQForm() {
           attribution: getPersistedAttribution(),
           form_page_path: window.location.pathname,
           location_label: "gov_procurement_rfq",
+          [HONEYPOT_FIELD]: honeypot,
         }),
       })
       const data = await res.json()
@@ -126,11 +129,7 @@ export default function GovRFQForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
-      {/* Honeypot */}
-      <input
-        type="text" name="company_website" value={form.company_website} onChange={set}
-        className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true"
-      />
+      <HoneypotField />
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div>

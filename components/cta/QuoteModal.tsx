@@ -14,6 +14,8 @@ import {
   setQuoteLeadContext,
 } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 import { CTA_COPY, QUOTE_LEAD_VALUE_INR, type Audience } from "./cta-config"
 
 type Props = {
@@ -73,6 +75,8 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(e.currentTarget)
     const trimmedName = name.trim()
     const trimmedPhone = phone.trim()
     const trimmedMessage = message.trim()
@@ -114,6 +118,7 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
           attribution: getPersistedAttribution(),
           form_page_url: typeof window !== "undefined" ? location.href : "",
           form_page_path: typeof window !== "undefined" ? location.pathname : "",
+          [HONEYPOT_FIELD]: honeypot,
         }),
       })
 
@@ -197,14 +202,7 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
           </div>
 
           <form onSubmit={handleSubmit} className="relative space-y-3">
-            <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-              <input
-                name="company_website"
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-              />
-            </div>
+            <HoneypotField />
 
             <div>
               <label htmlFor="sticky-quote-name" className="sr-only">

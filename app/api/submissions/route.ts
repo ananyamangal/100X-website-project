@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse, after } from 'next/server';
 import clientPromise from '@/lib/mongodb';
-import { Submission } from '@/lib/submissionModel';
+import type { Submission } from '@/lib/submissionModel';
 import { sendAdminEmail, isEmailConfigured } from '@/lib/email';
 import { buildLeadEmail, leadSubject } from '@/lib/lead-email';
 import { sanitizeAttribution } from '@/lib/attribution-sanitize';
+import { decoyId, isHoneypotFilled, logHoneypotDiscard, withoutHoneypot } from '@/lib/honeypot';
 
 // This route is shared by several different forms (OEM partner apply, quote
 // modal, dealer program, contact section, landing pages) with different field
@@ -24,28 +25,17 @@ async function notifyNewSubmission(submission: Record<string, unknown>, id: stri
   }
 }
 
-function stripBotFields(body: Record<string, unknown>): { rest: Record<string, unknown>; honeypot: boolean } {
-  const {
-    website,
-    company_website: companyWebsite,
-    hp,
-    url: urlHp,
-    ...rest
-  } = body;
-  const honeypot =
-    (typeof website === 'string' && website.trim() !== '') ||
-    (typeof companyWebsite === 'string' && companyWebsite.trim() !== '') ||
-    (typeof hp === 'string' && hp.trim() !== '') ||
-    (typeof urlHp === 'string' && urlHp.trim() !== '');
-  return { rest, honeypot };
-}
-
 export async function POST(request: NextRequest) {
   try {
     const raw = (await request.json()) as Record<string, unknown>;
-    const { rest, honeypot } = stripBotFields(raw);
-    if (honeypot) {
-      return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
+    const rest = withoutHoneypot(raw);
+    if (isHoneypotFilled(raw)) {
+      // Honeypot filled (lib/honeypot.ts): answer exactly like a saved submission
+      // (201, the echoed document with createdAt and an _id) so the client proceeds
+      // normally, but nothing is saved or e-mailed. One log line, no lead data.
+      logHoneypotDiscard('/api/submissions', raw, request.headers.get('referer'));
+      const { _id: _ignored, attribution: _attr, ...echo } = rest;
+      return NextResponse.json({ ...echo, createdAt: new Date().toISOString(), _id: decoyId() }, { status: 201 });
     }
 
     const data = rest as unknown as Submission;

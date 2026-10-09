@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
 import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
+import HoneypotField from "@/components/forms/HoneypotField"
+import { HONEYPOT_FIELD, readHoneypot } from "@/lib/honeypot"
 
 const STATES = [
   "Andhra Pradesh","Assam","Bihar","Chhattisgarh","Delhi",
@@ -35,8 +37,8 @@ export default function DealerApplicationForm() {
 
     const form = e.currentTarget
     const data = new FormData(form)
-    const honeypot = String(data.get("company_website") ?? "").trim()
-    if (honeypot) { setError("Something went wrong. Please try again."); return }
+    // Sent as-is; the server silently discards a filled value (lib/honeypot.ts).
+    const honeypot = readHoneypot(form)
 
     const name    = String(data.get("name") ?? "").trim()
     const mobile  = String(data.get("mobile") ?? "").trim()
@@ -77,7 +79,7 @@ export default function DealerApplicationForm() {
           attribution:   getPersistedAttribution(),
           form_page_url: window.location.href,
           form_page_path: window.location.pathname,
-          company_website: honeypot,
+          [HONEYPOT_FIELD]: honeypot,
         }),
       })
 
@@ -109,10 +111,7 @@ export default function DealerApplicationForm() {
       <p className="text-xs text-gray-500 mb-6">Our team calls back within 24 hours.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4 relative">
-        {/* Honeypot */}
-        <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-          <input name="company_website" type="text" tabIndex={-1} autoComplete="off" />
-        </div>
+        <HoneypotField />
 
         <div>
           <label htmlFor="d-name" className="block text-[11px] font-semibold uppercase tracking-wide text-gray-600 mb-1">
