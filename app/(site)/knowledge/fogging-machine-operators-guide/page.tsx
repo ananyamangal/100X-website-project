@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site-config"
+import VisibleSchemaFaq from "@/components/seo/VisibleSchemaFaq"
+import { faqPairsFromJsonLd } from "@/lib/seo/faqVisible"
 
 export const metadata: Metadata = {
   title: "Fogging Machine Operator's Guide — Pre-Operation, Operation & Post-Operation | 100X Circle",
@@ -329,6 +331,8 @@ export default function FoggingMachineOperatorsGuidePage() {
             </div>
           </div>
         </section>
+        {/* B1: every FAQPage schema Q&A shown as visible text (schema-only before) */}
+        <VisibleSchemaFaq items={faqPairsFromJsonLd(faqJsonLd)} heading="More frequently asked questions" />
       </main>
     </>
   )

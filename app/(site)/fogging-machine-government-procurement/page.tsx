@@ -16,6 +16,8 @@ import GovKPIStrip from "@/components/trust/GovKPIStrip"
 import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
 import FeaturedGovSupplies, { type SupplyRecord } from "@/components/trust/FeaturedGovSupplies"
 import FeaturedDeployments, { type DeploymentRecord } from "@/components/trust/FeaturedDeployments"
+import VisibleSchemaFaq from "@/components/seo/VisibleSchemaFaq"
+import { faqPairsFromJsonLd } from "@/lib/seo/faqVisible"
 import {
   StickyProcurementCTA,
   ProcurementLifecycleTimeline,
@@ -1078,6 +1080,8 @@ export default async function GovernmentProcurementPage() {
           </div>
 
         </div>
+        {/* B1: every FAQPage schema Q&A shown as visible text (schema-only before) */}
+        <VisibleSchemaFaq items={faqPairsFromJsonLd(jsonLdFaq)} heading="More frequently asked questions" className="px-4" />
       </main>
     </>
   )

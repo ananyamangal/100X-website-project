@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
+import VisibleSchemaFaq from "@/components/seo/VisibleSchemaFaq"
+import { faqPairsFromJsonLd } from "@/lib/seo/faqVisible"
 
 export const revalidate = 60
 
@@ -218,6 +220,8 @@ export default function GemReverseAuctionFoggingPage() {
             </Link>
           </div>
         </div>
+        {/* B1: every FAQPage schema Q&A shown as visible text (schema-only before) */}
+        <VisibleSchemaFaq items={faqPairsFromJsonLd(faqJsonLd)} heading="More frequently asked questions" />
       </main>
     </>
   )

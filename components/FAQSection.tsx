@@ -1,6 +1,5 @@
 "use client"
 
-import * as Accordion from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"
 
 
@@ -121,31 +120,27 @@ export default function FAQSection({ faqs: faqsProp }: { faqs?: Faq[] }) {
           </p>
         </div>
 
-        <Accordion.Root
-          type="single"
-          collapsible
-          className="divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden"
-        >
+        {/* Native <details>: every answer is in the server HTML (Radix unmounted
+            closed answers, so FAQPage schema answers were missing from the page). */}
+        <div className="divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
           {faqs.map((f, i) => (
-            <Accordion.Item key={i} value={`faq-${i}`}>
-              <Accordion.Header className="flex">
-                <Accordion.Trigger className="group flex w-full items-start justify-between gap-4 px-5 md:px-6 py-4 md:py-5 text-left font-600 text-gray-900 transition-colors hover:bg-brand-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-inset [&[data-state=open]]:text-brand-700 [&[data-state=open]]:bg-brand-50/40">
-                  <span className="text-sm md:text-base leading-snug">{f.q}</span>
-                  <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full border border-gray-200 group-data-[state=open]:border-brand-300 flex items-center justify-center transition-all">
-                    <ChevronDown
-                      size={12}
-                      aria-hidden="true"
-                      className="text-gray-400 group-data-[state=open]:text-brand-600 transition-transform duration-200 group-data-[state=open]:rotate-180"
-                    />
-                  </div>
-                </Accordion.Trigger>
-              </Accordion.Header>
-              <Accordion.Content className="overflow-hidden text-gray-600 data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+            <details key={i} className="group [&_summary::-webkit-details-marker]:hidden">
+              <summary className="flex w-full cursor-pointer list-none items-start justify-between gap-4 px-5 md:px-6 py-4 md:py-5 text-left font-600 text-gray-900 transition-colors hover:bg-brand-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-inset group-open:text-brand-700 group-open:bg-brand-50/40">
+                <span className="text-sm md:text-base leading-snug">{f.q}</span>
+                <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full border border-gray-200 group-open:border-brand-300 flex items-center justify-center transition-all">
+                  <ChevronDown
+                    size={12}
+                    aria-hidden="true"
+                    className="text-gray-400 group-open:text-brand-600 transition-transform duration-200 group-open:rotate-180"
+                  />
+                </div>
+              </summary>
+              <div className="overflow-hidden text-gray-600">
                 <p className="px-5 md:px-6 pb-5 md:pb-6 text-sm md:text-base text-gray-600 leading-relaxed">{f.a}</p>
-              </Accordion.Content>
-            </Accordion.Item>
+              </div>
+            </details>
           ))}
-        </Accordion.Root>
+        </div>
       </div>
 
       <script

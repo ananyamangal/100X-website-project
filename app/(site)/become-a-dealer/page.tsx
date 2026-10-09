@@ -3,6 +3,8 @@ import Link from "next/link"
 import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import clientPromise from "@/lib/mongodb"
 import CelebritySectionsBlock, { type HomepageSection } from "@/components/home/CelebritySectionsBlock"
+import VisibleSchemaFaq from "@/components/seo/VisibleSchemaFaq"
+import { faqPairsFromJsonLd } from "@/lib/seo/faqVisible"
 
 export const metadata: Metadata = {
   title: "Become an Authorized 100X Circle Dealer | Fogging Machine Distributor India",
@@ -419,6 +421,8 @@ export default async function BecomeADealerPage() {
             </Link>
           </div>
         </div>
+        {/* B1: every FAQPage schema Q&A shown as visible text (schema-only before) */}
+        <VisibleSchemaFaq items={faqPairsFromJsonLd(jsonLdFaq)} heading="More frequently asked questions" />
       </main>
     </>
   )

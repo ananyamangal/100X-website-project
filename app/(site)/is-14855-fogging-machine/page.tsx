@@ -4,6 +4,8 @@ import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd"
 import { buildOfferNode } from "@/lib/seo/offers"
 import RfqForm from "@/components/rfq/RfqForm"
+import VisibleSchemaFaq from "@/components/seo/VisibleSchemaFaq"
+import { faqPairsFromJsonLd } from "@/lib/seo/faqVisible"
 
 export const revalidate = 60
 
@@ -424,6 +426,8 @@ export default function Is14855FoggingMachinePage() {
             </Link>
           </div>
         </div>
+        {/* B1: every FAQPage schema Q&A shown as visible text (schema-only before) */}
+        <VisibleSchemaFaq items={faqPairsFromJsonLd(jsonLdFaq)} heading="More frequently asked questions" />
       </main>
     </>
   )
