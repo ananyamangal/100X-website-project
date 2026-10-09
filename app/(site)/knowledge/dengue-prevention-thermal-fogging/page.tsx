@@ -116,8 +116,8 @@ export default function DengueFoggingPage() {
           <ul className="text-sm text-brand-700 space-y-1">
             <li>• Thermal fogging kills adult dengue mosquitoes (Aedes aegypti) — does NOT kill eggs/larvae</li>
             <li>• Best time: 5–8 AM and 6–8 PM (Aedes peak activity, low wind)</li>
-            <li>• Recommended insecticide: deltamethrin 0.5–1% in mineral oil (approved formulation)</li>
-            <li>• Droplet size required: 10–30 microns MVD (droplet size of our machines depends on the model; see each product&apos;s specifications)</li>
+            <li>• Recommended insecticide: deltamethrin 0.5–1% in mineral oil (WHO-approved)</li>
+            <li>• Droplet size required: 10–30 microns MVD (thermal fogging achieves this)</li>
             <li>• Coverage: 50-litre machine covers one municipal ward per session</li>
             <li>• Must be combined with larval source reduction for sustained effect</li>
           </ul>

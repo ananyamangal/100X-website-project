@@ -7,7 +7,7 @@ const DEFAULT = {
   heroBadge: 'About Us',
   heroTitle: 'About 100X Circle Pvt Ltd',
   journeyHeading: 'Our Journey',
-  journeyParagraph1: `100X Circle Pvt Ltd is India's fast-growing OEM of advanced fogging machines, agri implements, and airport ground equipment. Located at Sector 7, IMT Manesar, Gurgaon, we proudly uphold the 'Make in India' mission by delivering CE-certified and ISO 9001-compliant solutions for both public and private sectors. Our brand '100X' stands for innovation, reliability, and scalable performance across segments`,
+  journeyParagraph1: `100X Circle Pvt Ltd is India's fast-growing OEM of advanced fogging machines, agri implements, and airport ground equipment. Located at Sector 7, IMT Manesar, Gurgaon, we proudly uphold the 'Make in India' mission by delivering CE-certified, ISO 9001-compliant, and W.H.O-compliant solutions for both public and private sectors. Our brand '100X' stands for innovation, reliability, and scalable performance across segments`,
   journeyList: 'Thermal Fogging Machines (Portable & Vehicle-Mounted)\nBio-Foggers for sensitive applications\nMini Fogging Machines for compact operations\nComplete Agricultural Machinery line\nHeavy-duty Airport Baggage Trolleys',
   journeyParagraph2: 'Tested in approved labs, our machines are available and listed on the Government e-Marketplace (GeM) and widely used by defense forces, municipal bodies, and agriculture departments. 100X Circle is UDYAM/MSME registered and offers authorized dealership support across India.',
   journeyStat1Value: '2015',

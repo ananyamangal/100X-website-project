@@ -82,7 +82,7 @@ const faqJsonLd = {
 }
 
 const CHEMICAL_TABLE = [
-  { name: "Deltamethrin EC", type: "Pyrethroid insecticide", use: "Mosquito, fly, agricultural pest", concentration: "0.025% AI in oil", notes: "Approved formulation; most common in Indian municipal ops" },
+  { name: "Deltamethrin EC", type: "Pyrethroid insecticide", use: "Mosquito, fly, agricultural pest", concentration: "0.025% AI in oil", notes: "WHO-approved; most common in Indian municipal ops" },
   { name: "Cypermethrin EC", type: "Pyrethroid insecticide", use: "Mosquito, cockroach, agricultural pest", concentration: "0.05–0.1% AI in oil", notes: "Alternative to deltamethrin; good residual" },
   { name: "Malathion EC", type: "Organophosphate insecticide", use: "Mosquito (adult), agricultural pest", concentration: "0.112% AI in oil", notes: "Older standard; some resistance in urban Aedes; WHO Class III" },
   { name: "Pyrethrin + PBO", type: "Botanical pyrethroid + synergist", use: "Flying insects, stored grain pests", concentration: "0.05–0.1% AI + PBO", notes: "Fast knockdown; PBO enhances efficacy" },
