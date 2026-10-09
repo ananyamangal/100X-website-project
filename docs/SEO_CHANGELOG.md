@@ -167,3 +167,12 @@ Cannibalisation decisions (checked against protected_pages_union.csv and top_que
 - "Thermal vs cold fogging for municipalities": NOT a new page. /thermal-vs-cold-fogging-machine (Tier A) and several Tier A blogs rank at 1-3 for "thermal vs cold fogger" queries. Short sections in both new pages link to it.
 - "Fogging machine specifications checklist for tenders": no existing page targets it (closest: /fogging-machine-buying-guide, Tier B, a general buyer guide; linked). New page.
 Paths checked free: no route in app/, no landing slug, no next.config redirect, no DB url_redirects row, not in the 2026-10-08 sitemap baseline, 404 on live.
+
+### E2 /api/ai/knowledge (machine-readable feed; not in the title/meta budget)
+
+| URL | field | old | new | reason | commit | rollback |
+|---|---|---|---|---|---|---|
+| /api/ai/knowledge | item fields | {title, url, summary, source_url?} | adds `type` (article/product/page/guide/faq), `canonical_url`, `date_modified` on every item, `date_published` where the Knowledge Base has it, `is_mirror` on copies, `model` on products, `question`/`answer` on FAQs; top-level `notes` | E2: per-item dates, mark canonical | {E2} | `git revert {E2}` |
+| same | items | 60 (live, 2026-10-09) | 78 against the same DB: +9 fogger products (incl. 100XMCF42, 100XULV22, 100XULVSS10 that had no entry), +4 key pages (GeM landing, IS 14855, government procurement, thermal vs cold), +2 procurement guides, +9 FAQ items (only FAQs visible on the guide pages); -6 Knowledge Base product mirrors (product-100xdb400/-tfs50/-hbl22/-hm20/-ssma20/-bf102) whose original product page is now listed. 33 blog mirrors stay, marked `is_mirror: true` with `canonical_url` = the blog post | E2 | {E2} | same |
+
+Implementation: new pure `lib/knowledge/feed-v2.ts` on top of the unchanged `mergeKnowledgeFeed`; route `app/api/ai/[entity]/route.ts` (knowledge case only). No ISO/CE claims or certificate numbers added.

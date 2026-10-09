@@ -12,7 +12,7 @@ import {
   SITE_URL,
 } from "@/lib/ai/knowledge"
 import { getPublishedKnowledgeArticles } from "@/lib/knowledgeQuery"
-import { mergeKnowledgeFeed } from "@/lib/knowledge/feed"
+import { buildKnowledgeFeedV2 } from "@/lib/knowledge/feed-v2"
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -93,9 +93,11 @@ export async function GET(
     }
 
     case "knowledge": {
-      // Curated list + every published knowledge_articles entry it does not already cover.
+      // Curated list + every published knowledge_articles entry it does not already cover,
+      // plus (E2, 2026-10) per-item dates, product / page / guide / FAQ items, and
+      // mirrors marked with their canonical URL (or dropped when the original is listed).
       // getPublishedKnowledgeArticles never throws (a DB outage yields the curated list alone).
-      const feed = mergeKnowledgeFeed(
+      const feed = buildKnowledgeFeedV2(
         AI_KNOWLEDGE_ARTICLES,
         await getPublishedKnowledgeArticles(),
         SITE_URL,
@@ -105,6 +107,8 @@ export async function GET(
         schema_version: "1.0",
         last_updated: feed.lastUpdated,
         source: `${SITE_URL}/api/ai/knowledge`,
+        notes:
+          "Each item has type, date_modified and canonical_url. Items with is_mirror=true are copies of the page at canonical_url; cite canonical_url.",
         count: feed.items.length,
         data: feed.items,
       })
