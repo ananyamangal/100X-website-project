@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next"
 import { SITE_URL } from "@/lib/seo/site-config"
+import { GENERIC_DISALLOW, withGenericDisallow } from "@/lib/seo/robotsRules"
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -13,94 +14,82 @@ export default function robots(): MetadataRoute.Robots {
           "/api/mcp",
           "/llms.txt",
         ],
-        disallow: [
-          "/admin",
-          "/admin/",
-          "/api/admin/",
-          "/api/submissions",
-          "/api/brochure",
-          "/brochure-thank-you",
-          "/thank-you",
-          "/*?utm_*",
-          "/*?fbclid=*",
-          "/*?gclid=*",
-          "/*?msclkid=*",
-        ],
+        disallow: GENERIC_DISALLOW,
       },
       // ── OpenAI / ChatGPT ─────────────────────────────────────────────────
       {
         userAgent: "GPTBot",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       {
         userAgent: "OAI-SearchBot",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       {
         userAgent: "ChatGPT-User",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       // ── Anthropic / Claude ───────────────────────────────────────────────
       {
         userAgent: "ClaudeBot",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       {
         userAgent: "Claude-User",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       {
         userAgent: "anthropic-ai",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       // ── Google AI ────────────────────────────────────────────────────────
       {
         userAgent: "Google-Extended",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       {
         userAgent: "Googlebot",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       // ── Perplexity ───────────────────────────────────────────────────────
       {
         userAgent: "PerplexityBot",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       // ── Meta / Grok / Others ─────────────────────────────────────────────
       {
         userAgent: "FacebookBot",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       {
         userAgent: "Twitterbot",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       {
         userAgent: "cohere-ai",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       {
         userAgent: "YouBot",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
       {
         userAgent: "Diffbot",
         allow: ["/"],
-        disallow: ["/admin", "/api/admin/"],
+        disallow: withGenericDisallow(["/admin", "/api/admin/"]),
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
