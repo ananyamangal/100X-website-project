@@ -6,6 +6,7 @@ import { X, Paperclip } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
+import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
 
 interface Question {
@@ -250,13 +251,15 @@ export default function RFQPopup() {
       } else {
         // Fire generate_lead only AFTER the server confirms the save --
         // matches the pattern used by PartnerApplyForm.
-        pushDataLayer({
-          event: "generate_lead",
-          lead_type: "rfq_popup",
-          page_type: "rfq_popup",
-          value: QUOTE_LEAD_VALUE_INR,
-          currency: "INR",
-        })
+        if (!shouldSkipGenerateLead(Object.entries(answers).find(([q]) => /name/i.test(q))?.[1])) {
+          pushDataLayer({
+            event: "generate_lead",
+            lead_type: "rfq_popup",
+            page_type: "rfq_popup",
+            value: QUOTE_LEAD_VALUE_INR,
+            currency: "INR",
+          })
+        }
       }
 
       // Persist submission so popup never shows again (if configured)

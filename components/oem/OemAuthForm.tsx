@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
+import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 
 // High-value Funnel A signal -- matches the value already assigned to this
 // lead type in lib/growth-os/conversion-tracking.ts's (currently unwired)
@@ -77,14 +78,16 @@ export default function OemAuthForm({ source = "oem_authorization", compact = fa
       // Fire generate_lead only AFTER the server confirms the save --
       // matches the pattern used by PartnerApplyForm. This form previously
       // had zero tracking despite being a real, high-value lead type.
-      pushDataLayer({
-        event: "generate_lead",
-        lead_type: "oem_authorization",
-        page_type: "oem_authorization",
-        value: OEM_AUTH_LEAD_VALUE_INR,
-        currency: "INR",
-        state: form.state,
-      })
+      if (!shouldSkipGenerateLead(form.name)) {
+        pushDataLayer({
+          event: "generate_lead",
+          lead_type: "oem_authorization",
+          page_type: "oem_authorization",
+          value: OEM_AUTH_LEAD_VALUE_INR,
+          currency: "INR",
+          state: form.state,
+        })
+      }
 
       setSuccess(true)
       setForm(EMPTY)

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
+import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 
 const STATES = [
   "Andhra Pradesh","Assam","Bihar","Chhattisgarh","Delhi",
@@ -83,14 +84,16 @@ export default function DealerApplicationForm() {
       if (!res.ok) throw new Error(`Server error ${res.status}`)
 
       // Fire generate_lead AFTER confirmed server response
-      pushDataLayer({
-        event: "generate_lead",
-        lead_type: "dealer_inquiry",
-        page_type: "dealer",
-        value:    LEAD_VALUE_INR,
-        currency: "INR",
-        state,
-      })
+      if (!shouldSkipGenerateLead(name)) {
+        pushDataLayer({
+          event: "generate_lead",
+          lead_type: "dealer_inquiry",
+          page_type: "dealer",
+          value:    LEAD_VALUE_INR,
+          currency: "INR",
+          state,
+        })
+      }
 
       router.push("/thank-you?type=dealer_inquiry")
     } catch {

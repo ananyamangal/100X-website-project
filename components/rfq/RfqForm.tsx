@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
+import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
 
 const INDIAN_STATES = [
@@ -61,14 +62,16 @@ export default function RfqForm({
         value: QUOTE_LEAD_VALUE_INR,
         currency: "INR",
       })
-      pushDataLayer({
-        event: "generate_lead",
-        lead_type: "rfq",
-        location: source,
-        product,
-        value: QUOTE_LEAD_VALUE_INR,
-        currency: "INR",
-      })
+      if (!shouldSkipGenerateLead(form.name)) {
+        pushDataLayer({
+          event: "generate_lead",
+          lead_type: "rfq",
+          location: source,
+          product,
+          value: QUOTE_LEAD_VALUE_INR,
+          currency: "INR",
+        })
+      }
       setStatus("done")
     } catch {
       setStatus("error")

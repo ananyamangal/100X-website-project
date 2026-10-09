@@ -21,6 +21,7 @@ import {
   pushDataLayer,
   setQuoteLeadContext,
 } from "@/lib/gtm"
+import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
 
 const PRODUCT_OPTIONS = [
@@ -252,14 +253,16 @@ export default function RFQForm({
       value: QUOTE_LEAD_VALUE_INR,
       currency: "INR",
     })
-    pushDataLayer({
-      event: "generate_lead",
-      lead_type: "rfq",
-      location,
-      product,
-      value: QUOTE_LEAD_VALUE_INR,
-      currency: "INR",
-    })
+    if (!shouldSkipGenerateLead(name)) {
+      pushDataLayer({
+        event: "generate_lead",
+        lead_type: "rfq",
+        location,
+        product,
+        value: QUOTE_LEAD_VALUE_INR,
+        currency: "INR",
+      })
+    }
 
     fetch('/api/analytics/event', {
       method: 'POST',

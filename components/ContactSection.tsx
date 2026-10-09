@@ -12,6 +12,7 @@ import {
   pushDataLayer,
   setContactLeadContext,
 } from "@/lib/gtm"
+import { markTestLeadSession, isTestLeadClient } from "@/lib/analytics/testLead"
 import { normalizeSocialLinks, pickVisibleSocialLinks, type VisibleSocialLink } from "@/lib/socialLinksShared"
 import { SOCIAL_ICONS } from "@/components/seo/SocialIcons"
 
@@ -154,6 +155,9 @@ export default function ContactSection({
           callback_slot: callbackSlot,
         })
       }
+
+      // generate_lead fires later on /thank-you; flag QA/test leads so it is skipped.
+      if (isTestLeadClient(name)) markTestLeadSession()
 
       setContactLeadContext({
         product: "contact_form",

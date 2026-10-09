@@ -15,6 +15,7 @@ import {
   pushDataLayer,
   setContactLeadContext,
 } from "@/lib/gtm"
+import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 
 // generate_lead params per variant — values in INR
 const GENERATE_LEAD_CFG: Record<LandingFormVariant, { lead_type: string; page_type: string; value: number }> = {
@@ -279,16 +280,18 @@ export default function LandingFormBlock({ block, landingSlug, locale = "en" }: 
 
       // Fire generate_lead AFTER confirmed server response — triggers Google Ads conversion
       const leadCfg = GENERATE_LEAD_CFG[block.variant]
-      pushDataLayer({
-        event: "generate_lead",
-        lead_type:    hasRoleChoice && role === "buyer" ? "gem_buyer_inquiry" : leadCfg.lead_type,
-        page_type:    leadCfg.page_type,
-        value:        leadCfg.value,
-        currency:     "INR",
-        variant:      block.variant,
-        landing_slug: landingSlug,
-        ...(hasRoleChoice ? { buyer_role: role } : {}),
-      })
+      if (!shouldSkipGenerateLead(values.name)) {
+        pushDataLayer({
+          event: "generate_lead",
+          lead_type:    hasRoleChoice && role === "buyer" ? "gem_buyer_inquiry" : leadCfg.lead_type,
+          page_type:    leadCfg.page_type,
+          value:        leadCfg.value,
+          currency:     "INR",
+          variant:      block.variant,
+          landing_slug: landingSlug,
+          ...(hasRoleChoice ? { buyer_role: role } : {}),
+        })
+      }
 
       setValues({})
       toast.success("Received! Our team will contact you within 24 hours.")

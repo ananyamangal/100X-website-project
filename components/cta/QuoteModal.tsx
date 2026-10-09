@@ -13,6 +13,7 @@ import {
   pushDataLayer,
   setQuoteLeadContext,
 } from "@/lib/gtm"
+import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { CTA_COPY, QUOTE_LEAD_VALUE_INR, type Audience } from "./cta-config"
 
 type Props = {
@@ -133,14 +134,16 @@ export default function QuoteModal({ open, onClose, audience, productName }: Pro
         value: QUOTE_LEAD_VALUE_INR,
         currency: "INR",
       })
-      pushDataLayer({
-        event: "generate_lead",
-        lead_type: "sticky_quote",
-        audience,
-        product: productName,
-        value: QUOTE_LEAD_VALUE_INR,
-        currency: "INR",
-      })
+      if (!shouldSkipGenerateLead(trimmedName)) {
+        pushDataLayer({
+          event: "generate_lead",
+          lead_type: "sticky_quote",
+          audience,
+          product: productName,
+          value: QUOTE_LEAD_VALUE_INR,
+          currency: "INR",
+        })
+      }
 
       reset()
       onClose()

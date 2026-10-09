@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { pushDataLayer, readContactLeadContext } from "@/lib/gtm"
+import { isTestLeadClient } from "@/lib/analytics/testLead"
 
 const CONTACT_LEAD_VALUE_INR =
   Number(process.env.NEXT_PUBLIC_CONTACT_LEAD_VALUE_INR) || 150000
@@ -27,14 +28,17 @@ export function ContactThankYouTracker({ type }: Props) {
     const ctx = readContactLeadContext()
     if (!ctx) return
 
-    pushDataLayer({
-      event: "generate_lead",
-      value: CONTACT_LEAD_VALUE_INR,
-      currency: "INR",
-      lead_type: "contact_form",
-      conversion_step: "thank_you",
-      ...ctx,
-    })
+    // QA/test leads must never fire the real conversion event.
+    if (!isTestLeadClient(ctx.name)) {
+      pushDataLayer({
+        event: "generate_lead",
+        value: CONTACT_LEAD_VALUE_INR,
+        currency: "INR",
+        lead_type: "contact_form",
+        conversion_step: "thank_you",
+        ...ctx,
+      })
+    }
     pushDataLayer({
       event: "contact_form_submission",
       lead_type: "contact_form",

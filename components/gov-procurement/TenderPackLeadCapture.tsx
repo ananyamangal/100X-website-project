@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
+import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { BUSINESS } from "@/lib/seo/site-config"
 
 const TENDER_DOCS = [
@@ -79,14 +80,16 @@ export default function TenderPackLeadCapture() {
       })
       const data = await res.json()
       if (data.ok) {
-        pushDataLayer({
-          event: "generate_lead",
-          value: 75000,
-          currency: "INR",
-          lead_type: "tender_pack",
-          conversion_step: "form_submit",
-          department: form.dept,
-        })
+        if (!shouldSkipGenerateLead(form.name)) {
+          pushDataLayer({
+            event: "generate_lead",
+            value: 75000,
+            currency: "INR",
+            lead_type: "tender_pack",
+            conversion_step: "form_submit",
+            department: form.dept,
+          })
+        }
         setStatus("success")
       } else {
         setStatus("error")

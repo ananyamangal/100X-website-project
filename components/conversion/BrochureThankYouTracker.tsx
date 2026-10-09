@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { pushDataLayer, readBrochureLeadContext } from "@/lib/gtm"
+import { isTestLeadClient } from "@/lib/analytics/testLead"
 
 // Brochure-download intent is softer than a contact form — value is set lower
 // so blended optimisation in Ads/GA4 doesn't over-weight top-of-funnel leads.
@@ -20,13 +21,16 @@ export function BrochureThankYouTracker() {
       ...ctx,
     }
     pushDataLayer({ event: "brochure_download", ...base })
-    pushDataLayer({
-      event: "generate_lead",
-      lead_type: "brochure",
-      value: BROCHURE_LEAD_VALUE_INR,
-      currency: "INR",
-      ...base,
-    })
+    // QA/test leads must never fire the real conversion event.
+    if (!isTestLeadClient((ctx as { name?: unknown }).name)) {
+      pushDataLayer({
+        event: "generate_lead",
+        lead_type: "brochure",
+        value: BROCHURE_LEAD_VALUE_INR,
+        currency: "INR",
+        ...base,
+      })
+    }
   }, [])
 
   return null

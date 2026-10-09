@@ -222,3 +222,7 @@ Once all 5 actions show "Recording conversions":
 
 → Activate Funnel B campaign (see `docs/funnel-b-campaign-draft.md`)  
 → Campaign is pre-built as PAUSED draft — only change status to ENABLED
+
+## QA / test-lead filter
+
+`generate_lead` is never pushed for QA/test leads: a lead whose name matches `TEST - ignore` (case/space tolerant) or whose persisted attribution `utm_source` is `qa-test`. Submit sites call `shouldSkipGenerateLead()` (`lib/analytics/testLead.ts`), which also sets `sessionStorage.qa_test_lead=1`; the `/thank-you` trackers skip `generate_lead` when that flag or the `qa-test` source is present. The lead is still saved and all other events still fire.

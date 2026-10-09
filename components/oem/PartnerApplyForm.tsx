@@ -3,6 +3,7 @@
 import { useState, useRef } from "react"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
+import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { QUOTE_LEAD_VALUE_INR } from "@/components/cta/cta-config"
 
 const INDIA_STATES = [
@@ -114,15 +115,17 @@ export default function PartnerApplyForm({ source = "partner_application", compa
 
       // Fire generate_lead only AFTER the server confirms the save — never on
       // click alone. "Request quote" in Google Ads listens on this event.
-      pushDataLayer({
-        event: "generate_lead",
-        lead_type: "gem_oem_partnership",
-        page_type: "gem_oem_partnership",
-        intent,
-        value: intent === "quote" ? QUOTE_LEAD_VALUE_INR : DEALER_LEAD_VALUE_INR,
-        currency: "INR",
-        state,
-      })
+      if (!shouldSkipGenerateLead(name)) {
+        pushDataLayer({
+          event: "generate_lead",
+          lead_type: "gem_oem_partnership",
+          page_type: "gem_oem_partnership",
+          intent,
+          value: intent === "quote" ? QUOTE_LEAD_VALUE_INR : DEALER_LEAD_VALUE_INR,
+          currency: "INR",
+          state,
+        })
+      }
 
       setSuccess(true)
       formRef.current?.reset()

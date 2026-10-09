@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react"
 import { getPersistedAttribution, pushDataLayer } from "@/lib/gtm"
+import { shouldSkipGenerateLead } from "@/lib/analytics/testLead"
 import { useRouter } from "next/navigation"
 
 const INDIAN_STATES = [
@@ -98,16 +99,18 @@ export default function GovRFQForm() {
       })
       const data = await res.json()
       if (data.ok) {
-        pushDataLayer({
-          event: "generate_lead",
-          value: 150000,
-          currency: "INR",
-          lead_type: "gov_rfq",
-          conversion_step: "form_submit",
-          department: form.dept_name,
-          state: form.state_val,
-          procurement_type: form.procurement_type,
-        })
+        if (!shouldSkipGenerateLead(form.officer_name)) {
+          pushDataLayer({
+            event: "generate_lead",
+            value: 150000,
+            currency: "INR",
+            lead_type: "gov_rfq",
+            conversion_step: "form_submit",
+            department: form.dept_name,
+            state: form.state_val,
+            procurement_type: form.procurement_type,
+          })
+        }
         router.push("/thank-you?type=gov_rfq")
       } else {
         setStatus("error")
