@@ -4,6 +4,25 @@ Created 2026-10-08 for the overnight conversion + SEO + AEO program. Every numbe
 
 Counts were taken read-only from the production database on 2026-10-08 (aggregates only, no lead data).
 
+## Owner-confirmed claims (2026-10-09) — these override anything below
+
+The owner confirmed these are real. Keep them exactly as live; never remove or downgrade them for lack of a database record.
+
+| Claim | Live value |
+|---|---|
+| Government orders | 500+ |
+| Departments served | 80+ |
+| Units supplied | 2,000+ |
+| States served | 15+ (site also says 28 / 29 states in places — unchanged) |
+| Customers / machines | 10,000+ |
+| Dealers / distributors | 50+ |
+| Municipalities / cities | 200+ |
+| WHO-approved | Real (owner) |
+| ISI | Real (owner) |
+| Droplet wording | Live "1–50 micron / sub-50-micron" wording stays |
+
+The database counts further down (24 case studies, 23 buyers, 12 states) are floors: the owner has more performances than the database lists.
+
 ## Company
 
 | Fact | Value | Source |
