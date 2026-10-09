@@ -8,6 +8,7 @@ import BrochureLeadModal from '@/components/BrochureLeadModal'
 import { BUSINESS } from '@/lib/seo/site-config'
 import { getProductCanonicalUrl } from '@/lib/seo/product-landing-map'
 import { yearsInBusiness, FOGGER_MODEL_COUNT } from '@/lib/facts'
+import { featureLabel } from '@/lib/featureLabel'
 
 const badgeLogoMap: Record<string, string> = {
   'German Technology':  '/Logos clipart 2/german technology.png',
@@ -27,17 +28,6 @@ const badgeLogoMap: Record<string, string> = {
 
 function decodeBadge(b: string): string {
   return b.replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/&#39;/gi, "'").trim()
-}
-
-// Safely extract a display label from a feature that may be either a plain
-// string ("Engine Power: 2HP") or a structured FeatureItem object ({title, value}).
-function featLabel(f: unknown): string {
-  if (typeof f === 'string') return f.split(':')[0].trim()
-  if (f && typeof f === 'object') {
-    const o = f as Record<string, unknown>
-    return String(o.title ?? o.label ?? o.name ?? '').trim()
-  }
-  return ''
 }
 
 function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p: any) => void }) {
@@ -112,7 +102,7 @@ function ProductListCard({ product, onBrochure }: { product: any; onBrochure: (p
         {Array.isArray(product.features) && product.features.length > 0 && (
           <ul className="space-y-1 mb-4 flex-1">
             {product.features.slice(0, 2).map((f: unknown, i: number) => {
-              const label = featLabel(f)
+              const label = featureLabel(f)
               if (!label) return null
               return (
                 <li key={i} className="flex items-start gap-2 text-xs text-gray-500">
