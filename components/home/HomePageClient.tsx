@@ -17,6 +17,7 @@ import BrochureLeadModal from "@/components/BrochureLeadModal"
 import { BUSINESS } from "@/lib/seo/site-config"
 import { getPersistedAttribution, pushDataLayer, setBrochureLeadContext } from "@/lib/gtm"
 import { type HomeContent } from "@/lib/homeContentTypes"
+import { selectHeroSlides } from "@/lib/heroBanner"
 import { HOMEPAGE_SECTIONS, resolveSections, toSectionMap, type PageSectionRecord } from "@/lib/pageSections"
 
 // Below-the-fold: lazy-loaded — reduces initial JS bundle by ~40%
@@ -264,9 +265,8 @@ export default function HomePageClient({
   const [brochureModalOpen, setBrochureModalOpen] = useState(false)
   const [brochureModalData, setBrochureModalData] = useState<{ productName?: string; brochureUrl?: string }>({})
 
-  const heroSlides = banners
-    .filter((b) => b.isActive && (b.desktopBannerImage || b.image))
-    .sort((a, b) => (a.order || 0) - (b.order || 0))
+  // Shared with the page's hero <link rel="preload"> tags (lib/heroBanner.ts).
+  const heroSlides = selectHeroSlides(banners)
 
   const displayBlogPosts = blogPosts.length > 0 ? blogPosts : defaultBlogPosts
 

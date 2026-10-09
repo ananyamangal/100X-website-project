@@ -75,11 +75,10 @@ export default async function SiteShell({ htmlLang, dir, locale, messages, foote
         <Script id="ga4-config" strategy="afterInteractive">
           {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-GEWH5YB3PS',{send_page_view:true,transport_url:'https://www.google-analytics.com'});`}
         </Script>
-        {/* Hero banner LCP preload — media-scoped so each viewport only
-            preloads the variant it will actually paint. */}
-        <link rel="preload" as="image" href="/banner-mobile.jpg" media="(max-width: 767.98px)" />
-        <link rel="preload" as="image" href="/banner-tablet.jpg" media="(min-width: 768px) and (max-width: 1023.98px)" />
-        <link rel="preload" as="image" href="/banner-desktop.jpg" media="(min-width: 1024px)" />
+        {/* Hero banner LCP preloads live on the homepage only
+            (app/(site)/(home)/page.tsx, lib/heroBanner.ts): a site-wide
+            /banner-*.jpg preload here downloaded an unused ~80 KB image on
+            every other page, competing with that page's own LCP image. */}
       </head>
       <body className="min-h-screen antialiased">
       <NextIntlClientProvider locale={locale} messages={messages}>

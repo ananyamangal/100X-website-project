@@ -8,27 +8,20 @@ import { getHomeContent } from "@/lib/homeContent"
 import { serializeBlogs } from "@/lib/blogSerialize"
 import HomePageClient from "@/components/home/HomePageClient"
 import HomepageAiSummary from "@/components/seo/HomepageAiSummary"
-import { optimizeCloudinary } from "@/lib/cloudinaryUrl"
+import { heroPreloads } from "@/lib/heroBanner"
 
-// Server-side preload component for the first banner image.
-// This emits <link rel="preload"> tags in <head> for the actual dynamic
-// Cloudinary banner URLs, not just the static fallbacks in layout.tsx.
+// Server-side preload tags for the first hero slide — the homepage LCP image.
+// Emitted (and hoisted into <head>) for the exact URL HeroBlock paints at each
+// breakpoint, including the static /banner-*.jpg fallbacks when no Cloudinary
+// banner is configured. Media-scoped, so each viewport fetches only the
+// variant it shows; fetchPriority=high so it is not queued behind the
+// below-the-fold images. (These used to be split between here and a global
+// fallback preload in SiteShell that ran on every page of the site.)
 function BannerPreloads({ banners }: { banners: any[] }) {
-  const first = banners[0]
-  if (!first) return null
-  const desktop = optimizeCloudinary(first.desktopBannerImage || first.image, 1920)
-  const tablet = optimizeCloudinary(first.tabletBannerImage || first.desktopBannerImage || first.image, 1200)
-  const mobile = optimizeCloudinary(first.mobileBannerImage || first.desktopBannerImage || first.image, 800)
   return (
     <>
-      {desktop && desktop.includes("cloudinary.com") && (
-        <link rel="preload" as="image" href={desktop} media="(min-width: 1024px)" />
-      )}
-      {tablet && tablet.includes("cloudinary.com") && (
-        <link rel="preload" as="image" href={tablet} media="(min-width: 768px) and (max-width: 1023.98px)" />
-      )}
-      {mobile && mobile.includes("cloudinary.com") && (
-        <link rel="preload" as="image" href={mobile} media="(max-width: 767.98px)" />
+      {heroPreloads(banners).map(({ href, media }) =>
+        href ? <link key={media} rel="preload" as="image" href={href} media={media} fetchPriority="high" /> : null,
       )}
     </>
   )
