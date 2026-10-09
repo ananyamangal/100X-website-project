@@ -33,9 +33,9 @@ Before B10 (b10/lh-before.txt): home perf 45-51, LCP 7.9 s (hero image lazy, pre
 | /products | 49/61 | 53/62 | 9.7 s | 7.9 s | 484 ms | 514 ms |
 | /case-studies | 55/57 | 51/56 | 11.8 s | 9.7 s | 687 ms | 563 ms |
 
-CLS stays 0.000 everywhere. The clearest gain is the homepage LCP (hero image now preloaded at high priority). On /products, /case-studies and the GeM page the LCP is still the video popup thumbnail opening on its 5 s timer (see below).
+CLS stays 0.000 everywhere. The clearest gain is the homepage LCP (hero image now preloaded at high priority). On /products, /case-studies and the GeM page the LCP is still the floating video popup thumbnail (see below).
 
-The 9.7-11.8 s LCP on /products, /case-studies and the GeM page is the floating video popup: its 25 KB thumbnail is not slow, the popup opens on a 5 s timer and is then the largest paint. Real fixes for the owner: fetch the thumbnail only when the popup opens (low priority), or open the popup on first scroll/tap.
+The 9.7-11.8 s LCP on /products, /case-studies and the GeM page is the floating video popup: its 25 KB thumbnail is not slow, the admin popup delay on live is 0 (delayMs 0; 5 s is only the code fallback), so the popup opens about 0.8 s into the page, before visitors interact, and is then the largest paint. The thumbnail is already fetched only when the popup opens. Options for the owner: raise the popup delay in admin to about 5-8 s (no code; improves field LCP for visitors who scroll or tap first, lab score unchanged), or open the popup on first scroll/tap (code change; removes it from LCP in lab and field).
 
 ## Owner decisions and open facts
 
