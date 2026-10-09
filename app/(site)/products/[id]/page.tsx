@@ -21,6 +21,7 @@ import RelatedProductsSection from "@/components/RelatedProductsSection"
 import { getProductBySlugOrId } from "@/lib/productsQuery"
 import { toDisplayStrings } from "@/lib/normalizeProduct"
 import { PRODUCT_LANDING_MAP } from "@/lib/seo/product-landing-map"
+import { resolveProductSeoOverride } from "@/lib/seo/product-seo-overrides"
 import { SITE_URL } from "@/lib/seo/site-config"
 import { plainTextFromHtml } from "@/lib/rich-text"
 import ProductAiSummary from "@/components/seo/ProductAiSummary"
@@ -76,8 +77,11 @@ export async function generateMetadata({
     plainTextFromHtml(rawDesc).slice(0, 155) ||
     `Buy ${name} from 100x Circle — thermal fogging and agricultural equipment in India.`
 
-  const title = storedSeoTitle || `${name} | 100x Circle`
-  const description = storedMetaDesc || fallbackDesc
+  // B4 (2026-10): code-side fixes for defective stored titles/descriptions,
+  // applied only while the DB still holds the defective value. See the file.
+  const seoFix = resolveProductSeoOverride(productSlug, storedSeoTitle, storedMetaDesc)
+  const title = seoFix.title || storedSeoTitle || `${name} | 100x Circle`
+  const description = seoFix.description || storedMetaDesc || fallbackDesc
   const ogTitle = storedOgTitle || title
   const ogDescription = storedOgDesc || description
 

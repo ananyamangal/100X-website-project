@@ -110,12 +110,15 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
     slug: "double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400",
     type: "product",
     metadata: {
-      title: "Buy Double Barrel Thermal Fogging Machine | 100x Circle",
+      title: "Buy Double Barrel Thermal Fogging Machine 100XDB400 | 100X",
       description:
         "Buy Double Barrel Thermal Fogging Machine from 100x Circle. High-power, durable fogger for industrial mosquito control and public health use. Contact us today!",
       keywords:
         "buy double barrel thermal fogging machine, vehicle mounted thermal fogger manufacturer india, vehicle mounted fogging machine, heavy duty vehicle mount fogging machine supplier, double barrel fogging machine",
     },
+    // B4 (2026-10): the model number was added to the <title> only. Keep the
+    // footer / related-card / breadcrumb label exactly as it was.
+    displayName: "Buy Double Barrel Thermal Fogging Machine",
     content1: {
       h2: "Vehicle-Mounted Mounting and Field Stability",
       p: [
@@ -791,12 +794,15 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
     slug: "thermal-fogging-machine-with-stainless-steel-tank-100xssma20",
     type: "product",
     metadata: {
-      title: "Buy Stainless Steel Tank Thermal Fogger | 100x Circle",
+      title: "Buy Stainless Steel Tank Thermal Fogger 100XSSMA20 | 100X",
       description:
         "Buy Stainless Steel Tank Thermal Fogger from 100x Circle. Durable, rust-resistant design with powerful fog output for effective mosquito control. Contact us today!",
       keywords:
         "buy stainless steel tank thermal fogger, stainless steel tank fogging machine manufacturer india, SS tank thermal fogging machine supplier, stainless steel fogger price, thermal fogging machine with stainless steel tank, SS fogging machine price",
     },
+    // B4 (2026-10): the model number was added to the <title> only. Keep the
+    // footer / related-card / breadcrumb label exactly as it was.
+    displayName: "Buy Stainless Steel Tank Thermal Fogger",
     content1: {
       h2: "Why the Stainless Steel Tank Matters",
       p: [
