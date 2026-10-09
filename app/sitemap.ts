@@ -7,6 +7,7 @@ import { DEFAULT_SITEMAP_BY_TYPE } from "@/lib/seo/landing-types"
 import { blogPostSlug } from "@/lib/blogSlug"
 import { PRODUCT_LANDING_MAP } from "@/lib/seo/product-landing-map"
 import { getAvailableLocales, buildLocalizedSitemapEntries } from "@/lib/seo/hreflang"
+import { getCaseStudiesForSitemap } from "@/lib/caseStudySitemap"
 
 // Unlike the 14 hardcoded landing pages fixed alongside this (see their own
 // revalidate additions), this route genuinely reads from Mongo on every
@@ -69,7 +70,7 @@ const STATIC_ROUTES: Array<{
   // Deployments
   { path: "/deployments", changeFrequency: "monthly", priority: 0.7 },
   // Government procurement trust cluster
-  { path: "/gem-approved-fogging-machine-oem", changeFrequency: "monthly", priority: 0.9 },
+  // /gem-approved-fogging-machine-oem is emitted once by the landing-page loop below (B6: was listed twice).
   { path: "/past-performance-government", changeFrequency: "monthly", priority: 0.85 },
   { path: "/fogging-machine-government-procurement", changeFrequency: "monthly", priority: 0.85 },
   { path: "/oem-authorization-letter", changeFrequency: "monthly", priority: 0.9 },
@@ -159,9 +160,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
   }
 
-  const [blogs, products] = await Promise.all([
+  const [blogs, products, caseStudies] = await Promise.all([
     getPublicBlogs(),
     getAllProductsForSitemap(),
+    getCaseStudiesForSitemap(),
   ])
 
   for (const blog of blogs) {
@@ -196,6 +198,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified,
       changeFrequency: "weekly",
       priority: 0.85,
+    })
+  }
+
+  // B6: published case-study detail pages. lastmod is the record's own
+  // updatedAt/createdAt; omitted (not "now") when the record has neither.
+  for (const cs of caseStudies) {
+    entries.push({
+      url: `${SITE_URL}/case-studies/${encodeURIComponent(cs.slug)}`,
+      ...(cs.lastModified ? { lastModified: new Date(cs.lastModified) } : {}),
+      changeFrequency: "monthly",
+      priority: 0.6,
     })
   }
 
