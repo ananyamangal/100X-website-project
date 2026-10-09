@@ -194,7 +194,7 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
         list: {
           after: 4,
           items: [
-            "A valid GSTIN (a GeM Seller ID is optional when requesting the letter)",
+            "A valid GeM seller registration and GSTIN",
             "Company and manufacturing details (for actual OEMs), or a signed OEM authorization letter (for resellers/deemed OEMs)",
             "Basic KYC documents",
           ],
@@ -219,8 +219,8 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
         eyebrow: "Process",
         title: "How to get started",
         steps: [
-          { title: "Fill the reseller registration form", description: "Share your GST number and company details (GeM Seller ID is optional). Takes under two minutes." },
-          { title: "We verify and reach out", description: "Our team verifies your details (and your GeM seller profile, if you share one) and calls back within 24 hours to begin the OEM authorization process." },
+          { title: "Fill the reseller registration form", description: "Share your GeM Seller ID, GST number, and company details. Takes under two minutes." },
+          { title: "We verify and reach out", description: "Our team verifies your GeM seller profile and calls back within 24 hours to begin the OEM authorization process." },
           { title: "Receive OEM Reseller Authorization", description: "We share the OEM code, technical catalogue, and pricing so you can list our machines on your GeM account immediately." },
           { title: "Start winning GeM orders", description: "Bid on government tenders, win orders, we ship directly. You earn the margin — hassle-free." },
         ],
@@ -253,9 +253,9 @@ export const LANDING_PAGES: Record<string, LandingPageDef> = {
     faqs: [
       { q: "What is 'GeM-approved OEM' and why does it matter for resellers?", a: "GeM-approved OEM means 100x Circle is registered on the Government e-Marketplace as the original manufacturer for our fogging machine SKUs. Resellers can list these SKUs on their own GeM seller account once we issue an OEM Reseller Authorization Code — without that authorization, your listing is non-compliant and gets rejected at order acceptance." },
       { q: "Which GeM category are 100x Circle fogging machines listed under?", a: "Q2 — Pest Control Equipment / Fogging Machines. Our SKUs include thermal foggers, cold (ULV) foggers, vehicle-mounted units, and stainless-steel-tank variants — all spec-mapped to the active GeM technical sheets." },
-      { q: "Do I need to be a registered GeM seller before applying for OEM code?", a: "No. A GeM Seller ID is optional when you request the OEM authorization letter; you'll need a valid GSTIN. To pair the OEM Reseller Authorization code on GeM, the seller account has to be in your name — if you're new to GeM, we can guide you to the registration flow." },
+      { q: "Do I need to be a registered GeM seller before applying for OEM code?", a: "Yes. You'll need an active GeM Seller ID and a valid GSTIN before we can issue the OEM Reseller Authorization. If you're new to GeM, we can guide you to the registration flow but the seller account itself has to be in your name." },
       { q: "Is there any fee to become an authorized GeM reseller?", a: "No — there is no joining fee. We earn through the wholesale rate we offer; you earn the difference between our rate and your GeM listing price." },
-      { q: "How quickly will I receive the OEM authorization after I register?", a: "Typically within 24–48 hours of receiving your registration. Our team verifies your GST status and basic KYC (and your GeM seller profile, if you share one) before issuing the OEM code." },
+      { q: "How quickly will I receive the OEM authorization after I register?", a: "Typically within 24–48 hours of receiving your registration. Our team verifies your GeM seller profile, GST status, and basic KYC before issuing the OEM code." },
       // Agency on-page SEO copy (Sept 2026) — appended, nothing above changed.
       { q: "How do I become an OEM on GeM?", a: "You register on the GeM portal as a seller, complete your company and GST verification, and submit your manufacturing details for approval. If you're not the original manufacturer, you can instead become a \"deemed OEM\" by getting an authorization letter from an actual OEM — that's the route most fogging machine resellers take, and it's what we help with." },
       { q: "What is deemed OEM in GeM?", a: "It's when GeM treats you as the OEM for listing purposes because a real manufacturer has formally authorized you to sell their product, even though you don't manufacture it yourself. You'll need a valid OEM authorization letter/code from that manufacturer to get this status." },

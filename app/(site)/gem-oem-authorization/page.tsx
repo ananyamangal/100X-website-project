@@ -42,13 +42,13 @@ const jsonLdHowTo = {
       "@type": "HowToStep",
       position: 1,
       name: "Submit your dealer inquiry",
-      text: "Contact 100X Circle via phone, WhatsApp, or email. Provide your GST number, GeM Seller ID (optional), business name, and the state(s) you plan to cover. WhatsApp: +91-7827229116 or Email: 100xcircle@gmail.com.",
+      text: "Contact 100X Circle via phone, WhatsApp, or email. Provide your GST number, GeM Seller ID, business name, and the state(s) you plan to cover. WhatsApp: +91-7827229116 or Email: 100xcircle@gmail.com.",
     },
     {
       "@type": "HowToStep",
       position: 2,
       name: "Verification and onboarding",
-      text: "100X Circle verifies your business credentials (and your GeM seller registration, if you share it). This typically takes 2–3 working days. You may be asked for business registration documents.",
+      text: "100X Circle verifies your GeM seller registration and business credentials. This typically takes 2–3 working days. You may be asked for business registration documents.",
     },
     {
       "@type": "HowToStep",
@@ -96,7 +96,7 @@ const jsonLdFaq = {
       name: "What is the eligibility to become a 100X Circle GeM reseller?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "To become a 100X Circle GeM reseller, you need: (1) Valid GST registration, (2) Prior experience in pest control, public health, or equipment supply is preferred but not mandatory. A GeM Seller ID is optional when you request the authorization letter. Contact 100X Circle to discuss your territory and requirements.",
+        text: "To become a 100X Circle GeM reseller, you need: (1) Active GeM seller registration, (2) Valid GST registration, (3) Prior experience in pest control, public health, or equipment supply is preferred but not mandatory. Contact 100X Circle to discuss your territory and requirements.",
       },
     },
     {
@@ -120,7 +120,7 @@ const jsonLdFaq = {
       name: "How long does it take to get OEM authorization from 100X Circle?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Standard processing time is 2–5 working days after submission of required documents (GST certificate, business registration; GeM seller ID is optional). Urgent authorization for active tenders can often be expedited. Contact +91-7827229116 for urgent requests.",
+        text: "Standard processing time is 2–5 working days after submission of required documents (GeM seller ID, GST certificate, business registration). Urgent authorization for active tenders can often be expedited. Contact +91-7827229116 for urgent requests.",
       },
     },
   ],
@@ -130,7 +130,7 @@ const STEPS = [
   {
     num: 1,
     title: "Submit dealer inquiry",
-    body: "Contact us via WhatsApp, phone, or email. Share your GeM Seller ID (optional), GST number, and the state(s) you operate in. No registration fee.",
+    body: "Contact us via WhatsApp, phone, or email. Share your GeM Seller ID, GST number, and the state(s) you operate in. No registration fee.",
   },
   {
     num: 2,
@@ -182,7 +182,7 @@ const BENEFITS = [
 ]
 
 export default function GemOemAuthorizationPage() {
-  const waLink = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent("Hi, I want to become an authorized 100X Circle GeM reseller. My GeM Seller ID (optional) is:")}`
+  const waLink = `https://wa.me/${BUSINESS.whatsappE164}?text=${encodeURIComponent("Hi, I want to become an authorized 100X Circle GeM reseller. My GeM Seller ID is:")}`
 
   return (
     <>
@@ -229,7 +229,7 @@ export default function GemOemAuthorizationPage() {
         <div className="bg-brand-600 rounded-xl p-6 mb-10 text-white">
           <h2 className="font-bold text-xl mb-2">Apply for GeM Dealer Authorization</h2>
           <p className="text-brand-100 text-sm mb-4">
-            Share your GST number (GeM Seller ID is optional). We verify and issue authorization within
+            Share your GeM Seller ID and GST number. We verify and issue authorization within
             2–5 working days.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
@@ -389,7 +389,7 @@ export default function GemOemAuthorizationPage() {
         <div className="bg-brand-600 rounded-xl p-6 mb-8 text-white">
           <h2 className="font-bold text-xl mb-1">Ready to Apply for OEM Authorization?</h2>
           <p className="text-brand-100 text-sm mb-1">Active tender deadline? We can expedite to 1 working day.</p>
-          <p className="text-brand-200 text-xs mb-4">Send your GST number (GeM Seller ID optional). No fee. No commitment.</p>
+          <p className="text-brand-200 text-xs mb-4">Send your GeM Seller ID + GST number. No fee. No commitment.</p>
           <div className="flex flex-col sm:flex-row gap-3">
             <a
               href={waLink}
