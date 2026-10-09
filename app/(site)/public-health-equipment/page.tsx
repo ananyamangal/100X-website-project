@@ -270,7 +270,7 @@ export default function PublicHealthEquipmentPage() {
             <li><strong>GeM listed MSME OEM:</strong> Direct government procurement without separate tender</li>
             <li><strong>IS 14855 (Part 1) compliant:</strong> BIS standard documentation provided</li>
             <li><strong>ISO 9001:2015 certified:</strong> Quality management — required by most tenders</li>
-            <li><strong>Droplet specifications:</strong> droplet size depends on the model; see each product&apos;s specifications</li>
+            <li><strong>WHO-compatible droplet specifications:</strong> 1–50 micron range meeting WHO vector control guidelines</li>
             <li><strong>Supply track record:</strong> Municipalities, Nagar Nigams, and health departments in 12 states</li>
             <li><strong>Pan-India dispatch:</strong> Gurugram factory, 5–10 working day delivery</li>
           </ul>

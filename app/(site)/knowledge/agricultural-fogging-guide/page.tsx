@@ -43,7 +43,7 @@ const faqJsonLd = {
       name: "Can thermal fogging machines be used for agriculture?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. Thermal foggers are highly effective for agricultural pest control and fungicide application. The fine droplets penetrate dense crop canopy and reach pests on under-leaf surfaces and in stem crevices that conventional sprayers miss. Thermal fogging is especially valuable for large-scale operations across paddy fields, sugarcane, orchards, and vegetable crops.",
+        text: "Yes. Thermal foggers are highly effective for agricultural pest control and fungicide application. The sub-50-micron droplets penetrate dense crop canopy and reach pests on under-leaf surfaces and in stem crevices that conventional sprayers miss. Thermal fogging is especially valuable for large-scale operations across paddy fields, sugarcane, orchards, and vegetable crops.",
       },
     },
     {
@@ -114,7 +114,7 @@ export default function AgriculturalFoggingPage() {
         <div className="bg-brand-50 border border-brand-200 rounded-xl p-5 mb-8">
           <p className="text-sm font-semibold text-brand-800 mb-1">Quick Summary</p>
           <p className="text-sm text-brand-700">
-            Thermal fogging machines are highly effective for large-scale crop pest control in India. Fine droplets penetrate dense canopy and reach pests on under-leaf surfaces. Compatible with oil-based pesticide and fungicide formulations. A 50-litre machine covers 8–15 acres per hour for field crops. Not suitable for use inside greenhouses — use cold (ULV) fogging inside enclosed spaces.
+            Thermal fogging machines are highly effective for large-scale crop pest control in India. Sub-50-micron droplets penetrate dense canopy and reach pests on under-leaf surfaces. Compatible with oil-based pesticide and fungicide formulations. A 50-litre machine covers 8–15 acres per hour for field crops. Not suitable for use inside greenhouses — use cold (ULV) fogging inside enclosed spaces.
           </p>
         </div>
 
@@ -124,7 +124,7 @@ export default function AgriculturalFoggingPage() {
             Conventional knapsack sprayers apply chemical as a coarse spray (150–400 microns) that wets leaf surfaces but does not penetrate the underside of leaves, stem crevices, or the interior of dense crop canopies where many pests feed and shelter. Labour-intensive and slow — a single sprayer operator covers 1–2 acres per day.
           </p>
           <p className="text-gray-700 leading-relaxed mb-4">
-            Thermal fogging generates fine particles that float through the crop canopy, reaching under-leaf surfaces and enclosed spaces in a way conventional spraying cannot. A single operator with a 50-litre thermal fogger can treat 8–15 acres per hour — effectively what five to ten conventional sprayers would require.
+            Thermal fogging generates sub-50-micron particles that float through the crop canopy, reaching under-leaf surfaces and enclosed spaces in a way conventional spraying cannot. A single operator with a 50-litre thermal fogger can treat 8–15 acres per hour — effectively what five to ten conventional sprayers would require.
           </p>
           <p className="text-gray-700 leading-relaxed">
             For large farmers, FPOs, and agricultural cooperatives, thermal fogging reduces labour cost per acre by 60–80% for pest control operations.
@@ -199,7 +199,7 @@ export default function AgriculturalFoggingPage() {
           <h2 className="text-2xl font-700 text-gray-900 mb-6">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {[
-              { q: "Can thermal fogging be used for agriculture?", a: "Yes — fine droplets penetrate crop canopy and under-leaf surfaces for highly effective pest control. A 50-litre machine covers 8–15 acres/hour." },
+              { q: "Can thermal fogging be used for agriculture?", a: "Yes — sub-50-micron droplets penetrate crop canopy and under-leaf surfaces for highly effective pest control. A 50-litre machine covers 8–15 acres/hour." },
               { q: "What chemicals for agricultural fogging?", a: "Oil-based pesticides and fungicides. Deltamethrin, chlorpyrifos, cypermethrin, lambda-cyhalothrin. Never use water-based formulations." },
               { q: "Is thermal fogging safe for crops?", a: "At recommended concentrations and timing (early morning/evening), approved oil-based formulations do not damage crops. Follow label re-entry intervals. Avoid during pollination for bee-sensitive crops." },
               { q: "Can I use a thermal fogger inside a greenhouse?", a: "No — use cold (ULV) fogging inside greenhouses. Thermal fogging creates smoke, heat, and fire risk in enclosed structures." },

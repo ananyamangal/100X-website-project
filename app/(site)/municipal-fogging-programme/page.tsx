@@ -194,7 +194,7 @@ export default function MunicipalFoggingProgrammePage() {
           <p>
             Thermal fogging is the most effective outdoor mosquito control method for
             municipal vector programmes. The pulse-jet engine vaporises oil-based insecticide
-            into ultra-fine droplets that penetrate dense vegetation, drains,
+            into ultra-fine droplets (1–50 microns) that penetrate dense vegetation, drains,
             and shaded areas where mosquitoes rest — areas that sprayers cannot reach.
           </p>
           <p>
@@ -206,7 +206,7 @@ export default function MunicipalFoggingProgrammePage() {
               per hour. Vehicle-mounted units cover entire wards in a single drive-through.
             </li>
             <li>
-              <strong>Penetration depth:</strong> The fog particle size (which depends on the model; see each product&apos;s specifications) is
+              <strong>Penetration depth:</strong> The fog particle size (1–30 microns) is
               sized to remain airborne and penetrate canopy cover, wall voids, and drain
               openings — targeting resting adult mosquitoes.
             </li>

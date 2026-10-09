@@ -44,12 +44,12 @@ const FAQS: Faq[] = [
   {
     q: "How does a pulse-jet thermal fogger differ from a knapsack or boom sprayer?",
     a:
-      "A pulse-jet thermal fogger uses a high-frequency combustion chamber to vapourise the chemical solution into fine droplets that drift on air currents into voids, foliage, and drains. Knapsack and boom sprayers produce larger droplets that fall to ground level — better for direct foliar application but limited in reach and coverage. Thermal foggers are the standard for outdoor vector control and area-wide disinfection.",
+      "A pulse-jet thermal fogger uses a high-frequency combustion chamber to vapourise the chemical solution into sub-50-micron droplets that drift on air currents into voids, foliage, and drains. Knapsack and boom sprayers produce larger droplets that fall to ground level — better for direct foliar application but limited in reach and coverage. Thermal foggers are the standard for outdoor vector control and area-wide disinfection.",
   },
   {
     q: "What droplet size do 100x Circle thermal foggers produce, and why does it matter?",
     a:
-      "Droplet size depends on the model; see each product's specifications. Fine droplets stay airborne long enough to penetrate vegetation, drains, and voids that conventional spraying cannot reach. Larger droplets fall too quickly; smaller droplets evaporate before deposition.",
+      "Our pulse-jet foggers produce droplets in the sub-50-micron range (typically 0.5–40 μm depending on chemical and engine setting). Droplets below 50 μm stay airborne long enough to penetrate vegetation, drains, and voids that conventional spraying cannot reach. Larger droplets fall too quickly; smaller droplets evaporate before deposition. This range is the sweet spot for vector control efficacy.",
   },
   {
     q: "Can 100x Circle fogging machines be used in agriculture for fungicide and pesticide application?",

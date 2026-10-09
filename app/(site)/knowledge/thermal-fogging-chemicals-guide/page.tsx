@@ -137,7 +137,7 @@ export default function ThermalFoggingChemicalsPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-700 text-gray-900 mb-3">How Thermal Foggers Work with Chemicals</h2>
           <p className="text-gray-700 leading-relaxed mb-4">
-            A thermal fogger pumps chemical solution through a heated exhaust tube (300–600°C). The oil-based carrier vaporises instantly, creating fine droplets that remain suspended in air as visible fog. These fine particles (10–30 microns) are in the WHO-recommended size range for penetrating vegetation and reaching target insects.
+            A thermal fogger pumps chemical solution through a heated exhaust tube (300–600°C). The oil-based carrier vaporises instantly, creating sub-50-micron droplets that remain suspended in air as visible fog. These fine particles (10–30 microns) are in the WHO-recommended size range for penetrating vegetation and reaching target insects.
           </p>
           <p className="text-gray-700 leading-relaxed mb-4">
             The chemistry requirement is specific: the carrier must be a low-viscosity oil (mineral oil, paraffin, or kerosene) that vaporises at the exhaust temperature. Active ingredients must be dissolved or emulsified in this oil carrier. Water cannot vaporise effectively at fogging temperatures and creates an incorrect (too large) droplet spectrum.

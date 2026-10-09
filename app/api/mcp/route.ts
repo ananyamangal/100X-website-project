@@ -390,7 +390,7 @@ async function handleTool(name: string, args: Record<string, any>): Promise<obje
 
 Thermal Fogging (100X Circle specialty):
 - Uses heat to vaporize liquid — creates dense visible fog
-- Fine droplets: drift and penetrate vegetation, voids, open drains
+- Sub-50-micron droplets: drift and penetrate vegetation, voids, open drains
 - Best for: outdoor mosquito control, large-area vector control
 - Chemical: petroleum-based or water-based solutions
 - Limitations: visible smoke; not ideal for enclosed, food-sensitive areas
