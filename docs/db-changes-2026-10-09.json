@@ -1,0 +1,122 @@
+{
+ "description": "Overnight 2026-10-08 DB content fixes (A9 typos/taglines + DB fact fixes). Revert: node apply.mjs revert <this file>",
+ "changes": [
+  {
+   "collection": "products",
+   "_id": "68e5217a0bab18231190602f",
+   "path": "features.0.title",
+   "old": "Therma & Cold fog",
+   "new": "Thermal & Cold fog",
+   "reason": "typo Therma",
+   "appliedAt": "2026-10-09T06:59:55.779Z"
+  },
+  {
+   "collection": "products",
+   "_id": "68e530fb67916b2aa5c42ca1",
+   "path": "detailedDescription",
+   "old": "<p>Cold&nbsp;fogger&nbsp;/&nbsp;Mist&nbsp;sprayer&nbsp;machine&nbsp;with&nbsp;2&nbsp;stoke&nbsp;engine.&nbsp;Used&nbsp;for&nbsp;cold&nbsp;fogging&nbsp;outdoors&nbsp;or&nbsp;for&nbsp;disinfection&nbsp;purposes.&nbsp;Model:&nbsp;100XMCF42&nbsp;</p>",
+   "new": "<p>Cold&nbsp;fogger&nbsp;/&nbsp;Mist&nbsp;sprayer&nbsp;machine&nbsp;with&nbsp;2&nbsp;stroke&nbsp;engine.&nbsp;Used&nbsp;for&nbsp;cold&nbsp;fogging&nbsp;outdoors&nbsp;or&nbsp;for&nbsp;disinfection&nbsp;purposes.&nbsp;Model:&nbsp;100XMCF42&nbsp;</p>",
+   "reason": "typo stoke (body only; name/slug/title untouched)",
+   "appliedAt": "2026-10-09T06:59:55.851Z"
+  },
+  {
+   "collection": "products",
+   "_id": "68e530fb67916b2aa5c42ca1",
+   "path": "filmChapters.0.description",
+   "old": "Unlike thermal foggers, the Cold fogger machine with 2 stoke engine- 100XMCF42  cold fogger generates ultra-fine droplets through air-shear atomisation at ambient temperature. No open combustion. No hot surfaces. No fuel vapour. This makes it safe for use in occupied hospitals, schools, food processing facilities, and server rooms where thermal fog cannot be deployed. The same WHO-approved chemicals deliver the same efficacy — without the heat risk.",
+   "new": "Unlike thermal foggers, the Cold fogger machine with 2 stroke engine- 100XMCF42  cold fogger generates ultra-fine droplets through air-shear atomisation at ambient temperature. No open combustion. No hot surfaces. No fuel vapour. This makes it safe for use in occupied hospitals, schools, food processing facilities, and server rooms where thermal fog cannot be deployed. The same WHO-approved chemicals deliver the same efficacy — without the heat risk.",
+   "reason": "typo stoke (body only)",
+   "appliedAt": "2026-10-09T06:59:55.919Z"
+  },
+  {
+   "collection": "products",
+   "_id": "6917412ca57432be8ffcbbde",
+   "path": "features.1.value",
+   "old": "HDPE - High density, 100% corrossion free",
+   "new": "HDPE - High density, 100% corrosion free",
+   "reason": "typo corrossion",
+   "appliedAt": "2026-10-09T06:59:55.987Z"
+  },
+  {
+   "collection": "products",
+   "_id": "6917412ca57432be8ffcbbde",
+   "path": "filmChapters.0.title",
+   "old": "Built from High density 100% corrossion free HDPE",
+   "new": "Built from High density 100% corrosion free HDPE",
+   "reason": "typo corrossion",
+   "appliedAt": "2026-10-09T06:59:56.050Z"
+  },
+  {
+   "collection": "products",
+   "_id": "6a3f5bfe5cc04246fbea7f75",
+   "path": "features.1.value",
+   "old": "HDPE - High density, 100% corrossion free",
+   "new": "HDPE - High density, 100% corrosion free",
+   "reason": "typo corrossion",
+   "appliedAt": "2026-10-09T06:59:56.118Z"
+  },
+  {
+   "collection": "products",
+   "_id": "6a1e6c08ef20ab52efaa3d69",
+   "path": "specifications.15.label",
+   "old": "Techology",
+   "new": "Technology",
+   "reason": "typo Techology",
+   "appliedAt": "2026-10-09T06:59:56.188Z"
+  },
+  {
+   "collection": "products",
+   "_id": "6a1e6c08ef20ab52efaa3d69",
+   "path": "filmChapters.0.description",
+   "old": "The Double Barrel Thermal Fogging Machine | Vehicle Mountable vehicle-mounted system allows municipal teams to cover entire wards — thousands of residents — in a single morning fogging drive. The dual-barrel configuration delivers up to 100 litres of insecticide fog per hour, while the 100-litre chemical tank means fewer stops for refilling. Mounted on a erikshaw or pickup truck , one machine and two operators can achieve what would require 6–8 portable machines.",
+   "new": "The Double Barrel Thermal Fogging Machine | Vehicle Mountable vehicle-mounted system allows municipal teams to cover entire wards — thousands of residents — in a single morning fogging drive. The dual-barrel configuration delivers up to 100 litres of insecticide fog per hour, while the 100-litre chemical tank means fewer stops for refilling. Mounted on an e-rickshaw or pickup truck , one machine and two operators can achieve what would require 6–8 portable machines.",
+   "reason": "typo erikshaw",
+   "appliedAt": "2026-10-09T06:59:56.247Z"
+  },
+  {
+   "collection": "products",
+   "_id": "6a61ab6eabf5e4a1fd5e46c5",
+   "path": "whatsappMessageText",
+   "old": "I’m interested in 100X Product – 100XULVSS10 Cold fogger. Please send me more details. I currently require = (0Please mention Quantity required)   ",
+   "new": "I’m interested in 100X Product – 100XULVSS10 Cold fogger. Please send me more details. I currently require = (Please mention Quantity required)   ",
+   "reason": "typo (0Please",
+   "appliedAt": "2026-10-09T06:59:56.311Z"
+  },
+  {
+   "collection": "spare_parts",
+   "_id": "6a463da3b1398cb58fb7bf92",
+   "path": "name",
+   "old": "Fuel Filet ",
+   "new": "Fuel Filter ",
+   "reason": "typo Fuel Filet",
+   "appliedAt": "2026-10-09T06:59:56.385Z"
+  },
+  {
+   "collection": "spare_parts",
+   "_id": "6a4cd878cc2e0f6f5861b6d5",
+   "path": "name",
+   "old": "Diphragm",
+   "new": "Diaphragm",
+   "reason": "typo Diphragm",
+   "appliedAt": "2026-10-09T06:59:56.439Z"
+  },
+  {
+   "collection": "spare_parts",
+   "_id": "6a4cd878cc2e0f6f5861b6d5",
+   "path": "category",
+   "old": "Diphragm",
+   "new": "Diaphragm",
+   "reason": "typo Diphragm (category; part URL uses compatibleProductNames[0])",
+   "appliedAt": "2026-10-09T06:59:56.515Z"
+  },
+  {
+   "collection": "spare_parts",
+   "_id": "6a4e2767c779d7ef3f40796e",
+   "path": "name",
+   "old": "Geen Washer for combustion tube",
+   "new": "Green Washer for combustion tube",
+   "reason": "typo Geen Washer",
+   "appliedAt": "2026-10-09T06:59:56.603Z"
+  }
+ ]
+}

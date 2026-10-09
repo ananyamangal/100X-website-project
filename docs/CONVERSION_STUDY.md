@@ -1,4 +1,6 @@
-# Phase 0b: conversion study, www.100xcircle.com
+# Phase 0b: conversion study, www.100xcircle.com (FINAL)
+
+Final pass 2026-10-09. The original findings below are unchanged and describe the site as of 2026-10-08 (main `b81bbe4`). Items the study could not finish are now marked **NOT TESTED** with the data or test that would settle them. See "9. Status after the 2026-10-08/09 program" at the end for what shipped.
 
 Date: 2026-10-08. This was read-only work. Code was read from production main `b81bbe4`, through the clean worktree `F:/dev/100x-seo-baseline`. The live site is https://www.100xcircle.com.
 
@@ -6,7 +8,7 @@ Date: 2026-10-08. This was read-only work. Code was read from production main `b
 
 **Disclosure.** One early schema probe captured `name` values from the `revenue_attribution` collection, because a field allow-list included "name". I removed them from the output file straight away. They appear nowhere in this folder or in this report.
 
-**Collection was stopped early on the owner's instruction.** Steps that were not finished are marked "not done in time" or "could not complete".
+**Collection was stopped early on the owner's instruction.** Steps that were not finished are marked **NOT TESTED** (originally "not done in time" or "could not complete"). No results were invented for them; section 7 lists the data or test each one needs.
 
 ---
 
@@ -20,7 +22,7 @@ Date: 2026-10-08. This was read-only work. Code was read from production main `b
 6. **The tracking over-counts.** Every homepage page view fires a Google Ads conversion (label `Gwt1…`), so Ads "conversions" include plain visits.
 7. An RFQ submit fires **2 Ads conversions** (`generate_lead` plus the `/thank-you?type=rfq` URL rule). It fires them **even when the server returns 500**: I tested this, and the user still sees "Thank you".
 8. GA4 receives **no lead events at all**, only page_view, form_start, form_submit, scroll and user_engagement. Hits go to two GA4 properties (G-GEWH… and G-32RK…). The stored GA4 sync shows 0 conversions.
-9. Phone and WhatsApp clicks each fire an Ads conversion, which counts intent, not leads. The quote modal, contact form, reseller form and dealer form fire on success only. Brochure tracking was not tested in time.
+9. Phone and WhatsApp clicks each fire an Ads conversion, which counts intent, not leads. The quote modal, contact form, reseller form and dealer form fire on success only. Brochure tracking was NOT TESTED (code says it fires brochure_download and generate_lead).
 10. Mobile, slow 4G: the first unobstructed CTA appears in 2.4–4.7 s, but CTAs only respond to taps after **3.1–8.8 s** (the homepage is slowest). On desktop the figures are 0.4–0.8 s and 0.7–1.2 s.
 11. **Biggest friction on mobile:** a floating YouTube Shorts player opens on most pages. Together with the GeM pill, the RFQ ribbon and the bottom bar, it **physically covers in-page form submit buttons**. My scripted taps on "Send enquiry", "Register as Reseller" and "Apply for Dealership" all timed out until I closed the video.
 12. Shortest working paths: mobile bottom bar to quote modal (4 taps, 2 fields) and product page to on-page form (4 taps). The RFQ ribbon takes 6–7 taps because its product dropdown comes first.
@@ -190,7 +192,7 @@ The **RFQ start-to-submit ratio is about 55%** (Aug 41 of 70; across the whole w
 | Gov buyer, knowledge article (gov procurement guide) | mobile / desktop | bottom bar → modal / ribbon | 4 / 7 | 2 | 2.4 s / 3.1 s; 0.7 s / 0.7 s | thank-you |
 | Gov buyer, /past-performance-government | mobile / desktop | the in-page "Request Reference List" is WhatsApp-only and "Email Reference Request" is mailto-only; used bottom bar / ribbon | 4 / 7 | 2 | 4.1 s / 5.2 s; 0.4 s / 0.7 s | thank-you |
 | Gov buyer, case study (Muzaffarpur) | mobile / desktop | no in-page form; bottom bar / ribbon | 4 / 7 | 2 | 3.7 s / 4.7 s; 0.8 s / 1.0 s | thank-you |
-| Gov buyer, /fogging-machine-government-procurement department RFQ form | mobile | scroll **26,545 px** to the form; 9 fields, 4 required (department, officer, state, phone) | could not complete: typing the officer name (field tap timed out twice) | — | 4.0 s / 5.1 s | not completed |
+| Gov buyer, /fogging-machine-government-procurement department RFQ form | mobile | scroll **26,545 px** to the form; 9 fields, 4 required (department, officer, state, phone) | NOT COMPLETED: typing the officer name timed out twice; needs a re-run with the floating video closed and the form scrolled into view | — | 4.0 s / 5.1 s | not completed |
 | GeM reseller, GeM page | mobile | close video → "Register as Reseller" → form | 7 | 4 (company, name, mobile, city/state) | 3.4 s / 4.7 s | /thank-you?type=oem_authorization |
 | Dealer, /dealer-program | mobile | close video → "Apply for Dealership" → form | 7 | 2 + state dropdown (3 required) | 2.9 s / 5.3 s | /thank-you?type=dealer_inquiry |
 | Dealer, /become-a-dealer → /dealer-application | mobile | the application page has **no form**: 4 "Apply via WhatsApp" buttons only | 2 taps then WhatsApp | 0 | 2.7 s / 4.7 s | leaves the site, no lead record |
@@ -208,7 +210,7 @@ The **RFQ start-to-submit ratio is about 55%** (Aug 41 of 70; across the whole w
 | GeM reseller form | company\*, name\*, mobile\*, city/state\*, GeM seller ID, GST, capacity | tel OK | organisation, name, tel, address-level1 OK | Native |
 | Dealer form | name\*, mobile\*, state\* (select), city, company, business type, GeM ID | tel OK | name, tel, organisation OK | Native |
 | Gov department RFQ form | department\*, officer\*, state\*, phone\*, e-mail, quantity, procurement type, tender deadline, message | phone is `type=tel` but has **no autocomplete on any field** | none | **14 px inputs: iOS zooms in on focus.** Native validation. |
-| Brochure modal (header "Brochure" or "Download Brochure") | name\*, phone\*, **e-mail\***, organisation, state select (+ hidden honeypot) | — | **none** | Not submitted (not done in time) |
+| Brochure modal (header "Brochure" or "Download Brochure") | name\*, phone\*, **e-mail\***, organisation, state select (+ hidden honeypot) | — | **none** | NOT TESTED: the modal was not submitted. Needs a stubbed-network run of the brochure form |
 
 ### 2.3 Success state, thank-you and slow connections
 
@@ -270,7 +272,7 @@ The **RFQ start-to-submit ratio is about 55%** (Aug 41 of 70; across the whole w
 | Phone click (header, mobile bar) | phone_click | n7D2 (1) | nothing | the click (intent, not a call) |
 | WhatsApp click (link, mobile bar, floating button) | whatsapp_click (one push each; **no double count seen**) | 8j5s (1) | nothing | the click |
 | RFQ form's automatic WhatsApp | none (`window.open`) | none | none | — |
-| Brochure download | brochure_download + generate_lead on /brochure-thank-you (per code) | MaD0 (per code) | file_download only if a .pdf link | not tested live: not done in time |
+| Brochure download | brochure_download + generate_lead on /brochure-thank-you (per code) | MaD0 (per code) | file_download only if a .pdf link | NOT TESTED live. Needs a stubbed-network brochure run to confirm the events and whether Ads fires |
 
 **What each tool can count today:**
 
@@ -363,7 +365,13 @@ Togetherimport is not a separate folder. It lives inside `F:/dev/vipdealers` (`d
 - **Sales outcomes:** for the about 110 real buyers, which were quoted, which became orders, and order value. Even a spreadsheet keyed by month and form type would do; no names needed.
 - **WhatsApp Business:** count of inbound chats per month. WhatsApp taps (201) exceed form leads, but chats are invisible to the site.
 - **Phone:** call counts per month from the business lines.
-- **Not done in time:** brochure-modal submission test; failure mode for the reseller, dealer and gov forms; 61 s thank-you navigation (harness or real); complete gov department form run; mobile homepage "close video" run on desktop; 8-manufacturer benchmark depth.
+- **NOT TESTED (needs a follow-up run; no result is claimed here):**
+  - Brochure-modal submission: needs a stubbed-network run to confirm the dataLayer events and which Ads tags fire.
+  - Failure mode (HTTP 500) for the reseller, dealer and gov forms: needs the same 500-stub test used for the RFQ, quote and contact forms. Code suggests success-only firing.
+  - The 61 s client-side navigation to /thank-you seen in 3 of 12 mobile runs: needs real-user (RUM) timing, or a re-run outside the throttled harness, to tell artefact from real.
+  - A complete run of the gov department form on mobile.
+  - A desktop "close video" run of the mobile homepage flow.
+  - Benchmark depth: only 6 brands and 3 marketplaces were covered, not 8 manufacturer sites; GeM pages were read from search snippets only.
 
 ---
 
@@ -386,3 +394,37 @@ Previously planned Phase A items that are not about conversion (content and SEO 
 - `scripts/`: `probe.mjs`, `probe2.mjs`, `leads-aggregate.mjs`, `repeaters.mjs`, `gclid-month.mjs` (DB, read-only); `harness.mjs`, `discover.mjs`, `explore.mjs`, `personas.mjs`, `beacons.mjs` (browser); `gtm-parse.cjs`.
 - Data: `leads-aggregate.json`, `repeaters.json`, `gclid-by-month.json`, `probe-schema.json`, `probe-analytics-schema.json` (keys only), `discover.json`, `personas-gov-home.json`, `personas-rerun.json`, `personas-run.log`, `beacons.json`, `gtm-container.js` (the public container).
 - Screenshots: `shots/discover/`, `shots/explore/`, `shots/<flow>/`, `shots/brochure-modal-*.png`.
+
+---
+
+## 9. Status after the 2026-10-08/09 program
+
+Sources: `PROGRAM_STATUS.md` (audit 2026-10-09) and `PUSH-LOG.md`. "Live" means on origin/main and checked after deploy. Rollback tag `rollback-pre-overnight-2026-10-08` -> d81aaed.
+
+| Study recommendation (section 6 / 8) | Program item | Status | Commits / push |
+|---|---|---|---|
+| 1 Tracking truth: RFQ event only on server success; one generate_lead; IS 14855 event | A2 | Shipped (push 2, live) | 4fd7af2 |
+| 3 No silent lead loss: RFQ saves first, WhatsApp optional | A1 | Shipped (push 2, live) | bee42fc, 2703ee2, 7785acf |
+| 5 / 8.4 Attribution on every lead, persisted (localStorage plus server fields) | A5 | Shipped (push 2, live) as 30 days, not the 90 days recommended. Device field and buyer-type select: UNKNOWN, not listed in PROGRAM_STATUS | e9d3228, b27cae5 |
+| Honeypot value sent, flag-only | A7 | Partly shipped: label leak fixed and input hidden; value deliberately NOT sent yet (owner decision, OPEN_FACTS #17) | 479f63f, 55d8956 |
+| Mobile unblock: floating stack | A8a (home pills appear after 300 px) | Partly shipped (push 1). Video facade also live earlier (63a43b2, 9bbdc91). Removal of the floating YouTube Shorts player, 16 px inputs and autocomplete: not in the program list, status UNKNOWN | ebfa2c5 |
+| 6 Government path: optional e-mail on contact and GeM forms, buyer / reseller choice | A3 | Shipped (push 3, deployed 2026-10-09 06:46Z) | 9357caf, 7af099e |
+| 6 / 10 Call-back option with time slot | A4 | Shipped (push 3) | 7a57cff, 7af099e |
+| 6 On-page quote actions beside WhatsApp-only / mailto-only CTAs | A6 | Shipped (push 3) | e9b0970 |
+| Performance: /about image dimensions | A8b | Shipped (push 2) | 68d6da9 |
+| Remove TEMP DEBUG logs | A10 | Shipped (push 2) | a1101d0 |
+| Facts pass (2020 founding, counters, 9 models, states; owner kept published trust numbers) | Facts | Shipped (push 3) | see PROGRAM_STATUS |
+
+**Not shipped by the program (still open from this study):**
+- Google Ads / GTM side fixes: the homepage-view conversion (`Gwt1...`), the duplicate `/thank-you?type=rfq` URL tag, sending `generate_lead` to GA4 as a key event, and the second GA4 property. These are configuration in GTM, Ads and GA4, not code. Whether the owner has changed them: UNKNOWN. `docs/gtm-conversion-setup.md` documents the intended setup.
+- Shortening the RFQ ribbon (name and phone first); brochure e-mail optional; thank-you page reference number and response promise; a real /dealer-application form; 16 px inputs and autocomplete on the gov form. Not in PROGRAM_STATUS.
+- Trust pack (price band, BIS CM/L number, test reports, response promise): blocked on owner facts (OPEN_FACTS #1, #9, #10).
+- Homepage mobile performance (interactive under 4 s): no Lighthouse / CWV baseline was captured (B10 not started).
+- Rating-based trust signals: ratings-markup removal (B2) not started; real reviews needed (see OFFSITE_TODO).
+
+**Issues found while verifying push 3 that affect conversion:**
+- Lead e-mail delivery has failed on production since 2026-10-08 (Gmail SMTP 535 EAUTH). Leads are still saved to the database; only the admin e-mail fails. Owner action: new Gmail app password, set `EMAIL_APP_PASSWORD` on the Vercel production project, redeploy.
+- The lead forms push the real `generate_lead` event on a normal test submit; there is no test-name filter. Test enquiries would count as conversions unless tag hosts are blocked or GTM excludes them.
+- Three "TEST - ignore" enquiries (rfq, contact, GeM landing) are saved in production and should be excluded from lead counts.
+
+**Re-measurement plan (data needed):** 30 days of post-push-3 lead rows (clean-lead share, organisation completeness now that e-mail and buyer choice exist, attribution fields present), a fresh GA4 / Ads export once the tag fixes are made, and the sales-outcome sheet from section 7.
