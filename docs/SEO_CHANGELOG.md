@@ -117,3 +117,16 @@ B4 notes: on /products/* pages og:title and twitter:title follow the `<title>` (
 | /gem-oem-authorization | twitter:title / twitter:description | inherited "Best ..." | = its own og tags | B5 | {B5} | same |
 
 Checked and left as is (already own og:url and own social title): /gem-approved-fogging-machine-oem, /past-performance-government, /blog.
+
+### E4 Organization node (JSON-LD, every page; not in the title/meta budget)
+
+| URL | field | old | new | reason | commit | rollback |
+|---|---|---|---|---|---|---|
+| all pages (GlobalJsonLd in the root layout) | Organization JSON-LD | built inline in components/seo/GlobalJsonLd.tsx | built by `buildOrganizationNode()` in the new `lib/seo/organization.ts` (single source, `@id` https://www.100xcircle.com/#organization unchanged) | E4: one consistent node | {E4} | `git revert {E4}` |
+| same | sameAs | social profiles + gem.gov.in + udyamregistration.gov.in + /ai/about-100x + /ai/entity-graph | social profiles only (admin social links; defaults YouTube, Facebook, Instagram, LinkedIn, X), de-duplicated | generic portals and own pages are not profiles of the company (OPEN_FACTS 14) | {E4} | same |
+| same | hasCredential / identifier | ISO 9001:2015, CE, ISI, MSME/UDYAM, GeM; identifier list (MSME, GeM, NAICS) | ISI (owner-confirmed) and GeM seller registration only; identifier list removed (NAICS stays in `naics`) | no ISO / CE / Udyam certificate on file (OPEN_FACTS 11-13) | {E4} | same |
+| same | description | "...GeM-listed, ISO 9001 certified, MSME/UDYAM registered... Distributed across 50+ Indian locations. Export to South Asia, Africa, and the Middle East." | "...in business since 2020. Machines are sold directly and through the Government e-Marketplace (GeM). Factory at IMT Manesar, Gurugram, Haryana." | facts only | {E4} | same |
+| same | areaServed | India, South Asia, Middle East, Africa | India | export markets not in FACTS (OPEN_FACTS 22) | {E4} | same |
+| same | added / removed | contactPoint `contactOption: TollFree`; `numberOfEmployees` 25-100 | removed (mobile numbers are not toll-free; headcount unverified); `address` (PostalAddress from site-config) added | accuracy | {E4} | same |
+
+LocalBusiness and WebSite nodes in GlobalJsonLd.tsx were not touched (B3 / structured-data batch owns LocalBusiness).

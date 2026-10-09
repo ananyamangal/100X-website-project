@@ -43,3 +43,4 @@ Question for the owner: what is the real turnaround from request to signed lette
 - Machine-dispatch lead times ("5–10 working days", "24–72h transit" on UP/Bihar pages) are a separate promise from spare-part dispatch; not in FACTS.
 
 - 21: /past-performance-government meta + og description still say "80+ departments across 15+ states" (protected hub meta, left unchanged) — owner to approve a meta fix.
+- 22: Export markets (South Asia, Africa, Middle East) appear in llms.txt history, /api/ai/company and old schema but are not in FACTS.md. Which countries have actually been supplied? Until answered, the Organization schema (E4, 2026-10-09) says areaServed India only and the new llms.txt does not claim exports.
