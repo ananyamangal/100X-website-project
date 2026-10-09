@@ -6,8 +6,11 @@ import { test, expect, type Page } from "@playwright/test"
 
 type Body = Record<string, unknown>
 
-// Centre the button first: on phones the fixed header / bottom CTA bar can cover an edge-scrolled button.
+// Centre the button first: on phones the fixed header / bottom CTA bar can cover an edge-scrolled button,
+// and the floating product video (if shown) can cover a centred one, so close it like a visitor would.
 async function submit(form: import("@playwright/test").Locator) {
+  const closeVideo = form.page().getByRole("button", { name: /close video/i })
+  if (await closeVideo.isVisible()) await closeVideo.click()
   const btn = form.locator('button[type="submit"]')
   await btn.evaluate((el) => el.scrollIntoView({ block: "center" }))
   await btn.click()
