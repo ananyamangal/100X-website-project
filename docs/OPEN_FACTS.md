@@ -43,8 +43,8 @@ Question for the owner: what is the real turnaround from request to signed lette
 - Machine-dispatch lead times ("5–10 working days", "24–72h transit" on UP/Bihar pages) are a separate promise from spare-part dispatch; not in FACTS.
 
 - 21: /past-performance-government meta + og description still say "80+ departments across 15+ states" (protected hub meta, left unchanged) — owner to approve a meta fix.
-- 22: Export markets (South Asia, Africa, Middle East) appear in llms.txt history, /api/ai/company and old schema but are not in FACTS.md. Which countries have actually been supplied? Until answered, the Organization schema (E4, 2026-10-09) says areaServed India only and the new llms.txt does not claim exports.
+- 22: Export markets (South Asia, Africa, Middle East): kept as published per owner rule (2026-10-09) in llms.txt and the Organization schema; owner may confirm the countries.
 - 23: The 100XHBL22 database record still stores the HM20 SEO title and meta description (and its short description repeats HM20 wording). Batch 5 (B4) masks this in code (`lib/seo/product-seo-overrides.ts`); the clean fix is to correct the record in the admin, after which the override switches itself off. Owner/admin action, no fact needed.
 - 24: On-site operator training on delivery: is it offered, and where? The new guides (E5) say "we share the operating manual, operator demo videos and maintenance guidance with every supply; on-site training: ask when you order".
-- 25: Machine dispatch lead time for new machines (the site says "5-10 working days" in places) is not in FACTS.md; llms.txt (E1) no longer states it.
-- 26: Price comparisons removed from llms.txt (E1): "3-5x lower cost than Korean imports", "40-60% cost advantage vs European". Kept off until a source is given.
+- 25: Machine dispatch lead time "5-10 working days for in-stock models": kept as published per owner rule (2026-10-09) in llms.txt; owner may confirm.
+- 26: Price comparisons ("3-5x lower cost" vs Korean imports, "40-60% cost advantage" vs European): kept as published per owner rule (2026-10-09) in llms.txt; owner may confirm.
