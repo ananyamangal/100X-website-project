@@ -221,7 +221,6 @@ export function buildOrganizationNode(socialLinks?: SocialLinks) {
       { "@type": "AdministrativeArea", name: "Africa" },
     ],
     numberOfEmployees: { "@type": "QuantitativeValue", minValue: 25, maxValue: 100 },
-    numberOfEmployees: { "@type": "QuantitativeValue", minValue: 25, maxValue: 100 },
     naics: "333999",
     isicV4: "2819",
     slogan: "100X your productivity with Indian-made fogging technology",
