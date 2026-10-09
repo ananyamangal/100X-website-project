@@ -44,3 +44,7 @@ Question for the owner: what is the real turnaround from request to signed lette
 
 - 21: /past-performance-government meta + og description still say "80+ departments across 15+ states" (protected hub meta, left unchanged) — owner to approve a meta fix.
 - 22: Export markets (South Asia, Africa, Middle East) appear in llms.txt history, /api/ai/company and old schema but are not in FACTS.md. Which countries have actually been supplied? Until answered, the Organization schema (E4, 2026-10-09) says areaServed India only and the new llms.txt does not claim exports.
+- 23: The 100XHBL22 database record still stores the HM20 SEO title and meta description (and its short description repeats HM20 wording). Batch 5 (B4) masks this in code (`lib/seo/product-seo-overrides.ts`); the clean fix is to correct the record in the admin, after which the override switches itself off. Owner/admin action, no fact needed.
+- 24: On-site operator training on delivery: is it offered, and where? The new guides (E5) say "we share the operating manual, operator demo videos and maintenance guidance with every supply; on-site training: ask when you order".
+- 25: Machine dispatch lead time for new machines (the site says "5-10 working days" in places) is not in FACTS.md; llms.txt (E1) no longer states it.
+- 26: Price comparisons removed from llms.txt (E1): "3-5x lower cost than Korean imports", "40-60% cost advantage vs European". Kept off until a source is given.

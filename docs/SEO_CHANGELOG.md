@@ -84,23 +84,23 @@ Non-product pages that carried Product schema (all fixed above): the 9 landing p
 - Not protected, 316c74f changes kept: /ai/about-100x, /ai/entity-graph, /ai/product-catalog, /factory, /make-in-india-fogging-machine, /municipal-fogging-programme, /vector-control-equipment.
 ## Batch 5 (2026-10-09, branch overnight/batch5): B4, B5, E1-E5
 
-Title/meta budget for this batch: at most 12 URLs with a changed `<title>` or meta description. Used: **8** (all B4 rows below). Social tags (og/twitter), JSON-LD, llms.txt, API and new pages are outside the budget and listed separately. Commit hashes: see the `commit` column (`{B4}` etc. are filled in by the last commit of the batch).
+Title/meta budget for this batch: at most 12 URLs with a changed `<title>` or meta description. Used: **8** (all B4 rows below). Social tags (og/twitter), JSON-LD, llms.txt, API and new pages are outside the budget and listed separately. Commit hashes are in the `commit` column.
 
 | URL | field | old | new | reason | commit | rollback |
 |---|---|---|---|---|---|---|
-| /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhbl22-c-ea7f75 (Tier A) | title | "ISI marked Thermal Fogging Machine with HDPE Tanks \| India Manufacturer \| 100X" (78, identical to HM20) | "ISI Marked Thermal Fogging Machine HDPE Tank 100XHBL22 \| 100X" (61) | B4: duplicate of HM20, too long, no model. Ranking words kept. Applied in code (`lib/seo/product-seo-overrides.ts`), DB untouched | {B4} | `git revert {B4}` |
-| same | meta description | "ISI marked Thermal Fogging Machine with HDPE tank-100XHM20 : fogging machines for Municipal mosquito and vector control (dengue, malaria, chikungunya pr…" | "100XHBL22 pulse jet thermal fogging machine, ISI marked, with HDPE tanks: 6 L solution tank, 2 L fuel tank, 30-40 L/hr output. For municipal vector control." | B4: named the wrong model (HM20) and was cut off. Specs from this product's DB record | {B4} | same |
-| /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde | title | "ISI marked Thermal Fogging Machine with HDPE Tanks \| India Manufacturer \| 100X" (78) | "ISI Marked Thermal Fogging Machine HDPE Tank 100XHM20 \| 100X" (60) | B4: too long, no model, duplicate of HBL22 | {B4} | same |
-| same | meta description | "...(dengue, malaria, chikungunya pr…" (cut off) | "100XHM20 ISI marked thermal fogging machine with HDPE tanks: 5.5 L solution tank, 2 L fuel tank, 30-40 L/hr adjustable output. For municipal vector control." | B4: truncated mid-word | {B4} | same |
-| /products/ulv-cold-fogger-machine-100xmcf42-copy-8dcd42lvlv (Tier B) | title | "ULV Cold fogger machine wi \| India Manufacturer \| 100X" | "ULV Cold Fogger Machine 100XULV22 \| India Manufacturer \| 100X" (61) | B4: truncated title, model added. Meta unchanged (no defect) | {B4} | same |
-| /products/100xulvss10-5e46c5 | title | "100XULVSS10 \| 100x Circle" (fallback; DB field empty) | "ULV Electric Cold Fogger 100XULVSS10 \| 100x Circle" (50) | B4: title was the model code only | {B4} | same |
-| same | meta description | "Ulv electric cold fogger / Mist Sprayer" (fallback) | "100XULVSS10 ULV electric cold fogger and mist sprayer: 240 V AC, 5 L chemical tank, 0.5-30 micron adjustable droplets. For hospitals and food facilities." | B4: 39-char fragment | {B4} | same |
-| /products/cold-fogger-machine-with-2-stoke-engine-100xmcf42-c42ca1 (Tier B) | title | "Cold fogger machine with 2 stoke engine \| India Manufacturer \| 100X" (67) | "Cold Fogger Machine with 2 Stroke Engine 100XMCF42 \| 100X" (57) | B4: typo "stoke", too long, no model. Slug unchanged | {B4} | same |
-| same | meta description | "...(dengue, malaria, chikungunya prevention) & Disinfect" (cut off) | "100XMCF42 cold fogger machine with a 2-stroke petrol engine: 14 L chemical tank, 20-100 micron adjustable droplets. For mosquito control and disinfection." | B4: truncated | {B4} | same |
-| /products/passenger-baggage-trolleys-stainless-steel-with-brakes-100xats | title | "Passenger Baggage Trolleys Stainless  \| India Manufacturer \| 100X" | "Passenger Baggage Trolleys Stainless Steel 100XATS \| 100X" (57) | B4: truncated title, model added | {B4} | same |
-| same | meta description | "...OEM manufacturer i…" (cut off) | "Passenger baggage trolleys 100XATS in grade 304 stainless steel with foot-operated locking brakes, 150 kg load. For airports, railway stations and hotels." | B4: truncated | {B4} | same |
-| /double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400 (Tier B) | title (and og/twitter title, which follow it) | "Buy Double Barrel Thermal Fogging Machine \| 100x Circle" | "Buy Double Barrel Thermal Fogging Machine 100XDB400 \| 100X" (58) | B4: model number added; `displayName` pinned so footer/breadcrumb labels do not change | {B4} | same |
-| /thermal-fogging-machine-with-stainless-steel-tank-100xssma20 (Tier B) | title (and og/twitter title) | "Buy Stainless Steel Tank Thermal Fogger \| 100x Circle" | "Buy Stainless Steel Tank Thermal Fogger 100XSSMA20 \| 100X" (57) | B4: model number added; `displayName` pinned | {B4} | same |
+| /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhbl22-c-ea7f75 (Tier A) | title | "ISI marked Thermal Fogging Machine with HDPE Tanks \| India Manufacturer \| 100X" (78, identical to HM20) | "ISI Marked Thermal Fogging Machine HDPE Tank 100XHBL22 \| 100X" (61) | B4: duplicate of HM20, too long, no model. Ranking words kept. Applied in code (`lib/seo/product-seo-overrides.ts`), DB untouched | e84aa7f | `git revert e84aa7f` |
+| same | meta description | "ISI marked Thermal Fogging Machine with HDPE tank-100XHM20 : fogging machines for Municipal mosquito and vector control (dengue, malaria, chikungunya pr…" | "100XHBL22 pulse jet thermal fogging machine, ISI marked, with HDPE tanks: 6 L solution tank, 2 L fuel tank, 30-40 L/hr output. For municipal vector control." | B4: named the wrong model (HM20) and was cut off. Specs from this product's DB record | e84aa7f | same |
+| /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde | title | "ISI marked Thermal Fogging Machine with HDPE Tanks \| India Manufacturer \| 100X" (78) | "ISI Marked Thermal Fogging Machine HDPE Tank 100XHM20 \| 100X" (60) | B4: too long, no model, duplicate of HBL22 | e84aa7f | same |
+| same | meta description | "...(dengue, malaria, chikungunya pr…" (cut off) | "100XHM20 ISI marked thermal fogging machine with HDPE tanks: 5.5 L solution tank, 2 L fuel tank, 30-40 L/hr adjustable output. For municipal vector control." | B4: truncated mid-word | e84aa7f | same |
+| /products/ulv-cold-fogger-machine-100xmcf42-copy-8dcd42lvlv (Tier B) | title | "ULV Cold fogger machine wi \| India Manufacturer \| 100X" | "ULV Cold Fogger Machine 100XULV22 \| India Manufacturer \| 100X" (61) | B4: truncated title, model added. Meta unchanged (no defect) | e84aa7f | same |
+| /products/100xulvss10-5e46c5 | title | "100XULVSS10 \| 100x Circle" (fallback; DB field empty) | "ULV Electric Cold Fogger 100XULVSS10 \| 100x Circle" (50) | B4: title was the model code only | e84aa7f | same |
+| same | meta description | "Ulv electric cold fogger / Mist Sprayer" (fallback) | "100XULVSS10 ULV electric cold fogger and mist sprayer: 240 V AC, 5 L chemical tank, 0.5-30 micron adjustable droplets. For hospitals and food facilities." | B4: 39-char fragment | e84aa7f | same |
+| /products/cold-fogger-machine-with-2-stoke-engine-100xmcf42-c42ca1 (Tier B) | title | "Cold fogger machine with 2 stoke engine \| India Manufacturer \| 100X" (67) | "Cold Fogger Machine with 2 Stroke Engine 100XMCF42 \| 100X" (57) | B4: typo "stoke", too long, no model. Slug unchanged | e84aa7f | same |
+| same | meta description | "...(dengue, malaria, chikungunya prevention) & Disinfect" (cut off) | "100XMCF42 cold fogger machine with a 2-stroke petrol engine: 14 L chemical tank, 20-100 micron adjustable droplets. For mosquito control and disinfection." | B4: truncated | e84aa7f | same |
+| /products/passenger-baggage-trolleys-stainless-steel-with-brakes-100xats | title | "Passenger Baggage Trolleys Stainless  \| India Manufacturer \| 100X" | "Passenger Baggage Trolleys Stainless Steel 100XATS \| 100X" (57) | B4: truncated title, model added | e84aa7f | same |
+| same | meta description | "...OEM manufacturer i…" (cut off) | "Passenger baggage trolleys 100XATS in grade 304 stainless steel with foot-operated locking brakes, 150 kg load. For airports, railway stations and hotels." | B4: truncated | e84aa7f | same |
+| /double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400 (Tier B) | title (and og/twitter title, which follow it) | "Buy Double Barrel Thermal Fogging Machine \| 100x Circle" | "Buy Double Barrel Thermal Fogging Machine 100XDB400 \| 100X" (58) | B4: model number added; `displayName` pinned so footer/breadcrumb labels do not change | e84aa7f | same |
+| /thermal-fogging-machine-with-stainless-steel-tank-100xssma20 (Tier B) | title (and og/twitter title) | "Buy Stainless Steel Tank Thermal Fogger \| 100x Circle" | "Buy Stainless Steel Tank Thermal Fogger 100XSSMA20 \| 100X" (57) | B4: model number added; `displayName` pinned | e84aa7f | same |
 
 B4 notes: on /products/* pages og:title and twitter:title follow the `<title>` (no stored og fields), so they change with it. No H1 was changed: both HDPE pages already show the correct model in their H1 (the mismatch was only in HBL22's title and meta). 100XTFS50 (title already has the model) and 100XBF102 ("100XBF102 \| Mini Fogger", no defect) were left alone.
 
@@ -108,13 +108,13 @@ B4 notes: on /products/* pages og:title and twitter:title follow the `<title>` (
 
 | URL | field | old | new | reason | commit | rollback |
 |---|---|---|---|---|---|---|
-| site-wide default (every page without its own og/twitter title, incl. /) | og:title, twitter:title | "Best Thermal Fogging Machine Manufacturer \| 100x Circle" | "Thermal Fogging Machine Manufacturer in India \| 100x Circle" | B5: stop the inherited "Best ..." title. Default descriptions (with "agriculture"/"agricultural") unchanged | {B5} | `git revert {B5}` |
-| /case-studies | og:title / og:description / og:url / twitter:* | inherited: "Best ..." title, homepage description, og:url = https://www.100xcircle.com | own: "Fogging Machine Case Studies: Government & Municipal Supply \| 100X Circle"; "Case studies of 100X Circle fogging machines supplied to municipal corporations, health departments, defence units and agricultural cooperatives in India."; og:url = /case-studies | B5: wrong og:url, inherited title | {B5} | same |
-| /knowledge | og:title / og:description / og:url / twitter:* | inherited (same as above, og:url = homepage) | own: "Knowledge Hub: Thermal Fogging & Vector Control Guides \| 100X Circle"; "Guides on thermal and cold fogging, mosquito and vector control, chemicals, maintenance, safety and buying fogging machines through GeM, by 100X Circle."; og:url = /knowledge | B5 | {B5} | same |
-| /spare-parts | twitter:title / twitter:description | inherited "Best ..." / homepage text | = its own og tags ("Spare Parts \| 100X Circle") | B5 | {B5} | same |
-| /products | twitter:title / twitter:description | "Products \| 100x Circle" / "Thermal fogging machines and agricultural equipment from 100x Circle." (from products/layout.tsx) | = its own og tags ("Fogging Machines & Agricultural Equipment \| 100X Circle"; agricultural wording kept) | B5 | {B5} | same |
-| /oem-authorization-letter | twitter:title / twitter:description | inherited "Best ..." | = its own og tags | B5 | {B5} | same |
-| /gem-oem-authorization | twitter:title / twitter:description | inherited "Best ..." | = its own og tags | B5 | {B5} | same |
+| site-wide default (every page without its own og/twitter title, incl. /) | og:title, twitter:title | "Best Thermal Fogging Machine Manufacturer \| 100x Circle" | "Thermal Fogging Machine Manufacturer in India \| 100x Circle" | B5: stop the inherited "Best ..." title. Default descriptions (with "agriculture"/"agricultural") unchanged | dc49217 | `git revert dc49217` |
+| /case-studies | og:title / og:description / og:url / twitter:* | inherited: "Best ..." title, homepage description, og:url = https://www.100xcircle.com | own: "Fogging Machine Case Studies: Government & Municipal Supply \| 100X Circle"; "Case studies of 100X Circle fogging machines supplied to municipal corporations, health departments, defence units and agricultural cooperatives in India."; og:url = /case-studies | B5: wrong og:url, inherited title | dc49217 | same |
+| /knowledge | og:title / og:description / og:url / twitter:* | inherited (same as above, og:url = homepage) | own: "Knowledge Hub: Thermal Fogging & Vector Control Guides \| 100X Circle"; "Guides on thermal and cold fogging, mosquito and vector control, chemicals, maintenance, safety and buying fogging machines through GeM, by 100X Circle."; og:url = /knowledge | B5 | dc49217 | same |
+| /spare-parts | twitter:title / twitter:description | inherited "Best ..." / homepage text | = its own og tags ("Spare Parts \| 100X Circle") | B5 | dc49217 | same |
+| /products | twitter:title / twitter:description | "Products \| 100x Circle" / "Thermal fogging machines and agricultural equipment from 100x Circle." (from products/layout.tsx) | = its own og tags ("Fogging Machines & Agricultural Equipment \| 100X Circle"; agricultural wording kept) | B5 | dc49217 | same |
+| /oem-authorization-letter | twitter:title / twitter:description | inherited "Best ..." | = its own og tags | B5 | dc49217 | same |
+| /gem-oem-authorization | twitter:title / twitter:description | inherited "Best ..." | = its own og tags | B5 | dc49217 | same |
 
 Checked and left as is (already own og:url and own social title): /gem-approved-fogging-machine-oem, /past-performance-government, /blog.
 
@@ -122,34 +122,34 @@ Checked and left as is (already own og:url and own social title): /gem-approved-
 
 | URL | field | old | new | reason | commit | rollback |
 |---|---|---|---|---|---|---|
-| all pages (GlobalJsonLd in the root layout) | Organization JSON-LD | built inline in components/seo/GlobalJsonLd.tsx | built by `buildOrganizationNode()` in the new `lib/seo/organization.ts` (single source, `@id` https://www.100xcircle.com/#organization unchanged) | E4: one consistent node | {E4} | `git revert {E4}` |
-| same | sameAs | social profiles + gem.gov.in + udyamregistration.gov.in + /ai/about-100x + /ai/entity-graph | social profiles only (admin social links; defaults YouTube, Facebook, Instagram, LinkedIn, X), de-duplicated | generic portals and own pages are not profiles of the company (OPEN_FACTS 14) | {E4} | same |
-| same | hasCredential / identifier | ISO 9001:2015, CE, ISI, MSME/UDYAM, GeM; identifier list (MSME, GeM, NAICS) | ISI (owner-confirmed) and GeM seller registration only; identifier list removed (NAICS stays in `naics`) | no ISO / CE / Udyam certificate on file (OPEN_FACTS 11-13) | {E4} | same |
-| same | description | "...GeM-listed, ISO 9001 certified, MSME/UDYAM registered... Distributed across 50+ Indian locations. Export to South Asia, Africa, and the Middle East." | "...in business since 2020. Machines are sold directly and through the Government e-Marketplace (GeM). Factory at IMT Manesar, Gurugram, Haryana." | facts only | {E4} | same |
-| same | areaServed | India, South Asia, Middle East, Africa | India | export markets not in FACTS (OPEN_FACTS 22) | {E4} | same |
-| same | added / removed | contactPoint `contactOption: TollFree`; `numberOfEmployees` 25-100 | removed (mobile numbers are not toll-free; headcount unverified); `address` (PostalAddress from site-config) added | accuracy | {E4} | same |
+| all pages (GlobalJsonLd in the root layout) | Organization JSON-LD | built inline in components/seo/GlobalJsonLd.tsx | built by `buildOrganizationNode()` in the new `lib/seo/organization.ts` (single source, `@id` https://www.100xcircle.com/#organization unchanged) | E4: one consistent node | 59d8f86 | `git revert 59d8f86` |
+| same | sameAs | social profiles + gem.gov.in + udyamregistration.gov.in + /ai/about-100x + /ai/entity-graph | social profiles only (admin social links; defaults YouTube, Facebook, Instagram, LinkedIn, X), de-duplicated | generic portals and own pages are not profiles of the company (OPEN_FACTS 14) | 59d8f86 | same |
+| same | hasCredential / identifier | ISO 9001:2015, CE, ISI, MSME/UDYAM, GeM; identifier list (MSME, GeM, NAICS) | ISI (owner-confirmed) and GeM seller registration only; identifier list removed (NAICS stays in `naics`) | no ISO / CE / Udyam certificate on file (OPEN_FACTS 11-13) | 59d8f86 | same |
+| same | description | "...GeM-listed, ISO 9001 certified, MSME/UDYAM registered... Distributed across 50+ Indian locations. Export to South Asia, Africa, and the Middle East." | "...in business since 2020. Machines are sold directly and through the Government e-Marketplace (GeM). Factory at IMT Manesar, Gurugram, Haryana." | facts only | 59d8f86 | same |
+| same | areaServed | India, South Asia, Middle East, Africa | India | export markets not in FACTS (OPEN_FACTS 22) | 59d8f86 | same |
+| same | added / removed | contactPoint `contactOption: TollFree`; `numberOfEmployees` 25-100 | removed (mobile numbers are not toll-free; headcount unverified); `address` (PostalAddress from site-config) added | accuracy | 59d8f86 | same |
 
 LocalBusiness and WebSite nodes in GlobalJsonLd.tsx were not touched (B3 / structured-data batch owns LocalBusiness).
 
 ### E3 answer-first summaries (new visible block; no title/meta/H1/paragraph changed)
 
-Block = `components/seo/AnswerSummary.tsx` ("In short" + 40-60 word answer + "Last updated 9 October 2026 · By 100X Circle Pvt Ltd, fogging machine manufacturer, Gurugram"). Text lives in `lib/seo/answer-summaries.ts`. Rollback for all rows: `git revert {E3}`.
+Block = `components/seo/AnswerSummary.tsx` ("In short" + 40-60 word answer + "Last updated 9 October 2026 · By 100X Circle Pvt Ltd, fogging machine manufacturer, Gurugram"). Text lives in `lib/seo/answer-summaries.ts`. Rollback for all rows: `git revert f02e5ff`.
 
 | URL | placement | protected? | commit |
 |---|---|---|---|
-| /gem-approved-fogging-machine-oem | new block directly after the hero (LandingRenderer, English only) | Tier A: additive block, hero/H1/body unchanged | {E3} |
-| /thermal-vs-cold-fogging-machine | same | Tier A: additive | {E3} |
-| /is-14855-fogging-machine | new block after the intro paragraph, before the CTA bar | Tier B: additive | {E3} |
-| /fogging-machine-government-procurement | new white band directly after the hero section | Tier B: additive | {E3} |
-| /thermal-and-cold-fogging-machine-100xtfs50 | under the H1/subhead/tagline in the product hero (new `answerSummary` prop on ProductDetailV2) | Tier A: additive | {E3} |
-| /double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400 | same | Tier B | {E3} |
-| /thermal-fogging-machine-with-stainless-steel-tank-100xssma20 | same | Tier B | {E3} |
-| /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde | same | no | {E3} |
-| /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhbl22-c-ea7f75 | same | Tier A: additive | {E3} |
-| /products/cold-fogger-machine-with-2-stoke-engine-100xmcf42-c42ca1 | same | Tier B | {E3} |
-| /products/ulv-cold-fogger-machine-100xmcf42-copy-8dcd42lvlv | same | Tier B | {E3} |
-| /products/100xulvss10-5e46c5 | same | no | {E3} |
-| /products/mini-fogger-100xbf102-2d9887 | same | Tier B | {E3} |
+| /gem-approved-fogging-machine-oem | new block directly after the hero (LandingRenderer, English only) | Tier A: additive block, hero/H1/body unchanged | f02e5ff |
+| /thermal-vs-cold-fogging-machine | same | Tier A: additive | f02e5ff |
+| /is-14855-fogging-machine | new block after the intro paragraph, before the CTA bar | Tier B: additive | f02e5ff |
+| /fogging-machine-government-procurement | new white band directly after the hero section | Tier B: additive | f02e5ff |
+| /thermal-and-cold-fogging-machine-100xtfs50 | under the H1/subhead/tagline in the product hero (new `answerSummary` prop on ProductDetailV2) | Tier A: additive | f02e5ff |
+| /double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400 | same | Tier B | f02e5ff |
+| /thermal-fogging-machine-with-stainless-steel-tank-100xssma20 | same | Tier B | f02e5ff |
+| /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde | same | no | f02e5ff |
+| /products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhbl22-c-ea7f75 | same | Tier A: additive | f02e5ff |
+| /products/cold-fogger-machine-with-2-stoke-engine-100xmcf42-c42ca1 | same | Tier B | f02e5ff |
+| /products/ulv-cold-fogger-machine-100xmcf42-copy-8dcd42lvlv | same | Tier B | f02e5ff |
+| /products/100xulvss10-5e46c5 | same | no | f02e5ff |
+| /products/mini-fogger-100xbf102-2d9887 | same | Tier B | f02e5ff |
 
 Skipped on purpose: /knowledge/* and /blog/* articles (AGENCY rule 3/4: nothing before the first content paragraph; the knowledge "government procurement guide" (Tier A) and the GeM blog guide keep their text; their topics are covered by /fogging-machine-government-procurement above and the new E5 pages). Trolley 100XATS not a key page.
 
@@ -157,9 +157,9 @@ Skipped on purpose: /knowledge/* and /blog/* articles (AGENCY rule 3/4: nothing 
 
 | URL | field | old | new | reason | commit | rollback |
 |---|---|---|---|---|---|---|
-| /fogging-machine-tender-specification-checklist | new page | 404 | "Fogging Machine Specification Checklist for Tenders \| 100X" (H1 "Fogging Machine Specifications Checklist for Tenders"), ~950 words, visible FAQ = FAQPage JSON-LD, Article JSON-LD (author/publisher = Organization @id), BreadcrumbList | E5 topic "specifications checklist for tenders"; also carries the "IS 14855 explained for procurement officers" section (links to /is-14855-fogging-machine and the IS 14855 blog) and a thermal/cold section (links to /thermal-vs-cold-fogging-machine) | {E5} | `git revert {E5}` |
-| /fogging-machine-delivery-inspection-checklist | new page | 404 | "Fogging Machine Delivery Inspection Checklist \| 100X Circle" (H1 "Fogging Machine Delivery and Acceptance Checklist"), ~810 words, same schema set | distinct query (delivery / acceptance on GeM); carries the "how to buy on GeM, step by step" section (links to /knowledge/government-procurement-guide, /gem-approved-fogging-machine-oem, the GeM blog guide) and "thermal vs cold for municipalities: what to check" | {E5} | same |
-| /sitemap.xml | 2 rows added | - | the two URLs above, lastmod 2026-10-09 (their real date, from lib/seo/procurement-guides.ts) | E5 | {E5} | same |
+| /fogging-machine-tender-specification-checklist | new page | 404 | "Fogging Machine Specification Checklist for Tenders \| 100X" (H1 "Fogging Machine Specifications Checklist for Tenders"), ~950 words, visible FAQ = FAQPage JSON-LD, Article JSON-LD (author/publisher = Organization @id), BreadcrumbList | E5 topic "specifications checklist for tenders"; also carries the "IS 14855 explained for procurement officers" section (links to /is-14855-fogging-machine and the IS 14855 blog) and a thermal/cold section (links to /thermal-vs-cold-fogging-machine) | 871b6ec | `git revert 871b6ec` |
+| /fogging-machine-delivery-inspection-checklist | new page | 404 | "Fogging Machine Delivery Inspection Checklist \| 100X Circle" (H1 "Fogging Machine Delivery and Acceptance Checklist"), ~810 words, same schema set | distinct query (delivery / acceptance on GeM); carries the "how to buy on GeM, step by step" section (links to /knowledge/government-procurement-guide, /gem-approved-fogging-machine-oem, the GeM blog guide) and "thermal vs cold for municipalities: what to check" | 871b6ec | same |
+| /sitemap.xml | 2 rows added | - | the two URLs above, lastmod 2026-10-09 (their real date, from lib/seo/procurement-guides.ts) | E5 | 871b6ec | same |
 
 Cannibalisation decisions (checked against protected_pages_union.csv and top_queries_union.csv):
 - "How to buy a fogging machine on GeM (step by step)": NOT a new page. /gem-approved-fogging-machine-oem (Tier A, "fogging machine on gem" pos 3.3), /knowledge/government-procurement-guide (Tier A) and /blog/how-to-buy-fogging-machines-on-gem-portal-a-complete-guide (Tier B) already target it. Became a section of the delivery/acceptance page with prominent links to all three.
@@ -172,8 +172,8 @@ Paths checked free: no route in app/, no landing slug, no next.config redirect, 
 
 | URL | field | old | new | reason | commit | rollback |
 |---|---|---|---|---|---|---|
-| /api/ai/knowledge | item fields | {title, url, summary, source_url?} | adds `type` (article/product/page/guide/faq), `canonical_url`, `date_modified` on every item, `date_published` where the Knowledge Base has it, `is_mirror` on copies, `model` on products, `question`/`answer` on FAQs; top-level `notes` | E2: per-item dates, mark canonical | {E2} | `git revert {E2}` |
-| same | items | 60 (live, 2026-10-09) | 78 against the same DB: +9 fogger products (incl. 100XMCF42, 100XULV22, 100XULVSS10 that had no entry), +4 key pages (GeM landing, IS 14855, government procurement, thermal vs cold), +2 procurement guides, +9 FAQ items (only FAQs visible on the guide pages); -6 Knowledge Base product mirrors (product-100xdb400/-tfs50/-hbl22/-hm20/-ssma20/-bf102) whose original product page is now listed. 33 blog mirrors stay, marked `is_mirror: true` with `canonical_url` = the blog post | E2 | {E2} | same |
+| /api/ai/knowledge | item fields | {title, url, summary, source_url?} | adds `type` (article/product/page/guide/faq), `canonical_url`, `date_modified` on every item, `date_published` where the Knowledge Base has it, `is_mirror` on copies, `model` on products, `question`/`answer` on FAQs; top-level `notes` | E2: per-item dates, mark canonical | 7ce9417 | `git revert 7ce9417` |
+| same | items | 60 (live, 2026-10-09) | 78 against the same DB: +9 fogger products (incl. 100XMCF42, 100XULV22, 100XULVSS10 that had no entry), +4 key pages (GeM landing, IS 14855, government procurement, thermal vs cold), +2 procurement guides, +9 FAQ items (only FAQs visible on the guide pages); -6 Knowledge Base product mirrors (product-100xdb400/-tfs50/-hbl22/-hm20/-ssma20/-bf102) whose original product page is now listed. 33 blog mirrors stay, marked `is_mirror: true` with `canonical_url` = the blog post | E2 | 7ce9417 | same |
 
 Implementation: new pure `lib/knowledge/feed-v2.ts` on top of the unchanged `mergeKnowledgeFeed`; route `app/api/ai/[entity]/route.ts` (knowledge case only). No ISO/CE claims or certificate numbers added.
 
@@ -181,5 +181,5 @@ Implementation: new pure `lib/knowledge/feed-v2.ts` on top of the unchanged `mer
 
 | URL | field | old | new | reason | commit | rollback |
 |---|---|---|---|---|---|---|
-| /llms.txt | whole file | "Founded 2014"; ISO 9001 / CE / MSME claims; "13 models"; 5 product URLs that 404 or 301 (BF-150, BF-200, BF-400, Minisuper Classic/New); export and price-multiple claims ("3-5x lower cost", "40-60% cost advantage"); no date, no FAQ | rewritten from the live catalogue (9 fogger models with each model's own DB specs + trolley + power tiller), FACTS.md ("since 2020", 24-hour reply, 24-48 h spares, 120+ parts, GeM Seller ID optional, IS 14855 "built to the requirements; test report on request", ISI on HM20/HBL22), owner-confirmed published numbers, services, the GeM path (6 URLs), the 2 new guides, contact, FAQ (8 Q&A), "Last updated: 2026-10-09" | E1 | {E1} | `git revert {E1}` |
-| same | URLs | 48 unique (43 returned 200, 5 dead) | all 43 valid URLs kept; 5 dead removed; added 26 that return 200 on live (GeM landing, OEM letter, past performance, spare parts, gov procurement, thermal vs cold, buying guide, dengue, Bihar, UP, power tiller, BF102, trolley, 10 knowledge/blog guides, /api/ai/knowledge) + the 2 new E5 pages (404 until this branch is deployed) | E1 | {E1} | same |
+| /llms.txt | whole file | "Founded 2014"; ISO 9001 / CE / MSME claims; "13 models"; 5 product URLs that 404 or 301 (BF-150, BF-200, BF-400, Minisuper Classic/New); export and price-multiple claims ("3-5x lower cost", "40-60% cost advantage"); no date, no FAQ | rewritten from the live catalogue (9 fogger models with each model's own DB specs + trolley + power tiller), FACTS.md ("since 2020", 24-hour reply, 24-48 h spares, 120+ parts, GeM Seller ID optional, IS 14855 "built to the requirements; test report on request", ISI on HM20/HBL22), owner-confirmed published numbers, services, the GeM path (6 URLs), the 2 new guides, contact, FAQ (8 Q&A), "Last updated: 2026-10-09" | E1 | 180de88 | `git revert 180de88` |
+| same | URLs | 48 unique (43 returned 200, 5 dead) | all 43 valid URLs kept; 5 dead removed; added 26 that return 200 on live (GeM landing, OEM letter, past performance, spare parts, gov procurement, thermal vs cold, buying guide, dengue, Bihar, UP, power tiller, BF102, trolley, 10 knowledge/blog guides, /api/ai/knowledge) + the 2 new E5 pages (404 until this branch is deployed) | E1 | 180de88 | same |
