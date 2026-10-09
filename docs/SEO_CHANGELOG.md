@@ -194,3 +194,13 @@ Implementation: new pure `lib/knowledge/feed-v2.ts` on top of the unchanged `mer
 
 The E4 rows above that say "removed" (sameAs, hasCredential/identifier, description, areaServed, numberOfEmployees) are superseded by this table.
 
+
+### B10 Performance (2026-10-09) -- performance-only, no SEO-surface change
+
+performance-only, no SEO-surface change: no visible text, heading, title, meta description, canonical, robots, JSON-LD, internal link, sitemap, llms.txt, URL or redirect was touched; alt text unchanged. Only image delivery URLs/attributes and <head> image preloads changed.
+
+| change | files | commit | rollback |
+|---|---|---|---|
+| Home hero: preload URL now computed by the same helper the hero <img> uses (old preload read raw `banners[0]`, ignoring isActive/order/*BannerEnabled); preloads + first-slide hero imgs get fetchpriority=high; site-wide `/banner-*.jpg` preloads removed from SiteShell (an unused ~80 KB download on every non-home page) and emitted on the homepage only | lib/heroBanner.ts (new, unit-tested), components/home/HeroBlock.tsx, components/home/HomePageClient.tsx, app/(site)/(home)/page.tsx, components/layout/SiteShell.tsx | ac7f776 | `git revert ac7f776` |
+| Product gallery thumbnails (above the fold, were 1-1.6 MB originals), product chapters/deployments/spare-part cards and homepage accreditation logos request width-capped f_auto/q_auto Cloudinary renditions | components/product/ProductDetailV2.tsx, components/home/AccreditationsStrip.tsx | e3396d0 | `git revert e3396d0` |
+| Video popup poster painted via <canvas> from the (hidden, unchanged) <img>, so the late corner overlay is no longer reported as LCP on /products, /case-studies, /gem-approved-fogging-machine-oem | components/VideoPopup.tsx | 65a8bed | `git revert 65a8bed` |
