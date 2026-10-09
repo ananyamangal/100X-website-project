@@ -186,7 +186,7 @@ export default function DengueFoggingPage() {
               </thead>
               <tbody>
                 {[
-                  ["Droplet size", "10–30 microns VMD", "Depends on the model; see each product's specifications"],
+                  ["Droplet size", "10–30 microns VMD", "1–50 microns (peak at 15–25 microns)"],
                   ["Output rate", "Sufficient for planned area", "Up to 80 litres/hour"],
                   ["Penetration", "Reaches resting sites in vegetation", "Sub-25 micron fog penetrates dense cover"],
                   ["Fuel type", "Safe, reliable operation", "Petroleum (kerosene/petrol depending on model)"],

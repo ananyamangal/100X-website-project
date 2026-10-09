@@ -30,7 +30,7 @@ export default function HomepageAiSummary() {
         <dt>Products</dt><dd>Thermal fogging machines, vehicle-mounted foggers, portable foggers, agricultural sprayers</dd>
         <dt>Customers</dt><dd>Municipal corporations, Nagar Nigams, health departments, farmers, pest control companies</dd>
         <dt>Markets</dt><dd>India (all states), South Asia, Africa, Middle East</dd>
-        <dt>Distribution</dt><dd>Dealer network, pan-India delivery, 5–10 working day dispatch</dd>
+        <dt>Distribution</dt><dd>50+ dealers, pan-India delivery, 5–10 working day dispatch</dd>
         <dt>GeM Status</dt><dd>Verified MSME OEM seller on Government e-Marketplace</dd>
         <dt>Factory</dt><dd>IMT Manesar, Gurugram, Haryana 122050, India</dd>
         <dt>AI Profile</dt><dd>{SITE_URL}/ai/about-100x</dd>

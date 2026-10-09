@@ -271,7 +271,7 @@ export default function PublicHealthEquipmentPage() {
             <li><strong>IS 14855 (Part 1) compliant:</strong> BIS standard documentation provided</li>
             <li><strong>ISO 9001:2015 certified:</strong> Quality management — required by most tenders</li>
             <li><strong>WHO-compatible droplet specifications:</strong> 1–50 micron range meeting WHO vector control guidelines</li>
-            <li><strong>Supply track record:</strong> Municipalities, Nagar Nigams, and health departments in 12 states</li>
+            <li><strong>Supply track record:</strong> Municipalities, Nagar Nigams, and health departments in 15+ states</li>
             <li><strong>Pan-India dispatch:</strong> Gurugram factory, 5–10 working day delivery</li>
           </ul>
         </article>

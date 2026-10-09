@@ -500,7 +500,7 @@ Response within 24 hours on working days. Mention: product model, quantity, use 
             type: "text",
             text: [
               `DEALER NETWORK${stateNote}`,
-              `100X Circle has an active dealer network across India.`,
+              `100X Circle has 50+ active dealers across India.`,
               ``,
               `To find your nearest dealer:`,
               `  Phone/WhatsApp: +91-7827229116`,

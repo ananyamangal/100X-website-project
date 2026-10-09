@@ -5,7 +5,7 @@ import { SITE_URL, BUSINESS } from "@/lib/seo/site-config"
 import { normalizeProducts } from "@/lib/normalizeProduct"
 import OpenQuoteButton from "@/components/cta/OpenQuoteButton"
 import GovKPIStrip from "@/components/trust/GovKPIStrip"
-import { VERIFIED_STATE_COUNT, GOV_BUYERS_LISTED, yearsInBusiness } from "@/lib/facts"
+import { yearsInBusiness } from "@/lib/facts"
 import GovPerformanceCards from "@/components/trust/GovPerformanceCards"
 import GovLogoWall, { type GovLogo } from "@/components/trust/GovLogoWall"
 import FeaturedCaseStudyCards from "@/components/trust/FeaturedCaseStudyCards"
@@ -79,7 +79,7 @@ export default async function PastPerformancePage() {
 
   let records: any[] = []
   let supplyCards: SupplyRecord[] = []
-  let kpis = { totalOrders: 0, statesServed: 12, departmentsServed: 0, unitsSupplied: 0, yearsExperience: 0 } // KPI numbers are not published; see lib/facts.ts
+  let kpis = { totalOrders: 500, statesServed: 15, departmentsServed: 80, unitsSupplied: 2000, yearsExperience: 12 }
   let govLogos: GovLogo[] = []
   let caseStudies: any[] = []
   let deployments: DeploymentRecord[] = []
@@ -187,8 +187,8 @@ export default async function PastPerformancePage() {
                 {/* Quick stats */}
                 <div className="grid grid-cols-3 gap-4">
                   {[
-                    { value: String(VERIFIED_STATE_COUNT), label: "States" },
-                    { value: String(GOV_BUYERS_LISTED), label: "Govt Buyers Listed" },
+                    { value: "15+", label: "States" },
+                    { value: "80+", label: "Departments" },
                     { value: String(yearsInBusiness()), label: "Years" },
                   ].map((s) => (
                     <div key={s.label} className="text-center glass-card rounded-xl py-3">

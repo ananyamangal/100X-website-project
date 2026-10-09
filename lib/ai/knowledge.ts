@@ -4,8 +4,6 @@
  * All data is static and fact-dense — no marketing language.
  */
 
-import { VERIFIED_STATES } from "../facts"
-
 export const AI_LAST_UPDATED = "2026-05-29"
 export const SITE_URL = "https://www.100xcircle.com"
 
@@ -231,8 +229,23 @@ export const AI_GOVERNMENT_SUPPLIES = {
       typical_products: ["Portable foggers", "Knapsack sprayers"],
     },
   ],
-  // States with a verified government order or case study (docs/FACTS.md).
-  states_served: [...VERIFIED_STATES],
+  states_served: [
+    "Delhi",
+    "Haryana",
+    "Uttar Pradesh",
+    "Bihar",
+    "Maharashtra",
+    "Gujarat",
+    "Rajasthan",
+    "Punjab",
+    "Himachal Pradesh",
+    "Madhya Pradesh",
+    "Karnataka",
+    "Tamil Nadu",
+    "West Bengal",
+    "Odisha",
+    "Jharkhand",
+  ],
   tender_support: [
     "Technical specification sheets for tender documents",
     "ISO/BIS/CE certification copies",

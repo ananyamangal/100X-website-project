@@ -7,7 +7,7 @@ import ScrollReveal from '@/components/cinematic/ScrollReveal'
 import BrochureLeadModal from '@/components/BrochureLeadModal'
 import { BUSINESS } from '@/lib/seo/site-config'
 import { getProductCanonicalUrl } from '@/lib/seo/product-landing-map'
-import { yearsInBusiness, FOGGER_MODEL_COUNT, GOV_BUYERS_LISTED } from '@/lib/facts'
+import { yearsInBusiness, FOGGER_MODEL_COUNT } from '@/lib/facts'
 
 const badgeLogoMap: Record<string, string> = {
   'German Technology':  '/Logos clipart 2/german technology.png',
@@ -199,7 +199,7 @@ export default function ProductsPageClient({ products }: { products: any[] }) {
             {[
               { value: String(FOGGER_MODEL_COUNT), label: 'Fogging Machine Models' },
               { value: String(yearsInBusiness()), label: 'Years Manufacturing' },
-              { value: String(GOV_BUYERS_LISTED), label: 'Government Buyers Listed' },
+              { value: '500+', label: 'Government Orders' },
               { value: 'GeM', label: 'Registered' },
             ].map((s) => (
               <div key={s.label}>

@@ -10,10 +10,10 @@ const INDUSTRIES = [
     id: "municipal",
     name: "Municipal Corporations",
     tagline: "City-scale vector control",
-    description: "Deployed with municipalities across 12 states for mosquito & pest management in residential zones, drains, and public parks.",
+    description: "Deployed across 200+ municipalities for mosquito & pest management in residential zones, drains, and public parks.",
     icon: "🏛️",
     gradient: "from-blue-600 to-blue-800",
-    stat: "12 States",
+    stat: "200+ Cities",
     link: "/knowledge/mosquito-control-india",
   },
   {

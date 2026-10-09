@@ -3,7 +3,15 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useCountUp } from "@/components/cinematic/useCountUp"
-import { FOUNDED_YEAR, yearsInBusiness, VERIFIED_STATE_COUNT, GOV_BUYERS_LISTED, CASE_STUDY_COUNT } from "@/lib/facts"
+import { yearsInBusiness } from "@/lib/facts"
+
+interface KPIs {
+  totalOrders: number
+  statesServed: number
+  departmentsServed: number
+  unitsSupplied: number
+  yearsExperience: number
+}
 
 function StatCounter({ value, suffix, label }: { value: number; suffix: string; label: string }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -24,9 +32,19 @@ function StatCounter({ value, suffix, label }: { value: number; suffix: string; 
   )
 }
 
-// The database `gov_kpis` numbers (orders / departments / units) have no records behind them and
-// are not published; tiles come from lib/facts.ts. `initialKpis` is accepted but ignored.
-export default function GovPerformanceSnapshot(_props: { initialKpis?: unknown }) {
+export default function GovPerformanceSnapshot({ initialKpis }: { initialKpis?: KPIs | null }) {
+  const [kpis, setKpis] = useState<KPIs | null>(initialKpis ?? null)
+
+  useEffect(() => {
+    if (initialKpis) return
+    fetch("/api/gov-kpis")
+      .then((r) => r.json())
+      .then((d) => setKpis(d))
+      .catch(() => {})
+  }, [initialKpis])
+
+  if (!kpis) return null
+
   return (
     <section className="py-14 md:py-18 bg-gray-50 border-t border-b border-gray-200">
       <div className="container mx-auto px-4 md:px-6">
@@ -38,16 +56,13 @@ export default function GovPerformanceSnapshot(_props: { initialKpis?: unknown }
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <StatCounter value={GOV_BUYERS_LISTED} suffix="" label="Government Buyers Listed" />
-          <StatCounter value={VERIFIED_STATE_COUNT} suffix="" label="States With Verified Orders" />
-          <StatCounter value={CASE_STUDY_COUNT} suffix="" label="Case Studies" />
-          <StatCounter value={yearsInBusiness()} suffix="" label={`Years Experience (Est. ${FOUNDED_YEAR})`} />
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 mb-8">
+          <StatCounter value={kpis.totalOrders} suffix="+" label="Government Orders" />
+          <StatCounter value={kpis.statesServed} suffix="+" label="States Served" />
+          <StatCounter value={kpis.departmentsServed} suffix="+" label="Departments" />
+          <StatCounter value={kpis.unitsSupplied} suffix="+" label="Units Supplied" />
+          <StatCounter value={yearsInBusiness()} suffix="" label="Years Experience" />
         </div>
-
-        <p className="text-center text-sm text-gray-500 mb-6">
-          Supplied to many government buyers across {VERIFIED_STATE_COUNT} states.
-        </p>
 
         <div className="text-center">
           <Link

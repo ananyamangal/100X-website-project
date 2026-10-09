@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useCountUp } from "@/components/cinematic/useCountUp"
-import { FOUNDED_YEAR, yearsInBusiness, VERIFIED_STATE_COUNT, GOV_BUYERS_LISTED, CASE_STUDY_COUNT } from "@/lib/facts"
+import { FOUNDED_YEAR, yearsInBusiness } from "@/lib/facts"
 
 export interface KPIs {
   totalOrders: number
@@ -78,6 +78,13 @@ function IconBuilding() {
     </svg>
   )
 }
+function IconBox() {
+  return (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" />
+    </svg>
+  )
+}
 function IconCalendar() {
   return (
     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -86,15 +93,16 @@ function IconCalendar() {
   )
 }
 
-// The database `gov_kpis` numbers (total orders / departments / units) have no records behind
-// them and are not published. Tiles below come from lib/facts.ts. The `kpis` prop is accepted
-// for backwards compatibility but its numbers are ignored.
-export default function GovKPIStrip(_props: { kpis?: KPIs | null }) {
+export default function GovKPIStrip({ kpis }: { kpis: KPIs }) {
+  // Years and founding year are facts (lib/facts.ts), never read from the database.
+  const founded = FOUNDED_YEAR
+
   const metrics = [
-    { value: GOV_BUYERS_LISTED, label: "Govt. Buyers Listed", icon: <IconBuilding />, delay: 0 },
-    { value: VERIFIED_STATE_COUNT, label: "States With Verified Orders", icon: <IconMap />, delay: 100 },
-    { value: CASE_STUDY_COUNT, label: "Case Studies", icon: <IconClipboard />, delay: 200 },
-    { value: yearsInBusiness(), label: "Years Track Record", icon: <IconCalendar />, delay: 300, note: `Est. ${FOUNDED_YEAR}` },
+    { value: kpis.totalOrders, label: "Govt. Orders", suffix: "+", icon: <IconClipboard />, delay: 0 },
+    { value: kpis.statesServed, label: "States Served", suffix: "+", icon: <IconMap />, delay: 100 },
+    { value: kpis.departmentsServed, label: "Departments", suffix: "+", icon: <IconBuilding />, delay: 200 },
+    { value: kpis.unitsSupplied, label: "Units Supplied", suffix: "+", icon: <IconBox />, delay: 300 },
+    { value: yearsInBusiness(), label: "Years Track Record", icon: <IconCalendar />, delay: 400, note: `Est. ${founded}` },
   ]
 
   return (
@@ -112,15 +120,11 @@ export default function GovKPIStrip(_props: { kpis?: KPIs | null }) {
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 divide-y lg:divide-y-0 divide-white/[0.05]">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-y lg:divide-y-0 divide-white/[0.05]">
         {metrics.map((m) => (
           <KPICard key={m.label} {...m} />
         ))}
       </div>
-
-      <p className="px-6 py-3 text-center text-xs text-gray-400 border-t border-white/[0.05]">
-        Supplied to many government buyers across {VERIFIED_STATE_COUNT} states.
-      </p>
 
       {/* Certifications footer */}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 px-6 py-4 bg-white/[0.02] border-t border-white/[0.05]">

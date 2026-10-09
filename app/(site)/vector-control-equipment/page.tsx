@@ -216,7 +216,7 @@ export default function VectorControlEquipmentPage() {
           </p>
           <ul>
             <li>IS 14855 (Part 1) compliant — meets BIS standard for government procurement</li>
-            <li>WHO droplet size (VMD): 10–30 microns for adult mosquito control</li>
+            <li>WHO droplet size range: 1–50 microns (peak 10–25 microns)</li>
             <li>Compatible with deltamethrin, cypermethrin, malathion, permethrin in oil base</li>
             <li>Price range: ₹6,500 (mini portable) to ₹2,50,000 (vehicle-mounted dual-barrel)</li>
           </ul>
