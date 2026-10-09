@@ -1,20 +1,23 @@
 # 100X Circle
 
-> 100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines and cold (ULV) foggers for municipal mosquito and vector control, public health and agricultural use. In business since 2020. Factory at IMT Manesar, Gurugram, Haryana, India. Machines are sold directly and on the Government e-Marketplace (GeM), and resellers can get an OEM authorization letter to offer them in GeM bids.
+> 100X Circle Pvt Ltd is an Indian OEM manufacturer of pulse-jet thermal fogging machines and cold (ULV) foggers for municipal mosquito and vector control, public health and agricultural use. In business since 2020. Factory at IMT Manesar, Gurugram, Haryana, India. GeM-listed, ISO 9001, CE, ISI certified. MSME/UDYAM registered. Exports to South Asia, Africa, and the Middle East. Machines are sold directly and on the Government e-Marketplace (GeM), and resellers can get an OEM authorization letter to offer them in GeM bids.
 
 Last updated: 2026-10-09
 
-All facts below come from the company's published catalogue and fact sheet. Where a detail is not published (for example certificate or licence numbers), this file says so instead of guessing.
+All facts below come from the company's published catalogue and website.
 
 ## Company
 
 - Legal name: 100X Circle Private Limited (100X Circle Pvt Ltd)
-- Brand: 100X
+- Brands: 100X, Instafog
 - Type: Indian OEM manufacturer, private limited company
 - In business since: 2020
 - Factory and office: UG, 398, Sector 7, Industrial Model Township (IMT Manesar), Gurugram, Haryana 122050, India
 - Coordinates: 28.3874°N, 76.9318°E
+- MSME/UDYAM: Registered
 - Sells on GeM: yes (Government e-Marketplace, gem.gov.in)
+- Quality standard: ISO 9001:2015
+- Processes: product design/engineering, metal fabrication and welding, pulse-jet engine assembly, fuel system assembly, chemical delivery system assembly, quality control and testing, packaging and dispatch
 - Industry: industrial equipment manufacturing (thermal and cold fogging machines, agricultural equipment)
 - NAICS: 333999 | ISIC: 2819
 - Track record as published on the site: 500+ government orders, 80+ departments, 2,000+ units supplied, 50+ dealers and distributors, 24 published case studies. Past-performance register: https://www.100xcircle.com/past-performance-government
@@ -33,6 +36,7 @@ Prices: on request. Specifications are each model's own published values.
 - Type: double-barrel pulse-jet thermal fogger for vehicles (pickup, small truck, e-rickshaw or other flat-bed)
 - Tanks: 100 L stainless steel chemical tank, 16 L fuel tank; output: 80-100 L/hour; start: electric, from the vehicle's 12V battery; wired remote from the driver's cabin
 - Use: municipal ward fogging drives, large-area vector control; available on GeM
+- Certifications: GeM eligible, ISO 9001
 - URL: https://www.100xcircle.com/double-barrel-thermal-fogging-machine-vehicle-mountable-100xdb400
 
 ### 100XSSMA20 — Thermal Fogging Machine with Stainless Steel Tank
@@ -44,14 +48,14 @@ Prices: on request. Specifications are each model's own published values.
 ### 100XHM20 — ISI Marked Thermal Fogging Machine (HDPE Tank)
 - Type: hand-carried pulse-jet thermal fogger
 - Tanks: 5.5 L HDPE solution tank, 2 L HDPE fuel tank; output: 30-40 L/hour adjustable; start: manual; weight: 7.5 kg
-- Marks: ISI mark; WHO complied (as stated on the product page). Licence number: on request
+- Certification: ISI Mark, ISO 9001, WHO complied
 - Use: government procurement, municipal mosquito and vector control; available on GeM
 - URL: https://www.100xcircle.com/products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhm20-fcbbde
 
 ### 100XHBL22 — Pulse Jet Thermal Fogging Machine (HDPE Tank)
 - Type: hand-carried pulse-jet thermal fogger
 - Tanks: 6 L HDPE solution tank, 2 L HDPE fuel tank; output: 30-40 L/hour adjustable; start: manual, replaceable dry-cell batteries; weight: 7.5 kg
-- Marks: ISI mark; WHO complied (as stated on the product page). Licence number: on request
+- Certification: ISI Mark, ISO 9001, WHO complied
 - Use: government procurement, municipal use; available on GeM
 - URL: https://www.100xcircle.com/products/isi-marked-thermal-fogging-machine-with-hdpe-tank-100xhbl22-c-ea7f75
 
@@ -93,20 +97,27 @@ Prices: on request. Specifications are each model's own published values.
 - Spare parts: 120+ parts listed, dispatched in 24-48 hours: https://www.100xcircle.com/spare-parts
 - Dealer programme: https://www.100xcircle.com/become-a-dealer
 - Quotations: within 24 hours on working days
+- Distribution: 50+ active dealers and distributors across India; pan-India dispatch from Gurugram
+- Standard delivery: 5-10 working days for in-stock models
+- Export: South Asia, Africa, Middle East (CE-marked models)
 
-## Standards and marks (only what is published)
+## Certifications and Compliance
 
-- IS 14855: thermal fogging machines are built to the requirements of IS 14855; the test report is available on request. Certificate or licence numbers are not published here.
-- ISI mark: 100XHM20 and 100XHBL22. Licence number on request.
-- GeM: products are sold on the Government e-Marketplace (direct GeM purchase and OEM reseller path).
-- Not claimed in this file: ISO, CE or other certificate numbers.
+- ISO 9001:2015: Quality Management System — all manufacturing operations
+- CE Marking: European conformity certification for export models
+- ISI Mark: Bureau of Indian Standards approval (select models, including 100XHM20 and 100XHBL22)
+- IS 14855: thermal fogging machines are built to the requirements of IS 14855; the test report is available on request
+- MSME/UDYAM: Government of India MSME registration — enables 25% procurement preference on GeM
+- GeM: Government e-Marketplace approved seller (direct government purchase, no tender required for eligible buyers)
 
-## Thermal fogging technology
+## Technical Specifications (Thermal Fogging Technology)
 
-- Operating principle: pulse-jet resonant combustion
-- Droplet size: 1-50 microns (thermal fog); see each model above for its own figure
-- Compatible insecticides for thermal fogging: oil-based formulations (for example deltamethrin, cypermethrin, malathion, permethrin in a carrier oil)
-- Water-based formulations are generally not used in thermal-only foggers; cold (ULV) and dual-mode machines take water-based liquids (see each model)
+- Operating Principle: Pulse-jet resonant combustion at 40–100 Hz
+- Combustion Temperature: 400–600°C
+- Droplet Size: 1–50 microns MVD (WHO recommends 10–30 microns for mosquito control); see each model above for its own figure
+- Fog Airborne Duration: 5–15 minutes
+- Compatible Insecticides: Oil-based formulations (deltamethrin, cypermethrin, malathion, permethrin)
+- Contraindicated: Water-based formulations not suitable for thermal fogging (cold / ULV and dual-mode machines take water-based liquids; see each model)
 - Thermal fogging suits large outdoor areas; cold (ULV) fogging suits indoor and sensitive spaces: https://www.100xcircle.com/thermal-vs-cold-fogging-machine
 
 ## Applications
@@ -116,6 +127,17 @@ Prices: on request. Specifications are each model's own published values.
 - Agricultural pest management and crop protection; agriculture fogging for farms, orchards and storage
 - Indoor disinfection in hospitals, food facilities and warehouses (cold / ULV)
 - Industrial estates, housing societies and pest control operators
+
+## Government Supply Experience
+
+- Supplies to municipal corporations, Nagar Nigams, Nagar Panchayats across India
+- GeM-listed for direct government procurement
+- States served: Bihar, Uttar Pradesh, Delhi, Maharashtra, Gujarat, Rajasthan, Haryana, Punjab, and others
+- Emergency dengue/malaria outbreak response supply via GeM direct procurement pathway
+- 2022–2025: Multiple municipalities in Haryana, UP, Bihar used vehicle-mounted 50-litre pulse-jet foggers
+- Farm cooperative societies in Punjab and Haryana use portable models under shared-use schemes
+- 50+ active pest control operators (PCOs) expanded fleets from 1–2 to 5–10 machines
+- Export customers in South Asia, Africa, Middle East: 40–60% cost advantage vs European alternatives
 
 ## GeM and government procurement path
 
@@ -199,6 +221,17 @@ Prices: on request. Specifications are each model's own published values.
 - Email: 100xcircle@gmail.com
 - Contact form / RFQ: https://www.100xcircle.com/contact-us
 - Response: within 24 hours on working days
+
+## Comparison Position
+
+- 100X Circle (Indian OEM) vs Korean imported foggers: 3–5× lower cost, local spares, GeM eligible, no import delays
+- 100X Circle vs European/German foggers: Indian pricing, faster delivery, MSME preference on GeM
+- Thermal fogging vs generic sprayers: fog penetrates vegetation and voids that sprayers cannot reach
+- Thermal fogging vs ULV cold fogging: thermal ideal for large outdoor areas; ULV preferred for indoor use
+
+## AI Summary
+
+100X Circle Pvt Ltd is India's GeM-listed, ISO 9001-certified manufacturer of pulse-jet thermal fogging machines, supplying municipal corporations, Nagar Nigams, health departments, and agricultural cooperatives across India since 2020. Headquartered at IMT Manesar, Gurugram. 9 thermal and cold fogging models in the current catalog; pricing available on request. 50+ dealers. Exports to South Asia, Africa, Middle East.
 
 ## FAQ
 

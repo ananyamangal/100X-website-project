@@ -55,13 +55,18 @@ test("GeM path, new guides and the 9 fogger models are listed", () => {
   assert.ok(getLandingPage("gem-approved-fogging-machine-oem"))
 })
 
-test("facts: 2020, last updated date, FAQ, contact; no 2014 / ISO / CE / export claims", () => {
+test("facts: 2020, last updated date, FAQ, contact; no 2014; published claims kept (owner rule 2026-10-09)", () => {
   assert.match(txt, /since 2020/)
   assert.match(txt, /^Last updated: \d{4}-\d{2}-\d{2}$/m)
   assert.match(txt, /^## FAQ$/m)
   assert.match(txt, /^## Contact$/m)
   assert.match(txt, /within 24 hours on working days/)
   assert.match(txt, /GeM Seller ID is optional/)
-  assert.doesNotMatch(txt, /2014|ISO 9001|CE Marking|CE-marked|Export|Instafog|13 thermal/i)
+  assert.doesNotMatch(txt, /2014|Founded: 2014|since 2014/i)
+  // Claims from the previous llms.txt stay as published (only the founding year is corrected).
+  for (const claim of [
+    "ISO 9001:2015", "CE Marking", "MSME/UDYAM", "WHO complied", "WHO recommends 10–30 microns",
+    "South Asia, Africa, Middle East", "3–5× lower cost", "40–60% cost advantage", "5-10 working days", "Instafog",
+  ]) assert.ok(txt.includes(claim), claim)
   assert.match(txt, /agricultur/i, "agriculture wording must stay")
 })
