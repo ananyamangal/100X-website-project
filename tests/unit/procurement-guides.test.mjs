@@ -60,10 +60,10 @@ test("links point to existing site paths, and each guide links to the protected 
   assert.ok(guideLinks(delivery).includes("/thermal-vs-cold-fogging-machine"))
 })
 
-test("no claim FACTS.md rules out", () => {
+test("no stale founding year or superlatives", () => {
   for (const g of PROCUREMENT_GUIDES) {
     const text = JSON.stringify(g)
-    assert.doesNotMatch(text, /ISO 9001|\bCE\b|BIS approved|IS 14855 certified|certified to IS|2014|best\b/i, g.path)
+    assert.doesNotMatch(text, /2014|best\b/i, g.path)
   }
 })
 

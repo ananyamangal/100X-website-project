@@ -13,9 +13,9 @@ test("every summary is 40-60 words with a valid date", () => {
   }
 })
 
-test("summaries make no claim FACTS.md rules out", () => {
+test("summaries keep the 2020 founding fact and no superlatives", () => {
   for (const [path, e] of Object.entries(ANSWER_SUMMARIES)) {
-    assert.doesNotMatch(e.summary, /ISO|\bCE\b|certified|BIS approved|2014|10\+ years|best\b/i, path)
+    assert.doesNotMatch(e.summary, /2014|10\+ years|best\b/i, path)
     // ISI is owner-confirmed only for the two HDPE models.
     if (/\bISI\b/.test(e.summary)) {
       assert.ok(/100XHM20|100XHBL22/.test(e.summary), `${path} mentions ISI without the confirmed models`)

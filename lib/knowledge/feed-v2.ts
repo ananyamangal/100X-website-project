@@ -11,8 +11,8 @@
  *    the GeM landing page, IS 14855, government procurement, the procurement
  *    guides, and FAQ items (only FAQs that are visible on the linked page).
  *
- * Facts: FACTS.md + product DB specs via lib/seo/answer-summaries.ts. No ISO /
- * CE claims or certificate numbers (OPEN_FACTS 9-12). Pure: no DB, no Next.
+ * Facts: FACTS.md + product DB specs via lib/seo/answer-summaries.ts. Published
+ * site claims may be used (owner rule 2026-10-09). Pure: no DB, no Next.
  */
 import type { KnowledgeArticle } from "./types"
 import { mergeKnowledgeFeed, type FeedItem } from "./feed"

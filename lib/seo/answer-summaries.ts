@@ -7,7 +7,7 @@
  * title, H1 or existing paragraph.
  *
  * Facts: docs/FACTS.md and each product's own database spec (checked
- * 2026-10-09). No ISO / CE / certificate numbers; IS 14855 wording follows
+ * 2026-10-09). Published site claims may be used (owner rule 2026-10-09); IS 14855 wording follows
  * FACTS ("built to the requirements of IS 14855; test report on request");
  * ISI only on the two models the owner confirmed (100XHM20, 100XHBL22).
  *

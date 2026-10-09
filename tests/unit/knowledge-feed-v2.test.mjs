@@ -81,9 +81,9 @@ test("covers all nine fogger models (incl. MCF42, ULV22, ULVSS10), GeM, IS 14855
   }
 })
 
-test("no unprovable certification claims in added items", () => {
+test("no stale founding year in added items", () => {
   const { items } = buildKnowledgeFeedV2([], [], S, "2026-05-29")
-  assert.doesNotMatch(JSON.stringify(items), /ISO 9001|\bCE\b|certificate no|licence no/i)
+  assert.doesNotMatch(JSON.stringify(items), /2014/)
 })
 
 test("last_updated is the newest item date", () => {
