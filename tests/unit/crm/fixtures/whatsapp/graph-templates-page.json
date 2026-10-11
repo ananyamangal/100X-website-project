@@ -1,0 +1,95 @@
+{
+  "data": [
+    {
+      "id": "9001",
+      "name": "fog_quote_followup",
+      "language": "en_US",
+      "status": "APPROVED",
+      "category": "UTILITY",
+      "parameter_format": "POSITIONAL",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "Hello {{1}}, we sent you quotation {{4}} for {{3}} on {{2}}.\nDo you have any questions, or would you like any changes? Reply to this message and our team will help.\n– 100X Circle"
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "QUICK_REPLY",
+              "text": "Need changes"
+            },
+            {
+              "type": "QUICK_REPLY",
+              "text": "Will confirm soon"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9002",
+      "name": "fog_product_offer",
+      "language": "hi",
+      "status": "PAUSED",
+      "category": "MARKETING",
+      "parameter_format": "POSITIONAL",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "नमस्ते {{1}}, {{2}} अब ₹{{3}} में उपलब्ध है।"
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "QUICK_REPLY",
+              "text": "कोटेशन चाहिए"
+            },
+            {
+              "type": "QUICK_REPLY",
+              "text": "प्रमोशन बंद करें"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9003",
+      "name": "fog_quote_document",
+      "language": "en_US",
+      "status": "APPROVED",
+      "category": "UTILITY",
+      "parameter_format": "POSITIONAL",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "DOCUMENT"
+        },
+        {
+          "type": "BODY",
+          "text": "Hello {{1}}, please find attached quotation {{2}} for {{3}}. Total amount: ₹{{4}} (incl. GST). Valid until {{5}}."
+        }
+      ]
+    },
+    {
+      "id": "9004",
+      "name": "fog_service_reminder",
+      "language": "en_US",
+      "status": "PENDING",
+      "category": "UTILITY",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "Hello {{1}}, your {{2}} was last serviced on {{3}}."
+        }
+      ]
+    }
+  ],
+  "paging": {
+    "cursors": {
+      "before": "QVFI",
+      "after": "QVFIend"
+    }
+  }
+}

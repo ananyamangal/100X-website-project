@@ -1,0 +1,14 @@
+{
+  "messaging_product": "whatsapp",
+  "contacts": [
+    {
+      "input": "919800000001",
+      "wa_id": "919800000001"
+    }
+  ],
+  "messages": [
+    {
+      "id": "wamid.TEST_SENT_0001"
+    }
+  ]
+}

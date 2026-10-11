@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse, after } from "next/server"
 import { sendAdminEmail, isEmailConfigured } from "@/lib/email"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { buildLeadEmail, leadSubject } from "@/lib/lead-email"
 import { sanitizeAttribution } from "@/lib/attribution-sanitize"
 import { decoyId, isHoneypotFilled, logHoneypotDiscard, withoutHoneypot } from "@/lib/honeypot"
+import { ingestWebsiteSubmissionSafely } from "@/lib/crm/website"
 
 interface RFQBody {
   product: string;
@@ -74,6 +75,12 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     dbStatus = "failed"
     console.error("[api/rfq-submit] DB save failed:", err instanceof Error ? err.message.split("\n")[0] : String(err))
+  }
+
+  // CRM lead (lib/crm/website.ts): saved rows only; runs after the response, never throws, never changes it.
+  if (dbStatus === "saved" && dbId) {
+    const savedId = dbId
+    after(() => ingestWebsiteSubmissionSafely({ ...record, _id: savedId }, request.headers.get("x-vercel-id")))
   }
 
   // E-mail built from every submitted field (graceful if not configured or failing).

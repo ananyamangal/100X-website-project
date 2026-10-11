@@ -1,0 +1,12 @@
+{
+  "error": {
+    "message": "(#130429) Rate limit hit",
+    "type": "OAuthException",
+    "code": 130429,
+    "error_data": {
+      "messaging_product": "whatsapp",
+      "details": "Cloud API message throughput has been reached."
+    },
+    "fbtrace_id": "ATraceSend130429"
+  }
+}

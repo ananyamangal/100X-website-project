@@ -152,6 +152,34 @@ export const PERMISSION_REGISTRY: PermDef[] = [
   { key: "leads.edit",           label: "Edit Leads",            description: "Update lead status and notes",                      group: "Dealer & CRM", subgroup: "Leads",    module: "leads",   action: "edit",   sortOrder: 5102 },
   { key: "leads.export",         label: "Export Leads",          description: "Export lead data to CSV",                           group: "Dealer & CRM", subgroup: "Leads",    module: "leads",   action: "export", sortOrder: 5103 },
 
+  // ── FOGGING CRM + WHATSAPP INBOX (crm.*) ──────────────────────────────────
+  // Keys + role mapping: docs/crm/DATA_MODEL.md §8 and CRM_PERMISSIONS in lib/crm/model.ts (the two
+  // lists must stay identical). Live rows in rbac_role_permissions govern; the dry-run-first script
+  // scripts/crm/grant-crm-permissions.mjs proposes the row diff.
+  { key: "crm.view", label: "CRM — Open", description: "Open the fogging CRM (lead list, contact pages, dealer directory)", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "view", sortOrder: 5200 },
+  { key: "crm.leads.view_all", label: "CRM — All Leads", description: "See every CRM lead regardless of assignee", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "view", sortOrder: 5201 },
+  { key: "crm.leads.view_assigned", label: "CRM — Assigned Leads", description: "See only CRM leads assigned to this user", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "view", sortOrder: 5202 },
+  { key: "crm.leads.create", label: "CRM — Add Lead", description: "Log a call / add a lead manually", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "create", sortOrder: 5203 },
+  { key: "crm.leads.edit", label: "CRM — Edit Lead", description: "Edit lead fields (follow-up date, product, customer type)", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "edit", sortOrder: 5204 },
+  { key: "crm.leads.assign", label: "CRM — Assign Leads", description: "Assign or re-assign leads to team members", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "edit", sortOrder: 5205 },
+  { key: "crm.leads.close", label: "CRM — Close Deals", description: "Move deals to Closed-Won / Closed-Lost", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "edit", sortOrder: 5206 },
+  { key: "crm.leads.export", label: "CRM — Export Leads", description: "Export the CRM lead list to CSV (no notes, no attribution)", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "export", critical: true, sortOrder: 5207 },
+  { key: "crm.leads.merge", label: "CRM — Merge Contacts", description: "Merge two contacts (re-points deals, messages, notes)", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "edit", critical: true, sortOrder: 5208 },
+  { key: "crm.inbox.view", label: "CRM — View Inbox", description: "Read WhatsApp conversations", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "view", sortOrder: 5209 },
+  { key: "crm.inbox.reply", label: "CRM — Reply on WhatsApp", description: "Send WhatsApp replies and templates to customers", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "create", sortOrder: 5210 },
+  { key: "crm.notes.view", label: "CRM — View Internal Notes", description: "Read private team notes on a contact", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "view", sortOrder: 5211 },
+  { key: "crm.notes.create", label: "CRM — Add Internal Notes", description: "Write private team notes (never sent to customers)", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "create", sortOrder: 5212 },
+  { key: "crm.quotes.create", label: "CRM — Create Quotations", description: "Draft and issue quotations", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "create", sortOrder: 5213 },
+  { key: "crm.quotes.send", label: "CRM — Send Quotations", description: "Send quotation PDFs on WhatsApp / e-mail", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "create", sortOrder: 5214 },
+  { key: "crm.tasks.manage", label: "CRM — Manage Tasks", description: "Create, complete and reassign follow-up tasks", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "edit", sortOrder: 5215 },
+  { key: "crm.broadcasts.view", label: "CRM — View Broadcasts", description: "See WhatsApp broadcast campaigns and their results", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "view", sortOrder: 5216 },
+  { key: "crm.broadcasts.send", label: "CRM — Send Broadcasts", description: "Create and send WhatsApp broadcast campaigns", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "run", critical: true, sortOrder: 5217 },
+  { key: "crm.import.run", label: "CRM — Import CSV", description: "Import the dealer directory (preview + confirm)", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "import", sortOrder: 5218 },
+  { key: "crm.reports.view", label: "CRM — Reports", description: "View CRM funnel and source reports", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "view", sortOrder: 5219 },
+  { key: "crm.settings.edit", label: "CRM — Settings", description: "Reminder rules, template sync, numbers, business hours, tier cap", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "edit", critical: true, sortOrder: 5220 },
+  { key: "crm.audit.view", label: "CRM — Audit Log", description: "Read the CRM audit log", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "view", critical: true, sortOrder: 5221 },
+  { key: "crm.growth.export", label: "CRM — Growth Exports", description: "Offline-conversion and Customer Match CSVs; ad attribution (sales-invisible)", group: "Dealer & CRM", subgroup: "CRM", module: "crm", action: "export", critical: true, sortOrder: 5222 },
+
   // ── DATA ACCESS LEVELS ────────────────────────────────────────────────────
   { key: "data.export_unlimited",label: "Unlimited Export",      description: "No row limit on exports",                           group: "Data Access", module: "data", action: "export", sortOrder: 6000 },
   { key: "data.export_limited",  label: "Limited Export",        description: "Export up to 1,000 rows",                           group: "Data Access", module: "data", action: "export", sortOrder: 6001 },
@@ -321,6 +349,8 @@ export const MODULE_PERMISSIONS: Record<string, string> = {
   "/admin/growth/permissions":         "permissions.view",
   // CRM
   "/admin/growth/contact-this-week":   "dealer.view",
+  // Fogging CRM: every /admin/crm page needs crm.view; finer gates are per API route.
+  "/admin/crm":                        "crm.view",
   // Advanced Tools (all previously hidden, now surfaced)
   "/admin/growth/market-intelligence": "dashboard.view",
   "/admin/growth/launch":              "dashboard.view",

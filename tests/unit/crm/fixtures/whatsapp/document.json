@@ -1,0 +1,43 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "200000000000001",
+      "changes": [
+        {
+          "field": "messages",
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "15550000001",
+              "phone_number_id": "100000000000001"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Test Customer One"
+                },
+                "wa_id": "919800000001"
+              }
+            ],
+            "messages": [
+              {
+                "from": "919800000001",
+                "id": "wamid.TEST_DOC_0001",
+                "timestamp": "1760000000",
+                "type": "document",
+                "document": {
+                  "caption": "Tender spec",
+                  "filename": "tender-spec.pdf",
+                  "mime_type": "application/pdf",
+                  "sha256": "dGVzdC1kb2Mtc2hhMjU2",
+                  "id": "900000000000002"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

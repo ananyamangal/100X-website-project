@@ -3,7 +3,7 @@ const DEFAULT_PRESET = "product_uploads"
 
 export async function uploadToCloudinary(
   file: File,
-  resourceType: "image" | "video" = "image",
+  resourceType: "image" | "video" | "raw" = "image",
   preset = DEFAULT_PRESET
 ): Promise<string> {
   const fd = new FormData()

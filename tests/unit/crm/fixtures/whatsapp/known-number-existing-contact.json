@@ -1,0 +1,39 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "200000000000001",
+      "changes": [
+        {
+          "field": "messages",
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "15550000001",
+              "phone_number_id": "100000000000001"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Existing Customer"
+                },
+                "wa_id": "919800000002"
+              }
+            ],
+            "messages": [
+              {
+                "from": "919800000002",
+                "id": "wamid.TEST_KNOWN_0001",
+                "timestamp": "1760000000",
+                "type": "text",
+                "text": {
+                  "body": "Following up on my quotation"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
