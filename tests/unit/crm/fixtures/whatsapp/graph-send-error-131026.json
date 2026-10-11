@@ -1,0 +1,12 @@
+{
+  "error": {
+    "message": "(#131026) Message undeliverable",
+    "type": "OAuthException",
+    "code": 131026,
+    "error_data": {
+      "messaging_product": "whatsapp",
+      "details": "Message undeliverable: recipient +919800000001 cannot be reached https://developers.facebook.com/docs"
+    },
+    "fbtrace_id": "ATraceSend131026"
+  }
+}

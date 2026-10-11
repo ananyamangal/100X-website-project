@@ -35,7 +35,13 @@ const intlMiddleware = createIntlMiddleware(routing)
 // a confined role (seo_team / content_team) → 403 via canAccessAdminApi's
 // default-deny, every other role → through. No public page calls either
 // family (verified by grep over app/(site), app/[locale], components, lib).
-const PROTECTED_API_PREFIXES = ["/api/admin/", "/api/fogging/", "/api/growth/", "/api/rfq-attachments/"] as const
+const PROTECTED_API_PREFIXES = ["/api/admin/", "/api/fogging/", "/api/growth/", "/api/rfq-attachments/", "/api/crm/"] as const
+
+// CRM routes under /api/crm/ that authenticate themselves instead of by session: the
+// WhatsApp Cloud API webhook (X-Hub-Signature-256 HMAC), /health (Bearer CRON_SECRET) and the
+// queue runner (HMAC chunk signature for its self-continuation, else a CRM session checked in
+// the handler). Exact paths only; every other /api/crm/* route needs a session like /api/admin/*.
+const CRM_SELF_AUTH_API_PATHS: ReadonlySet<string> = new Set(["/api/crm/whatsapp/webhook", "/api/crm/health", "/api/crm/queue/run"])
 
 // Lead data and admin-only writes outside those families, gated the same way:
 //  - /api/rfq-attachments/<id> (prefix above): customers' RFQ uploads, streamed from
@@ -245,6 +251,9 @@ async function handleMiddleware(request: NextRequest, event: NextFetchEvent) {
 
     return NextResponse.next({ request: { headers: cloned } })
   }
+
+  // CRM webhook + health: signature / bearer are checked inside the route handlers.
+  if (CRM_SELF_AUTH_API_PATHS.has(pathname)) return NextResponse.next()
 
   // ── Protect admin, fogging and growth API routes ─────────────────────────────
   if (
@@ -514,6 +523,7 @@ export const config = {
     // catch-all at the bottom excludes /api, so these must be listed explicitly.
     "/api/fogging/:path*",
     "/api/growth/:path*",
+    "/api/crm/:path*", // CRM APIs (session); webhook + health exempt via CRM_SELF_AUTH_API_PATHS
     // Lead data + legacy upload (PROTECTED_API_PATHS / isProtectedLeadRead above).
     "/api/rfq-attachments/:path*",
     "/api/brochure-leads",

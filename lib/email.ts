@@ -108,3 +108,39 @@ export async function sendAdminEmail(args: {
     return { ok: false, reason: "send_failed", error }
   }
 }
+
+/**
+ * Email to a customer with attachments (CRM quotation PDFs). Same Gmail transport as
+ * sendAdminEmail; the sender shows as "100X Circle". Never logs the recipient or the body.
+ */
+export async function sendCustomerEmail(args: {
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
+  replyTo?: string;
+  attachments?: { filename: string; content: Buffer; contentType: string }[];
+}): Promise<SendResult> {
+  const transporter = getTransporter()
+  if (!transporter) {
+    console.error(`[email] not configured — missing env var(s): ${missingEnv().join(", ")}. Customer email was NOT sent.`)
+    return { ok: false, reason: "not_configured" }
+  }
+  const from = process.env.EMAIL_USER!
+  try {
+    const info = await transporter.sendMail({
+      from: `100X Circle <${from}>`,
+      to: [args.to],
+      subject: args.subject,
+      text: args.text,
+      html: args.html,
+      replyTo: args.replyTo,
+      attachments: args.attachments,
+    })
+    return { ok: true, messageId: info.messageId }
+  } catch (err) {
+    const error = describeError(err)
+    console.error(`[email] customer send failed: ${error}`)
+    return { ok: false, reason: "send_failed", error }
+  }
+}

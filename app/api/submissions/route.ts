@@ -5,6 +5,7 @@ import { sendAdminEmail, isEmailConfigured } from '@/lib/email';
 import { buildLeadEmail, leadSubject } from '@/lib/lead-email';
 import { sanitizeAttribution } from '@/lib/attribution-sanitize';
 import { decoyId, isHoneypotFilled, logHoneypotDiscard, withoutHoneypot } from '@/lib/honeypot';
+import { ingestWebsiteSubmissionSafely } from '@/lib/crm/website';
 
 // This route is shared by several different forms (OEM partner apply, quote
 // modal, dealer program, contact section, landing pages) with different field
@@ -68,6 +69,9 @@ export async function POST(request: NextRequest) {
         console.error(`[api/submissions] admin e-mail failed for submission ${id}:`, err instanceof Error ? err.message.split('\n')[0] : String(err));
       }
     });
+
+    // CRM lead (lib/crm/website.ts): after the response, never throws, never changes it.
+    after(() => ingestWebsiteSubmissionSafely({ ...submission, _id: result.insertedId }, request.headers.get('x-vercel-id')));
 
     return NextResponse.json({ ...submission, _id: result.insertedId }, { status: 201 });
   } catch (error) {

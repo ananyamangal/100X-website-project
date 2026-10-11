@@ -228,6 +228,7 @@ function AdminDashboardContent() {
   }
 
   const canSeeGrowthOS = roleLoaded && (!restricted || canSeeGrowthOSPerm(userPermissions, userRole))
+  const canSeeCrm = roleLoaded && (!restricted || userPermissions.includes("crm.view"))
   const showLandingPages = roleLoaded && (!restricted || canSeeLandingPagesPerm(userPermissions, userRole))
 
   function canSeeTab(tab: string): boolean {
@@ -1612,6 +1613,16 @@ function AdminDashboardContent() {
                     Catalog Audit
                   </a>
                   )}
+                </div>
+              )}
+              {canSeeCrm && (
+                <div className="pt-2 mt-2 border-t border-gray-200">
+                  <a
+                    href="/admin/crm"
+                    className="w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-gray-700 hover:bg-gray-100 font-semibold"
+                  >
+                    Sales CRM
+                  </a>
                 </div>
               )}
               {canSeeGrowthOS && (

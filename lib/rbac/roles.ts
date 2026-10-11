@@ -8,6 +8,16 @@ import type { RoleSlug, DBRole } from "./types"
 
 const P = PERMISSIONS
 
+// Fogging CRM "Sales" set (DATA_MODEL §8 / CRM_ROLE_MAPPING.sales in lib/crm/model.ts) minus the
+// lead-visibility key: sales_manager adds crm.leads.view_all, sales_executive crm.leads.view_assigned.
+// The `operations` role slug is NOT created (pending owner approval, DATA_MODEL §8).
+// Code fallback only: live rbac_role_permissions rows govern (scripts/crm/grant-crm-permissions.mjs).
+export const CRM_SALES_PERMISSIONS: readonly Permission[] = [
+  "crm.view", "crm.leads.create", "crm.leads.edit", "crm.leads.close",
+  "crm.inbox.view", "crm.inbox.reply", "crm.notes.view", "crm.notes.create",
+  "crm.quotes.create", "crm.quotes.send", "crm.tasks.manage", "crm.reports.view",
+]
+
 export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
 
   super_admin: [
@@ -64,6 +74,11 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     "permissions.view", "permissions.edit",
     "system.settings", "billing.view",
     "api_keys.view", "api_keys.edit",
+    // Fogging CRM: the owner holds every crm.* key (DATA_MODEL §8).
+    ...CRM_SALES_PERMISSIONS, "crm.leads.view_all", "crm.leads.view_assigned",
+    "crm.leads.assign", "crm.leads.export", "crm.leads.merge",
+    "crm.broadcasts.view", "crm.broadcasts.send", "crm.import.run",
+    "crm.settings.edit", "crm.audit.view", "crm.growth.export",
   ],
 
   growth_admin: [
@@ -131,6 +146,8 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     "dealers.view_all", "dealers.edit", "dealers.export",
     "leads.view_all", "leads.edit", "leads.export",
     "data.all_leads", "data.export_unlimited",
+    // Fogging CRM: the Sales set + every lead (DATA_MODEL §8, "sales_manager (view_all)").
+    ...CRM_SALES_PERMISSIONS, "crm.leads.view_all",
   ],
 
   sales_executive: [
@@ -139,6 +156,8 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     "dealers.view_assigned",
     "leads.view_assigned", "leads.edit",
     "logs.view",
+    // Fogging CRM: the Sales set, assigned leads only.
+    ...CRM_SALES_PERMISSIONS, "crm.leads.view_assigned",
   ],
 
   procurement_analyst: [

@@ -1,0 +1,9 @@
+// Segment audience preview (STEP 9). Logic: lib/crm/api/broadcasts.ts.
+import { defaultCrmApiDeps, type RouteCtx } from "@/lib/crm/api/route"
+import { previewSegmentHandler } from "@/lib/crm/api/broadcasts"
+
+export const dynamic = "force-dynamic"
+export const runtime = "nodejs"
+
+const NO_PARAMS: RouteCtx = { params: Promise.resolve({}) }
+export const POST = (request: Request) => previewSegmentHandler(request, NO_PARAMS, defaultCrmApiDeps)
